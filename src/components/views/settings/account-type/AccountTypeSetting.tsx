@@ -19,7 +19,7 @@ import ToggleButton from "../../../ui/ToggleButton";
 const AccountTypeSetting: React.FC = () => {
   const {
     userHasAccessToAddCompanyAccountType,
-    userHasAccessToUpdateCompanyAccountType,
+    userHasAccessToUpdateCompanyAccountType,    
   } = useUserAccessModules();
   const { loginStatus } = useLoggedInUserContext();
   const [accountType, setAccountType] = useState<AccountType[]>([]);
@@ -169,8 +169,11 @@ const AccountTypeSetting: React.FC = () => {
 
   //Component render first time call
   useEffect(() => {
-    getAccountType();
-    getComapnyAccountType();
+    
+
+      getAccountType();
+      getComapnyAccountType();
+  
   }, []);
 
   //  track which parent types are expanded
@@ -207,8 +210,8 @@ const AccountTypeSetting: React.FC = () => {
     <div className="min-h-screen bg-gray-50 rounded-md">
       <div className="max-w-6xl mx-auto p-1">
         <div className="flex justify-between">
-          <h1 className="table-header-custom my-3">
-            Company Account Type Management
+          <h1 className="section-header-custom my-3">
+            Company Account Type 
           </h1>
           {!showAddForm && (
             <div>

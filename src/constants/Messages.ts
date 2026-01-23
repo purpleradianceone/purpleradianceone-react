@@ -176,6 +176,22 @@ const MESSAGE = {
             DENIED_ADD_ACCESS: "You do not have permission to assign team to product.",
             DENIED_UPDATE_ACCESS: "You do not have permission to update product team.",
         },SETTING: {
+
+            ACCOUNT_SETTING: {
+                DENIED_VIEW_ACCESS: "You do not have permission to view account type setting.",
+                DENIED_ADD_ACCESS: "You do not have permission to create account type setting.",
+                DENIED_UPDATE_ACCESS: "You do not have permission to update account type setting .",
+            },
+            LEAD_SETTING: {
+                DENIED_VIEW_ACCESS: "You do not have permission to view lead setting.",
+                DENIED_ADD_ACCESS: "You do not have permission to create lead setting.",
+                DENIED_UPDATE_ACCESS: "You do not have permission to update lead setting .",
+            },
+            MEETING_SETTING: {
+                DENIED_VIEW_ACCESS: "You do not have permission to view meeting setting.",
+                DENIED_ADD_ACCESS: "You do not have permission to create meeting setting.",
+                DENIED_UPDATE_ACCESS: "You do not have permission to update meeting setting .",
+            },
             EMAIL_TYPE_SETTING: {
                 DENIED_VIEW_ACCESS: "You do not have permission to view email type setting.",
                 DENIED_ADD_ACCESS: "You do not have permission to create email type setting.",
@@ -205,6 +221,10 @@ const MESSAGE = {
                 DENIED_VIEW_ACCESS: "You do not have permission to view company warehouse setting.",
                 DENIED_ADD_ACCESS: "You do not have permission to create company warehouse setting.",
                 DENIED_UPDATE_ACCESS: "You do not have permission to update company warehouse setting .",
+            },GENERAL_USER_SETTING: {
+                DENIED_VIEW_ACCESS: "You do not have permission to view general setting.",
+                DENIED_ADD_ACCESS: "You do not have permission to create general setting.",
+                DENIED_UPDATE_ACCESS: "You do not have permission to update general setting .",
             },
         }
 

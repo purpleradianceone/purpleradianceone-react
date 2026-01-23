@@ -80,5 +80,13 @@ const ROUTES_URL = {
     SUPPORT_TICKET_MANAGEMENT : "/home/manage-support-ticket/support-tickets",
     SUPPORT_TICKET_DETAILS : "/home/manage-support-ticket/support-tickets/support-ticket/details",
 
+    SETTING_EMAIL : "email",
+    SETTING_MEETINGS : "meetings",
+    SETTING_ACCOUNT_TYPE : "account-type",
+    SETTING_NOTIFICATIONS : "notification",
+    SETTING_GENERAL : "general",
+    SETTING_SUPPORT_TICKET_CATEGORY : "support-ticket-category",
+    SETTING_COMPANY_WAREHOUSE : "company-warehouse"
+
 }
 export default ROUTES_URL;

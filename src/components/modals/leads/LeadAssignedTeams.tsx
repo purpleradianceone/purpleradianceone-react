@@ -33,7 +33,7 @@ const LeadAssignedTeams = ({
 }: LeadAssignedTeamsProps) => {
   // context
   const { loginStatus } = useLoggedInUserContext();
-  const { userHasAccessToUpdateLeadTeams,userHasAccessToAddLeadTeams , userHasAccessToViewLeadTeams} = useUserAccessModules();
+  const { userHasAccessToUpdateLeadTeams,userHasAccessToAddLeadTeams , userHasAccessToViewLeadTeams , userHasAccessToViewTeamUsers} = useUserAccessModules();
   //States
   const [leadCompanyTeam, setLeadCompnayTeam] = useState<LeadCompanyTeam[]>([]);
   const [openCreateLeadCompanyTeam, setOpenCreateLeadCompanyTeam] =
@@ -47,7 +47,7 @@ const LeadAssignedTeams = ({
 
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isLoadingCompanyTeamCompanyUser, setIsLoadingCompanyTeamCompanyUser] =
-    useState<boolean>(true);
+    useState<boolean>(false);
 
   //   Note : Get Lead assigned company team
   const getLeadAssignedCompanyteam = async () => {
@@ -112,6 +112,11 @@ const LeadAssignedTeams = ({
 
   // Note : Get Company team company User
   const getComapnyTeamUsers = async (companyTeam: any) => {
+    if(!userHasAccessToViewTeamUsers){
+      return;
+    } 
+
+    setIsLoadingCompanyTeamCompanyUser(true)
     const postDataToGetCompanyTeamUsers = {
       company_id: loginStatus.companyId,
       company_team_id: companyTeam.companyTeamId,
@@ -226,8 +231,42 @@ const LeadAssignedTeams = ({
       </>
     );
 
-  if(userHasAccessToViewLeadTeams && leadCompanyTeam && leadCompanyTeam.length ===0){
-    return(
+//   if(userHasAccessToViewLeadTeams && leadCompanyTeam && leadCompanyTeam.length ===0){
+//     return(
+// <div className=" w-full h-full bg-slate-0">
+//           <div className="flex gap-1 w-full text-xs h-full bg-green-0 items-center justify-center">
+//             <Button
+//               disabled={!userHasAccessToAddLeadTeams}
+//               onClick={() => {
+//                 if (userHasAccessToAddLeadTeams) {
+//                   setOpenCreateLeadCompanyTeam(true);
+//                 } else {
+//                   // showMessageSnackbar({
+//                   //   message:
+//                   //     MESSAGE.MODULE_ACCESS.LEAD_MODULE
+//                   //       .UPDATE_LEAD_ACCESS_DENIED_message,
+//                   //   type: "error",
+//                   // });
+//                   toast.error(
+//                     MESSAGE.MODULE_ACCESS.LEAD_TEAMS.DENIED_ADD_ACCESS
+//                   );
+//                 }
+//               }}
+//               className={COLORS.ADD_BUTTON}
+//             >
+//               +Add
+//             </Button>
+//             <span className="caption-custom italic">
+//               Company Team is Not assigned to lead.
+//             </span>
+//           </div>
+//         </div>
+//     )
+//   }
+  return (
+    <>
+    {
+     ( userHasAccessToViewLeadTeams && leadCompanyTeam && leadCompanyTeam.length ===0) && (
 <div className=" w-full h-full bg-slate-0">
           <div className="flex gap-1 w-full text-xs h-full bg-green-0 items-center justify-center">
             <Button
@@ -256,10 +295,8 @@ const LeadAssignedTeams = ({
             </span>
           </div>
         </div>
-    )
-  }
-  return (
-    <>
+      )
+    }
       {/* NOTE : if there is no any team  */}
       {leadCompanyTeam && leadCompanyTeam.length > 0 && (
         
@@ -293,7 +330,7 @@ const LeadAssignedTeams = ({
                   onClick={() => {
                     setSelectedCompanyTeamCard(companyTeam);
                     getComapnyTeamUsers(companyTeam);
-                    setIsLoadingCompanyTeamCompanyUser(true);
+                    // setIsLoadingCompanyTeamCompanyUser(true);
                   }}
                   className={COLORS.CONTACT_CARD}
                 >
@@ -361,19 +398,10 @@ const LeadAssignedTeams = ({
       )}
       {/* view in pop up card  */}
           {selectedCompanyTeamCard && createPortal(
-            <div className="fixed inset-0 bg-opacity-5 bg-black flex justify-center items-center z-20 p-4">
-              {/* Overlay */}
-              {/* <div
-                className="fixed inset-0 bg-black bg-opacity-5 "
-                onClick={() => {
-                  setSelectedCompanyTeamCard(null);
-                  setCompanyTeamCompanyUser([]);
-                  setIsLoadingCompanyTeamCompanyUser(false);
-                }}
-              ></div> */}
+            <div className="fixed inset-0 bg-opacity-5 bg-black flex justify-center items-center z-20 p-1">
 
               {/* Modal */}
-              <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden z-10 animate-[fadeInScale_0.3s_ease]">
+              <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-hidden z-10 animate-[fadeInScale_0.3s_ease]">
                 {/* Close button */}
                 <button
                   onClick={() => {
@@ -442,46 +470,14 @@ const LeadAssignedTeams = ({
                     <div className="flex flex-col items-end gap-1 lg:min-w-[200px]">
                       {/* Status Badge */}
                       <div className="flex items-center gap-3">
-                        {/* <span
-                          className={`px-2 py-1 rounded-full text-xs font-semibold shadow-sm
-                        ${
-                          isActive
-                            ? "bg-green-100 input-label-custom-active border border-green-200"
-                            : "bg-red-100 input-label-custom-inactive border border-red-200"
-                        }`}
-                        >
-                          <span
-                            className={`inline-block w-2 h-2 rounded-full mr-2
-                          ${isActive ? "bg-green-600" : "bg-red-600"}`}
-                          ></span>
-                          {isActive ? "Active" : "Inactive"}
-                        </span> */}
-                        <StatusChip
+                        {/* <StatusChip
                         isActive={isActive}
-                        />
+                        /> */}
                       </div>
 
                       {/* Toggle Switch */}
                       <div className="flex items-center gap-3">
                         <span className="input-label-custom">Status:</span>
-                        {/* <label className="relative inline-flex items-center cursor-pointer">
-                          <input
-                            type="checkbox"
-                            checked={isActive}
-                            onChange={() => {
-                              if (userHasAccessToUpdateLead) {
-                                updateLeadCompanyTeam(selectedCompanyTeamCard);
-                              } else {
-                                toast.error(
-                                  MESSAGE.MODULE_ACCESS.LEAD_MODULE
-                                    .UPDATE_LEAD_ACCESS_DENIED_message
-                                );
-                              }
-                            }}
-                            className="sr-only peer"
-                          />
-                          <div className="w-12 h-6 bg-gray-300 rounded-full peer peer-checked:bg-green-500 peer-focus:ring-2 peer-focus:ring-green-300 transition-all duration-300 after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all after:duration-300 peer-checked:after:translate-x-6 shadow-inner"></div>
-                        </label> */}
                         <ToggleButton
                         checked={isActive}
                         name="isActive"
@@ -506,7 +502,7 @@ const LeadAssignedTeams = ({
                   <div>
                     <h3 className="table-header-custom mb-1 flex items-center gap-2">
                       Team Members
-                      <span className="bg-gray-100 input-label-custom px-2 py-1 rounded-full">
+                      <span className={`${userHasAccessToViewTeamUsers ? "" :"hidden "}bg-gray-100 input-label-custom px-2 py-1 rounded-full`}>
                         {Array.isArray(companyTeamCompanyUsers)
                           ? companyTeamCompanyUsers.length
                           : 0}
@@ -519,7 +515,7 @@ const LeadAssignedTeams = ({
                         <div className="flex justify-center items-center py-12">
                           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
                         </div>
-                      ) : Array.isArray(companyTeamCompanyUsers) &&
+                      ) : userHasAccessToViewTeamUsers && Array.isArray(companyTeamCompanyUsers) &&
                         companyTeamCompanyUsers.length > 0 ? (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           {companyTeamCompanyUsers.map((userData, index) => (
@@ -548,9 +544,7 @@ const LeadAssignedTeams = ({
                                 </div>
 
                                 {/* Status Indicator */}
-                                <div
-                                  
-                                >
+                                <div>
                                   <StatusChip 
                                   isActive={userData.isActive}
                                   />
@@ -559,6 +553,13 @@ const LeadAssignedTeams = ({
                             </div>
                           ))}
                         </div>
+                      ) : !userHasAccessToViewTeamUsers ? (
+                        <>
+                        <AccessDeniedMessagePage
+                        message={MESSAGE.MODULE_ACCESS.TEAM_USERS.DENIED_VIEW_ACCESS}
+                        />
+                        </>
+
                       ) : (
                         <div className="text-center py-2">
                           <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">

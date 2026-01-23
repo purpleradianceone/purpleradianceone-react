@@ -9,7 +9,6 @@ import {
   Plus,
   Save,
   Settings,
-  User2,
   X,
 } from "lucide-react";
 import React, { useCallback, useEffect, useRef, useState } from "react";
@@ -30,7 +29,6 @@ import LeadDetailsData from "../../../@types/lead-management/LeadDetailsData";
 import PostDataLeadUpdate from "../../../@types/lead-management/PostDataLeadUpdate";
 import RefreshToken from "../../../config/validations/RefreshToken";
 import qs from "query-string";
-import GetCompanyUsersForLead from "./company-users-selection-modal/GetCompanyUsersForLead";
 import CompanyUser from "../../../@types/company-users/CompanyUser";
 import LeadOwnerHistory from "./LeadOwnerHistory";
 import AssignProductToLead from "./AssignProductToLead";
@@ -48,8 +46,6 @@ import toast from "react-hot-toast";
 import { useInView } from "react-intersection-observer";
 import { motion } from "framer-motion";
 import Button from "../../ui/Button";
-import FormHeader from "../../ui/FormHeader";
-import { createPortal } from "react-dom";
 import StatusUpdateModal from "./lead-status/StatusUpdateModal";
 import ConvertLeadModal from "./lead-status/ConvertLeadModal";
 
@@ -58,6 +54,8 @@ import axiosClient from "../../../axios-client/AxiosClient";
 import CompanyUserSearchFieldInput from "../../ui/CompanyUserSearchFieldInput";
 import LeadDataProps from "../../../@types/lead-management/LeadProps";
 import { handleApiError } from "../../../config/error/handleApiError";
+import LoadingPopUpAnimation from "../../views/card/LoadingPopUpAnimation";
+import FormLayout from "../../ui/FormLayout";
 
 const ViewLeadManagement = () => {
   const navigate = useNavigate();
@@ -68,7 +66,7 @@ const ViewLeadManagement = () => {
     userHasAccessToViewLeadContacts,
     userHasAccessToViewLeadProduct,
     userHasAccessToUpdateLeadDetails,
-    userHasAccessToViewLeadDetails
+    userHasAccessToViewLeadDetails,
   } = useUserAccessModules();
   const [ref, inView] = useInView({ fallbackInView: true, threshold: 0.1 });
 
@@ -225,56 +223,60 @@ const ViewLeadManagement = () => {
     requestedby: "",
     generate_password: "",
   });
-  const [isLeadOwnerPopUpOpen, setIsLeadOwnerPopUpOpen] =
-    useState<boolean>(false);
-  const [persistedSelectedUserId, setPersistedSelectedUserId] = useState<
-    number | null
-  >(selectedLeadData.companyUserId);
+  // const [isLeadOwnerPopUpOpen, setIsLeadOwnerPopUpOpen] =
+  //   useState<boolean>(false);
+  // const [persistedSelectedUserId, setPersistedSelectedUserId] = useState<
+  //   number | null
+  // >(selectedLeadData.companyUserId);
 
   previouseOwnerRef.current = selectedLeadData.companyUserId;
 
-  const handleSelectedCompanyUserChange = (params: CompanyUser | null) => {
-    if (params) {
-      setPersistedSelectedUserId(params.id);
+  // const handleSelectedCompanyUserChange = (params: CompanyUser | null) => {
+  //   if (params) {
+  //     setPersistedSelectedUserId(params.id);
 
-      setSelectedCompanyUser({
-        company_id: params.company_id,
-        id: params.id,
-        fullname: params.fullname,
-        email: params.email,
-        mobilenumber: params.mobilenumber,
-        createdby: "",
-        isactive: params.isactive,
-        requestedby: "",
-        generate_password: "",
-      });
-    } else {
-      setPersistedSelectedUserId(null);
-      // Reset selectedCompanyUser to its initial state when null is received
-      setSelectedCompanyUser({
-        company_id: 0,
-        id: 0,
-        fullname: "",
-        email: "",
-        mobilenumber: "",
-        createdby: "",
-        isactive: false,
-        requestedby: "",
-        generate_password: "",
-      });
-    }
-  };
+  //     setSelectedCompanyUser({
+  //       company_id: params.company_id,
+  //       id: params.id,
+  //       fullname: params.fullname,
+  //       email: params.email,
+  //       mobilenumber: params.mobilenumber,
+  //       createdby: "",
+  //       isactive: params.isactive,
+  //       requestedby: "",
+  //       generate_password: "",
+  //     });
+  //   } else {
+  //     setPersistedSelectedUserId(null);
+  //     // Reset selectedCompanyUser to its initial state when null is received
+  //     setSelectedCompanyUser({
+  //       company_id: 0,
+  //       id: 0,
+  //       fullname: "",
+  //       email: "",
+  //       mobilenumber: "",
+  //       createdby: "",
+  //       isactive: false,
+  //       requestedby: "",
+  //       generate_password: "",
+  //     });
+  //   }
+  // };
 
   // const handleClickLeadOwnerChange = () => {
   //   setIsLeadOwnerPopUpOpen(true);
   // };
 
+  const [showSpinnerForSavingLeadOwner, setShowSpinnerForSavingLeadOwner] =
+    useState<boolean>(false);
   const handleLeadOwnerChange = async () => {
     if (selectedCompanyUser.id === null || selectedCompanyUser.id === 0) {
       setReasonInputBoxOpenForLeadOwner(false);
       toast.error("Select new lead owner before procedding.");
       return;
     }
+    setShowSpinnerForSavingLeadOwner(true);
+
     const PostDataLeadOwnerChange = {
       company_id: loginStatus.companyId,
       id: selectedLeadData.id,
@@ -308,6 +310,7 @@ const ViewLeadManagement = () => {
             leadOwner: selectedCompanyUser.fullname,
             companyUserId: selectedCompanyUser.id,
           }));
+          setShowSpinnerForSavingLeadOwner(false);
         } else {
           toast.error(response.data.message);
         }
@@ -595,25 +598,24 @@ const ViewLeadManagement = () => {
     apisCalls();
   }, []);
 
-  useEffect(()=>{
-    if(userHasAccessToViewLeadDetails){
+  useEffect(() => {
+    if (userHasAccessToViewLeadDetails) {
       getLeadDetails();
     }
+  }, [userHasAccessToViewLeadDetails]);
 
-  },[userHasAccessToViewLeadDetails])
-
-  useEffect(()=>{
-    if(userHasAccessToViewLeadContacts){
-      fetchLeadContact()
+  useEffect(() => {
+    if (userHasAccessToViewLeadContacts) {
+      fetchLeadContact();
     }
-  }, [userHasAccessToViewLeadContacts])
+  }, [userHasAccessToViewLeadContacts]);
 
-  useEffect(()=>{
-    if(userHasAccessToViewLeadProduct){
+  useEffect(() => {
+    if (userHasAccessToViewLeadProduct) {
       getLeadInterestData();
-      fetchLeadCompanyProduct()
+      fetchLeadCompanyProduct();
     }
-  }, [userHasAccessToViewLeadProduct])
+  }, [userHasAccessToViewLeadProduct]);
   const handleLeadInfoSave = async () => {
     const trimmedName = selectedLeadData.name?.trim() ?? "";
 
@@ -722,7 +724,7 @@ const ViewLeadManagement = () => {
   function handleLeadOwnerChangeStateClear() {
     setReasonTextForLeadOwnerChange("");
     setReasonInputBoxOpenForLeadOwner(!reasonInputBoxOpenForLeadOwner);
-    setPersistedSelectedUserId(selectedLeadData.companyUserId);
+    // setPersistedSelectedUserId(selectedLeadData.companyUserId);
     // window.location.reload();
     setRefreshKeyForLeadOwnerChange((prev) => prev + 1);
   }
@@ -1176,10 +1178,6 @@ const ViewLeadManagement = () => {
                       labelClassname="caption-custom"
                       onUserSelected={handleLeadOwnerSelected}
                       defaultValue={selectedLeadData?.leadOwner}
-                      // hasXLogo={false}
-                      // hasPenLogo={true}
-                      // hasBorder={false}
-                      // hasSearchLogo={false}
                       has={{
                         border: false,
                         penLogo: true,
@@ -1200,50 +1198,52 @@ const ViewLeadManagement = () => {
                 </div>
               </div>
               {reasonInputBoxOpenForLeadOwner && (
-                <div className="fixed inset-0 bg-black bg-opacity-5 flex items-center justify-center z-50">
-                  <div className="bg-white rounded-xl shadow-lg p-2 w-full max-w-md mx-2">
-                    <div className="flex flex-col gap-1">
-                      <label className="table-header-custom">
-                        Reason (Optional)
-                      </label>
-                      <textarea
-                        autoFocus={true}
-                        rows={7}
-                        placeholder="Enter reason for lead owner update"
-                        className="border rounded  p-1 input-label-custom"
-                        value={reasonTextForLeadOwnerChange}
-                        onChange={(e) =>
-                          setReasonTextForLeadOwnerChange(e.target.value)
-                        }
-                      />
-                      <div className="flex justify-end ">
-                        <div className="flex gap-1">
-                          <Button
-                            type="submit"
-                            onClick={(e) => {
-                              e.preventDefault();
-                              handleLeadOwnerChange();
-                            }}
-                          >
-                            <div className="flex items-center gap-1">
-                              <Save size={16} />
-                              Save
-                            </div>
-                          </Button>
-                          <Button
-                            type="button"
-                            onClick={handleLeadOwnerChangeStateClear}
-                          >
-                            <div className="flex items-center ">
-                              <X size={18} />
-                              Cancel
-                            </div>
-                          </Button>
-                        </div>
+                // <div className="fixed inset-0 bg-black bg-opacity-5 flex items-center justify-center z-50">
+                //   <div className="bg-white rounded-xl shadow-lg p-2 w-full max-w-md mx-2">
+                <FormLayout width={2} padding={2}>
+                  <div className="flex flex-col gap-1">
+                    <label className="table-header-custom">
+                      Reason (Optional)
+                    </label>
+                    <textarea
+                      autoFocus={true}
+                      rows={7}
+                      placeholder="Enter reason for lead owner update"
+                      className="border rounded  p-1 input-label-custom"
+                      value={reasonTextForLeadOwnerChange}
+                      onChange={(e) =>
+                        setReasonTextForLeadOwnerChange(e.target.value)
+                      }
+                    />
+                    <div className="flex justify-end ">
+                      <div className="flex gap-1">
+                        <Button
+                          type="submit"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            handleLeadOwnerChange();
+                          }}
+                        >
+                          <div className="flex items-center gap-1">
+                            <Save size={16} />
+                            Save
+                          </div>
+                        </Button>
+                        <Button
+                          type="button"
+                          onClick={handleLeadOwnerChangeStateClear}
+                        >
+                          <div className="flex items-center ">
+                            <X size={18} />
+                            Cancel
+                          </div>
+                        </Button>
                       </div>
                     </div>
                   </div>
-                </div>
+                </FormLayout>
+                // </div>
+                // </div>
               )}
             </div>
             {/* Lead Details */}
@@ -1261,7 +1261,6 @@ const ViewLeadManagement = () => {
 
             {/* Assigned Company Product */}
             <div className=" shadow-md rounded">
-              
               <LeadAssignedComponyProducts
                 setIsAddProductModalOpen={setIsAddProductModalOpen}
                 data={leadAssignedCompanyProduct}
@@ -1404,14 +1403,18 @@ const ViewLeadManagement = () => {
             setIsOpenLeadOwnerHistory(!isOpenLeadOwnerHistory);
           }}
         />
+        {/* Note : this loading pop up will be shown when we change the lead owner */}
+        {showSpinnerForSavingLeadOwner && (
+          <LoadingPopUpAnimation show={showSpinnerForSavingLeadOwner} />
+        )}
 
         {/* lead owner pop up open */}
-        {isLeadOwnerPopUpOpen &&
+        {/* {isLeadOwnerPopUpOpen &&
           createPortal(
             <div className="fixed top-12 inset-0 z-50 bg-black bg-opacity-5 flex items-center justify-center p-4 ">
               <div className="bg-white p-3  rounded-2xl shadow-lg w-full max-w-6xl max-h-[100%] overflow-y-auto relative animate-fadeIn">
                 {/* Header with Close Button */}
-                <FormHeader
+                {/* <FormHeader
                   preText="Assign new lead owner."
                   description="Select and assign a new owner to manage this lead."
                   onClose={() => {
@@ -1426,9 +1429,9 @@ const ViewLeadManagement = () => {
                     }
                   }}
                   icon={User2}
-                />
+                /> */}
                 {/* NOTE : CALL TO THE MODAL COMPONENT */}
-                <div className="">
+                {/* <div className="">
                   <GetCompanyUsersForLead
                     isUsedForSettings={false}
                     selectedUserId={persistedSelectedUserId} // Pass the persisted ID
@@ -1440,7 +1443,7 @@ const ViewLeadManagement = () => {
               </div>
             </div>,
             document.body
-          )}
+          )} */} 
         <AssignProductToLead
           selectedLeadData={selectedLeadData}
           isOpen={isAddProductModalOpen}

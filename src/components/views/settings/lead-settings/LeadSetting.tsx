@@ -14,9 +14,7 @@ import CompanyLeadSettingType from "../../../../@types/settings/CompanyLeadSetti
 import { useGoogleMeetStatus } from "../../../../config/hooks/useGoogleMeetStatus";
 import { useZoomMeetingsStatus } from "../../../../config/hooks/useZoomMeetingsStatus";
 import SettingToggleCard from "../../../ui/SettingToggleCard";
-// import Button from "../../../ui/Button";
-import { User2 } from "lucide-react";
-// import { createPortal } from "react-dom";
+import { Handshake, User2 } from "lucide-react";
 import FormHeader from "../../../ui/FormHeader";
 import GetCompanyUsersForLead from "../../../modals/leads/company-users-selection-modal/GetCompanyUsersForLead";
 import CompanyUser from "../../../../@types/company-users/CompanyUser";
@@ -27,16 +25,13 @@ import MESSAGE from "../../../../constants/Messages";
 const LeadSetting: React.FC = () => {
   useGoogleMeetStatus();
   useZoomMeetingsStatus();
-  // const [companyUserModalOpen, setCompanyUserModalOpen] =
-  //   useState<boolean>(false);
 
   const { loginStatus } = useLoggedInUserContext();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [leadSetting, setLeadSetting] = useState<CompanyLeadSettingType[]>([]);
 
-  const {
-    userHasAccessToUpdateSettingLead,
-  } = useUserAccessModules();
+  const { userHasAccessToUpdateSettingLead } =
+    useUserAccessModules();
 
   const getLeadSetting = async () => {
     setIsLoading(true);
@@ -203,59 +198,51 @@ const LeadSetting: React.FC = () => {
   };
 
   return (
-    <div className="w-full min-h-screen bg-white">
-      <div className="flex justify-between items-center mb-3 w-full">
-        {/* <div className="flex-1"></div> */}
-
-        <div className="flex justify-center items-center flex-1">
-          <p className="table-data-custom mt-2 text-center">
-            Manage your company's lead-related configurations.
-          </p>
-        </div>
-
-        {/* <div className="flex-1 flex justify-end min-w-36">
-          <div>
-            <Button
-              onClick={() => {
-                setCompanyUserModalOpen(true);
-              }}
-            >
-              <div className="flex items-center gap-2">
-                <UserCheck2Icon />
-                MDLM
-              </div>
-            </Button>
-          </div>
-        </div> */}
-      </div>
-      {isLoading ? (
-        <div className="flex justify-center items-center mt-20">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-blue-500" />
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {leadSetting.map((per) => (
-            <SettingToggleCard
-              key={per.id}
-              setting={per}
-              onToggle={handleLeadSettingCheckBoxChange}
-              description={getDescription(per)}
-            />
-          ))}
-        </div>
-      )}
-
-      <div className="bg-white  rounded-2xl py-5 w-full max-h-[100%] overflow-y-auto relative animate-fadeIn">
+    <div className="w-full h-full   p-2 ">
+      <div className="">
         <FormHeader
-          preText="Assign Users to whom all leads are visible"
+          preText="Manage your company's lead-related configurations."
+          description="Select and assign a user to whom lead will be visible."
+          onClose={() => {
+            // setCompanyUserModalOpen(false);
+          }}
+          icon={Handshake}
+          isModal={false}
+          wantBorderBottom={false}
+        />
+        {isLoading ? (
+          <div className="flex justify-center items-center mt-20">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-blue-500" />
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-1">
+            {leadSetting.map((per) => (
+              <SettingToggleCard
+                key={per.id}
+                setting={per}
+                onToggle={handleLeadSettingCheckBoxChange}
+                description={getDescription(per)}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* divider */}
+      <div className="border-b  p-1 border-gray-300"></div>
+
+      <div className="  rounded-2xl py-3 w-full   relative animate-fadeIn">
+        <FormHeader
+          preText="Assign Users to whom all leads should be visible"
           description="Select and assign a user to whom all the lead's will be visible."
           onClose={() => {
             // setCompanyUserModalOpen(false);
           }}
           icon={User2}
           isModal={false}
+          wantBorderBottom={false}
         />
-        <div className="bg-white z-50 overflow-y-auto rounded-lg shadow-sm p-0">
+        <div className="bg-white z-50 rounded-lg shadow-sm p-0">
           <div className="ag-theme-balhal w-full">
             <GetCompanyUsersForLead
               handleSelectedCompanyUserChange={() => {

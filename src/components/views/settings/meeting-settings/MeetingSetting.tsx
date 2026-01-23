@@ -7,10 +7,6 @@ import GoogleMeetIcon from "../../../../assets/svg/GoogleMeetIcon";
 import ZoomMeetingsIcon from "../../../../assets/svg/ZoomMeetingsIcon";
 import TeamsIcon from "../../../../assets/svg/TeamsIcon";
 
-
-
-
-
 function MeetingSettings() {
   const { googleMeetStatus } = useGoogleMeetContext();
   const { zoomMeetingStatus } = useZoomMeetingContext();

@@ -12,6 +12,7 @@ import CompanyPreferencesType from "../../../../@types/settings/CompanyPreferenc
 import toast from "react-hot-toast";
 import { useUserAccessModules } from "../../../../config/hooks/useAccessModules";
 import MESSAGE from "../../../../constants/Messages";
+import LoadingSpinner from "../../../../assets/animations/LoadingSpinner";
 
 // New, reusable card component for each company preference
 interface PreferenceCardProps {
@@ -177,7 +178,7 @@ function CompanyPreferenceSetting() {
   }
 
   return (
-    <div className="w-full min-h-screen bg-white  lg:p-1">
+    <div className="w-full min-h-screen  lg:p-1">
       <div className="text-center mb-3">
         <p className="table-data-custom mt-2">
           {/* Manage your company's default settings and services. */}
@@ -185,9 +186,9 @@ function CompanyPreferenceSetting() {
         </p>
       </div>
       {isLoading ? (
-        <div className="flex justify-center items-center mt-20">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-blue-500" />
-        </div>
+        <>
+        <LoadingSpinner />
+        </>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {companyPreferences && (
