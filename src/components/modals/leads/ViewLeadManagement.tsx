@@ -11,7 +11,7 @@ import {
   Settings,
   X,
 } from "lucide-react";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import UpdateLeadForm from "./UpdateLeadForm";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
 import POST_API from "../../../constants/PostApi";
@@ -107,12 +107,11 @@ const ViewLeadManagement = () => {
   >([]);
   //meeting modal states
   const [leadContact, setLeadContact] = useState<LeadContactType[]>([]);
-  const [activeTab, setActiveTab] = useState<string>("contact");
-  const [isOpenMeetingsModal, setIsOpenMeetingsModal] =
-    useState<boolean>(false);
-  const [isOpenProductCard, setIsOpenProductCard] = useState<boolean>(true);
-  const [isOpenLeadTeamsCard, setIsOpenLeadTeamsCard] =
-    useState<boolean>(false);
+  // const [isOpenMeetingsModal, setIsOpenMeetingsModal] =
+  //   useState<boolean>(false);
+  // const [isOpenProductCard, setIsOpenProductCard] = useState<boolean>(true);
+  // const [isOpenLeadTeamsCard, setIsOpenLeadTeamsCard] =
+  //   useState<boolean>(false);
 
   const fetchLeadStatus = async () => {
     try {
@@ -685,33 +684,41 @@ const ViewLeadManagement = () => {
       }
     }
   };
+  type ActiveCard = "meeting" | "contact" | "LeadTeams" | "leadUsers";
+  const [activeTab, setActiveTab] = useState<ActiveCard>("contact");
+  const [activeCard, setActiveCard] = useState<ActiveCard>("contact");
 
   const handleClickCards = (event: React.MouseEvent<HTMLElement>) => {
-    const id = event.currentTarget.id;
-    setActiveTab(id); // set active tab for border effect
-
-    if (id === "meeting") {
-      setIsOpenProductCard(false);
-      setIsOpenMeetingsModal(true);
-      setIsOpenLeadTeamsCard(false);
-    } else if (id === "contact") {
-      setIsOpenProductCard(true);
-      setIsOpenMeetingsModal(false);
-      setIsOpenLeadTeamsCard(false);
-    } else if (id === "LeadTeams") {
-      setIsOpenProductCard(false);
-      setIsOpenMeetingsModal(false);
-      setIsOpenLeadTeamsCard(true);
-    }
+    const id = event.currentTarget.id as ActiveCard;
+    setActiveTab(id);
+    setActiveCard(id);
   };
+  // const handleClickCards = (event: React.MouseEvent<HTMLElement>) => {
+  //   const id = event.currentTarget.id;
+  //   setActiveTab(id); // set active tab for border effect
 
-  const getHeightAboveTasks = useCallback(() => {
-    if (isOpenMeetingsModal) {
-      return "min-h-40";
-    } else {
-      return "min-h-72";
-    }
-  }, [isOpenMeetingsModal]);
+  //   if (id === "meeting") {
+  //     setIsOpenProductCard(false);
+  //     setIsOpenMeetingsModal(true);
+  //     setIsOpenLeadTeamsCard(false);
+  //   } else if (id === "contact") {
+  //     setIsOpenProductCard(true);
+  //     setIsOpenMeetingsModal(false);
+  //     setIsOpenLeadTeamsCard(false);
+  //   } else if (id === "LeadTeams") {
+  //     setIsOpenProductCard(false);
+  //     setIsOpenMeetingsModal(false);
+  //     setIsOpenLeadTeamsCard(true);
+  //   }
+  // };
+
+  // const getHeightAboveTasks = useCallback(() => {
+  //   if (isOpenMeetingsModal) {
+  //     return "min-h-40";
+  //   } else {
+  //     return "min-h-72";
+  //   }
+  // }, [isOpenMeetingsModal]);
 
   // New Code
   const [isAddProductModalOpen, setIsAddProductModalOpen] = useState(false);
@@ -1309,15 +1316,27 @@ const ViewLeadManagement = () => {
               >
                 Lead Teams
               </span>
+              {/* <span
+                id="leadUsers" 
+                className={`cursor-pointer ${
+                  activeTab === "leadUsers"
+                    ? "border-b-2 border-blue-500 caption-custom-blue"
+                    : "hover:text-blue-500"
+                }`}
+                onClick={handleClickCards}
+              >
+                Lead Users
+              </span> */}
             </div>
             <div className="flex flex-col min-h-72 gap-2">
               <div
-                className={`flex max-h-72 ${getHeightAboveTasks()} overflow-y-scroll flex-col  gap-2 [&::-webkit-scrollbar]:w-2
+                // ${getHeightAboveTasks()}
+                className={`flex min-h-72 max-h-72  overflow-y-scroll flex-col  gap-2 [&::-webkit-scrollbar]:w-2
             [&::-webkit-scrollbar-track]:bg-gray-50
              [&::-webkit-scrollbar-thumb]:bg-gray-50
               [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full`}
               >
-                {isOpenMeetingsModal && (
+                {activeCard === "meeting" && (
                   <div className="flex  items-center justify-center   min-h-72">
                     <div className="flex flex-col items-center justify-center p-6 text-center space-y-3 border rounded-xl bg-gray-50 shadow-sm">
                       <h2 className="table-header-custom">
@@ -1353,19 +1372,69 @@ const ViewLeadManagement = () => {
                     </div>
                   </div>
                 )}
-                {isOpenProductCard && (
+                {/* {isOpenMeetingsModal && (
+                  <div className="flex  items-center justify-center   min-h-72">
+                    <div className="flex flex-col items-center justify-center p-6 text-center space-y-3 border rounded-xl bg-gray-50 shadow-sm">
+                      <h2 className="table-header-custom">
+                        Schedule a Meeting
+                      </h2>
+                      <p className="input-label-custom">
+                        Plan your next discussion with ease. Use this option to
+                        select a convenient time, invite participants, and share
+                        meeting details — all in one place.
+                      </p>
+                      <p className="input-label-custom max-w-md">
+                        Once scheduled, participants will receive notifications
+                        with the meeting link and reminders before it begins.
+                      </p>
+                      <div>
+                        <Button
+                          type="submit"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            const leadDataSearchParams = JSON.parse(
+                              searchParams.get("leadData") || "{}"
+                            );
+                            sessionStorage.setItem(
+                              "leadData",
+                              JSON.stringify(leadDataSearchParams!)
+                            );
+                            navigate(ROUTES_URL.SCHEDULE_MEETING);
+                          }}
+                        >
+                          + Schedule Meeting
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                )} */}
+                {/* {isOpenProductCard && (
+                  <LeadContact
+                    selectedLeadData={selectedLeadData}
+                    leadContact={leadContact}
+                    fetchLeadContact={fetchLeadContact}
+                  />
+                )} */}
+                {activeCard === "contact" && (
                   <LeadContact
                     selectedLeadData={selectedLeadData}
                     leadContact={leadContact}
                     fetchLeadContact={fetchLeadContact}
                   />
                 )}
-                {isOpenLeadTeamsCard && (
+                {activeCard === "LeadTeams" && (
+                  <LeadAssignedTeams
+                    selectedLeadData={selectedLeadData}
+                    // isOpen={isOpenLeadTeamsCard}
+                  />
+                )}
+
+                {/* {isOpenLeadTeamsCard && (
                   <LeadAssignedTeams
                     selectedLeadData={selectedLeadData}
                     isOpen={isOpenLeadTeamsCard}
                   />
-                )}
+                )} */}
               </div>
             </div>
             {/* Activity */}
@@ -1414,7 +1483,7 @@ const ViewLeadManagement = () => {
             <div className="fixed top-12 inset-0 z-50 bg-black bg-opacity-5 flex items-center justify-center p-4 ">
               <div className="bg-white p-3  rounded-2xl shadow-lg w-full max-w-6xl max-h-[100%] overflow-y-auto relative animate-fadeIn">
                 {/* Header with Close Button */}
-                {/* <FormHeader
+        {/* <FormHeader
                   preText="Assign new lead owner."
                   description="Select and assign a new owner to manage this lead."
                   onClose={() => {
@@ -1430,8 +1499,8 @@ const ViewLeadManagement = () => {
                   }}
                   icon={User2}
                 /> */}
-                {/* NOTE : CALL TO THE MODAL COMPONENT */}
-                {/* <div className="">
+        {/* NOTE : CALL TO THE MODAL COMPONENT */}
+        {/* <div className="">
                   <GetCompanyUsersForLead
                     isUsedForSettings={false}
                     selectedUserId={persistedSelectedUserId} // Pass the persisted ID
@@ -1443,7 +1512,7 @@ const ViewLeadManagement = () => {
               </div>
             </div>,
             document.body
-          )} */} 
+          )} */}
         <AssignProductToLead
           selectedLeadData={selectedLeadData}
           isOpen={isAddProductModalOpen}

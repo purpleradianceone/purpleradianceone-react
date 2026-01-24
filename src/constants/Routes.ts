@@ -68,8 +68,6 @@ const ROUTES_URL = {
     ACCOUNT_IMPORT_CSV : "/home/manage-accounts/accounts/import",
     ACCOUNT_COMPANY_PRODUCT_DETAILS: '/home/manage-accounts/accounts/acc-com-prod-details',
     ACCOUNT_COMPANY_PRODUCT_AMC_DETAILS: '/home/manage-accounts/accounts/prod-details-amc/:accountCompanyProductId',
-    // ACCOUNT_MULTIPLE_COMPANY_PRODUCT : "/home/manage-accounts/accounts/create",
-
     ACCOUNT_MULTIPLE_COMPANY_PRODUCT : "assign-products",
 
     // Stock
@@ -80,6 +78,7 @@ const ROUTES_URL = {
     SUPPORT_TICKET_MANAGEMENT : "/home/manage-support-ticket/support-tickets",
     SUPPORT_TICKET_DETAILS : "/home/manage-support-ticket/support-tickets/support-ticket/details",
 
+    // setting
     SETTING_EMAIL : "email",
     SETTING_MEETINGS : "meetings",
     SETTING_ACCOUNT_TYPE : "account-type",

@@ -23,12 +23,12 @@ import axiosClient from "../../../axios-client/AxiosClient";
 import AccessDeniedMessagePage from "../../views/not-found/AccessDeniedMessagePage";
 
 type LeadAssignedTeamsProps = {
-  isOpen: boolean;
+  // isOpen: boolean;
   selectedLeadData: any;
 };
 
 const LeadAssignedTeams = ({
-  isOpen,
+  // isOpen,
   selectedLeadData,
 }: LeadAssignedTeamsProps) => {
   // context
@@ -219,7 +219,7 @@ const LeadAssignedTeams = ({
     }
   }, [userHasAccessToViewLeadTeams]);
 
-  if (!isOpen) return null;
+  // if (!isOpen) return null;
 
   if(!userHasAccessToViewLeadTeams)return <AccessDeniedMessagePage message={MESSAGE.MODULE_ACCESS.LEAD_TEAMS.DENIED_VIEW_ACCESS}/>
   if (isLoading && userHasAccessToViewLeadTeams)
@@ -230,39 +230,6 @@ const LeadAssignedTeams = ({
         </div>
       </>
     );
-
-//   if(userHasAccessToViewLeadTeams && leadCompanyTeam && leadCompanyTeam.length ===0){
-//     return(
-// <div className=" w-full h-full bg-slate-0">
-//           <div className="flex gap-1 w-full text-xs h-full bg-green-0 items-center justify-center">
-//             <Button
-//               disabled={!userHasAccessToAddLeadTeams}
-//               onClick={() => {
-//                 if (userHasAccessToAddLeadTeams) {
-//                   setOpenCreateLeadCompanyTeam(true);
-//                 } else {
-//                   // showMessageSnackbar({
-//                   //   message:
-//                   //     MESSAGE.MODULE_ACCESS.LEAD_MODULE
-//                   //       .UPDATE_LEAD_ACCESS_DENIED_message,
-//                   //   type: "error",
-//                   // });
-//                   toast.error(
-//                     MESSAGE.MODULE_ACCESS.LEAD_TEAMS.DENIED_ADD_ACCESS
-//                   );
-//                 }
-//               }}
-//               className={COLORS.ADD_BUTTON}
-//             >
-//               +Add
-//             </Button>
-//             <span className="caption-custom italic">
-//               Company Team is Not assigned to lead.
-//             </span>
-//           </div>
-//         </div>
-//     )
-//   }
   return (
     <>
     {
