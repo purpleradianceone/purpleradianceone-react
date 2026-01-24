@@ -13,6 +13,8 @@ import toast from "react-hot-toast";
 import { useUserAccessModules } from "../../../../config/hooks/useAccessModules";
 import MESSAGE from "../../../../constants/Messages";
 import LoadingSpinner from "../../../../assets/animations/LoadingSpinner";
+import FormHeader from "../../../ui/FormHeader";
+import { Bell } from "lucide-react";
 
 // New, reusable card component for each company preference
 interface PreferenceCardProps {
@@ -178,19 +180,29 @@ function CompanyPreferenceSetting() {
   }
 
   return (
-    <div className="w-full min-h-screen  lg:p-1">
-      <div className="text-center mb-3">
-        <p className="table-data-custom mt-2">
-          {/* Manage your company's default settings and services. */}
+    <div className="w-full min-h-screen  lg:p-2">
+      {/* <div className="text-center mb-3"> */}
+        {/* <p className="table-data-custom mt-2">
           Choose how you want to receive notifications. You can enable or disable different channels based on your preference. Notifications will be sent through Email, Mobile, or directly in your Web browser.
-        </p>
-      </div>
+        </p> */}
+        <FormHeader
+          preText="Manage your company's default settings and services."
+          description="Choose how you want to receive notifications. You can enable or disable different channels based on your preference. Notifications will be sent through Email, Mobile, or directly in your Web browser.
+"
+          onClose={() => {
+            // setCompanyUserModalOpen(false);
+          }}
+          icon={Bell}
+          isModal={false}
+          wantBorderBottom={false}
+        />
+      {/* </div> */}
       {isLoading ? (
         <>
         <LoadingSpinner />
         </>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-1">
           {companyPreferences && (
             <>
               <PreferenceCard
