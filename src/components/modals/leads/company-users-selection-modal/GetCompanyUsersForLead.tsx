@@ -37,12 +37,12 @@ function GetCompanyUsersForLead({
 
   const {
     currentPage,
+    currentPageData,
     pageSize,
     dateRangeId,
     concatDate,
     searchParameter,
-    totalPages,
-    setTotalPages,
+    setCurrentPageData,
     handleDatePageIdChange,
     handleEndDateChange,
     handlePageChange,
@@ -101,11 +101,10 @@ function GetCompanyUsersForLead({
           withCredentials: true,
         }
       );
+      setCurrentPageData({currentPage: currentPage, pageDataLength: response.data.length});
 
       setCompanyUsers(response.data);
-      if (response.data[0]?.count) {
-        setTotalPages(Math.ceil(response.data[0].count / pageSize));
-      }
+     
     } catch (error: any) {
       console.log(error);
       if (error.status === STATUS_CODE.UNATHORISED) {
@@ -159,11 +158,11 @@ function GetCompanyUsersForLead({
                 handleDateRangeIdChange: handleDatePageIdChange,
               }}
               paginationData={{
-                selectedPageSize: handlePageSizeChange,
-                currentPage,
-                handlePageChange,
-                totalPages,
                 pageSize,
+                currentPage,
+                currentPageData,
+                onPageSizeChange: handlePageSizeChange,
+                onPageChange:handlePageChange,
               }}
               users={companyUsers}
               isUsedForSettings={isUsedForSettings}

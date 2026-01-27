@@ -6,7 +6,6 @@ import { StockAvaibleSerialNumber } from "../../../../@types/stock/StockAvailabl
 import ApiError from "../../../../@types/error/ApiError";
 import RefreshToken from "../../../../config/validations/RefreshToken";
 import { useEffect, useState } from "react";
-import Pagination from "../../../ag-grid/Pagination";
 import { useSearchFilterPaginationDateHandlers } from "../../../../config/hooks/usePaginationHandler";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
 import FormHeader from "../../../ui/FormHeader";
@@ -14,6 +13,7 @@ import { Box } from "lucide-react";
 import FormLayout from "../../../ui/FormLayout";
 import StockRulesCard from "./StockRuledCard";
 import axiosClient from "../../../../axios-client/AxiosClient";
+import PaginationWithoutCount from "../../../ag-grid/PaginationWithoutCount";
 
 export const StockSerialNumber = ({
   companyProductId,
@@ -32,10 +32,10 @@ export const StockSerialNumber = ({
     useState<StockAvaibleSerialNumber[]>([]);
 
   const {
-    currentPage,
     pageSize,
-    totalPages,
-    setTotalPages,
+    currentPage,
+    currentPageData,
+    setCurrentPageData,
     handlePageChange,
     handlePageSizeChange,
   } = useSearchFilterPaginationDateHandlers();
@@ -59,9 +59,7 @@ export const StockSerialNumber = ({
         }
       );
       if (response.status == STATUS_CODE.OK) {
-        if (response.data.length > 0) {
-          setTotalPages(Math.ceil(response.data[0].count / pageSize));
-        }
+       setCurrentPageData({currentPage: currentPage, pageDataLength: response.data.length});
         const responseData = response.data;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const formattedData: StockAvaibleSerialNumber[] = responseData.map(
@@ -125,10 +123,10 @@ export const StockSerialNumber = ({
           />
         </div>
         <div className="flex items-center justify-end ">
-          <Pagination
-            totalPages={totalPages}
-            currentPage={currentPage}
+          <PaginationWithoutCount
             pageSize={pageSize}
+            currentPage={currentPage}
+            currentPageData={currentPageData}
             onPageChange={handlePageChange}
             onPageSizeChange={handlePageSizeChange}
           />

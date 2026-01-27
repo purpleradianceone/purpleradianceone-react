@@ -149,6 +149,7 @@ export const TemplatesPage: React.FC = () => {
   // Removed 'loadingTemplates' and 'hasMoreTemplates' as dependencies to prevent loops
   const getTemplatesOfCompany = useCallback(
     async ({ typeId, reset = false }: { typeId: number; reset?: boolean }) => {
+      if(loginStatus.companyId === 0 )return;
       if (dateRangeId === 8 && concatDate.trim() === "") return;
       // We use a functional update for setOffset to get the latest value
       // and avoid including 'offset' in useCallback dependencies.

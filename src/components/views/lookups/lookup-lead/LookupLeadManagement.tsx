@@ -21,6 +21,7 @@ export const LookupLeadManagement = ({
   const [lookupLeadData, setLookupLeadData] = useState<LookupLead[]>([]);
   const {
     currentPage,
+    currentPageData,
     pageSize,
     searchParameter,
     // setTotalPages,
@@ -53,9 +54,9 @@ export const LookupLeadManagement = ({
         }
       );
       if (response.status === STATUS_CODE.OK) {
+        setCurrentPageData({currentPage: currentPage, pageDataLength: response.data.length});
         //lead status call was here
         const responseData = response.data;
-              setCurrentPageData({currentPage: currentPage, pageDataLength: response.data.length});
 
         // if (response.data.length > 0) {
         //   setTotalPages(Math.ceil(response.data[0].count / pageSize));
@@ -131,6 +132,8 @@ export const LookupLeadManagement = ({
           totalPages={totalPages}
           currentPage={currentPage}
           pageSize={pageSize}
+          currentPage={currentPage}
+          currentPageData={currentPageData}
           onPageChange={handlePageChange}
           onPageSizeChange={handlePageSizeChange}
         /> */}
