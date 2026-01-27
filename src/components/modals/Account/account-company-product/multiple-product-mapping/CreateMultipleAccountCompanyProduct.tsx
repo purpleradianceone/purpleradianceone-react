@@ -237,7 +237,8 @@ export const CreateMultipleAccountCompanyProduct = () => {
 
     try {
       const res = await axiosClient.post(
-        POST_API.GET_PRODUCTS,
+        // POST_API.GET_PRODUCTS,
+        POST_API.GET_LOOKUP_COMPANY_PRODUCT,
         {
           search_parameter: search, // null when first clicked
           offset: newOffset,
@@ -247,7 +248,7 @@ export const CreateMultipleAccountCompanyProduct = () => {
           id: null,
           search_company_specific_date_range_id: null,
           search_parameter_date: null,
-          requestedby_id: loginStatus.id,
+          requestedby: loginStatus.id,
         },
         { withCredentials: true }
       );

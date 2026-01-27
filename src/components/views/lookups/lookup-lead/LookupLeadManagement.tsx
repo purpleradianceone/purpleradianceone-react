@@ -6,11 +6,11 @@ import RefreshToken from "../../../../config/validations/RefreshToken";
 import { STATUS_CODE } from "../../../../constants/AppConstants";
 import POST_API from "../../../../constants/PostApi";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
-import Pagination from "../../../ag-grid/Pagination";
 import LookupLeadsAgGrid from "../../../ag-grid/LookupLeadsAgGrid";
 import { LookupLead } from "../../../../@types/lookup/LookupLead";
 import SearchInput from "../../../ui/SearchInput";
 import COLORS from "../../../../constants/Colors";
+import PaginationWithoutCount from "../../../ag-grid/PaginationWithoutCount";
 
 export const LookupLeadManagement = ({
   handleRowSelectedForShowAccountLead,
@@ -23,11 +23,12 @@ export const LookupLeadManagement = ({
     currentPage,
     pageSize,
     searchParameter,
-    totalPages,
-    setTotalPages,
+    // setTotalPages,
     handlePageChange,
     handlePageSizeChange,
     handleSearchParameterChange,
+    currentPageData,
+    setCurrentPageData
   } = useSearchFilterPaginationDateHandlers();
 
   const getLeadsData = async (signal: AbortSignal) => {
@@ -54,9 +55,11 @@ export const LookupLeadManagement = ({
       if (response.status === STATUS_CODE.OK) {
         //lead status call was here
         const responseData = response.data;
-        if (response.data.length > 0) {
-          setTotalPages(Math.ceil(response.data[0].count / pageSize));
-        }
+              setCurrentPageData({currentPage: currentPage, pageDataLength: response.data.length});
+
+        // if (response.data.length > 0) {
+        //   setTotalPages(Math.ceil(response.data[0].count / pageSize));
+        // }
 
         const formattedData = responseData.map((item: any) => ({
           id: item.id,
@@ -124,9 +127,16 @@ export const LookupLeadManagement = ({
         />
       </div>
       <div className="flex items-center justify-end ">
-        <Pagination
+        {/* <Pagination
           totalPages={totalPages}
           currentPage={currentPage}
+          pageSize={pageSize}
+          onPageChange={handlePageChange}
+          onPageSizeChange={handlePageSizeChange}
+        /> */}
+          <PaginationWithoutCount
+          currentPage={currentPage}
+          currentPageData={currentPageData}
           pageSize={pageSize}
           onPageChange={handlePageChange}
           onPageSizeChange={handlePageSizeChange}
