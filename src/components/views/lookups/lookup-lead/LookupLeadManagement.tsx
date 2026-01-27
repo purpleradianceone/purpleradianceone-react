@@ -24,10 +24,12 @@ export const LookupLeadManagement = ({
     currentPageData,
     pageSize,
     searchParameter,
-    setCurrentPageData,
+    // setTotalPages,
     handlePageChange,
     handlePageSizeChange,
     handleSearchParameterChange,
+    currentPageData,
+    setCurrentPageData
   } = useSearchFilterPaginationDateHandlers();
 
   const getLeadsData = async (signal: AbortSignal) => {
@@ -55,7 +57,10 @@ export const LookupLeadManagement = ({
         setCurrentPageData({currentPage: currentPage, pageDataLength: response.data.length});
         //lead status call was here
         const responseData = response.data;
-       
+
+        // if (response.data.length > 0) {
+        //   setTotalPages(Math.ceil(response.data[0].count / pageSize));
+        // }
 
         const formattedData = responseData.map((item: any) => ({
           id: item.id,
@@ -123,10 +128,19 @@ export const LookupLeadManagement = ({
         />
       </div>
       <div className="flex items-center justify-end ">
-        <PaginationWithoutCount
+        {/* <Pagination
+          totalPages={totalPages}
+          currentPage={currentPage}
           pageSize={pageSize}
           currentPage={currentPage}
           currentPageData={currentPageData}
+          onPageChange={handlePageChange}
+          onPageSizeChange={handlePageSizeChange}
+        /> */}
+          <PaginationWithoutCount
+          currentPage={currentPage}
+          currentPageData={currentPageData}
+          pageSize={pageSize}
           onPageChange={handlePageChange}
           onPageSizeChange={handlePageSizeChange}
         />
