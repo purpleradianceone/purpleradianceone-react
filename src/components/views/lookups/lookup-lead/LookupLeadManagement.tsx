@@ -21,7 +21,6 @@ export const LookupLeadManagement = ({
   const [lookupLeadData, setLookupLeadData] = useState<LookupLead[]>([]);
   const {
     currentPage,
-    currentPageData,
     pageSize,
     searchParameter,
     // setTotalPages,
