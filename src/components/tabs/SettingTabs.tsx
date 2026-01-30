@@ -219,7 +219,7 @@ function SettingsTabs() {
   return (
     <div className="relative">
       <Tabs value={activeTab}>
-        <div className="sticky top-0 bg-white">
+        <div className="sticky top-0 left-0 bg-white">
           <TabsHeader
             placeholder=""
             onResize={undefined}
@@ -240,7 +240,7 @@ function SettingsTabs() {
                 }
                 className={
                   activeTab === value
-                    ? "main-nav-custom-setting active-tab-setting mt-0.5"
+                    ? "main-nav-custom-setting active-tab-setting "
                     : "main-nav-custom-setting"
                 }
                 placeholder=""

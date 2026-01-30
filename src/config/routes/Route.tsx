@@ -75,6 +75,8 @@ import SupportTicketCategorySetting from "../../components/views/settings/suppor
 import CompanyWarehouseSetting from "../../components/views/settings/company-warehouse/CompanyWarehouseSetting";
 import { ModuleGuard } from "../guard/ModuleGuard";
 import MESSAGE from "../../constants/Messages";
+import MetaAppsIntegration from "../../components/views/settings/social-media-integration/MetaAppsIntegration";
+import WebFormIntegration from "../../components/views/settings/web-form-integration/WebFormIntegration";
 
 export const router = createBrowserRouter([
   {
@@ -335,7 +337,8 @@ export const router = createBrowserRouter([
       },
       {
         path: ROUTES_URL.SETTING_ACCOUNT_TYPE,
-        element: <ModuleGuard
+        element: (
+          <ModuleGuard
             permissionKey="userHasAccessToViewCompanyAccountType"
             deniedMessage={
               MESSAGE.MODULE_ACCESS.SETTING.ACCOUNT_SETTING.DENIED_VIEW_ACCESS
@@ -343,52 +346,63 @@ export const router = createBrowserRouter([
           >
             <AccountTypeSetting />
           </ModuleGuard>
+        ),
       },
       {
         path: ROUTES_URL.SETTING_NOTIFICATIONS,
-        element: <ModuleGuard
+        element: (
+          <ModuleGuard
             permissionKey="userHasAccessToViewCompanyPreferences"
             deniedMessage={
-              MESSAGE.MODULE_ACCESS.SETTING.COMPANY_PREFERENCE_SETTING.DENIED_VIEW_ACCESS
+              MESSAGE.MODULE_ACCESS.SETTING.COMPANY_PREFERENCE_SETTING
+                .DENIED_VIEW_ACCESS
             }
           >
-
             <CompanyPreferenceSetting />,
           </ModuleGuard>
+        ),
       },
       {
         path: ROUTES_URL.SETTING_GENERAL,
-        element: <ModuleGuard
+        element: (
+          <ModuleGuard
             permissionKey="userHasAccessToViewSettingGeneral"
             deniedMessage={
-              MESSAGE.MODULE_ACCESS.SETTING.GENERAL_USER_SETTING.DENIED_VIEW_ACCESS
+              MESSAGE.MODULE_ACCESS.SETTING.GENERAL_USER_SETTING
+                .DENIED_VIEW_ACCESS
             }
           >
             <UserPrerefenceManagement />,
-            </ModuleGuard>
+          </ModuleGuard>
+        ),
       },
       {
         path: ROUTES_URL.SETTING_SUPPORT_TICKET_CATEGORY,
-        element:
-         <ModuleGuard
+        element: (
+          <ModuleGuard
             permissionKey="userHasAccessToViewSettingSupposeTicketCategory"
             deniedMessage={
-              MESSAGE.MODULE_ACCESS.SETTING.SUPPORT_TICKET_CATEGORY_SETTING.DENIED_VIEW_ACCESS
+              MESSAGE.MODULE_ACCESS.SETTING.SUPPORT_TICKET_CATEGORY_SETTING
+                .DENIED_VIEW_ACCESS
             }
           >
             <SupportTicketCategorySetting />,
           </ModuleGuard>
+        ),
       },
       {
         path: ROUTES_URL.SETTING_COMPANY_WAREHOUSE,
-        element: <ModuleGuard
+        element: (
+          <ModuleGuard
             permissionKey="userHasAccessToViewSettingCompanyWarehouse"
             deniedMessage={
-              MESSAGE.MODULE_ACCESS.SETTING.COMPANY_WAREHOUSE_SETTING.DENIED_VIEW_ACCESS
+              MESSAGE.MODULE_ACCESS.SETTING.COMPANY_WAREHOUSE_SETTING
+                .DENIED_VIEW_ACCESS
             }
-            >
-              <CompanyWarehouseSetting />,
-            </ModuleGuard> 
+          >
+            <CompanyWarehouseSetting />,
+          </ModuleGuard>
+        ),
       },
     ],
   },
@@ -742,59 +756,6 @@ export const router = createBrowserRouter([
       </MobileRedirectWrapper>
     ),
   },
-  // {
-  //   path: `${ROUTES_URL.ACCOUNT_DETAILS}/:accountId`,
-  //   element: (
-  //     <MobileRedirectWrapper>
-  //       <PrivateRoute>
-  //         <div>
-  //           <Navbar>
-  //             <AccountDetails
-  //             />
-  //             {/* <GetAccounts isUsedForAccountLead={false} /> */}
-  //           </Navbar>
-  //         </div>
-  //       </PrivateRoute>
-  //     </MobileRedirectWrapper>
-  //   ),
-  // },
-
-  // {
-  //   path:`${ROUTES_URL.ACCOUNT_MULTIPLE_COMPANY_PRODUCT}/:accountId`,
-  //   element: (
-  //     <MobileRedirectWrapper>
-  //       <PrivateRoute>
-  //         <div>
-  //           <Navbar>
-  //             <PageLayout>
-  //           <CreateMultipleAccountCompanyProduct/>
-  //             </PageLayout>
-  //           </Navbar>
-  //         </div>
-  //       </PrivateRoute>
-  //     </MobileRedirectWrapper>
-  //   ),
-  // },
-
-  //  {
-  //   path:`${ROUTES_URL.ACCOUNT_COMPANY_PRODUCT_DETAILS}/:accountCompanyProductId`,
-  //   element: (
-  //     <MobileRedirectWrapper>
-  //       <PrivateRoute>
-  //         <div>
-  //           <Navbar>
-  //             <PageLayout>
-  //           <AccountCompanyProductDetails/>
-  //             </PageLayout>
-  //           </Navbar>
-  //         </div>
-  //       </PrivateRoute>
-  //     </MobileRedirectWrapper>
-  //   ),
-  // },
-
-  // this is new
-
   {
     path: `${ROUTES_URL.ACCOUNT_DETAILS}/:accountId`,
     element: (
@@ -803,7 +764,6 @@ export const router = createBrowserRouter([
           <Navbar>
             <AccountNavbarBreadcrumb />
           </Navbar>
-          {/* <AccountLayout /> */}
         </PrivateRoute>
       </MobileRedirectWrapper>
     ),
@@ -822,19 +782,6 @@ export const router = createBrowserRouter([
       },
     ],
   },
-
-  //  {
-  //   path: ROUTES_URL.ACCOUNT_COMPANY_PRODUCT_DETAILS,
-  //   element: (
-  //     <MobileRedirectWrapper>
-  //       <PrivateRoute>
-  //           <Navbar>
-  //             <AccountComProdDetails />
-  //           </Navbar>
-  //       </PrivateRoute>
-  //     </MobileRedirectWrapper>
-  //   ),
-  // },
   {
     path: ROUTES_URL.FACEBOOK_OAUTH,
     element: (
@@ -858,6 +805,73 @@ export const router = createBrowserRouter([
         </PrivateRoute>
       </MobileRedirectWrapper>
     ),
+    children: [
+      {
+        index: true,
+        element: (
+          <ModuleGuard
+            permissionKey="userHasAccessToViewIntegrationSetting"
+            deniedMessage={
+              MESSAGE.MODULE_ACCESS.SETTING.INTEGRATION.DENIED_VIEW_ACCESS
+            }
+          >
+            <WebFormIntegration />
+          </ModuleGuard>
+        ),
+      },
+      {
+        path: ROUTES_URL.SETTING_META_APP,
+        element: (
+          <ModuleGuard
+            permissionKey="userHasAccessToViewIntegrationSetting"
+            deniedMessage={
+              MESSAGE.MODULE_ACCESS.SETTING.INTEGRATION.DENIED_VIEW_ACCESS
+            }
+          >
+            <MetaAppsIntegration />
+          </ModuleGuard>
+        ),
+      },
+      {
+        path: ROUTES_URL.SETTING_INDIAMART,
+        element: (
+          <ModuleGuard
+            permissionKey="userHasAccessToViewIntegrationSetting"
+            deniedMessage={
+              MESSAGE.MODULE_ACCESS.SETTING.INTEGRATION.DENIED_VIEW_ACCESS
+            }
+          >
+            <>INDIA MART</>
+          </ModuleGuard>
+        ),
+      },
+      {
+        path: ROUTES_URL.SETTING_LINKEDIN,
+        element: (
+          <ModuleGuard
+            permissionKey="userHasAccessToViewIntegrationSetting"
+            deniedMessage={
+              MESSAGE.MODULE_ACCESS.SETTING.INTEGRATION.DENIED_VIEW_ACCESS
+            }
+          >
+            <>LINKEDIN</>
+          </ModuleGuard>
+        ),
+      },
+      {
+        path: ROUTES_URL.SETTING_GOOGLE_ADS,
+        element: (
+          <ModuleGuard
+            permissionKey="userHasAccessToViewIntegrationSetting"
+            deniedMessage={
+              MESSAGE.MODULE_ACCESS.SETTING.INTEGRATION.DENIED_VIEW_ACCESS
+            }
+          >
+            <>GOOGLE ADS</>
+          </ModuleGuard>
+        ),
+      },
+    ],
   },
   {
     path: ROUTES_URL.STOCK_MANAGEMENT,
