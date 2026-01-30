@@ -238,7 +238,7 @@ export const CreateMultipleAccountCompanyProduct = () => {
     try {
       const res = await axiosClient.post(
         // POST_API.GET_PRODUCTS,
-        POST_API.GET_LOOKUP_COMPANY_PRODUCT,
+        POST_API.GET_LOOKUP_COMPANY_PRODUCT_FOR_ACCOUNT,
         {
           search_parameter: search, // null when first clicked
           offset: newOffset,
@@ -426,7 +426,6 @@ export const CreateMultipleAccountCompanyProduct = () => {
     }
     return isValid;
   };
-
   const updateRow = <K extends keyof ProductRow>(
     index: number,
     field: K,

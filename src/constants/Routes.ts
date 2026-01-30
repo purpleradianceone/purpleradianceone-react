@@ -85,7 +85,14 @@ const ROUTES_URL = {
     SETTING_NOTIFICATIONS : "notification",
     SETTING_GENERAL : "general",
     SETTING_SUPPORT_TICKET_CATEGORY : "support-ticket-category",
-    SETTING_COMPANY_WAREHOUSE : "company-warehouse"
+    SETTING_COMPANY_WAREHOUSE : "company-warehouse",
+
+
+    // setting-integration
+    SETTING_META_APP: "meta-app",
+    SETTING_INDIAMART :"indiamart",
+    SETTING_LINKEDIN : "linkedin",
+    SETTING_GOOGLE_ADS : "google-ads"
 
 }
 export default ROUTES_URL;

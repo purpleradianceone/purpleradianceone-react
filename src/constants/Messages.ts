@@ -226,6 +226,11 @@ const MESSAGE = {
                 DENIED_ADD_ACCESS: "You do not have permission to create general setting.",
                 DENIED_UPDATE_ACCESS: "You do not have permission to update general setting .",
             },
+            INTEGRATION : {
+               DENIED_VIEW_ACCESS: "You do not have permission to view integration setting.",
+                DENIED_ADD_ACCESS: "You do not have permission to create integration setting.",
+                DENIED_UPDATE_ACCESS: "You do not have permission to update integration setting .",  
+            }
         }
 
     }
