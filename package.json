@@ -40,6 +40,7 @@
     "dayjs": "^1.11.19",
     "dompurify": "^3.3.1",
     "framer-motion": "^12.23.6",
+    "jodit-react": "^5.2.41",
     "jwt-decode": "^4.0.0",
     "lexical": "^0.31.2",
     "lodash": "^4.17.21",

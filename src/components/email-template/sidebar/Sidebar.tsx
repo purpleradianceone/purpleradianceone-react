@@ -12,6 +12,7 @@ import { ImageBlock } from "../template-blocks/ImageBlock";
 import { LexicalText } from "../template-blocks/LexicalText";
 import { SectionBlock } from "../template-blocks/SectionBlock";
 import { TableBlock } from "../template-blocks/TableBlock";
+import { LucideClipboardEdit, LucideColumns, LucideImage, LucidePackage, LucideSeparatorHorizontal, LucideTable, MousePointerSquare } from "lucide-react";
 
 export const Sidebar: React.FC = () => {
   const { connectors } = useEditor();
@@ -26,31 +27,31 @@ export const Sidebar: React.FC = () => {
           <span>Subject</span>
         </div> */}
         <div id="section" ref={(ref: HTMLDivElement) => { ref && connectors.create(ref, <SectionBlock />); }} className="sidebar-block caption-custom">
-          <span>📦</span>
+          <span><LucidePackage/></span>
           <span>Section</span>
         </div>
         <div id="text" ref={(ref: HTMLDivElement) => { ref && connectors.create(ref, <LexicalText />); }} className="sidebar-block caption-custom">
-          <span>📝</span>
+          <span><LucideClipboardEdit/></span>
           <span>Text</span>
         </div>
         <div id="image" ref={(ref: HTMLDivElement) => { ref && connectors.create(ref, <ImageBlock src="" width={0} height={0} alignment={"left"} />); }} className="sidebar-block caption-custom">
-          <span>🖼️</span>
+          <span><LucideImage/></span>
           <span>Image</span>
         </div>
         <div id="button" ref={(ref: HTMLDivElement) => { ref && connectors.create(ref, <ButtonBlock />); }} className="sidebar-block caption-custom">
-          <span>🔘</span>
+          <span><MousePointerSquare/></span>
           <span>Button</span>
         </div>
         <div id="divider" ref={(ref: HTMLDivElement) => { ref && connectors.create(ref, <DividerBlock />); }} className="sidebar-block caption-custom">
-          <span>➖</span>
+          <span><LucideSeparatorHorizontal/></span>
           <span>Divider</span>
         </div>
         <div id="column" ref={(ref: HTMLDivElement) => { ref && connectors.create(ref, <ColumnBlock />); }}  className="sidebar-block caption-custom">
-          <span>📊</span>
+          <span><LucideColumns/></span>
           <span>Column</span>
         </div>
         <div id="table" ref={(ref: HTMLDivElement) => { ref && connectors.create(ref, <TableBlock />); }}  className="sidebar-block caption-custom">
-          <span>📋</span>
+          <span><LucideTable/></span>
           <span>Table</span>
         </div>
         {/* <div id="dynamic_fields" ref={(ref: HTMLDivElement) => { ref && connectors.create(ref, <DynamicFieldBlock />); }} className="sidebar-block">

@@ -23,15 +23,20 @@
 //  │   ├── templateApi.ts
 
 import { Editor } from "@craftjs/core";
-import { PageBlockQuotation } from "../blocks/PageBlockQuotation";
-import { CanvasWrapperQuotation } from "./canvas-wrapper/CanvasWrapperQuotation";
-import { SectionBlockQuotation } from "../blocks/SectionBlockQuotation";
-import { SidebarQuotation } from "../sidebar/SidebarQuotation";
-import { useUserPreference } from "../../../context/user/UserPreference";
-import Button from "../../ui/Button";
+import { PageBlockQuotation } from "../../blocks/PageBlockQuotation";
+import { CanvasWrapperQuotation } from "../canvas-wrapper/CanvasWrapperQuotation";
+import { SectionBlockQuotation } from "../../blocks/SectionBlockQuotation";
+import { SidebarQuotation } from "../../sidebar/SidebarQuotation";
+import { useUserPreference } from "../../../../context/user/UserPreference";
+import Button from "../../../ui/Button";
 import { QuoteIcon, Save } from "lucide-react";
-import { SIZE } from "../../../constants/AppConstants";
-import COLORS from "../../../constants/Colors";
+import { SIZE } from "../../../../constants/AppConstants";
+import COLORS from "../../../../constants/Colors";
+import { ImageBlockQuotation } from "../../blocks/ImageBlockQuotation";
+import { DocumentCanvasQuotation } from "../../blocks/DocumentCanvasQuotation";
+import { HeaderBlockQuotation } from "../../blocks/HeaderBlockQuotation";
+import { FooterBlockQuotation } from "../../blocks/FooterBlockQuotation";
+import { ContentBlockQuotation } from "../../blocks/ContentBlockQuotation";
 
 export const EditorCanvasForQuotation: React.FC = () => {
   const canvasBgColor = "#f9f9f9";
@@ -62,11 +67,7 @@ export const EditorCanvasForQuotation: React.FC = () => {
             // disabled={!userHasAccessToAddEmailTemplateSetting}
             onClick={(e) => {
               e.preventDefault();
-              // if (userHasAccessToAddEmailTemplateSetting) {
-              //   setShowModal(true);
-              // } else {
-              //   toast.error(MESSAGE.ERROR.NOT_ATHORISED);
-              // }
+         
             }}
           >
             <div className="flex items-center justify-center gap-1">
@@ -78,8 +79,13 @@ export const EditorCanvasForQuotation: React.FC = () => {
       </div>
       <Editor
         resolver={{
+          DocumentCanvasQuotation,
           PageBlockQuotation,
           SectionBlockQuotation,
+          ImageBlockQuotation,
+          HeaderBlockQuotation,
+          FooterBlockQuotation,
+          ContentBlockQuotation,
         }}
       >
         {/* ROOT WRAPPER */}
@@ -98,7 +104,7 @@ export const EditorCanvasForQuotation: React.FC = () => {
             style={{ backgroundColor: canvasBgColor }}
           >
             <div id="CANVAS" className=" w-full">
-              <CanvasWrapperQuotation />
+              <CanvasWrapperQuotation data="" />
             </div>
           </main>
         </div>
