@@ -1,8 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Frame, Element, useEditor } from "@craftjs/core";
 import { useEffect, useState } from "react";
+import { DocumentCanvasQuotation } from "../../blocks/DocumentCanvasQuotation";
+import { LucideClipboardPaste } from "lucide-react";
 
-export const CanvasWrapperQuotation = () => {
+export const CanvasWrapperQuotation = ({data}:{data:string}) => {
   const { query } = useEditor();
   const [isEmpty, setIsEmpty] = useState(true);
 
@@ -20,11 +22,11 @@ export const CanvasWrapperQuotation = () => {
   }, [query]);
 
   return (
-    <div style={{ position: "relative" }}  className="table-data-custom">
+    <div style={{ position: "relative" }} className="table-data-custom">
       {/* Canvas frame */}
-      <Frame>
+      <Frame data={data}>
         <Element
-          is="div"
+          is={DocumentCanvasQuotation}
           canvas
           id="ROOT"
           style={{
@@ -39,7 +41,7 @@ export const CanvasWrapperQuotation = () => {
 
       {/* Floating overlay message outside the Element */}
       <div
-      className="table-data-custom"
+        className="table-data-custom"
         style={{
           position: "absolute",
           top: "30%",
@@ -52,7 +54,10 @@ export const CanvasWrapperQuotation = () => {
           zIndex: isEmpty ? 1 : -1, // hide from interaction when invisible
         }}
       >
-        📦 Drag the blocks here 👉
+        <div className="flex gap-1">
+        <LucideClipboardPaste size={19}/>
+        Drag the Page blocks here 👉
+        </div>
       </div>
     </div>
   );

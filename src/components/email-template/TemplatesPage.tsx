@@ -92,6 +92,7 @@ export const TemplatesPage: React.FC = () => {
   };
 
   const getTemplateTypes = async () => {
+    if(loginStatus.companyId === 0)return;
     setLoadingTemplatesPage(true);
     try {
       const response = await axios.post(

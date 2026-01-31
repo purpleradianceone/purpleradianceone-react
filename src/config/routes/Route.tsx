@@ -66,7 +66,7 @@ import { CreateMultipleAccountCompanyProduct } from "../../components/modals/Acc
 import AccountDetails from "../../components/modals/Account/AccountDetails";
 import { AccountCompanyProductDetails } from "../../components/modals/Account/account-company-product/account-company-product-details/AccountCompanyProductDetails";
 import AccountNavbarBreadcrumb from "../../components/modals/Account/nav-wrapper/AccountNavbarBreadcrumb";
-import { EditorCanvasForQuotation } from "../../components/quotation-builder/builder/EditorCanvasForQuotation";
+import { EditorCanvasForQuotation } from "../../components/quotation-builder/builder/editor-canvas/EditorCanvasForQuotation";
 import LeadSetting from "../../components/views/settings/lead-settings/LeadSetting";
 import MeetingSettings from "../../components/views/settings/meeting-settings/MeetingSetting";
 import AccountTypeSetting from "../../components/views/settings/account-type/AccountTypeSetting";

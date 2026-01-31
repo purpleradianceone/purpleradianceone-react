@@ -167,7 +167,7 @@ export const SectionBlockQuotation: React.FC = () => {
           style={{
             width: "100%",
             boxSizing: "border-box",
-            minHeight: "50px",
+            minHeight: "30px",
           }}
         />
       </div>
@@ -182,4 +182,9 @@ export const SectionBlockQuotation: React.FC = () => {
     padding: "20px",
     align: "center",
   },
+rules: {
+  canMoveIn: (_incoming: any, currentNode: any) =>
+    currentNode.data.parent?.data.displayName === "Page Block",
+},
+  
 };
