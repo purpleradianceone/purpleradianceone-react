@@ -3,9 +3,10 @@ import { Frame, Element, useEditor } from "@craftjs/core";
 import { useEffect, useState } from "react";
 import { DocumentCanvasQuotation } from "../../blocks/DocumentCanvasQuotation";
 import { LucideClipboardPaste } from "lucide-react";
+export const STORAGE_KEY = "quotation_editor_json";
 
-export const CanvasWrapperQuotation = ({data}:{data:string}) => {
-  const { query } = useEditor();
+export const CanvasWrapperQuotation = ({ data }: { data: string }) => {
+  const { query, store } = useEditor();
   const [isEmpty, setIsEmpty] = useState(true);
 
   useEffect(() => {
@@ -20,6 +21,23 @@ export const CanvasWrapperQuotation = ({data}:{data:string}) => {
     const interval = setInterval(checkCanvasEmpty, 500);
     return () => clearInterval(interval);
   }, [query]);
+
+  //Auto save editor state
+  useEffect(() => {
+    const unsubscribe = store.subscribe(
+      (state) => state,
+      () => {
+        const serialized = query.serialize();
+        const data = JSON.parse(serialized);
+        const result = isCanvasTrulyEmpty(data, "ROOT");
+        if (!result) localStorage.setItem(STORAGE_KEY, serialized);
+      },
+    );
+
+    return () => unsubscribe();
+  }, [store, query]);
+
+ 
 
   return (
     <div style={{ position: "relative" }} className="table-data-custom">
@@ -55,8 +73,8 @@ export const CanvasWrapperQuotation = ({data}:{data:string}) => {
         }}
       >
         <div className="flex gap-1">
-        <LucideClipboardPaste size={19}/>
-        Drag the Page blocks here 👉
+          <LucideClipboardPaste size={19} />
+          Drag the Page blocks here 👉
         </div>
       </div>
     </div>

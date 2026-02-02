@@ -9,10 +9,9 @@
 //  ├── blocks/
 //  │        PageBlock (A4)
 //  │            ├── SectionBlock
-//  │            │    ├── HeaderBlock
-//  │            │    ├── TextBlock
-//  │            │    ├── ImageBlock
+//  │            │    ├── ContentBlock
 //  │            │    ├── TableBlock
+//  │            │    ├── HeaderBlock
 //  │            │    └── FooterBlock
 //  │
 //  ├── state/
@@ -24,7 +23,10 @@
 
 import { Editor } from "@craftjs/core";
 import { PageBlockQuotation } from "../../blocks/PageBlockQuotation";
-import { CanvasWrapperQuotation } from "../canvas-wrapper/CanvasWrapperQuotation";
+import {
+  CanvasWrapperQuotation,
+  STORAGE_KEY,
+} from "../canvas-wrapper/CanvasWrapperQuotation";
 import { SectionBlockQuotation } from "../../blocks/SectionBlockQuotation";
 import { SidebarQuotation } from "../../sidebar/SidebarQuotation";
 import { useUserPreference } from "../../../../context/user/UserPreference";
@@ -37,11 +39,26 @@ import { DocumentCanvasQuotation } from "../../blocks/DocumentCanvasQuotation";
 import { HeaderBlockQuotation } from "../../blocks/HeaderBlockQuotation";
 import { FooterBlockQuotation } from "../../blocks/FooterBlockQuotation";
 import { ContentBlockQuotation } from "../../blocks/ContentBlockQuotation";
+import { TableBlockQuotation } from "../../blocks/TableBlockQuotation";
+import { useEffect, useState } from "react";
 
 export const EditorCanvasForQuotation: React.FC = () => {
   const canvasBgColor = "#f9f9f9";
-
   const { userPreference } = useUserPreference();
+
+  const [editorStateData, setEditorStateData] = useState(() => {
+    const jsonEditorState = localStorage.getItem(STORAGE_KEY);
+    return jsonEditorState;
+  });
+
+  useEffect(() => {
+    const jsonEditorState = localStorage.getItem(STORAGE_KEY);
+    if (jsonEditorState) {
+      setEditorStateData(jsonEditorState);
+      console.log("stored Local storage editor json state:");
+      console.log(jsonEditorState);
+    }
+  }, []);
 
   return (
     <div
@@ -67,7 +84,6 @@ export const EditorCanvasForQuotation: React.FC = () => {
             // disabled={!userHasAccessToAddEmailTemplateSetting}
             onClick={(e) => {
               e.preventDefault();
-         
             }}
           >
             <div className="flex items-center justify-center gap-1">
@@ -86,6 +102,7 @@ export const EditorCanvasForQuotation: React.FC = () => {
           HeaderBlockQuotation,
           FooterBlockQuotation,
           ContentBlockQuotation,
+          TableBlockQuotation,
         }}
       >
         {/* ROOT WRAPPER */}
@@ -104,7 +121,7 @@ export const EditorCanvasForQuotation: React.FC = () => {
             style={{ backgroundColor: canvasBgColor }}
           >
             <div id="CANVAS" className=" w-full">
-              <CanvasWrapperQuotation data="" />
+              <CanvasWrapperQuotation data={editorStateData ?? ""} />
             </div>
           </main>
         </div>
