@@ -18,7 +18,9 @@ function FacebookOAuthConsent() {
     if (isFlowCompleted) {
       window.history.go(-7);
     }
-    window.history.back();
+    // NOTE : Navigating back when clicked on the cancel button or outside the card
+    navigate(ROUTES_URL.INTEGRATIONS_SETTINGS+"/"+ROUTES_URL.SETTING_META_APP)
+    // window.history.back();
   };
 
   const handleConfirm = () => {
@@ -51,7 +53,9 @@ function FacebookOAuthConsent() {
     window.history.pushState(null, document.title, window.location.href);
     const handleBackButton = (event: PopStateEvent) => {
       event.preventDefault();
-      navigate(ROUTES_URL.INTEGRATIONS_SETTINGS, { replace: true });
+          navigate(ROUTES_URL.INTEGRATIONS_SETTINGS+"/"+ROUTES_URL.SETTING_META_APP)
+
+      // navigate(ROUTES_URL.INTEGRATIONS_SETTINGS, { replace: true });
     };
 
     window.addEventListener("popstate", handleBackButton);
@@ -96,7 +100,7 @@ function FacebookOAuthConsent() {
   return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div
-        className="fixed inset-0 bg-black/50 backdrop-blur-sm"
+        className="fixed inset-0 bg-black/50 opacity-50 backdrop-blur-sm"
         onClick={() => {
           handleClose(false);
         }}

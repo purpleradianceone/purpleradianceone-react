@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import AccountProduct from "../../../../../@types/account/AccountProduct";
 import { useUserAccessModules } from "../../../../../config/hooks/useAccessModules";
 import { useLoggedInUserContext } from "../../../../../context/user/LoggedInUserContext";
@@ -29,17 +29,22 @@ import CompanyUserSearchFieldInput from "../../../../ui/CompanyUserSearchFieldIn
 import { AccountCompanyProductAmcDetails } from "../account-company-product-amc/AccountCompanyProductAmcDetails";
 import AccessDeniedMessagePage from "../../../../views/not-found/AccessDeniedMessagePage";
 import MESSAGE from "../../../../../constants/Messages";
+import FormInput from "../../../../ui/FormInput";
+import { updateAccountCompanyProductSerialNumberApiCall } from "../../../../../config/apis/AccountApis";
 
 export const AccountCompanyProductDetailsCard = ({
   selectedProductCard,
 }: {
   selectedProductCard: AccountProduct;
 }) => {
-  const { userHasAccessToUpdateAccountProducts , userHasAccessToViewAccountProducts} = useUserAccessModules();
+  const {
+    userHasAccessToUpdateAccountProducts,
+    userHasAccessToViewAccountProducts,
+  } = useUserAccessModules();
   const { loginStatus } = useLoggedInUserContext();
 
   const [productData, setProductData] = useState<AccountProduct | null>(
-    selectedProductCard
+    selectedProductCard,
   );
   const [originalProductData, setOriginalProductData] =
     useState<AccountProduct | null>(selectedProductCard);
@@ -49,6 +54,19 @@ export const AccountCompanyProductDetailsCard = ({
     if (selectedProductCard) {
       setProductData({ ...selectedProductCard });
       setOriginalProductData({ ...selectedProductCard });
+    }
+  }, [selectedProductCard]);
+
+  const [originalProductSerialNumber, setOriginalProductSerialNumber] =
+    useState<string | null>(null);
+  const [productSerialNumber, setProductSerialNumber] = useState<string | null>(
+    null,
+  );
+
+  useEffect(() => {
+    if (selectedProductCard) {
+      setProductSerialNumber(selectedProductCard.serialNumber);
+      setOriginalProductSerialNumber(selectedProductCard.serialNumber);
     }
   }, [selectedProductCard]);
 
@@ -66,7 +84,7 @@ export const AccountCompanyProductDetailsCard = ({
 
   const updateAccountCompanyProduct = async <K extends keyof AccountProduct>(
     field: K,
-    value: AccountProduct[K]
+    value: AccountProduct[K],
   ) => {
     if (!productData || !originalProductData) return;
 
@@ -74,7 +92,7 @@ export const AccountCompanyProductDetailsCard = ({
     if (typeof value === "string" && value.trim() === "") {
       toast.error("Field cannot be empty");
       setProductData((prev) =>
-        prev ? { ...prev, [field]: originalProductData[field] } : prev
+        prev ? { ...prev, [field]: originalProductData[field] } : prev,
       );
       return;
     }
@@ -92,20 +110,20 @@ export const AccountCompanyProductDetailsCard = ({
       const response = await axiosClient.post(
         POST_API.UPDATE_ACCOUNT_COMPANY_PRODUCT,
         postData,
-        { withCredentials: true }
+        { withCredentials: true },
       );
 
       if (response.data.status) {
         toast.success(response.data.message);
         setOriginalProductData((prev) =>
-          prev ? { ...prev, [field]: value } : prev
+          prev ? { ...prev, [field]: value } : prev,
         );
       } else {
         toast.error(response.data.message);
         //   throw new Error(response.data.message);
         // rollback only the failed field
         setProductData((prev) =>
-          prev ? { ...prev, [field]: originalProductData[field] } : prev
+          prev ? { ...prev, [field]: originalProductData[field] } : prev,
         );
       }
     } catch (error) {
@@ -113,14 +131,14 @@ export const AccountCompanyProductDetailsCard = ({
 
       // rollback only the failed field
       setProductData((prev) =>
-        prev ? { ...prev, [field]: originalProductData[field] } : prev
+        prev ? { ...prev, [field]: originalProductData[field] } : prev,
       );
     }
   };
 
   const handleOnChange = <K extends keyof AccountProduct>(
     fieldName: K,
-    event: React.ChangeEvent<HTMLTextAreaElement>
+    event: React.ChangeEvent<HTMLTextAreaElement>,
   ) => {
     const value = event.target.value;
 
@@ -134,9 +152,65 @@ export const AccountCompanyProductDetailsCard = ({
     });
   };
 
+  // Note : udpating the state of serial number
+  const handleSerialNumberChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    setProductSerialNumber(event.target.value);
+  };
+
+  const timeoutRefForProductSerialNumber = useRef<number | null>(null);
+
+  // Note : this useeffect will run when user will update the serial number
+  useEffect(() => {
+
+    if (productSerialNumber === originalProductSerialNumber) return;
+    if (timeoutRefForProductSerialNumber.current) {
+      clearTimeout(timeoutRefForProductSerialNumber.current);
+    }
+
+    timeoutRefForProductSerialNumber.current = window.setTimeout(() => {
+      updateAccountCompanyProductSerialNumber(productData?.id , productSerialNumber);
+    }, 1000);
+
+    return () => {
+      if (timeoutRefForProductSerialNumber.current) {
+        clearTimeout(timeoutRefForProductSerialNumber.current);
+      }
+    };
+  }, [productSerialNumber]);
+
+  // Note : update api call for account-company-product-serial-number
+  const updateAccountCompanyProductSerialNumber = async (
+    id: number | undefined,
+    value : string | null
+  ) => {
+    if (!id) return;
+    try {
+      const postData = {
+        company_id: loginStatus.companyId,
+        id: id,
+        serial_number: value,
+        updatedby_id: loginStatus.id,
+      };
+      const response =
+        await updateAccountCompanyProductSerialNumberApiCall(postData);
+
+      if (response.data.status) {
+        toast.success(response.data.message);
+        setOriginalProductSerialNumber(productSerialNumber);
+      } else {
+        toast.error(response.data.message);
+        setProductSerialNumber(originalProductSerialNumber);
+      }
+    } catch (error) {
+      setProductSerialNumber(originalProductSerialNumber);
+      handleApiError(error);
+    }
+  };
   const handleDateCommit = <K extends keyof AccountProduct>(
     fieldName: K,
-    date: Date | null
+    date: Date | null,
   ) => {
     if (!date) return;
 
@@ -188,7 +262,7 @@ export const AccountCompanyProductDetailsCard = ({
 
     // if (!changedField) return;
     const changedField = API_UPDATABLE_FIELDS.find(
-      (key) => productData[key] !== originalProductData[key]
+      (key) => productData[key] !== originalProductData[key],
     );
 
     if (!changedField) return;
@@ -200,10 +274,16 @@ export const AccountCompanyProductDetailsCard = ({
     return () => clearTimeout(timer);
   }, [productData]);
 
-  if (selectedProductCard === null ) return null;
-  if(!userHasAccessToViewAccountProducts)
-    return( <AccessDeniedMessagePage message={MESSAGE.MODULE_ACCESS.ACCOUNT_COMPANY_PRODUCT.DENIED_VIEW_ACCESS}></AccessDeniedMessagePage>)
-  
+  if (selectedProductCard === null) return null;
+  if (!userHasAccessToViewAccountProducts)
+    return (
+      <AccessDeniedMessagePage
+        message={
+          MESSAGE.MODULE_ACCESS.ACCOUNT_COMPANY_PRODUCT.DENIED_VIEW_ACCESS
+        }
+      ></AccessDeniedMessagePage>
+    );
+
   return (
     <div className="px-1  py-0.5">
       {/* user access : {userHasAccessToUpdateAccount ? "true" : "false"} */}
@@ -260,15 +340,6 @@ export const AccountCompanyProductDetailsCard = ({
           }
           penLogo={false}
         />
-        {productData?.serialNumber && (
-          <DisplayComponent
-            icon={FileDigit}
-            title="Serial Number"
-            value={productData!.serialNumber ? productData!.serialNumber : ""}
-            penLogo={false}
-          />
-        )}
-
         {productData?.barcode && (
           <DisplayComponent
             icon={Barcode}
@@ -277,6 +348,27 @@ export const AccountCompanyProductDetailsCard = ({
             penLogo={false}
           />
         )}
+         {productData?.serialNumber && (
+
+           <FormInput
+           logo={FileDigit}
+           label="Serial Number"
+           name="serialNumber"
+           placeholder="Enter serial number"
+           value={productSerialNumber ? productSerialNumber : ""}
+           onChange={handleSerialNumberChange}
+          inputMode="text"
+          type="text"
+          />
+        )}
+        {/* {productData?.serialNumber && (
+          <DisplayComponent
+            icon={FileDigit}
+            title="Serial Number"
+            value={productData!.serialNumber ? productData!.serialNumber : ""}
+            penLogo={false}
+          />
+        )} */}
       </div>
 
       {/* Content */}

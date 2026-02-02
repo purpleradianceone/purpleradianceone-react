@@ -137,7 +137,7 @@ const AccountCompanyType = ({ accountId }: { accountId: number }) => {
   if(!userHasAccessToViewAccountTypes)return <AccessDeniedMessagePage message={MESSAGE.MODULE_ACCESS.ACCOUNT_TYPES.DENIED_VIEW_ACCESS}/>
 
   return (
-  <div className="bg-white border flex flex-col h-full  rounded-lg p-1 max-h-96 overflow-auto">
+  <div className="bg-white border flex flex-col   rounded-lg p-1 max-h-96 overflow-auto">
       {/* Header */}
     {/* <div className="bg-gray-100 table-header-custom rounded-t-md px-2 ">
       <span>Company Account Type</span>
@@ -148,7 +148,7 @@ const AccountCompanyType = ({ accountId }: { accountId: number }) => {
         </div>
       ) : accountCompanyAccountType.length === 0 &&
         !isLoadingCompanyAccountType ? (
-        <div className="flex items-center justify-center h-full  " >
+        <div className="flex items-center justify-center min-h-20  " >
         <span className="italic caption-custom flex gap-1 items-center ">
             <Button
               disabled={!userHasAccessToAddAccountTypes}
@@ -173,8 +173,8 @@ const AccountCompanyType = ({ accountId }: { accountId: number }) => {
           </span>
         </div>
       ) : (
-        <div className="grid md:grid-cols-2 gap-1 w-full">
-          <div className="col-span-2 flex justify-end p-0.5">
+        <div className="grid md:grid-cols-2 gap-1 w-full ">
+          <div className="col-span-2 flex justify-end">
             <Button
               disabled={!userHasAccessToAddAccountTypes}
               onClick={() => {

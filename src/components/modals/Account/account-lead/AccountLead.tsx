@@ -195,7 +195,7 @@ const AccountLead = ({ account }: CreateAccountLeadType) => {
 
       {/* Empty State */}
       {!isLoading && accountLead.length === 0 && (
-        <div className="flex items-center justify-center h-full ">
+        <div className="flex items-center justify-center  min-h-20 ">
           <span className="italic caption-custom flex gap-1 items-center ">
             <CreateAccountLead
               account={account}

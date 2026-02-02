@@ -102,7 +102,6 @@ function WebFormIntegration() {
             handleCompanySecretChange={handleCompanySecretChange}
             />
             )}
-            
           </div>
         </div>
       </motion.section>

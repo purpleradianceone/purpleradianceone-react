@@ -47,16 +47,16 @@ import {
   createMultipleAccountCompanyProduct,
   fetchAccount,
   getLookupQuantityLive,
-  
 } from "../../../../../config/apis/api";
 import MESSAGE from "../../../../../constants/Messages";
 import { handleApiError } from "../../../../../config/error/handleApiError";
-import ControlledDatePicker from "../../../../ui/ControlledDatePicker";
 import { format } from "date-fns";
 import { calculateEndDate } from "../../../../../utils/date/calculateEndDate";
 import LoadingPopUpAnimation from "../../../../views/card/LoadingPopUpAnimation";
 import AccessDeniedMessagePage from "../../../../views/not-found/AccessDeniedMessagePage";
 import Account from "../../../../../@types/account/Account";
+import { ControlledMuiDatePicker } from "../../../../ui/ControlledMuiDatePicker";
+import { Dayjs } from "dayjs";
 
 interface ProductRow {
   rowNaNoId: string;
@@ -105,22 +105,22 @@ interface ProductRow {
 export const CreateMultipleAccountCompanyProduct = () => {
   const navigate = useNavigate();
   const { userPreference } = useUserPreference();
-  const { userHasAccessToAddAccountProducts  } = useUserAccessModules();
+  const { userHasAccessToAddAccountProducts } = useUserAccessModules();
   const { loginStatus } = useLoggedInUserContext();
 
-  // Note : will get the accountId from the url params 
+  // Note : will get the accountId from the url params
   const { accountId } = useParams<{ accountId: string }>();
 
-  // Note : state created to store the account details as per the account id 
-  const [accountDetails , setAccountDetails ] = useState<Account >();
+  // Note : state created to store the account details as per the account id
+  const [accountDetails, setAccountDetails] = useState<Account>();
 
-  // Note : On render call will go for account details 
-  // we require the account details to pre populate the billing and shipping address 
+  // Note : On render call will go for account details
+  // we require the account details to pre populate the billing and shipping address
   useEffect(() => {
-    const apiCall = async() => {
-      try{
-        if(!accountId || !loginStatus) return;
-        const  response= await fetchAccount({
+    const apiCall = async () => {
+      try {
+        if (!accountId || !loginStatus) return;
+        const response = await fetchAccount({
           company_id: loginStatus.companyId,
           id: accountId,
           isactive: null,
@@ -131,25 +131,23 @@ export const CreateMultipleAccountCompanyProduct = () => {
           search_parameter: "",
           search_parameter_date: "",
         });
-        if(response){
-          const  data =response.data[0];
+        if (response) {
+          const data = response.data[0];
 
-          const formattedData :Account = {
+          const formattedData: Account = {
             ...data,
-            billingAddress : data.billing_address,
-            shippingAddress : data.shipping_address,
-            deliveryAddress : data.delivery_address
-          }
+            billingAddress: data.billing_address,
+            shippingAddress: data.shipping_address,
+            deliveryAddress: data.delivery_address,
+          };
           setAccountDetails(formattedData);
-          
         }
-      }catch(err){
-        handleApiError(err)
+      } catch (err) {
+        handleApiError(err);
       }
-      
-    }
+    };
     apiCall();
-  },[accountId , loginStatus]);
+  }, [accountId, loginStatus]);
 
   const [rows, setRows] = useState<ProductRow[]>([
     {
@@ -161,11 +159,11 @@ export const CreateMultipleAccountCompanyProduct = () => {
       warranty: 0,
       amc: 0,
       installedBy:
-      loginStatus.fullName || loginStatus.email || loginStatus.mobileNumber,
+        loginStatus.fullName || loginStatus.email || loginStatus.mobileNumber,
       amcCycleEndDate: null,
       amcCycleStartDate: null,
-      billingAddress:"",
-      deliveryAddress:"",
+      billingAddress: "",
+      deliveryAddress: "",
       deliveryDate: null,
       installationDate: null,
       unit_id: 0,
@@ -181,17 +179,17 @@ export const CreateMultipleAccountCompanyProduct = () => {
     },
   ]);
 
-  // Note : when accountDetails state gets the data from api call then we populate the billing and shilling address state 
-  useEffect(()=>{
-    if(!accountDetails) return;
-    setRows((prev)=>
-      prev.map((row)=>({
+  // Note : when accountDetails state gets the data from api call then we populate the billing and shilling address state
+  useEffect(() => {
+    if (!accountDetails) return;
+    setRows((prev) =>
+      prev.map((row) => ({
         ...row,
         billingAddress: accountDetails.billingAddress ?? "",
-        deliveryAddress : accountDetails.shippingAddress ?? ""
-      }))
-    )
-  },[accountDetails])
+        deliveryAddress: accountDetails.shippingAddress ?? "",
+      })),
+    );
+  }, [accountDetails]);
   // Per-row product dropdown
   const [products, setProducts] = useState<Product[]>([]);
   const [searchText, setSearchText] = useState<string>("");
@@ -203,7 +201,6 @@ export const CreateMultipleAccountCompanyProduct = () => {
   const limit = userPreference.rowsInGrid || 25;
   const dropdownRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
-
 
   // Note : Used when user clicks outside of dropdown to close the dropdown
   useEffect(() => {
@@ -237,20 +234,18 @@ export const CreateMultipleAccountCompanyProduct = () => {
 
     try {
       const res = await axiosClient.post(
-        // POST_API.GET_PRODUCTS,
         POST_API.GET_LOOKUP_COMPANY_PRODUCT_FOR_ACCOUNT,
         {
           search_parameter: search, // null when first clicked
           offset: newOffset,
           limit,
-
           company_id: loginStatus.companyId,
           id: null,
           search_company_specific_date_range_id: null,
           search_parameter_date: null,
           requestedby: loginStatus.id,
         },
-        { withCredentials: true }
+        { withCredentials: true },
       );
 
       const list = res.data;
@@ -426,10 +421,28 @@ export const CreateMultipleAccountCompanyProduct = () => {
     }
     return isValid;
   };
+
+  // Note : validate the date and call the updaterow function to update the states.
+  const handleDateCommit = (
+    index: number,
+    field: keyof ProductRow,
+    date: Dayjs | null,
+  ) => {
+    if (!date || !date.isValid) return;
+
+    if (date.year() < 2000) return;
+
+    // const formattedDate = date.format("YYYY-MM-DD");
+    const formattedDate = date.toDate();
+    updateRow(index, field, formattedDate);
+  };
+
+
+  // NOte : update the states
   const updateRow = <K extends keyof ProductRow>(
     index: number,
     field: K,
-    value: ProductRow[K]
+    value: ProductRow[K],
   ) => {
     setRows((prev) =>
       prev.map((row, i) => {
@@ -516,7 +529,7 @@ export const CreateMultipleAccountCompanyProduct = () => {
             newRow.warrantyEndDate = calculateEndDate(
               value as Date,
               newRow.productWarrantyNumber!,
-              newRow.productWarrantyId!
+              newRow.productWarrantyId!,
             );
           }
 
@@ -531,7 +544,7 @@ export const CreateMultipleAccountCompanyProduct = () => {
             newRow.amcCycleEndDate = calculateEndDate(
               value as Date,
               newRow.productAmcNumber,
-              newRow.productAmcId
+              newRow.productAmcId,
             );
           }
         }
@@ -547,7 +560,7 @@ export const CreateMultipleAccountCompanyProduct = () => {
 
         newRow.hasError = newHasError;
         return newRow;
-      })
+      }),
     );
   };
 
@@ -573,27 +586,16 @@ export const CreateMultipleAccountCompanyProduct = () => {
     //  Enable loader for this row
     setRows((prev) =>
       prev.map((row, i) =>
-        i === index ? { ...row, isLoading: true, unit_id: 0 } : row
-      )
+        i === index ? { ...row, isLoading: true, unit_id: 0 } : row,
+      ),
     );
 
     try {
-      // const payload = {
-      //   company_id: loginStatus.companyId,
-      //   search_company_specific_date_range_id: null,
-      //   company_product_id: item.id,
-      //   search_parameter: null,
-      //   search_parameter_date: "",
-      //   limit: 25,
-      //   offset: 0,
-      //   requestedby_id: loginStatus.id,
-      // };
-
-      const payload ={
-        company_id : loginStatus.companyId,
+      const payload = {
+        company_id: loginStatus.companyId,
         company_product_id: item.id,
         requestedby_id: loginStatus.id,
-      }
+      };
       // Run APIs in parallel
       const [stockRes, units] = await Promise.all([
         getLookupQuantityLive(payload),
@@ -607,8 +609,8 @@ export const CreateMultipleAccountCompanyProduct = () => {
         toast.error(MESSAGE.ERROR.STOCK_NOT_AVAILABLE_FOR_PRODUCT);
         setRows((prev) =>
           prev.map((row, i) =>
-            i === index ? { ...row, isLoading: false } : row
-          )
+            i === index ? { ...row, isLoading: false } : row,
+          ),
         );
         return;
       }
@@ -641,14 +643,16 @@ export const CreateMultipleAccountCompanyProduct = () => {
           };
 
           return { ...newRow, isLoading: false };
-        })
+        }),
       );
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err: any) {
       toast.error(MESSAGE.ERROR.FAILED_TO_LOAD_PRODUCT_DATA);
 
       setRows((prev) =>
-        prev.map((row, i) => (i === index ? { ...row, isLoading: false } : row))
+        prev.map((row, i) =>
+          i === index ? { ...row, isLoading: false } : row,
+        ),
       );
     }
   };
@@ -758,7 +762,11 @@ export const CreateMultipleAccountCompanyProduct = () => {
   if (!userHasAccessToAddAccountProducts)
     return (
       <div>
-        <AccessDeniedMessagePage message={MESSAGE.MODULE_ACCESS.ACCOUNT_COMPANY_PRODUCT.DENIED_ADD_ACCESS} />
+        <AccessDeniedMessagePage
+          message={
+            MESSAGE.MODULE_ACCESS.ACCOUNT_COMPANY_PRODUCT.DENIED_ADD_ACCESS
+          }
+        />
       </div>
     );
 
@@ -922,7 +930,7 @@ export const CreateMultipleAccountCompanyProduct = () => {
                   <div className="grid  md:grid-cols-4 gap-1">
                     {/* QTY + UNIT */}
                     <div className="col-span-2 grid grid-cols-4 gap-1 ">
-                      <div>
+                      <div className="pt-0.5"> 
                         <FormInput
                           logo={Box}
                           label="Quantity :"
@@ -937,7 +945,7 @@ export const CreateMultipleAccountCompanyProduct = () => {
                             const qty = Number(e.target.value);
 
                             const selectedUnit = unitsForRows[index]?.find(
-                              (u) => u.id === row.unit_id
+                              (u) => u.id === row.unit_id,
                             );
 
                             if (selectedUnit) {
@@ -948,6 +956,7 @@ export const CreateMultipleAccountCompanyProduct = () => {
 
                             updateRow(index, "quantity", qty);
                           }}
+                          paddingy={2}
                         />
                         {row.hasError?.zeroQuantity && (
                           <p className="text-red-500 text-xs mt-1">
@@ -961,7 +970,7 @@ export const CreateMultipleAccountCompanyProduct = () => {
                         )}
                       </div>
                       {/* Unit */}
-                      <div className="">
+                      <div className="pt-0.5">
                         <CustomDropdown
                           labelName="Unit :"
                           logo={LucideTimer}
@@ -983,7 +992,7 @@ export const CreateMultipleAccountCompanyProduct = () => {
                               Number(row.quantity) *
                               Number(
                                 unitForProduct.find((item) => item.id === unit)
-                                  ?.conversionFactor
+                                  ?.conversionFactor,
                               );
 
                             if (finalFactor) {
@@ -992,6 +1001,7 @@ export const CreateMultipleAccountCompanyProduct = () => {
                           }}
                           options={unitsForRows[index] || []}
                           requiredRedDot={true}
+                          paddingy={2}
                         />
                         {row.hasError?.unit && (
                           <p className="text-red-500 text-xs mt-1">
@@ -1024,7 +1034,18 @@ export const CreateMultipleAccountCompanyProduct = () => {
 
                       {/* PURCHASE DATE */}
                       <div>
-                        <ControlledDatePicker
+                        <ControlledMuiDatePicker
+                          readonly={!row.productId}
+                          label="Purchase Date"
+                          value={row.purchaseDate}
+                          onCommit={(date) => {
+                            handleDateCommit(index, "purchaseDate", date);
+                          }}
+                          isRequired
+                          logo={Calendar}
+                        />
+                        {/* Note : this is working code need to implement another solution */}
+                        {/* <ControlledDatePicker
                           readonly={!row.productId}
                           isRequired={true}
                           logo={Calendar}
@@ -1036,7 +1057,7 @@ export const CreateMultipleAccountCompanyProduct = () => {
                             updateRow(index, "purchaseDate", date);
                           }}
                           value={row.purchaseDate}
-                        />
+                        /> */}
                         {/* <DatePickerInput
                           required
                           label="Purchase Date :"
@@ -1070,7 +1091,18 @@ export const CreateMultipleAccountCompanyProduct = () => {
                           updateRow(index, "deliveryDate", e.target.value)
                         }
                       /> */}
-                      <ControlledDatePicker
+
+                        <ControlledMuiDatePicker
+                          readonly={!row.productId}
+                          label="Delivery Date"
+                          value={row.deliveryDate}
+                          onCommit={(date) => {
+                            handleDateCommit(index, "deliveryDate", date);
+                          }}
+                          logo={Calendar}
+                        />
+                      {/* NOte : this working */}
+                      {/* <ControlledDatePicker
                         readonly={!row.productId}
                         logo={Calendar}
                         label="Delivery Date"
@@ -1079,21 +1111,21 @@ export const CreateMultipleAccountCompanyProduct = () => {
                           updateRow(index, "deliveryDate", date);
                         }}
                         value={row.deliveryDate}
-                      />
+                      /> */}
                     </div>
                     <div className="col-span-2 grid grid-cols-4 gap-x-1">
                       {/* Warranty start date */}
-                      {/* <DatePickerInput
-                        label="Warranty Start Date :"
-                        logo={LucideCalendar}
-                        name="warrantyStartDate"
-                        placeholder="Select Date"
-                        value={row.warrantyStartDate}
-                        onChange={(e) =>
-                          updateRow(index, "warrantyStartDate", e.target.value)
-                        }
-                      /> */}
-                      <ControlledDatePicker
+                      <ControlledMuiDatePicker
+                        readonly={!row.productId}
+                        label="Warranty Start Date"
+                          value={row.warrantyStartDate}
+                          onCommit={(date) => {
+                            handleDateCommit(index, "warrantyStartDate", date);
+                          }}
+                          logo={Calendar}
+                        />
+                      {/* this working */}
+                      {/* <ControlledDatePicker
                         readonly={!row.productId}
                         logo={Calendar}
                         label="Warranty Start Date"
@@ -1101,20 +1133,20 @@ export const CreateMultipleAccountCompanyProduct = () => {
                           updateRow(index, "warrantyStartDate", date);
                         }}
                         value={row.warrantyStartDate}
-                      />
+                      /> */}
 
                       {/* Warranty end date */}
-                      {/* <DatePickerInput
-                        label="Warranty End Date :"
-                        logo={LucideCalendar}
-                        name="warrantyEndDate"
-                        placeholder="Select Date"
-                        value={row.warrantyEndDate}
-                        onChange={(e) =>
-                          updateRow(index, "warrantyEndDate", e.target.value)
-                        }
-                      /> */}
-                      <ControlledDatePicker
+                      <ControlledMuiDatePicker
+                        readonly={!row.productId}
+                        label="Warranty End Date"
+                          value={row.warrantyEndDate}
+                          onCommit={(date) => {
+                            handleDateCommit(index, "warrantyEndDate", date);
+                          }}
+                          logo={Calendar}
+                        />
+                        {/* This working */}
+                      {/* <ControlledDatePicker
                         readonly={!row.productId}
                         logo={Calendar}
                         label="Warranty End Date"
@@ -1122,8 +1154,19 @@ export const CreateMultipleAccountCompanyProduct = () => {
                           updateRow(index, "warrantyEndDate", date);
                         }}
                         value={row.warrantyEndDate}
-                      />
-                      <ControlledDatePicker
+                      /> */}
+
+                       <ControlledMuiDatePicker
+                         readonly={!row.productId}
+                        label="AMC Start Date"
+                          value={row.amcCycleStartDate}
+                          onCommit={(date) => {
+                            handleDateCommit(index, "amcCycleStartDate", date);
+                          }}
+                          logo={Calendar}
+                        />
+                        {/* This working */}
+                      {/* <ControlledDatePicker
                         readonly={!row.productId}
                         logo={Calendar}
                         label="AMC Start Date"
@@ -1131,8 +1174,18 @@ export const CreateMultipleAccountCompanyProduct = () => {
                           updateRow(index, "amcCycleStartDate", date);
                         }}
                         value={row.amcCycleStartDate}
-                      />
-                      <ControlledDatePicker
+                      /> */}
+
+                       <ControlledMuiDatePicker
+                         readonly={!row.productId}
+                        label="AMC End Date"
+                          value={row.amcCycleEndDate}
+                          onCommit={(date) => {
+                            handleDateCommit(index, "amcCycleEndDate", date);
+                          }}
+                          logo={Calendar}
+                        />
+                      {/* <ControlledDatePicker
                         readonly={!row.productId}
                         logo={Calendar}
                         label="Amc End Date"
@@ -1140,26 +1193,6 @@ export const CreateMultipleAccountCompanyProduct = () => {
                           updateRow(index, "amcCycleEndDate", date);
                         }}
                         value={row.amcCycleEndDate}
-                      />
-                      {/* <DatePickerInput
-                        label="Amc Start Date :"
-                        logo={LucideCalendar}
-                        name="amcCycleStartDate"
-                        placeholder="Select Date"
-                        value={row.amcCycleStartDate}
-                        onChange={(e) =>
-                          updateRow(index, "amcCycleStartDate", e.target.value)
-                        }
-                      /> */}
-                      {/* <DatePickerInput
-                        label="Amc End Date :"
-                        logo={LucideCalendar}
-                        name="amcCycleEndDate"
-                        placeholder="Select Date"
-                        value={row.amcCycleEndDate}
-                        onChange={(e) =>
-                          updateRow(index, "amcCycleEndDate", e.target.value)
-                        }
                       /> */}
                     </div>
                     <div
@@ -1195,19 +1228,18 @@ export const CreateMultipleAccountCompanyProduct = () => {
                             Installed by is required
                           </p>
                         )}
-                        {/* <div> */}
-                        {/* <DatePickerInput
-                          label="Installation Date :"
-                          logo={LucideCalendar}
-                          name="installationDate"
-                          placeholder="Select Date"
-                          value={row.installationDate}
-                          onChange={(e) =>
-                            updateRow(index, "installationDate", e.target.value)
-                          }
-                        /> */}
                       </div>
-                      <ControlledDatePicker
+                       <ControlledMuiDatePicker
+                       readonly={!row.productId}
+                        label="Installation Date"
+                          value={row.installationDate}
+                          onCommit={(date) => {
+                            handleDateCommit(index, "installationDate", date);
+                          }}
+                          logo={Calendar}
+                        />
+                        {/* this working */}
+                      {/* <ControlledDatePicker
                         readonly={!row.productId}
                         logo={Calendar}
                         label="Installation Date"
@@ -1215,7 +1247,7 @@ export const CreateMultipleAccountCompanyProduct = () => {
                           updateRow(index, "installationDate", date);
                         }}
                         value={row.installationDate}
-                      />
+                      /> */}
                       {row !== undefined && row?.isSerialNumber === true && (
                         <div>
                           <div className="flex items-center justify-end h-fit ">
@@ -1361,8 +1393,8 @@ export const CreateMultipleAccountCompanyProduct = () => {
               prev.map((r) =>
                 r.rowNaNoId === serialRowIndex
                   ? { ...r, serialNumber: selectedSerialIds }
-                  : r
-              )
+                  : r,
+              ),
             );
           }}
         />
@@ -1466,7 +1498,7 @@ function CompanyUserSearchFieldInput({
 
   const debouncedSearch = useCallback(
     debounce((txt: string) => fetchUsers(txt), 300),
-    [isDisabled]
+    [isDisabled],
   );
 
   useEffect(() => {
@@ -1637,8 +1669,8 @@ function CompanyUserSearchFieldInput({
             isDisabled
               ? " table-header-custom appearance-none block w-full px-3 py-0.5 border bg-gray-200 border-gray-300 rounded-md shadow-sm text-gray-500 cursor-not-allowed"
               : readOnly
-              ? "appearance-none block w-full px-3 py-0.5 border table-header-custom bg-gray-100 border-gray-300 rounded-md shadow-sm"
-              : "table-header-custom appearance-none block w-full px-3 py-0.5 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                ? "appearance-none block w-full px-3 py-0.5 border table-header-custom bg-gray-100 border-gray-300 rounded-md shadow-sm"
+                : "table-header-custom appearance-none block w-full px-3 py-0.5 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
           }
         />
 
@@ -1687,7 +1719,7 @@ function CompanyUserSearchFieldInput({
               )
             )}
           </div>,
-          document.body
+          document.body,
         )}
 
       {error && (
