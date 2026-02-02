@@ -24,3 +24,9 @@ export const getLookupAccounts  = async (payload: object , signal? : AbortSignal
     const response = await axiosClient.post(POST_API.GET_LOOKUP_ACCOUNTS, payload, {signal, withCredentials: true })
     return response;
 }
+
+export const updateAccountCompanyProductSerialNumberApiCall  = async (payload: object
+) => {
+    const response = await axiosClient.post(POST_API.UPDATE_ACCOUNT_COMPANY_PRODUCT_SERIAL_NUMBER, payload, { withCredentials: true })
+    return response;
+}

@@ -54,9 +54,13 @@ export const AccountCompanyProductAmcCreate: React.FC<
     field: keyof AccountCompanyProductAmcCreateDto,
     date: Dayjs | null
   ) => {
-    if (!date) return;
+    if (!date || !date.isValid) return;
+
+    if(date.year() < 2000 ) return;
+
 
     const formattedDate = date.format("YYYY-MM-DD");
+    console.log("this is the date ");
     console.log(formattedDate);
 
     setFormData((prev) => ({

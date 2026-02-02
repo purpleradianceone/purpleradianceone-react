@@ -787,7 +787,7 @@ export const router = createBrowserRouter([
     element: (
       <MobileRedirectWrapper>
         <PrivateRoute>
-          <FacebookOAuthConsent></FacebookOAuthConsent>
+          <FacebookOAuthConsent/>
         </PrivateRoute>
       </MobileRedirectWrapper>
     ),

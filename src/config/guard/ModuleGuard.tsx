@@ -15,7 +15,11 @@ export function ModuleGuard({
   const permission = useUserAccessModules();
 
   if (!permission[permissionKey]) {
-    return <AccessDeniedMessagePage message={deniedMessage} />;
+    return (
+      <div className="w-full h-96 flex items-center justify-center">
+        <AccessDeniedMessagePage message={deniedMessage} />;
+      </div>
+    );
   }
   return <>{children}</>;
 }
