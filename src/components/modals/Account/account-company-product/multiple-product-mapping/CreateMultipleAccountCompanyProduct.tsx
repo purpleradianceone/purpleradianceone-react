@@ -17,6 +17,7 @@ import {
   Calendar,
   FileDigit,
   Info,
+  InfoIcon,
   LucideIcon,
   LucideTimer,
   MapPin,
@@ -437,7 +438,6 @@ export const CreateMultipleAccountCompanyProduct = () => {
     updateRow(index, field, formattedDate);
   };
 
-
   // NOte : update the states
   const updateRow = <K extends keyof ProductRow>(
     index: number,
@@ -566,6 +566,13 @@ export const CreateMultipleAccountCompanyProduct = () => {
 
   const [showSerialNumberModule, setShowSerialNumberModule] =
     useState<boolean>(false);
+
+  // Note : used to show the selected serial number data when user hovers over the info icon
+  const [
+    showProductsSelectedSerialNumber,
+    setShowProductsSelectedSerialNumber,
+  ] = useState<boolean>(false);
+
   const { unitForProduct, getUnitForProduct } = useUnitForProduct({});
 
   // ==============================
@@ -930,7 +937,7 @@ export const CreateMultipleAccountCompanyProduct = () => {
                   <div className="grid  md:grid-cols-4 gap-1">
                     {/* QTY + UNIT */}
                     <div className="col-span-2 grid grid-cols-4 gap-1 ">
-                      <div className="pt-0.5"> 
+                      <div className="pt-0.5">
                         <FormInput
                           logo={Box}
                           label="Quantity :"
@@ -1092,15 +1099,15 @@ export const CreateMultipleAccountCompanyProduct = () => {
                         }
                       /> */}
 
-                        <ControlledMuiDatePicker
-                          readonly={!row.productId}
-                          label="Delivery Date"
-                          value={row.deliveryDate}
-                          onCommit={(date) => {
-                            handleDateCommit(index, "deliveryDate", date);
-                          }}
-                          logo={Calendar}
-                        />
+                      <ControlledMuiDatePicker
+                        readonly={!row.productId}
+                        label="Delivery Date"
+                        value={row.deliveryDate}
+                        onCommit={(date) => {
+                          handleDateCommit(index, "deliveryDate", date);
+                        }}
+                        logo={Calendar}
+                      />
                       {/* NOte : this working */}
                       {/* <ControlledDatePicker
                         readonly={!row.productId}
@@ -1118,12 +1125,12 @@ export const CreateMultipleAccountCompanyProduct = () => {
                       <ControlledMuiDatePicker
                         readonly={!row.productId}
                         label="Warranty Start Date"
-                          value={row.warrantyStartDate}
-                          onCommit={(date) => {
-                            handleDateCommit(index, "warrantyStartDate", date);
-                          }}
-                          logo={Calendar}
-                        />
+                        value={row.warrantyStartDate}
+                        onCommit={(date) => {
+                          handleDateCommit(index, "warrantyStartDate", date);
+                        }}
+                        logo={Calendar}
+                      />
                       {/* this working */}
                       {/* <ControlledDatePicker
                         readonly={!row.productId}
@@ -1139,13 +1146,13 @@ export const CreateMultipleAccountCompanyProduct = () => {
                       <ControlledMuiDatePicker
                         readonly={!row.productId}
                         label="Warranty End Date"
-                          value={row.warrantyEndDate}
-                          onCommit={(date) => {
-                            handleDateCommit(index, "warrantyEndDate", date);
-                          }}
-                          logo={Calendar}
-                        />
-                        {/* This working */}
+                        value={row.warrantyEndDate}
+                        onCommit={(date) => {
+                          handleDateCommit(index, "warrantyEndDate", date);
+                        }}
+                        logo={Calendar}
+                      />
+                      {/* This working */}
                       {/* <ControlledDatePicker
                         readonly={!row.productId}
                         logo={Calendar}
@@ -1156,16 +1163,16 @@ export const CreateMultipleAccountCompanyProduct = () => {
                         value={row.warrantyEndDate}
                       /> */}
 
-                       <ControlledMuiDatePicker
-                         readonly={!row.productId}
+                      <ControlledMuiDatePicker
+                        readonly={!row.productId}
                         label="AMC Start Date"
-                          value={row.amcCycleStartDate}
-                          onCommit={(date) => {
-                            handleDateCommit(index, "amcCycleStartDate", date);
-                          }}
-                          logo={Calendar}
-                        />
-                        {/* This working */}
+                        value={row.amcCycleStartDate}
+                        onCommit={(date) => {
+                          handleDateCommit(index, "amcCycleStartDate", date);
+                        }}
+                        logo={Calendar}
+                      />
+                      {/* This working */}
                       {/* <ControlledDatePicker
                         readonly={!row.productId}
                         logo={Calendar}
@@ -1176,15 +1183,15 @@ export const CreateMultipleAccountCompanyProduct = () => {
                         value={row.amcCycleStartDate}
                       /> */}
 
-                       <ControlledMuiDatePicker
-                         readonly={!row.productId}
+                      <ControlledMuiDatePicker
+                        readonly={!row.productId}
                         label="AMC End Date"
-                          value={row.amcCycleEndDate}
-                          onCommit={(date) => {
-                            handleDateCommit(index, "amcCycleEndDate", date);
-                          }}
-                          logo={Calendar}
-                        />
+                        value={row.amcCycleEndDate}
+                        onCommit={(date) => {
+                          handleDateCommit(index, "amcCycleEndDate", date);
+                        }}
+                        logo={Calendar}
+                      />
                       {/* <ControlledDatePicker
                         readonly={!row.productId}
                         logo={Calendar}
@@ -1229,16 +1236,16 @@ export const CreateMultipleAccountCompanyProduct = () => {
                           </p>
                         )}
                       </div>
-                       <ControlledMuiDatePicker
-                       readonly={!row.productId}
+                      <ControlledMuiDatePicker
+                        readonly={!row.productId}
                         label="Installation Date"
-                          value={row.installationDate}
-                          onCommit={(date) => {
-                            handleDateCommit(index, "installationDate", date);
-                          }}
-                          logo={Calendar}
-                        />
-                        {/* this working */}
+                        value={row.installationDate}
+                        onCommit={(date) => {
+                          handleDateCommit(index, "installationDate", date);
+                        }}
+                        logo={Calendar}
+                      />
+                      {/* this working */}
                       {/* <ControlledDatePicker
                         readonly={!row.productId}
                         logo={Calendar}
@@ -1250,7 +1257,7 @@ export const CreateMultipleAccountCompanyProduct = () => {
                       /> */}
                       {row !== undefined && row?.isSerialNumber === true && (
                         <div>
-                          <div className="flex items-center justify-end h-fit ">
+                          <div className="relative flex items-center justify-end h-fit ">
                             <div className="w-full ">
                               <label className=" input-label-custom text-sm   flex items-center gap-1 text-gray-700  ">
                                 <FileDigit
@@ -1266,11 +1273,29 @@ export const CreateMultipleAccountCompanyProduct = () => {
                               <div className="flex items-center justify-between border border-gray-300 rounded px-3 py-1 bg-white shadow-sm focus-within:ring-2 focus-within:ring-blue-500">
                                 <span className="table-header-custom  truncate">
                                   {row.serialNumber.length > 0 ? (
-                                    <>
+                                    <div className="flex items-center justify-between gap-1">
                                       <span className="">
                                         Item count: {row.serialNumber.length}
                                       </span>
-                                    </>
+                                      <button
+                                        type="button"
+                                        onMouseEnter={() =>
+                                          setShowProductsSelectedSerialNumber(
+                                            true,
+                                          )
+                                        }
+                                        onMouseLeave={() =>
+                                          setShowProductsSelectedSerialNumber(
+                                            false,
+                                          )
+                                        }
+                                      >
+                                        <InfoIcon
+                                          size={12}
+                                          className="text-black"
+                                        />
+                                      </button>
+                                    </div>
                                   ) : (
                                     "No item chosen"
                                   )}
@@ -1291,6 +1316,23 @@ export const CreateMultipleAccountCompanyProduct = () => {
                                     ? "Change"
                                     : "Select"}
                                 </Button>
+                                {showProductsSelectedSerialNumber && (
+                                  <div
+                                    className="absolute top-10 bg-pink-500 p-11"
+                                    onMouseLeave={() =>
+                                      setShowProductsSelectedSerialNumber(false)
+                                    }
+                                    onMouseEnter={() =>
+                                      setShowProductsSelectedSerialNumber(true)
+                                    }
+                                  >
+                                    {row.serialNumber.map((item) =>
+                                       <span className="block">
+                                         {item}
+                                       </span>
+                                       )}
+                                  </div>
+                                )}
                               </div>
                             </div>
                           </div>
