@@ -447,8 +447,6 @@ const handleInputChange = (value: string) => {
           description="Add new stock details to the inventory."
           preText="Add Stock"
         />
-
-        
           <>
             <div className="flex flex-col sm:flex-row sm:items-center  gap-2 mt-3 px-2 ">
               {selectedProduct && (
