@@ -124,20 +124,10 @@ const AccountCompanyType = ({ accountId }: { accountId: number }) => {
     }
   }, [userHasAccessToViewAccountTypes]);
 
-  // if (isLoadingCompanyAccountType) {
-  //   return (
-  //     <div>
-  //       <h1>
-  //         <LoadingSpinner />
-  //       </h1>
-  //     </div>
-  //   );
-  // }
-
   if(!userHasAccessToViewAccountTypes)return <AccessDeniedMessagePage message={MESSAGE.MODULE_ACCESS.ACCOUNT_TYPES.DENIED_VIEW_ACCESS}/>
 
   return (
-  <div className="bg-white border flex flex-col   rounded-lg p-1 max-h-96 overflow-auto">
+  <div className="bg-white  flex flex-col   rounded-lg p-1 max-h-96 overflow-auto">
       {/* Header */}
     {/* <div className="bg-gray-100 table-header-custom rounded-t-md px-2 ">
       <span>Company Account Type</span>

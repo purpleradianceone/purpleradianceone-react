@@ -208,13 +208,6 @@ export const AccountCompanyProductWarrantyUpdate = ({
 
   useEffect(() => {
     if (!formData || !originalAccountProductWarrantyData) return;
-
-    // const changedFields = API_UPDATABLE_FIELDS.filter(
-    //   (key) => formData[key] !== originalAccountProductWarrantyData[key]
-    // );
-
-    // if (!changedFields.length) return;
-
     const hasChanges = Object.keys(formData).some(
       (key) =>
         formData[key as keyof AccountCompanyProductWarranty] !==
@@ -222,18 +215,10 @@ export const AccountCompanyProductWarrantyUpdate = ({
           key as keyof AccountCompanyProductWarranty
         ]
     );
-
     if (!hasChanges) return;
-
     const timer = setTimeout(() => {
       updateAccountCompanyProductAmc();
     }, 1000);
-    // const timer = setTimeout(() => {
-    //   changedFields.forEach((field)=>{
-    //     updateAccountCompanyProductAmc(field, formData[field]);
-    //   })
-    // }, 1000);
-
     return () => clearTimeout(timer);
   }, [formData]);
 
