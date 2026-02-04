@@ -3,11 +3,14 @@ import { Frame, Element, useEditor } from "@craftjs/core";
 import { useEffect, useState } from "react";
 import { DocumentCanvasQuotation } from "../../blocks/DocumentCanvasQuotation";
 import { LucideClipboardPaste } from "lucide-react";
-export const STORAGE_KEY = "quotation_editor_json";
+import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
+export const STORAGE_KEY = "quotation_editor_json_user_id=";
 
 export const CanvasWrapperQuotation = ({ data }: { data: string }) => {
   const { query, store } = useEditor();
   const [isEmpty, setIsEmpty] = useState(true);
+  const {loginStatus} = useLoggedInUserContext();
+
 
   useEffect(() => {
     const checkCanvasEmpty = () => {
@@ -30,7 +33,7 @@ export const CanvasWrapperQuotation = ({ data }: { data: string }) => {
         const serialized = query.serialize();
         const data = JSON.parse(serialized);
         const result = isCanvasTrulyEmpty(data, "ROOT");
-        if (!result) localStorage.setItem(STORAGE_KEY, serialized);
+        if (!result) localStorage.setItem(STORAGE_KEY+loginStatus.id, serialized);
       },
     );
 

@@ -51,6 +51,7 @@ import { useTutorailDataContext } from "../../../../context/tutorail/useTutorail
 import { TutorailColumnName } from "../../../../constants/Tutorail";
 import { cancelAllRequests } from "../../../../axios-client/AxiosClient";
 import { LocalStorageKeys } from "../../../../enums/LocalStorageKeys";
+import { APP_VERSION } from "../../../../@types/config/AppVersion";
 
 function Navbar({ children }: { children: React.ReactNode }) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -693,6 +694,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
                         </div>
                       )}
                     </div>
+                    
                   </>
                 )}
 
@@ -832,6 +834,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
                         {/* Menu Options */}
                         <div className="flex flex-col">
                           {/* {userHasAccessToViewUser ? ( */}
+
                           <button
                             onClick={handleClickOnUserProfile}
                             className="px-4 py-2 input-label-custom hover:bg-gray-200 text-left flex items-center gap-2 transition rounded-md mx-2 my-1"
@@ -844,16 +847,6 @@ function Navbar({ children }: { children: React.ReactNode }) {
                             </div>
                             {/* 👤 Profile */}
                           </button>
-                          {/* ) : ( */}
-                          {/* <button
-                              onClick={() => {
-                                setAccessDeniedPopUpView(true);
-                              }}
-                              className="px-4 py-2 hover:bg-gray-200 text-left flex items-center gap-2 transition rounded-md mx-2 my-1"
-                            >
-                              👤 Profile
-                            </button>
-                          )} */}
                           <button
                             onClick={handleClickOnSettings}
                             className="px-4 py-2 input-label-custom hover:bg-gray-200 text-left flex items-center gap-2 transition rounded-md mx-2 my-1"
@@ -910,6 +903,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
                               </span>
                             </div>
                           </button>
+                          <div className="flex w-full justify-center items-center text-gray-400 mb-1">{APP_VERSION}</div>
                         </div>
                       </div>
                     )}
