@@ -25,6 +25,7 @@ import CustomDropdown from "../modals/leads/CustomDropdown";
 import { useGeoLocationData } from "../../config/hooks/useGeoLocation";
 import toast from "react-hot-toast";
 import { Globe, KeySquare, Mail, Phone, User } from "lucide-react";
+import { APP_VERSION } from "../../@types/config/AppVersion";
 
 function SignUpForm() {
   const initialSignUpFormState: SignUpFormDataType = {
@@ -282,6 +283,7 @@ function SignUpForm() {
               <Link to={ROUTES_URL.SIGN_IN}>Log In</Link>
             </button>
           </span>
+          <span className="flex justify-center items-center text-gray-400 mb-1">{APP_VERSION}</span>
         </div>
       </form>
 
