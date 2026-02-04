@@ -28,7 +28,7 @@ import {
   X,
 } from "lucide-react";
 import TextAreaInput from "../../../../ui/TextAreaInput";
-import {  useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import ROUTES_URL from "../../../../../constants/Routes";
 import Button from "../../../../ui/Button";
 import { useUserAccessModules } from "../../../../../config/hooks/useAccessModules";
@@ -458,7 +458,7 @@ export const CreateMultipleAccountCompanyProduct = () => {
     if (date.year() < 2000) return;
 
     console.log("this is the date : ");
-    
+
     // const formattedDate = date.format("YYYY-MM-DD");
     const formattedDate = date.toDate();
     console.log(formattedDate);
@@ -533,22 +533,22 @@ export const CreateMultipleAccountCompanyProduct = () => {
           newHasError[field as (typeof errorFields)[number]] = false;
         }
 
-        if(field === "deliveryDate"){
+        if (field === "deliveryDate") {
           newRow[field] = value;
-          newRow.hasValueGiven!.deliveryDate=true
+          newRow.hasValueGiven!.deliveryDate = true;
         }
-        if(field === "installationDate"){
+        if (field === "installationDate") {
           newRow[field] = value;
-          newRow.hasValueGiven!.installationDate=true
+          newRow.hasValueGiven!.installationDate = true;
         }
 
-        if(field === "amcCycleEndDate" || field ==="amcCycleStartDate"){
-          newRow.hasValueGiven!.amcEndDate=true
-          newRow.hasValueGiven!.amcStartDate=true
+        if (field === "amcCycleEndDate" || field === "amcCycleStartDate") {
+          newRow.hasValueGiven!.amcEndDate = true;
+          newRow.hasValueGiven!.amcStartDate = true;
         }
-         if(field === "warrantyEndDate" || field ==="warrantyStartDate"){
-          newRow.hasValueGiven!.warrantyEndDate=true
-          newRow.hasValueGiven!.warrantyStartDate=true
+        if (field === "warrantyEndDate" || field === "warrantyStartDate") {
+          newRow.hasValueGiven!.warrantyEndDate = true;
+          newRow.hasValueGiven!.warrantyStartDate = true;
         }
         //  Recalculate dates if purchaseDate exists
         if (field === "purchaseDate") {
@@ -556,14 +556,16 @@ export const CreateMultipleAccountCompanyProduct = () => {
           // if (!row.deliveryDate) newRow.deliveryDate = value as any;
           // if (!row.installationDate) newRow.installationDate = value as any;
 
-          if(!row.hasValueGiven?.deliveryDate) newRow.deliveryDate = value as any;
-          if(!row.hasValueGiven?.installationDate) newRow.installationDate = value as any;
+          if (!row.hasValueGiven?.deliveryDate)
+            newRow.deliveryDate = value as any;
+          if (!row.hasValueGiven?.installationDate)
+            newRow.installationDate = value as any;
           if (
             value &&
             // !row.warrantyStartDate &&
             // !row.warrantyEndDate &&
             !row.hasValueGiven?.warrantyEndDate &&
-            !row.hasValueGiven?.warrantyStartDate && 
+            !row.hasValueGiven?.warrantyStartDate &&
             newRow.productWarrantyNumber &&
             newRow.productWarrantyId
           ) {
@@ -581,7 +583,7 @@ export const CreateMultipleAccountCompanyProduct = () => {
             // !row.amcCycleStartDate &&
             // !row.amcCycleEndDate &&
             !row.hasValueGiven?.amcEndDate &&
-            !row.hasValueGiven?.amcStartDate && 
+            !row.hasValueGiven?.amcStartDate &&
             newRow.productAmcNumber &&
             newRow.productAmcId
           ) {
@@ -723,7 +725,7 @@ export const CreateMultipleAccountCompanyProduct = () => {
   ] = useState<boolean>(false);
   // Note : Create api call
   const handleCreateAccountCompanyProduct = async () => {
-    if (!validateRows()) {      
+    if (!validateRows()) {
       // toast.error("Please fill all mandatory fields");
       return;
     }
@@ -979,328 +981,171 @@ export const CreateMultipleAccountCompanyProduct = () => {
                   </div>
 
                   {/* GRID */}
-                  <div className="grid  md:grid-cols-4 gap-1">
+                  <div className="grid  md:grid-cols-2 gap-1">
                     {/* QTY + UNIT */}
-                    <div className="col-span-2 grid grid-cols-4 gap-1 ">
-                      <div className="pt-0.5">
-                        <FormInput
-                          logo={Box}
-                          label="Quantity :"
-                          readonly={!row.productId}
-                          required
-                          placeholder="Enter Product Quantity"
-                          type="number"
-                          value={row.quantity == 0 ? "" : row.quantity}
-                          // min={0}
-                          // max={row.productQuantity!}
-                          onChange={(e) => {
-                            const qty = Number(e.target.value);
+                    <div
+                      className={` grid  ${
+                        row.isSerialNumber ? "grid-cols-3 " : "grid-cols-2"
+                      } gap-1 `}
+                    >
+                      <div>
+                        <div className="pt-0.5">
+                          <FormInput
+                            logo={Box}
+                            label="Quantity :"
+                            readonly={!row.productId}
+                            required
+                            placeholder="Enter Product Quantity"
+                            type="number"
+                            value={row.quantity == 0 ? "" : row.quantity}
+                            // min={0}
+                            // max={row.productQuantity!}
+                            onChange={(e) => {
+                              const qty = Number(e.target.value);
 
-                            const selectedUnit = unitsForRows[index]?.find(
-                              (u) => u.id === row.unit_id,
-                            );
-
-                            if (selectedUnit) {
-                              const finalFactor =
-                                qty * Number(selectedUnit.conversionFactor);
-                              updateRow(index, "conversionFactor", finalFactor);
-                            }
-
-                            updateRow(index, "quantity", qty);
-                          }}
-                          
-                        />
-                        {row.hasError?.zeroQuantity && (
-                          <p className="text-red-500 text-xs mt-1">
-                            Quantity is required.
-                          </p>
-                        )}
-                        {row.hasError?.quantity === true && (
-                          <p className="text-red-500 text-xs mt-1">
-                            qty should be as per the stock
-                          </p>
-                        )}
-                      </div>
-                      {/* Unit */}
-                      <div className="pt-0.5">
-                        <CustomDropdown
-                          labelName="Unit :"
-                          logo={LucideTimer}
-                          readOnly={!row.productId || row.isSerialNumber}
-                          selectedValue={row.unit_id}
-                          onSelect={(unit) => {
-                            //  Clear selection
-                            if (!unit) {
-                              updateRow(index, "unit_id", undefined as any);
-                              updateRow(index, "conversionFactor", 0);
-                              return;
-                            }
-
-                            // if(unit){
-                            updateRow(index, "unit_id", unit!);
-                            // }
-
-                            const finalFactor =
-                              Number(row.quantity) *
-                              Number(
-                                unitForProduct.find((item) => item.id === unit)
-                                  ?.conversionFactor,
+                              const selectedUnit = unitsForRows[index]?.find(
+                                (u) => u.id === row.unit_id,
                               );
 
-                            if (finalFactor) {
-                              updateRow(index, "conversionFactor", finalFactor);
-                            }
+                              if (selectedUnit) {
+                                const finalFactor =
+                                  qty * Number(selectedUnit.conversionFactor);
+                                updateRow(
+                                  index,
+                                  "conversionFactor",
+                                  finalFactor,
+                                );
+                              }
+
+                              updateRow(index, "quantity", qty);
+                            }}
+                          />
+                          {row.hasError?.zeroQuantity && (
+                            <p className="text-red-500 text-xs mt-1">
+                              Quantity is required.
+                            </p>
+                          )}
+                          {row.hasError?.quantity === true && (
+                            <p className="text-red-500 text-xs mt-1">
+                              qty should be as per the stock
+                            </p>
+                          )}
+                        </div>
+                        <ControlledMuiDatePicker
+                          readonly={!row.productId}
+                          label="Installation Date"
+                          value={row.installationDate}
+                          onCommit={(date) => {
+                            handleDateCommit(index, "installationDate", date);
                           }}
-                          options={unitsForRows[index] || []}
-                          requiredRedDot={true}
+                          logo={Calendar}
                         />
-                        {row.hasError?.unit && (
-                          <p className="text-red-500 text-xs mt-1">
-                            Unit is required
-                          </p>
-                        )}
-                        <div className="col-span-2 text-xs">
-                          {!Number.isNaN(row.conversionFactor) &&
-                            row.quantity !== 0 &&
-                            row.conversionFactor !== 0 && (
-                              <p
-                                title="Quantity is converted automatically based on the product base unit and current selected unit."
-                                className="caption-custom-active flex items-center cursor-pointer gap-1"
-                              >
-                                Quantity will be deducted from stock :{" "}
-                                {row.conversionFactor + row.unitName}
-                                {/* {row.conversionFactor} */}
-                                {/* {
+                      </div>
+                      {/* Unit */}
+                      <div>
+                        <div className="pt-0.5">
+                          <CustomDropdown
+                            labelName="Unit :"
+                            logo={LucideTimer}
+                            readOnly={!row.productId || row.isSerialNumber}
+                            selectedValue={row.unit_id}
+                            onSelect={(unit) => {
+                              //  Clear selection
+                              if (!unit) {
+                                updateRow(index, "unit_id", undefined as any);
+                                updateRow(index, "conversionFactor", 0);
+                                return;
+                              }
+
+                              // if(unit){
+                              updateRow(index, "unit_id", unit!);
+                              // }
+
+                              const finalFactor =
+                                Number(row.quantity) *
+                                Number(
+                                  unitForProduct.find(
+                                    (item) => item.id === unit,
+                                  )?.conversionFactor,
+                                );
+
+                              if (finalFactor) {
+                                updateRow(
+                                  index,
+                                  "conversionFactor",
+                                  finalFactor,
+                                );
+                              }
+                            }}
+                            options={unitsForRows[index] || []}
+                            requiredRedDot={true}
+                          />
+                          {row.hasError?.unit && (
+                            <p className="text-red-500 text-xs mt-1">
+                              Unit is required
+                            </p>
+                          )}
+                          <div className="col-span-2 text-xs">
+                            {!Number.isNaN(row.conversionFactor) &&
+                              row.quantity !== 0 &&
+                              row.conversionFactor !== 0 && (
+                                <p
+                                  title="Quantity is converted automatically based on the product base unit and current selected unit."
+                                  className="caption-custom-active flex items-center cursor-pointer gap-1"
+                                >
+                                  Quantity deduction : 
+                                  {/* Quantity will be deducted from stock :{" "} */}
+                                  {row.conversionFactor + row.unitName}
+                                  {/* {row.conversionFactor} */}
+                                  {/* {
                                   unitForProduct.find(
                                     (item) =>
                                       item.conversionFactor ===
-                                      row.conversionFactor
-                                  )?.unitNameInStock
-                                } */}
-                                <Info size={12} className="" />
+                                    row.conversionFactor
+                                    )?.unitNameInStock
+                                    } */}
+                                  <Info size={12} className="" />
+                                </p>
+                              )}
+                          </div>
+                          {/* INSTALLED BY */}
+                          <div className=" ">
+                            <CompanyUserSearchFieldInput
+                              readOnly={!row.productId}
+                              label="Installed By :"
+                              required
+                              onUserSelected={(data) => {
+                                if (!row.product) return;
+                                if (data) {
+                                  updateRow(index, "installedById", data?.id);
+                                  updateRow(
+                                    index,
+                                    "installedBy",
+                                    data?.fullname,
+                                  );
+                                } else {
+                                  updateRow(index, "installedById", 0);
+                                  updateRow(index, "installedBy", "");
+                                }
+                              }}
+                              defaultValue={loginStatus.fullName}
+                              // disabledMessage={ }
+                              error=""
+                              logo={User}
+                              placeholder="Select User"
+                            />
+                            {(row.hasError?.installedBy ||
+                              row.hasError?.installedById) && (
+                              <p className="text-red-500 text-xs mt-1">
+                                Installed by is required
                               </p>
                             )}
+                          </div>
                         </div>
                       </div>
 
-                      {/* PURCHASE DATE */}
-                      <div>
-                        <ControlledMuiDatePicker
-                          readonly={!row.productId}
-                          label="Purchase Date"
-                          value={row.purchaseDate}
-                          onCommit={(date) => {
-                            handleDateCommit(index, "purchaseDate", date);
-                          }}
-                          isRequired
-                          logo={Calendar}
-                        />
-                        {/* Note : this is working code need to implement another solution */}
-                        {/* <ControlledDatePicker
-                          readonly={!row.productId}
-                          isRequired={true}
-                          logo={Calendar}
-                          label="Purchase Date"
-                          onCommit={(date) => {
-                            // if (!date) return;
-                            console.log("this is the date purchase : " + date);
-
-                            updateRow(index, "purchaseDate", date);
-                          }}
-                          value={row.purchaseDate}
-                        /> */}
-                        {/* <DatePickerInput
-                          required
-                          label="Purchase Date :"
-                          logo={LucideCalendar}
-                          name="purchaseDate"
-                          placeholder="Select Date"
-                          value={row.purchaseDate ?? ""}
-                          onChange={(e) => {
-                            // console.log(e.target.value);
-                            // console.log("this is the ");
-
-                            if (e.target.value) {
-                              updateRow(index, "purchaseDate", e.target.value);
-                            }
-                          }}
-                        /> */}
-                        {row.hasError?.purchaseDate && (
-                          <p className="text-red-500 text-xs mt-1">
-                            Purchase Date is required
-                          </p>
-                        )}
-                      </div>
-                      {/* Delivery date */}
-                      {/* <DatePickerInput
-                        label="Delivery Date :"
-                        logo={LucideCalendar}
-                        name="deliveryDate"
-                        placeholder="Select Date"
-                        value={row.deliveryDate ?? ""}
-                        onChange={(e) =>
-                          updateRow(index, "deliveryDate", e.target.value)
-                        }
-                      /> */}
-
-                      <ControlledMuiDatePicker
-                        readonly={!row.productId}
-                        label="Delivery Date"
-                        value={row.deliveryDate}
-                        onCommit={(date) => {
-                          handleDateCommit(index, "deliveryDate", date);
-                        }}
-                        logo={Calendar}
-                      />
-                      {/* NOte : this working */}
-                      {/* <ControlledDatePicker
-                        readonly={!row.productId}
-                        logo={Calendar}
-                        label="Delivery Date"
-                        onCommit={(date) => {
-                          console.log("this is the date purchase : " + date);
-                          updateRow(index, "deliveryDate", date);
-                        }}
-                        value={row.deliveryDate}
-                      /> */}
-                    </div>
-                    <div className="col-span-2 grid grid-cols-4 gap-x-1">
-                      {/* Warranty start date */}
-                      <ControlledMuiDatePicker
-                        readonly={!row.productId}
-                        label="Warranty Start Date"
-                        value={row.warrantyStartDate}
-                        onCommit={(date) => {
-                          handleDateCommit(index, "warrantyStartDate", date);
-                        }}
-                        logo={Calendar}
-                      />
-                      {/* this working */}
-                      {/* <ControlledDatePicker
-                        readonly={!row.productId}
-                        logo={Calendar}
-                        label="Warranty Start Date"
-                        onCommit={(date) => {
-                          updateRow(index, "warrantyStartDate", date);
-                        }}
-                        value={row.warrantyStartDate}
-                      /> */}
-
-                      {/* Warranty end date */}
-                      <ControlledMuiDatePicker
-                        readonly={!row.productId}
-                        label="Warranty End Date"
-                        value={row.warrantyEndDate}
-                        onCommit={(date) => {
-                          handleDateCommit(index, "warrantyEndDate", date);
-                        }}
-                        logo={Calendar}
-                      />
-                      {/* This working */}
-                      {/* <ControlledDatePicker
-                        readonly={!row.productId}
-                        logo={Calendar}
-                        label="Warranty End Date"
-                        onCommit={(date) => {
-                          updateRow(index, "warrantyEndDate", date);
-                        }}
-                        value={row.warrantyEndDate}
-                      /> */}
-
-                      <ControlledMuiDatePicker
-                        readonly={!row.productId}
-                        label="AMC Start Date"
-                        value={row.amcCycleStartDate}
-                        onCommit={(date) => {
-                          handleDateCommit(index, "amcCycleStartDate", date);
-                        }}
-                        logo={Calendar}
-                      />
-                      {/* This working */}
-                      {/* <ControlledDatePicker
-                        readonly={!row.productId}
-                        logo={Calendar}
-                        label="AMC Start Date"
-                        onCommit={(date) => {
-                          updateRow(index, "amcCycleStartDate", date);
-                        }}
-                        value={row.amcCycleStartDate}
-                      /> */}
-
-                      <ControlledMuiDatePicker
-                        readonly={!row.productId}
-                        label="AMC End Date"
-                        value={row.amcCycleEndDate}
-                        onCommit={(date) => {
-                          handleDateCommit(index, "amcCycleEndDate", date);
-                        }}
-                        logo={Calendar}
-                      />
-                      {/* <ControlledDatePicker
-                        readonly={!row.productId}
-                        logo={Calendar}
-                        label="Amc End Date"
-                        onCommit={(date) => {
-                          updateRow(index, "amcCycleEndDate", date);
-                        }}
-                        value={row.amcCycleEndDate}
-                      /> */}
-                    </div>
-                    <div
-                      className={`col-span-2 grid  ${
-                        row.isSerialNumber ? "grid-cols-3 " : "grid-cols-2"
-                      } gap-1 bg-pink-00 mt-1.5`}
-                    >
-                      {/* INSTALLED BY */}
-                      <div className="mt-1 ">
-                        <CompanyUserSearchFieldInput
-                          readOnly={!row.productId}
-                          label="Installed By :"
-                          required
-                          onUserSelected={(data) => {
-                            if (!row.product) return;
-                            if (data) {
-                              updateRow(index, "installedById", data?.id);
-                              updateRow(index, "installedBy", data?.fullname);
-                            } else {
-                              updateRow(index, "installedById", 0);
-                              updateRow(index, "installedBy", "");
-                            }
-                          }}
-                          defaultValue={loginStatus.fullName}
-                          // disabledMessage={ }
-                          error=""
-                          logo={User}
-                          placeholder="Select User"
-                        />
-                        {(row.hasError?.installedBy ||
-                          row.hasError?.installedById) && (
-                          <p className="text-red-500 text-xs mt-1">
-                            Installed by is required
-                          </p>
-                        )}
-                      </div>
-                      <ControlledMuiDatePicker
-                        readonly={!row.productId}
-                        label="Installation Date"
-                        value={row.installationDate}
-                        onCommit={(date) => {
-                          handleDateCommit(index, "installationDate", date);
-                        }}
-                        logo={Calendar}
-                      />
-                      {/* this working */}
-                      {/* <ControlledDatePicker
-                        readonly={!row.productId}
-                        logo={Calendar}
-                        label="Installation Date"
-                        onCommit={(date) => {
-                          updateRow(index, "installationDate", date);
-                        }}
-                        value={row.installationDate}
-                      /> */}
                       {row !== undefined && row?.isSerialNumber === true && (
-                        <div>
+                        <div className="mt-1">
                           <div className="relative flex items-center justify-end h-fit ">
                             <div className="w-full ">
                               <label className=" input-label-custom text-sm   flex items-center gap-1 text-gray-700  ">
@@ -1322,6 +1167,7 @@ export const CreateMultipleAccountCompanyProduct = () => {
                                         Item count: {row.serialNumber.length}
                                       </span>
                                       <button
+                                      className="hidden"
                                         type="button"
                                         onMouseEnter={() =>
                                           setShowProductsSelectedSerialNumber(
@@ -1357,7 +1203,7 @@ export const CreateMultipleAccountCompanyProduct = () => {
                                   }}
                                 >
                                   {row.serialNumber.length > 0
-                                    ? "Change"
+                                    ? "View/Change"
                                     : "Select"}
                                 </Button>
                                 {showProductsSelectedSerialNumber && (
@@ -1380,60 +1226,156 @@ export const CreateMultipleAccountCompanyProduct = () => {
                           </div>
                         </div>
                       )}
-                      {/* </div> */}
+                      <div
+                        className={`col-span-2 grid   gap-1 bg-pink-00 mt-1.5`}
+                      >
+                        {/* old position for serial number */}
+                      </div>
                     </div>
-                    <div className="col-span-2">
-                      {/* Warranty terms */}
-                      <TextAreaInput
-                        disabled={!row.productId}
+                    <div className=" grid grid-cols-3 gap-x-1">
+                      <div>
+                        <div>
+                          <ControlledMuiDatePicker
+                            readonly={!row.productId}
+                            label="Purchase Date"
+                            value={row.purchaseDate}
+                            onCommit={(date) => {
+                              handleDateCommit(index, "purchaseDate", date);
+                            }}
+                            isRequired
+                            logo={Calendar}
+                          />
+                          {row.hasError?.purchaseDate && (
+                            <p className="text-red-500 text-xs mt-1">
+                              Purchase Date is required
+                            </p>
+                          )}
+                        </div>
+                        <ControlledMuiDatePicker
+                          readonly={!row.productId}
+                          label="Delivery Date"
+                          value={row.deliveryDate}
+                          onCommit={(date) => {
+                            handleDateCommit(index, "deliveryDate", date);
+                          }}
+                          logo={Calendar}
+                        />
+                      </div>
+                      {/* Warranty start date */}
+                      <div>
+                        <ControlledMuiDatePicker
+                          readonly={!row.productId}
+                          label="Warranty Start Date"
+                          value={row.warrantyStartDate}
+                          onCommit={(date) => {
+                            handleDateCommit(index, "warrantyStartDate", date);
+                          }}
+                          logo={Calendar}
+                        />
+                        {/* Warranty end date */}
+                        <ControlledMuiDatePicker
+                          readonly={!row.productId}
+                          label="Warranty End Date"
+                          value={row.warrantyEndDate}
+                          onCommit={(date) => {
+                            handleDateCommit(index, "warrantyEndDate", date);
+                          }}
+                          logo={Calendar}
+                        />
+                      </div>
+
+                      <div>
+                        <ControlledMuiDatePicker
+                          readonly={!row.productId}
+                          label="AMC Start Date"
+                          value={row.amcCycleStartDate}
+                          onCommit={(date) => {
+                            handleDateCommit(index, "amcCycleStartDate", date);
+                          }}
+                          logo={Calendar}
+                        />
+                        {/* This working */}
+                        {/* <ControlledDatePicker
                         readonly={!row.productId}
-                        placeholder="Enter Warranty Terms "
-                        logo={ShieldCheck}
-                        cols={4}
-                        label="Warranty Terms : "
-                        name="warrantyTerms"
-                        rows={2}
-                        value={row.warrantyTerms}
-                        maxLength={VALIDATIONS.MAX_DESCRIPTION_LENGTH}
-                        onChange={(e) =>
-                          updateRow(index, "warrantyTerms", e.target.value)
-                        }
-                      />
+                        logo={Calendar}
+                        label="AMC Start Date"
+                        onCommit={(date) => {
+                          updateRow(index, "amcCycleStartDate", date);
+                          }}
+                          value={row.amcCycleStartDate}
+                      /> */}
+
+                        <ControlledMuiDatePicker
+                          readonly={!row.productId}
+                          label="AMC End Date"
+                          value={row.amcCycleEndDate}
+                          onCommit={(date) => {
+                            handleDateCommit(index, "amcCycleEndDate", date);
+                          }}
+                          logo={Calendar}
+                        />
+                      </div>
+                      {/* <ControlledDatePicker
+                        readonly={!row.productId}
+                        logo={Calendar}
+                        label="Amc End Date"
+                        onCommit={(date) => {
+                          updateRow(index, "amcCycleEndDate", date);
+                        }}
+                        value={row.amcCycleEndDate}
+                      /> */}
                     </div>
-                    <div className="col-span-4 grid grid-cols-2 gap-x-1">
-                      {/* Billing address */}
-                      <TextAreaInput
-                        disabled={!row.productId}
-                        readonly={!row.productId}
-                        placeholder="Enter Billing Address"
-                        logo={MapPin}
-                        cols={4}
-                        label="Billing Address :"
-                        rows={2}
-                        name="billingAddress"
-                        maxLength={VALIDATIONS.MAX_DESCRIPTION_LENGTH}
-                        value={row.billingAddress}
-                        onChange={(e) =>
-                          updateRow(index, "billingAddress", e.target.value)
-                        }
-                      />
-                      {/* Delivery address */}
-                      <TextAreaInput
-                        disabled={!row.productId}
-                        readonly={!row.productId}
-                        placeholder="Enter Delivery Address"
-                        logo={MapPin}
-                        cols={4}
-                        label="Delivery Address :"
-                        name="deliveryAddress"
-                        value={row.deliveryAddress}
-                        maxLength={VALIDATIONS.MAX_DESCRIPTION_LENGTH}
-                        onChange={(e) =>
-                          updateRow(index, "deliveryAddress", e.target.value)
-                        }
-                        rows={2}
-                      />
-                    </div>
+                    {/* here */}
+                  </div>
+
+                  <div className="col-span-4 grid grid-cols-3 gap-x-1">
+                    <TextAreaInput
+                      disabled={!row.productId}
+                      readonly={!row.productId}
+                      placeholder="Enter Warranty Terms "
+                      logo={ShieldCheck}
+                      cols={4}
+                      label="Warranty Terms : "
+                      name="warrantyTerms"
+                      rows={2}
+                      value={row.warrantyTerms}
+                      maxLength={VALIDATIONS.MAX_DESCRIPTION_LENGTH}
+                      onChange={(e) =>
+                        updateRow(index, "warrantyTerms", e.target.value)
+                      }
+                    />
+                    {/* Billing address */}
+                    <TextAreaInput
+                      disabled={!row.productId}
+                      readonly={!row.productId}
+                      placeholder="Enter Billing Address"
+                      logo={MapPin}
+                      cols={4}
+                      label="Billing Address :"
+                      rows={2}
+                      name="billingAddress"
+                      maxLength={VALIDATIONS.MAX_DESCRIPTION_LENGTH}
+                      value={row.billingAddress}
+                      onChange={(e) =>
+                        updateRow(index, "billingAddress", e.target.value)
+                      }
+                    />
+                    {/* Delivery address */}
+                    <TextAreaInput
+                      disabled={!row.productId}
+                      readonly={!row.productId}
+                      placeholder="Enter Delivery Address"
+                      logo={MapPin}
+                      cols={4}
+                      label="Delivery Address :"
+                      name="deliveryAddress"
+                      value={row.deliveryAddress}
+                      maxLength={VALIDATIONS.MAX_DESCRIPTION_LENGTH}
+                      onChange={(e) =>
+                        updateRow(index, "deliveryAddress", e.target.value)
+                      }
+                      rows={2}
+                    />
                   </div>
                 </div>
               );
