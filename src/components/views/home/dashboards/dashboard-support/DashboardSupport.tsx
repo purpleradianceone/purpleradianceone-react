@@ -30,23 +30,8 @@ import SupportTicketTaskDashboardProps from "../../../../../@types/support-ticke
 import RecentTicketDashboardProps from "../../../../../@types/support-ticket-management/RecentTicketDashboardProps";
 import RecentTicketsDashboard from "./RecentTicketsDashboard";
 import { DashboardLoadingSpinner } from "../dashboards_components/DashboardLoadingSpinner";
+import { AccessManagementType } from "../../../../../@types/company-users/AccessManagementContextType";
 
-/* ---------------- TYPES ---------------- */
-
-type AccessModuleType = {
-  id: number;
-  crm_module_id: number;
-  company_user_id: number;
-  add: boolean;
-  view: boolean;
-  update: boolean;
-  createdby: number;
-  updatedby: number;
-  createdon: string;
-  module_name: string;
-  updatedby_user: string;
-  updatedon: string;
-};
 
 type DashboardDataType = Record<string, Array<Record<string, any>>>;
 
@@ -80,7 +65,7 @@ const DashboardSupport: React.FC<DashboardSupportProp> = ({
   >([]);
   const [dashboardData, setDashboardData] = useState<DashboardDataType>({});
   const [accessModuleCompanyUser, setAccessModuleCompanyUser] = useState<
-    AccessModuleType[]
+    AccessManagementType[]
   >([]);
 
   /* ---------------- SAFE HELPERS (FIX) ---------------- */

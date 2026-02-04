@@ -41,13 +41,16 @@ import { FooterBlockQuotation } from "../../blocks/FooterBlockQuotation";
 import { ContentBlockQuotation } from "../../blocks/ContentBlockQuotation";
 import { TableBlockQuotation } from "../../blocks/TableBlockQuotation";
 import { useEffect, useState } from "react";
+import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
 
 export const EditorCanvasForQuotation: React.FC = () => {
   const canvasBgColor = "#f9f9f9";
   const { userPreference } = useUserPreference();
+    const {loginStatus} = useLoggedInUserContext();
+  
 
   const [editorStateData, setEditorStateData] = useState(() => {
-    const jsonEditorState = localStorage.getItem(STORAGE_KEY);
+    const jsonEditorState = localStorage.getItem(STORAGE_KEY+loginStatus.id);
     return jsonEditorState;
   });
 

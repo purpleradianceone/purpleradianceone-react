@@ -1,7 +1,6 @@
 import { Users, UserPlus, Calendar } from "lucide-react";
 import Button from "../ui/Button";
 import { useEffect, useState } from "react";
-import CompanyUserAccessManagementModal from "../modals/company-user/CompanyUserAccessManagementModal";
 import EditCompanyUserModal from "../modals/company-user/EditCompanyUserModal";
 import DateRangePicker from "../ui/DateRangePicker";
 import AddCompanyUserModal from "../modals/company-user/AddCompanyUserModal";
@@ -29,6 +28,7 @@ import { useTutorailDataContext } from "../../context/tutorail/useTutorailDataCo
 import { TutorailColumnName } from "../../constants/Tutorail";
 import RefreshToken from "../../config/validations/RefreshToken";
 import PaginationWithoutCount from "../ag-grid/PaginationWithoutCount";
+import CompanyUserAccessManagementModalNew from "../modals/company-user/CompanyUserAccessManagementModalNew";
 
 function GetCompanyUsersList({
   users,
@@ -383,7 +383,7 @@ function GetCompanyUsersList({
             handleActionsTourEnd={handleActionsTourEnd}
           />
         </div>
-        <CompanyUserAccessManagementModal
+        <CompanyUserAccessManagementModalNew
           isOpen={isAccessModalOpen}
           onClose={() => setIsAccessModalOpen(false)}
           users={selectedCompanyUser}

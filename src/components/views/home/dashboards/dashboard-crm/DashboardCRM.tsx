@@ -37,27 +37,12 @@ import { TutorailColumnName } from "../../../../../constants/Tutorail";
 import { useTutorailDataContext } from "../../../../../context/tutorail/useTutorailDataContext";
 import { DashboardComponentJsxKey } from "../../../../../enums/dashboard/DashboardComponentJsxKey.enum";
 import { DashboardLoadingSpinner } from "../dashboards_components/DashboardLoadingSpinner";
+import { AccessManagementType } from "../../../../../@types/company-users/AccessManagementContextType";
 
 // import DashboardChartComponent from "../../../dashboarcrmcomponents/DashboardChartComponent";
 // import { PieDataItem } from "../../../../@types/dashboard/PieDataItem";
 // import { BarDataItem } from "../../../../@types/dashboard/BarDataItem";
 // import { BarDataItemFor12MonthPerformance } from "../../../../@types/dashboard/BarDataItemFor12MonthPerformance";
-type AccessModuleType = {
-  id: number;
-  crm_module_id: number;
-  company_user_id: number;
-
-  add: boolean;
-  view: boolean;
-  update: boolean;
-
-  createdby: number;
-  updatedby: number;
-  createdon: string;
-  module_name: string;
-  updatedby_user: string;
-  updatedon: string;
-};
 
 type DashboardDataType = Record<string, Array<Record<string, any>>>;
 interface DashboardCRMProp {
@@ -88,7 +73,7 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
 
   const [dashboardData, setDashboardData] = useState<DashboardDataType>({});
   const [accessModuleCompanyUser, setAccessModuleCompanyUser] = useState<
-    AccessModuleType[]
+    AccessManagementType[]
   >([]);
 
   useEffect(() => {
@@ -110,7 +95,7 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
       })
       .then((response) => {
         if (response.status === STATUS_CODE.OK) {
-          const accessModuleOfCompanyUser: AccessModuleType[] = response.data;
+          const accessModuleOfCompanyUser: AccessManagementType[] = response.data;
           setAccessModuleCompanyUser(accessModuleOfCompanyUser);
         }
       })

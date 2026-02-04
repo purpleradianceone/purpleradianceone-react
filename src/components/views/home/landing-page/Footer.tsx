@@ -1,6 +1,7 @@
 import { Activity, Mail, Phone } from "lucide-react";
 import ROUTES_URL from "../../../../constants/Routes";
 import { motion } from "framer-motion";
+import { APP_VERSION } from "../../../../@types/config/AppVersion";
 
 function Footer() {
   return (
@@ -87,6 +88,9 @@ function Footer() {
             <p className="text-gray-400 mb-4 md:mb-0">
               © 2025 PurpleRadianceOne.com All rights reserved.
             </p>
+
+            <div className="flex justify-center items-center text-gray-400 mb-1">{APP_VERSION}</div>
+
             <div className="flex space-x-6 text-sm">
               <a
                 href={ROUTES_URL.PRIVACY_POLICY}
