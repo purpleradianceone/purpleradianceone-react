@@ -175,7 +175,10 @@ const AccountDetails: React.FC = () => {
   };
 
   function permissionVerification(): boolean {
+    console.log("inside per verification 1");
+    
     if (!userHasAccessToUpdateAccount) {
+          console.log("inside per verification 2");
       toast.error(MESSAGE.MODULE_ACCESS.ACCOUNT_ACCESS.DENIED_UPDATE_ACCESS);
       return false;
     }
@@ -261,10 +264,14 @@ const AccountDetails: React.FC = () => {
     fieldName: keyof Account,
     value: string | number | any,
   ) => {
+          console.log("in api call 1");
+
     const isDropdown = dropdownFieldMap[fieldName];
     const permission = permissionVerification();
     if (!permission) {
       revert(fieldName);
+                console.log("in api call 2");
+
       return;
     }
     //  Validate correctly
@@ -305,6 +312,8 @@ const AccountDetails: React.FC = () => {
       isactive: null,
       updatedby_id: loginStatus.id,
     };
+
+              console.log("in api call 3");
 
     try {
       const response = await axiosClient.post(
@@ -363,10 +372,14 @@ const AccountDetails: React.FC = () => {
   const handleAccountStatusToggle = async (
     event: React.ChangeEvent<HTMLInputElement>,
   ) => {
+    console.log("inside the toggle api call : 1 line");
+    
     if (!userHasAccessToUpdateAccount) {
+      console.log("in api call toggle check block 1");
       toast.error(MESSAGE.MODULE_ACCESS.ACCOUNT_ACCESS.DENIED_UPDATE_ACCESS);
       return;
     }
+  console.log("in api call toggle");
     const { checked } = event.target;
     const postData = {
       id: formData.id,
@@ -390,6 +403,7 @@ const AccountDetails: React.FC = () => {
       isactive: checked,
       updatedby_id: loginStatus.id,
     };
+      console.log("in api call toggle final ");
 
     await axiosClient
       .post(POST_API.UPDATE_ACCOUNT, postData, { withCredentials: true })
@@ -501,6 +515,7 @@ const AccountDetails: React.FC = () => {
 
     // Only call API if value actually changed
     if (currentValue !== originalValue) {
+    console.log("inside the api call input blur");
       handleUpdateAccountDetails(fieldName, currentValue);
     }
     setEditingField(null);
@@ -517,8 +532,16 @@ const AccountDetails: React.FC = () => {
     const originalId = originalValues[idKey]
     const curretntId =   formData[idKey]
 
+      console.log("ori value");
+    console.log(originalId);
+
+    console.log("curr value");
+    console.log(curretntId);
+
     // comparing the id's
     if(originalId !== curretntId){
+      console.log("inside the api call dropdown");
+      
       handleUpdateAccountDetails(fieldName, curretntId)
     }
 
@@ -981,7 +1004,7 @@ const AccountDetails: React.FC = () => {
             <div className="space-y-1">
               <h3 className="font-medium text-slate-700 flex items-center">
                 <div className="w-2 h-2 bg-purple-500 rounded-full mr-2"></div>
-                <span className="caption-custom">Registered Office</span>
+                <span className="caption-custom">Registered Office Address</span>
               </h3>
               <div className="text-sm text-slate-600 bg-purple-50 p-2 rounded-lg border border-purple-100">
                 {renderEditableField(
