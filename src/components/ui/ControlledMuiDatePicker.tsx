@@ -82,7 +82,8 @@ export const ControlledMuiDatePicker: React.FC<
           }}
           className={`${readonly ? "bg-gray-100" : ""} `}
           disabled={readonly}
-          views={["day"]}
+          views={[ 'year',"month", 'day']}
+          openTo="day"
           showDaysOutsideCurrentMonth={true}
           slotProps={{
             openPickerIcon:{

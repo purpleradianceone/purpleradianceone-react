@@ -723,7 +723,7 @@ export const CreateMultipleAccountCompanyProduct = () => {
   ] = useState<boolean>(false);
   // Note : Create api call
   const handleCreateAccountCompanyProduct = async () => {
-    if (!validateRows()) {
+    if (!validateRows()) {      
       // toast.error("Please fill all mandatory fields");
       return;
     }
