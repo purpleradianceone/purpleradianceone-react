@@ -89,7 +89,6 @@ function Footer() {
               © 2025 PurpleRadianceOne.com All rights reserved.
             </p>
 
-            <div className="flex justify-center items-center text-gray-400 mb-1">{APP_VERSION}</div>
 
             <div className="flex space-x-6 text-sm">
               <a
@@ -118,6 +117,7 @@ function Footer() {
               </a>
             </div>
           </div>
+          <div className="flex justify-center items-center text-gray-400">{APP_VERSION}</div>
         </div>
       </div>
     </motion.footer>
