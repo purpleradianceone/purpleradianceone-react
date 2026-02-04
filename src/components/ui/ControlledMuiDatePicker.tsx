@@ -64,29 +64,45 @@ export const ControlledMuiDatePicker: React.FC<
           value={draftValue}
           format="DD-MM-YYYY"
           onChange={(newValue) => {
+            // allow empty
+            if (!newValue) {
+              setDraftValue(null);
+              return;
+            }
+
+            if (!newValue.isValid()) {
+              return;
+            }
             setDraftValue(newValue); // allow partial typing
           }}
+          enableAccessibleFieldDOMStructure={false}
           // onChange={(newValue) => onCommit(newValue ?? null)}
           onAccept={(newValue) => {
-            onCommit(newValue ?? null); // commit only when valid
+            onCommit(newValue && newValue.isValid() ? newValue : null); // commit only when valid
           }}
-          className={`${readonly ? "bg-gray-100" : ""}`}
+          className={`${readonly ? "bg-gray-100" : ""} `}
           disabled={readonly}
-          views={["day" ]}
-          
+          views={["day"]}
           showDaysOutsideCurrentMonth={true}
           slotProps={{
+            openPickerIcon:{
+              sx : {
+                fontSize : 18,
+                color : "#9CA3AF"
+              }
+            },
             textField: {
               size: "small",
               fullWidth: true,
               error,
               helperText,
               sx: {
-                "& input" : {
-                  minHeight : 20,
-                  height:20,
-                   padding: "0 3px",
-          fontSize: "7px",
+
+                "& input": {
+                  minHeight: 20,
+                  height: 20,
+                  padding: "0 3px",
+                  fontSize: "14px",
                 },
                 "& .MuiOutlinedInput-root": {
                   height: 28,
@@ -99,6 +115,12 @@ export const ControlledMuiDatePicker: React.FC<
                 "& .MuiFormHelperText-root": {
                   fontSize: "11px",
                   marginLeft: 0,
+                },
+                "& .MuiOutlinedInput-notchedOutline": {
+                  borderColor: "#D1D5DB", // gray
+                },
+                "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                  borderColor: "#D1D5DB",
                 },
               },
             },

@@ -28,7 +28,7 @@ import {
   X,
 } from "lucide-react";
 import TextAreaInput from "../../../../ui/TextAreaInput";
-import { useNavigate, useParams } from "react-router-dom";
+import {  useNavigate, useParams } from "react-router-dom";
 import ROUTES_URL from "../../../../../constants/Routes";
 import Button from "../../../../ui/Button";
 import { useUserAccessModules } from "../../../../../config/hooks/useAccessModules";
@@ -100,6 +100,14 @@ interface ProductRow {
     quantity?: boolean;
     zeroQuantity?: boolean;
     installedById?: boolean;
+  };
+  hasValueGiven?: {
+    deliveryDate?: boolean;
+    warrantyStartDate?: boolean;
+    warrantyEndDate?: boolean;
+    amcStartDate?: boolean;
+    amcEndDate?: boolean;
+    installationDate?: boolean;
   };
 }
 
@@ -177,6 +185,23 @@ export const CreateMultipleAccountCompanyProduct = () => {
       conversionFactor: 0,
       conversionFactorString: "",
       unitName: "",
+      hasError: {
+        installedBy: false,
+        installedById: false,
+        product: false,
+        purchaseDate: false,
+        quantity: false,
+        unit: false,
+        zeroQuantity: false,
+      },
+      hasValueGiven: {
+        amcEndDate: false,
+        amcStartDate: false,
+        deliveryDate: false,
+        installationDate: false,
+        warrantyEndDate: false,
+        warrantyStartDate: false,
+      },
     },
   ]);
 
@@ -430,15 +455,17 @@ export const CreateMultipleAccountCompanyProduct = () => {
     date: Dayjs | null,
   ) => {
     if (!date || !date.isValid) return;
-
     if (date.year() < 2000) return;
 
+    console.log("this is the date : ");
+    
     // const formattedDate = date.format("YYYY-MM-DD");
     const formattedDate = date.toDate();
+    console.log(formattedDate);
     updateRow(index, field, formattedDate);
   };
 
-  // NOte : update the states
+  // Note : update the states
   const updateRow = <K extends keyof ProductRow>(
     index: number,
     field: K,
@@ -450,11 +477,6 @@ export const CreateMultipleAccountCompanyProduct = () => {
 
         const newRow: ProductRow = { ...row };
         const newHasError = { ...row.hasError };
-
-        // if (!newRow.product) {
-        //   toast.error(MESSAGE.ERROR.SELECT_PRODUCT_FIRST);
-        //   return newRow;
-        // }
 
         if (field === "quantity") {
           const qty = Number(value);
@@ -511,16 +533,37 @@ export const CreateMultipleAccountCompanyProduct = () => {
           newHasError[field as (typeof errorFields)[number]] = false;
         }
 
+        if(field === "deliveryDate"){
+          newRow[field] = value;
+          newRow.hasValueGiven!.deliveryDate=true
+        }
+        if(field === "installationDate"){
+          newRow[field] = value;
+          newRow.hasValueGiven!.installationDate=true
+        }
+
+        if(field === "amcCycleEndDate" || field ==="amcCycleStartDate"){
+          newRow.hasValueGiven!.amcEndDate=true
+          newRow.hasValueGiven!.amcStartDate=true
+        }
+         if(field === "warrantyEndDate" || field ==="warrantyStartDate"){
+          newRow.hasValueGiven!.warrantyEndDate=true
+          newRow.hasValueGiven!.warrantyStartDate=true
+        }
         //  Recalculate dates if purchaseDate exists
         if (field === "purchaseDate") {
           newRow.purchaseDate = value as any;
-          if (!row.deliveryDate) newRow.deliveryDate = value as any;
-          if (!row.installationDate) newRow.installationDate = value as any;
+          // if (!row.deliveryDate) newRow.deliveryDate = value as any;
+          // if (!row.installationDate) newRow.installationDate = value as any;
 
+          if(!row.hasValueGiven?.deliveryDate) newRow.deliveryDate = value as any;
+          if(!row.hasValueGiven?.installationDate) newRow.installationDate = value as any;
           if (
             value &&
-            !row.warrantyStartDate &&
-            !row.warrantyEndDate &&
+            // !row.warrantyStartDate &&
+            // !row.warrantyEndDate &&
+            !row.hasValueGiven?.warrantyEndDate &&
+            !row.hasValueGiven?.warrantyStartDate && 
             newRow.productWarrantyNumber &&
             newRow.productWarrantyId
           ) {
@@ -535,8 +578,10 @@ export const CreateMultipleAccountCompanyProduct = () => {
 
           if (
             value &&
-            !row.amcCycleStartDate &&
-            !row.amcCycleEndDate &&
+            // !row.amcCycleStartDate &&
+            // !row.amcCycleEndDate &&
+            !row.hasValueGiven?.amcEndDate &&
+            !row.hasValueGiven?.amcStartDate && 
             newRow.productAmcNumber &&
             newRow.productAmcId
           ) {
@@ -963,7 +1008,7 @@ export const CreateMultipleAccountCompanyProduct = () => {
 
                             updateRow(index, "quantity", qty);
                           }}
-                          paddingy={2}
+                          
                         />
                         {row.hasError?.zeroQuantity && (
                           <p className="text-red-500 text-xs mt-1">
@@ -1008,7 +1053,6 @@ export const CreateMultipleAccountCompanyProduct = () => {
                           }}
                           options={unitsForRows[index] || []}
                           requiredRedDot={true}
-                          paddingy={2}
                         />
                         {row.hasError?.unit && (
                           <p className="text-red-500 text-xs mt-1">
@@ -1326,11 +1370,9 @@ export const CreateMultipleAccountCompanyProduct = () => {
                                       setShowProductsSelectedSerialNumber(true)
                                     }
                                   >
-                                    {row.serialNumber.map((item) =>
-                                       <span className="block">
-                                         {item}
-                                       </span>
-                                       )}
+                                    {row.serialNumber.map((item) => (
+                                      <span className="block">{item}</span>
+                                    ))}
                                   </div>
                                 )}
                               </div>
