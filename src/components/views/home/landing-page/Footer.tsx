@@ -117,6 +117,7 @@ function Footer() {
               </a>
             </div>
           </div>
+
           <AppVersionViewCard/>
         </div>
       </div>

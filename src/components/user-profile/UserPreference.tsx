@@ -744,9 +744,8 @@ const UserPreference = () => {
           </div>
         </div>
       </div>
-          <AppVersionViewCard/>
+      <AppVersionViewCard/>
     </div>
-    
 </div>
   );
 };

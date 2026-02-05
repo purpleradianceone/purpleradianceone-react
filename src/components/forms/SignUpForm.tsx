@@ -283,6 +283,7 @@ function SignUpForm() {
               <Link to={ROUTES_URL.SIGN_IN}>Log In</Link>
             </button>
           </span>
+
           <AppVersionViewCard/>
         </div>
       </form>

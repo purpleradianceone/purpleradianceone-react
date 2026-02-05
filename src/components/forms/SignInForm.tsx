@@ -516,6 +516,7 @@ function SignInForm() {
                 <Link to={ROUTES_URL.SIGN_UP}>Sign Up</Link>
               </button>
             </span>
+
             <AppVersionViewCard/>
           </div>
         </form>

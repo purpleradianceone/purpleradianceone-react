@@ -903,6 +903,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
                               </span>
                             </div>
                           </button>
+
                           <AppVersionViewCard/>
                         </div>
                       </div>
