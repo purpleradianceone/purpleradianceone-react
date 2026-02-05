@@ -51,7 +51,7 @@ import { useTutorailDataContext } from "../../../../context/tutorail/useTutorail
 import { TutorailColumnName } from "../../../../constants/Tutorail";
 import { cancelAllRequests } from "../../../../axios-client/AxiosClient";
 import { LocalStorageKeys } from "../../../../enums/LocalStorageKeys";
-import { APP_VERSION } from "../../../../@types/config/AppVersion";
+import { AppVersionViewCard } from "../../card/AppVersionViewCard";
 
 function Navbar({ children }: { children: React.ReactNode }) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -808,7 +808,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
                         className="absolute -right-2.5 mt-72 w-64 bg-white shadow-xl rounded-lg border border-gray-200 animate-slide-down"
                       >
                         {/* Profile Section */}
-                        <div className="p-4 border-b border-gray-200 flex items-center space-x-3">
+                        <div className="p-3 border-b border-gray-200 flex items-center space-x-3">
                           <div
                             className={`w-9 h-9 rounded-full grid place-content-center section-header-custom-white border border-gray-300 ${getColor(
                               loginStatus.email
@@ -892,7 +892,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
 
                           <button
                             onClick={handleLogout}
-                            className="px-4 py-2 input-label-custom hover:bg-gray-200 text-left flex items-center gap-2 transition rounded-md mx-2 my-1"
+                            className="px-4 py-2 input-label-custom hover:bg-gray-200 text-left flex items-center gap-2 transition rounded-md mx-2 "
                           >
                             {/* <LogOut className="input-label-custom" />
                             Sign Out */}
@@ -903,7 +903,8 @@ function Navbar({ children }: { children: React.ReactNode }) {
                               </span>
                             </div>
                           </button>
-                          <div className="flex w-full justify-center items-center caption-custom mb-1">{APP_VERSION}</div>
+
+                          <AppVersionViewCard/>
                         </div>
                       </div>
                     )}

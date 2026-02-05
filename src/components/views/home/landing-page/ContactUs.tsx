@@ -24,6 +24,7 @@ function ContactUs() {
 
   return (
       <div
+      id="contactUs"
         className="flex w-full justify-center items-center"
         dangerouslySetInnerHTML={{
           __html: `<iframe 
