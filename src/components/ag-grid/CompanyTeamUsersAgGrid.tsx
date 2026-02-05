@@ -23,7 +23,7 @@ import AddCompanyTeamUsersAgGrid from "./AddCompanyTeamUsersAgGrid";
 import CompanyTeamUsersAgGridProps from "../../@types/ag-grid/CompanyTeamUsersAgGridProps";
 import toast from "react-hot-toast";
 import ToggleButton from "../ui/ToggleButton";
-
+import MESSAGE from "../../constants/Messages";
 function CompanyTeamUsersAgGrid({
   companyTeam,
   isOpen,
@@ -43,8 +43,8 @@ function CompanyTeamUsersAgGrid({
 }: CompanyTeamUsersAgGridProps) {
   const {
     userHasAccessToViewUser,
-    userHasAccessToUpdateTeamManagement,
-    userHasAccessToUpdateProductTeam,
+    userHasAccessToUpdateProductUsers,
+    userHasAccessToUpdateTeamUSers
   } = useUserAccessModules();
 
   const [companyUsersNotAssigned, setCompanyUsersNotAssigned] = useState<
@@ -364,7 +364,7 @@ function CompanyTeamUsersAgGrid({
             event: React.ChangeEvent<HTMLInputElement>
           ) => {
             setIsActive(params.data.isActive);
-            if (userHasAccessToUpdateTeamManagement) {
+            if (userHasAccessToUpdateTeamUSers) {
               const updateCompanyTeamUserPostData = {
                 company_id: loginStatus.companyId,
                 id: parseInt(event.currentTarget.id),
@@ -398,6 +398,9 @@ function CompanyTeamUsersAgGrid({
                     }
                   }
                 });
+            }else{
+              toast.error(MESSAGE.MODULE_ACCESS.TEAM_USERS.DENIED_UPDATE_ACCESS)
+              return;
             }
           };
 
@@ -405,7 +408,7 @@ function CompanyTeamUsersAgGrid({
             event: React.ChangeEvent<HTMLInputElement>
           ) => {
             setIsActive(params.data.isActive);
-            if (userHasAccessToUpdateProductTeam) {
+            if (userHasAccessToUpdateProductUsers) {
               const updateCompanyProductUserPostData = {
                 company_id: loginStatus.companyId,
                 id: parseInt(event.currentTarget.id),
@@ -440,6 +443,9 @@ function CompanyTeamUsersAgGrid({
                     }
                   }
                 });
+            }else{
+              toast.error(MESSAGE.MODULE_ACCESS.PRODUCT_USERS.DENIED_UPDATE_ACCESS)
+              return;
             }
           };
           return (
@@ -577,6 +583,7 @@ function CompanyTeamUsersAgGrid({
             )}
           </div>
         </div>
+        
         <AddCompanyTeamUsersAgGrid
           companyUsers={companyUsersNotAssigned}
           handleViewPortChanged={handleCompanyUserNotAssignedViewPortChanged}

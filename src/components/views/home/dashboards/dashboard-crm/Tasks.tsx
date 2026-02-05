@@ -105,9 +105,13 @@ function Tasks({
     }));
   };
 
+  const [isLoadingForNavigate, setIsLoadingForNavigate] = useState<boolean>(false);
+
   const DESCRIPTION_TRUNCATE_LENGTH = 80;
 
   const getLeadDetails = async (leadId: number) => {
+    if(isLoadingForNavigate)return;
+    setIsLoadingForNavigate(true);
     if(companyUserId === null || companyUserId !== loginStatus.id){
       // toast.error(MESSAGE.ERROR.YOU_ARE_NOT_ON_YOUR_DASHBOARD)
       // return ;
@@ -158,6 +162,8 @@ function Tasks({
             getLeadDetails(leadId);
           }
         }
+      }).finally(()=>{
+        setIsLoadingForNavigate(false);
       });
   };
 
@@ -192,7 +198,7 @@ function Tasks({
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto pr-2 -mr-2 no-scrollbar">
+      <div className={`flex-1 overflow-y-auto pr-2 -mr-2 no-scrollbar ${isLoadingForNavigate?"cursor-wait":"cursor-default"}`}>
         {isLoading && <LoadingSpinner></LoadingSpinner>}
         {!isLoading && (
           <div className="space-y-4">
@@ -230,6 +236,9 @@ function Tasks({
                     // borderColor: getBorderColorFromHex(task.colorCode),
                     animationDelay: `${index * 0.1}s`,
                   }}
+                   onClick={() => {
+                            getLeadDetails(task.leadId);
+                          }}
                 >
                   <div
                     className="p-2 rounded-xl shadow-sm group-hover:scale-110 transition-transform duration-200 flex-shrink-0"
@@ -245,17 +254,17 @@ function Tasks({
                       <div>
                         <h4
                           onClick={() => {
-                            getLeadDetails(task.leadId);
+                            // getLeadDetails(task.leadId);
                           }}
-                          className="table-header-custom cursor-pointer group-hover:text-blue-600 transition-colors"
+                          className={`table-header-custom ${isLoadingForNavigate ? "cursor-wait" : "cursor-pointer"} group-hover:text-blue-600 transition-colors`}
                         >
                            {task.leadTaskActivityName} - {task.subject}
                         </h4>
                          <h4
                           onClick={() => {
-                            getLeadDetails(task.leadId);
+                            // getLeadDetails(task.leadId);
                           }}
-                          className="table-header-custom cursor-pointer group-hover:text-blue-600 transition-colors"
+                          className={`table-header-custom ${isLoadingForNavigate ? "cursor-wait" : "cursor-pointer"} group-hover:text-blue-600 transition-colors`}
                         >
                           Lead Name: {task.leadName} ({task.leadStatusName})
                         </h4>
@@ -294,40 +303,7 @@ function Tasks({
                           </span>{" "}
                           {/* Displaying raw dueDateTime */}
                         </div>
-                        {/* <div
-                        className="relative flex gap-2"
-                        onMouseEnter={() => setHoveredTaskId(task.id)}
-                        onMouseLeave={() => setHoveredTaskId(null)}
-                      >
-                        <User className="w-3 h-3 text-gray-700" />
-                        <span className="text-xs cursor-pointer">
-                          {assignedNames.length > 1
-                            ? `${assignedNames[0]} +${assignedNames.length - 1}`
-                            : assignedNames[0] || 'Unassigned'
-                          }
-                        </span>
-                        {hoveredTaskId === task.id && assignedNames.length > 0 && (
-                          <div
-                            className="absolute z-20 p-2 mt-1 bg-gray-800 text-white rounded shadow-lg"
-                            style={{
-                              top: '100%', 
-                              left: '50%',
-                              transform: 'translateX(-50%)',
-                              whiteSpace: 'nowrap',
-                              minWidth: 'max-content'
-                            }}
-                          >
-                            <ul className="list-none p-0 m-0 text-xs">
-                              {assignedNames.map((name, nameIndex) => (
-                                <li key={nameIndex}>{name}</li>
-                              ))}
-                            </ul>
-                          </div>
-                        )}
-                      </div> */}
-                        {/* <span className="caption-custom px-2 py-1 border border-gray-300 hover:bg-gray-200 rounded-full">
-                          {task.leadTaskStageName/,l }
-                        </span> */}
+
                         <TaskStageChip
                         stageName={task.leadTaskStageName}
                         stageId={task.leadTaskStageId}

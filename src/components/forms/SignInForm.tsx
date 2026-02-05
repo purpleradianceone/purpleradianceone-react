@@ -32,6 +32,7 @@ import toast from "react-hot-toast";
 import { KeySquare, Mail } from "lucide-react";
 import {TutorailDataType} from "../../@types/tutorail/TutorailDataType";
 import { useTutorailDataContext } from "../../context/tutorail/useTutorailDataContext";
+import { AppVersionViewCard } from "../views/card/AppVersionViewCard";
 
 function SignInForm() {
   const navigate = useNavigate();
@@ -515,6 +516,7 @@ function SignInForm() {
                 <Link to={ROUTES_URL.SIGN_UP}>Sign Up</Link>
               </button>
             </span>
+            <AppVersionViewCard/>
           </div>
         </form>
         {

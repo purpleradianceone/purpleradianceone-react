@@ -13,6 +13,7 @@ interface DropdownProps {
   preselectedOption?: number;
   requiredRedDot?: boolean;
   logo?: LucideIcon;
+  paddingy? : number
 }
 
 const CustomDropdown: React.FC<DropdownProps> = ({
@@ -24,6 +25,7 @@ const CustomDropdown: React.FC<DropdownProps> = ({
   preselectedOption,
   requiredRedDot,
   logo: Icon,
+  paddingy=1
 }) => {
   const [selectedOption, setSelectedOption] = useState<number | undefined>(
     () => {
@@ -93,7 +95,7 @@ const CustomDropdown: React.FC<DropdownProps> = ({
       <div
         role="button"
         tabIndex={0}
-        className={`w-full flex justify-between py-1 px-1 border-2 rounded-md cursor-pointer text-gray-700 
+        className={`w-full flex justify-between py-${paddingy} px-1 border-2 rounded-md cursor-pointer text-gray-700 
           ${readOnly ? "bg-gray-100" : "bg-white"}`}
         onClick={() => {
           if (!readOnly) {

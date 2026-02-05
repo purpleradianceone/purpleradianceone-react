@@ -19,26 +19,26 @@ import CompanyUserSearchFieldInput from "../../ui/CompanyUserSearchFieldInput";
 import CompanyUser from "../../../@types/company-users/CompanyUser";
 import MESSAGE from "../../../constants/Messages";
 
-export  type supportTicketLifecycleType = {
-    queryDescription: string;
-    publicNotes: string;
-    resolutionApplied: string;
-    resolvedBy: CompanyUser;
-  }
+export type supportTicketLifecycleType = {
+  queryDescription: string;
+  publicNotes: string;
+  resolutionApplied: string;
+  resolvedBy: CompanyUser;
+};
 
 export function SupportTicketLIfecycleChangeModal({
   isLoading,
-  previousSupportTicketStatus,
+  selectedSupportTicketState,
   selectedSupportTicketLifecyclId,
   selectedSupportTicketLifecycleName,
   handleSubmit,
   onClose,
 }: {
   isLoading: boolean;
-  previousSupportTicketStatus: any;
+  selectedSupportTicketState: any;
   selectedSupportTicketLifecyclId: number | undefined;
   selectedSupportTicketLifecycleName: string | undefined;
-  handleSubmit: (supportTicketData: any) => void;
+  handleSubmit: (supportTicketLifecycleFormData: any) => void;
   onClose: () => void;
 }) {
   const [formData, setFormData] = useState<supportTicketLifecycleType>({
@@ -47,8 +47,12 @@ export function SupportTicketLIfecycleChangeModal({
     resolutionApplied: "",
     resolvedBy: {
       company_id: 0,
-      id: previousSupportTicketStatus.assignedTo,
-      fullname: previousSupportTicketStatus.assignedToName,
+      id: selectedSupportTicketState.resolvedBy
+        ? selectedSupportTicketState.resolvedBy
+        : selectedSupportTicketState.assignedTo,
+      fullname: selectedSupportTicketState.resolvedBy
+        ? selectedSupportTicketState.resolvedByName
+        : selectedSupportTicketState.assignedToName,
       email: "",
       mobilenumber: "",
       createdby: "",
@@ -58,8 +62,6 @@ export function SupportTicketLIfecycleChangeModal({
       all_leads_visible: true,
     },
   });
-
-  const { userHasAccessToViewUser } = useUserAccessModules();
 
   const { userHasAccessToUpdateSupportTicket } = useUserAccessModules();
 
@@ -78,30 +80,45 @@ export function SupportTicketLIfecycleChangeModal({
           onClose={onClose}
           preText={`Support ticket lifecycle updating to `}
           userName={selectedSupportTicketLifecycleName}
-          description={`support ticket lifecycle is updating from ${previousSupportTicketStatus.supportTicketLifecycleName} to ${selectedSupportTicketLifecycleName} .`}
+          description={`support ticket lifecycle is updating from ${selectedSupportTicketState.supportTicketLifecycleName} to ${selectedSupportTicketLifecycleName} .`}
         />
-        <form className="mt-2">
+        <form
+          className={`mt-2 ${isLoading ? "cursor-wait" : "cursor-default"}`}
+        >
           <div className="gap-2">
             <TextAreaInput
               logo={LucideText}
+              defaultValue={selectedSupportTicketState.queryDescription}
               label="Query Description"
               name="queryDescription"
               onChange={handleFormChange}
-              autoFocus={true}
+              autoFocus={
+                selectedSupportTicketLifecyclId &&
+                selectedSupportTicketLifecyclId < 4
+                  ? true
+                  : false
+              }
               rows={2}
               cols={0}
             />
             <TextAreaInput
               logo={Wrench}
+              defaultValue={selectedSupportTicketState.resolutionApplied}
               label="Resolution Applied"
               name="resolutionApplied"
               onChange={handleFormChange}
-              // autoFocus={true}
+              autoFocus={
+                selectedSupportTicketLifecyclId &&
+                selectedSupportTicketLifecyclId >= 4
+                  ? true
+                  : false
+              }
               rows={2}
               cols={0}
             />
             <TextAreaInput
               logo={StickyNote}
+              defaultValue={selectedSupportTicketState?.publicNotes}
               label="Public Note"
               name="publicNotes"
               onChange={(e) => handleFormChange(e)}
@@ -109,58 +126,68 @@ export function SupportTicketLIfecycleChangeModal({
               rows={2}
               cols={0}
             />
-            {selectedSupportTicketLifecyclId!>=4 &&<div className="mt-2">
-              <div className="grid grid-cols-1">
-              <CompanyUserSearchFieldInput
-                label="Resolved By:"
-                required
-                // placeholder={loginStatus.fullName}
-                defaultValue={
-                  formData.resolvedBy.fullname === ""
-                    ? previousSupportTicketStatus.assignedToName
-                    : formData.resolvedBy.fullname
-                }
-                logo={User}
-                onUserSelected={(user) => {
-                  if (user) {
-                    setFormData((prev) => {
-                      return {
-                        ...prev,
-                        resolvedBy: user,
-                      };
-                    });
-                  } else {
-                    setFormData((prev) => {
-                      return {
-                        ...prev,
-                        resolvedBy: {
-                          company_id: 0,
-                          id: previousSupportTicketStatus.assignedTo,
-                          fullname: previousSupportTicketStatus.assignedToName,
-                          email: "",
-                          mobilenumber: "",
-                          createdby: "",
-                          isactive: true,
-                          requestedby: "",
-                          generate_password: "",
-                          all_leads_visible: true,
-                        },
-                      };
-                    });
-                  }
-                }}
-                isDisabled={!userHasAccessToViewUser}
-                disabledMessage={
-                  MESSAGE.MODULE_ACCESS.COMPANY_USER.DENIED_VIEW_ACCESS
-                }
-                // error={selectedCompanyUser.fullname===""?"Need to select assign to":""}
-              /></div>
-              <span className="caption-custom">
-                <span className="">Note :</span> If “Resolved By” is not selected  or is removed, it will be set to the
-                <span className="table-header-custom active"> ticket creator</span> by
-                default.
-              </span>
-            </div>}
+            {selectedSupportTicketLifecyclId! >= 4 && (
+              <div className="mt-2">
+                <div className="grid grid-cols-1">
+                  <CompanyUserSearchFieldInput
+                    label="Resolved By:"
+                    required
+                    // placeholder={loginStatus.fullName}
+                    defaultValue={
+                      formData.resolvedBy.id
+                        ? formData.resolvedBy.fullname
+                        : selectedSupportTicketState.assignedToName
+                    }
+                    logo={User}
+                    onUserSelected={(user) => {
+                      if (user) {
+                        setFormData((prev) => {
+                          return {
+                            ...prev,
+                            resolvedBy: user,
+                          };
+                        });
+                      } else {
+                        setFormData((prev) => {
+                          return {
+                            ...prev,
+                            resolvedBy: {
+                              company_id: 0,
+                              id: selectedSupportTicketState.resolvedBy
+                                ? selectedSupportTicketState.resolvedBy
+                                : selectedSupportTicketState.assignedTo,
+                              fullname: selectedSupportTicketState.resolvedBy
+                                ? selectedSupportTicketState.resolvedByName
+                                : selectedSupportTicketState.assignedToName,
+                              email: "",
+                              mobilenumber: "",
+                              createdby: "",
+                              isactive: true,
+                              requestedby: "",
+                              generate_password: "",
+                              all_leads_visible: true,
+                            },
+                          };
+                        });
+                      }
+                    }}
+                    disabledMessage={
+                      MESSAGE.MODULE_ACCESS.COMPANY_USER.DENIED_VIEW_ACCESS
+                    }
+                    // error={selectedCompanyUser.fullname===""?"Need to select assign to":""}
+                  />
+                </div>
+                <span className="caption-custom">
+                  <span className="">Note :</span> If “Resolved By” is not
+                  selected or is removed, it will be set to the
+                  <span className="table-header-custom active">
+                    {" "}
+                    ticket creator
+                  </span>{" "}
+                  by default.
+                </span>
+              </div>
+            )}
           </div>
           <div className="flex items-center  justify-end gap-3 mt-3">
             <div className="flex gap-2">

@@ -16,7 +16,8 @@ export const  STRING_VALUES = {
 
 export enum ActionTypeForStockMOdule{
   DETAILS = "DETAILS",
-  TRANSACTIONS = "TRANSACTIONS"
+  TRANSACTIONS = "TRANSACTIONS",
+  CREATE_STOCK = "CREATE-STOCK"
 }
 
 export const DEBOUNCE_DELAY = 300;
@@ -135,8 +136,9 @@ export const JSX_CHILDREN_NAME = {
     UPDATE : "Update",
     MEETINGS : "Meetings",
     CREATE_SUPPORT_TICKET : "Create",
-
-
+    DETAILS :"Details",
+    TRANSACRTIONS : "Trans...",
+    ADD_STOCK :"Stock"
 }
 
 export const SIZE = {
@@ -146,7 +148,11 @@ export const SIZE = {
     TWELEVE : 12,
     FOURTEEN : 14,
     SIXTEEN : 16,
-    LUCIDE_LOGO_INPUT_LABEL_SIZE: 14
+    LUCIDE_LOGO_INPUT_LABEL_SIZE: 14,
+    NAVBAR : {
+      TOP_HEIGHT_USER_PREF_LEFT : 'h-11',
+      TOP_HEIGHT_USER_PREF_RIGHT : 'h-12'
+    }
 }
 
 export const INNERHTML = {

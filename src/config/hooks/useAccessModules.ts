@@ -148,17 +148,17 @@ export const useUserAccessModules = () => {
   );
 
   //Setting - Email
-  const userHasAccessToViewEmailSetting = accessModules.some(
+  const userHasAccessToViewSettingPersonalEmail = accessModules.some(
     (accessModule)=>
         accessModule.crm_module_id === 10 && accessModule.view
   );
 
-   const userHasAccessToUpdateEmailSetting = accessModules.some(
+   const userHasAccessToUpdateSettingPersonalEmail = accessModules.some(
     (accessModule) =>
       accessModule.crm_module_id === 10 && accessModule.update
   );
 
-  const userHasAccessToAddEmailSetting = accessModules.some(
+  const userHasAccessToAddSettingPersonalEmail = accessModules.some(
     (accessModule) =>
       accessModule.crm_module_id === 10 && accessModule.add
   );
@@ -218,7 +218,7 @@ export const useUserAccessModules = () => {
       accessModules.crm_module_id === 14 && accessModules.add
   );
 
-   const userHasAccessToViewSettingLeady = accessModules.some(
+   const userHasAccessToViewSettingLead = accessModules.some(
     (accessModule) =>
       accessModule.crm_module_id === 14 && accessModule.view
   );
@@ -358,6 +358,21 @@ const userHasAccessToAddEmailTemplateSetting = accessModules.some(
       accessModule.crm_module_id === 22 && accessModule.update
   );
 
+    const userHasAccessToAddSupportTicketTask = accessModules.some(
+    (accessModules) => 
+      accessModules.crm_module_id === 33 && accessModules.add
+  );
+
+   const userHasAccessToViewSupportTicketTask  = accessModules.some(
+    (accessModule) =>
+      accessModule.crm_module_id === 33 && accessModule.view
+  );
+
+  const userHasAccessToUpdateSupportTicketTask = accessModules.some(
+    (accessModule) =>
+      accessModule.crm_module_id === 33 && accessModule.update
+  );
+
   //stock
   const userHasAccessToAddStock = accessModules.some(
     (accessModules) => 
@@ -373,6 +388,312 @@ const userHasAccessToAddEmailTemplateSetting = accessModules.some(
     (accessModule) =>
       accessModule.crm_module_id === 23 && accessModule.update
   );
+
+  //setting
+  const userHasAccessToAddSetting = accessModules.some(
+    (accessModules) => 
+      accessModules.crm_module_id === 24 && accessModules.add
+  );
+
+   const userHasAccessToViewSetting  = accessModules.some(
+    (accessModule) =>
+      accessModule.crm_module_id === 24 && accessModule.view
+  );
+
+  const userHasAccessToUpdateSetting = accessModules.some(
+    (accessModule) =>
+      accessModule.crm_module_id === 24 && accessModule.update
+  );
+
+
+  //lead-product
+  const userHasAccessToAddLeadProduct = accessModules.some(
+    (accessModules) => 
+      accessModules.crm_module_id === 25 && accessModules.add
+  );
+
+   const userHasAccessToViewLeadProduct  = accessModules.some(
+    (accessModule) =>
+      accessModule.crm_module_id === 25 && accessModule.view
+  );
+
+  const userHasAccessToUpdateLeadProduct= accessModules.some(
+    (accessModule) =>
+      accessModule.crm_module_id === 25 && accessModule.update
+  );
+
+  //lead-teams
+  const userHasAccessToAddLeadTeams = accessModules.some(
+    (accessModules) => 
+      accessModules.crm_module_id === 26 && accessModules.add
+  );
+
+   const userHasAccessToViewLeadTeams  = accessModules.some(
+    (accessModule) =>
+      accessModule.crm_module_id === 26 && accessModule.view
+  );
+
+  const userHasAccessToUpdateLeadTeams = accessModules.some(
+    (accessModule) =>
+      accessModule.crm_module_id === 26 && accessModule.update
+  );
+
+  //lead-Contacts
+  const userHasAccessToAddLeadContacts = accessModules.some(
+    (accessModules) => 
+      accessModules.crm_module_id === 27 && accessModules.add
+  );
+
+   const userHasAccessToViewLeadContacts  = accessModules.some(
+    (accessModule) =>
+      accessModule.crm_module_id === 27 && accessModule.view
+  );
+
+  const userHasAccessToUpdateLeadContacts = accessModules.some(
+    (accessModule) =>
+      accessModule.crm_module_id === 27 && accessModule.update
+  );
+
+  //lead-Details
+  const userHasAccessToAddLeadDetails = accessModules.some(
+    (accessModules) => 
+      accessModules.crm_module_id === 28 && accessModules.add
+  );
+
+   const userHasAccessToViewLeadDetails  = accessModules.some(
+    (accessModule) =>
+      accessModule.crm_module_id === 28 && accessModule.view
+  );
+
+  const userHasAccessToUpdateLeadDetails = accessModules.some(
+    (accessModule) =>
+      accessModule.crm_module_id === 28 && accessModule.update
+  );
+
+  //lead-tasks
+  const userHasAccessToAddLeadTasks = accessModules.some(
+    (accessModules) => 
+      accessModules.crm_module_id === 29 && accessModules.add
+  );
+
+   const userHasAccessToViewLeadTasks  = accessModules.some(
+    (accessModule) =>
+      accessModule.crm_module_id === 29 && accessModule.view
+  );
+
+  const userHasAccessToUpdateLeadTasks = accessModules.some(
+    (accessModule) =>
+      accessModule.crm_module_id === 29 && accessModule.update
+  );
+
+   //product-users
+  const userHasAccessToAddProductUsers = accessModules.some(
+    (accessModules) => 
+      accessModules.crm_module_id === 30 && accessModules.add
+  );
+
+   const userHasAccessToViewProductUsers  = accessModules.some(
+    (accessModule) =>
+      accessModule.crm_module_id === 30 && accessModule.view
+  );
+
+  const userHasAccessToUpdateProductUsers = accessModules.some(
+    (accessModule) =>
+      accessModule.crm_module_id === 30 && accessModule.update
+  );
+
+   //product-stock
+  const userHasAccessToAddProductStock = accessModules.some(
+    (accessModules) => 
+      accessModules.crm_module_id === 31 && accessModules.add
+  );
+
+   const userHasAccessToViewProductStock = accessModules.some(
+    (accessModule) =>
+      accessModule.crm_module_id === 31 && accessModule.view
+  );
+
+  const userHasAccessToUpdateProductStock = accessModules.some(
+    (accessModule) =>
+      accessModule.crm_module_id === 31 && accessModule.update
+  );
+
+   //product-service-level-agrrement
+  const userHasAccessToAddServiceLevelAgreement = accessModules.some(
+    (accessModules) => 
+      accessModules.crm_module_id === 32 && accessModules.add
+  );
+
+   const userHasAccessToViewServiceLevelAgreement = accessModules.some(
+    (accessModule) =>
+      accessModule.crm_module_id === 32 && accessModule.view
+  );
+
+  const userHasAccessToUpdateServiceLevelAgreement = accessModules.some(
+    (accessModule) =>
+      accessModule.crm_module_id === 32 && accessModule.update
+  );
+
+  //account-leads
+  const userHasAccessToAddAccountLeads = accessModules.some(
+    (accessModules) => 
+      accessModules.crm_module_id === 34 && accessModules.add
+  );
+
+   const userHasAccessToViewAccountLeads = accessModules.some(
+    (accessModule) =>
+      accessModule.crm_module_id === 34 && accessModule.view
+  );
+
+  const userHasAccessToUpdateAccountLeads = accessModules.some(
+    (accessModule) =>
+      accessModule.crm_module_id === 34 && accessModule.update
+  );
+
+   //account-contacts
+  const userHasAccessToAddAccountContacts = accessModules.some(
+    (accessModules) => 
+      accessModules.crm_module_id === 35 && accessModules.add
+  );
+
+   const userHasAccessToViewAccountContacts = accessModules.some(
+    (accessModule) =>
+      accessModule.crm_module_id === 35 && accessModule.view
+  );
+
+  const userHasAccessToUpdateAccountContacts = accessModules.some(
+    (accessModule) =>
+      accessModule.crm_module_id === 35 && accessModule.update
+  );
+
+   //account-types
+  const userHasAccessToAddAccountTypes = accessModules.some(
+    (accessModules) => 
+      accessModules.crm_module_id === 36 && accessModules.add
+  );
+
+   const userHasAccessToViewAccountTypes = accessModules.some(
+    (accessModule) =>
+      accessModule.crm_module_id === 36 && accessModule.view
+  );
+
+  const userHasAccessToUpdateAccountTypes = accessModules.some(
+    (accessModule) =>
+      accessModule.crm_module_id === 36 && accessModule.update
+  );
+
+  //account-products
+  const userHasAccessToAddAccountProducts = accessModules.some(
+    (accessModules) => 
+      accessModules.crm_module_id === 37 && accessModules.add
+  );
+
+   const userHasAccessToViewAccountProducts= accessModules.some(
+    (accessModule) =>
+      accessModule.crm_module_id === 37 && accessModule.view
+  );
+
+  const userHasAccessToUpdateAccountProducts= accessModules.some(
+    (accessModule) =>
+      accessModule.crm_module_id === 37 && accessModule.update
+  );
+
+   //account-products-amc
+  const userHasAccessToAddAccountProductsAmc = accessModules.some(
+    (accessModules) => 
+      accessModules.crm_module_id === 38 && accessModules.add
+  );
+
+   const userHasAccessToViewAccountProductsAmc= accessModules.some(
+    (accessModule) =>
+      accessModule.crm_module_id === 38 && accessModule.view
+  );
+
+  const userHasAccessToUpdateAccountProductsAmc= accessModules.some(
+    (accessModule) =>
+      accessModule.crm_module_id === 38 && accessModule.update
+  );
+
+  //account-products-warranty
+  const userHasAccessToAddAccountProductsWarranty = accessModules.some(
+    (accessModules) => 
+      accessModules.crm_module_id === 39 && accessModules.add
+  );
+
+   const userHasAccessToViewAccountProductsWarranty= accessModules.some(
+    (accessModule) =>
+      accessModule.crm_module_id === 39 && accessModule.view
+  );
+
+  const userHasAccessToUpdateAccountProductsWarranty= accessModules.some(
+    (accessModule) =>
+      accessModule.crm_module_id === 39 && accessModule.update
+  );
+
+  //team - users
+  const userHasAccessToAddTeamUsers = accessModules.some(
+    (accessModules) => 
+      accessModules.crm_module_id === 40 && accessModules.add
+  );
+
+   const userHasAccessToViewTeamUsers= accessModules.some(
+    (accessModule) =>
+      accessModule.crm_module_id === 40 && accessModule.view
+  );
+
+  const userHasAccessToUpdateTeamUSers= accessModules.some(
+    (accessModule) =>
+      accessModule.crm_module_id === 40 && accessModule.update
+  );
+
+  //setting - support-ticket-category
+  const userHasAccessToAddSettingSupposeTicketCategory = accessModules.some(
+    (accessModules) => 
+      accessModules.crm_module_id === 41 && accessModules.add
+  );
+
+   const userHasAccessToViewSettingSupposeTicketCategory= accessModules.some(
+    (accessModule) =>
+      accessModule.crm_module_id === 41 && accessModule.view
+  );
+
+  const userHasAccessToUpdateSettingSupposeTicketCategory= accessModules.some(
+    (accessModule) =>
+      accessModule.crm_module_id === 41 && accessModule.update
+  );
+
+   //setting - company-warehouse
+  const userHasAccessToAddSettingCompanyWarehouse = accessModules.some(
+    (accessModules) => 
+      accessModules.crm_module_id === 42 && accessModules.add
+  );
+
+   const userHasAccessToViewSettingCompanyWarehouse= accessModules.some(
+    (accessModule) =>
+      accessModule.crm_module_id === 42 && accessModule.view
+  );
+
+  const userHasAccessToUpdateSettingCompanyWarehouse= accessModules.some(
+    (accessModule) =>
+      accessModule.crm_module_id === 42 && accessModule.update
+  );
+
+  //lead-setting
+  const userHasAccessToAddLeadSettings = accessModules.some(
+    (accessModules) => 
+      accessModules.crm_module_id === 43 && accessModules.add
+  );
+
+   const userHasAccessToViewLeadSettings= accessModules.some(
+    (accessModule) =>
+      accessModule.crm_module_id === 43 && accessModule.view
+  );
+
+  const userHasAccessToUpdateLeadSettings= accessModules.some(
+    (accessModule) =>
+      accessModule.crm_module_id === 43 && accessModule.update
+  );
+
 
   return {
     userHasAccessToAddUser,
@@ -411,9 +732,9 @@ const userHasAccessToAddEmailTemplateSetting = accessModules.some(
     userHasAccessToViewSettingGeneral,
     userHasAccessToUpdateSettingGeneral,
 
-    userHasAccessToAddEmailSetting,
-    userHasAccessToViewEmailSetting,
-    userHasAccessToUpdateEmailSetting,
+    userHasAccessToViewSettingPersonalEmail,
+    userHasAccessToAddSettingPersonalEmail,
+    userHasAccessToUpdateSettingPersonalEmail,
 
     userHasAccessToViewMeetingSetting,
     userHasAccessToUpdateMeetingSetting,
@@ -428,7 +749,7 @@ const userHasAccessToAddEmailTemplateSetting = accessModules.some(
     userHasAccessToUpdateEmailSettingCompany,
 
     userHasAccessToAddSettingLead,
-    userHasAccessToViewSettingLeady,
+    userHasAccessToViewSettingLead,
     userHasAccessToUpdateSettingLead,
 
     userHasAccessToAddEmailTemplateSetting,
@@ -462,9 +783,88 @@ const userHasAccessToAddEmailTemplateSetting = accessModules.some(
     userHasAccessToAddSupportTicket,
     userHasAccessToViewSupportTicket,
     userHasAccessToUpdateSupportTicket,
+    userHasAccessToAddSupportTicketTask,
+    userHasAccessToViewSupportTicketTask,
+    userHasAccessToUpdateSupportTicketTask,
 
     userHasAccessToAddStock,
     userHasAccessToViewStock,
-    userHasAccessToUpdateStock
+    userHasAccessToUpdateStock,
+
+    userHasAccessToAddSetting,
+    userHasAccessToViewSetting,
+    userHasAccessToUpdateSetting,
+
+    userHasAccessToAddLeadProduct,
+    userHasAccessToViewLeadProduct,
+    userHasAccessToUpdateLeadProduct,
+
+    userHasAccessToAddLeadTeams,
+    userHasAccessToViewLeadTeams,
+    userHasAccessToUpdateLeadTeams,
+
+    userHasAccessToAddLeadContacts,
+    userHasAccessToViewLeadContacts,
+    userHasAccessToUpdateLeadContacts,
+
+    userHasAccessToAddLeadDetails,
+    userHasAccessToViewLeadDetails,
+    userHasAccessToUpdateLeadDetails,
+
+    userHasAccessToAddLeadTasks,
+    userHasAccessToViewLeadTasks,
+    userHasAccessToUpdateLeadTasks,
+
+    userHasAccessToAddProductUsers,
+    userHasAccessToViewProductUsers,
+    userHasAccessToUpdateProductUsers,
+
+    userHasAccessToAddProductStock,
+    userHasAccessToViewProductStock,
+    userHasAccessToUpdateProductStock,
+
+    userHasAccessToAddServiceLevelAgreement,
+    userHasAccessToViewServiceLevelAgreement,
+    userHasAccessToUpdateServiceLevelAgreement,
+
+    userHasAccessToAddAccountLeads,
+    userHasAccessToViewAccountLeads,
+    userHasAccessToUpdateAccountLeads,
+
+    userHasAccessToAddAccountContacts,
+    userHasAccessToViewAccountContacts,
+    userHasAccessToUpdateAccountContacts,
+
+    userHasAccessToAddAccountTypes,
+    userHasAccessToViewAccountTypes,
+    userHasAccessToUpdateAccountTypes,
+
+    userHasAccessToAddAccountProducts,
+    userHasAccessToViewAccountProducts,
+    userHasAccessToUpdateAccountProducts,
+
+    userHasAccessToAddAccountProductsAmc,
+    userHasAccessToViewAccountProductsAmc,
+    userHasAccessToUpdateAccountProductsAmc,
+
+    userHasAccessToAddAccountProductsWarranty,
+    userHasAccessToViewAccountProductsWarranty,
+    userHasAccessToUpdateAccountProductsWarranty,
+
+    userHasAccessToAddTeamUsers,
+    userHasAccessToViewTeamUsers,
+    userHasAccessToUpdateTeamUSers,
+
+    userHasAccessToAddSettingSupposeTicketCategory,
+    userHasAccessToViewSettingSupposeTicketCategory,
+    userHasAccessToUpdateSettingSupposeTicketCategory,
+
+    userHasAccessToAddSettingCompanyWarehouse,
+    userHasAccessToViewSettingCompanyWarehouse,
+    userHasAccessToUpdateSettingCompanyWarehouse,
+
+    userHasAccessToAddLeadSettings,
+    userHasAccessToViewLeadSettings,
+    userHasAccessToUpdateLeadSettings
   };
 };

@@ -21,7 +21,6 @@ import { useComapanySpecificSearchDateRange } from "../../config/hooks/useCompan
 import { useDateRangeIdChange } from "../../config/hooks/useDateRangeIdChange";
 import LeadManagementListProps from "../../@types/List/LeadManagementListProps";
 import DateRangeFilterDropdown from "../ui/DateRangeFilterDropdown";
-import Pagination from "../ag-grid/Pagination";
 import CustomDropdown from "../modals/leads/CustomDropdown";
 import LeadDataProps from "../../@types/lead-management/LeadProps";
 import { useNavigate } from "react-router-dom";
@@ -34,6 +33,7 @@ import { useUserPreference } from "../../context/user/UserPreference";
 import FormHeader from "../ui/FormHeader";
 import COLORS from "../../constants/Colors";
 import { createPortal } from "react-dom";
+import PaginationWithoutCount from "../ag-grid/PaginationWithoutCount";
 function LeadManagementList({
   handleSearchOption,
   onStartDateChange,
@@ -138,19 +138,18 @@ function LeadManagementList({
     navigate(ROUTES_URL.LEAD_IMPORT_CSV);
   };
 
-   useEffect(()=>{
-    if(handleSearchOption.dateRangeId===8){
-
-      setIsCustomDateOptionSelected(true)
-    }
-  }, [handleSearchOption.dateRangeId])
 
   const selectedDateName = dateRangeDropdownOptions.find(o => o.search_date_range_id === handleSearchOption.dateRangeId)?.date_range
-  || "Filter";
+  || "Date Filter";
   const handleCreateLeadModalClose = () => {
     setIsCreateLeadModalOpen(false);
   };
 
+   useEffect(() => {
+      if(handleSearchOption.dateRangeId === 8){
+        setIsCustomDateOptionSelected(true);
+      }
+    }, [handleSearchOption.searchParameter, handleSearchOption.dateRangeId, setIsCustomDateOptionSelected]);
   // let  startDate ;
 
   // useEffect(()=>{
@@ -163,39 +162,45 @@ function LeadManagementList({
         className={`w-full ${position === "left" && isUsedInLeadModule ? "pl-5" : "pl-1"} pr-1 gap-1`}
       >
         {/* sticky */}
-        <div className={`z-10 top-12 mt-1 p-0.5  flex items-center justify-between text-sm ${COLORS.GRID_HEADER_SECTION_BG_COLOR} rounded-lg shadow-sm  mb-1.5 w-full`}>
-         {
-          isUsedInLeadModule && (
-             <div className="flex gap-2">
-            {!isSmallScreen && <Handshake className={COLORS.GRID_HEADER_ICONS_COLOR_AND_SIZE} />}
+        <div
+          className={`z-10 top-12 mt-1 p-0.5  flex items-center justify-between text-sm ${COLORS.GRID_HEADER_SECTION_BG_COLOR} rounded-lg shadow-sm  mb-1.5 w-full`}
+        >
+          {isUsedInLeadModule && (
+            <div className="flex gap-1">
+              {!isSmallScreen && (
+                <Handshake
+                  className={COLORS.GRID_HEADER_ICONS_COLOR_AND_SIZE}
+                />
+              )}
 
-
-            {(isMediumScreen || isLargeScreen) && (
-              <span className="section-header-custom">{" Leads"} </span>
-            )}
-          </div>
-          )
-         }
-              
+              {(isMediumScreen || isLargeScreen) && (
+                <span className="section-header-custom">{" Leads"} </span>
+              )}
+            </div>
+          )}
 
           {/* {isLargeScreen && ( */}
-            <>
-              <div className="flex gap-2  px-1 justify-center items-center">
-                {/* search box flex div */}
-                  <div className={`relative flex items-start ${isCustomDateOptionSelected ? "w-56" : "w-80"}`}>
-                    <SearchInput
-                    value={handleSearchOption.searchParameter}
-                      onChange={(e) => {
-                        handleSearchOption.handleSearchParameterChange(
-                          e.target.value
-                        );
-                      }}
-                    ></SearchInput>
-                  </div>
+          <>
+            <div className="flex gap-2  px-1 justify-center items-center">
+              {/* search box flex div */}
+              <div
+                className={`relative flex items-start ${isCustomDateOptionSelected ? "w-56" : "w-80"}`}
+              >
+                <SearchInput
+                  value={handleSearchOption.searchParameter}
+                  onChange={(e) => {
+                    handleSearchOption.handleSearchParameterChange(
+                      e.target.value,
+                    );
+                  }}
+                ></SearchInput>
+              </div>
 
-                {/* Date FIlters Dropdown */}
-                <div className={`flex flex-wrap gap-0.5 ${isCustomDateOptionSelected ? 'max-h-12' : 'max-h-8'}`}>
-                <div className="flex">
+              {/* Date FIlters Dropdown */}
+              <div
+                className={`flex flex-wrap gap-0.5 ${isCustomDateOptionSelected ? "max-h-12" : "max-h-8"}`}
+              >
+                <div className="flex mx-3 gap-1">
                   <div className="flex ">
                     <div className="flex input-label-custom items-center size-4 justify-center mt-2 mr-2 gap-2">
                       <Calendar className="input-label-custom" />
@@ -204,102 +209,112 @@ function LeadManagementList({
                       dropdownOptions={dateRangeDropdownOptions}
                       handleDateIdChange={handleDateRangeIdChange}
                       selectedOption={selectedDateName}
-                      />
+                    />
                   </div>
-                </div>
-                {/* Custom Date Picker Div Flex Box*/}
-                <div
-                  style={
-                    isCustomDateOptionSelected
-                      ? { visibility: "visible" }
-                      : { visibility: "hidden" }
-                  }
-                >
-                  <DateRangePicker
-                    onStartDateChange={onStartDateChange.handleStartDateChange}
-                    onEndDateChange={onEndDateChange.handleEndDateChange}
-                    // startDate ={startDate}
-                    // endDate ={endDate}
 
-                  />
-                </div>
-                </div>
-                {isUsedInLeadModule && (
-                  <div className="flex gap-1">
-                    <div className="ml-0.5 min-w-[120px] max-h-[40px]">
-                      <CustomDropdown
-                      selectedValue={handleLeadSelectedSource.selectedLeadSource || undefined}
-                        labelName="source"
-                        options={leadSource!}
-                        onSelect={handleLeadSelectedSource.handleLeadSelectedSource}
+                  {/* Custom Date Picker Div Flex Box*/}
+                  {isCustomDateOptionSelected && (
+                    <div
+                      style={
+                        isCustomDateOptionSelected
+                          ? { visibility: "visible" }
+                          : { visibility: "hidden" }
+                      }
+                    >
+                      <DateRangePicker
+                        onStartDateChange={
+                          onStartDateChange.handleStartDateChange
+                        }
+                        onEndDateChange={onEndDateChange.handleEndDateChange}
+                        initialStartDate={handleSearchOption.startDate}
+                        initialEndDate={handleSearchOption.endDate}
                       />
                     </div>
-                    <div className="ml-0.5 min-w-[120px]">
-                      <CustomDropdown
-                      selectedValue={handleLeadSelectedStatus.selectedLeadStatus || undefined}
-                        labelName="status"
-                        options={leadStatus!}
-                        onSelect={handleLeadSelectedStatus.handleLeadSelectedStatus}
-                      />
-                    </div>
-                  
-               
-
-                <div className="relative flex items-center justify-center w-auto ">
-                  <div className="grid ">
-                    {selectedLeadOwner.id === 0 && (
-                      <Button
-                        type="button"
-                        onClick={handleCompanyUserPopUp}
-                        className="flex items-center gap-2 h-7 px-2 py-1 caption-custom border border-gray-300 
-                      rounded-md bg-white  hover:bg-gray-50 
-                      focus:outline-none shadow-sm"
-                      >
-                        <User size={14} />
-                        <span>Owner</span>
-                      </Button>
-                    )}
-
-                    {selectedLeadOwner.id !== 0 && (
-                      <div className="border rounded-md border-gray-400 p-0.5">
-                        <div
-                          title={selectedLeadOwner.fullname}
-                          className={
-                            selectedLeadOwner.id === 0
-                              ? "bg-transparent"
-                              : "relative max-h-6 rounded flex justify-between gap-x-0.5 bg-blue-600 caption-custom white-text p-0.5 "
-                          }
-                        >
-                          <span>
-                            {selectedLeadOwner.fullname.length > 14
-                              ? selectedLeadOwner.fullname.slice(0, 14) + "..."
-                              : selectedLeadOwner.fullname}
-                          </span>
-
-                          <button
-                            title="Select another owner to view assigned leads"
-                            onClick={() => {
-                              handleSelectedCompanyUserCheckBoxChange(null);
-                            }}
-                            className="border-transparent  float-end"
-                          >
-                            <X size={14} className="self-center"></X>
-                          </button>
-                        </div>
-                      </div>
-                    )}
-                  </div>
+                  )}
                 </div>
-                </div>
-                 )}
               </div>
-            </>
+              {isUsedInLeadModule && (
+                <div className="flex gap-1">
+                  <div className="ml-0.5 min-w-[120px] max-h-[40px]">
+                    <CustomDropdown
+                      selectedValue={
+                        handleLeadSelectedSource.selectedLeadSource || undefined
+                      }
+                      labelName="source"
+                      options={leadSource!}
+                      onSelect={
+                        handleLeadSelectedSource.handleLeadSelectedSource
+                      }
+                    />
+                  </div>
+                  <div className="ml-0.5 min-w-[120px]">
+                    <CustomDropdown
+                      selectedValue={
+                        handleLeadSelectedStatus.selectedLeadStatus || undefined
+                      }
+                      labelName="status"
+                      options={leadStatus!}
+                      onSelect={
+                        handleLeadSelectedStatus.handleLeadSelectedStatus
+                      }
+                    />
+                  </div>
+
+                  <div className="relative flex items-center justify-center w-auto ">
+                    <div className="grid ">
+                      {selectedLeadOwner.id === 0 && (
+                        <Button
+                          type="button"
+                          onClick={handleCompanyUserPopUp}
+                          className="flex items-center gap-2 px-2 py-1 caption-custom border border-gray-300 
+                  rounded-md bg-white hover:bg-gray-50 shadow-sm"
+                        >
+                          <User size={14} />
+                          <span>Owner</span>
+                        </Button>
+                      )}
+
+                      {selectedLeadOwner.id !== 0 && (
+                        <div className="border rounded-md border-gray-400 p-0.5">
+                          <div
+                            title={selectedLeadOwner.fullname}
+                            className={
+                              selectedLeadOwner.id === 0
+                                ? "bg-transparent"
+                                : "relative max-h-6 rounded flex justify-between gap-x-0.5 bg-blue-600 caption-custom white-text p-0.5 "
+                            }
+                          >
+                            <span>
+                              {selectedLeadOwner.fullname.length > 14
+                                ? selectedLeadOwner.fullname.slice(0, 14) +
+                                  "..."
+                                : selectedLeadOwner.fullname}
+                            </span>
+
+                            <button
+                              title="Select another owner to view assigned leads"
+                              onClick={() => {
+                                handleSelectedCompanyUserCheckBoxChange(null);
+                              }}
+                              className="border-transparent  float-end"
+                            >
+                              <X size={14} className="self-center"></X>
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </>
           {/* )} */}
 
           {isUsedInLeadModule && (
             <div className="flex  gap-1">
               <Button
-              type="submit"
+                type="submit"
                 disabled={!userHasAccessToAddLead}
                 onClick={(e) => {
                   e.preventDefault();
@@ -308,24 +323,24 @@ function LeadManagementList({
                   } else {
                     toast.error(
                       MESSAGE.MODULE_ACCESS.LEAD_MODULE
-                        .DENIED_ADD_LEAD_IMPORT_ACCESS
+                        .DENIED_ADD_LEAD_IMPORT_ACCESS,
                     );
                   }
                 }}
               >
                 <span className="flex items-center">
                   <Plus size={SIZE.SIXTEEN} />
-                <span>Import </span>
+                  <span>Import </span>
                 </span>
               </Button>
               <Button
-              type="submit"
+                type="submit"
                 disabled={!userHasAccessToAddLead}
                 onClick={(e) => {
                   e.preventDefault();
                   if (!userHasAccessToAddLead) {
                     toast.error(
-                      MESSAGE.MODULE_ACCESS.LEAD_MODULE.DENIED_ADD_ACCESS
+                      MESSAGE.MODULE_ACCESS.LEAD_MODULE.DENIED_ADD_ACCESS,
                     );
                     return;
                   } else {
@@ -346,10 +361,11 @@ function LeadManagementList({
         <div className="bg-white  overflow-y-auto rounded-lg shadow-sm ">
           <div
             className={
-              !isUsedInLeadModule ? `ag-theme-balham w-full h-[60vh]`:
-              userPreference.isLeftMenu
-                ? `ag-theme-balham w-full h-[calc(100vh-120px)]`
-                : "ag-theme-balham w-full h-[calc(100vh-128px)]"
+              !isUsedInLeadModule
+                ? `ag-theme-balham w-full h-[60vh]`
+                : userPreference.isLeftMenu
+                  ? `ag-theme-balham w-full h-[calc(100vh-115px)]`
+                  : "ag-theme-balham w-full h-[calc(100vh-120px)]"
             }
           >
             <LeadManagementAgGrid
@@ -368,19 +384,20 @@ function LeadManagementList({
         </div>
 
         <div className="flex items-center justify-end ">
-          <Pagination
-            totalPages={paginationData.totalPages}
-            currentPage={paginationData.currentPage}
+          <PaginationWithoutCount
             pageSize={paginationData.pageSize}
-            onPageChange={paginationData.handlePageChange}
-            onPageSizeChange={paginationData.selectedPageSize}
+            currentPage={paginationData.currentPage}
+            currentPageData={paginationData.currentPageData}
+            onPageChange={paginationData.onPageChange}
+            onPageSizeChange={paginationData.onPageSizeChange}
           />
         </div>
-        {openPopUpOfCompanyUserModal && createPortal(
-          <div className="fixed inset-0 z-50 bg-black bg-opacity-5 flex items-center justify-center p-4">
-            <div className="bg-white rounded-2xl shadow-lg p-3 w-full max-w-5xl max-h-[100vh] overflow-y-auto relative animate-fadeIn">
-              {/* Header with Close Button */}
-              {/* <div className="flex justify-between items-center p-3 border-b border-gray-200">
+        {openPopUpOfCompanyUserModal &&
+          createPortal(
+            <div className="fixed inset-0 z-50 bg-black bg-opacity-5 flex items-center justify-center p-4">
+              <div className="bg-white rounded-2xl shadow-lg p-3 w-full max-w-5xl max-h-[100vh] overflow-y-auto relative animate-fadeIn">
+                {/* Header with Close Button */}
+                {/* <div className="flex justify-between items-center p-3 border-b border-gray-200">
                 <h3 className="text-lg font-semibold text-gray-800">
                   Select Company User
                 </h3>
@@ -391,26 +408,26 @@ function LeadManagementList({
                   <X size={20} />
                 </button>
               </div> */}
-              <FormHeader
-                icon={User}
-                onClose={() => setOpenPopUpOfCompanyUserModal(false)}
-                preText="Select Company User"
-                description="Select the user to view him/her owned leads"
-              />
-              {/* NOTE : CALL TO THE MODAL COMPONENT */}
-              <div className="p-1">
-                <GetCompanyUsersForLead
-                  selectedUserId={persistedSelectedUserId} // Pass the persisted ID
-                  handleSelectedCompanyUserChange={
-                    handleSelectedCompanyUserCheckBoxChange
-                  }
-                  isUsedForSettings={false}
+                <FormHeader
+                  icon={User}
+                  onClose={() => setOpenPopUpOfCompanyUserModal(false)}
+                  preText="Select Company User"
+                  description="Select the user to view him/her owned leads"
                 />
+                {/* NOTE : CALL TO THE MODAL COMPONENT */}
+                <div className="p-1">
+                  <GetCompanyUsersForLead
+                    selectedUserId={persistedSelectedUserId} // Pass the persisted ID
+                    handleSelectedCompanyUserChange={
+                      handleSelectedCompanyUserCheckBoxChange
+                    }
+                    isUsedForSettings={false}
+                  />
+                </div>
               </div>
-            </div>
-          </div>,
-          document.body
-        )}
+            </div>,
+            document.body,
+          )}
       </div>
     );
   }

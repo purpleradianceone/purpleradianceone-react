@@ -74,6 +74,7 @@ export const EditorCanvasWithJson = () => {
   }: {
     templateTypeId: number;
   }) => {
+    if(loginStatus.companyId === 0)return;
     setIsLoading(true);
     await axios
       .post(
@@ -119,6 +120,8 @@ export const EditorCanvasWithJson = () => {
     emailTemplateId: number;
     templateTypeId: number;
   }) => {
+    if(loginStatus.companyId === 0)return;
+    
     await axios
       .post(
         POST_API.GET_EMAIL_TEMPLATE,

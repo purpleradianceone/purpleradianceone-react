@@ -17,6 +17,7 @@ import {
   Calendar,
   FileDigit,
   Info,
+  InfoIcon,
   LucideIcon,
   LucideTimer,
   MapPin,
@@ -45,14 +46,18 @@ import COLORS from "../../../../../constants/Colors";
 import { createPortal } from "react-dom";
 import {
   createMultipleAccountCompanyProduct,
-  getStockLiveForCompanyProduct,
+  fetchAccount,
+  getLookupQuantityLive,
 } from "../../../../../config/apis/api";
 import MESSAGE from "../../../../../constants/Messages";
 import { handleApiError } from "../../../../../config/error/handleApiError";
-import ControlledDatePicker from "../../../../ui/ControlledDatePicker";
 import { format } from "date-fns";
 import { calculateEndDate } from "../../../../../utils/date/calculateEndDate";
 import LoadingPopUpAnimation from "../../../../views/card/LoadingPopUpAnimation";
+import AccessDeniedMessagePage from "../../../../views/not-found/AccessDeniedMessagePage";
+import Account from "../../../../../@types/account/Account";
+import { ControlledMuiDatePicker } from "../../../../ui/ControlledMuiDatePicker";
+import { Dayjs } from "dayjs";
 
 interface ProductRow {
   rowNaNoId: string;
@@ -79,7 +84,7 @@ interface ProductRow {
   amc: number;
   conversionFactor: number;
   conversionFactorString: string;
-  unitName : string ,
+  unitName: string;
   productWarranty?: string;
   productAmc?: string;
   productWarrantyId?: number;
@@ -96,15 +101,62 @@ interface ProductRow {
     zeroQuantity?: boolean;
     installedById?: boolean;
   };
+  hasValueGiven?: {
+    deliveryDate?: boolean;
+    warrantyStartDate?: boolean;
+    warrantyEndDate?: boolean;
+    amcStartDate?: boolean;
+    amcEndDate?: boolean;
+    installationDate?: boolean;
+  };
 }
 
 export const CreateMultipleAccountCompanyProduct = () => {
   const navigate = useNavigate();
   const { userPreference } = useUserPreference();
-  const { userHasAccessToUpdateAccount } = useUserAccessModules();
+  const { userHasAccessToAddAccountProducts } = useUserAccessModules();
   const { loginStatus } = useLoggedInUserContext();
 
+  // Note : will get the accountId from the url params
   const { accountId } = useParams<{ accountId: string }>();
+
+  // Note : state created to store the account details as per the account id
+  const [accountDetails, setAccountDetails] = useState<Account>();
+
+  // Note : On render call will go for account details
+  // we require the account details to pre populate the billing and shipping address
+  useEffect(() => {
+    const apiCall = async () => {
+      try {
+        if (!accountId || !loginStatus) return;
+        const response = await fetchAccount({
+          company_id: loginStatus.companyId,
+          id: accountId,
+          isactive: null,
+          limit: 1,
+          offset: 0,
+          requestedby: loginStatus.id,
+          search_company_specific_date_range_id: null,
+          search_parameter: "",
+          search_parameter_date: "",
+        });
+        if (response) {
+          const data = response.data[0];
+
+          const formattedData: Account = {
+            ...data,
+            billingAddress: data.billing_address,
+            shippingAddress: data.shipping_address,
+            deliveryAddress: data.delivery_address,
+          };
+          setAccountDetails(formattedData);
+        }
+      } catch (err) {
+        handleApiError(err);
+      }
+    };
+    apiCall();
+  }, [accountId, loginStatus]);
 
   const [rows, setRows] = useState<ProductRow[]>([
     {
@@ -132,10 +184,38 @@ export const CreateMultipleAccountCompanyProduct = () => {
       installedById: loginStatus.id,
       conversionFactor: 0,
       conversionFactorString: "",
-      unitName:""
+      unitName: "",
+      hasError: {
+        installedBy: false,
+        installedById: false,
+        product: false,
+        purchaseDate: false,
+        quantity: false,
+        unit: false,
+        zeroQuantity: false,
+      },
+      hasValueGiven: {
+        amcEndDate: false,
+        amcStartDate: false,
+        deliveryDate: false,
+        installationDate: false,
+        warrantyEndDate: false,
+        warrantyStartDate: false,
+      },
     },
   ]);
 
+  // Note : when accountDetails state gets the data from api call then we populate the billing and shilling address state
+  useEffect(() => {
+    if (!accountDetails) return;
+    setRows((prev) =>
+      prev.map((row) => ({
+        ...row,
+        billingAddress: accountDetails.billingAddress ?? "",
+        deliveryAddress: accountDetails.shippingAddress ?? "",
+      })),
+    );
+  }, [accountDetails]);
   // Per-row product dropdown
   const [products, setProducts] = useState<Product[]>([]);
   const [searchText, setSearchText] = useState<string>("");
@@ -148,6 +228,7 @@ export const CreateMultipleAccountCompanyProduct = () => {
   const dropdownRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
 
+  // Note : Used when user clicks outside of dropdown to close the dropdown
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as Node;
@@ -179,19 +260,18 @@ export const CreateMultipleAccountCompanyProduct = () => {
 
     try {
       const res = await axiosClient.post(
-        POST_API.GET_PRODUCTS,
+        POST_API.GET_LOOKUP_COMPANY_PRODUCT_FOR_ACCOUNT,
         {
           search_parameter: search, // null when first clicked
           offset: newOffset,
           limit,
-
           company_id: loginStatus.companyId,
           id: null,
           search_company_specific_date_range_id: null,
           search_parameter_date: null,
-          requestedby_id: loginStatus.id,
+          requestedby: loginStatus.id,
         },
-        { withCredentials: true }
+        { withCredentials: true },
       );
 
       const list = res.data;
@@ -281,8 +361,8 @@ export const CreateMultipleAccountCompanyProduct = () => {
           loginStatus.fullName || loginStatus.email || loginStatus.mobileNumber,
         amcCycleEndDate: null,
         amcCycleStartDate: null,
-        billingAddress: "",
-        deliveryAddress: "",
+        billingAddress: accountDetails?.billingAddress ?? "",
+        deliveryAddress: accountDetails?.shippingAddress ?? "",
         deliveryDate: null,
         installationDate: null,
         quantity: 0,
@@ -295,7 +375,7 @@ export const CreateMultipleAccountCompanyProduct = () => {
         installedById: loginStatus.id,
         conversionFactor: 0,
         conversionFactorString: "",
-        unitName : ""
+        unitName: "",
       },
     ]);
   };
@@ -368,10 +448,28 @@ export const CreateMultipleAccountCompanyProduct = () => {
     return isValid;
   };
 
+  // Note : validate the date and call the updaterow function to update the states.
+  const handleDateCommit = (
+    index: number,
+    field: keyof ProductRow,
+    date: Dayjs | null,
+  ) => {
+    if (!date || !date.isValid) return;
+    if (date.year() < 2000) return;
+
+    console.log("this is the date : ");
+
+    // const formattedDate = date.format("YYYY-MM-DD");
+    const formattedDate = date.toDate();
+    console.log(formattedDate);
+    updateRow(index, field, formattedDate);
+  };
+
+  // Note : update the states
   const updateRow = <K extends keyof ProductRow>(
     index: number,
     field: K,
-    value: ProductRow[K]
+    value: ProductRow[K],
   ) => {
     setRows((prev) =>
       prev.map((row, i) => {
@@ -379,11 +477,6 @@ export const CreateMultipleAccountCompanyProduct = () => {
 
         const newRow: ProductRow = { ...row };
         const newHasError = { ...row.hasError };
-
-        // if (!newRow.product) {
-        //   toast.error(MESSAGE.ERROR.SELECT_PRODUCT_FIRST);
-        //   return newRow;
-        // }
 
         if (field === "quantity") {
           const qty = Number(value);
@@ -440,16 +533,39 @@ export const CreateMultipleAccountCompanyProduct = () => {
           newHasError[field as (typeof errorFields)[number]] = false;
         }
 
+        if (field === "deliveryDate") {
+          newRow[field] = value;
+          newRow.hasValueGiven!.deliveryDate = true;
+        }
+        if (field === "installationDate") {
+          newRow[field] = value;
+          newRow.hasValueGiven!.installationDate = true;
+        }
+
+        if (field === "amcCycleEndDate" || field === "amcCycleStartDate") {
+          newRow.hasValueGiven!.amcEndDate = true;
+          newRow.hasValueGiven!.amcStartDate = true;
+        }
+        if (field === "warrantyEndDate" || field === "warrantyStartDate") {
+          newRow.hasValueGiven!.warrantyEndDate = true;
+          newRow.hasValueGiven!.warrantyStartDate = true;
+        }
         //  Recalculate dates if purchaseDate exists
         if (field === "purchaseDate") {
           newRow.purchaseDate = value as any;
-          if (!row.deliveryDate) newRow.deliveryDate = value as any;
-          if (!row.installationDate) newRow.installationDate = value as any;
+          // if (!row.deliveryDate) newRow.deliveryDate = value as any;
+          // if (!row.installationDate) newRow.installationDate = value as any;
 
+          if (!row.hasValueGiven?.deliveryDate)
+            newRow.deliveryDate = value as any;
+          if (!row.hasValueGiven?.installationDate)
+            newRow.installationDate = value as any;
           if (
             value &&
-            !row.warrantyStartDate &&
-            !row.warrantyEndDate &&
+            // !row.warrantyStartDate &&
+            // !row.warrantyEndDate &&
+            !row.hasValueGiven?.warrantyEndDate &&
+            !row.hasValueGiven?.warrantyStartDate &&
             newRow.productWarrantyNumber &&
             newRow.productWarrantyId
           ) {
@@ -458,14 +574,16 @@ export const CreateMultipleAccountCompanyProduct = () => {
             newRow.warrantyEndDate = calculateEndDate(
               value as Date,
               newRow.productWarrantyNumber!,
-              newRow.productWarrantyId!
+              newRow.productWarrantyId!,
             );
           }
 
           if (
             value &&
-            !row.amcCycleStartDate &&
-            !row.amcCycleEndDate &&
+            // !row.amcCycleStartDate &&
+            // !row.amcCycleEndDate &&
+            !row.hasValueGiven?.amcEndDate &&
+            !row.hasValueGiven?.amcStartDate &&
             newRow.productAmcNumber &&
             newRow.productAmcId
           ) {
@@ -473,7 +591,7 @@ export const CreateMultipleAccountCompanyProduct = () => {
             newRow.amcCycleEndDate = calculateEndDate(
               value as Date,
               newRow.productAmcNumber,
-              newRow.productAmcId
+              newRow.productAmcId,
             );
           }
         }
@@ -489,110 +607,24 @@ export const CreateMultipleAccountCompanyProduct = () => {
 
         newRow.hasError = newHasError;
         return newRow;
-      })
+      }),
     );
   };
 
   const [showSerialNumberModule, setShowSerialNumberModule] =
     useState<boolean>(false);
+
+  // Note : used to show the selected serial number data when user hovers over the info icon
+  const [
+    showProductsSelectedSerialNumber,
+    setShowProductsSelectedSerialNumber,
+  ] = useState<boolean>(false);
+
   const { unitForProduct, getUnitForProduct } = useUnitForProduct({});
 
   // ==============================
   // HANDLE PRODUCT SELECT
   // ==============================
-  // const handleProductSelect = async (item: Product, index: number) => {
-
-  //   setSearchText("");
-  //   setActiveRow(null);
-  //   setProducts([]);
-
-  //   if (rows.some((r, i) => r.productId === item.id && i !== index)) {
-  //     toast.error("This product is already selected in another row!");
-  //     return;
-  //   }
-
-  //   const payload = {
-  //     company_id: loginStatus.companyId,
-  //     search_company_specific_date_range_id: null,
-  //     company_product_id: item.id,
-  //     search_parameter: null,
-  //     search_parameter_date: "",
-  //     limit: 25,
-  //     offset: 0,
-  //     requestedby_id: loginStatus.id,
-  //   };
-
-  //   const response = await getStockLiveForCompanyProduct(payload);
-  //   const stock = response.data?.[0];
-
-  //   if (!stock || stock.quantity_live === 0) {
-  //     toast.error("Selected Product doesn't have stock.");
-  //     return;
-  //   }
-
-  //   setRows((prev) =>
-  //     prev.map((row, i) => {
-  //       if (i !== index) return row;
-
-  //       const newRow: ProductRow = {
-  //         ...row,
-  //         product: item.name,
-  //         productId: item.id!,
-  //         productQuantity: stock.quantity_live,
-  //         isSerialNumber: item.isSerialNumber!,
-  //         unit_id: item.isSerialNumber ? item.unitId : row.unit_id,
-
-  //         // warranty
-  //         productWarranty: item.defaultWarrantyName,
-  //         productWarrantyNumber: item.defaultWarranty,
-  //         productWarrantyId: item.defaultWarrantyIntervalTypeId,
-
-  //         // amc
-  //         productAmc: item.defaultAmcCycleName,
-  //         productAmcNumber: item.defaultAmcCycle,
-  //         productAmcId: item.defaultAmcCycleIntervalTypeId,
-  //       };
-
-  //       //  Force recalculation if purchase date exists
-  //       if (newRow.purchaseDate) {
-  //         const start = new Date(newRow.purchaseDate);
-
-  //         if (newRow.productWarrantyNumber && newRow.productWarrantyId) {
-  //           const end = new Date(start);
-  //           if (newRow.productWarrantyId === 1)
-  //             end.setFullYear(end.getFullYear() + newRow.productWarrantyNumber);
-  //           else if (newRow.productWarrantyId === 2)
-  //             end.setMonth(end.getMonth() + newRow.productWarrantyNumber);
-  //           else if (newRow.productWarrantyId === 3)
-  //             end.setDate(end.getDate() + newRow.productWarrantyNumber);
-
-  //           newRow.warrantyStartDate = newRow.purchaseDate;
-  //           newRow.warrantyEndDate = end.toISOString().split("T")[0];
-  //         }
-
-  //         if (newRow.productAmcNumber && newRow.productAmcId) {
-  //           const end = new Date(start);
-  //           if (newRow.productAmcId === 1)
-  //             end.setFullYear(end.getFullYear() + newRow.productAmcNumber);
-  //           else if (newRow.productAmcId === 2)
-  //             end.setMonth(end.getMonth() + newRow.productAmcNumber);
-  //           else if (newRow.productAmcId === 3)
-  //             end.setDate(end.getDate() + newRow.productAmcNumber);
-
-  //           newRow.amcCycleStartDate = newRow.purchaseDate;
-  //           newRow.amcCycleEndDate = end.toISOString().split("T")[0];
-  //         }
-  //       }
-
-  //       return newRow;
-  //     })
-  //   );
-
-  //   const units = await getUnitForProduct(item.id!);
-  //   setUnitsForRows((prev) => ({ ...prev, [index]: units }));
-
-  // };
-
   const handleProductSelect = async (item: Product, index: number) => {
     // Close dropdown immediately
     setSearchText("");
@@ -605,45 +637,48 @@ export const CreateMultipleAccountCompanyProduct = () => {
       return;
     }
 
+     if (rows.some((r, i) => r.productId === item.id && i === index)) {
+      toast.error(MESSAGE.ERROR.SAME_PRODUCT_SELECTED);
+      return;
+    }
+
     //  Enable loader for this row
+    
+    // Note : When user selected another product in selected product row then need to scrap given data such as 
+    // unit_id , unitName , con factor , con factor string , serial number array
     setRows((prev) =>
       prev.map((row, i) =>
-        i === index ? { ...row, isLoading: true, unit_id: 0 } : row
-      )
+        i === index ? { ...row, isLoading: true, unit_id: 0 ,unitName:"" , conversionFactorString:"" , conversionFactor:0,  serialNumber:[]} : row,
+      ),
     );
 
     try {
       const payload = {
         company_id: loginStatus.companyId,
-        search_company_specific_date_range_id: null,
         company_product_id: item.id,
-        search_parameter: null,
-        search_parameter_date: "",
-        limit: 25,
-        offset: 0,
         requestedby_id: loginStatus.id,
       };
-
       // Run APIs in parallel
       const [stockRes, units] = await Promise.all([
-        getStockLiveForCompanyProduct(payload),
+        getLookupQuantityLive(payload),
+        // getStockLiveForCompanyProduct(payload),
         getUnitForProduct(item.id!),
       ]);
 
-      const stock = stockRes.data?.[0];
+      const stock = stockRes.data;
 
       if (!stock || stock.quantity_live === 0) {
         toast.error(MESSAGE.ERROR.STOCK_NOT_AVAILABLE_FOR_PRODUCT);
         setRows((prev) =>
           prev.map((row, i) =>
-            i === index ? { ...row, isLoading: false } : row
-          )
+            i === index ? { ...row, isLoading: false } : row,
+          ),
         );
         return;
       }
 
       setUnitsForRows((prev) => ({ ...prev, [index]: units }));
-                                
+
       setRows((prev) =>
         prev.map((row, i) => {
           if (i !== index) return row;
@@ -655,7 +690,7 @@ export const CreateMultipleAccountCompanyProduct = () => {
             productQuantity: stock.quantity_live,
             isSerialNumber: item.isSerialNumber!,
             unit_id: item.isSerialNumber ? item.unitId : row.unit_id,
-            unitName : units[0].unitNameInStock,
+            unitName: units[0].unitNameInStock,
             productWarranty: item.defaultWarrantyName,
             productWarrantyNumber: item.defaultWarranty,
             productWarrantyId: item.defaultWarrantyIntervalTypeId,
@@ -670,14 +705,16 @@ export const CreateMultipleAccountCompanyProduct = () => {
           };
 
           return { ...newRow, isLoading: false };
-        })
+        }),
       );
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err: any) {
       toast.error(MESSAGE.ERROR.FAILED_TO_LOAD_PRODUCT_DATA);
 
       setRows((prev) =>
-        prev.map((row, i) => (i === index ? { ...row, isLoading: false } : row))
+        prev.map((row, i) =>
+          i === index ? { ...row, isLoading: false } : row,
+        ),
       );
     }
   };
@@ -690,7 +727,10 @@ export const CreateMultipleAccountCompanyProduct = () => {
     }
   };
 
-  const [showLoadingAnimationForAssignApi, setShowLoadingAnimationForAssignApi]= useState<boolean>(false);
+  const [
+    showLoadingAnimationForAssignApi,
+    setShowLoadingAnimationForAssignApi,
+  ] = useState<boolean>(false);
   // Note : Create api call
   const handleCreateAccountCompanyProduct = async () => {
     if (!validateRows()) {
@@ -753,15 +793,10 @@ export const CreateMultipleAccountCompanyProduct = () => {
       }
     } catch (error: any) {
       handleApiError(error);
-    }finally{
-      setShowLoadingAnimationForAssignApi(false)
+    } finally {
+      setShowLoadingAnimationForAssignApi(false);
     }
   };
-
-  useEffect(() => {
-    console.log(" this are the rows : ");
-    console.log(rows);
-  }, [rows]);
 
   const [unitsForRows, setUnitsForRows] = useState<
     Record<number, UnitForProduct[]>
@@ -781,12 +816,25 @@ export const CreateMultipleAccountCompanyProduct = () => {
     number | null
   >(null);
 
+   useEffect(()=>{
+      console.log(rows);
+    },[rows])
+
   // separate state just for the serial number pop up
   // const [serialRowIndex, setSerialRowIndex] = useState<number | null>(null);
   // nonoid changes
   const [serialRowIndex, setSerialRowIndex] = useState<string | null>(null);
 
-  if (!userHasAccessToUpdateAccount) return <div>permission denied</div>;
+  if (!userHasAccessToAddAccountProducts)
+    return (
+      <div>
+        <AccessDeniedMessagePage
+          message={
+            MESSAGE.MODULE_ACCESS.ACCOUNT_COMPANY_PRODUCT.DENIED_ADD_ACCESS
+          }
+        />
+      </div>
+    );
 
   return (
     <>
@@ -945,319 +993,180 @@ export const CreateMultipleAccountCompanyProduct = () => {
                   </div>
 
                   {/* GRID */}
-                  <div className="grid  md:grid-cols-4 gap-1">
+                  <div className="grid  md:grid-cols-2 gap-1">
                     {/* QTY + UNIT */}
-                    <div className="col-span-2 grid grid-cols-4 gap-1 ">
+                    <div
+                      className={` grid  ${
+                        row.isSerialNumber ? "grid-cols-3 " : "grid-cols-2"
+                      } gap-1 `}
+                    >
                       <div>
-                        <FormInput
-                          logo={Box}
-                          label="Quantity :"
-                          readonly={!row.productId}
-                          required
-                          placeholder="Enter Product Quantity"
-                          type="number"
-                          value={row.quantity == 0 ? "" : row.quantity}
-                          // min={0}
-                          // max={row.productQuantity!}
-                          onChange={(e) => {
-                            const qty = Number(e.target.value);
+                        <div className="pt-0.5">
+                          <FormInput
+                            logo={Box}
+                            label="Quantity :"
+                            readonly={!row.productId}
+                            required
+                            placeholder="Enter Product Quantity"
+                            type="number"
+                            value={row.quantity == 0 ? "" : row.quantity}
+                            // min={0}
+                            // max={row.productQuantity!}
+                            onChange={(e) => {
+                              const qty = Number(e.target.value);
 
-                            const selectedUnit = unitsForRows[index]?.find(
-                              (u) => u.id === row.unit_id
-                            );
-
-                            if (selectedUnit) {
-                              const finalFactor =
-                                qty * Number(selectedUnit.conversionFactor);
-                              updateRow(index, "conversionFactor", finalFactor);
-
-                      
-                            }
-
-                            // if(qty){
-
-                            updateRow(index, "quantity", qty);
-                            // }
-                          }}
-                        />
-                        {row.hasError?.zeroQuantity && (
-                          <p className="text-red-500 text-xs mt-1">
-                            Quantity is required.
-                          </p>
-                        )}
-                        {row.hasError?.quantity === true && (
-                          <p className="text-red-500 text-xs mt-1">
-                            qty should be as per the stock
-                          </p>
-                        )}
-                      </div>
-                      {/* Unit */}
-                      <div className="">
-                        <CustomDropdown
-                          labelName="Unit :"
-                          logo={LucideTimer}
-                          readOnly={!row.productId || row.isSerialNumber}
-                          selectedValue={row.unit_id}
-                          onSelect={(unit) => {
-                            //  Clear selection
-                            if (!unit) {
-                              updateRow(index, "unit_id", undefined as any);
-                              updateRow(index, "conversionFactor", 0);
-                              return;
-                            }
-
-                            // if(unit){
-                            updateRow(index, "unit_id", unit!);
-                            // }
-
-                           
-
-                            const finalFactor =
-                              Number(row.quantity) *
-                              Number(
-                                unitForProduct.find((item) => item.id === unit)
-                                  ?.conversionFactor
+                              const selectedUnit = unitsForRows[index]?.find(
+                                (u) => u.id === row.unit_id,
                               );
 
-                            if (finalFactor) {
-                              updateRow(index, "conversionFactor", finalFactor);
-                              // updateRow(
-                              //   index,
-                              //   "conversionFactorString",
-                              //   finalFactor + unnit!
-                              // );
-                            }
+                              if (selectedUnit) {
+                                const finalFactor =
+                                  qty * Number(selectedUnit.conversionFactor);
+                                updateRow(
+                                  index,
+                                  "conversionFactor",
+                                  finalFactor,
+                                );
+                              }
+
+                              updateRow(index, "quantity", qty);
+                            }}
+                          />
+                          {row.hasError?.zeroQuantity && (
+                            <p className="text-red-500 text-xs mt-1">
+                              Quantity is required.
+                            </p>
+                          )}
+                          {row.hasError?.quantity === true && (
+                            <p className="text-red-500 text-xs mt-1">
+                              qty should be as per the stock
+                            </p>
+                          )}
+                        </div>
+                        <ControlledMuiDatePicker
+                          readonly={!row.productId}
+                          label="Installation Date"
+                          value={row.installationDate}
+                          onCommit={(date) => {
+                            handleDateCommit(index, "installationDate", date);
                           }}
-                          options={unitsForRows[index] || []}
-                          requiredRedDot={true}
+                          logo={Calendar}
                         />
-                        {row.hasError?.unit && (
-                          <p className="text-red-500 text-xs mt-1">
-                            Unit is required
-                          </p>
-                        )}
-                        <div className="col-span-2 text-xs">
-                          {!Number.isNaN(row.conversionFactor) &&
-                            row.quantity !== 0 &&
-                            row.conversionFactor !== 0 && (
-                              <p
-                                title="Quantity is converted automatically based on the product base unit and current selected unit."
-                                className="caption-custom-active flex items-center cursor-pointer gap-1"
-                              >
-                                Quantity will be deducted from stock :{" "}
-                                {row.conversionFactor + row.unitName}
-                                {/* {row.conversionFactor} */}
-                                {/* {
+                      </div>
+                      {/* Unit */}
+                      <div>
+                        <div className="pt-0.5">
+                          <CustomDropdown
+                          key={row.unit_id}
+                            labelName="Unit :"
+                            logo={LucideTimer}
+                            
+                            readOnly={!row.productId || row.isSerialNumber}
+                            selectedValue={row.unit_id}
+                            onSelect={(unit) => {
+                              //  Clear selection
+                              if (!unit) {
+                                updateRow(index, "unit_id", undefined as any);
+                                updateRow(index, "conversionFactor", 0);
+                                return;
+                              }
+
+                              // if(unit){
+                              updateRow(index, "unit_id", unit!);
+                              // }
+
+                              const finalFactor =
+                                Number(row.quantity) *
+                                Number(
+                                  unitForProduct.find(
+                                    (item) => item.id === unit,
+                                  )?.conversionFactor,
+                                );
+
+                              if (finalFactor) {
+                                updateRow(
+                                  index,
+                                  "conversionFactor",
+                                  finalFactor,
+                                );
+                              }
+                            }}
+                            options={unitsForRows[index] || []}
+                            requiredRedDot={true}
+                          />
+                          {row.hasError?.unit && (
+                            <p className="text-red-500 text-xs mt-1">
+                              Unit is required
+                            </p>
+                          )}
+                          <div className="col-span-2 text-xs">
+                            {!Number.isNaN(row.conversionFactor) &&
+                              row.quantity !== 0 &&
+                              row.conversionFactor !== 0 && (
+                                <p
+                                  title="Quantity is converted automatically based on the product base unit and current selected unit."
+                                  className="caption-custom-active flex items-center cursor-pointer gap-1"
+                                >
+                                  Quantity deduction : 
+                                  {/* Quantity will be deducted from stock :{" "} */}
+                                  {row.conversionFactor + row.unitName}
+                                  {/* {row.conversionFactor} */}
+                                  {/* {
                                   unitForProduct.find(
                                     (item) =>
                                       item.conversionFactor ===
-                                      row.conversionFactor
-                                  )?.unitNameInStock
-                                } */}
-                                <Info size={12} className="" />
+                                    row.conversionFactor
+                                    )?.unitNameInStock
+                                    } */}
+                                  <Info size={12} className="" />
+                                </p>
+                              )}
+                          </div>
+                          {/* INSTALLED BY */}
+                          <div className=" ">
+                            <CompanyUserSearchFieldInput
+                              readOnly={!row.productId}
+                              label="Installed By :"
+                              required
+                              onUserSelected={(data) => {
+                                if (!row.product) return;
+                                if (data) {
+                                  updateRow(index, "installedById", data?.id);
+                                  updateRow(
+                                    index,
+                                    "installedBy",
+                                    data?.fullname,
+                                  );
+                                } else {
+                                  updateRow(index, "installedById", 0);
+                                  updateRow(index, "installedBy", "");
+                                }
+                              }}
+                              defaultValue={loginStatus.fullName}
+                              // disabledMessage={ }
+                              error=""
+                              logo={User}
+                              placeholder="Select User"
+                            />
+                            {(row.hasError?.installedBy ||
+                              row.hasError?.installedById) && (
+                              <p className="text-red-500 text-xs mt-1">
+                                Installed by is required
                               </p>
                             )}
+                          </div>
                         </div>
                       </div>
 
-                      {/* PURCHASE DATE */}
-                      <div>
-                        <ControlledDatePicker
-                          readonly={!row.productId}
-                          isRequired={true}
-                          logo={Calendar}
-                          label="Purchase Date"
-                          onCommit={(date) => {
-                            // if (!date) return;
-                            console.log("this is the date purchase : " + date);
-
-                            updateRow(index, "purchaseDate", date);
-                          }}
-                          value={row.purchaseDate}
-                        />
-                        {/* <DatePickerInput
-                          required
-                          label="Purchase Date :"
-                          logo={LucideCalendar}
-                          name="purchaseDate"
-                          placeholder="Select Date"
-                          value={row.purchaseDate ?? ""}
-                          onChange={(e) => {
-                            // console.log(e.target.value);
-                            // console.log("this is the ");
-
-                            if (e.target.value) {
-                              updateRow(index, "purchaseDate", e.target.value);
-                            }
-                          }}
-                        /> */}
-                        {row.hasError?.purchaseDate && (
-                          <p className="text-red-500 text-xs mt-1">
-                            Purchase Date is required
-                          </p>
-                        )}
-                      </div>
-                      {/* Delivery date */}
-                      {/* <DatePickerInput
-                        label="Delivery Date :"
-                        logo={LucideCalendar}
-                        name="deliveryDate"
-                        placeholder="Select Date"
-                        value={row.deliveryDate ?? ""}
-                        onChange={(e) =>
-                          updateRow(index, "deliveryDate", e.target.value)
-                        }
-                      /> */}
-                      <ControlledDatePicker
-                        readonly={!row.productId}
-                        logo={Calendar}
-                        label="Delivery Date"
-                        onCommit={(date) => {
-                          console.log("this is the date purchase : " + date);
-                          updateRow(index, "deliveryDate", date);
-                        }}
-                        value={row.deliveryDate}
-                      />
-                    </div>
-                    <div className="col-span-2 grid grid-cols-4 gap-x-1">
-                      {/* Warranty start date */}
-                      {/* <DatePickerInput
-                        label="Warranty Start Date :"
-                        logo={LucideCalendar}
-                        name="warrantyStartDate"
-                        placeholder="Select Date"
-                        value={row.warrantyStartDate}
-                        onChange={(e) =>
-                          updateRow(index, "warrantyStartDate", e.target.value)
-                        }
-                      /> */}
-                      <ControlledDatePicker
-                        readonly={!row.productId}
-                        logo={Calendar}
-                        label="Warranty Start Date"
-                        onCommit={(date) => {
-                          updateRow(index, "warrantyStartDate", date);
-                        }}
-                        value={row.warrantyStartDate}
-                      />
-
-                      {/* Warranty end date */}
-                      {/* <DatePickerInput
-                        label="Warranty End Date :"
-                        logo={LucideCalendar}
-                        name="warrantyEndDate"
-                        placeholder="Select Date"
-                        value={row.warrantyEndDate}
-                        onChange={(e) =>
-                          updateRow(index, "warrantyEndDate", e.target.value)
-                        }
-                      /> */}
-                      <ControlledDatePicker
-                        readonly={!row.productId}
-                        logo={Calendar}
-                        label="Warranty End Date"
-                        onCommit={(date) => {
-                          updateRow(index, "warrantyEndDate", date);
-                        }}
-                        value={row.warrantyEndDate}
-                      />
-                      <ControlledDatePicker
-                        readonly={!row.productId}
-                        logo={Calendar}
-                        label="AMC Start Date"
-                        onCommit={(date) => {
-                          updateRow(index, "amcCycleStartDate", date);
-                        }}
-                        value={row.amcCycleStartDate}
-                      />
-                      <ControlledDatePicker
-                        readonly={!row.productId}
-                        logo={Calendar}
-                        label="Amc End Date"
-                        onCommit={(date) => {
-                          updateRow(index, "amcCycleEndDate", date);
-                        }}
-                        value={row.amcCycleEndDate}
-                      />
-                      {/* <DatePickerInput
-                        label="Amc Start Date :"
-                        logo={LucideCalendar}
-                        name="amcCycleStartDate"
-                        placeholder="Select Date"
-                        value={row.amcCycleStartDate}
-                        onChange={(e) =>
-                          updateRow(index, "amcCycleStartDate", e.target.value)
-                        }
-                      /> */}
-                      {/* <DatePickerInput
-                        label="Amc End Date :"
-                        logo={LucideCalendar}
-                        name="amcCycleEndDate"
-                        placeholder="Select Date"
-                        value={row.amcCycleEndDate}
-                        onChange={(e) =>
-                          updateRow(index, "amcCycleEndDate", e.target.value)
-                        }
-                      /> */}
-                    </div>
-                    <div
-                      className={`col-span-2 grid  ${row.isSerialNumber ? "grid-cols-3 " : "grid-cols-2"} gap-1 bg-pink-00 mt-1.5`}
-                    >
-                      {/* INSTALLED BY */}
-                      <div className="mt-1 ">
-                        <CompanyUserSearchFieldInput
-                          readOnly={!row.productId}
-                          label="Installed By :"
-                          required
-                          onUserSelected={(data) => {
-                            if (!row.product) return;
-                            if (data) {
-                              updateRow(index, "installedById", data?.id);
-                              updateRow(index, "installedBy", data?.fullname);
-                            } else {
-                              updateRow(index, "installedById", 0);
-                              updateRow(index, "installedBy", "");
-                            }
-                          }}
-                          defaultValue={loginStatus.fullName}
-                          // disabledMessage={ }
-                          error=""
-                          logo={User}
-                          placeholder="Select User"
-                        />
-                        {(row.hasError?.installedBy ||
-                          row.hasError?.installedById) && (
-                          <p className="text-red-500 text-xs mt-1">
-                            Installed by is required
-                          </p>
-                        )}
-                        {/* <div> */}
-                        {/* <DatePickerInput
-                          label="Installation Date :"
-                          logo={LucideCalendar}
-                          name="installationDate"
-                          placeholder="Select Date"
-                          value={row.installationDate}
-                          onChange={(e) =>
-                            updateRow(index, "installationDate", e.target.value)
-                          }
-                        /> */}
-                      </div>
-                      <ControlledDatePicker
-                        readonly={!row.productId}
-                        logo={Calendar}
-                        label="Installation Date"
-                        onCommit={(date) => {
-                          updateRow(index, "installationDate", date);
-                        }}
-                        value={row.installationDate}
-                      />
                       {row !== undefined && row?.isSerialNumber === true && (
-                        <div>
-                          <div className="flex items-center justify-end h-fit ">
+                        <div className="mt-1">
+                          <div className="relative flex items-center justify-end h-fit ">
                             <div className="w-full ">
                               <label className=" input-label-custom text-sm   flex items-center gap-1 text-gray-700  ">
-                                <FileDigit className="text-blue-500" size={15} />
+                                <FileDigit
+                                  className="text-blue-500"
+                                  size={15}
+                                />
                                 <div>
                                   Serial Number :
                                   <span className="ml-0 text-red-400">*</span>
@@ -1267,12 +1176,30 @@ export const CreateMultipleAccountCompanyProduct = () => {
                               <div className="flex items-center justify-between border border-gray-300 rounded px-3 py-1 bg-white shadow-sm focus-within:ring-2 focus-within:ring-blue-500">
                                 <span className="table-header-custom  truncate">
                                   {row.serialNumber.length > 0 ? (
-                                    <>
+                                    <div className="flex items-center justify-between gap-1">
                                       <span className="">
-                                        Item count:{" "}
-                                        {row.serialNumber.length}
+                                        Item count: {row.serialNumber.length}
                                       </span>
-                                    </>
+                                      <button
+                                      className="hidden"
+                                        type="button"
+                                        onMouseEnter={() =>
+                                          setShowProductsSelectedSerialNumber(
+                                            true,
+                                          )
+                                        }
+                                        onMouseLeave={() =>
+                                          setShowProductsSelectedSerialNumber(
+                                            false,
+                                          )
+                                        }
+                                      >
+                                        <InfoIcon
+                                          size={12}
+                                          className="text-black"
+                                        />
+                                      </button>
+                                    </div>
                                   ) : (
                                     "No item chosen"
                                   )}
@@ -1290,68 +1217,179 @@ export const CreateMultipleAccountCompanyProduct = () => {
                                   }}
                                 >
                                   {row.serialNumber.length > 0
-                                    ? "Change"
+                                    ? "View/Change"
                                     : "Select"}
                                 </Button>
+                                {showProductsSelectedSerialNumber && (
+                                  <div
+                                    className="absolute top-10 bg-pink-500 p-11"
+                                    onMouseLeave={() =>
+                                      setShowProductsSelectedSerialNumber(false)
+                                    }
+                                    onMouseEnter={() =>
+                                      setShowProductsSelectedSerialNumber(true)
+                                    }
+                                  >
+                                    {row.serialNumber.map((item) => (
+                                      <span className="block">{item}</span>
+                                    ))}
+                                  </div>
+                                )}
                               </div>
                             </div>
                           </div>
                         </div>
                       )}
-                      {/* </div> */}
+                      <div
+                        className={`col-span-2 grid   gap-1 bg-pink-00 mt-1.5`}
+                      >
+                        {/* old position for serial number */}
+                      </div>
                     </div>
-                    <div className="col-span-2">
-                      {/* Warranty terms */}
-                      <TextAreaInput
+                    <div className=" grid grid-cols-3 gap-x-1">
+                      <div>
+                        <div>
+                          <ControlledMuiDatePicker
+                            readonly={!row.productId}
+                            label="Purchase Date"
+                            value={row.purchaseDate}
+                            onCommit={(date) => {
+                              handleDateCommit(index, "purchaseDate", date);
+                            }}
+                            isRequired
+                            logo={Calendar}
+                          />
+                          {row.hasError?.purchaseDate && (
+                            <p className="text-red-500 text-xs mt-1">
+                              Purchase Date is required
+                            </p>
+                          )}
+                        </div>
+                        <ControlledMuiDatePicker
+                          readonly={!row.productId}
+                          label="Delivery Date"
+                          value={row.deliveryDate}
+                          onCommit={(date) => {
+                            handleDateCommit(index, "deliveryDate", date);
+                          }}
+                          logo={Calendar}
+                        />
+                      </div>
+                      {/* Warranty start date */}
+                      <div>
+                        <ControlledMuiDatePicker
+                          readonly={!row.productId}
+                          label="Warranty Start Date"
+                          value={row.warrantyStartDate}
+                          onCommit={(date) => {
+                            handleDateCommit(index, "warrantyStartDate", date);
+                          }}
+                          logo={Calendar}
+                        />
+                        {/* Warranty end date */}
+                        <ControlledMuiDatePicker
+                          readonly={!row.productId}
+                          label="Warranty End Date"
+                          value={row.warrantyEndDate}
+                          onCommit={(date) => {
+                            handleDateCommit(index, "warrantyEndDate", date);
+                          }}
+                          logo={Calendar}
+                        />
+                      </div>
+
+                      <div>
+                        <ControlledMuiDatePicker
+                          readonly={!row.productId}
+                          label="AMC Start Date"
+                          value={row.amcCycleStartDate}
+                          onCommit={(date) => {
+                            handleDateCommit(index, "amcCycleStartDate", date);
+                          }}
+                          logo={Calendar}
+                        />
+                        {/* This working */}
+                        {/* <ControlledDatePicker
+                        readonly={!row.productId}
+                        logo={Calendar}
+                        label="AMC Start Date"
+                        onCommit={(date) => {
+                          updateRow(index, "amcCycleStartDate", date);
+                          }}
+                          value={row.amcCycleStartDate}
+                      /> */}
+
+                        <ControlledMuiDatePicker
+                          readonly={!row.productId}
+                          label="AMC End Date"
+                          value={row.amcCycleEndDate}
+                          onCommit={(date) => {
+                            handleDateCommit(index, "amcCycleEndDate", date);
+                          }}
+                          logo={Calendar}
+                        />
+                      </div>
+                      {/* <ControlledDatePicker
+                        readonly={!row.productId}
+                        logo={Calendar}
+                        label="Amc End Date"
+                        onCommit={(date) => {
+                          updateRow(index, "amcCycleEndDate", date);
+                        }}
+                        value={row.amcCycleEndDate}
+                      /> */}
+                    </div>
+                    {/* here */}
+                  </div>
+
+                  <div className="col-span-4 grid grid-cols-3 gap-x-1">
+                    <TextAreaInput
                       disabled={!row.productId}
-                        readonly={!row.productId}
-                        placeholder="Enter Warranty Terms "
-                        logo={ShieldCheck}
-                        cols={4}
-                        label="Warranty Terms : "
-                        name="warrantyTerms"
-                        rows={2}
-                        value={row.warrantyTerms}
-                        maxLength={VALIDATIONS.MAX_DESCRIPTION_LENGTH}
-                        onChange={(e) =>
-                          updateRow(index, "warrantyTerms", e.target.value)
-                        }
-                      />
-                    </div>
-                    <div className="col-span-4 grid grid-cols-2 gap-x-1">
-                      {/* Billing address */}
-                      <TextAreaInput
-                       disabled={!row.productId}
-                        readonly={!row.productId}
-                        placeholder="Enter Billing Address"
-                        logo={MapPin}
-                        cols={4}
-                        label="Billing Address :"
-                        rows={2}
-                        name="billingAddress"
-                        maxLength={VALIDATIONS.MAX_DESCRIPTION_LENGTH}
-                        value={row.billingAddress}
-                        onChange={(e) =>
-                          updateRow(index, "billingAddress", e.target.value)
-                        }
-                      />
-                      {/* Delivery address */}
-                      <TextAreaInput
+                      readonly={!row.productId}
+                      placeholder="Enter Warranty Terms "
+                      logo={ShieldCheck}
+                      cols={4}
+                      label="Warranty Terms : "
+                      name="warrantyTerms"
+                      rows={2}
+                      value={row.warrantyTerms}
+                      maxLength={VALIDATIONS.MAX_DESCRIPTION_LENGTH}
+                      onChange={(e) =>
+                        updateRow(index, "warrantyTerms", e.target.value)
+                      }
+                    />
+                    {/* Billing address */}
+                    <TextAreaInput
                       disabled={!row.productId}
-                        readonly={!row.productId}
-                        placeholder="Enter Delivery Address"
-                        logo={MapPin}
-                        cols={4}
-                        label="Delivery Address :"
-                        name="deliveryAddress"
-                        value={row.deliveryAddress}
-                        maxLength={VALIDATIONS.MAX_DESCRIPTION_LENGTH}
-                        onChange={(e) =>
-                          updateRow(index, "deliveryAddress", e.target.value)
-                        }
-                        rows={2}
-                      />
-                    </div>
+                      readonly={!row.productId}
+                      placeholder="Enter Billing Address"
+                      logo={MapPin}
+                      cols={4}
+                      label="Billing Address :"
+                      rows={2}
+                      name="billingAddress"
+                      maxLength={VALIDATIONS.MAX_DESCRIPTION_LENGTH}
+                      value={row.billingAddress}
+                      onChange={(e) =>
+                        updateRow(index, "billingAddress", e.target.value)
+                      }
+                    />
+                    {/* Delivery address */}
+                    <TextAreaInput
+                      disabled={!row.productId}
+                      readonly={!row.productId}
+                      placeholder="Enter Delivery Address"
+                      logo={MapPin}
+                      cols={4}
+                      label="Delivery Address :"
+                      name="deliveryAddress"
+                      value={row.deliveryAddress}
+                      maxLength={VALIDATIONS.MAX_DESCRIPTION_LENGTH}
+                      onChange={(e) =>
+                        updateRow(index, "deliveryAddress", e.target.value)
+                      }
+                      rows={2}
+                    />
                   </div>
                 </div>
               );
@@ -1375,11 +1413,9 @@ export const CreateMultipleAccountCompanyProduct = () => {
           </div>
         </div>
       </form>
-      {
-        showLoadingAnimationForAssignApi && (
-          <LoadingPopUpAnimation show={showLoadingAnimationForAssignApi}/>
-        )
-      }
+      {showLoadingAnimationForAssignApi && (
+        <LoadingPopUpAnimation show={showLoadingAnimationForAssignApi} />
+      )}
       {showSerialNumberModule && serialRowIndex !== null && (
         <StockSerialNumber
           companyProductId={selectedCompanyProductId!} // required for API call
@@ -1397,8 +1433,8 @@ export const CreateMultipleAccountCompanyProduct = () => {
               prev.map((r) =>
                 r.rowNaNoId === serialRowIndex
                   ? { ...r, serialNumber: selectedSerialIds }
-                  : r
-              )
+                  : r,
+              ),
             );
           }}
         />
@@ -1484,7 +1520,7 @@ function CompanyUserSearchFieldInput({
         search_parameter: searchText.trim() === "" ? null : searchText.trim(),
         limit: userPreference.rowsInGrid,
         requestedby: loginStatus.id,
-        isactive:true
+        isactive: true,
       });
 
       if (response?.status === STATUS_CODE.OK) {
@@ -1502,7 +1538,7 @@ function CompanyUserSearchFieldInput({
 
   const debouncedSearch = useCallback(
     debounce((txt: string) => fetchUsers(txt), 300),
-    [isDisabled]
+    [isDisabled],
   );
 
   useEffect(() => {
@@ -1673,8 +1709,8 @@ function CompanyUserSearchFieldInput({
             isDisabled
               ? " table-header-custom appearance-none block w-full px-3 py-0.5 border bg-gray-200 border-gray-300 rounded-md shadow-sm text-gray-500 cursor-not-allowed"
               : readOnly
-              ? "appearance-none block w-full px-3 py-0.5 border table-header-custom bg-gray-100 border-gray-300 rounded-md shadow-sm"
-              : "table-header-custom appearance-none block w-full px-3 py-0.5 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                ? "appearance-none block w-full px-3 py-0.5 border table-header-custom bg-gray-100 border-gray-300 rounded-md shadow-sm"
+                : "table-header-custom appearance-none block w-full px-3 py-0.5 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
           }
         />
 
@@ -1723,7 +1759,7 @@ function CompanyUserSearchFieldInput({
               )
             )}
           </div>,
-          document.body
+          document.body,
         )}
 
       {error && (

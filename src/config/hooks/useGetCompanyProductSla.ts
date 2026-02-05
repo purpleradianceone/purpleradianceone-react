@@ -9,7 +9,7 @@ import { CompanyProductSla } from "../../@types/products/CompanyProductSla";
 import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
 import axiosClient from "../../axios-client/AxiosClient";
 
-export const useCompanyProductSla = (companyProductId : number) =>{
+export const useCompanyProductSla = (companyProductId : number, isUsedForAssigning ?: boolean) =>{
     const {loginStatus} = useLoggedInUserContext();
     const [loading, setIsLoading] = useState<boolean>(true)
     const [companyProductSla, setCompanyProductSla] = useState<CompanyProductSla[]>([]);
@@ -20,12 +20,13 @@ export const useCompanyProductSla = (companyProductId : number) =>{
             company_id: loginStatus.companyId,
             company_product_id: companyProductId,
             isactive: null,
-            requestedby_id : loginStatus.id
+            requestedby_id : loginStatus.id,
+            requestedby : loginStatus.id
         };
 
         try {
             const response = await axiosClient.post(
-                POST_API.GET_COMPANY_PRODUCT_SLA
+               isUsedForAssigning?POST_API.GET_LOOKUP_COMPANY_PRODUCT_SLA : POST_API.GET_COMPANY_PRODUCT_SLA
                 , postData, {
                 withCredentials: true,
             });
@@ -36,7 +37,7 @@ export const useCompanyProductSla = (companyProductId : number) =>{
                 const formattedData : CompanyProductSla[] = responseData.map((item: any) => (
                     {
                     id: item.id,
-                    name: item.name,
+                    name: !isUsedForAssigning? item.name :`${item.name} (Resolution Time: ${item.expected_resolution_time_hours}hr)`,
                     isActive: item.isactive,
                     companyProductId: item.company_product_id,
                     colorCode: item.color_code ,

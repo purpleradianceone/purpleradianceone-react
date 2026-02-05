@@ -48,6 +48,8 @@ import { useCompanyProductSla } from "../../../config/hooks/useGetCompanyProduct
 import FormSkeleton from "../Account/FormSkeleton";
 import FormLayout from "../../ui/FormLayout";
 import { CompanyProductSlaComponent } from "./CompanyProductSla";
+import useUnit from "../../../config/hooks/useUnit";
+import axiosClient from "../../../axios-client/AxiosClient";
 
 function EditCompanyProductModal({
   isOpen,
@@ -59,6 +61,7 @@ function EditCompanyProductModal({
   const { intervalTypeData, loading: intervalTypeDataLoading } =
     useIntervalType();
   const { productTypeData, loading: productTypeLoading } = useProductType();
+  const {loading : unitDataLoading , unit : unitData} = useUnit();
   const rangeOfNumber: Item[] = range(1, 365);
 
   const intialEditCompanyProductFormData = {
@@ -77,6 +80,7 @@ function EditCompanyProductModal({
     url: product.url,
     isActive: product.isActive,
     isSerialNumber: product.isSerialNumber,
+    unitId : product.unitId
   };
 
   const [selectedProductTypeId, setSelectedProductTypeId] = useState<
@@ -86,6 +90,14 @@ function EditCompanyProductModal({
   const [selectedWarrantyIntervalTypeId, setWarrantyIntervalTypeId] = useState<
     number | undefined
   >(0);
+
+  const [selectedUnitId, setSelectedUnitId] = useState<
+    number | undefined
+  >(0);
+
+  useEffect(()=>{
+    setSelectedUnitId(product.unitId)
+  },[product])
 
   const [selectedDefaultWarranty, setDefaultWarranty] = useState<
     number | undefined
@@ -192,18 +204,26 @@ function EditCompanyProductModal({
   const [selectedProductTypeIdError, setSelectedProductTypeIdError] =
     useState<boolean>(false);
 
+     const [selectedUnitIdError, setSelectedUnitIdError] =
+    useState<boolean>(false);
+
   const [isSerialNumberChecked, setIsSerialNumberChecked] = useState<boolean>(
     product.isSerialNumber!
   );
 
-  const validateDropdown = () => {
-    if (selectedProductTypeId === 0 || selectedProductTypeId === undefined) {
-      setSelectedProductTypeIdError(true);
-      // toast.error("Please select 'Product Type'");
-    } else {
-      setSelectedProductTypeIdError(false);
-    }
-  };
+  const validateDropdown = (): boolean => {
+  const isProductTypeInvalid =
+    selectedProductTypeId === 0 || selectedProductTypeId === undefined;
+
+  const isUnitInvalid =
+    selectedUnitId === 0 || selectedUnitId === undefined;
+
+  setSelectedProductTypeIdError(isProductTypeInvalid);
+  setSelectedUnitIdError(isUnitInvalid);
+
+  return !isProductTypeInvalid && !isUnitInvalid;
+};
+
 
   const handleCompanyProductTaxChange = () => {
     handleCompanyProductChange();
@@ -226,8 +246,7 @@ function EditCompanyProductModal({
     // event.preventDefault();
     const isvalid =validate();
     if(!isvalid) return;
-    validateDropdown();
-
+    if(!validateDropdown())return;
     if (
       updateCompanyProductFormData.name !== "" &&
       updateCompanyProductFormData.name !== null &&
@@ -269,7 +288,8 @@ function EditCompanyProductModal({
           intialEditCompanyProductFormData.version ||
         updateCompanyProductFormData.url !==
           intialEditCompanyProductFormData.url ||
-        updateCompanyProductFormData.isSerialNumber !== isSerialNumberChecked
+        updateCompanyProductFormData.isSerialNumber !== isSerialNumberChecked ||
+        selectedUnitId !== intialEditCompanyProductFormData.unitId 
       ) {
         if (userHasAccessToUpdateProduct) {
           const updateProductPostData = {
@@ -279,6 +299,7 @@ function EditCompanyProductModal({
               selectedProductTypeId !== 0
                 ? selectedProductTypeId
                 : updateCompanyProductFormData.product_type_id,
+            unit_id : selectedUnitId !==0 ? selectedUnitId : updateCompanyProductFormData.unitId,
             default_warranty_interval_type_id:
               selectedWarrantyIntervalTypeId !== 0
                 ? selectedWarrantyIntervalTypeId
@@ -304,7 +325,7 @@ function EditCompanyProductModal({
             url: updateCompanyProductFormData.url,
             updatedby_id: loginStatus.id,
           };
-          await axios
+          await axiosClient
             .put(POST_API.UPDATE_PRODUCT, updateProductPostData, {
               withCredentials: true,
             })
@@ -331,6 +352,9 @@ function EditCompanyProductModal({
                   hanldeUpdateCompanyProductFormSubmit();
                 }
               }
+            })
+            .finally(()=>{
+              onClose();
             });
         } else {
           toast.error(
@@ -452,7 +476,8 @@ function EditCompanyProductModal({
 
   if (
     productTypeLoading ||
-    intervalTypeDataLoading
+    intervalTypeDataLoading ||
+    unitDataLoading
   ) {
     return (
       <FormLayout width={6}>
@@ -497,7 +522,29 @@ function EditCompanyProductModal({
               error={errors.name}
               onBlur={handleBlur}
             />
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-3 gap-3">
+              <div className="">
+
+               <CustomDropdown
+                  logo={LucideClock}
+                  labelName="Unit :"
+                  preselectedOption={
+                    intialEditCompanyProductFormData.unitId
+                  }
+                  onSelect={(e) => {
+                    if (e) {
+                      setSelectedUnitIdError(false);
+                    }
+                    setSelectedUnitId(e);
+                  }}
+                  options={unitData}
+                  />
+                  {selectedUnitIdError && (
+                  <div className="caption-custom-inactive">
+                    Unit is required
+                  </div>
+                )}
+                  </div>
               <div className="">
                 <CustomDropdown
                   labelName="Product Type"

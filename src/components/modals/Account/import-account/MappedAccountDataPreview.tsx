@@ -3,15 +3,15 @@ import { Account, MappableItem } from "./AccountCsvMapper";
 import FormHeader from "../../../ui/FormHeader";
 import { Import, LucideCheckCircle, LucideScanEye, X } from "lucide-react";
 import Button from "../../../ui/Button";
-import { OPACITY, SIZE, STATUS_CODE } from "../../../../constants/AppConstants";
+import { OPACITY, SIZE, } from "../../../../constants/AppConstants";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
 import POST_API from "../../../../constants/PostApi";
-import RefreshToken from "../../../../config/validations/RefreshToken";
 import toast from "react-hot-toast";
 import ConfirmationDialog from "../../../dialogue-box/ConfirmationDialogue";
 import { convertToCsvFile } from "../../../../constants/PostDataToCsv";
 import LoadingPopUpAnimation from "../../../views/card/LoadingPopUpAnimation";
 import axiosClient from "../../../../axios-client/AxiosClient";
+import { handleApiError } from "../../../../config/error/handleApiError";
 
 interface MappedAccountDataPopupProps {
   open: boolean;
@@ -128,14 +128,7 @@ const MappedAccountDataPopup = ({
         })
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .catch(async (error: any) => {
-          if (error.status === STATUS_CODE.UNATHORISED) {
-            const refreshTokenStatus = await RefreshToken({
-              callFunction: handleImport,
-            });
-            if (refreshTokenStatus) {
-              handleImport();
-            }
-          }
+          handleApiError(error);
         })
         .finally(() => {
           setIsLoading(false);

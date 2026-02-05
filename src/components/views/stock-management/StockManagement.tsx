@@ -16,25 +16,24 @@ import { useSearchFilterPaginationDateHandlers } from "../../../config/hooks/use
 import { LocalStorageKeys } from "../../../enums/LocalStorageKeys";
 
 const StockManagement = () => {
-  
-    // Restore saved filters when opening this module
-        // useEffect(() => {
-        //   const saved = localStorage.getItem(LocalStorageKeys.STOCK_MANAGEMEMNT_FILTERS);
-        //   if (!saved) return;
-      
-        //   const filters = JSON.parse(saved);
-      
-        //   // Ensure URL & hook initialize first before restoring
-        //   requestAnimationFrame(() => {
-        //     if (filters.page) handlePageChange(filters.page);
-        //     if (filters.size) handlePageSizeChange(filters.size);
-        //     if (filters.search) handleSearchParameterChange(filters.search);
-        //     if (filters.dateRangeId) handleDatePageIdChange(filters.dateRangeId);
-        //     if(filters.customStartDate) handleStartDateChange(filters.customStartDate)
-        //       if(filters.customEndDate) handleEndDateChange(filters.customEndDate)
-           
-        //   });
-        // }, []);
+  // Restore saved filters when opening this module
+  // useEffect(() => {
+  //   const saved = localStorage.getItem(LocalStorageKeys.STOCK_MANAGEMEMNT_FILTERS);
+  //   if (!saved) return;
+
+  //   const filters = JSON.parse(saved);
+
+  //   // Ensure URL & hook initialize first before restoring
+  //   requestAnimationFrame(() => {
+  //     if (filters.page) handlePageChange(filters.page);
+  //     if (filters.size) handlePageSizeChange(filters.size);
+  //     if (filters.search) handleSearchParameterChange(filters.search);
+  //     if (filters.dateRangeId) handleDatePageIdChange(filters.dateRangeId);
+  //     if(filters.customStartDate) handleStartDateChange(filters.customStartDate)
+  //       if(filters.customEndDate) handleEndDateChange(filters.customEndDate)
+
+  //   });
+  // }, []);
   const { userHasAccessToViewStock } = useUserAccessModules();
   const { loginStatus } = useLoggedInUserContext();
   const [ref, inView] = useInView({ fallbackInView: true, threshold: 0.1 });
@@ -51,18 +50,20 @@ const StockManagement = () => {
     }
   }, [userHasAccessToViewStock]);
 
-    // Read filters from LocalStorage (before hook initializes)
-const savedFilters = JSON.parse(
-  localStorage.getItem(LocalStorageKeys.STOCK_MANAGEMEMNT_FILTERS) || "{}"
-);
+  // Read filters from LocalStorage (before hook initializes)
+  const savedFilters = JSON.parse(
+    localStorage.getItem(LocalStorageKeys.STOCK_MANAGEMEMNT_FILTERS) || "{}"
+  );
   const {
     currentPage,
+    currentPageData,
     pageSize,
     dateRangeId,
     concatDate,
+    startDate,
+    endDate,
     searchParameter,
-    totalPages,
-    setTotalPages,
+    setCurrentPageData,
     handleDatePageIdChange,
     handleEndDateChange,
     handlePageChange,
@@ -70,7 +71,9 @@ const savedFilters = JSON.parse(
     handleSearchParameterChange,
     handleStartDateChange,
   } = useSearchFilterPaginationDateHandlers(savedFilters);
+
   const getStockLiveForCompanyProduct = async (signal: AbortSignal) => {
+    if (dateRangeId === 8 && concatDate.trim() === "") return;
     const offset = (currentPage - 1) * pageSize;
 
     const effectiveDateRangeId = dateRangeId;
@@ -91,12 +94,8 @@ const savedFilters = JSON.parse(
       })
       .then((response) => {
         if (response.status === STATUS_CODE.OK) {
+          setCurrentPageData({currentPage: currentPage, pageDataLength: response.data.length});
           const responseData = response.data;
-
-          if (response.data.length > 0) {
-            setTotalPages(Math.ceil(response.data[0].count / pageSize));
-          }
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const formattedData: LiveStockForCompanyProduct[] = responseData.map(
             (item: any) => ({
               count: item.count,
@@ -110,7 +109,6 @@ const savedFilters = JSON.parse(
 
           setLiveStockForCompanyProduct(formattedData);
         }
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       })
       .catch(async (error: ApiError | any) => {
         if (error.status === STATUS_CODE.UNATHORISED) {
@@ -141,7 +139,6 @@ const savedFilters = JSON.parse(
     };
   }, [pageSize, currentPage, dateRangeId, searchParameter, concatDate]);
 
-  
   // Save all filters to localStorage whenever they change
   useEffect(() => {
     const filters = {
@@ -149,6 +146,9 @@ const savedFilters = JSON.parse(
       size: pageSize,
       search: searchParameter,
       dateRangeId,
+      concatDate,
+      customStartDate: startDate,
+      customEndDate: endDate,
     };
 
     localStorage.setItem(
@@ -159,7 +159,10 @@ const savedFilters = JSON.parse(
     currentPage,
     pageSize,
     searchParameter,
-    dateRangeId
+    dateRangeId,
+    concatDate,
+    startDate,
+    endDate,
   ]);
 
   // Note : On refresh button click clear the storage
@@ -170,7 +173,6 @@ const savedFilters = JSON.parse(
     }
     return () => window.removeEventListener("beforeunload", clearLeadFilters);
   }, []);
-
 
   return (
     <div className="w-full">
@@ -185,11 +187,11 @@ const savedFilters = JSON.parse(
             <StockManagementList
               liveStockForCompanyProduct={liveStockForCompanyProduct}
               paginationData={{
-                selectedPageSize: handlePageSizeChange,
+                onPageSizeChange: handlePageSizeChange,
                 currentPage,
-                handlePageChange,
-                totalPages,
+                onPageChange: handlePageChange,
                 pageSize,
+                currentPageData,
               }}
               onStartDateChange={handleStartDateChange}
               onEndDateChange={handleEndDateChange}
@@ -197,7 +199,9 @@ const savedFilters = JSON.parse(
                 handleSearchParameterChange,
                 handleDateRangeIdChange: handleDatePageIdChange,
                 dateRangeId,
-                searchParameter
+                startDate,
+                endDate,
+                searchParameter,
               }}
             />
           </>

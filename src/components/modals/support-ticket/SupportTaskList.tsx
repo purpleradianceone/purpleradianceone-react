@@ -10,33 +10,35 @@ import {
 } from "lucide-react"; // Corrected import for Lucide React icons
 import LoadingSpinner from "../../../assets/animations/LoadingSpinner";
 import StatusChip from "../../ui/StatusChip";
-import LeadTaskType from "../../../@types/lead-management/LeadTaskType";
 import { useState } from "react";
 import SupportTicketTaskProps from "../../../@types/support-ticket-management/SupportTicketTaskProps";
 import SupportTicketTaskStage from "../../../@types/support-ticket-management/SupportTicketTaskStage";
 import UpdateSupportTicketTaskModal from "./UpdateSupportTicketTaskModal";
+import MESSAGE from "../../../constants/Messages";
 
 function SupportTicketTaskList({
-  taskId,  
+  taskId,
   supportTicketTaskStage,
   supportTicketTasks,
   handleSupportTicketTaskUpdate,
   isLoading,
 }: {
-  taskId: number;  
+  taskId: number;
   supportTicketTaskStage: SupportTicketTaskStage[];
   supportTicketTasks: SupportTicketTaskProps[];
   handleSupportTicketTaskUpdate: () => void;
   isLoading: boolean;
 }) {
-  const [isUpdateLeadTaskModalOpen, setIsUpdateLeadTaskModalOpen] =
-    useState<boolean>(false);
+  const [
+    isUpdateSupportTicketTaskModalOpen,
+    setIsUpdateSupportTicketTaskModalOpen,
+  ] = useState<boolean>(false);
   const [selecedSupportTicketTask, setSelecedSupportTicketTask] =
     useState<SupportTicketTaskProps>();
   // State to manage expanded card
   const [expandedCardId, setExpandedCardId] = useState<number | null>(null);
 
-  const getActivityIcon = (type: LeadTaskType["leadActivityId"]) => {
+  const getActivityIcon = (type: number) => {
     switch (type) {
       case 1:
         return <Phone size={20} />;
@@ -72,10 +74,13 @@ function SupportTicketTaskList({
             <div className="flex min-h-72 items-center justify-center  py-10">
               <LoadingSpinner></LoadingSpinner>
             </div>
-          ) : supportTicketTasks.length === 0 ? (
+          ) : supportTicketTasks.length === 0 ||
+            supportTicketTasks[0].id === null ? (
             <div className=" min-h-72   flex items-center justify-center">
               <p className="text-center caption-custom italic ">
-                No activities found.
+                {supportTicketTasks.length
+                  ? MESSAGE.MODULE_ACCESS.SUPPORT_MODULE.DENIED_VIEW_TASK_ACCESS
+                  : `No activities found.`}
               </p>
             </div>
           ) : (
@@ -107,14 +112,16 @@ function SupportTicketTaskList({
                     {expandedCardId === activity.id ? (
                       <div className="caption-custom">
                         <p className="pb-1 pt-2">
-                          {taskId===0&&<div className="mt-1">
-                            <span className="caption-custom-blue">
-                              Task Stage :{" "}
-                            </span>{" "}
-                            <span className="caption-custom">
-                              {activity.supportTicketTaskStageName || ""}
-                            </span>{" "}
-                          </div>}
+                          {taskId === 0 && (
+                            <div className="mt-1">
+                              <span className="caption-custom-blue">
+                                Task Stage :{" "}
+                              </span>{" "}
+                              <span className="caption-custom">
+                                {activity.supportTicketTaskStageName || ""}
+                              </span>{" "}
+                            </div>
+                          )}
                           <div>
                             <span className="caption-custom-blue">
                               Description :{" "}
@@ -162,14 +169,16 @@ function SupportTicketTaskList({
                     ) : (
                       <div className="text-xs text-gray-600">
                         <p className="truncate  mt-1">
-                          {taskId===0&&<div className="mt-1">
-                            <span className="caption-custom-blue">
-                              Task Stage :{" "}
-                            </span>{" "}
-                            <span className="caption-custom">
-                              {activity.supportTicketTaskStageName || ""}
-                            </span>{" "}
-                          </div>}
+                          {taskId === 0 && (
+                            <div className="mt-1">
+                              <span className="caption-custom-blue">
+                                Task Stage :{" "}
+                              </span>{" "}
+                              <span className="caption-custom">
+                                {activity.supportTicketTaskStageName || ""}
+                              </span>{" "}
+                            </div>
+                          )}
                           <div className="mt-1">
                             <span className="caption-custom-blue">
                               Description :{" "}
@@ -208,7 +217,7 @@ function SupportTicketTaskList({
                     </span>
                     <button
                       onClick={() => {
-                        setIsUpdateLeadTaskModalOpen(true);
+                        setIsUpdateSupportTicketTaskModalOpen(true);
                         setSelecedSupportTicketTask(activity);
                       }}
                       className="px-2 caption-custom white-text bg-blue-500  rounded hover:bg-blue-600 transition-colors"
@@ -226,11 +235,11 @@ function SupportTicketTaskList({
             </div>
           )}
         </div>
-        {isUpdateLeadTaskModalOpen && (
+        {isUpdateSupportTicketTaskModalOpen && (
           <UpdateSupportTicketTaskModal
-            isOpen={isUpdateLeadTaskModalOpen}
+            isOpen={isUpdateSupportTicketTaskModalOpen}
             handleClose={(value: boolean) => {
-              setIsUpdateLeadTaskModalOpen(value);
+              setIsUpdateSupportTicketTaskModalOpen(value);
             }}
             supportTicketTask={selecedSupportTicketTask!}
             supportTicketTaskStage={supportTicketTaskStage}

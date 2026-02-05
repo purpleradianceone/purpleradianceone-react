@@ -528,7 +528,7 @@
         class="text-2xl font-extrabold text-center mb-2"
         style="color: rgb(59, 128, 237)"
       >
-        Get in Touch Form
+        Connect With Our Team
       </h2>
       <form id="leadForm" class="space-y-4">
         <div>
@@ -744,14 +744,6 @@
             console.log(token);
             console.log("--------------------------");
 
-    //           window.parent.postMessage(
-    //     { type: "SET_TOKEN", token: token },
-    //     parentOrigin // or "*"
-    // );
-
-
-            // localStorage.setItem("contactustoken", token); // ✅ store in browser
-
             console.log("✅ Token stored in localStorage:", token);
           } else {
             console.error("Invalid response");
@@ -830,9 +822,10 @@
             document.getElementById("leadForm").reset();
           } else {
             showToast(
-              "Something went wrong! please Try again later",
-              "#dc2626"
+              "We will follow up with you shortly.",
+              "#16a34a"
             );
+            document.getElementById("leadForm").reset();
           }
         } catch (error) {
           showToast("Something went wrong! please Try again later", "#dc2626");

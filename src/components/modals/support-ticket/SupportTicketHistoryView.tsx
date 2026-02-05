@@ -3,8 +3,6 @@ import React, { useEffect, useState } from "react";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
 import POST_API from "../../../constants/PostApi";
 import { STATUS_CODE } from "../../../constants/AppConstants";
-
-import RefreshToken from "../../../config/validations/RefreshToken";
 import { History } from "lucide-react";
 import FormHeader from "../../ui/FormHeader";
 import SupportTicketHistoryAgGrid from "../../ag-grid/SupportTicketHistoryAgGrid";
@@ -13,6 +11,7 @@ import axiosClient from "../../../axios-client/AxiosClient";
 import SupportTicketHistoryProp from "../../../@types/support-ticket-management/SupportTicketHistoryProp";
 import { createPortal } from "react-dom";
 import LoadingSpinner from "../../../assets/animations/LoadingSpinner";
+import { handleApiError } from "../../../config/error/handleApiError";
 
 const SupportTicketHistoryView: React.FC<SupportTicketHistoryProp> = ({
   isOpen,
@@ -102,16 +101,7 @@ const SupportTicketHistoryView: React.FC<SupportTicketHistoryProp> = ({
         setIsLoadingForSupportTicketHistory(false);
       }
     } catch (error: any) {
-      if (error.status === STATUS_CODE.UNATHORISED) {
-        const refreshTokenStatus = await RefreshToken({
-          callFunction: getSupportTicketHistory,
-        });
-
-        // setIsDialogueOpen(!refreshTokenStatus);
-        if (refreshTokenStatus) {
-          getSupportTicketHistory();
-        }
-      }
+      handleApiError(error);
     }
   };
   useEffect(() => {

@@ -4,7 +4,7 @@ import DateRangeFilterDropdownProps from '../../@types/ui/DateRangeFilterDropdow
 
 function DateRangeFilterDropdown(props: DateRangeFilterDropdownProps) {
     const [isOpen, setIsOpen] = useState(false);
-    const [selectedOption, setSelectedOption] = useState("Filter");
+    const [selectedOption, setSelectedOption] = useState("Date Filter");
     const dropdownRef = useRef<HTMLDivElement>(null);
   
     useEffect(() => {
@@ -67,7 +67,7 @@ function DateRangeFilterDropdown(props: DateRangeFilterDropdownProps) {
               <button
               id = "0"
                 className="w-full px-4 py-2 text-left input-label-custom hover:bg-gray-50 focus:bg-gray-50 focus:outline-none"
-                onClick={() => handleOptionClick(0,"Filter")}
+                onClick={() => handleOptionClick(0,"Date Filter")}
               >
                 <div className='flex gap-2 text-center input-label-custom'><Delete></Delete>
                 <span className='mt-0.5 input-label-custom'>Clear Filter</span></div>

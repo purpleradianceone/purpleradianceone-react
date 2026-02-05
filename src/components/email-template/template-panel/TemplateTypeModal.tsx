@@ -1,13 +1,7 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import axios from "axios";
 import { CheckCircle, X, LucideArrowBigRight } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, } from "react";
 import toast from "react-hot-toast";
-import ApiError from "../../../@types/error/ApiError";
-import RefreshToken from "../../../config/validations/RefreshToken";
-import { SIZE, STATUS_CODE } from "../../../constants/AppConstants";
-import POST_API from "../../../constants/PostApi";
-import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
+import { SIZE, } from "../../../constants/AppConstants";
 import Button from "../../ui/Button";
 import FormHeader from "../../ui/FormHeader";
 import { TemplateType } from "../TemplatesPage";
@@ -15,66 +9,17 @@ import { TemplateType } from "../TemplatesPage";
 export type TemplateTypeModalProps = {
   onClose: () => void;
   onCreate: (typeId: string) => void;
+  templateTypes: TemplateType[];
 };
 
 export const TemplateTypeModal: React.FC<TemplateTypeModalProps> = ({
   onClose,
   onCreate,
+  templateTypes,
 }) => {
   const [selectedTypeId, setSelectedTypeId] = useState<string>(""); // Initial state is an empty string
-  const { loginStatus } = useLoggedInUserContext();
-  const [templateTypes, setTemplateTypes] = useState<TemplateType[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
+  const loading = false;
 
-  useEffect(() => {
-    fetchTypes();
-  }, [loginStatus.companyId, loginStatus.id]);
-
-  const fetchTypes = async () => {
-    setLoading(true);
-    try {
-      await axios
-        .post(
-          POST_API.GET_EMAIL_TYPE,
-          {
-            company_id: loginStatus.companyId,
-            requestedby: loginStatus.id,
-            is_host_email: false,
-          },
-          { withCredentials: true }
-        )
-        .then((response) => {
-          if (response.status === STATUS_CODE.OK) {
-            const activeTypes = response.data.filter(
-              (type: TemplateType) => type.isactive
-            );
-            setTemplateTypes(activeTypes);
-          }
-        })
-        .catch(async (error: ApiError | any) => {
-          if (error.status === STATUS_CODE.UNATHORISED) {
-            const refreshTokenResponse = await RefreshToken({
-              callFunction: fetchTypes,
-            });
-            if (refreshTokenResponse) {
-              fetchTypes();
-            }
-          }
-        });
-    } catch (error: ApiError | any) {
-      console.error("Error fetching template types for modal:", error);
-      if (error.status === STATUS_CODE.UNATHORISED) {
-        const refreshTokenStatus = await RefreshToken({
-          callFunctionWithParamsNotEvent: fetchTypes,
-        });
-        if (refreshTokenStatus) {
-          fetchTypes();
-        }
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
   const handleSubmit = () => {
     if (selectedTypeId) {
       // This check ensures selectedTypeId is not an empty string

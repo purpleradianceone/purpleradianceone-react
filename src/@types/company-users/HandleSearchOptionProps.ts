@@ -3,6 +3,11 @@ type HandleSearchOptionProps = {
     handleDateRangeIdChange : (dateRangeId? : number) => void,
     handleSearchParameterChange: (searchParameter?: string) => void,
     searchParameter? : string ,
-    dateRangeId ? : number
+    dateRangeId ? : number,
+    startDate ? : string,
+    endDate ? : string,
+    selectedSupportTicketCategory ? : number ,
+    selectedSupportTicketSource ? : number ,
+    selectedSupportTicketLifecycle ? : number ,
 }
 export default HandleSearchOptionProps;

@@ -1,10 +1,16 @@
-import { AxiosError } from "axios";
+import axios, {  AxiosError } from "axios";
 import MESSAGE from "../../constants/Messages";
 import toast from "react-hot-toast";
 
 export function handleApiError(error: unknown) {
+
+
+  // note : this ignore cancelled requests such as abort req
+  if(axios.isCancel(error) || (error as AxiosError)?.code === "ERR_CANCELED")
+  {
+    return;
+  }
   if (!(error instanceof AxiosError)) {
-    console.error(error);
     toast.error("Unexpected error occurred.");
     return;
   }
@@ -39,13 +45,38 @@ export function handleApiError(error: unknown) {
       toast.error("Requested resource not found.");
       break;
 
+    case 408:                       //Nginx   Upload timeout
+      toast.error(message);
+      break;
+
     case 409:
       toast.error(message);
+      break;
+
+    case 413:                       //Nginx   Body too large
+      toast.error(message);
+      break;
+
+    case 415:
+      toast.error(message);
+      break;
+
+    case 499:                       //Nginx   Client aborted
+      // toast.error(message);
       break;
 
     case 500:
       toast.error("Server error. Please try again later.");
       break;
+
+    case 502:                       //Nginx   Backend failed
+      toast.error(message);
+      break;
+
+    case 504:                       //Nginx   Backend timeout
+      toast.error(message);
+      break;
+
 
     default:
       toast.error(message);

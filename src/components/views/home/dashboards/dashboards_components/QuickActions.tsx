@@ -7,32 +7,17 @@ import {
   Store,
   Network,
   Settings,
+  Headset,
 } from "lucide-react";
 import ROUTES_URL from "../../../../../constants/Routes";
 import { useNavigate } from "react-router-dom";
 import { useLoggedInUserContext } from "../../../../../context/user/LoggedInUserContext";
 import { getQuickActionColor } from "../../../../../constants/QuickActionsStyle";
-
-type AccessModuleType = {
-  id: number;
-  crm_module_id: number;
-  company_user_id: number;
-
-  add: boolean;
-  view: boolean;
-  update: boolean;
-
-  createdby: number;
-  updatedby: number;
-  createdon: string;
-  module_name: string;
-  updatedby_user: string;
-  updatedon: string;
-};
+import { AccessManagementType } from "../../../../../@types/company-users/AccessManagementContextType";
 
 interface QuickActionsProp {
   companyUserId: number | null;
-  moduleAccessCompanyUser: AccessModuleType[];
+  moduleAccessCompanyUser: AccessManagementType[];
 }
 const QuickActions: React.FC<QuickActionsProp> = ({
   companyUserId,
@@ -191,10 +176,38 @@ const QuickActions: React.FC<QuickActionsProp> = ({
             )[0].view ?? false
           : false,
     },
+    {
+      id: 13,
+      title: "Support",
+      description: "Support Ticket Management  ",
+      icon: Headset,
+      shortcut: "Support Tickets",
+      route: ROUTES_URL.SUPPORT_TICKET_MANAGEMENT,
+      visibility:
+        moduleAccessCompanyUser.length !== 0
+          ? moduleAccessCompanyUser.filter(
+              (molule) => molule.crm_module_id === 22
+            )[0].view ?? false
+          : false,
+    },
+    {
+      id: 14,
+      title: "Support",
+      description: "Create Support Ticket Management",
+      icon: Headset,
+      shortcut: "Create Ticket",
+      route: `${ROUTES_URL.SUPPORT_TICKET_MANAGEMENT}?fromDashboard=true`,
+      visibility:
+        moduleAccessCompanyUser.length !== 0
+          ? moduleAccessCompanyUser.filter(
+              (molule) => molule.crm_module_id === 22
+            )[0].add ?? false
+          : false,
+    },
   ];
 
   return (
-    <div className="bg-white min-h-full rounded-2xl shadow-lg border border-gray-100 p-8">
+    <div className="bg-white min-h-full rounded-2xl shadow-lg border border-gray-100 p-8 ">
       <div className="mb-8">
         <h3 className="section-header-custom mb-2">Quick Actions</h3>
         <p className="table-header-custom">Frequently used CRM functions</p>
@@ -223,7 +236,7 @@ const QuickActions: React.FC<QuickActionsProp> = ({
               }}
               className={`${getQuickActionColor(
                 action.description.length
-              )} text-white p-5 rounded-xl transition-all duration-200 hover:shadow-lg hover:scale-105 active:scale-95 group relative overflow-hidden`}
+              )} text-white p-5 rounded-xl transition-all duration-200 hover:shadow-lg hover:scale-105 active:scale-95 group relative overflow-hidden `}
               style={{ animationDelay: `${index * 0.05}s` }}
             >
               {/* The change is in this div, specifically the flex classes */}

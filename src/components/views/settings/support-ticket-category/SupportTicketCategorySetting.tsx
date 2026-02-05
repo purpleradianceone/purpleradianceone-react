@@ -20,8 +20,8 @@ import validateDescription from "../../../../config/validations/ValidateDescript
 
 const SupportTicketCategorySetting: React.FC = () => {
   const {
-    userHasAccessToAddSupportTicket,
-    userHasAccessToUpdateSupportTicket,
+    userHasAccessToAddSettingSupposeTicketCategory,
+    userHasAccessToUpdateSettingSupposeTicketCategory
   } = useUserAccessModules();
 
   const { loginStatus } = useLoggedInUserContext();
@@ -99,7 +99,10 @@ const SupportTicketCategorySetting: React.FC = () => {
     isactive?: boolean | null;
   }) => {
 
-
+    if(!userHasAccessToUpdateSettingSupposeTicketCategory){
+      toast.error(MESSAGE.MODULE_ACCESS.SETTING.SUPPORT_TICKET_CATEGORY_SETTING.DENIED_UPDATE_ACCESS)
+      return;
+    }
     if (!validateName(editingTypeName)) {
       toast.error(
         "Invalid warehouse name. Only letters, numbers, spaces, '.', '&', and '-' are allowed."
@@ -168,9 +171,10 @@ const SupportTicketCategorySetting: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="h-56 flex items-center justify-center">
+      <div className="h-screen flex items-center justify-center">
         <div className="flex items-center justify-between gap-3">
-          <span>Loading...</span> <LoadingSpinner />
+          {/* <span>Loading...</span> */}
+           <LoadingSpinner />
         </div>
       </div>
     );
@@ -183,15 +187,15 @@ const SupportTicketCategorySetting: React.FC = () => {
           {!showAddForm && (
             <div>
               <Button
+              disabled={!userHasAccessToAddSettingSupposeTicketCategory}
                 type="submit"
                 onClick={(e) => {
                   e.preventDefault();
-                  if (userHasAccessToAddSupportTicket) {
+                  if (userHasAccessToAddSettingSupposeTicketCategory) {
                     setShowAddForm(true);
                   } else {
                     toast.error(
-                      MESSAGE.MODULE_ACCESS.SUPPORT_TICKET_CATEGORY
-                        .DENIED_ADD_ACCESS
+                      MESSAGE.MODULE_ACCESS.SETTING.SUPPORT_TICKET_CATEGORY_SETTING.DENIED_ADD_ACCESS
                     );
                   }
                 }}
@@ -217,7 +221,7 @@ const SupportTicketCategorySetting: React.FC = () => {
         )}
 
         {/* <div className="space-y-6 border p-2  rounded-md hover:scale-[1.01] transition-all duration-200 ease-in-out bg-white"> */}
-        <div className="p-4 grid md:grid-cols-4 sm:grid-cols-2 gap-4 bg-white">
+        <div className="p-4 grid md:grid-cols-4 sm:grid-cols-2 gap-4 bg-white border rounded-md">
           {supportTicketCategory.length === 0 ? (
             <p className="flex items-center justify-center caption-custom h-56 text-center ">
               No Support Ticket Category is Available.
@@ -267,14 +271,13 @@ const SupportTicketCategorySetting: React.FC = () => {
                       title={item.name}
                       className="hover:bg-gray-00 flex items-center gap-1 table-data-custom md-2 cursor-pointer "
                       onClick={() => {
-                        if (userHasAccessToUpdateSupportTicket) {
+                        if (userHasAccessToUpdateSettingSupposeTicketCategory) {
                           setEditingTypeId(item.id);
                           setEditingTypeName(item.name);
                           setEditingField("name");
                         } else {
                           toast.error(
-                            MESSAGE.MODULE_ACCESS.SUPPORT_TICKET_CATEGORY
-                              .DENIED_UPDATE_ACCESS
+                            MESSAGE.MODULE_ACCESS.SETTING.SUPPORT_TICKET_CATEGORY_SETTING.DENIED_UPDATE_ACCESS
                           );
                         }
                       }}
@@ -339,14 +342,13 @@ const SupportTicketCategorySetting: React.FC = () => {
                       title={item.description}
                       className="hover:bg-gray-00 flex items-center gap-1 table-data-custom md-2 cursor-pointer "
                       onClick={() => {
-                        if (userHasAccessToUpdateSupportTicket) {
+                        if (userHasAccessToUpdateSettingSupposeTicketCategory) {
                           setEditingTypeId(item.id);
                           setEditingTypeDescription(item.description);
                           setEditingField("description");
                         } else {
                           toast.error(
-                            MESSAGE.MODULE_ACCESS.SUPPORT_TICKET_CATEGORY
-                              .DENIED_UPDATE_ACCESS
+                            MESSAGE.MODULE_ACCESS.SETTING.SUPPORT_TICKET_CATEGORY_SETTING.DENIED_UPDATE_ACCESS
                           );
                         }
                       }}

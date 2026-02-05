@@ -32,8 +32,8 @@ const MetaIntegration: React.FC = () => {
   ];
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-50 p-1 font-sans">
-      <div className="bg-white rounded-xl shadow-2xl overflow-hidden max-w-4xl w-full mt-0 pt-0 md:p-3 border border-gray-200 transition-all duration-300 transform hover:scale-[1.01]">
+    <div className="flex items-center justify-center min-h-screen bg-gray-50  font-sans">
+      <div className="bg-white rounded-xl shadow-lg overflow-hidden max-w-4xl w-full mt-0 pt-0 md:p-3 border border-gray-200 transition-all duration-300 transform hover:scale-[1.01]">
         {/* Header Section */}
         <div className="text-center mb-1">
           <h1 className="main-title-custom tracking-tight">
@@ -49,7 +49,7 @@ const MetaIntegration: React.FC = () => {
         </div>
 
         {/* Steps Section */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-10 md:mb-16">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8  md:mb-4">
           {stepItems.map((step, index) => (
             <div
               key={index}

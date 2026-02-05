@@ -57,12 +57,14 @@ const savedFilters = JSON.parse(
 
   const {
     currentPage,
+    currentPageData,
     pageSize,
     dateRangeId,
     concatDate,
+    startDate,
+    endDate,
     searchParameter,
-    totalPages,
-    setTotalPages,
+    setCurrentPageData,
     handleDatePageIdChange,
     handleEndDateChange,
     handlePageChange,
@@ -85,7 +87,8 @@ const savedFilters = JSON.parse(
   };
 
   const fetchCompanyProducts = async (signal : AbortSignal) => {
-    if (userHasAccessToViewProduct) {
+    if (dateRangeId === 8 && concatDate.trim() === "") return;
+    if (userHasAccessToViewProduct || isGridForAccountProduct) {
       const offset = (currentPage - 1) * pageSize;
 
       const effectiveDateRangeId =
@@ -102,11 +105,12 @@ const savedFilters = JSON.parse(
         search_parameter: searchParameter,
         search_parameter_date: concatDate,
         requestedby_id: loginStatus.id,
+        requestedby: loginStatus.id,
       };
 
       try {
         const response = await axios.post(
-          POST_API.GET_PRODUCTS,
+          isGridForAccountProduct?POST_API.GET_LOOKUP_COMPANY_PRODUCT:POST_API.GET_PRODUCTS,
           getProductPostData,
           {
             signal,
@@ -115,6 +119,7 @@ const savedFilters = JSON.parse(
         );
 
         if (response.data && response.status === STATUS_CODE.OK) {
+          setCurrentPageData({currentPage: currentPage, pageDataLength: response.data.length});
           const formattedData: Product[] = response.data.map((res: any) => ({
             count: res.count,
             id: res.id,
@@ -148,9 +153,6 @@ const savedFilters = JSON.parse(
 
           }));
           setProductsData(formattedData);
-          if (response.data[0]?.count) {
-            setTotalPages(Math.ceil(response.data[0].count / pageSize));
-          }
         }
       } catch (error: ApiError | any) {
         if (error.status === STATUS_CODE.UNATHORISED) {
@@ -194,7 +196,7 @@ const savedFilters = JSON.parse(
   ]);
 
   useEffect(() => {
-    if (!userHasAccessToViewProduct) {
+    if (!userHasAccessToViewProduct && !isGridForAccountProduct) {
       setAccessDeniedPopUpOpen(true);
     }
   }, [userHasAccessToViewProduct]);
@@ -207,6 +209,9 @@ const savedFilters = JSON.parse(
       size: pageSize,
       search: searchParameter,
       dateRangeId,
+      concatDate,
+      customStartDate: startDate,
+      customEndDate: endDate,
     };
 
     localStorage.setItem(
@@ -217,7 +222,10 @@ const savedFilters = JSON.parse(
     currentPage,
     pageSize,
     searchParameter,
-    dateRangeId
+    dateRangeId,
+    concatDate,
+    startDate,
+    endDate
   ]);
 
   // Note : On refresh button click clear the storage
@@ -237,7 +245,7 @@ const savedFilters = JSON.parse(
         animate={inView ? { opacity: 1, y: 0 } : {}}
         transition={{ duration: 0.4, ease: "easeOut" }}
       >
-        {userHasAccessToViewProduct ? (
+        {userHasAccessToViewProduct || isGridForAccountProduct ? (
           <>
             <div>
               <ProductsManagementList
@@ -250,14 +258,16 @@ const savedFilters = JSON.parse(
                   handleSearchParameterChange,
                   handleDateRangeIdChange: handleDatePageIdChange,
                   dateRangeId,
+                  startDate,
+                  endDate,
                   searchParameter
                 }}
                 paginationData={{
-                  selectedPageSize: handlePageSizeChange,
                   currentPage,
-                  handlePageChange,
-                  totalPages,
+                  currentPageData,
+                  onPageChange: handlePageChange,
                   pageSize,
+                  onPageSizeChange: handlePageSizeChange,
                 }}
                 products={productsData}
                 isGridForAccountProduct ={isGridForAccountProduct}

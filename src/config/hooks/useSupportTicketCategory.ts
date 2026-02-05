@@ -27,7 +27,7 @@ export const useSupportTicketCategory = () => {
     // if (postData.company_id === 0) return;
 
     await axiosClient
-      .post(POST_API.GET_SUPPORT_TICKET_CATEGORY, postData, {
+      .post(POST_API.GET_LOOKUP_SUPPORT_TICKET_CATEGORY, postData, {
         withCredentials: true,
       })
       .then((response) => {

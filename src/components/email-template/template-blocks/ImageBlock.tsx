@@ -8,6 +8,8 @@ import { AlignCenter, AlignLeft, AlignRight, Trash2 } from "lucide-react";
 import FormInput from "../../ui/FormInput";
 import { SIZE } from "../../../constants/AppConstants";
 
+const buttonTextStyle = "input-label-custom-white";
+
 type ImageBlockProps = {
   src: string;
   width: number;
@@ -95,13 +97,14 @@ export const ImageBlock: React.FC<ImageBlockProps> = ({
         <Button type="button" onClick={handleDelete}>
           <div className="flex items-center justify-center gap-1">
             <Trash2 size={SIZE.SIXTEEN} />
-            Delete Image Block
+            <span className={buttonTextStyle}>Image Block</span>
           </div>
         </Button>
       </div>
 
       {/* Image with Resizable */}
-      <div className="mt-5"
+      <div
+        className="mt-5"
         style={{
           display: "flex",
           ...alignmentStyles[alignment],
@@ -139,62 +142,57 @@ export const ImageBlock: React.FC<ImageBlockProps> = ({
         />
         {/* <input type="file" accept="image/*" onChange={handleFileChange} /> */}
         <div style={{ marginTop: "10px" }}>
+          <div className="flex gap-2 justify-center items-center">
           <label className="table-header-custom">Alignment:</label>
-          <div className="flex gap-2">
             <div className="w-fit">
-            <Button
-            type="submit"
-              onClick={(e) => {
-                e.preventDefault();
-                handleAlignmentChange("left");
-              }}
-            >
-              
-              <div className="flex items-center justify-center gap-1">
-            <AlignLeft size={SIZE.SIXTEEN} />
-            Left
-          </div>
-            </Button>
-          </div>
-          <div className="w-fit">
-            <Button
-            type="submit"
-              onClick={(e) => {
-                e.preventDefault();
-                handleAlignmentChange("center");
-              }}
-            >
-             
-               <div className="flex items-center justify-center gap-1">
-            <AlignCenter size={SIZE.SIXTEEN} />
-             Center
-          </div>
-            </Button>
-          </div>
+              <Button
+                type="submit"
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleAlignmentChange("left");
+                }}
+              >
+                <div className="flex items-center justify-center gap-1">
+                  <AlignLeft size={SIZE.SIXTEEN} />
+                  <span className={buttonTextStyle}>Left</span>
+                </div>
+              </Button>
+            </div>
+            <div className="w-fit">
+              <Button
+                type="submit"
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleAlignmentChange("center");
+                }}
+              >
+                <div className="flex items-center justify-center gap-1">
+                  <AlignCenter size={SIZE.SIXTEEN} />
+                  <span className={buttonTextStyle}>Center</span>
+                </div>
+              </Button>
+            </div>
 
-          <div className="w-fit">
-            <Button
-            type="submit"
-              onClick={(e) => {
-                e.preventDefault();
-                handleAlignmentChange("right");
-              }}
-            >
-               <div className="flex items-center justify-center gap-1">
-            <AlignRight size={SIZE.SIXTEEN} />
-             Right
+            <div className="w-fit">
+              <Button
+                type="submit"
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleAlignmentChange("right");
+                }}
+              >
+                <div className="flex items-center justify-center gap-1">
+                  <AlignRight size={SIZE.SIXTEEN} />
+                  <span className={buttonTextStyle}>Right</span>
+                </div>
+              </Button>
+            </div>
           </div>
-              
-            </Button>
-          </div>
-          </div>
-          
         </div>
       </div>
     </div>
   );
 };
-
 
 (ImageBlock as any).craft = {
   displayName: "Image Block",

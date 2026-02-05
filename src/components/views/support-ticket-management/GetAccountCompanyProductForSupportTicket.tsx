@@ -11,23 +11,24 @@ import { useInView } from "react-intersection-observer";
 import { motion } from "framer-motion";
 import { LocalStorageKeys } from "../../../enums/LocalStorageKeys";
 import AccountCompanyProductForSupportTicket from "../../../@types/support-ticket-management/AccountCompanyProductForSupportTicket";
-import axiosClient from "../../../axios-client/AxiosClient";
 import AccountCompanyProductForSupportTicketList from "../../lists/AccountCompanyProductForSupportTicketList";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import ApiError from "../../../@types/error/ApiError";
+import axios from "axios";
 
-function GetAccountCompanyProductFroSupportTicket({
+function GetAccountCompanyProductForSupportTicket({
   handleRowSelect,
 }: {
   handleRowSelect?: (data: AccountCompanyProductForSupportTicket | any) => void;
 }) {
-  const [accounts, setAccounts] = useState<
+  const [accountsCompanyProductForSupportTicke, setAccountsCompanyProductForSupportTicke] = useState<
     AccountCompanyProductForSupportTicket[]
   >([]);
   const [ref, inView] = useInView({ fallbackInView: true, threshold: 0.1 });
   const { loginStatus } = useLoggedInUserContext();
   const [accessDeniedPopUpOpen, setAccessDeniedPopUpOpen] = useState(false);
-  const { userHasAccessToViewAccount } = useUserAccessModules();
+  const { userHasAccessToViewSupportTicket } = useUserAccessModules();
+
 
   // Read filters from LocalStorage (before hook initializes)
   const savedFilters = JSON.parse(
@@ -37,12 +38,14 @@ function GetAccountCompanyProductFroSupportTicket({
   );
   const {
     currentPage,
+    currentPageData,
     pageSize,
     dateRangeId,
     concatDate,
+    startDate,
+    endDate,
     searchParameter,
-    totalPages,
-    setTotalPages,
+    setCurrentPageData,
     handleDatePageIdChange,
     handleEndDateChange,
     handlePageChange,
@@ -51,8 +54,12 @@ function GetAccountCompanyProductFroSupportTicket({
     handleStartDateChange,
   } = useSearchFilterPaginationDateHandlers(savedFilters);
 
+
+
   // Fetch data function
   const fetchAccountCompanyProductForSupportTicket = async () => {
+    if(loginStatus.companyId === 0) return;
+    if (dateRangeId === 8 && concatDate.trim() === "") return;
     const offset = (currentPage - 1) * pageSize;
 
     const effectiveDateRangeId =
@@ -71,14 +78,15 @@ function GetAccountCompanyProductFroSupportTicket({
     };
 
     try {
-      const response = await axiosClient.post(
+      const response = await axios.post(
         POST_API.GET_ACCOUNT_COMPANY_PRODUCT_FOR_SUPPORT_TICKET,
         postData,
         {
           withCredentials: true,
         }
       );
-
+      // setCurrentPageDataLength(currentPage, response.data.length);
+      setCurrentPageData({currentPage:currentPage, pageDataLength: response.data.length});
       const formattedData: AccountCompanyProductForSupportTicket[] =
         response.data.map((res: any) => ({
           count: res.count,
@@ -102,11 +110,11 @@ function GetAccountCompanyProductFroSupportTicket({
           createdOn: res.createdon,
           updatedOn: res.updatedon,
         }));
-      setAccounts(formattedData);
+      setAccountsCompanyProductForSupportTicke(formattedData);
 
-      if (response.data[0]?.count) {
-        setTotalPages(Math.ceil(response.data[0].count / pageSize));
-      }
+      // if (response.data[0]?.count) {
+      //   setTotalPages(Math.ceil(response.data[0].count / pageSize));
+      // }
     } catch (error: ApiError | any) {
       if (error.status === STATUS_CODE.UNATHORISED) {
         const refreshTokenStatus = await RefreshToken({
@@ -125,10 +133,10 @@ function GetAccountCompanyProductFroSupportTicket({
   }, [pageSize, currentPage, dateRangeId, searchParameter, concatDate]);
 
   useEffect(() => {
-    if (!userHasAccessToViewAccount) {
+    if (!userHasAccessToViewSupportTicket) {
       setAccessDeniedPopUpOpen(true);
     }
-  }, [userHasAccessToViewAccount]);
+  }, [userHasAccessToViewSupportTicket]);
 
   // Save all filters to localStorage whenever they change
   useEffect(() => {
@@ -137,29 +145,49 @@ function GetAccountCompanyProductFroSupportTicket({
       size: pageSize,
       search: searchParameter,
       dateRangeId,
+      concatDate,
+      customStartDate: startDate,
+      customEndDate: endDate,
     };
 
     localStorage.setItem(
       LocalStorageKeys.ACCOUNT_COMPANY_PRODUCT_FOR_SUPPORT_TICKET,
       JSON.stringify(filters)
     );
-  }, [currentPage, pageSize, searchParameter, dateRangeId]);
+  }, [
+    currentPage,
+    pageSize,
+    searchParameter,
+    dateRangeId,
+    concatDate,
+    startDate,
+    endDate,
+  ]);
 
-
-    function clearAccountCompanyProductForSupportTicketFilters() {
-      localStorage.removeItem(
-        LocalStorageKeys.ACCOUNT_COMPANY_PRODUCT_FOR_SUPPORT_TICKET
-      );
-    }
+  function clearAccountCompanyProductForSupportTicketFilters() {
+    localStorage.removeItem(
+      LocalStorageKeys.ACCOUNT_COMPANY_PRODUCT_FOR_SUPPORT_TICKET
+    );
+  }
   // Note : On refresh button click clear the storage
   useEffect(() => {
-    window.addEventListener("beforeunload", clearAccountCompanyProductForSupportTicketFilters);
-    window.addEventListener("close", clearAccountCompanyProductForSupportTicketFilters);
-    return () => window.removeEventListener("beforeunload", clearAccountCompanyProductForSupportTicketFilters);
+    window.addEventListener(
+      "beforeunload",
+      clearAccountCompanyProductForSupportTicketFilters
+    );
+    window.addEventListener(
+      "close",
+      clearAccountCompanyProductForSupportTicketFilters
+    );
+    return () =>
+      window.removeEventListener(
+        "beforeunload",
+        clearAccountCompanyProductForSupportTicketFilters
+      );
   }, []);
   return (
     <div className="w-full">
-      {userHasAccessToViewAccount ? (
+      {userHasAccessToViewSupportTicket ? (
         <>
           <div>
             <motion.section
@@ -169,21 +197,24 @@ function GetAccountCompanyProductFroSupportTicket({
               transition={{ duration: 0.4, ease: "easeOut" }}
             >
               <AccountCompanyProductForSupportTicketList
-                accountCompanyProductsForSupportTicket={accounts}
+                accountCompanyProductsForSupportTicket={accountsCompanyProductForSupportTicke}
                 handleSearchOption={{
                   handleSearchParameterChange,
                   handleDateRangeIdChange: handleDatePageIdChange,
                   dateRangeId,
+                  startDate,
+                  endDate,
                   searchParameter,
                 }}
                 onEndDateChange={handleEndDateChange}
                 onStartDateChange={handleStartDateChange}
                 paginationData={{
-                  selectedPageSize: handlePageSizeChange,
                   currentPage,
-                  handlePageChange,
-                  totalPages,
+                  currentPageData,
                   pageSize,
+                  onPageChange: handlePageChange,
+                  onPageSizeChange: handlePageSizeChange,
+                  
                 }}
                 handleRowSelect={handleRowSelect}
               />
@@ -205,4 +236,4 @@ function GetAccountCompanyProductFroSupportTicket({
   );
 }
 
-export default GetAccountCompanyProductFroSupportTicket;
+export default GetAccountCompanyProductForSupportTicket;

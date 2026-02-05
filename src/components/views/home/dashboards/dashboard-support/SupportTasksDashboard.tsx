@@ -23,6 +23,10 @@ import TaskStageChip from "../../../../ui/TaskStageChip";
 import SupportTicketTaskDashboardProps from "../../../../../@types/support-ticket-management/SupportTicketTaskDashboardProps";
 import { handleApiError } from "../../../../../config/error/handleApiError";
 import axiosClient from "../../../../../axios-client/AxiosClient";
+import { useUserAccessModules } from "../../../../../config/hooks/useAccessModules";
+import toast from "react-hot-toast";
+import MESSAGE from "../../../../../constants/Messages";
+import { supportTicketDataUrlSearchParamKey } from "../../../../lists/SupportTicketManagementList";
 
 // Helper function to get icon based on activity name
 const getActivityIcon = (activity: SupportTicketTaskDashboardProps) => {
@@ -61,7 +65,7 @@ const getActivityIcon = (activity: SupportTicketTaskDashboardProps) => {
 const getIconColorFromHex = (colorCode: string) => {
   const hex = colorCode.replace("#", "");
   const r = parseInt(hex.slice(0, 2), 16);
-  const g = parseInt(hex.slice(2, 2), 16);
+  const g = parseInt(hex.slice(2, 4), 16);
   const b = parseInt(hex.slice(4, 2), 16);
   return `rgba(${r}, ${g}, ${b}, 0.6)`;
 };
@@ -70,9 +74,9 @@ const getIconColorFromHex = (colorCode: string) => {
 const getPriorityColor = (taskType: number) => {
   switch (taskType) {
     case 1:
-      return `bg-green-200 text-green-800 border-green-200`;
+      return `bg-blue-100 text-blue-800 border-blue-200`;
     case 2:
-      return `bg-yellow-200 text-yellow-800 border-yellow-200`;
+      return `bg-orange-100 text-orange-800 border-orange-200`;
     case 3:
       return `bg-red-200 text-red-800 border-red-200`;
     default:
@@ -91,11 +95,15 @@ function SupportTasksDashboard({
   supportTasks: SupportTicketTaskDashboardProps[];
   taskType: "upcoming" | "pending" | "completed";
 }) {
+  const { userHasAccessToViewSupportTicket } = useUserAccessModules();
   const { loginStatus } = useLoggedInUserContext();
   const navigate = useNavigate();
   const [expandedDescriptions, setExpandedDescriptions] = useState<{
     [key: number]: boolean;
   }>({});
+
+  const [isLoadingForNavigate, setIsLoadingForNavigate] = useState<boolean>(false);
+
 
   const [ref, inView] = useInView({ fallbackInView: true, threshold: 0.1 });
 
@@ -109,71 +117,79 @@ function SupportTasksDashboard({
   const DESCRIPTION_TRUNCATE_LENGTH = 80;
 
   const getSupportTicketDetails = async (supportTicketId: number) => {
+    if(isLoadingForNavigate)return;
+    setIsLoadingForNavigate(true);
     if (companyUserId === null || companyUserId !== loginStatus.id) {
       // toast.error(MESSAGE.ERROR.YOU_ARE_NOT_ON_YOUR_DASHBOARD)
       // return ;
     }
-    const postDataToGetLead = {
-      company_id: loginStatus.companyId,
-      id: supportTicketId,
-      requestedby: loginStatus.id,
-    };
-    await axiosClient
-      .post(POST_API.GET_SUPPORT_TICKET, postDataToGetLead, {
-        withCredentials: true,
-      })
-      .then((response) => {
-        const supportTicketData = response.data.map((item: any) => {
-          const queryParams = qs.stringify({
-            supportTicketData: JSON.stringify({
-              count: item.count,
-              id: item.id,
-              ticketNumber: item.ticket_number,
-              companyId: item.company_id,
-              accountName: item.account_name,
-              accountEmail: item.account_email,
-              accountMobileNumber: item.account_mobilenumber,
-              companyProductId: item.company_product_id,
-              companyProductName: item.company_product_name,
-              accountCompanyProductId: item.account_company_product_id,
-              supportTicketCategoryId: item.support_ticket_category_id,
-              supportTicketCategoryName: item.support_ticket_category_name,
-              supportTicketEscalationLevelId:
-                item.support_ticket_escalation_level_id,
-              supportTicketEscalationLevelName:
-                item.support_ticket_escalation_level_name,
-              supportTicketLifecycleId: item.support_ticket_lifecycle_id,
-              supportTicketLifecycleName: item.support_ticket_lifecycle_name,
-              companyProductSlaId: item.company_product_sla_id,
-              companyProductSlaName: item.company_product_sla_name,
-              supportTicketSourceId: item.support_ticket_source_id,
-              supportTicketSourceName: item.support_ticket_source_name,
-              queryDescription: item.query_description,
-              publicNotes: item.public_notes,
-              resolutionApplied: item.resolution_applied,
-              assignedTo: item.assignedto,
-              assignedToName: item.assignedto_name,
-              resolvedBy: item.resolvedby,
-              resolvedByName: item.resolvedby_name,
-              dueDateTime: item.due_date_time,
-              completedAtDateTime: item.completed_at_date_time,
-              createdBy: item.createdby,
-              createdOn: item.createdon,
-              updatedBy: item.updatedby,
-              updatedOn: item.updatedon,
-            }),
+    if (userHasAccessToViewSupportTicket) {
+      const postDataToGetLead = {
+        company_id: loginStatus.companyId,
+        id: supportTicketId,
+        requestedby: loginStatus.id,
+      };
+      await axiosClient
+        .post(POST_API.GET_SUPPORT_TICKET, postDataToGetLead, {
+          withCredentials: true,
+        })
+        .then((response) => {
+          const supportTicketData = response.data.map((item: any) => {
+            const queryParams = qs.stringify({
+              [supportTicketDataUrlSearchParamKey]: JSON.stringify({
+                count: item.count,
+                id: item.id,
+                ticketNumber: item.ticket_number,
+                companyId: item.company_id,
+                accountName: item.account_name,
+                accountEmail: item.account_email,
+                accountMobileNumber: item.account_mobilenumber,
+                companyProductId: item.company_product_id,
+                companyProductName: item.company_product_name,
+                accountCompanyProductId: item.account_company_product_id,
+                supportTicketCategoryId: item.support_ticket_category_id,
+                supportTicketCategoryName: item.support_ticket_category_name,
+                supportTicketEscalationLevelId:
+                  item.support_ticket_escalation_level_id,
+                supportTicketEscalationLevelName:
+                  item.support_ticket_escalation_level_name,
+                supportTicketLifecycleId: item.support_ticket_lifecycle_id,
+                supportTicketLifecycleName: item.support_ticket_lifecycle_name,
+                companyProductSlaId: item.company_product_sla_id,
+                companyProductSlaName: item.company_product_sla_name,
+                supportTicketSourceId: item.support_ticket_source_id,
+                supportTicketSourceName: item.support_ticket_source_name,
+                queryDescription: item.query_description,
+                publicNotes: item.public_notes,
+                resolutionApplied: item.resolution_applied,
+                assignedTo: item.assignedto,
+                assignedToName: item.assignedto_name,
+                resolvedBy: item.resolvedby,
+                resolvedByName: item.resolvedby_name,
+                dueDateTime: item.due_date_time,
+                completedAtDateTime: item.completed_at_date_time,
+                createdBy: item.createdby,
+                createdOn: item.createdon,
+                updatedBy: item.updatedby,
+                updatedOn: item.updatedon,
+              }),
+            });
+            return queryParams;
           });
-          return queryParams;
+          navigate(ROUTES_URL.SUPPORT_TICKET_DETAILS + `?${supportTicketData}`);
+        })
+        .catch(async (error: any) => {
+          handleApiError(error);
+        }).finally(()=>{
+          setIsLoadingForNavigate(false)
         });
-        navigate(ROUTES_URL.SUPPORT_TICKET_DETAILS + `?${supportTicketData}`);
-      })
-      .catch(async (error: any) => {
-        handleApiError(error);
-      });
+    } else {
+      toast.error(MESSAGE.MODULE_ACCESS.SUPPORT_MODULE.DENIED_VIEW_ACCESS);
+    }
   };
 
   return (
-    <div className="bg-white p-8 h-full flex flex-col ">
+    <div className={`bg-white p-8 h-full flex flex-col ${isLoadingForNavigate ? "cursor-wait" : "cursor-default"}`}>
       <motion.section
         ref={ref}
         initial={{ opacity: 0, y: 40 }}
@@ -230,9 +246,12 @@ function SupportTasksDashboard({
                 return (
                   <div
                     key={task.id}
-                    className="flex items-start min-h-28 space-x-4 p-3 border-2 rounded-xl hover:shadow-lg transition-all duration-200 group"
+                    className={`flex items-start min-h-28 space-x-4 p-3 border-2 rounded-xl hover:shadow-lg transition-all duration-200 group ${isLoadingForNavigate ? "cursor-wait" : "cursor-pointer"}`}
                     style={{
                       animationDelay: `${index * 0.1}s`,
+                    }}
+                    onClick={()=>{
+                          getSupportTicketDetails(task.support_ticket_id);
                     }}
                   >
                     <div
@@ -252,11 +271,11 @@ function SupportTasksDashboard({
                         <div>
                           <h4
                             onClick={() => {
-                              getSupportTicketDetails(task.support_ticket_id);
+                              // getSupportTicketDetails(task.support_ticket_id);
                             }}
-                            className="table-header-custom cursor-pointer group-hover:text-blue-600 transition-colors"
+                            className={`table-header-custom  ${isLoadingForNavigate ? "cursor-wait" : "cursor-pointer"} group-hover:text-blue-600 transition-colors`}
                           >
-                            Ticket Id: {task.ticket_number}
+                            Ticket Number: {task.ticket_number}
                             {/* ({task.support_ticket_task_stage_name}) */}
                           </h4>
                           <p className="caption-custom mt-1">

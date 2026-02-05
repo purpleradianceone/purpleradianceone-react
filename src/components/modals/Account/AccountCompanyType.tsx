@@ -17,9 +17,10 @@ import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
 import MESSAGE from "../../../constants/Messages";
 import Button from "../../ui/Button";
 import axiosClient from "../../../axios-client/AxiosClient";
+import AccessDeniedMessagePage from "../../views/not-found/AccessDeniedMessagePage";
 
 const AccountCompanyType = ({ accountId }: { accountId: number }) => {
-  const { userHasAccessToUpdateAccount } = useUserAccessModules();
+  const { userHasAccessToAddAccountTypes , userHasAccessToUpdateAccountTypes , userHasAccessToViewAccountTypes} = useUserAccessModules();
   const { loginStatus } = useLoggedInUserContext();
 
   // States
@@ -118,39 +119,31 @@ const AccountCompanyType = ({ accountId }: { accountId: number }) => {
   };
 
   useEffect(() => {
-    getAccountCompanyAccountType();
-  }, []);
+    if(userHasAccessToViewAccountTypes){
+      getAccountCompanyAccountType();
+    }
+  }, [userHasAccessToViewAccountTypes]);
 
-  // if (isLoadingCompanyAccountType) {
-  //   return (
-  //     <div>
-  //       <h1>
-  //         <LoadingSpinner />
-  //       </h1>
-  //     </div>
-  //   );
-  // }
+  if(!userHasAccessToViewAccountTypes)return <AccessDeniedMessagePage message={MESSAGE.MODULE_ACCESS.ACCOUNT_TYPES.DENIED_VIEW_ACCESS}/>
 
   return (
-  <div className="bg-white border flex flex-col h-full  rounded-lg p-1 max-h-96 overflow-auto">
-
-     
+  <div className="bg-white  flex flex-col   rounded-lg p-1 max-h-96 overflow-auto">
       {/* Header */}
-    <div className="bg-gray-100 table-header-custom rounded-t-md px-2 ">
+    {/* <div className="bg-gray-100 table-header-custom rounded-t-md px-2 ">
       <span>Company Account Type</span>
-    </div>
+    </div> */}
       {isLoadingCompanyAccountType ? (
        <div className="h-20 flex items-center justify-center">
           <LoadingSpinner />
         </div>
       ) : accountCompanyAccountType.length === 0 &&
         !isLoadingCompanyAccountType ? (
-        <div className="flex items-center justify-center h-full  " >
+        <div className="flex items-center justify-center min-h-20  " >
         <span className="italic caption-custom flex gap-1 items-center ">
             <Button
-              disabled={!userHasAccessToUpdateAccount}
+              disabled={!userHasAccessToAddAccountTypes}
               onClick={() => {
-                if (userHasAccessToUpdateAccount) {
+                if (userHasAccessToAddAccountTypes) {
                   setShowCompanyAccountTypeForCreate(
                     !showCompanyAccountTypeForCreate
                   );
@@ -170,12 +163,12 @@ const AccountCompanyType = ({ accountId }: { accountId: number }) => {
           </span>
         </div>
       ) : (
-        <div className="grid md:grid-cols-2 gap-1 w-full">
-          <div className="col-span-2 flex justify-end p-0.5">
+        <div className="grid md:grid-cols-2 gap-1 w-full ">
+          <div className="col-span-2 flex justify-end">
             <Button
-              disabled={!userHasAccessToUpdateAccount}
+              disabled={!userHasAccessToAddAccountTypes}
               onClick={() => {
-                if (userHasAccessToUpdateAccount) {
+                if (userHasAccessToAddAccountTypes) {
                   setShowCompanyAccountTypeForCreate(
                     !showCompanyAccountTypeForCreate
                   );
@@ -193,7 +186,7 @@ const AccountCompanyType = ({ accountId }: { accountId: number }) => {
           {accountCompanyAccountType.map((item: AccountCompanyAccountType) => (
             <div
               key={item.id}
-              className="p-2 max-h-56 hover:white-text hover:shadow-md bg-white shadow-sm rounded-xl border border-gray-200 flex flex-col"
+              className="p-2 relative max-h-56 hover:white-text hover:shadow-md bg-white shadow-sm rounded-xl border border-gray-200 flex flex-col"
             >
               <div className="flex justify-between items-start">
                 <div className="flex flex-col">
@@ -214,16 +207,22 @@ const AccountCompanyType = ({ accountId }: { accountId: number }) => {
                     {item.accountTypeName}
                   </p>
                 </div>
+                <div className="absolute top-2 right-2">
                 {/* Toggle */}
                 <ToggleButton
                   checked={item.isActive}
                   name={item.id.toString()}
                   onToggle={(e) => {
                     e.preventDefault();
+                    if(!userHasAccessToUpdateAccountTypes) {
+                      toast.error(MESSAGE.MODULE_ACCESS.ACCOUNT_TYPES.DENIED_UPDATE_ACCESS)
+                      return;
+                    };
                     handleAccountCompanyAccountStatusChange(item);
                   }}
-                />
-              </div>
+                  />
+                  </div>
+                  </div>
             </div>
           ))}
         </div>

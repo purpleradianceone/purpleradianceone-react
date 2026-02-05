@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/exhaustive-deps */
 import {
   Calendar,
@@ -22,8 +21,6 @@ import FormLayout from "../../ui/FormLayout";
 import FormHeader from "../../ui/FormHeader";
 import axiosClient from "../../../axios-client/AxiosClient";
 import POST_API from "../../../constants/PostApi";
-import { STATUS_CODE } from "../../../constants/AppConstants";
-import RefreshToken from "../../../config/validations/RefreshToken";
 import MESSAGE from "../../../constants/Messages";
 import LoadingPopUpAnimation from "../../views/card/LoadingPopUpAnimation";
 import CustomDropdown from "../leads/CustomDropdown";
@@ -33,22 +30,24 @@ import TextAreaInput from "../../ui/TextAreaInput";
 import CompanyUserSearchFieldInput from "../../ui/CompanyUserSearchFieldInput";
 import CompanyUser from "../../../@types/company-users/CompanyUser";
 import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
+import { handleApiError } from "../../../config/error/handleApiError";
+import { supportTicketDataUrlSearchParamKey } from "../../lists/SupportTicketManagementList";
 
 function CreateSupportTicketTaskModal({
   isOpen,
   handleClose,
-  leadTaskStage,
-  handleLeadTaskCreate,
+  supportTicketTaskStage,
+  handleSupportTicketTaskCreate,
 }: {
   isOpen: boolean;
   handleClose: () => void;
-  leadTaskStage: SupportTicketTaskStage[];
-  handleLeadTaskCreate: () => void;
+  supportTicketTaskStage: SupportTicketTaskStage[];
+  handleSupportTicketTaskCreate: () => void;
 }) {
   const { loginStatus } = useLoggedInUserContext();
   const [searchParams] = useSearchParams();
   const [isSaving, setIsSaving] = useState(false);
-  const { userHasAccessToAddSupportTicket, userHasAccessToViewUser } =
+  const { userHasAccessToAddSupportTicketTask } =
     useUserAccessModules();
 
   const [description, setDescription] = useState<string>("");
@@ -65,13 +64,12 @@ function CreateSupportTicketTaskModal({
     return options;
   };
 
-
-
   const timeOptions = useMemo(() => generateTimeOptions(), []);
 
   const [dueDate, setDueDate] = useState<string>("");
   const [dueTime, setDueTime] = useState<string>(timeOptions[0]);
-  const [leadTaskStageId, setLeadTaskStageId] = useState<number>(0);
+  const [supportTicketTaskStageId, setSupportTicketTaskStageId] =
+    useState<number>(0);
   const [resultOutcome, setResultOutcome] = useState<string>("");
   const [supportTicketData, setSupportTicketData] =
     useState<SupportTicketProps>();
@@ -97,7 +95,7 @@ function CreateSupportTicketTaskModal({
     });
     setDueDate("");
     setDueTime(timeOptions[0]);
-    setLeadTaskStageId(0);
+    setSupportTicketTaskStageId(0);
     setAssignedTo({
       id: 0,
       company_id: 0,
@@ -120,12 +118,12 @@ function CreateSupportTicketTaskModal({
   function handleFormChange(): boolean {
     let flagVariable = false;
 
-    if (leadTaskStageId === 0) {
+    if (supportTicketTaskStageId === 0) {
       setErrors((prev) => ({
         ...prev,
-        supportTicketTaskStageError: "Please select Lead Task Stage",
+        supportTicketTaskStageError: "Please select Ticket Task Stage",
       }));
-      toast.error("Please Select Lead Task Stage");
+      toast.error("Please Select Ticket Task Stage");
       flagVariable = true;
     } else {
       setErrors((prev) => ({
@@ -173,12 +171,12 @@ function CreateSupportTicketTaskModal({
     const createSupportTicketTaskPostData = {
       company_id: loginStatus.companyId,
       support_ticket_id: supportTicketData!.id,
-      support_ticket_task_stage_id: leadTaskStageId,
+      support_ticket_task_stage_id: supportTicketTaskStageId,
       description: description,
       result_outcome: resultOutcome,
       assignedto:
         assignedTo.id === 0 ? supportTicketData?.assignedTo : assignedTo.id,
-      due_date_time: `${dueDate} ${dueTime || '00:00'}:00`,
+      due_date_time: `${dueDate} ${dueTime || "00:00"}:00`,
       createdby_id: loginStatus.id,
     };
     setIsSaving(true);
@@ -193,23 +191,14 @@ function CreateSupportTicketTaskModal({
       .then((response) => {
         if (response.data.status) {
           toast.success(response.data.message);
-          handleLeadTaskCreate();
+          handleSupportTicketTaskCreate();
           handleClose();
         } else {
           toast.error(response.data.message);
         }
       })
       .catch(async (error) => {
-        if (error.status === STATUS_CODE.UNATHORISED) {
-          const refreshTokenResponse = await RefreshToken({
-            callFunctionWithEvent: createSupportTicketTask,
-          });
-          if (refreshTokenResponse) {
-            createSupportTicketTask(event);
-          }
-        } else {
-          toast.error(MESSAGE.ERROR.SOMETHING_WENT_WRONG_TRY_AGAIN);
-        }
+        handleApiError(error);
       })
       .finally(() => {
         setIsSaving(false);
@@ -223,7 +212,7 @@ function CreateSupportTicketTaskModal({
   useEffect(() => {
     if (isOpen) {
       const supportTicketData = JSON.parse(
-        searchParams.get("supportTicketData") || "{}"
+        searchParams.get(supportTicketDataUrlSearchParamKey) || "{}"
       );
       setSupportTicketData(supportTicketData);
 
@@ -257,7 +246,11 @@ function CreateSupportTicketTaskModal({
       {isSaving && <LoadingPopUpAnimation show={isSaving} />}
 
       {/* Form Grid */}
-      <form className="space-y-2 mt-2">
+      <form
+        className={`space-y-2 mt-2 ${
+          isSaving ? "cursor-wait" : "cursor-default"
+        }`}
+      >
         <div className="grid grid-cols-2 gap-3">
           {/* Stage */}
           <div>
@@ -268,12 +261,12 @@ function CreateSupportTicketTaskModal({
               preselectedOption={1}
               onSelect={(e) => {
                 if (e) {
-                  setLeadTaskStageId(e);
+                  setSupportTicketTaskStageId(e);
                 } else {
-                  setLeadTaskStageId(0);
+                  setSupportTicketTaskStageId(0);
                 }
               }}
-              options={leadTaskStage}
+              options={supportTicketTaskStage}
             ></CustomDropdown>
             {errors.supportTicketTaskStageError !== "" && (
               <div className="caption-custom-inactive">
@@ -362,7 +355,6 @@ function CreateSupportTicketTaskModal({
                 logo={User}
                 label="Assign To:"
                 defaultValue={supportTicketData?.assignedToName}
-                // placeholder={leadData?.assignedToName}
                 onUserSelected={(user) => {
                   if (user && user?.id) {
                     //
@@ -381,10 +373,10 @@ function CreateSupportTicketTaskModal({
                       generate_password: "",
                     });
                   }
-                  console.log("selected user:")
-                  console.log(user)
+                  console.log("selected user:");
+                  console.log(user);
                 }}
-                isDisabled={!userHasAccessToViewUser}
+                // isDisabled={!userHasAccessToViewUser}
                 disabledMessage={
                   MESSAGE.MODULE_ACCESS.COMPANY_USER.DENIED_VIEW_ACCESS
                 }
@@ -417,7 +409,7 @@ function CreateSupportTicketTaskModal({
             {/* Save */}
             <Button
               type="submit"
-              disabled={isSaving || !userHasAccessToAddSupportTicket}
+              disabled={isSaving || !userHasAccessToAddSupportTicketTask}
               onClick={(event: React.FormEvent<HTMLButtonElement>) => {
                 if (isSaving) return;
                 createSupportTicketTask(event);

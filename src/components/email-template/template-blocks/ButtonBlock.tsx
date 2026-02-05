@@ -9,6 +9,8 @@ import Button from "../../ui/Button";
 import FormInput from "../../ui/FormInput";
 import { SIZE } from "../../../constants/AppConstants";
 
+const buttonTextStyle = "input-label-custom-white";
+
 interface ButtonBlockProps {
   text: string;
   href: string;
@@ -74,7 +76,7 @@ export const ButtonBlock: React.FC = () => {
         if (ref) connect(drag(ref));
       }}
       // onMouseEnter={() => setHovered(true)}
-     
+
       style={{
         position: "relative",
         width: "fit-content",
@@ -84,31 +86,36 @@ export const ButtonBlock: React.FC = () => {
         textAlign: props.align,
       }}
     >
-      {(hovered) && (
-        <div className="absolute w-full flex justify-between items-center -top-4 left-0 z-10"
-        onMouseLeave={() => setHovered(false)}
-      onMouseOver={() => setHovered(true)}
+      {hovered && (
+        <div
+          className="absolute w-full flex justify-between items-center -top-4 left-0 z-10"
+          onMouseLeave={() => setHovered(false)}
+          onMouseOver={() => setHovered(true)}
         >
           <div className="w-fit h-fit">
-            <Button type="submit" onClick={(e) => {
-              e.preventDefault();
-              setEditing(true);
-              }} title="Edit Button">
+            <Button
+              type="submit"
+              onClick={(e) => {
+                e.preventDefault();
+                setEditing(true);
+              }}
+              title="Edit Button"
+            >
               <div className="flex items-center justify-center gap-0.5">
                 <Edit size={SIZE.FOURTEEN} />
-                Edit
+                <span className={buttonTextStyle}>Edit</span>
               </div>
             </Button>
           </div>
           <div className="w-fit h-fit">
             <Button
-            type="button"
+              type="button"
               onClick={() => actions.delete(id)}
               // style={btnStyle("#ff5f5f", "right")}
             >
               <div className="flex items-center justify-center gap-1">
                 <Trash2 size={SIZE.FOURTEEN} />
-                Delete
+                <span className={buttonTextStyle}>Delete</span>
               </div>
             </Button>
           </div>
@@ -209,70 +216,71 @@ export const ButtonBlock: React.FC = () => {
           <div style={{ display: "flex", justifyContent: "space-between" }}>
             <div>
               <Button type="button" onClick={() => setEditing(false)}>
-                 <div className="flex items-center justify-center gap-0.5">
-                                      <X size={SIZE.SIXTEEN} />
-                                      Cancel
-                                    </div>
+                <div className="flex items-center justify-center gap-0.5">
+                  <X size={SIZE.SIXTEEN} />
+                  Cancel
+                </div>
               </Button>
             </div>
 
             <div>
-              <Button type="submit" onClick={(e) => {
-                e.preventDefault();
-                handleSave();
-              }}>
-               <div className="flex items-center justify-center gap-1">
-                                     <Save size={SIZE.SIXTEEN} />
-                                     Save
-                                   </div>
+              <Button
+                type="submit"
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleSave();
+                }}
+              >
+                <div className="flex items-center justify-center gap-1">
+                  <Save size={SIZE.SIXTEEN} />
+                  Save
+                </div>
               </Button>
             </div>
           </div>
         </div>
       )}
       <div
-       onMouseLeave={() => setHovered(false)}
-      onMouseOver={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+        onMouseOver={() => setHovered(true)}
       >
         <ResizableBox
-      
-        width={200}
-        height={50}
-        minConstraints={[100, 40]}
-        maxConstraints={[400, 100]}
-        resizeHandles={["e", "s", "se"]}
-      >
-        <a
-          href={props.href}
-          style={{
-            display: "inline-block",
-            padding: "10px 20px",
-            backgroundColor: props.bgColor,
-            color: props.textColor,
-            fontFamily: props.fontFamily,
-            fontSize: props.fontSize,
-            fontWeight: props.fontWeight,
-            textDecoration: "none",
-            borderRadius: "4px",
-            width: "100%",
-            height: "100%",
-            lineHeight: "30px",
-            textAlign: "center",
-            overflow: "hidden",
-            whiteSpace: "nowrap",
-            textOverflow: "ellipsis",
-          }}
-          target="_blank"
-          rel="noreferrer"
+          width={200}
+          height={50}
+          minConstraints={[100, 40]}
+          maxConstraints={[400, 100]}
+          resizeHandles={["e", "s", "se"]}
         >
-          {props.icon && (
-            <i className={props.icon} style={{ marginRight: "6px" }}></i>
-          )}
-          {props.text}
-        </a>
-      </ResizableBox>
+          <a
+            href={props.href}
+            style={{
+              display: "inline-block",
+              padding: "10px 20px",
+              backgroundColor: props.bgColor,
+              color: props.textColor,
+              fontFamily: props.fontFamily,
+              fontSize: props.fontSize,
+              fontWeight: props.fontWeight,
+              textDecoration: "none",
+              borderRadius: "4px",
+              width: "100%",
+              height: "100%",
+              lineHeight: "30px",
+              textAlign: "center",
+              overflow: "hidden",
+              whiteSpace: "nowrap",
+              textOverflow: "ellipsis",
+            }}
+            target="_blank"
+            rel="noreferrer"
+          >
+            {props.icon && (
+              <i className={props.icon} style={{ marginRight: "6px" }}></i>
+            )}
+            {props.text}
+          </a>
+        </ResizableBox>
       </div>
-      
     </div>
   );
 };

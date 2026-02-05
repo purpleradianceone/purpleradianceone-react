@@ -10,6 +10,7 @@ const FormHeader =({
     postText,
     description,
     isModal = true,
+    wantBorderBottom = true
 }:{
     onClose : ()=>void;
     userName? : string;
@@ -18,9 +19,11 @@ const FormHeader =({
     postText?: string,
     description? : string,
     isModal? : boolean,
+    wantBorderBottom? : boolean
+
 })=>{
     return (
-  <div className={`flex ${isModal ? 'justify-between' : 'justify-center'} items-center  border-b pb-1`}>
+  <div className={`flex ${isModal ? 'justify-between' : 'justify-start'} items-center ${wantBorderBottom ? "border-b" :""}  pb-1`}>
     {/* Left side */}
     <div className="flex items-center gap-3">
       <Icon className={COLORS.FORM_HEADER_ICONS_COLOR} size={SIZE.TWENTY} />
@@ -41,7 +44,7 @@ const FormHeader =({
     {isModal && (
       <button
       onClick={onClose}
-      className=" right-4 top-4 input-label-custom"
+      className=" right-4 top-4 input-label-custom rounded-xl p-0.5 hover:bg-gray-100"
     >
       <X size={SIZE.TWENTY} />
     </button>

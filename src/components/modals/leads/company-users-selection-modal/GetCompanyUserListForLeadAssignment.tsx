@@ -9,17 +9,16 @@ import DateRangeFilterDropdown from "../../../ui/DateRangeFilterDropdown";
 import DateRangePicker from "../../../ui/DateRangePicker";
 import Button from "../../../ui/Button";
 
-import Pagination from "../../../ag-grid/Pagination";
 import { SIZE } from "../../../../constants/AppConstants";
 import CompanyUserAgGridForLead from "./CompanyUserAgGridForLead";
 import CompanyUsersSearchProps from "../../../../@types/company-users/CompanyUserProps";
-import PaginationDataProps from "../../../../@types/ag-grid/PaginationDataProps";
 import HandleSearchOptionProps from "../../../../@types/company-users/HandleSearchOptionProps";
 import CompanyUser from "../../../../@types/company-users/CompanyUser";
+import PaginationWithoutCount, { PaginationDataWithoutCountProps } from "../../../ag-grid/PaginationWithoutCount";
 
 type GetCompanyUsersListForLeadProps = {
   users: CompanyUsersSearchProps[];
-  paginationData: PaginationDataProps;
+  paginationData: PaginationDataWithoutCountProps;
   handleSearchOption: HandleSearchOptionProps;
   onStartDateChange: (date: Date) => void;
   onEndDateChange: (date: Date) => void;
@@ -57,7 +56,7 @@ function GetCompanyUserListForLeadAssignment({
   const { userHasAccessToViewUser } = useUserAccessModules();
 
   return (
-    userHasAccessToViewUser && (
+    (userHasAccessToViewUser || !isUsedForSettings) && (
       <div className="w-full">
         <div className=" z-10  mt-1  mb-2 flex items-center justify-between p-0.5  bg-gray-50 rounded-lg shadow-sm   w-full">
           {isLargeScreen && (
@@ -68,25 +67,27 @@ function GetCompanyUserListForLeadAssignment({
                   <SearchInput
                     onChange={(e) => {
                       handleSearchOption.handleSearchParameterChange(
-                        e.target.value
+                        e.target.value,
                       );
                     }}
                   ></SearchInput>
                 </div>
 
                 {/* Date FIlters Dropdown */}
-                <div className="flex mx-3">
-                  <div className="flex">
-                    <div className="flex items-center size-4 justify-center mt-2 mr-2 gap-2 text-gray-900">
-                      <Calendar className="mt-2" />
-                    </div>
+                {isUsedForSettings && (
+                  <div className="flex mx-3">
+                    <div className="flex">
+                      <div className="flex items-center size-4 justify-center mt-2 mr-2 gap-2 text-gray-900">
+                        <Calendar className="mt-2" />
+                      </div>
 
-                    <DateRangeFilterDropdown
-                      dropdownOptions={dateRangeDropdownOptions}
-                      handleDateIdChange={handleDateRangeIdChange}
-                    ></DateRangeFilterDropdown>
+                      <DateRangeFilterDropdown
+                        dropdownOptions={dateRangeDropdownOptions}
+                        handleDateIdChange={handleDateRangeIdChange}
+                      ></DateRangeFilterDropdown>
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
 
               {/* Custom Date Picker Div Flex Box*/}
@@ -111,7 +112,7 @@ function GetCompanyUserListForLeadAssignment({
                 <SearchInput
                   onChange={(e) => {
                     handleSearchOption.handleSearchParameterChange(
-                      e.target.value
+                      e.target.value,
                     );
                   }}
                 ></SearchInput>
@@ -165,7 +166,7 @@ function GetCompanyUserListForLeadAssignment({
                 <SearchInput
                   onChange={(e) => {
                     handleSearchOption.handleSearchParameterChange(
-                      e.target.value
+                      e.target.value,
                     );
                   }}
                 ></SearchInput>
@@ -185,7 +186,7 @@ function GetCompanyUserListForLeadAssignment({
                     <button
                       onClick={() => {
                         setIsFiltersOpenInMobileView(
-                          !isFiltersOpenInMobileView
+                          !isFiltersOpenInMobileView,
                         );
                       }}
                       className="absolute right-4 top-4 text-gray-400 hover:text-gray-600"
@@ -228,7 +229,7 @@ function GetCompanyUserListForLeadAssignment({
                           <Button
                             onClick={() => {
                               setIsFiltersOpenInMobileView(
-                                !isFiltersOpenInMobileView
+                                !isFiltersOpenInMobileView,
                               );
                             }}
                           >
@@ -262,12 +263,12 @@ function GetCompanyUserListForLeadAssignment({
         </div>
 
         <div className="flex items-center justify-end ">
-          <Pagination
-            totalPages={paginationData.totalPages}
-            currentPage={paginationData.currentPage}
+          <PaginationWithoutCount
             pageSize={paginationData.pageSize}
-            onPageChange={paginationData.handlePageChange}
-            onPageSizeChange={paginationData.selectedPageSize}
+            currentPage={paginationData.currentPage}
+            currentPageData={paginationData.currentPageData}
+            onPageChange={paginationData.onPageChange}
+            onPageSizeChange={paginationData.onPageSizeChange}
           />
         </div>
       </div>

@@ -17,6 +17,7 @@ import Button from "../../../ui/Button";
 import COLORS from "../../../../constants/Colors";
 import axiosClient from "../../../../axios-client/AxiosClient";
 import { handleApiError } from "../../../../config/error/handleApiError";
+import AccessDeniedMessagePage from "../../../views/not-found/AccessDeniedMessagePage";
 
 const AccountCompanyProduct = (
   { 
@@ -25,7 +26,7 @@ const AccountCompanyProduct = (
    }: AccountCompanyProductType) => {
   const navigate = useNavigate();
   const { loginStatus } = useLoggedInUserContext();
-  const { userHasAccessToUpdateAccount } = useUserAccessModules();
+  const { userHasAccessToAddAccountProducts, userHasAccessToViewAccountProducts } = useUserAccessModules();
   const [isLoadingAccountCompanyProduct, setIsLoadingAccountCompanyProduct] =
     useState<boolean>(true);
   const [showCreateAccountCompanyProduct, setShowCreateAccountCompanyProduct] =
@@ -48,6 +49,8 @@ const AccountCompanyProduct = (
     
   // };
   const handleRowSelectAccountProduct = (data: AccountProduct) => {
+    if(!userHasAccessToViewAccountProducts) return ;
+
   navigate(
     // `products/${data.id}`,
       `${ROUTES_URL.ACCOUNT_DETAILS}/${accountId}/products/${data.id}`,
@@ -55,7 +58,7 @@ const AccountCompanyProduct = (
     {
       state: {
         productName: data.companyProductName,
-        accountName : data.accountName
+        // accountName : data.accountName
       },
     }
   );
@@ -63,6 +66,7 @@ const AccountCompanyProduct = (
 
 
   function handleRowClick(event :any){
+        if(!userHasAccessToViewAccountProducts) return ;
     const data = event.data;
     navigate(
     // `products/${data.id}`,
@@ -71,7 +75,7 @@ const AccountCompanyProduct = (
     {
       state: {
         productName: data.companyProductName,
-        accountName : data.accountName
+        // accountName : data.accountName
       },
     }
   );
@@ -206,8 +210,10 @@ const AccountCompanyProduct = (
 
 
   useEffect(() => {
-    getAccountCompanyProduct();
-  }, []);
+    if(userHasAccessToViewAccountProducts){
+      getAccountCompanyProduct();
+    }
+  }, [userHasAccessToViewAccountProducts]);
 
   if(hasError){
     return(
@@ -217,6 +223,8 @@ const AccountCompanyProduct = (
       </ div>
     )
   }
+
+  if(!userHasAccessToViewAccountProducts) return <AccessDeniedMessagePage message={MESSAGE.MODULE_ACCESS.ACCOUNT_COMPANY_PRODUCT.DENIED_VIEW_ACCESS}/>
   return (
     <div className="h-full w-full min-h-14">
       {/* Main Content */}
@@ -239,22 +247,22 @@ const AccountCompanyProduct = (
           //     assignProducts: true,
           //   }}
               onClick={(e) => {
-                if (!userHasAccessToUpdateAccount) {
+                if (!userHasAccessToAddAccountProducts) {
                   e.preventDefault();
                   toast.error(
-                    MESSAGE.MODULE_ACCESS.ACCOUNT_ACCESS.DENIED_UPDATE_ACCESS
+                    MESSAGE.MODULE_ACCESS.ACCOUNT_COMPANY_PRODUCT.DENIED_ADD_ACCESS
                   );
                 }
               }}
               className={
-                !userHasAccessToUpdateAccount
-                  ? "pointer-events-none opacity-85"
-                  : ""
+                !userHasAccessToAddAccountProducts
+                  ? "cursor-not-allowed opacity-85"
+                  : "cursor-pointer"
               }
             >
               {" "}
               <Button
-                disabled={!userHasAccessToUpdateAccount}
+                disabled={!userHasAccessToAddAccountProducts}
                 // onClick={() => {
                 //   if (userHasAccessToUpdateAccount) {
                 //     setShowCreateAccountCompanyProduct(
@@ -285,27 +293,25 @@ const AccountCompanyProduct = (
             }}
               // to={`${ROUTES_URL.ACCOUNT_MULTIPLE_COMPANY_PRODUCT}/${accountId}`}
               onClick={(e) => {
-                if (!userHasAccessToUpdateAccount) {
+                if (!userHasAccessToAddAccountProducts) {
                   e.preventDefault();
                   toast.error(
-                    MESSAGE.MODULE_ACCESS.ACCOUNT_ACCESS.DENIED_UPDATE_ACCESS
+                    MESSAGE.MODULE_ACCESS.ACCOUNT_COMPANY_PRODUCT.DENIED_ADD_ACCESS
                   );
                 }
               }}
               className={
-                !userHasAccessToUpdateAccount
-                  ? "pointer-events-none opacity-85"
-                  : ""
+                !userHasAccessToAddAccountProducts
+                  ? "cursor-not-allowed opacity-55"
+                  : "cursor-pointer"
               }
             >
               <Button
-                disabled={!userHasAccessToUpdateAccount}
+                disabled={!userHasAccessToAddAccountProducts}
                 // onClick={() => {
-                //   if (userHasAccessToUpdateAccount) {
-                //     setShowCreateAccountCompanyProduct(
-                //       !showCreateAccountCompanyProduct
-                //     );
-                //   } else {
+                //   if (userHasAccessToUpdateAccountProducts) {
+                    
+                  
                 //     toast.error(
                 //       MESSAGE.MODULE_ACCESS.ACCOUNT_ACCESS.DENIED_UPDATE_ACCESS
                 //     );

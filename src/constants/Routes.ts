@@ -27,9 +27,9 @@ const ROUTES_URL = {
     LEAD_DETAILS : "/home/manage-leads/leads/lead/view",
     SCHEDULE_MEETING : "/meetings/schedule",
     //for email template
-    EMAIL_TEMPLATE : "/email-template",
-    EMAIL_TEMPLATE_CREATE : "/email-template/create",
-    EMAIL_TEMPLATE_UPDATE : "/email-template/update",
+    EMAIL_TEMPLATE : "/settings/email-template",
+    EMAIL_TEMPLATE_CREATE : "/settings/email-template/create",
+    EMAIL_TEMPLATE_UPDATE : "/settings/email-template/update",
 
     //for meetings
     GOOGLE_OAUTH : "/authenticate/google",
@@ -60,6 +60,7 @@ const ROUTES_URL = {
 
     FACEBOOK_OAUTH : "/authenticate/facebook",
     INTEGRATIONS_SETTINGS : "/settings/integrations",
+    QUOTATION_SETTINGS : "/settings/quotations",
 
     // Account module
     ACCOUNT_MANAGEMENT : "/home/manage-accounts/accounts",
@@ -67,8 +68,6 @@ const ROUTES_URL = {
     ACCOUNT_IMPORT_CSV : "/home/manage-accounts/accounts/import",
     ACCOUNT_COMPANY_PRODUCT_DETAILS: '/home/manage-accounts/accounts/acc-com-prod-details',
     ACCOUNT_COMPANY_PRODUCT_AMC_DETAILS: '/home/manage-accounts/accounts/prod-details-amc/:accountCompanyProductId',
-    // ACCOUNT_MULTIPLE_COMPANY_PRODUCT : "/home/manage-accounts/accounts/create",
-
     ACCOUNT_MULTIPLE_COMPANY_PRODUCT : "assign-products",
 
     // Stock
@@ -78,6 +77,22 @@ const ROUTES_URL = {
     //Support Tickets
     SUPPORT_TICKET_MANAGEMENT : "/home/manage-support-ticket/support-tickets",
     SUPPORT_TICKET_DETAILS : "/home/manage-support-ticket/support-tickets/support-ticket/details",
+
+    // setting
+    SETTING_EMAIL : "email",
+    SETTING_MEETINGS : "meetings",
+    SETTING_ACCOUNT_TYPE : "account-type",
+    SETTING_NOTIFICATIONS : "notification",
+    SETTING_GENERAL : "general",
+    SETTING_SUPPORT_TICKET_CATEGORY : "support-ticket-category",
+    SETTING_COMPANY_WAREHOUSE : "company-warehouse",
+
+
+    // setting-integration
+    SETTING_META_APP: "meta-app",
+    SETTING_INDIAMART :"indiamart",
+    SETTING_LINKEDIN : "linkedin",
+    SETTING_GOOGLE_ADS : "google-ads"
 
 }
 export default ROUTES_URL;

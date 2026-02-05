@@ -79,9 +79,11 @@ export default function EmailSettingsTabs() {
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const {
-    userHasAccessToAddEmailSetting,
-    userHasAccessToUpdateEmailSetting,
-    userHasAccessToViewEmailSetting,
+    userHasAccessToAddSettingPersonalEmail,
+    userHasAccessToViewSettingPersonalEmail,
+    userHasAccessToUpdateSettingPersonalEmail,
+    userHasAccessToAddEmailSettingCompany,
+    userHasAccessToUpdateEmailSettingCompany,
     userHasAccessToViewEmailSettingCompany,
     userHasAccessToViewEmailTypeSetting,
   } = useUserAccessModules();
@@ -175,13 +177,21 @@ export default function EmailSettingsTabs() {
   };
 
   useEffect(() => {
-    if (activeTab === "company") {
-      getEmailSettingsCompany();
+    if (userHasAccessToViewEmailSettingCompany) {
+      if (activeTab === "company") {
+        getEmailSettingsCompany();
+      }
     }
-    if (activeTab === "user") {
-      getEmailSettingsUser();
+    if (userHasAccessToViewSettingPersonalEmail) {
+      if (activeTab === "user") {
+        getEmailSettingsUser();
+      }
     }
-  }, [activeTab]);
+  }, [
+    activeTab,
+    userHasAccessToViewEmailSettingCompany,
+    userHasAccessToViewSettingPersonalEmail,
+  ]);
 
   const onEmailSettingToggle = async (
     event: React.ChangeEvent<HTMLInputElement>,
@@ -190,7 +200,7 @@ export default function EmailSettingsTabs() {
   ) => {
     const { checked } = event.target;
 
-    if (userHasAccessToUpdateEmailSetting) {
+    if (userHasAccessToAddSettingPersonalEmail) {
       const updateEmailSettingPostData = {
         company_id: loginStatus.companyId,
         id: setting.id,
@@ -268,15 +278,18 @@ export default function EmailSettingsTabs() {
           <div className="absolute right-3">
             <Button
               type="submit"
-              disabled={!userHasAccessToUpdateEmailSetting}
+              disabled={!userHasAccessToUpdateEmailSettingCompany}
               onClick={(e) => {
                 e.preventDefault();
-                if (userHasAccessToUpdateEmailSetting) {
+                if (userHasAccessToUpdateEmailSettingCompany) {
                   setModalType("company");
                   setEditData(setting);
                   setIsModalOpen(true);
                 } else {
-                  toast.error(MESSAGE.ERROR.NOT_ATHORISED);
+                  toast.error(
+                    MESSAGE.MODULE_ACCESS.SETTING.COMPANY_EMAIL_SETTING
+                      .DENIED_UPDATE_ACCESS
+                  );
                 }
               }}
             >
@@ -409,7 +422,7 @@ export default function EmailSettingsTabs() {
     index: number
   ) => (
     <>
-      {userHasAccessToViewEmailSetting ? (
+      {userHasAccessToViewSettingPersonalEmail ? (
         <>
           <div className="flex justify-between">
             <div
@@ -419,15 +432,18 @@ export default function EmailSettingsTabs() {
               <div className="absolute w-fit right-3">
                 <Button
                   type="submit"
-                  disabled={!userHasAccessToUpdateEmailSetting}
+                  disabled={!userHasAccessToUpdateSettingPersonalEmail}
                   onClick={(e) => {
                     e.preventDefault();
-                    if (userHasAccessToUpdateEmailSetting) {
+                    if (userHasAccessToUpdateSettingPersonalEmail) {
                       setModalType("user");
                       setEditData(setting);
                       setIsModalOpen(true);
                     } else {
-                      toast.error(MESSAGE.ERROR.NOT_ATHORISED);
+                      toast.error(
+                        MESSAGE.MODULE_ACCESS.SETTING.PERSONAL_EMAIL_SETTING
+                          .DENIED_UPDATE_ACCESS
+                      );
                     }
                   }}
                 >
@@ -619,15 +635,18 @@ export default function EmailSettingsTabs() {
                       <div>
                         <Button
                           type="submit"
-                          disabled={!userHasAccessToAddEmailSetting}
+                          disabled={!userHasAccessToAddEmailSettingCompany}
                           onClick={(e) => {
                             e.preventDefault();
-                            if (userHasAccessToAddEmailSetting) {
+                            if (userHasAccessToAddEmailSettingCompany) {
                               setModalType("company");
                               setEditData(null);
                               setIsModalOpen(true);
                             } else {
-                              toast.error(MESSAGE.ERROR.NOT_ATHORISED);
+                              toast.error(
+                                MESSAGE.MODULE_ACCESS.SETTING
+                                  .COMPANY_EMAIL_SETTING.DENIED_ADD_ACCESS
+                              );
                             }
                           }}
                         >
@@ -642,12 +661,17 @@ export default function EmailSettingsTabs() {
                 </div>
               )
             ) : (
-              <AccessDeniedMessagePage></AccessDeniedMessagePage>
+              <AccessDeniedMessagePage
+                message={
+                  MESSAGE.MODULE_ACCESS.SETTING.COMPANY_EMAIL_SETTING
+                    .DENIED_VIEW_ACCESS
+                }
+              ></AccessDeniedMessagePage>
             )}
           </div>
         ) : activeTab === "user" ? (
           <div className="w-full">
-            {userHasAccessToViewEmailSetting ? (
+            {userHasAccessToViewSettingPersonalEmail ? (
               isLoading ? (
                 <div className="flex justify-center items-center h-[40vh]">
                   <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-600"></div>
@@ -659,20 +683,25 @@ export default function EmailSettingsTabs() {
                   ) : (
                     <div className="flex col-span-2 w-full justify-items-center justify-between text-gray-500 p-4  rounded-md bg-white shadow-sm">
                       <div>
-                        <span>No Email Settings For User </span>
+                        <span className="caption-custom">
+                          No Email Settings For User{" "}
+                        </span>
                       </div>
                       <div>
                         <Button
                           type="submit"
-                          disabled={!userHasAccessToAddEmailSetting}
+                          disabled={!userHasAccessToAddSettingPersonalEmail}
                           onClick={(e) => {
                             e.preventDefault();
-                            if (userHasAccessToAddEmailSetting) {
+                            if (userHasAccessToAddSettingPersonalEmail) {
                               setModalType("user");
                               setEditData(null);
                               setIsModalOpen(true);
                             } else {
-                              toast.error(MESSAGE.ERROR.NOT_ATHORISED);
+                              toast.error(
+                                MESSAGE.MODULE_ACCESS.SETTING
+                                  .PERSONAL_EMAIL_SETTING.DENIED_ADD_ACCESS
+                              );
                             }
                           }}
                         >
@@ -687,7 +716,12 @@ export default function EmailSettingsTabs() {
                 </div>
               )
             ) : (
-              <AccessDeniedMessagePage></AccessDeniedMessagePage>
+              <AccessDeniedMessagePage
+                message={
+                  MESSAGE.MODULE_ACCESS.SETTING.PERSONAL_EMAIL_SETTING
+                    .DENIED_VIEW_ACCESS
+                }
+              ></AccessDeniedMessagePage>
             )}
           </div>
         ) : (
@@ -695,7 +729,11 @@ export default function EmailSettingsTabs() {
             {userHasAccessToViewEmailTypeSetting ? (
               <EmailTypeSettings></EmailTypeSettings>
             ) : (
-              <AccessDeniedMessagePage></AccessDeniedMessagePage>
+              <AccessDeniedMessagePage
+                message={
+                  MESSAGE.MODULE_ACCESS.SETTING.EMAIL_TYPE_SETTING.DENIED_VIEW_ACCESS
+                }
+              ></AccessDeniedMessagePage>
             )}
           </div>
         )}

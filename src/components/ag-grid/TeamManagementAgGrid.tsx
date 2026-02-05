@@ -3,7 +3,7 @@
 import { AllCommunityModule, ColDef, themeBalham } from "ag-grid-community";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { INNERHTML, JSX_CHILDREN_NAME } from "../../constants/AppConstants";
-import { Edit, } from "lucide-react";
+import {  ReceiptText, } from "lucide-react";
 import { AgGridReact } from "ag-grid-react";
 import { createPortal } from "react-dom";
 import { useUserAccessModules } from "../../config/hooks/useAccessModules";
@@ -22,7 +22,7 @@ function TeamManagementAgGrid({
   handleViewPortChanged,
   onGridReady,
 }: TeamManagementAgGridProps) {
-  const { userHasAccessToUpdateTeamManagement } = useUserAccessModules();
+  const {   userHasAccessToViewTeamManagement } = useUserAccessModules();
 
   const columnDefs = useMemo<ColDef[]>(
     () => [
@@ -154,22 +154,22 @@ function TeamManagementAgGrid({
                       className="absolute bg-white  border rounded-md shadow-lg w-24 ml-2 z-50"
                       style={{ top: position.top, left: position.left }}
                     >
-                      {userHasAccessToUpdateTeamManagement && (
+                      {userHasAccessToViewTeamManagement && (
                         <ActionsDropdownButton
                           onClick={() => {
                             setIsActionsDropDownOpen(false);
                             isUpdateCompanyTeamModalOpen!(params.data);
                           }}
                         >
-                          <Edit className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR} />{" "}
-                          Edit
+                          <ReceiptText className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR} />
+                          Details
                         </ActionsDropdownButton>
                       )}
 
-                      {!userHasAccessToUpdateTeamManagement && (
+                      {!userHasAccessToViewTeamManagement && (
                         <ActionsDropdownButton disabled>
-                          <Edit className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR} />{" "}
-                          Edit
+                          <ReceiptText className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR} />
+                          Details
                         </ActionsDropdownButton>
                       )}
                     </div>,

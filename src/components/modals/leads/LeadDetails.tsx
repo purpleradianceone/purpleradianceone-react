@@ -7,7 +7,6 @@ import State from "../../../@types/general/State";
 import District from "../../../@types/general/District";
 import industryType from "../../../@types/general/industryType";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
-import axios from "axios";
 import POST_API from "../../../constants/PostApi";
 import {
   MOBILE_NUMBER_VALIDATION,
@@ -21,6 +20,9 @@ import toast from "react-hot-toast";
 import COLORS from "../../../constants/Colors";
 import {  Pen, Save } from "lucide-react";
 import { useUserPreference } from "../../../context/user/UserPreference";
+import axiosClient from "../../../axios-client/AxiosClient";
+import AccessDeniedMessagePage from "../../views/not-found/AccessDeniedMessagePage";
+import MESSAGE from "../../../constants/Messages";
 
 const LeadDetails = ({
   leadDetailsData,
@@ -40,7 +42,7 @@ const LeadDetails = ({
     editLeadDetailsData: LeadDetailsData
   ) => void;
 }) => {
-  const { userHasAccessToUpdateLead } = useUserAccessModules();
+  const {    userHasAccessToUpdateLeadDetails, userHasAccessToViewLeadDetails} = useUserAccessModules();
 
   const [editLeadDetails, setEditLeadDetails] = useState<LeadDetailsData>({
     additional_contact_number: "",
@@ -141,7 +143,7 @@ const LeadDetails = ({
       ? POST_API.CREATE_LEAD_DETAILS
       : POST_API.UPDATE_LEAD_DETAILS;
     try {
-      const response = await axios.post(url, PostDataCreateLead, {
+      const response = await axiosClient.post(url, PostDataCreateLead, {
         withCredentials: true,
         headers: {
           "Content-Type": "application/json",
@@ -185,7 +187,7 @@ const LeadDetails = ({
       isactive: true,
     };
     try {
-      const response = await axios.post(POST_API.GET_INDUSTRY_TYPE, postData, {
+      const response = await axiosClient.post(POST_API.GET_INDUSTRY_TYPE, postData, {
         withCredentials: true,
       });
 
@@ -219,7 +221,7 @@ const LeadDetails = ({
     };
 
     try {
-      const response = await axios.post(POST_API.GET_COUNTRY, PostData, {
+      const response = await axiosClient.post(POST_API.GET_COUNTRY, PostData, {
         withCredentials: true,
       });
       if (response.status == STATUS_CODE.OK) {
@@ -248,7 +250,7 @@ const LeadDetails = ({
       isactive: true,
     };
     try {
-      const response = await axios.post(POST_API.GET_STATE, PostDataForState, {
+      const response = await axiosClient.post(POST_API.GET_STATE, PostDataForState, {
         withCredentials: true,
         headers: {
           "Content-Type": "application/json",
@@ -283,7 +285,7 @@ const LeadDetails = ({
     };
 
     try {
-      const response = await axios.post(
+      const response = await axiosClient.post(
         POST_API.GET_DISTRICT,
         PostDataForDistrict,
         {
@@ -374,11 +376,17 @@ const LeadDetails = ({
   //   }
   // }, [userPreference, editLeadDetails]);
 
+  if(!userHasAccessToViewLeadDetails) return <>
+  <HeaderInfo/>
+  <AccessDeniedMessagePage/>
+  </>
+
   return (
     <div>
       <form>
-        <div className="w-auto flex justify-between  bg-slate-200 px-1 mb-1  ">
-          <span className="table-header-custom">Details</span>
+        {/* <div className="w-auto flex justify-between  bg-slate-200 px-1 mb-1  "> */}
+          {/* <span className="table-header-custom">Details</span> */}
+          <HeaderInfo/>
           {showSaveLeadButton && (
             <button type="submit" className={COLORS.ADD_BUTTON} onClick={handleSave}>
               <div className="flex items-center gap-0.5">
@@ -387,11 +395,11 @@ const LeadDetails = ({
               </div>
             </button>
           )}
-        </div>
+        {/* </div> */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-2">
           <FormField
             maxLength={30}
-            userHasAccessToUpdate={userHasAccessToUpdateLead}
+            userHasAccessToUpdate={userHasAccessToUpdateLeadDetails}
             type="text"
             label="Job title"
             value={editLeadDetails.job_title}
@@ -405,7 +413,7 @@ const LeadDetails = ({
             }}
           />
           <FormField
-            userHasAccessToUpdate={userHasAccessToUpdateLead}
+            userHasAccessToUpdate={userHasAccessToUpdateLeadDetails}
             type="textarea"
             label="Address"
             value={editLeadDetails.address}
@@ -419,7 +427,7 @@ const LeadDetails = ({
             }}
           />
           <FormField
-            userHasAccessToUpdate={userHasAccessToUpdateLead}
+            userHasAccessToUpdate={userHasAccessToUpdateLeadDetails}
             type="select"
             label="Industry"
             handleGetDropdownData={() => {
@@ -442,7 +450,7 @@ const LeadDetails = ({
 
           <FormField
             maxLength={10}
-            userHasAccessToUpdate={userHasAccessToUpdateLead}
+            userHasAccessToUpdate={userHasAccessToUpdateLeadDetails}
             type="text"
             label="Add. Contact Number"
             value={editLeadDetails.additional_contact_number}
@@ -456,7 +464,7 @@ const LeadDetails = ({
           />
 
           <FormField
-            userHasAccessToUpdate={userHasAccessToUpdateLead}
+            userHasAccessToUpdate={userHasAccessToUpdateLeadDetails}
             type="select"
             label="Country"
             handleGetDropdownData={() => {
@@ -503,7 +511,7 @@ const LeadDetails = ({
           />
           {/* <p className="text-xs">Selected State: {stateOptions.find(opt => opt.value === leadDetailsData.state_id)?.label || 'None'}</p> */}
           <FormField
-            userHasAccessToUpdate={userHasAccessToUpdateLead}
+            userHasAccessToUpdate={userHasAccessToUpdateLeadDetails}
             type="text"
             maxLength={70}
             label="Industry Name"
@@ -517,7 +525,7 @@ const LeadDetails = ({
             }}
           />
           <FormField
-            userHasAccessToUpdate={userHasAccessToUpdateLead}
+            userHasAccessToUpdate={userHasAccessToUpdateLeadDetails}
             type="select"
             label="State"
             handleGetDropdownData={() => {
@@ -557,7 +565,7 @@ const LeadDetails = ({
           />
 
           <FormField
-            userHasAccessToUpdate={userHasAccessToUpdateLead}
+            userHasAccessToUpdate={userHasAccessToUpdateLeadDetails}
             type="text"
             label="Website"
             maxLength={100}
@@ -571,7 +579,7 @@ const LeadDetails = ({
             }}
           />
           <FormField
-            userHasAccessToUpdate={userHasAccessToUpdateLead}
+            userHasAccessToUpdate={userHasAccessToUpdateLeadDetails}
             type="select"
             label="District"
             handleGetDropdownData={() => {
@@ -598,6 +606,14 @@ const LeadDetails = ({
     </div>
   );
 };
+
+const HeaderInfo=()=>{
+  return(
+            <div className="w-auto flex justify-between  bg-slate-200 px-1 mb-1  ">
+              <span className="table-header-custom">Details</span>
+              </div>
+  )
+}
 
 type OptionType = {
   label: string | null;
@@ -666,7 +682,7 @@ const FormField = ({
               onChange?.(event);
             }
           } else {
-            toast.error("You do not have access to update");
+            toast.error(MESSAGE.MODULE_ACCESS.LEAD_DETAILS.DENIED_UPDATE_ACCESS);
           }
         }}
       >

@@ -19,7 +19,6 @@ import {
 import { useLoggedInUserContext } from "../../../../../context/user/LoggedInUserContext";
 import POST_API from "../../../../../constants/PostApi";
 import { STATUS_CODE } from "../../../../../constants/AppConstants";
-import LoadingSpinner from "../../../../../assets/animations/LoadingSpinner";
 import { REFCURSOR_KEY } from "../../../../../constants/RefcursorConstants";
 import { DashboardComponentJsxKey } from "../../../../../enums/dashboard/DashboardComponentJsxKey.enum";
 import MetricCard from "../dashboards_components/MetricCard";
@@ -30,23 +29,9 @@ import SupportTasksDashboard from "./SupportTasksDashboard";
 import SupportTicketTaskDashboardProps from "../../../../../@types/support-ticket-management/SupportTicketTaskDashboardProps";
 import RecentTicketDashboardProps from "../../../../../@types/support-ticket-management/RecentTicketDashboardProps";
 import RecentTicketsDashboard from "./RecentTicketsDashboard";
+import { DashboardLoadingSpinner } from "../dashboards_components/DashboardLoadingSpinner";
+import { AccessManagementType } from "../../../../../@types/company-users/AccessManagementContextType";
 
-/* ---------------- TYPES ---------------- */
-
-type AccessModuleType = {
-  id: number;
-  crm_module_id: number;
-  company_user_id: number;
-  add: boolean;
-  view: boolean;
-  update: boolean;
-  createdby: number;
-  updatedby: number;
-  createdon: string;
-  module_name: string;
-  updatedby_user: string;
-  updatedon: string;
-};
 
 type DashboardDataType = Record<string, Array<Record<string, any>>>;
 
@@ -80,7 +65,7 @@ const DashboardSupport: React.FC<DashboardSupportProp> = ({
   >([]);
   const [dashboardData, setDashboardData] = useState<DashboardDataType>({});
   const [accessModuleCompanyUser, setAccessModuleCompanyUser] = useState<
-    AccessModuleType[]
+    AccessManagementType[]
   >([]);
 
   /* ---------------- SAFE HELPERS (FIX) ---------------- */
@@ -258,7 +243,7 @@ const DashboardSupport: React.FC<DashboardSupportProp> = ({
             value={(
               dashboardData?.[
                 REFCURSOR_KEY.MY_FIXED_CURSOR_INPROGRESS_SUPPORT_TICKETS
-              ]?.[0]?.converted_leads ?? 0
+              ]?.[0]?.inprogress_support_tickets ?? 0
             ).toString()}
             icon={TicketSlashIcon}
             color="bg-gradient-to-r from-blue-500 to-blue-600"
@@ -356,9 +341,7 @@ const DashboardSupport: React.FC<DashboardSupportProp> = ({
             gradient="bg-gradient-to-r from-red-500 to-red-600"
             visibility={
               dashboardVisiblity.length !== 0
-                ? dashboardVisiblity.find(
-                    (visibility) => visibility.key == "Total Pending Task"
-                  )!.value
+                ? getVisibility("Total Pending Task")
                 : false
             }
           />
@@ -375,10 +358,7 @@ const DashboardSupport: React.FC<DashboardSupportProp> = ({
             gradient="bg-gradient-to-r from-emerald-500 to-emerald-600"
             visibility={
               dashboardVisiblity.length !== 0
-                ? dashboardVisiblity.find(
-                    (visibility) =>
-                      visibility.key == "Total Pending Task - Today"
-                  )!.value
+                ? getVisibility("Total Pending Task - Today")
                 : false
             }
           />
@@ -395,9 +375,7 @@ const DashboardSupport: React.FC<DashboardSupportProp> = ({
             gradient="bg-gradient-to-r from-blue-500 to-blue-600"
             visibility={
               dashboardVisiblity.length !== 0
-                ? dashboardVisiblity.find(
-                    (visibility) => visibility.key == "Total Upcoming Task"
-                  )!.value
+                ? getVisibility("Total Upcoming Task")
                 : false
             }
           />
@@ -414,10 +392,7 @@ const DashboardSupport: React.FC<DashboardSupportProp> = ({
             gradient="bg-gradient-to-r from-teal-500 to-teal-600"
             visibility={
               dashboardVisiblity.length !== 0
-                ? dashboardVisiblity.find(
-                    (visibility) =>
-                      visibility.key == "Total Upcoming Task - Today"
-                  )!.value
+                ? getVisibility("Total Upcoming Task - Today")
                 : false
             }
           />
@@ -488,8 +463,8 @@ const DashboardSupport: React.FC<DashboardSupportProp> = ({
   return (
     <div className="min-h-screen w-full bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50">
       {isTasksLoading ? (
-        <div className="flex justify-center items-center mt-48">
-          <LoadingSpinner />
+        <div className={`grid justify-center items-center min-h-[100vh] ${isTasksLoading?"cursor-wait":"cursor-default"}`}>
+          <DashboardLoadingSpinner/>
         </div>
       ) : (
         <div className="max-w-full p-6 mx-auto grid gap-3 grid-cols-2 space-y-5">

@@ -29,7 +29,8 @@ function ProductsManagementGrid({
     userHasAccessToViewProduct,
     userHasAccessToViewProductTax,
     userHasAccessToUpdateProduct,
-    userHasAccessToUpdateProductTeam,
+    userHasAccessToViewProductTeam,
+    userHasAccessToViewProductUsers
   } = useUserAccessModules();
 
   const columnDefs = useMemo<ColDef[]>(
@@ -57,6 +58,7 @@ function ProductsManagementGrid({
         maxWidth: 130,
         filter: true,
         flex: 1,
+        hide: isGridForAccountProduct
       },
       {
         field: "cost",
@@ -65,6 +67,7 @@ function ProductsManagementGrid({
         maxWidth: 130,
         filter: true,
         flex: 1,
+        hide: isGridForAccountProduct
       },
 
       {
@@ -74,6 +77,7 @@ function ProductsManagementGrid({
         maxWidth: 120,
         filter: true,
         flex: 1,
+        hide: isGridForAccountProduct
       },
       {
         field: "unitName",
@@ -81,6 +85,8 @@ function ProductsManagementGrid({
         sortable: true,
         filter: true,
         flex: 1,
+        hide: isGridForAccountProduct,
+
       },
 
       {
@@ -97,6 +103,8 @@ function ProductsManagementGrid({
             </div>
           );
         },
+        hide: isGridForAccountProduct,
+
       },
       {
         field: "isSerialNumber",
@@ -117,6 +125,8 @@ function ProductsManagementGrid({
             </div>
           );
         },
+        hide: isGridForAccountProduct,
+
       },
 
       {
@@ -126,7 +136,7 @@ function ProductsManagementGrid({
         maxWidth: 110,
         filter: true,
         flex: 1,
-        hide: !userHasAccessToViewProduct,
+        hide: !userHasAccessToViewProduct || isGridForAccountProduct,
       },
       {
         field: "defaultAmcCycleName",
@@ -135,7 +145,8 @@ function ProductsManagementGrid({
         maxWidth: 120,
         filter: true,
         flex: 1,
-        hide: !userHasAccessToViewProduct,
+        hide: !userHasAccessToViewProduct || isGridForAccountProduct,
+
       },
       {
         field: "version",
@@ -144,7 +155,8 @@ function ProductsManagementGrid({
         maxWidth: 100,
         filter: true,
         flex: 1,
-        hide: !userHasAccessToViewProduct,
+        hide: !userHasAccessToViewProduct || isGridForAccountProduct,
+
       },
       {
         field: "url",
@@ -153,7 +165,7 @@ function ProductsManagementGrid({
         filter: true,
         maxWidth: 120,
         flex: 1,
-        hide: !userHasAccessToViewProduct,
+        hide: !userHasAccessToViewProduct || isGridForAccountProduct,
         tooltipValueGetter(params) {
           return params.data.url;
         },
@@ -163,6 +175,7 @@ function ProductsManagementGrid({
           }
         },
         cellStyle: { color: "blue", cursor: "pointer" },
+
       },
       {
         field: "hsn",
@@ -174,7 +187,7 @@ function ProductsManagementGrid({
           return params.data.hsn;
         },
         flex: 1,
-        hide: !userHasAccessToViewProductTax,
+        hide: !userHasAccessToViewProductTax || isGridForAccountProduct,
       },
       {
         field: "sac",
@@ -186,7 +199,7 @@ function ProductsManagementGrid({
           return params.data.sac;
         },
         flex: 1,
-        hide: !userHasAccessToViewProductTax,
+        hide: !userHasAccessToViewProductTax || isGridForAccountProduct,
       },
       {
         field: "taxRate",
@@ -195,7 +208,7 @@ function ProductsManagementGrid({
         maxWidth: 100,
         filter: true,
         flex: 1,
-        hide: !userHasAccessToViewProductTax,
+        hide: !userHasAccessToViewProductTax || isGridForAccountProduct,
         valueFormatter: (params) => {
           if (params.value === 0) {
             return ""; // Return an empty string if the value is 0
@@ -209,7 +222,7 @@ function ProductsManagementGrid({
         sortable: true,
         filter: true,
         flex: 1,
-        hide: !userHasAccessToViewProductTax,
+        hide: !userHasAccessToViewProductTax || isGridForAccountProduct,
       },
 
       {
@@ -221,6 +234,7 @@ function ProductsManagementGrid({
         tooltipValueGetter(params) {
           return params.data.description;
         },
+        hide: isGridForAccountProduct,
       },
 
       {
@@ -246,6 +260,7 @@ function ProductsManagementGrid({
         sortable: true,
         filter: true,
         flex: 1,
+        hide: isGridForAccountProduct,
       },
       {
         field: "createdOn",
@@ -253,6 +268,8 @@ function ProductsManagementGrid({
         sortable: true,
         filter: true,
         flex: 1,
+                hide: isGridForAccountProduct,
+
       },
       {
         headerName: "Actions",
@@ -389,9 +406,9 @@ function ProductsManagementGrid({
                           }
                         }}
                       >
-                        <div className="flex text-nowrap">
+                        <div className="">
                           <Plus className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR} />
-                          Stock
+                         {JSX_CHILDREN_NAME.ADD_STOCK}
                         </div>
                       </ActionsDropdownButton>
                     </>
@@ -399,16 +416,15 @@ function ProductsManagementGrid({
                       {/* {userHasAccessToUpdateProductTeam && ( */}
                       <>
                         <ActionsDropdownButton
-                          disabled={!userHasAccessToUpdateProductTeam}
+                          disabled={!userHasAccessToViewProductUsers}
                           onClick={() => {
-                            if (userHasAccessToUpdateProductTeam) {
+                            if (userHasAccessToViewProductUsers) {
                               setIsActionsDropDownOpen(false);
                               handleCompanyProductUserModalOpen(true);
                               handleSelectedProductChange(params.data);
                             } else {
                               toast.error(
-                                MESSAGE.MODULE_ACCESS.PRODUCT_TEAM_MANAGEMENT
-                                  .DENIED_UPDATE_ACCESS
+                                MESSAGE.MODULE_ACCESS.PRODUCT_USERS.DENIED_VIEW_ACCESS
                               );
                             }
                           }}
@@ -419,16 +435,15 @@ function ProductsManagementGrid({
                           {JSX_CHILDREN_NAME.USER}
                         </ActionsDropdownButton>
                         <ActionsDropdownButton
-                          disabled={!userHasAccessToUpdateProductTeam}
+                          disabled={!userHasAccessToViewProductTeam}
                           onClick={() => {
-                            if (userHasAccessToUpdateProductTeam) {
+                            if (userHasAccessToViewProductTeam) {
                               setIsActionsDropDownOpen(false);
                               handleCompanyProductTeamModalOpen(true);
                               handleSelectedProductChange(params.data);
                             } else {
                               toast.error(
-                                MESSAGE.MODULE_ACCESS.PRODUCT_TEAM_MANAGEMENT
-                                  .DENIED_UPDATE_ACCESS
+                                MESSAGE.MODULE_ACCESS.PRODUCT_TEAMS.DENIED_VIEW_ACCESS
                               );
                             }
                           }}

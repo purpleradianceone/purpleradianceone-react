@@ -9,13 +9,11 @@ import {
   Plus,
   Save,
   Settings,
-  User2,
   X,
 } from "lucide-react";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import UpdateLeadForm from "./UpdateLeadForm";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
-import axios from "axios";
 import POST_API from "../../../constants/PostApi";
 import {
   MOBILE_NUMBER_VALIDATION,
@@ -31,7 +29,6 @@ import LeadDetailsData from "../../../@types/lead-management/LeadDetailsData";
 import PostDataLeadUpdate from "../../../@types/lead-management/PostDataLeadUpdate";
 import RefreshToken from "../../../config/validations/RefreshToken";
 import qs from "query-string";
-import GetCompanyUsersForLead from "./company-users-selection-modal/GetCompanyUsersForLead";
 import CompanyUser from "../../../@types/company-users/CompanyUser";
 import LeadOwnerHistory from "./LeadOwnerHistory";
 import AssignProductToLead from "./AssignProductToLead";
@@ -49,17 +46,28 @@ import toast from "react-hot-toast";
 import { useInView } from "react-intersection-observer";
 import { motion } from "framer-motion";
 import Button from "../../ui/Button";
-import FormHeader from "../../ui/FormHeader";
-import { createPortal } from "react-dom";
 import StatusUpdateModal from "./lead-status/StatusUpdateModal";
 import ConvertLeadModal from "./lead-status/ConvertLeadModal";
 
 import { PageLayout } from "../../ui/PageLayout";
+import axiosClient from "../../../axios-client/AxiosClient";
+import CompanyUserSearchFieldInput from "../../ui/CompanyUserSearchFieldInput";
+import LeadDataProps from "../../../@types/lead-management/LeadProps";
+import { handleApiError } from "../../../config/error/handleApiError";
+import LoadingPopUpAnimation from "../../views/card/LoadingPopUpAnimation";
+import FormLayout from "../../ui/FormLayout";
 
 const ViewLeadManagement = () => {
   const navigate = useNavigate();
-  const { userHasAccessToUpdateLead, userHasAccessToViewLead } =
-    useUserAccessModules();
+  const {
+    userHasAccessToUpdateLead,
+    userHasAccessToViewLead,
+    userHasAccessToViewLeadSettings,
+    userHasAccessToViewLeadContacts,
+    userHasAccessToViewLeadProduct,
+    userHasAccessToUpdateLeadDetails,
+    userHasAccessToViewLeadDetails,
+  } = useUserAccessModules();
   const [ref, inView] = useInView({ fallbackInView: true, threshold: 0.1 });
 
   const { loginStatus } = useLoggedInUserContext();
@@ -83,7 +91,7 @@ const ViewLeadManagement = () => {
     useState<boolean>(false);
 
   //NOTE : THIS IS THE SELECTED LEAD
-  const [selectedLeadData, setSelectedLeadData] = useState(
+  const [selectedLeadData, setSelectedLeadData] = useState<LeadDataProps>(
     JSON.parse(searchParams.get("leadData") || "{}")
   );
 
@@ -99,12 +107,11 @@ const ViewLeadManagement = () => {
   >([]);
   //meeting modal states
   const [leadContact, setLeadContact] = useState<LeadContactType[]>([]);
-  const [activeTab, setActiveTab] = useState<string>("contact");
-  const [isOpenMeetingsModal, setIsOpenMeetingsModal] =
-    useState<boolean>(false);
-  const [isOpenProductCard, setIsOpenProductCard] = useState<boolean>(true);
-  const [isOpenLeadTeamsCard, setIsOpenLeadTeamsCard] =
-    useState<boolean>(false);
+  // const [isOpenMeetingsModal, setIsOpenMeetingsModal] =
+  //   useState<boolean>(false);
+  // const [isOpenProductCard, setIsOpenProductCard] = useState<boolean>(true);
+  // const [isOpenLeadTeamsCard, setIsOpenLeadTeamsCard] =
+  //   useState<boolean>(false);
 
   const fetchLeadStatus = async () => {
     try {
@@ -114,7 +121,7 @@ const ViewLeadManagement = () => {
         description: null,
         isactive: true,
       };
-      const response = await axios.post(
+      const response = await axiosClient.post(
         POST_API.GET_LEAD_STATUS,
         postDataForLeadStatusData,
         { withCredentials: true }
@@ -155,7 +162,7 @@ const ViewLeadManagement = () => {
 
     try {
       setIsLeadStatusSaving(true);
-      const response = await axios.post(
+      const response = await axiosClient.post(
         POST_API.UPDATE_LEAD_STATUS,
         postDataForLeadStatusUpdate,
         { withCredentials: true }
@@ -215,56 +222,60 @@ const ViewLeadManagement = () => {
     requestedby: "",
     generate_password: "",
   });
-  const [isLeadOwnerPopUpOpen, setIsLeadOwnerPopUpOpen] =
-    useState<boolean>(false);
-  const [persistedSelectedUserId, setPersistedSelectedUserId] = useState<
-    number | null
-  >(selectedLeadData.companyUserId);
+  // const [isLeadOwnerPopUpOpen, setIsLeadOwnerPopUpOpen] =
+  //   useState<boolean>(false);
+  // const [persistedSelectedUserId, setPersistedSelectedUserId] = useState<
+  //   number | null
+  // >(selectedLeadData.companyUserId);
 
   previouseOwnerRef.current = selectedLeadData.companyUserId;
 
-  const handleSelectedCompanyUserChange = (params: CompanyUser | null) => {
-    if (params) {
-      setPersistedSelectedUserId(params.id);
+  // const handleSelectedCompanyUserChange = (params: CompanyUser | null) => {
+  //   if (params) {
+  //     setPersistedSelectedUserId(params.id);
 
-      setSelectedCompanyUser({
-        company_id: params.company_id,
-        id: params.id,
-        fullname: params.fullname,
-        email: params.email,
-        mobilenumber: params.mobilenumber,
-        createdby: "",
-        isactive: params.isactive,
-        requestedby: "",
-        generate_password: "",
-      });
-    } else {
-      setPersistedSelectedUserId(null);
-      // Reset selectedCompanyUser to its initial state when null is received
-      setSelectedCompanyUser({
-        company_id: 0,
-        id: 0,
-        fullname: "",
-        email: "",
-        mobilenumber: "",
-        createdby: "",
-        isactive: false,
-        requestedby: "",
-        generate_password: "",
-      });
-    }
-  };
+  //     setSelectedCompanyUser({
+  //       company_id: params.company_id,
+  //       id: params.id,
+  //       fullname: params.fullname,
+  //       email: params.email,
+  //       mobilenumber: params.mobilenumber,
+  //       createdby: "",
+  //       isactive: params.isactive,
+  //       requestedby: "",
+  //       generate_password: "",
+  //     });
+  //   } else {
+  //     setPersistedSelectedUserId(null);
+  //     // Reset selectedCompanyUser to its initial state when null is received
+  //     setSelectedCompanyUser({
+  //       company_id: 0,
+  //       id: 0,
+  //       fullname: "",
+  //       email: "",
+  //       mobilenumber: "",
+  //       createdby: "",
+  //       isactive: false,
+  //       requestedby: "",
+  //       generate_password: "",
+  //     });
+  //   }
+  // };
 
-  const handleClickLeadOwnerChange = () => {
-    setIsLeadOwnerPopUpOpen(true);
-  };
+  // const handleClickLeadOwnerChange = () => {
+  //   setIsLeadOwnerPopUpOpen(true);
+  // };
 
+  const [showSpinnerForSavingLeadOwner, setShowSpinnerForSavingLeadOwner] =
+    useState<boolean>(false);
   const handleLeadOwnerChange = async () => {
     if (selectedCompanyUser.id === null || selectedCompanyUser.id === 0) {
       setReasonInputBoxOpenForLeadOwner(false);
       toast.error("Select new lead owner before procedding.");
       return;
     }
+    setShowSpinnerForSavingLeadOwner(true);
+
     const PostDataLeadOwnerChange = {
       company_id: loginStatus.companyId,
       id: selectedLeadData.id,
@@ -273,7 +284,7 @@ const ViewLeadManagement = () => {
       updatedby: loginStatus.id,
     };
     try {
-      const response = await axios.post(
+      const response = await axiosClient.post(
         POST_API.UPDATE_LEAD_OWNER,
         PostDataLeadOwnerChange,
         { withCredentials: true }
@@ -293,12 +304,12 @@ const ViewLeadManagement = () => {
 
           //resetting the states
           setReasonTextForLeadOwnerChange("");
-          setReasonInputBoxOpenForLeadOwner(false);
           setSelectedLeadData((prev: any) => ({
             ...prev,
             leadOwner: selectedCompanyUser.fullname,
             companyUserId: selectedCompanyUser.id,
           }));
+          setShowSpinnerForSavingLeadOwner(false);
         } else {
           toast.error(response.data.message);
         }
@@ -306,16 +317,18 @@ const ViewLeadManagement = () => {
         toast.error(response.data.message);
       }
     } catch (error: any) {
-      if (error.status === STATUS_CODE.UNATHORISED) {
-        const refreshTokenStatus = await RefreshToken({
-          callFunction: handleLeadOwnerChange,
-        });
-        if (refreshTokenStatus) {
-          handleLeadOwnerChange();
-        }
-      }
+      handleApiError(error);
+      // if (error.status === STATUS_CODE.UNATHORISED) {
+      //   const refreshTokenStatus = await RefreshToken({
+      //     callFunction: handleLeadOwnerChange,
+      //   });
+      //   if (refreshTokenStatus) {
+      //     handleLeadOwnerChange();
+      //   }
+      // }
     } finally {
       // selected company user should become null after this function runs
+      setReasonInputBoxOpenForLeadOwner(false);
       setSelectedCompanyUser({
         company_id: 0,
         id: 0,
@@ -327,6 +340,7 @@ const ViewLeadManagement = () => {
         requestedby: "",
         generate_password: "",
       });
+      setRefreshKeyForLeadOwnerChange((prev) => prev + 1);
     }
   };
   const [leadDetailsData, setLeadDetailsData] = useState<LeadDetailsData>({
@@ -359,10 +373,14 @@ const ViewLeadManagement = () => {
     };
 
     try {
-      const response = await axios.post(POST_API.GET_LEAD_DETAILS, PostData, {
-        withCredentials: true,
-        headers: { "Content-Type": "application/json" },
-      });
+      const response = await axiosClient.post(
+        POST_API.GET_LEAD_DETAILS,
+        PostData,
+        {
+          withCredentials: true,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
 
       if (response.status === STATUS_CODE.OK) {
         const data = response.data;
@@ -412,7 +430,7 @@ const ViewLeadManagement = () => {
   // API call to get lead interest data
   async function getLeadInterestData() {
     try {
-      const response = await axios.get(POST_API.GET_LEAD_INTEREST_TYPE, {
+      const response = await axiosClient.get(POST_API.GET_LEAD_INTEREST_TYPE, {
         params: {
           id: null,
           name: null,
@@ -439,16 +457,19 @@ const ViewLeadManagement = () => {
   //fetch the lead assigned company product
   const fetchLeadCompanyProduct = async () => {
     try {
-      const response = await axios.get(POST_API.GET_LEAD_ASSIGED_PRODUCT, {
-        params: {
-          companyId: loginStatus.companyId,
-          leadId: selectedLeadData.id,
-          companyProductId: null,
-          leadInterestId: null,
-          requestedBy: loginStatus.id,
-        },
-        withCredentials: true,
-      });
+      const response = await axiosClient.get(
+        POST_API.GET_LEAD_ASSIGED_PRODUCT,
+        {
+          params: {
+            companyId: loginStatus.companyId,
+            leadId: selectedLeadData.id,
+            companyProductId: null,
+            leadInterestId: null,
+            requestedBy: loginStatus.id,
+          },
+          withCredentials: true,
+        }
+      );
 
       if (response.status === STATUS_CODE.OK) {
         const mappedData: LeadAssignedCompanyProduct[] = response.data.map(
@@ -524,7 +545,7 @@ const ViewLeadManagement = () => {
       lead_id: selectedLeadData.id,
       requestedby: loginStatus.id,
     };
-    await axios
+    await axiosClient
       .post(POST_API.GET_LEAD_CONTACT, postDataGetLeadContact, {
         withCredentials: true,
       })
@@ -568,14 +589,32 @@ const ViewLeadManagement = () => {
   useEffect(() => {
     const apisCalls = () => {
       fetchLeadStatus();
-      getLeadDetails();
-      fetchLeadContact();
-      getLeadInterestData();
-      fetchLeadCompanyProduct();
+      // getLeadDetails();
+      // fetchLeadContact();
+      // getLeadInterestData();
+      // fetchLeadCompanyProduct();
     };
     apisCalls();
   }, []);
 
+  useEffect(() => {
+    if (userHasAccessToViewLeadDetails) {
+      getLeadDetails();
+    }
+  }, [userHasAccessToViewLeadDetails]);
+
+  useEffect(() => {
+    if (userHasAccessToViewLeadContacts) {
+      fetchLeadContact();
+    }
+  }, [userHasAccessToViewLeadContacts]);
+
+  useEffect(() => {
+    if (userHasAccessToViewLeadProduct) {
+      getLeadInterestData();
+      fetchLeadCompanyProduct();
+    }
+  }, [userHasAccessToViewLeadProduct]);
   const handleLeadInfoSave = async () => {
     const trimmedName = selectedLeadData.name?.trim() ?? "";
 
@@ -586,7 +625,6 @@ const ViewLeadManagement = () => {
         name: null,
       }));
     }
-    console.log(trimmedName);
 
     const PostDataForLeadUpdate: PostDataLeadUpdate = {
       company_id: loginStatus.companyId,
@@ -599,7 +637,7 @@ const ViewLeadManagement = () => {
     console.log(PostDataForLeadUpdate);
 
     try {
-      const response = await axios.post(
+      const response = await axiosClient.post(
         POST_API.UPDATE_LEAD,
         PostDataForLeadUpdate,
         { withCredentials: true }
@@ -646,44 +684,67 @@ const ViewLeadManagement = () => {
       }
     }
   };
+  type ActiveCard = "meeting" | "contact" | "LeadTeams" | "leadUsers";
+  const [activeTab, setActiveTab] = useState<ActiveCard>("contact");
+  const [activeCard, setActiveCard] = useState<ActiveCard>("contact");
 
   const handleClickCards = (event: React.MouseEvent<HTMLElement>) => {
-    const id = event.currentTarget.id;
-    setActiveTab(id); // set active tab for border effect
-
-    if (id === "meeting") {
-      setIsOpenProductCard(false);
-      setIsOpenMeetingsModal(true);
-      setIsOpenLeadTeamsCard(false);
-    } else if (id === "contact") {
-      setIsOpenProductCard(true);
-      setIsOpenMeetingsModal(false);
-      setIsOpenLeadTeamsCard(false);
-    } else if (id === "LeadTeams") {
-      setIsOpenProductCard(false);
-      setIsOpenMeetingsModal(false);
-      setIsOpenLeadTeamsCard(true);
-    }
+    const id = event.currentTarget.id as ActiveCard;
+    setActiveTab(id);
+    setActiveCard(id);
   };
+  // const handleClickCards = (event: React.MouseEvent<HTMLElement>) => {
+  //   const id = event.currentTarget.id;
+  //   setActiveTab(id); // set active tab for border effect
 
-  const getHeightAboveTasks = useCallback(() => {
-    if (isOpenMeetingsModal) {
-      return "min-h-40";
-    } else {
-      return "min-h-72";
-    }
-  }, [isOpenMeetingsModal]);
+  //   if (id === "meeting") {
+  //     setIsOpenProductCard(false);
+  //     setIsOpenMeetingsModal(true);
+  //     setIsOpenLeadTeamsCard(false);
+  //   } else if (id === "contact") {
+  //     setIsOpenProductCard(true);
+  //     setIsOpenMeetingsModal(false);
+  //     setIsOpenLeadTeamsCard(false);
+  //   } else if (id === "LeadTeams") {
+  //     setIsOpenProductCard(false);
+  //     setIsOpenMeetingsModal(false);
+  //     setIsOpenLeadTeamsCard(true);
+  //   }
+  // };
+
+  // const getHeightAboveTasks = useCallback(() => {
+  //   if (isOpenMeetingsModal) {
+  //     return "min-h-40";
+  //   } else {
+  //     return "min-h-72";
+  //   }
+  // }, [isOpenMeetingsModal]);
 
   // New Code
   const [isAddProductModalOpen, setIsAddProductModalOpen] = useState(false);
   const [isLeadSettingModalOpen, setIsLeadSettingModalOpen] =
     useState<boolean>(false);
 
+  const [refreshkeyForLeadOwnerChange, setRefreshKeyForLeadOwnerChange] =
+    useState<number>(0);
   // Note : Clears the states when user clicks on lead owner change button
   function handleLeadOwnerChangeStateClear() {
     setReasonTextForLeadOwnerChange("");
     setReasonInputBoxOpenForLeadOwner(!reasonInputBoxOpenForLeadOwner);
-    setPersistedSelectedUserId(selectedLeadData.companyUserId);
+    // setPersistedSelectedUserId(selectedLeadData.companyUserId);
+    // window.location.reload();
+    setRefreshKeyForLeadOwnerChange((prev) => prev + 1);
+  }
+
+  function handleLeadOwnerSelected(user: CompanyUser | null) {
+    if (!user || user.id == 0) return null;
+
+    if (user.id == selectedLeadData.companyUserId) {
+      toast.error("Select another user.");
+      return;
+    }
+    setSelectedCompanyUser(user);
+    setReasonInputBoxOpenForLeadOwner(true);
   }
 
   const [showName, setShowName] = useState<boolean>(false);
@@ -730,7 +791,7 @@ const ViewLeadManagement = () => {
             <div className="relative inline-block">
               <button
                 onClick={() => {
-                  if (userHasAccessToUpdateLead) {
+                  if (userHasAccessToViewLeadSettings) {
                     setIsLeadSettingModalOpen(true);
                   } else {
                     toast.error(
@@ -739,11 +800,19 @@ const ViewLeadManagement = () => {
                     );
                   }
                 }}
-                className="px-1 py-0.5 caption-custom flex gap-1 items-center justify-center bg-white hover:bg-slate-400 hover:text-white text-gray-500 bg-transparent border rounded  transition"
+                className={`px-1 py-0.5 caption-custom flex gap-1 items-center justify-center
+    border rounded transition
+    ${
+      userHasAccessToViewLeadSettings
+        ? "bg-white hover:bg-slate-400 hover:text-white text-gray-500 cursor-pointer"
+        : "bg-gray-200 text-gray-400 cursor-not-allowed"
+    }
+  `}
               >
                 <Settings size={12} />
                 <span>Lead setting</span>
               </button>
+
               {isLeadSettingModalOpen && (
                 <LeadSettingForLead
                   isOpen={isLeadSettingModalOpen}
@@ -876,7 +945,7 @@ const ViewLeadManagement = () => {
                       "polygon(0 0, calc(100% - 16px) 0, 100% 50%, calc(100% - 16px) 100%, 0 100%)",
                   }}
                   onClick={() => {
-                    if (userHasAccessToUpdateLead) {
+                    if (userHasAccessToUpdateLeadDetails) {
                       setReasonInputBoxOpen(true);
                       setSelectedStatusId(item.id);
                     } else {
@@ -992,7 +1061,9 @@ const ViewLeadManagement = () => {
                       label="Name"
                       // hasBorder={true}
                       type={userHasAccessToUpdateLead ? "text" : "none"}
-                      value={selectedLeadData?.name}
+                      value={
+                        (selectedLeadData.name && selectedLeadData.name) || ""
+                      }
                       onChange={(e) => {
                         setSelectedLeadData({
                           ...selectedLeadData,
@@ -1024,7 +1095,7 @@ const ViewLeadManagement = () => {
                     // hasBorder={true}
                     label="Email"
                     type={userHasAccessToUpdateLead ? "text" : "none"}
-                    value={selectedLeadData?.email}
+                    value={selectedLeadData.email!}
                     onChange={(e) => {
                       setSelectedLeadData({
                         ...selectedLeadData,
@@ -1056,7 +1127,7 @@ const ViewLeadManagement = () => {
                     label="Mobile number"
                     // hasBorder={true}
                     type={userHasAccessToUpdateLead ? "text" : "none"}
-                    value={selectedLeadData?.mobileNumber}
+                    value={selectedLeadData.mobileNumber!}
                     onChange={(e) => {
                       setSelectedLeadData({
                         ...selectedLeadData,
@@ -1101,12 +1172,25 @@ const ViewLeadManagement = () => {
                   }}
                 >
                   <div className="flex relative ">
-                    <Detail
+                    {/* <Detail
                       label="Lead owner"
                       hasBorder={true}
                       type={userHasAccessToUpdateLead ? "select" : "none"}
                       value={selectedLeadData?.leadOwner}
                       handleClickLeadOwnerChange={handleClickLeadOwnerChange}
+                    /> */}
+                    <CompanyUserSearchFieldInput
+                      key={refreshkeyForLeadOwnerChange}
+                      label="Lead Owner"
+                      labelClassname="caption-custom"
+                      onUserSelected={handleLeadOwnerSelected}
+                      defaultValue={selectedLeadData?.leadOwner}
+                      has={{
+                        border: false,
+                        penLogo: true,
+                        xLogo: false,
+                        searchLogo: false,
+                      }}
                     />
                     <button
                       title="Lead owner history"
@@ -1121,49 +1205,52 @@ const ViewLeadManagement = () => {
                 </div>
               </div>
               {reasonInputBoxOpenForLeadOwner && (
-                <div className="fixed inset-0 bg-black bg-opacity-5 flex items-center justify-center z-50">
-                  <div className="bg-white rounded-xl shadow-lg p-2 w-full max-w-md mx-2">
-                    <div className="flex flex-col gap-1">
-                      <label className="table-header-custom">
-                        Reason (Optional)
-                      </label>
-                      <textarea
-                        rows={7}
-                        placeholder="Enter reason for lead owner update"
-                        className="border rounded  p-1 input-label-custom"
-                        value={reasonTextForLeadOwnerChange}
-                        onChange={(e) =>
-                          setReasonTextForLeadOwnerChange(e.target.value)
-                        }
-                      />
-                      <div className="flex justify-end ">
-                        <div className="flex gap-1">
-                          <Button
-                            type="submit"
-                            onClick={(e) => {
-                              e.preventDefault();
-                              handleLeadOwnerChange();
-                            }}
-                          >
-                            <div className="flex items-center gap-1">
-                              <Save size={16} />
-                              Save
-                            </div>
-                          </Button>
-                          <Button
-                            type="button"
-                            onClick={handleLeadOwnerChangeStateClear}
-                          >
-                            <div className="flex items-center ">
-                              <X size={18} />
-                              Cancel
-                            </div>
-                          </Button>
-                        </div>
+                // <div className="fixed inset-0 bg-black bg-opacity-5 flex items-center justify-center z-50">
+                //   <div className="bg-white rounded-xl shadow-lg p-2 w-full max-w-md mx-2">
+                <FormLayout width={2} padding={2}>
+                  <div className="flex flex-col gap-1">
+                    <label className="table-header-custom">
+                      Reason (Optional)
+                    </label>
+                    <textarea
+                      autoFocus={true}
+                      rows={7}
+                      placeholder="Enter reason for lead owner update"
+                      className="border rounded  p-1 input-label-custom"
+                      value={reasonTextForLeadOwnerChange}
+                      onChange={(e) =>
+                        setReasonTextForLeadOwnerChange(e.target.value)
+                      }
+                    />
+                    <div className="flex justify-end ">
+                      <div className="flex gap-1">
+                        <Button
+                          type="submit"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            handleLeadOwnerChange();
+                          }}
+                        >
+                          <div className="flex items-center gap-1">
+                            <Save size={16} />
+                            Save
+                          </div>
+                        </Button>
+                        <Button
+                          type="button"
+                          onClick={handleLeadOwnerChangeStateClear}
+                        >
+                          <div className="flex items-center ">
+                            <X size={18} />
+                            Cancel
+                          </div>
+                        </Button>
                       </div>
                     </div>
                   </div>
-                </div>
+                </FormLayout>
+                // </div>
+                // </div>
               )}
             </div>
             {/* Lead Details */}
@@ -1229,15 +1316,27 @@ const ViewLeadManagement = () => {
               >
                 Lead Teams
               </span>
+              {/* <span
+                id="leadUsers" 
+                className={`cursor-pointer ${
+                  activeTab === "leadUsers"
+                    ? "border-b-2 border-blue-500 caption-custom-blue"
+                    : "hover:text-blue-500"
+                }`}
+                onClick={handleClickCards}
+              >
+                Lead Users
+              </span> */}
             </div>
             <div className="flex flex-col min-h-72 gap-2">
               <div
-                className={`flex max-h-72 ${getHeightAboveTasks()} overflow-y-scroll flex-col  gap-2 [&::-webkit-scrollbar]:w-2
+                // ${getHeightAboveTasks()}
+                className={`flex min-h-72 max-h-72  overflow-y-scroll flex-col  gap-2 [&::-webkit-scrollbar]:w-2
             [&::-webkit-scrollbar-track]:bg-gray-50
              [&::-webkit-scrollbar-thumb]:bg-gray-50
               [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full`}
               >
-                {isOpenMeetingsModal && (
+                {activeCard === "meeting" && (
                   <div className="flex  items-center justify-center   min-h-72">
                     <div className="flex flex-col items-center justify-center p-6 text-center space-y-3 border rounded-xl bg-gray-50 shadow-sm">
                       <h2 className="table-header-custom">
@@ -1273,19 +1372,69 @@ const ViewLeadManagement = () => {
                     </div>
                   </div>
                 )}
-                {isOpenProductCard && (
+                {/* {isOpenMeetingsModal && (
+                  <div className="flex  items-center justify-center   min-h-72">
+                    <div className="flex flex-col items-center justify-center p-6 text-center space-y-3 border rounded-xl bg-gray-50 shadow-sm">
+                      <h2 className="table-header-custom">
+                        Schedule a Meeting
+                      </h2>
+                      <p className="input-label-custom">
+                        Plan your next discussion with ease. Use this option to
+                        select a convenient time, invite participants, and share
+                        meeting details — all in one place.
+                      </p>
+                      <p className="input-label-custom max-w-md">
+                        Once scheduled, participants will receive notifications
+                        with the meeting link and reminders before it begins.
+                      </p>
+                      <div>
+                        <Button
+                          type="submit"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            const leadDataSearchParams = JSON.parse(
+                              searchParams.get("leadData") || "{}"
+                            );
+                            sessionStorage.setItem(
+                              "leadData",
+                              JSON.stringify(leadDataSearchParams!)
+                            );
+                            navigate(ROUTES_URL.SCHEDULE_MEETING);
+                          }}
+                        >
+                          + Schedule Meeting
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                )} */}
+                {/* {isOpenProductCard && (
+                  <LeadContact
+                    selectedLeadData={selectedLeadData}
+                    leadContact={leadContact}
+                    fetchLeadContact={fetchLeadContact}
+                  />
+                )} */}
+                {activeCard === "contact" && (
                   <LeadContact
                     selectedLeadData={selectedLeadData}
                     leadContact={leadContact}
                     fetchLeadContact={fetchLeadContact}
                   />
                 )}
-                {isOpenLeadTeamsCard && (
+                {activeCard === "LeadTeams" && (
+                  <LeadAssignedTeams
+                    selectedLeadData={selectedLeadData}
+                    // isOpen={isOpenLeadTeamsCard}
+                  />
+                )}
+
+                {/* {isOpenLeadTeamsCard && (
                   <LeadAssignedTeams
                     selectedLeadData={selectedLeadData}
                     isOpen={isOpenLeadTeamsCard}
                   />
-                )}
+                )} */}
               </div>
             </div>
             {/* Activity */}
@@ -1323,35 +1472,18 @@ const ViewLeadManagement = () => {
             setIsOpenLeadOwnerHistory(!isOpenLeadOwnerHistory);
           }}
         />
+        {/* Note : this loading pop up will be shown when we change the lead owner */}
+        {showSpinnerForSavingLeadOwner && (
+          <LoadingPopUpAnimation show={showSpinnerForSavingLeadOwner} />
+        )}
 
         {/* lead owner pop up open */}
-        {isLeadOwnerPopUpOpen &&
+        {/* {isLeadOwnerPopUpOpen &&
           createPortal(
             <div className="fixed top-12 inset-0 z-50 bg-black bg-opacity-5 flex items-center justify-center p-4 ">
               <div className="bg-white p-3  rounded-2xl shadow-lg w-full max-w-6xl max-h-[100%] overflow-y-auto relative animate-fadeIn">
                 {/* Header with Close Button */}
-                {/* <div className="flex justify-between items-center p-2 border-b border-gray-200">
-                <h3 className="text-lg font-bold text-gray-800">
-                  Select Company User
-                </h3>
-                <button
-                  onClick={() => {
-                    setIsLeadOwnerPopUpOpen(false);
-
-                    if (
-                      selectedCompanyUser.id !== 0 &&
-                      selectedCompanyUser.id !== null &&
-                      selectedCompanyUser.id === persistedSelectedUserId
-                    ) {
-                      setReasonInputBoxOpenForLeadOwner(true);
-                    }
-                  }}
-                  className="text-gray-500 hover:text-gray-700"
-                >
-                  <X size={20} />
-                </button>
-              </div> */}
-                <FormHeader
+        {/* <FormHeader
                   preText="Assign new lead owner."
                   description="Select and assign a new owner to manage this lead."
                   onClose={() => {
@@ -1366,9 +1498,9 @@ const ViewLeadManagement = () => {
                     }
                   }}
                   icon={User2}
-                />
-                {/* NOTE : CALL TO THE MODAL COMPONENT */}
-                <div className="">
+                /> */}
+        {/* NOTE : CALL TO THE MODAL COMPONENT */}
+        {/* <div className="">
                   <GetCompanyUsersForLead
                     isUsedForSettings={false}
                     selectedUserId={persistedSelectedUserId} // Pass the persisted ID
@@ -1380,7 +1512,7 @@ const ViewLeadManagement = () => {
               </div>
             </div>,
             document.body
-          )}
+          )} */}
         <AssignProductToLead
           selectedLeadData={selectedLeadData}
           isOpen={isAddProductModalOpen}

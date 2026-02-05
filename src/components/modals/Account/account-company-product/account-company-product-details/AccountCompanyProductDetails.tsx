@@ -104,8 +104,5 @@ export const AccountCompanyProductDetails: React.FC = () => {
     <AccountCompanyProductDetailsCard 
       selectedProductCard={accountCompanyProduct}
     />
-    // <AccountCompanyProductPopUpDetails
-    //   selectedProductCard={accountCompanyProduct}
-    // />
   );
 };

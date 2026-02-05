@@ -77,16 +77,16 @@ useEffect(()=>{
 //   }, []);
     const {
     currentPage,
+    currentPageData,
     pageSize,
     dateRangeId,
     concatDate,
-    searchParameter,
-    totalPages,
-    setTotalPages,
-    handleDatePageIdChange,
-    handleEndDateChange,
     endDate,
     startDate,
+    searchParameter,
+    setCurrentPageData,
+    handleDatePageIdChange,
+    handleEndDateChange,
     handlePageChange,
     handlePageSizeChange,
     handleSearchParameterChange,
@@ -137,6 +137,7 @@ useEffect(()=>{
   };
 
   const getLeadsData = async (signal: AbortSignal) => {
+    if (dateRangeId === 8 && concatDate.trim() === "") return;
     const offset = (currentPage - 1) * pageSize;
 
     const effectiveDateRangeId = dateRangeId;
@@ -161,11 +162,10 @@ useEffect(()=>{
         withCredentials: true,
       });
       if (response.status === STATUS_CODE.OK) {
+        setCurrentPageData({currentPage: currentPage, pageDataLength: response.data.length});
         //lead status call was here
         const responseData = response.data;
-        if (response.data.length > 0) {
-          setTotalPages(Math.ceil(response.data[0].count / pageSize));
-        }
+        
 
         const formattedData: LeadDataProps[] = responseData.map(
           (item: any) => ({
@@ -357,6 +357,7 @@ useEffect(()=>{
       size: pageSize,
       search: searchParameter,
       dateRangeId,
+      concatDate,
       leadStatus: selectedLeadStatus,
       leadSource: selectedLeadSource,
       userId: selectedCompanyUser.id,
@@ -374,11 +375,13 @@ useEffect(()=>{
     pageSize,
     searchParameter,
     dateRangeId,
+    concatDate,
+    startDate,
+    endDate,
     selectedLeadStatus,
     selectedLeadSource,
     persistedSelectedUserId,
-    startDate,
-    endDate
+
   ]);
 
   // Note : On refresh button click clear the storage
@@ -410,7 +413,9 @@ useEffect(()=>{
               handleSearchParameterChange,
               handleDateRangeIdChange: handleDatePageIdChange,
               searchParameter: searchParameter,
-              dateRangeId : dateRangeId
+              dateRangeId : dateRangeId,
+              startDate,
+              endDate,
             }}
             leadData={leadData}
             onEndDateChange={{
@@ -422,11 +427,11 @@ useEffect(()=>{
               // startDate
             } }
             paginationData={{
-              selectedPageSize: handlePageSizeChange,
-              currentPage,
-              handlePageChange,
-              totalPages,
               pageSize,
+              currentPage,
+              currentPageData,
+              onPageSizeChange: handlePageSizeChange,
+              onPageChange: handlePageChange,
             }}
             handleSelectedCompanyUserCheckBoxChange={
               handleSelectedCompanyUserCheckBoxChange

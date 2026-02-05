@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useEffect, useState } from "react";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
-import axios from "axios";
 import POST_API from "../../../constants/PostApi";
 import { STATUS_CODE } from "../../../constants/AppConstants";
 import RefreshToken from "../../../config/validations/RefreshToken";
@@ -11,6 +10,7 @@ import LeadOwnerHistoryAgGrid from "../../ag-grid/LeadOwnerHistoryAgGrid";
 import { History } from "lucide-react";
 import FormHeader from "../../ui/FormHeader";
 import { createPortal } from "react-dom";
+import axiosClient from "../../../axios-client/AxiosClient";
 
 const LeadOwnerHistory: React.FC<LeadOwnerHistoryProp> = ({
   isOpen,
@@ -36,7 +36,7 @@ const LeadOwnerHistory: React.FC<LeadOwnerHistoryProp> = ({
       requestedby: loginStatus.id,
     };
     try {
-      const response = await axios.post(
+      const response = await axiosClient.post(
         POST_API.GET_LEAD_OWNER_HISTORY,
         PostDataToGetLeadOwnerHistory,
         { withCredentials: true }

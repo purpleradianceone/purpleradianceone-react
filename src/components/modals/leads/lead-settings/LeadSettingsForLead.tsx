@@ -3,11 +3,9 @@
 import { Settings } from "lucide-react";
 import {  STATUS_CODE } from "../../../../constants/AppConstants";
 import { createPortal } from "react-dom";
-import Lead from "../../../../@types/lead-management/LeadManagementProps";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
 import { useEffect, useState } from "react";
 import CompanyLeadSettingType from "../../../../@types/settings/CompanyLeadSettings";
-import axios from "axios";
 import POST_API from "../../../../constants/PostApi";
 import ApiError from "../../../../@types/error/ApiError";
 import RefreshToken from "../../../../config/validations/RefreshToken";
@@ -15,6 +13,10 @@ import toast from "react-hot-toast";
 import FormHeader from "../../../ui/FormHeader";
 import LoadingSpinner from "../../../../assets/animations/LoadingSpinner";
 import ToggleButton from "../../../ui/ToggleButton";
+import axiosClient from "../../../../axios-client/AxiosClient";
+import LeadDataProps from "../../../../@types/lead-management/LeadProps";
+import { useUserAccessModules } from "../../../../config/hooks/useAccessModules";
+import MESSAGE from "../../../../constants/Messages";
 
 function LeadSettingForLead({
   isOpen,
@@ -23,8 +25,11 @@ function LeadSettingForLead({
 }: {
   isOpen: boolean;
   onClose: () => void;
-  lead: Lead;
+  // lead : Lead
+  lead: LeadDataProps;
 }) {
+
+  const {userHasAccessToUpdateLeadSettings} = useUserAccessModules();
   const { loginStatus } = useLoggedInUserContext();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [leadSetting, setLeadSetting] = useState<CompanyLeadSettingType[]>([]);
@@ -39,7 +44,7 @@ function LeadSettingForLead({
         requestedby_id: loginStatus.id,
       };
 
-      await axios
+      await axiosClient
         .post(POST_API.GET_LEAD_SETTING_LEAD, companyLeadSettingPostData, {
           withCredentials: true,
         })
@@ -82,6 +87,11 @@ function LeadSettingForLead({
   const handleLeadSettingCheckBoxChange = async (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
+    // NOTE: check if the user hase access to update the lead settings
+    if(!userHasAccessToUpdateLeadSettings) {
+      toast.error(MESSAGE.MODULE_ACCESS.LEADS_SETTINGS.DENIED_UPDATE_ACCESS);
+      return;
+    }
     const isChecked = event.target.checked;
     const id = parseInt(event.target.id);
 
@@ -92,7 +102,7 @@ function LeadSettingForLead({
       isactive: isChecked,
       updatedby_id: loginStatus.id,
     };
-    await axios
+    await axiosClient
       .post(
         POST_API.UPDATE_LEAD_SETTING_LEAD,
         updateLeadSettingCompanyPostData,
@@ -219,6 +229,7 @@ function LeadSettingForLead({
                         <div className="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transform peer-checked:translate-x-5 transition-all duration-300" />{" "}
                       </label> */}
                       <ToggleButton
+
                       checked={per.isActive}
                       name={per.id.toString()}
                       onToggle={handleLeadSettingCheckBoxChange}

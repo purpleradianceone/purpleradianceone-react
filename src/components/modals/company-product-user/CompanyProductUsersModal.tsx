@@ -18,6 +18,7 @@ import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
 import toast from "react-hot-toast";
 import FormHeader from "../../ui/FormHeader";
 import { createPortal } from "react-dom";
+import MESSAGE from "../../../constants/Messages";
 function CompanyProductUsersModal({
   isOpen,
   onClose,
@@ -25,7 +26,7 @@ function CompanyProductUsersModal({
 }: CompanyProductUsersModalProps) {
   const { isSmallScreen } = useScreenSize();
   const { loginStatus } = useLoggedInUserContext();
-  const { userHasAccessToUpdateProductTeam, userHasAccessToViewProductTeam } =
+  const { userHasAccessToAddProductUsers, userHasAccessToViewProductTeam } =
     useUserAccessModules();
 
   const [companyProductUsersList, setCompanyProductUsersList] = useState<
@@ -86,7 +87,7 @@ function CompanyProductUsersModal({
     }
   };
   const handleAddCompanyProductUsers = async () => {
-    if (userHasAccessToUpdateProductTeam) {
+    if (userHasAccessToAddProductUsers) {
       const createCompanyProductUserPostData = {
         company_id: loginStatus.companyId,
         company_product_id: companyProduct!.id,
@@ -129,6 +130,8 @@ function CompanyProductUsersModal({
             }
           }
         });
+    }else{
+      toast.error(MESSAGE.MODULE_ACCESS.PRODUCT_USERS.DENIED_ADD_ACCESS)
     }
   };
 

@@ -6,6 +6,8 @@ import Button from "../../ui/Button";
 import { Minus, Plus, Trash2 } from "lucide-react";
 import { SIZE } from "../../../constants/AppConstants";
 
+const buttonTextStyle = "input-label-custom-white";
+
 type TableBlockProps = {
   width?: number;
   height?: number;
@@ -123,7 +125,7 @@ const removeColumn = () => {
             <Button type="button" onClick={handleDeleteTable}>
               <div className="flex items-center justify-center gap-1">
                 <Trash2 size={SIZE.SIXTEEN} />
-                Delete Table Block
+                <span className={buttonTextStyle}>Table Block</span>
               </div>
             </Button>
           </div>
@@ -170,7 +172,7 @@ const removeColumn = () => {
             }}>
               <div className="flex items-center justify-center gap-1">
                 <Plus size={SIZE.SIXTEEN} />
-               Row
+               <span className={buttonTextStyle}>Row</span>
               </div>
               </Button>
           </div>
@@ -180,7 +182,7 @@ const removeColumn = () => {
               <Button type="button" onClick={() => removeRow()}>
               <div className="flex items-center justify-center gap-1">
                 <Minus size={SIZE.SIXTEEN} />
-               Row
+               <span className={buttonTextStyle}>Row</span>
               </div>
                </Button>
             </div>
@@ -192,7 +194,7 @@ const removeColumn = () => {
             }}>
               <div className="flex items-center justify-center gap-1">
                 <Plus size={SIZE.SIXTEEN} />
-               Column
+               <span className={buttonTextStyle}>Column</span>
               </div>
               </Button>
           </div>
@@ -202,20 +204,14 @@ const removeColumn = () => {
               <Button type="button" onClick={removeColumn}>
                 <div className="flex items-center justify-center gap-1">
                 <Minus size={SIZE.SIXTEEN} />
-               Column
+               <span className={buttonTextStyle}>
+                Column
+              </span>
               </div>
                 
                 </Button>
             </div>
           )}
-          {/* <div className="w-fit h-fit">
-            <Button type="button" onClick={handleDeleteTable}>
-              <div className="flex items-center justify-center gap-1">
-                <Trash2 size={SIZE.SIXTEEN} />
-                Delete Table Block
-              </div>
-            </Button>
-          </div> */}
         </div>
       </div>
     </div>

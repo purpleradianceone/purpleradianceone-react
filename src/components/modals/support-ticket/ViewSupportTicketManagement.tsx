@@ -10,6 +10,7 @@ import {
   LucideMail,
   LucidePhoneCall,
   LucideText,
+  QrCodeIcon,
   ShoppingBag,
   StickyNote,
   TicketIcon,
@@ -36,7 +37,9 @@ import axiosClient from "../../../axios-client/AxiosClient";
 import POST_API from "../../../constants/PostApi";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
 import SupportTicketHistoryView from "./SupportTicketHistoryView";
-import CompanyUserSearchFieldInput from "../../ui/CompanyUserSearchFieldInput";
+import CompanyUserSearchFieldInput, {
+  CompanyUserSearchFieldRef,
+} from "../../ui/CompanyUserSearchFieldInput";
 import CustomDropdown from "../leads/CustomDropdown";
 import { useCompanyProductSla } from "../../../config/hooks/useGetCompanyProductSla";
 import {
@@ -49,34 +52,83 @@ import { useSupportTicketCategory } from "../../../config/hooks/useSupportTicket
 import ROUTES_URL from "../../../constants/Routes";
 import Button from "../../ui/Button";
 import SupportTicketTasksModal from "./SupportTicketTasksModal";
-import RefreshToken from "../../../config/validations/RefreshToken";
 import CompanyUser from "../../../@types/company-users/CompanyUser";
 import { useSupportTicketSource } from "../../../config/hooks/useSupportTicketSource";
 import { PageLayout } from "../../ui/PageLayout";
+import { handleApiError } from "../../../config/error/handleApiError";
+import { supportTicketDataUrlSearchParamKey } from "../../lists/SupportTicketManagementList";
+
 
 const ViewSupportTicketManagement = () => {
+  const searchRef = useRef<CompanyUserSearchFieldRef>(null);
   const [ref, inView] = useInView({ fallbackInView: true, threshold: 0.1 });
   const { loginStatus } = useLoggedInUserContext();
 
   const [searchParams] = useSearchParams();
-  const { userHasAccessToUpdateSupportTicket } = useUserAccessModules();
+  const {
+    userHasAccessToUpdateSupportTicket,
+    userHasAccessToViewSupportTicketTask,
+  } = useUserAccessModules();
 
   const [selectedSupportTicket, setSelectedSupportTicket] = useState(
-    JSON.parse(searchParams.get("supportTicketData") || "{}")
+    JSON.parse(searchParams.get(supportTicketDataUrlSearchParamKey) || "{}")
   );
 
-  const [formData, setFormData] = useState({
-    queryDescription: selectedSupportTicket.queryDescription,
-    publicNotes: selectedSupportTicket.publicNotes,
-    resolutionApplied: selectedSupportTicket.resolutionApplied,
+  const [formData, setFormData] = useState<{
+    queryDescription: string;
+    publicNotes: string;
+    resolutionApplied: string;
+  }>({
+    queryDescription:
+      selectedSupportTicket.queryDescription !== null &&
+      selectedSupportTicket.queryDescription !== undefined
+        ? selectedSupportTicket.queryDescription
+        : "",
+    publicNotes:
+      selectedSupportTicket.publicNotes !== null &&
+      selectedSupportTicket.publicNotes !== undefined
+        ? selectedSupportTicket.publicNotes
+        : "",
+    resolutionApplied:
+      selectedSupportTicket.resolutionApplied != null &&
+      selectedSupportTicket.resolutionApplied !== undefined
+        ? selectedSupportTicket.resolutionApplied
+        : "",
   });
 
-  useEffect(() => {
+  const [errorData, setErrorData] = useState({
+    ticketCatagoryError: false,
+    productSlaError: false,
+    ticketSourceError: false,
+    escalationLevelError: false,
+  });
+
+  function saveChangesOfSupportTicketState() {
+    setkeyForAssignTo((prev) => prev + 1);
+    setkeyForResolvedBy((prev) => prev + 1);
+    setkeyForPageDataChange((prev) => prev + 1);
     setFormData({
-      queryDescription: selectedSupportTicket.queryDescription,
-      publicNotes: selectedSupportTicket.publicNotes,
-      resolutionApplied: selectedSupportTicket.resolutionApplied,
+      queryDescription:
+        selectedSupportTicket.queryDescription !== null &&
+        selectedSupportTicket.queryDescription !== undefined
+          ? selectedSupportTicket.queryDescription
+          : "",
+      publicNotes:
+        selectedSupportTicket.publicNotes !== null &&
+        selectedSupportTicket.publicNotes !== undefined
+          ? selectedSupportTicket.publicNotes
+          : "",
+      resolutionApplied:
+        selectedSupportTicket.resolutionApplied != null &&
+        selectedSupportTicket.resolutionApplied !== undefined
+          ? selectedSupportTicket.resolutionApplied
+          : "",
     });
+  }
+
+  useEffect(() => {
+    saveChangesOfSupportTicketState();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedSupportTicket]);
 
   const [selectedAssignTo, setSelectedAssignTo] = useState<CompanyUser>({
@@ -143,7 +195,7 @@ const ViewSupportTicketManagement = () => {
     companyProductSla,
     loading: isLoadingForCompanyProductSla,
     // refetch: refetchCompanyProductSla,
-  } = useCompanyProductSla(selectedSupportTicket.companyProductId);
+  } = useCompanyProductSla(selectedSupportTicket.companyProductId, true);
 
   const {
     supportTicketCategory,
@@ -158,11 +210,21 @@ const ViewSupportTicketManagement = () => {
   const { supportTicketSource, isLoading: isLoadingForSupportTicketSource } =
     useSupportTicketSource();
 
-  const [isOpenLeadStatusHistory, setIsOpenLeadStatusHistory] =
+  const [isOpenSupportTicketHistory, setIsOpenSupportTicketHistory] =
     useState<boolean>(false);
 
   const [isLoadingForLifecycleChanging, setIsLoadingForLifecycleChanging] =
     useState<boolean>(false);
+
+  const [
+    isLoadingForSupportTicketInfoSave,
+    setIsLoadingForSupportTicketInfoSave,
+  ] = useState<boolean>(false);
+
+  //for re-rendering components when some activity is done without reloading the page
+  const [keyForAssignTo, setkeyForAssignTo] = useState<number>(0);
+  const [keyForResolvedBy, setkeyForResolvedBy] = useState<number>(0);
+  const [keyForPageDataChange, setkeyForPageDataChange] = useState<number>(0);
 
   const handleSaveSupportTicketLifecycleUpdate = async (
     lifecycleFormData: supportTicketLifecycleType
@@ -233,7 +295,9 @@ const ViewSupportTicketManagement = () => {
           //updating the url params
           const searchParams = new URLSearchParams(location.search);
 
-          const existingData = searchParams.get("supportTicketData");
+          const existingData = searchParams.get(
+            supportTicketDataUrlSearchParamKey
+          );
 
           const updatedQueryData = {
             ...(existingData ? JSON.parse(existingData) : {}),
@@ -241,7 +305,7 @@ const ViewSupportTicketManagement = () => {
           };
 
           searchParams.set(
-            "supportTicketData",
+            supportTicketDataUrlSearchParamKey,
             JSON.stringify(updatedQueryData)
           );
           setSelectedSupportTicketLifecycleId(undefined);
@@ -257,28 +321,33 @@ const ViewSupportTicketManagement = () => {
         }
       }
     } catch (error: any) {
-      if (error.status === STATUS_CODE.INTERNAL_SERVER_ERROR) {
-        toast.error(error.response?.data);
-      }
+      handleApiError(error);
     } finally {
       setIsLoadingForLifecycleChanging(false);
     }
   };
 
-  // const handleClickLeadOwnerChange = () => {
-  //   // setIsLeadOwnerPopUpOpen(true);
-  // };
   function handleFormDataChange(e: any) {
     const { name, value } = e.target;
     setFormData((prev: any) => {
       return { ...prev, [name]: value };
     });
-    // setSelectedSupportTicket((prev: any) => {
-    //   return { ...prev, [name]: value };
-    // });
   }
 
-  const handSupportTicketInfoSave = async () => {
+  function handleOnBlur(e: any) {
+    const { name, value } = e.target;
+    if (value.trim() === "") {
+      setFormData((prev: any) => {
+        return { ...prev, [name]: selectedSupportTicket[name] };
+      });
+    } else {
+      if (userHasAccessToUpdateSupportTicket) {
+        handleSupportTicketInfoSave();
+      }
+    }
+  }
+
+  const handleSupportTicketInfoSave = async () => {
     if (
       selectedSupportTicketCategory?.id ===
         selectedSupportTicket.supportTicketCategoryId &&
@@ -287,15 +356,27 @@ const ViewSupportTicketManagement = () => {
       selectedAssignTo.id === selectedSupportTicket.assignedTo &&
       selectedSupportTicketSource.id ===
         selectedSupportTicket.supportTicketSourceId &&
-      formData.queryDescription.trim() ===
-        selectedSupportTicket.queryDescription.trim() &&
-      formData.publicNotes.trim() ===
-        selectedSupportTicket.publicNotes.trim() &&
-      formData.resolutionApplied.trim() ===
-        selectedSupportTicket.resolutionApplied.trim() &&
+      (formData.queryDescription.trim() === "" ||
+        formData.queryDescription.trim() ===
+          (selectedSupportTicket.queryDescription
+            ? selectedSupportTicket.queryDescription.trim()
+            : "")) &&
+      (formData.publicNotes.trim() === "" ||
+        formData.publicNotes.trim() ===
+          (selectedSupportTicket.publicNotes
+            ? selectedSupportTicket.publicNotes.trim()
+            : "")) &&
+      (formData.resolutionApplied.trim() === "" ||
+        formData.resolutionApplied.trim() ===
+          (selectedSupportTicket.resolutionApplied
+            ? selectedSupportTicket.resolutionApplied.trim()
+            : "")) &&
       selectedResolvedBy.id === selectedSupportTicket.resolvedBy
-    )
+    ) {
       return;
+    }
+
+    setIsLoadingForSupportTicketInfoSave(true);
 
     const PostDataForSupportTicketUpdate = {
       company_id: loginStatus.companyId,
@@ -319,6 +400,7 @@ const ViewSupportTicketManagement = () => {
           ? selectedAssignTo.id
           : selectedSupportTicket.assignTo,
       resolvedby: selectedResolvedBy.id,
+      support_ticket_lifecycle_id: selectedSupportTicket.supportTicketLifecycleId,
       updatedby_id: loginStatus.id,
     };
     console.log(PostDataForSupportTicketUpdate);
@@ -354,14 +436,19 @@ const ViewSupportTicketManagement = () => {
         //updating the url params
         const searchParams = new URLSearchParams(location.search);
 
-        const existingData = searchParams.get("supportTicketData");
+        const existingData = searchParams.get(
+          supportTicketDataUrlSearchParamKey
+        );
 
         const updatedQueryData = {
           ...(existingData ? JSON.parse(existingData) : {}),
           ...updatedSupportTicket,
         };
 
-        searchParams.set("supportTicketData", JSON.stringify(updatedQueryData));
+        searchParams.set(
+          supportTicketDataUrlSearchParamKey,
+          JSON.stringify(updatedQueryData)
+        );
 
         navigate(`${location.pathname}?${searchParams.toString()}`, {
           replace: true,
@@ -372,17 +459,10 @@ const ViewSupportTicketManagement = () => {
         toast.error(response.data.message);
       }
     } catch (error: any) {
-      if (error.status === STATUS_CODE.UNATHORISED) {
-        const refreshTokenStatus = await RefreshToken({
-          callFunctionWithEvent: handSupportTicketInfoSave,
-        });
-        // setIsDialogueOpen(!refreshTokenStatus);
-        if (refreshTokenStatus) {
-          handSupportTicketInfoSave();
-        }
-      } else if (error.status === 400) {
-        toast.error(error.response.data);
-      }
+      handleApiError(error);
+    } finally {
+      setIsLoadingForSupportTicketInfoSave(false);
+      saveChangesOfSupportTicketState();
     }
   };
 
@@ -402,7 +482,10 @@ const ViewSupportTicketManagement = () => {
       (selectedResolvedBy.id !== 0 &&
         selectedResolvedBy.id !== selectedSupportTicket.resolvedBy)
     ) {
-      handSupportTicketInfoSave();
+      if (!userHasAccessToUpdateSupportTicket) {
+        return;
+      }
+      handleSupportTicketInfoSave();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
@@ -414,6 +497,10 @@ const ViewSupportTicketManagement = () => {
   ]);
 
   const [showAccountName, setShowAccountName] = useState<boolean>(false);
+
+  
+  
+
 
   return (
     <PageLayout onScrollChange={setShowAccountName} scrollTopValue={80}>
@@ -461,7 +548,13 @@ const ViewSupportTicketManagement = () => {
       >
         {/*Support Ticket Lifecycle*/}
         {!isLoadingForSupportTicketLifecycle ? (
-          <div className="mx-1 mt-2  flex  bg-slate-100  shadow rounded-sm">
+          <div
+            className={`mx-1 mt-2  flex  bg-slate-100  shadow rounded-sm ${
+              isLoadingForSupportTicketInfoSave || isLoadingForLifecycleChanging
+                ? "cursor-wait"
+                : "cursor-default"
+            }`}
+          >
             <div className="flex w-full">
               <div
                 className="flex w-[100%] border bg-white"
@@ -497,7 +590,6 @@ const ViewSupportTicketManagement = () => {
                           setSelectedSupportTicketLifecycleId(item.id);
                           setSelectedSupportTicketLifecycleName(item.name);
                         }
-                        /////////////////////////////////////////////////////////////////////////////////////
                       } else {
                         toast.error(
                           MESSAGE.MODULE_ACCESS.SUPPORT_MODULE
@@ -512,10 +604,9 @@ const ViewSupportTicketManagement = () => {
               </div>
               {/* status history */}
               <div className="flex justify-end caption-custom  mb-1 px-2">
-                {/* <span className="font-semibold ">Lead Status</span> */}
                 <button
                   onClick={() => {
-                    setIsOpenLeadStatusHistory(!isOpenLeadStatusHistory);
+                    setIsOpenSupportTicketHistory(!isOpenSupportTicketHistory);
                   }}
                 >
                   <span
@@ -562,18 +653,24 @@ const ViewSupportTicketManagement = () => {
         )}
 
         {/**Sections */}
-        <div className="w-full flex flex-col gap-1 p-1">
+        <div
+          className={`w-full flex flex-col gap-1 p-1 ${
+            isLoadingForSupportTicketInfoSave || isLoadingForLifecycleChanging
+              ? "cursor-wait"
+              : "cursor-default"
+          }`}
+        >
           {/** Section 1 */}
           {/* SUPPORT TICKET DETAILS */}
           <div className="w-full flex flex-col gap-4 ">
             {/* ===== ACCOUNT + PRODUCT IN SINGLE CARD ===== */}
             <div className="p-2 bg-white shadow rounded-lg border  flex flex-col gap-4">
               <div className="flex col-span-1 md:con-span-2 gap-6 justify-between ">
-                <div className="flex gap-6">
+                <div className="flex gap-3">
                   {/* Ticket Number */}
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-1.5">
                     <div className="bg-blue-600 p-1.5 rounded text-white">
-                      <TicketIcon size={30} strokeWidth={2} />
+                      <TicketIcon size={27} strokeWidth={2} />
                     </div>
                     <Detail
                       label="Ticket Number"
@@ -583,9 +680,9 @@ const ViewSupportTicketManagement = () => {
                     />
                   </div>
                   {/* Account */}
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-1.5">
                     <div className="bg-blue-600 p-1.5 rounded text-white">
-                      <HeadsetIcon size={30} strokeWidth={2} />
+                      <HeadsetIcon size={27} strokeWidth={2} />
                     </div>
                     <Detail
                       label="Account"
@@ -594,35 +691,11 @@ const ViewSupportTicketManagement = () => {
                       value={selectedSupportTicket?.accountName}
                     />
                   </div>
-                  {/* Account Email */}
-                  <div className="flex items-center gap-3">
-                    <div className="bg-blue-600 p-1.5 rounded text-white">
-                      <LucideMail size={30} strokeWidth={2} />
-                    </div>
-                    <Detail
-                      label="Email"
-                      hasBorder={false}
-                      type="none"
-                      value={selectedSupportTicket?.accountEmail}
-                    />
-                  </div>
-                  {/* Account Mobile Number*/}
-                  <div className="flex items-center gap-3">
-                    <div className="bg-blue-600 p-1.5 rounded text-white">
-                      <LucidePhoneCall size={30} strokeWidth={2} />
-                    </div>
-                    <Detail
-                      label="Mobile Number"
-                      hasBorder={false}
-                      type="none"
-                      value={selectedSupportTicket?.accountMobileNumber}
-                    />
-                  </div>
 
                   {/* Support Product Name*/}
-                  <div className="flex items-center gap-3">
-                    <div className="bg-blue-600 p-1.5 rounded text-white">
-                      <ShoppingBag size={30} strokeWidth={2} />
+                  <div className="flex items-center gap-1.5">
+                    <div className="bg-blue-600 p-1.5 rounded text-white ">
+                      <ShoppingBag size={27} strokeWidth={2} />
                     </div>
                     <Detail
                       label="Support Product"
@@ -631,60 +704,58 @@ const ViewSupportTicketManagement = () => {
                       value={selectedSupportTicket?.companyProductName}
                     />
                   </div>
+                  {/* Product SerialNumber */}
+                  {selectedSupportTicket?.serialNumber && (
+                    <div className="flex items-center gap-1.5">
+                      <div className="bg-blue-600 p-1.5 rounded text-white">
+                        <QrCodeIcon size={27} strokeWidth={2} />
+                      </div>
+                      <Detail
+                        label="Serial Number"
+                        hasBorder={false}
+                        type="none"
+                        value={selectedSupportTicket?.serialNumber}
+                      />
+                    </div>
+                  )}
                 </div>
-                <Detail
-                  type="none"
-                  label={
+
+                <div
+                  className={`${
                     selectedSupportTicket?.resolvedByName !== "NA" &&
                     selectedSupportTicket?.resolvedByName
-                      ? "Resolved By"
-                      : "Resolved Status"
-                  }
-                  value={
-                    selectedSupportTicket?.resolvedByName || "Not Resolved"
-                  }
-                />
+                      ? "hover:cursor-cell"
+                      : "hover:cursor-not-allowed"
+                  }`}
+                >
+                  <Detail
+                    type="none"
+                    onClick={() => {
+                      searchRef.current?.focus();
+                    }}
+                    label={
+                      selectedSupportTicket?.resolvedByName !== "NA" &&
+                      selectedSupportTicket?.resolvedByName
+                        ? "Resolved By"
+                        : "Status"
+                    }
+                    value={
+                      selectedSupportTicket?.resolvedByName || "Not Resolved"
+                    }
+                  />
+                </div>
               </div>
             </div>
 
             {/* ===== MAIN TWO-COLUMN LAYOUT ===== */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div
+              className="grid grid-cols-1 md:grid-cols-2 gap-4"
+              // data-refresh={keyForTextAreaInput}
+              key={keyForPageDataChange}
+            >
               {/* LEFT SIDE FORM */}
               <div className="flex flex-col gap-4">
-                {/* 4 DROPDOWNS GRID */}
                 <div className="p-1 bg-white shadow rounded-lg border grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  {/* Assign To */}
-                  <CompanyUserSearchFieldInput
-                    logo={User}
-                    label="Assign To"
-                    // placeholder={selectedSupportTicket.assignedToName}
-                    defaultValue={selectedSupportTicket.assignedToName}
-                    isDisabled={!userHasAccessToUpdateSupportTicket}
-                    disabledMessage={
-                      MESSAGE.MODULE_ACCESS.SUPPORT_MODULE
-                        .UPDATE_ACCESS_DENIED_MESSAGE
-                    }
-                    onUserSelected={(user) => {
-                      if (user && user.id !== 0) {
-                        setSelectedAssignTo(user);
-                        // handSupportTicketInfoSave();
-                      }
-                      if (user === null || user === undefined) {
-                        setSelectedAssignTo({
-                          company_id: 0,
-                          email: "",
-                          fullname: selectedSupportTicket.assignedToName,
-                          mobilenumber: "",
-                          generate_password: "",
-                          createdby: "",
-                          id: selectedSupportTicket.assignedTo,
-                          isactive: false,
-                          requestedby: "",
-                        });
-                      }
-                    }}
-                  />
-
                   {/* Ticket Category */}
                   {isLoadingForSupportTicketCategory ? (
                     <div className="flex flex-col gap-2 animate-pulse w-full">
@@ -692,63 +763,55 @@ const ViewSupportTicketManagement = () => {
                       <div className="h-10 bg-gray-200 rounded" />
                     </div>
                   ) : (
-                    <CustomDropdown
-                      logo={ListTree}
-                      labelName="Ticket Category"
-                      options={supportTicketCategory}
-                      preselectedOption={
-                        selectedSupportTicket?.supportTicketCategoryId
-                      }
-                      onSelect={(value) => {
-                        if (userHasAccessToUpdateSupportTicket) {
-                          const result = supportTicketCategory?.find(
-                            (item) => item.id === value
-                          );
-                          setSelectedSupportTicketCategor({
-                            id: value || 0,
-                            name: result?.name || "",
-                          });
-                        } else {
-                          toast.error(
-                            MESSAGE.MODULE_ACCESS.SUPPORT_MODULE
-                              .UPDATE_ACCESS_DENIED_MESSAGE
-                          );
+                    <div
+                      className={`space-y-1 ${
+                        isLoadingForSupportTicketInfoSave
+                          ? "cursor-wait"
+                          : "cursor-pointer"
+                      }`}
+                    >
+                      <CustomDropdown
+                        logo={ListTree}
+                        labelName="Ticket Category"
+                        options={supportTicketCategory}
+                        preselectedOption={
+                          selectedSupportTicket?.supportTicketCategoryId
                         }
-                      }}
-                    />
-                  )}
-
-                  {/* Product SLA */}
-                  {isLoadingForCompanyProductSla ? (
-                    <div className="flex flex-col gap-2 animate-pulse w-full">
-                      <div className="h-4 w-24 bg-gray-200 rounded" />
-                      <div className="h-10 bg-gray-200 rounded" />
+                        // selectedValue={selectedSupportTicketCategory?.id}
+                        readOnly={!userHasAccessToUpdateSupportTicket}
+                        onSelect={(value) => {
+                          if (userHasAccessToUpdateSupportTicket) {
+                            const result = supportTicketCategory?.find(
+                              (item) => item.id === value
+                            );
+                            if (value) {
+                              setSelectedSupportTicketCategor({
+                                id: value || 0,
+                                name: result?.name || "",
+                              });
+                              setErrorData((prev) => {
+                                return {
+                                  ...prev,
+                                  ticketCatagoryError: false,
+                                };
+                              });
+                            } else {
+                              setErrorData((prev) => {
+                                return {
+                                  ...prev,
+                                  ticketCatagoryError: true,
+                                };
+                              });
+                            }
+                          }
+                        }}
+                      />
+                      {errorData.ticketCatagoryError && (
+                        <div className="text-red-500 text-xs">
+                          Please select ticket category
+                        </div>
+                      )}
                     </div>
-                  ) : (
-                    <CustomDropdown
-                      logo={Hourglass}
-                      labelName="Product SLA"
-                      options={companyProductSla}
-                      preselectedOption={
-                        selectedSupportTicket?.companyProductSlaId
-                      }
-                      onSelect={(value) => {
-                        if (userHasAccessToUpdateSupportTicket) {
-                          const result = companyProductSla?.find(
-                            (item) => item.id === value
-                          );
-                          setSelectedCompanyProductSla({
-                            id: value || 0,
-                            name: result?.name || "",
-                          });
-                        } else {
-                          toast.error(
-                            MESSAGE.MODULE_ACCESS.SUPPORT_MODULE
-                              .UPDATE_ACCESS_DENIED_MESSAGE
-                          );
-                        }
-                      }}
-                    />
                   )}
 
                   {/* Support ticket source */}
@@ -758,23 +821,111 @@ const ViewSupportTicketManagement = () => {
                       <div className="h-10 bg-gray-200 rounded" />
                     </div>
                   ) : (
-                    <CustomDropdown
-                      logo={Layers}
-                      labelName="Source"
-                      options={supportTicketSource}
-                      preselectedOption={
-                        selectedSupportTicket?.supportTicketSourceId
-                      }
-                      onSelect={(value) => {
-                        const result = supportTicketSource?.find(
-                          (item) => item.id === value
-                        );
-                        setSelectedSupportTicketSource({
-                          id: value,
-                          name: result?.name || "",
-                        });
-                      }}
-                    />
+                    <div
+                      className={`space-y-1 ${
+                        isLoadingForSupportTicketInfoSave
+                          ? "cursor-wait"
+                          : "cursor-pointer"
+                      }`}
+                    >
+                      <CustomDropdown
+                        logo={Layers}
+                        labelName="Source"
+                        options={supportTicketSource}
+                        preselectedOption={
+                          selectedSupportTicket?.supportTicketSourceId
+                        }
+                        readOnly={!userHasAccessToUpdateSupportTicket}
+                        onSelect={(value) => {
+                          if (userHasAccessToUpdateSupportTicket) {
+                            const result = supportTicketSource?.find(
+                              (item) => item.id === value
+                            );
+                            if (value) {
+                              setSelectedSupportTicketSource({
+                                id: value,
+                                name: result?.name || "",
+                              });
+                              setErrorData((prev) => {
+                                return {
+                                  ...prev,
+                                  ticketSourceError: false,
+                                };
+                              });
+                            } else {
+                              setErrorData((prev) => {
+                                return {
+                                  ...prev,
+                                  ticketSourceError: true,
+                                };
+                              });
+                            }
+                          }
+                        }}
+                      />
+                      {errorData.ticketSourceError && (
+                        <div className="text-red-500 text-xs">
+                          Please select ticket source
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Product SLA */}
+                  {isLoadingForCompanyProductSla ? (
+                    <div className="flex flex-col gap-2 animate-pulse w-full">
+                      <div className="h-4 w-24 bg-gray-200 rounded" />
+                      <div className="h-10 bg-gray-200 rounded" />
+                    </div>
+                  ) : (
+                    <div
+                      className={`space-y-1 ${
+                        isLoadingForSupportTicketInfoSave
+                          ? "cursor-wait"
+                          : "cursor-pointer"
+                      }`}
+                    >
+                      <CustomDropdown
+                        logo={Hourglass}
+                        labelName="Product SLA"
+                        options={companyProductSla}
+                        preselectedOption={
+                          selectedSupportTicket?.companyProductSlaId
+                        }
+                        readOnly={!userHasAccessToUpdateSupportTicket}
+                        onSelect={(value) => {
+                          if (userHasAccessToUpdateSupportTicket) {
+                            const result = companyProductSla?.find(
+                              (item) => item.id === value
+                            );
+                            if (value) {
+                              setSelectedCompanyProductSla({
+                                id: value || 0,
+                                name: result?.name || "",
+                              });
+                              setErrorData((prev) => {
+                                return {
+                                  ...prev,
+                                  productSlaError: false,
+                                };
+                              });
+                            } else {
+                              setErrorData((prev) => {
+                                return {
+                                  ...prev,
+                                  productSlaError: true,
+                                };
+                              });
+                            }
+                          }
+                        }}
+                      />
+                      {errorData.productSlaError && (
+                        <div className="text-red-500 text-xs">
+                          Please select company product SLA
+                        </div>
+                      )}
+                    </div>
                   )}
 
                   {isLoadingForSupportTicketEscalationLevel ? (
@@ -783,34 +934,76 @@ const ViewSupportTicketManagement = () => {
                       <div className="h-10 bg-gray-200 rounded" />
                     </div>
                   ) : (
-                    <CustomDropdown
-                      logo={TrendingUp}
-                      labelName="Escalation Level"
-                      options={supportTickeEscalationLevel}
-                      preselectedOption={
-                        selectedSupportTicket?.supportTicketEscalationLevelId
-                      }
-                      onSelect={(value) => {
-                        setSelectedSupportTicketEscalationId(value);
-                        const result = supportTickeEscalationLevel?.find(
-                          (item) => item.id === value
-                        );
-                        setSelectedSupportTicket({
-                          ...selectedSupportTicket,
-                          supportTicketEscalationLevelName: result?.name,
-                          supportTicketEscalationLevelId: value,
-                        });
-                        // handSupportTicketInfoSave();
-                      }}
-                    />
+                    <div
+                      className={`space-y-1 ${
+                        isLoadingForSupportTicketInfoSave
+                          ? "cursor-wait"
+                          : "cursor-pointer"
+                      }`}
+                    >
+                      <CustomDropdown
+                        logo={TrendingUp}
+                        labelName="Escalation Level"
+                        options={supportTickeEscalationLevel}
+                        preselectedOption={
+                          selectedSupportTicket?.supportTicketEscalationLevelId
+                        }
+                        readOnly={!userHasAccessToUpdateSupportTicket}
+                        onSelect={(value) => {
+                          setSelectedSupportTicketEscalationId(value);
+                          // const result = supportTickeEscalationLevel?.find(
+                          //   (item) => item.id === value
+                          // );
+                          if (value) {
+                            // setSelectedSupportTicket({
+                            //   ...selectedSupportTicket,
+                            //   supportTicketEscalationLevelName: result?.name,
+                            //   supportTicketEscalationLevelId: value,
+                            // });
+                            setErrorData((prev) => {
+                              return {
+                                ...prev,
+                                escalationLevelError: false,
+                              };
+                            });
+                          } else {
+                            setErrorData((prev) => {
+                              return {
+                                ...prev,
+                                escalationLevelError: true,
+                              };
+                            });
+                          }
+                        }}
+                      />
+                      {errorData.escalationLevelError && (
+                        <div className="text-red-500 text-xs">
+                          Please select escalation level
+                        </div>
+                      )}
+                    </div>
                   )}
 
-                  {selectedSupportTicket.resolvedBy && (
+                  {/* Assign To */}
+                  <div
+                    className={` ${
+                      isLoadingForSupportTicketInfoSave
+                        ? "cursor-wait"
+                        : "cursor-pointer"
+                    }`}
+                  >
                     <CompanyUserSearchFieldInput
-                      logo={UserCheck2Icon}
-                      label="Resolved By"
+                      key={keyForAssignTo}
+                      logo={User}
+                      has={{
+                          border: true,
+                          penLogo: true,
+                          searchLogo: true,
+                          xLogo:true
+                        }}
+                      label="Assign To"
                       // placeholder={selectedSupportTicket.assignedToName}
-                      defaultValue={selectedSupportTicket.resolvedByName}
+                      defaultValue={selectedSupportTicket.assignedToName}
                       isDisabled={!userHasAccessToUpdateSupportTicket}
                       disabledMessage={
                         MESSAGE.MODULE_ACCESS.SUPPORT_MODULE
@@ -818,11 +1011,11 @@ const ViewSupportTicketManagement = () => {
                       }
                       onUserSelected={(user) => {
                         if (user && user.id !== 0) {
-                          setSelectedResolvedBy(user);
-                          // handSupportTicketInfoSave();
+                          setSelectedAssignTo(user);
                         }
                         if (user === null || user === undefined) {
-                          setSelectedResolvedBy({
+                          setkeyForAssignTo((prev)=>prev+1);
+                          setSelectedAssignTo({
                             company_id: 0,
                             email: "",
                             fullname: selectedSupportTicket.assignedToName,
@@ -836,6 +1029,54 @@ const ViewSupportTicketManagement = () => {
                         }
                       }}
                     />
+                  </div>
+
+                  {selectedSupportTicket.resolvedBy && (
+                    <div
+                      className={` ${
+                        isLoadingForSupportTicketInfoSave
+                          ? "cursor-wait"
+                          : "cursor-pointer"
+                      }`}
+                    >
+                      <CompanyUserSearchFieldInput
+                        ref={searchRef}
+                        key={keyForResolvedBy}
+                        logo={UserCheck2Icon}
+                        has={{
+                          border: true,
+                          searchLogo: true,
+                          penLogo: true,
+                          xLogo:true
+                        }}
+                        label="Resolved By"
+                        defaultValue={selectedSupportTicket.resolvedByName}
+                        isDisabled={!userHasAccessToUpdateSupportTicket}
+                        disabledMessage={
+                          MESSAGE.MODULE_ACCESS.SUPPORT_MODULE
+                            .UPDATE_ACCESS_DENIED_MESSAGE
+                        }
+                        onUserSelected={(user) => {
+                          if (user && user.id !== 0) {
+                            setSelectedResolvedBy(user);
+                          }
+                          if (user === null || user === undefined) {
+                            setkeyForResolvedBy((prev) => prev + 1);
+                            setSelectedResolvedBy({
+                              company_id: 0,
+                              email: "",
+                              fullname: selectedSupportTicket.resolvedByName,
+                              mobilenumber: "",
+                              generate_password: "",
+                              createdby: "",
+                              id: selectedSupportTicket.resolvedBy,
+                              isactive: false,
+                              requestedby: "",
+                            });
+                          }
+                        }}
+                      />
+                    </div>
                   )}
                 </div>
               </div>
@@ -844,41 +1085,78 @@ const ViewSupportTicketManagement = () => {
               <div className="flex flex-col gap-4">
                 {/* Created/Updated Info */}
                 <div className="p-4 bg-white shadow rounded-lg border grid grid-cols-2 gap-1">
-                  <Detail
-                    label="Created By"
-                    type="none"
-                    value={selectedSupportTicket?.createdBy}
-                  />
-                  <Detail
-                    label="Created On"
-                    type="none"
-                    value={selectedSupportTicket?.createdOn}
-                  />
+                  {/* Account Email */}
+                  <div className="flex items-center gap-1.5 mb-1.5">
+                    <div className="bg-blue-600 p-1 mb-1.5 rounded text-white">
+                      <LucideMail size={25} strokeWidth={2} />
+                    </div>
+                    <Detail
+                      label="Account Email"
+                      hasBorder={false}
+                      type="none"
+                      value={selectedSupportTicket?.accountEmail}
+                    />
+                  </div>
+                  {/* Account Mobile Number*/}
+                  <div className="flex items-center gap-1.5 mb-1.5">
+                    <div className="bg-blue-600 p-1 mb-1.5 rounded text-white">
+                      <LucidePhoneCall size={25} strokeWidth={2} />
+                    </div>
+                    <Detail
+                      label="Account Mobile Number"
+                      hasBorder={false}
+                      type="none"
+                      value={selectedSupportTicket?.accountMobileNumber}
+                    />
+                  </div>
+                  <div className="flex items-center gap-1.5 ">
+                    <Detail
+                      label="Created By"
+                      type="none"
+                      value={selectedSupportTicket?.createdBy}
+                    />
+                  </div>
+                  <div className="flex items-center gap-1.5 ">
+                    <Detail
+                      label="Created On"
+                      type="none"
+                      value={selectedSupportTicket?.createdOn}
+                    />
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <Detail
+                      label="Updated By"
+                      type="none"
+                      value={selectedSupportTicket?.updatedBy}
+                    />
+                  </div>
 
-                  <Detail
-                    label="Updated By"
-                    type="none"
-                    value={selectedSupportTicket?.updatedBy}
-                  />
-                  <Detail
-                    label="Updated On"
-                    type="none"
-                    value={selectedSupportTicket?.updatedOn}
-                  />
+                  <div className="flex items-center gap-1.5">
+                    <Detail
+                      label="Updated On"
+                      type="none"
+                      value={selectedSupportTicket?.updatedOn}
+                    />
+                  </div>
+                   
                 </div>
               </div>
             </div>
           </div>
 
           {/* Second Column */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 w-full">
+          <div
+            className="grid grid-cols-1 sm:grid-cols-3 gap-3 w-full"
+            // data-refresh={keyForTextAreaInput}
+            // key={keyForTextAreaInput}
+          >
             {/* Query Description */}
             <TextAreaInput
               logo={LucideText}
               label="Query Description"
               name="queryDescription"
               value={formData.queryDescription}
-              defaultValue={selectedSupportTicket?.queryDescription}
+              // defaultValue={selectedSupportTicket?.queryDescription}
               onChange={(e) => {
                 if (userHasAccessToUpdateSupportTicket) {
                   handleFormDataChange(e);
@@ -886,12 +1164,12 @@ const ViewSupportTicketManagement = () => {
               }}
               readonly={!userHasAccessToUpdateSupportTicket}
               disabled={!userHasAccessToUpdateSupportTicket}
-              onBlur={() => {
+              onBlur={(e) => {
                 if (userHasAccessToUpdateSupportTicket) {
-                  handSupportTicketInfoSave();
+                  handleOnBlur(e);
                 }
               }}
-              rows={2}
+              rows={userHasAccessToViewSupportTicketTask ? 4 : 9}
               cols={0}
             />
 
@@ -901,18 +1179,18 @@ const ViewSupportTicketManagement = () => {
               label="Resolution Applied"
               name="resolutionApplied"
               value={formData.resolutionApplied}
-              defaultValue={selectedSupportTicket?.resolutionApplied}
+              // defaultValue={selectedSupportTicket?.resolutionApplied}
               onChange={(e) => {
                 if (userHasAccessToUpdateSupportTicket) handleFormDataChange(e);
               }}
               readonly={!userHasAccessToUpdateSupportTicket}
               disabled={!userHasAccessToUpdateSupportTicket}
-              onBlur={() => {
+              onBlur={(e) => {
                 if (userHasAccessToUpdateSupportTicket) {
-                  handSupportTicketInfoSave();
+                  handleOnBlur(e);
                 }
               }}
-              rows={2}
+              rows={userHasAccessToViewSupportTicketTask ? 4 : 9}
               cols={0}
             />
 
@@ -922,37 +1200,37 @@ const ViewSupportTicketManagement = () => {
               label="Public Notes"
               name="publicNotes"
               value={formData.publicNotes}
-              defaultValue={selectedSupportTicket?.publicNotes}
+              // defaultValue={selectedSupportTicket?.publicNotes}
               onChange={(e) => {
                 if (userHasAccessToUpdateSupportTicket) handleFormDataChange(e);
               }}
               readonly={!userHasAccessToUpdateSupportTicket}
               disabled={!userHasAccessToUpdateSupportTicket}
-              onBlur={() => {
+              onBlur={(e) => {
                 if (userHasAccessToUpdateSupportTicket) {
-                  handSupportTicketInfoSave();
+                  handleOnBlur(e);
                 }
               }}
-              rows={2}
+              rows={userHasAccessToViewSupportTicketTask ? 4 : 9}
               cols={0}
             />
           </div>
 
           {/* third Column */}
-          <div className="mt-3">
-            <SupportTicketTasksModal
-            // ownerId ={selectedSupportTicket?.assignedToId}
-            />
-          </div>
+          {(
+            <div className="mt-3">
+              <SupportTicketTasksModal />
+            </div>
+          )}
         </div>
 
         {/* Support Ticket history */}
-        {isOpenLeadStatusHistory && (
+        {isOpenSupportTicketHistory && (
           <SupportTicketHistoryView
             selectedSupportTicket={selectedSupportTicket}
-            isOpen={isOpenLeadStatusHistory}
+            isOpen={isOpenSupportTicketHistory}
             onClose={() => {
-              setIsOpenLeadStatusHistory(!isOpenLeadStatusHistory);
+              setIsOpenSupportTicketHistory(!isOpenSupportTicketHistory);
             }}
           />
         )}
@@ -960,7 +1238,7 @@ const ViewSupportTicketManagement = () => {
         {selectedSupportTicketLifecycleId && (
           <SupportTicketLIfecycleChangeModal
             isLoading={isLoadingForLifecycleChanging}
-            previousSupportTicketStatus={selectedSupportTicket}
+            selectedSupportTicketState={selectedSupportTicket}
             selectedSupportTicketLifecyclId={selectedSupportTicketLifecycleId}
             selectedSupportTicketLifecycleName={
               selectedSupportTicketLifecycleName
@@ -983,13 +1261,13 @@ type DetailProps = {
   value: string;
   type?: "text" | "number" | "select" | "none";
   options?: string[];
+  onClick?: () => void;
   onChange?: (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
     >
   ) => void;
   handleSupportTicketInfoSave?: () => Promise<void>;
-  handleClickLeadOwnerChange?: () => void;
   hasBorder?: boolean;
   rows?: number;
 };
@@ -1000,8 +1278,8 @@ const Detail: React.FC<DetailProps> = ({
   type,
   options = [],
   onChange,
+  onClick,
   handleSupportTicketInfoSave,
-  handleClickLeadOwnerChange,
   hasBorder,
   rows = 3,
 }) => {
@@ -1122,10 +1400,11 @@ const Detail: React.FC<DetailProps> = ({
       type === "none" ? (
         <div>
           <p className="input-label-custom text-gray-800 whitespace-nowrap overflow-x-hidden text-clip">
-            {value ? (
+            {value && (
               <span
-                title={value.length > 30 ? value : undefined}
-                className={`inline-block max-w-[250px] select-text truncate ${
+                onClick={onClick}
+                title={value.length > 25 ? value : undefined}
+                className={`inline-block max-w-[200px] select-text truncate ${
                   [
                     "Updated By",
                     "Updated On",
@@ -1133,9 +1412,13 @@ const Detail: React.FC<DetailProps> = ({
                     "Created On",
                     "Account",
                     "Support Product",
+                    "Serial Number",
                     "Resolved Status",
+                    "Status",
                     "Resolved By",
+                    "Account Email",
                     "Email",
+                    "Account Mobile Number",
                     "Mobile Number",
                     "Ticket Number",
                   ].includes(label)
@@ -1144,23 +1427,6 @@ const Detail: React.FC<DetailProps> = ({
                 }`}
               >
                 {value}
-              </span>
-            ) : (
-              <span
-                className={`${
-                  [
-                    "Updated By",
-                    "Updated On",
-                    "Created By",
-                    "Created On",
-                  ].includes(label)
-                    ? ""
-                    : "border border-gray-200 rounded-md"
-                } caption-custom px-1`}
-              >
-                {["Updated By", "Created By", "Created On"].includes(label)
-                  ? "Data not found"
-                  : "Add here..."}
               </span>
             )}
           </p>
@@ -1172,21 +1438,6 @@ const Detail: React.FC<DetailProps> = ({
           title={value}
         >
           {value || <span className="italic text-gray-400">Add here...</span>}
-        </div>
-      ) : label === "Lead owner" ? (
-        <div
-          title={value}
-          className="input-label-custom hover:bg-slate-100 cursor-pointer"
-          onClick={handleClickLeadOwnerChange}
-        >
-          {value ? (
-            <>
-              {value}
-              <Edit3 className="ml-1 h-3 w-3 inline-block text-slate-400 flex-shrink-0" />
-            </>
-          ) : (
-            <span className="input-label-custom">Add here...</span>
-          )}
         </div>
       ) : (
         <div
@@ -1200,7 +1451,7 @@ const Detail: React.FC<DetailProps> = ({
         >
           <div className="flex items-center cursor-pointer hover:bg-slate-100 rounded transition-colors">
             <span
-              className={`truncate ${label === "Name" ? "" : "max-w-[205px]"}`}
+              className={`truncate ${label === "Name" ? "" : "max-w-[200px]"}`}
             >
               {value || (
                 <span className="p-1 caption-custom italic">Add here...</span>

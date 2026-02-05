@@ -8,7 +8,7 @@ import SupportTicketProps from "../../@types/support-ticket-management/SupportTi
 
 function SupportTicketManagementAgGrid({
   supportTickets,
-  onRowSelect, //selected user for view lead details
+  onRowSelect, 
   handleRowClick,
   isUsedInSupportTicketModule,
   
@@ -23,12 +23,7 @@ function SupportTicketManagementAgGrid({
         headerName: "Ticket Number",
         minWidth: 130,
       },
-      {
-        field: "createdOn",
-        headerName: "Created On",
-        sortable: true,
-        filter: true,
-      },
+
       {
         field: "accountName",
         headerName: "Account Name",
@@ -48,13 +43,18 @@ function SupportTicketManagementAgGrid({
         sortable: true,
         filter: true,
       },
-       {
+      {
         field: "companyProductName",
         headerName: "Product Name",
         sortable: true,
         filter: true,
       },
-      
+      {
+        field: "serialNumber",
+        headerName: "Serial Number",
+        sortable: true,
+        filter: true,
+      },
       {
         field: "queryDescription",
         hide: !isUsedInSupportTicketModule,
@@ -70,8 +70,20 @@ function SupportTicketManagementAgGrid({
         filter: true,
       },
       {
+        field: "barcode",
+        headerName: "Barcode",
+        sortable: true,
+        filter: true,
+      },
+      {
         field: "createdBy",
         headerName: "Created By",
+        filter: true,
+      },
+      {
+        field: "createdOn",
+        headerName: "Created On",
+        sortable: true,
         filter: true,
       },
       {
@@ -84,27 +96,28 @@ function SupportTicketManagementAgGrid({
         comparator: (a, b) => a?.toLowerCase().localeCompare(b?.toLowerCase()),
       },
       {
-        field: "resolvedByName",
-        headerName: "Resolved By",
-        sortable: true,
-        filter: true,
-      },
-      {
-        field: "resolutionApplied",
-        headerName: "Resolution Applied",
-        sortable: true,
-        filter: true,
-      },
-      
-      {
         field: "dueDateTime",
         headerName: "Due Date/Time",
         sortable: true,
         filter: true,
       },
       {
+        field: "resolvedByName",
+        headerName: "Resolved By",
+        sortable: true,
+        filter: true,
+      },
+
+      {
         field: "completedAtDateTime",
         headerName: "Completed At Date/Time",
+        sortable: true,
+        filter: true,
+      },
+
+      {
+        field: "resolutionApplied",
+        headerName: "Resolution Applied",
         sortable: true,
         filter: true,
       },

@@ -44,7 +44,7 @@ function WebFormIntegrationTabs({
   return (
     <div className="relative">
       <Tabs value={activeTab}>
-        <div className="sticky top-0 bg-white pb-2">
+        <div className="sticky top-0">
           <TabsHeader
             placeholder="All Tasks"
             onPointerEnterCapture={undefined}

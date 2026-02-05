@@ -29,7 +29,6 @@ import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserCon
 import Lead from "../../../../@types/lead-management/LeadManagementProps";
 import {  STATUS_CODE } from "../../../../constants/AppConstants";
 import CompanyUsersSearchProps from "../../../../@types/company-users/CompanyUserProps";
-import axios from "axios";
 import POST_API from "../../../../constants/PostApi";
 import RefreshToken from "../../../../config/validations/RefreshToken";
 import CompanyLeadContactsSelectionAgGrid from "../../../ag-grid/CompanyLeadContactsSelectionAgGrid";
@@ -43,6 +42,7 @@ import ToggleButton from "../../../ui/ToggleButton";
 import MESSAGE from "../../../../constants/Messages";
 import LoadingPopUpAnimation from "../../../views/card/LoadingPopUpAnimation";
 import FormLayout from "../../../ui/FormLayout";
+import axiosClient from "../../../../axios-client/AxiosClient";
 
 function UpdateLeadTaskModal({
   isOpen,
@@ -288,7 +288,7 @@ function UpdateLeadTaskModal({
     };
 
     setIsSaving(true);
-    await axios
+    await axiosClient
       .post(POST_API.UPDATE_LEAD_TASK, updateLeadTaskPostData, {
         withCredentials: true,
       })
@@ -332,7 +332,7 @@ function UpdateLeadTaskModal({
         requestedby: loginStatus.id,
       };
 
-      await axios
+      await axiosClient
         .post(POST_API.GET_COMPANY_USERS, getCompanyUserPostData, {
           withCredentials: true,
         })
@@ -379,7 +379,7 @@ function UpdateLeadTaskModal({
       updatedby_id: loginStatus.id,
     };
 
-    axios
+    axiosClient
       .post(POST_API.UPDATE_LEAD_TASK, updateLeadTaskPostData, {
         withCredentials: true,
       })

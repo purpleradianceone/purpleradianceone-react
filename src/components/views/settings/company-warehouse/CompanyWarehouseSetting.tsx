@@ -25,8 +25,8 @@ const CompanyWarehouseSetting: React.FC = () => {
   const { warehouseTypeData } = useWarehouseType();
 
   const {
-    userHasAccessToAddSettingGeneral,
-    userHasAccessToUpdateSettingGeneral,
+    userHasAccessToUpdateSettingCompanyWarehouse,
+    userHasAccessToAddSettingCompanyWarehouse
   } = useUserAccessModules();
 
   const { loginStatus } = useLoggedInUserContext();
@@ -108,6 +108,10 @@ const CompanyWarehouseSetting: React.FC = () => {
   }) => {
   
 
+    if(!userHasAccessToUpdateSettingCompanyWarehouse){
+      toast.error(MESSAGE.MODULE_ACCESS.SETTING.COMPANY_WAREHOUSE_SETTING.DENIED_UPDATE_ACCESS)
+      return;
+    }
     if (!validateName(editingTypeName)) {
       toast.error(
         "Invalid warehouse name. Only letters, numbers, spaces, '.', '&', and '-' are allowed."
@@ -186,15 +190,16 @@ const CompanyWarehouseSetting: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="h-56 flex items-center justify-center">
+      <div className="h-screen flex items-center justify-center">
         <div className="flex items-center justify-between gap-3">
-          <span>Loading...</span> <LoadingSpinner />
+          {/* <span>Loading...</span> */}
+           <LoadingSpinner />
         </div>
       </div>
     );
   }
   return (
-    <div className="min-h-screen bg-gray-50 rounded-md">
+    <div className="min-h-screen bg-gray-50 rounded-md ">
       <div className="max-w-6xl mx-auto p-1">
         <div className="flex justify-between">
           <h1 className="table-header-custom my-3">Company Warehouse</h1>
@@ -202,15 +207,15 @@ const CompanyWarehouseSetting: React.FC = () => {
             <div>
               <Button
                 type="submit"
+                disabled={!userHasAccessToAddSettingCompanyWarehouse}
                 onClick={(e) => {
                   e.preventDefault();
-                  setShowAddForm(true);
                   // remove above line after code is done
-                  if (userHasAccessToAddSettingGeneral) {
+                  if (userHasAccessToAddSettingCompanyWarehouse) {
                     setShowAddForm(true);
                   } else {
                     toast.error(
-                      MESSAGE.MODULE_ACCESS.COMPANY_WAREHOUSE.DENIED_ADD_ACCESS
+                      MESSAGE.MODULE_ACCESS.SETTING.COMPANY_WAREHOUSE_SETTING.DENIED_ADD_ACCESS
                     );
                   }
                 }}
@@ -236,7 +241,7 @@ const CompanyWarehouseSetting: React.FC = () => {
           ></CreateCompanyWarehouse>
         )}
 
-        <div className="p-4 grid md:grid-cols-4 sm:grid-cols-2 gap-4 bg-white">
+        <div className="p-4 grid md:grid-cols-4 sm:grid-cols-2 gap-4 bg-white border rounded-md">
           {companyWarehouse.length === 0 ? (
             <p className="flex items-center justify-center caption-custom h-56 text-center ">
               No Company Warehouse is Available.
@@ -287,14 +292,13 @@ const CompanyWarehouseSetting: React.FC = () => {
                       title={item.name}
                       className="hover:bg-gray-00 flex items-center gap-1 table-data-custom md-2 cursor-pointer "
                       onClick={() => {
-                        if (userHasAccessToUpdateSettingGeneral) {
+                        if (userHasAccessToUpdateSettingCompanyWarehouse) {
                           setEditingTypeId(item.id);
                           setEditingTypeName(item.name);
                           setEditingField("name");
                         } else {
                           toast.error(
-                            MESSAGE.MODULE_ACCESS.COMPANY_WAREHOUSE
-                              .DENIED_UPDATE_ACCESS
+                            MESSAGE.MODULE_ACCESS.SETTING.COMPANY_WAREHOUSE_SETTING.DENIED_UPDATE_ACCESS
                           );
                         }
                       }}
@@ -360,14 +364,13 @@ const CompanyWarehouseSetting: React.FC = () => {
                       title={item.description}
                       className="hover:bg-gray-00 flex items-center gap-1 table-data-custom md-2 cursor-pointer "
                       onClick={() => {
-                        if (userHasAccessToUpdateSettingGeneral) {
+                        if (userHasAccessToUpdateSettingCompanyWarehouse) {
                           setEditingTypeId(item.id);
                           setEditingTypeDescription(item.description ?? "");
                           setEditingField("description");
                         } else {
                           toast.error(
-                            MESSAGE.MODULE_ACCESS.COMPANY_WAREHOUSE
-                              .DENIED_UPDATE_ACCESS
+                            MESSAGE.MODULE_ACCESS.SETTING.COMPANY_WAREHOUSE_SETTING.DENIED_UPDATE_ACCESS
                           );
                         }
                       }}
@@ -431,15 +434,14 @@ const CompanyWarehouseSetting: React.FC = () => {
                       title={item.location}
                       className="hover:bg-gray-00 flex items-center gap-1 table-data-custom md-2 cursor-pointer "
                       onClick={() => {
-                        if (userHasAccessToUpdateSettingGeneral) {
+                        if (userHasAccessToUpdateSettingCompanyWarehouse) {
                           setEditingTypeId(item.id);
                           setEditingTypeDescription(item.description ?? "");
                           setEditingTypeLocation(item.location ?? "");
                           setEditingField("location");
                         } else {
                           toast.error(
-                            MESSAGE.MODULE_ACCESS.COMPANY_WAREHOUSE
-                              .DENIED_UPDATE_ACCESS
+                            MESSAGE.MODULE_ACCESS.SETTING.COMPANY_WAREHOUSE_SETTING.DENIED_UPDATE_ACCESS
                           );
                         }
                       }}

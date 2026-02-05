@@ -12,30 +12,30 @@ import { JSX_CHILDREN_NAME, SIZE } from "../../constants/AppConstants";
 import Button from "../ui/Button";
 import { useUserAccessModules } from "../../config/hooks/useAccessModules";
 import { useEffect, useState } from "react";
-import GetCompanyUsersForLead from "../modals/leads/company-users-selection-modal/GetCompanyUsersForLead";
 import SearchInput from "../ui/SearchInput";
 import DateRangePicker from "../ui/DateRangePicker";
 import { useComapanySpecificSearchDateRange } from "../../config/hooks/useCompanySpecificDateRange";
 import { useDateRangeIdChange } from "../../config/hooks/useDateRangeIdChange";
 import DateRangeFilterDropdown from "../ui/DateRangeFilterDropdown";
-import Pagination from "../ag-grid/Pagination";
 import CustomDropdown from "../modals/leads/CustomDropdown";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import qs from "query-string";
 import ROUTES_URL from "../../constants/Routes";
 import { usePanel } from "../../context/panel/usePanel";
 import toast from "react-hot-toast";
 import MESSAGE from "../../constants/Messages";
 import { useUserPreference } from "../../context/user/UserPreference";
-import FormHeader from "../ui/FormHeader";
 import COLORS from "../../constants/Colors";
-import { createPortal } from "react-dom";
 import SupportTicketManagementAgGrid from "../ag-grid/SupportTicketManagementAgGrid";
 import SupportTicketManagementListProps from "../../@types/List/SupportTicketManagementListProps";
 import SupportTicketProps from "../../@types/support-ticket-management/SupportTicketProps";
-import ProductManagement from "../views/product-Management/ProductsManagement";
 import CreateSupportTicketModal from "../modals/support-ticket/CreateSupportTicketModal";
-import { LocalStorageKeys } from "../../enums/LocalStorageKeys";
+import LookupCompanyUserSelection from "../views/lookups/lookup-company-user/LookupCompanyUserSelection";
+import LookupCompanyProductSelection from "../views/lookups/lookup-company-product/LookupCompanyProductSelection";
+import PaginationWithoutCount from "../ag-grid/PaginationWithoutCount";
+
+export const supportTicketDataUrlSearchParamKey: string = "supportTicketData";
+
 function SupportTicketManagementList({
   handleSearchOption,
   onStartDateChange,
@@ -46,11 +46,9 @@ function SupportTicketManagementList({
   handleSelectedCompanyProductCheckBoxChange,
 
   selectedAssignTo,
-  persistedSelectedUserId,
   handleSelectedAssignToCheckBoxChange,
 
   selectedResolvedBy,
-  persistedSelectedResolvedById,
   handleSelectedResolvedByCheckBoxChange,
   selectedCompanyProduct,
   supportTicketCategory,
@@ -62,11 +60,7 @@ function SupportTicketManagementList({
   isUsedInSupportTicketModule,
   handleRowSelectedForShowSupportTicket,
 }: SupportTicketManagementListProps) {
-  // Read filters from LocalStorage (before hook initializes)
-  const savedFilters = JSON.parse(
-    localStorage.getItem(LocalStorageKeys.SUPPORT_TICKET_MANAGEMENT_FILTERS) ||
-      "{}"
-  );
+  const [searchParams] = useSearchParams();
 
   const navigate = useNavigate();
   const { position } = usePanel();
@@ -75,7 +69,7 @@ function SupportTicketManagementList({
   const { userHasAccessToViewSupportTicket, userHasAccessToAddSupportTicket } =
     useUserAccessModules();
   const [isCreateSupportTicketModalOpen, setIsCreateSupportTicketModalOpen] =
-    useState<boolean>(false);
+    useState<boolean>(searchParams.get("fromDashboard") === "true");
 
   const [selectedSupportTicketForEdit, setSelectedSupportTicketForEdit] =
     useState<SupportTicketProps>({
@@ -87,6 +81,8 @@ function SupportTicketManagementList({
       accountEmail: "",
       accountMobileNumber: "",
       companyProductName: "",
+      barcode: "",
+      serialNumber: "",
       accountCompanyProductId: 0,
       supportTicketCategoryId: 0,
       supportTicketCategoryName: "",
@@ -119,7 +115,7 @@ function SupportTicketManagementList({
     console.log(selectedSupportTicketForEdit);
   };
 
-  const [openPopUpOfCompanyUserModal, setOpenPopUpOfCompanyUserModal] =
+  const [openPopUpOfAssignToModal, setOpenPopUpOfAssignToModal] =
     useState(false);
   const [openPopUpOfResolvedByModal, setOpenPopUpOfResolvedByModal] =
     useState(false);
@@ -127,7 +123,7 @@ function SupportTicketManagementList({
     useState(false);
 
   const handleCompanyUserPopUp = () => {
-    setOpenPopUpOfCompanyUserModal(true);
+    setOpenPopUpOfAssignToModal(true);
   };
 
   const handleResolvedByPopUp = () => {
@@ -140,25 +136,27 @@ function SupportTicketManagementList({
 
   const { dateRangeDropdownOptions } = useComapanySpecificSearchDateRange();
 
-  const { handleDateRangeIdChange, isCustomDateOptionSelected } =
-    useDateRangeIdChange({ dateRangeDropdownOptions, handleSearchOption });
+  const {
+    handleDateRangeIdChange,
+    isCustomDateOptionSelected,
+    setIsCustomDateOptionSelected,
+  } = useDateRangeIdChange({ dateRangeDropdownOptions, handleSearchOption });
 
   //NOTE : BELOW BOTH FUNCTION DO THE SAME THING
   const handleRowClicked = (event: any) => {
     if (isUsedInSupportTicketModule) {
       const rowData: SupportTicketProps = event.data;
       const queryParams = qs.stringify({
-        supportTicketData: JSON.stringify(rowData),
+        [supportTicketDataUrlSearchParamKey]: JSON.stringify(rowData),
       });
       navigate(ROUTES_URL.SUPPORT_TICKET_DETAILS + `?${queryParams}`);
     }
   };
 
   const handleRowSelected = (rowData: SupportTicketProps | any) => {
-    // Note : If used in the lead module then below if block will work
     if (isUsedInSupportTicketModule) {
       // const queryParams = qs.stringify({
-      //   supportTicketData: JSON.stringify(rowData),
+      //   [supportTicketDataUrlSearchParamKey]: JSON.stringify(rowData),
       // });
       // navigate(ROUTES_URL.SUPPORT_TICKET_DETAILS + `?${queryParams}`);
     } else {
@@ -167,21 +165,26 @@ function SupportTicketManagementList({
   };
 
   if (userHasAccessToViewSupportTicket) {
-    const handleCreateLeadModalClose = () => {
+    const handleCreateSupportTicketModalClose = () => {
       setIsCreateSupportTicketModalOpen(false);
     };
 
     const selectedDateName =
       dateRangeDropdownOptions.find(
-        (o) => o.search_date_range_id === handleSearchOption.dateRangeId
-      )?.date_range || "Filter";
+        (o) => o.search_date_range_id === handleSearchOption.dateRangeId,
+      )?.date_range || "Date Filter";
 
     // eslint-disable-next-line react-hooks/rules-of-hooks
     useEffect(() => {
-      console.log("Filter parameters:");
-      console.log(handleSearchOption.searchParameter);
-      console.log(handleSearchOption.dateRangeId);
-    }, [handleSearchOption.searchParameter, handleSearchOption.dateRangeId]);
+      if (handleSearchOption.dateRangeId === 8) {
+        setIsCustomDateOptionSelected(true);
+      }
+    }, [
+      handleSearchOption.searchParameter,
+      handleSearchOption.dateRangeId,
+      setIsCustomDateOptionSelected,
+    ]);
+
     return (
       <div
         className={`w-full ${
@@ -197,7 +200,7 @@ function SupportTicketManagementList({
           >
             {/* LEFT SECTION - Support Label */}
             {isUsedInSupportTicketModule && (
-              <div className="flex gap-2 items-center w-fit">
+              <div className="flex gap-1 items-center w-fit">
                 {!isSmallScreen && (
                   <Headset
                     className={`${
@@ -208,18 +211,17 @@ function SupportTicketManagementList({
                   />
                 )}
 
-                {(isMediumScreen || isLargeScreen) &&
-                  (
-                    <span
-                      className={`${
-                        isCustomDateOptionSelected
-                          ? "text-xs"
-                          : "section-header-custom"
-                      } `}
-                    >
-                      Support
-                    </span>
-                  )}
+                {(isMediumScreen || isLargeScreen) && (
+                  <span
+                    className={`${
+                      isCustomDateOptionSelected
+                        ? "text-xs"
+                        : "section-header-custom"
+                    } `}
+                  >
+                    Support
+                  </span>
+                )}
               </div>
             )}
 
@@ -234,40 +236,17 @@ function SupportTicketManagementList({
                   value={handleSearchOption.searchParameter}
                   onChange={(e) => {
                     handleSearchOption.handleSearchParameterChange(
-                      e.target.value
+                      e.target.value,
                     );
                   }}
                 ></SearchInput>
               </div>
               {/* DATE FILTERS */}
               <div className="flex flex-wrap items-center gap-2 w-fit">
-                {/* <div className="grid grid-cols-1 items-center justify-center gap-1">
-                  <div className="flex w-full justify-center items-start">
-                    <DateRangeFilterDropdown
-                      dropdownOptions={dateRangeDropdownOptions}
-                      handleDateIdChange={handleDateRangeIdChange}
-                      selectedOption={selectedDateName}
-                    ></DateRangeFilterDropdown>
-                  </div>
-                  {isCustomDateOptionSelected && (
-                    <div className="max-w-fit"
-                      style={
-                        isCustomDateOptionSelected
-                          ? { visibility: "visible" }
-                          : { visibility: "hidden" }
-                      }
-                    >
-                      <DateRangePicker
-                        onStartDateChange={onStartDateChange}
-                        onEndDateChange={onEndDateChange}
-                      />
-                    </div>
-                  )}
-                </div> */}
                 <div>
                   <div className="grid grid-cols-1 justify-center gap-1 w-full">
                     {/* Shared width wrapper */}
-                    <div className="relative w-fit flex justify-center">
+                    <div className="relative w-fit flex justify-center gap-1">
                       <div className="flex col-span-2 w-fit">
                         <DateRangeFilterDropdown
                           dropdownOptions={dateRangeDropdownOptions}
@@ -279,6 +258,8 @@ function SupportTicketManagementList({
                             <DateRangePicker
                               onStartDateChange={onStartDateChange}
                               onEndDateChange={onEndDateChange}
+                              initialStartDate={handleSearchOption.startDate}
+                              initialEndDate={handleSearchOption.endDate}
                             />
                           </div>
                         )}
@@ -294,7 +275,8 @@ function SupportTicketManagementList({
                     <div className="min-w-[110px]">
                       <CustomDropdown
                         preselectedOption={
-                          savedFilters.selectedSupportTicketCategory || null
+                          // savedFilters.selectedSupportTicketCategory || null
+                          handleSearchOption.selectedSupportTicketCategory
                         }
                         labelName="category"
                         options={supportTicketCategory!}
@@ -307,7 +289,8 @@ function SupportTicketManagementList({
                       <CustomDropdown
                         labelName="source"
                         preselectedOption={
-                          savedFilters.selectedSupportTicketSource || null
+                          // savedFilters.selectedSupportTicketSource || null
+                          handleSearchOption.selectedSupportTicketSource
                         }
                         options={supportTicketSource!}
                         onSelect={handleSupportSelectedSource}
@@ -319,7 +302,8 @@ function SupportTicketManagementList({
                       <CustomDropdown
                         labelName="lifecycle"
                         preselectedOption={
-                          savedFilters.selectedSupportTicketLifecycle || null
+                          // savedFilters.selectedSupportTicketLifecycle || null
+                          handleSearchOption.selectedSupportTicketLifecycle
                         }
                         options={supportTicketLifecycle!}
                         onSelect={handleSupportSelectedLifecycle}
@@ -438,7 +422,7 @@ function SupportTicketManagementList({
                                 title="Clear"
                                 onClick={() =>
                                   handleSelectedCompanyProductCheckBoxChange(
-                                    null
+                                    null,
                                   )
                                 }
                                 className="border-transparent"
@@ -450,36 +434,34 @@ function SupportTicketManagementList({
                         )}
                       </div>
                     </div>
+                  </div>
+                )}
 
-                    {/* RIGHT SECTION - Create Button */}
-                    {isUsedInSupportTicketModule && (
-                      <div className="flex gap-1 justify-end w-fit">
-                        <Button
-                          type="submit"
-                          disabled={!userHasAccessToAddSupportTicket}
-                          onClick={(e) => {
-                            e.preventDefault();
-                            if (!userHasAccessToAddSupportTicket) {
-                              toast.error(
-                                MESSAGE.MODULE_ACCESS.SUPPORT_MODULE
-                                  .DENIED_ADD_ACCESS
-                              );
-                              return;
-                            }
-                            setIsCreateSupportTicketModalOpen(true);
-                          }}
-                        >
-                          <span className="flex items-center gap-1">
-                            {!isSmallScreen && (
-                              <TicketPlus size={SIZE.SIXTEEN} />
-                            )}
-                            {isSmallScreen && <TicketPlus size={SIZE.EIGHT} />}
-                            {isLargeScreen &&
-                              JSX_CHILDREN_NAME.CREATE_SUPPORT_TICKET}
-                          </span>
-                        </Button>
-                      </div>
-                    )}
+                {/* RIGHT SECTION - Create Button */}
+                {isUsedInSupportTicketModule && (
+                  <div className="flex gap-1 justify-end w-fit">
+                    <Button
+                      type="submit"
+                      disabled={!userHasAccessToAddSupportTicket}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        if (!userHasAccessToAddSupportTicket) {
+                          toast.error(
+                            MESSAGE.MODULE_ACCESS.SUPPORT_MODULE
+                              .DENIED_ADD_ACCESS,
+                          );
+                          return;
+                        }
+                        setIsCreateSupportTicketModalOpen(true);
+                      }}
+                    >
+                      <span className="flex items-center gap-1">
+                        {!isSmallScreen && <TicketPlus size={SIZE.SIXTEEN} />}
+                        {isSmallScreen && <TicketPlus size={SIZE.EIGHT} />}
+                        {isLargeScreen &&
+                          JSX_CHILDREN_NAME.CREATE_SUPPORT_TICKET}
+                      </span>
+                    </Button>
                   </div>
                 )}
               </div>
@@ -492,7 +474,7 @@ function SupportTicketManagementList({
             className={
               userPreference.isLeftMenu
                 ? `ag-theme-balham w-full h-[calc(100vh-120px)]`
-                : "ag-theme-balham w-full h-[calc(100vh-128px)]"
+                : "ag-theme-balham w-full h-[calc(100vh-122px)]"
             }
           >
             <SupportTicketManagementAgGrid
@@ -507,86 +489,77 @@ function SupportTicketManagementList({
           </div>
           <CreateSupportTicketModal
             isOpen={isCreateSupportTicketModalOpen}
-            onClose={handleCreateLeadModalClose}
+            onClose={handleCreateSupportTicketModalClose}
             handleSupportTicketCreated={handleAddSupportTicket}
           ></CreateSupportTicketModal>
         </div>
 
-        <div className="flex items-center justify-end ">
-          <Pagination
-            totalPages={paginationData.totalPages}
-            currentPage={paginationData.currentPage}
+        <div className="flex items-center justify-end col-span-1 ">
+          <PaginationWithoutCount
             pageSize={paginationData.pageSize}
-            onPageChange={paginationData.handlePageChange}
-            onPageSizeChange={paginationData.selectedPageSize}
+            currentPage={paginationData.currentPage}
+            currentPageData={paginationData.currentPageData}
+            onPageSizeChange={paginationData.onPageSizeChange}
+            onPageChange={paginationData.onPageChange}
           />
         </div>
-        {(openPopUpOfCompanyUserModal || openPopUpOfResolvedByModal) &&
-          createPortal(
-            <div className="fixed inset-0 z-50 bg-black bg-opacity-5 flex items-center justify-center p-4">
-              <div className="bg-white rounded-2xl shadow-lg p-3 w-full max-w-5xl max-h-[100vh] overflow-y-auto relative animate-fadeIn">
-                <FormHeader
-                  icon={User}
-                  onClose={() => {
-                    if (openPopUpOfCompanyUserModal) {
-                      setOpenPopUpOfCompanyUserModal(false);
-                    }
-                    if (openPopUpOfResolvedByModal) {
-                      setOpenPopUpOfResolvedByModal(false);
-                    }
-                  }}
-                  preText="Select Company User"
-                  description="Select the user to view him/her support tickets"
-                />
-                {/* NOTE : CALL TO THE MODAL COMPONENT */}
-                <div className="p-1">
-                  <GetCompanyUsersForLead
-                    selectedUserId={
-                      openPopUpOfCompanyUserModal
-                        ? persistedSelectedUserId
-                        : persistedSelectedResolvedById
-                    } // Pass the persisted ID
-                    handleSelectedCompanyUserChange={(params) => {
-                      if (openPopUpOfCompanyUserModal) {
-                        handleSelectedAssignToCheckBoxChange(params);
-                        setOpenPopUpOfCompanyUserModal(false);
-                      }
-                      if (openPopUpOfResolvedByModal) {
-                        handleSelectedResolvedByCheckBoxChange(params);
-                        setOpenPopUpOfResolvedByModal(false);
-                      }
-                    }}
-                    isUsedForSettings={false}
-                  />
-                </div>
-              </div>
-            </div>,
-            document.body
-          )}
-        {openPopUpOfCompanyProductModal &&
-          createPortal(
-            <div className="fixed inset-0 z-50 bg-black bg-opacity-5 flex items-center justify-center p-4">
-              <div className="bg-white rounded-2xl shadow-lg p-3 w-full max-w-5xl max-h-[100vh] overflow-y-auto relative animate-fadeIn">
-                <FormHeader
-                  icon={ShoppingBag}
-                  onClose={() => setOpenPopUpOfCompanyProductModal(false)}
-                  preText="Select Product"
-                  description="Select the product to view its support tickets"
-                />
-                {/* NOTE : CALL TO THE MODAL COMPONENT */}
-                <div className="p-1">
-                  <ProductManagement
-                    isGridForAccountProduct={true}
-                    onRowSelect={(params) => {
-                      handleSelectedCompanyProductCheckBoxChange(params);
-                      setOpenPopUpOfCompanyProductModal(false);
-                    }}
-                  />
-                </div>
-              </div>
-            </div>,
-            document.body
-          )}
+        {(openPopUpOfAssignToModal || openPopUpOfResolvedByModal) && (
+          <div>
+            <LookupCompanyUserSelection
+              isOpen={openPopUpOfAssignToModal || openPopUpOfResolvedByModal}
+              onClose={() => {
+                if (openPopUpOfAssignToModal) {
+                  setOpenPopUpOfAssignToModal(false);
+                }
+                if (openPopUpOfResolvedByModal) {
+                  setOpenPopUpOfResolvedByModal(false);
+                }
+              }}
+              preText={
+                openPopUpOfAssignToModal
+                  ? "Select Support Ticket AssignTo"
+                  : "Select Support Ticket Resolved By"
+              }
+              description="Select the user to view him/her support tickets"
+              selectedUserId={
+                openPopUpOfAssignToModal
+                  ? selectedAssignTo.id !== 0
+                    ? selectedAssignTo.id
+                    : null
+                  : selectedResolvedBy.id !== 0
+                    ? selectedResolvedBy.id
+                    : null
+              }
+              handleSelectedCompanyUserChange={(params) => {
+                if (openPopUpOfAssignToModal) {
+                  handleSelectedAssignToCheckBoxChange(params);
+                  setOpenPopUpOfAssignToModal(false);
+                }
+                if (openPopUpOfResolvedByModal) {
+                  handleSelectedResolvedByCheckBoxChange(params);
+                  setOpenPopUpOfResolvedByModal(false);
+                }
+              }}
+            />
+          </div>
+        )}
+        {openPopUpOfCompanyProductModal && (
+          <LookupCompanyProductSelection
+            isOpen={openPopUpOfCompanyProductModal}
+            onClose={() => setOpenPopUpOfCompanyProductModal(false)}
+            preText="Select Company Product"
+            description="Select company product to view its support tickets"
+            selectedProductId={
+              selectedCompanyProduct && selectedCompanyProduct.id !== 0
+                ? selectedCompanyProduct.id!
+                : null
+            }
+            handleSelectedCompanyProductChange={(params) => {
+              handleSelectedCompanyProductCheckBoxChange(params);
+              setOpenPopUpOfCompanyProductModal(false);
+            }}
+          />
+        )}
       </div>
     );
   }

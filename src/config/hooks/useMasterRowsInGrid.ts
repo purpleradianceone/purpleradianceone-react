@@ -5,7 +5,7 @@ import ApiError from "../../@types/error/ApiError"
 import { STATUS_CODE } from "../../constants/AppConstants"
 import RefreshToken from "../validations/RefreshToken"
 import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext"
-import axiosClient from "../../axios-client/AxiosClient"
+import axios from "axios"
 
 interface rowsInGridDropdownOptionsResponse {
     id: number,
@@ -16,12 +16,13 @@ export const useMasterRowsInGrid = () => {
     const {loginStatus} = useLoggedInUserContext();
 
     const fetchMasterRowsInGridDropdownOptions = async () => {
+        if(loginStatus.companyId===0)return;
         if(loginStatus.status){
                 const postData = {
             id: null,
         };
         setRowsInGridDropdownOptions([]);
-        await axiosClient.post(POST_API.GET_MASTER_ROWS_IN_GRID, postData, {
+        await axios.post(POST_API.GET_MASTER_ROWS_IN_GRID, postData, {
             withCredentials: true,
         })
             .then((response) => {

@@ -40,14 +40,17 @@ import AccountCompanyType from "./AccountCompanyType";
 import AccountCompanyProduct from "./account-company-product/AccountCompanyProduct";
 import { useAccountDetails } from "../../../config/hooks/useGetAccountDetails";
 import ROUTES_URL from "../../../constants/Routes";
-import { useNavigate, useParams } from "react-router-dom";
-import {  parseInt } from "lodash";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { parseInt } from "lodash";
 import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
 import MESSAGE from "../../../constants/Messages";
 import axiosClient from "../../../axios-client/AxiosClient";
-
+import State from "../../../@types/general/State";
+import Country from "../../../@types/general/Country";
+import District from "../../../@types/general/District";
 
 const AccountDetails: React.FC = () => {
+  const location = useLocation();
   const { accountId } = useParams();
   const { accountDetails: company, loading: accountDetailsLoading } =
     useAccountDetails(parseInt(accountId!));
@@ -67,13 +70,8 @@ const AccountDetails: React.FC = () => {
       return;
     }
   }, [accountDetailsLoading, company, navigate]);
-  useEffect(() => {
-    if (company != null) {
-      setFormData(company);
-    }
-  }, [company]);
 
-  const [formData, setFormData] = useState<Account>({
+  const initialState = {
     count: 0,
     id: 0,
     companyId: 0,
@@ -101,25 +99,24 @@ const AccountDetails: React.FC = () => {
     isActive: false,
     createdBy: "",
     createdOn: "",
-  });
+  };
+
+  // Note : states for managing the data
+  const [formData, setFormData] = useState<Account>(initialState);
+  const [originalValues, setOriginalValues] = useState<Account>(initialState);
+
+  // set the data as it arrives on the render
+  useEffect(() => {
+    if (company != null) {
+      setFormData(company);
+      setOriginalValues(company);
+    }
+  }, [company]);
+
   const { userHasAccessToUpdateAccount } = useUserAccessModules();
   const { loginStatus } = useLoggedInUserContext();
   const { userPreference } = useUserPreference();
-  const [editingField, setEditingField] = useState<string | null>(null);
-  // NOte- ori vlaue
-  // const [originalValues, setOriginalValues] = useState<{
-  //   [key: string]: string;
-  // }>({});
-  const [originalValues, setOriginalValues] = useState<Record<string, string | number | null>>({});
-  const dropdownIdMap: Record<string, keyof typeof formData> = {
-  businessTypeName: "businessTypeId",
-  industryTypeName: "industryTypeId",
-  countryName: "countryId",
-  stateName: "stateId",
-  districtName: "districtId",
-};
-
-
+  const [editingField, setEditingField] = useState<keyof Account | null>(null);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [activeTab, setActiveTab] = useState<
     "primary contact" | "legal" | "address" | "details"
@@ -132,45 +129,43 @@ const AccountDetails: React.FC = () => {
   const { states } = useStates(formData.countryId);
   const { districts } = useDistricts(formData.stateId);
 
-  const validateField = (fieldName: string, value: string): string => {
-    // const fields = [""]
-    // if(fieldName ===)
+  const validateField = (
+    fieldName: keyof Account,
+    value: string | number,
+  ): string => {
+    const str = String(value);
     switch (fieldName) {
       case "name":
-        if (!value.trim()) return "Account name is required";
-        if (value.length > 40)
-          return "Account name cannot exceed 40 characters";
+        if (!str.trim()) return "Account name is required";
+        if (str.length > 40) return "Account name cannot exceed 40 characters";
         return "";
       case "email":
-        if (!value.trim()) return "Email is required";
-        if (value.length > 50) return "Email cannot exceed 50 characters";
-        if (!REGEX.EMAIL.test(value)) return "Please enter a valid email";
+        if (!str.trim()) return "Email is required";
+        if (str.length > 50) return "Email cannot exceed 50 characters";
+        if (!REGEX.EMAIL.test(str)) return "Please enter a valid email";
         return "";
       case "mobileNumber":
-        if (!value.trim()) return "Mobile number is required";
-        if (!/^\d+$/.test(value))
-          return "Mobile number can only contain digits";
-        if (!MOBILE_NUMBER_VALIDATION.MOBILE_NUMBER_PATTERN_INDIAN.test(value))
+        if (!str.trim()) return "Mobile number is required";
+        if (!/^\d+$/.test(str)) return "Mobile number can only contain digits";
+        if (!MOBILE_NUMBER_VALIDATION.MOBILE_NUMBER_PATTERN_INDIAN.test(str))
           return "Please enter a valid 10-digit mobile number";
         return "";
       case "pan":
-        if (!/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(value))
+        if (!/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(str))
           return "Please enter the valid pan.";
         return "";
       case "tan":
-        if (!/^[A-Z]{4}[0-9]{5}[A-Z]{1}$/.test(value))
+        if (!/^[A-Z]{4}[0-9]{5}[A-Z]{1}$/.test(str))
           return "Please enter the valid tan.";
         return "";
       case "gst":
         if (
-          !/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/.test(
-            value
-          )
+          !/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/.test(str)
         )
           return "Please enter the valid gst.";
         return "";
-      case "registration":
-        if (value.length > 100) {
+      case "businessResgistrationNumber":
+        if (str.length > 100) {
           return "registration number length is greater that 100.";
         }
         return "";
@@ -179,96 +174,16 @@ const AccountDetails: React.FC = () => {
     }
   };
 
-  function permissionVerification(fieldName: string): boolean {
+  function permissionVerification(): boolean {
+    console.log("inside per verification 1");
+    
     if (!userHasAccessToUpdateAccount) {
-      setFormData((prev) => {
-        const updated: any = {
-          ...prev,
-
-          // Always revert the field that user tried to update
-          [fieldName]:
-            originalValues[fieldName] || company![fieldName as keyof Account],
-        };
-
-        // If country changed → revert country + state + district
-        if (fieldName === "countryName") {
-          updated.countryId =
-            originalValues["countryId"] || company!["countryId"];
-          updated.countryName =
-            originalValues["countryName"] || company!["countryName"];
-
-          updated.stateId = originalValues["stateId"] || company!["stateId"];
-          updated.stateName =
-            originalValues["stateName"] || company!["stateName"];
-
-          updated.districtId =
-            originalValues["districtId"] || company!["districtId"];
-          updated.districtName =
-            originalValues["districtName"] || company!["districtName"];
-        }
-
-        // If state changed → revert only state + district
-        if (fieldName === "stateName") {
-          updated.stateId = originalValues["stateId"] || company!["stateId"];
-          updated.stateName =
-            originalValues["stateName"] || company!["stateName"];
-
-          updated.districtId =
-            originalValues["districtId"] || company!["districtId"];
-          updated.districtName =
-            originalValues["districtName"] || company!["districtName"];
-        }
-
-        // If district changed → revert only district
-        if (fieldName === "districtName") {
-          updated.districtId =
-            originalValues["districtId"] || company!["districtId"];
-          updated.districtName =
-            originalValues["districtName"] || company!["districtName"];
-        }
-
-        return updated;
-      });
-
+          console.log("inside per verification 2");
       toast.error(MESSAGE.MODULE_ACCESS.ACCOUNT_ACCESS.DENIED_UPDATE_ACCESS);
       return false;
     }
     return true;
   }
-
-  //   type DropdownMeta = {
-  //   idKey: keyof typeof formData;
-  //   nameKey: keyof typeof formData;
-  //   apiKey: string;
-  // };
-
-  // const dropdownFieldMap: Record<string, DropdownMeta> = {
-  //   businessTypeName: {
-  //     idKey: "businessTypeId",
-  //     nameKey: "businessTypeName",
-  //     apiKey: "business_type_id",
-  //   },
-  //   industryTypeName: {
-  //     idKey: "industryTypeId",
-  //     nameKey: "industryTypeName",
-  //     apiKey: "industry_type_id",
-  //   },
-  //   countryName: {
-  //     idKey: "countryId",
-  //     nameKey: "countryName",
-  //     apiKey: "country_id",
-  //   },
-  //   stateName: {
-  //     idKey: "stateId",
-  //     nameKey: "stateName",
-  //     apiKey: "state_id",
-  //   },
-  //   districtName: {
-  //     idKey: "districtId",
-  //     nameKey: "districtName",
-  //     apiKey: "district_id",
-  //   },
-  // };
 
   type DropdownMeta = {
     idKey: keyof typeof formData;
@@ -307,24 +222,64 @@ const AccountDetails: React.FC = () => {
     },
   };
 
+  function revert(fieldName: keyof Account) {
+    setFormData((prev) => {
+      const updated: any = {
+        ...prev,
+
+        // Always revert the field that user tried to update
+        [fieldName]: originalValues[fieldName],
+      };
+
+      // If country changed → revert country + state + district
+      if (fieldName === "countryName") {
+        updated.countryId = originalValues["countryId"];
+        updated.countryName = originalValues["countryName"];
+
+        updated.stateId = originalValues["stateId"];
+        updated.stateName = originalValues["stateName"];
+
+        updated.districtId = originalValues["districtId"];
+        updated.districtName = originalValues["districtName"];
+      }
+
+      // If state changed → revert only state + district
+      if (fieldName === "stateName") {
+        updated.stateId = originalValues["stateId"];
+        updated.stateName = originalValues["stateName"];
+
+        updated.districtId = originalValues["districtId"];
+        updated.districtName = originalValues["districtName"];
+      }
+
+      // If district changed → revert only district
+      if (fieldName === "districtName") {
+        updated.districtId = originalValues["districtId"];
+        updated.districtName = originalValues["districtName"];
+      }
+      return updated;
+    });
+  }
   const handleUpdateAccountDetails = async (
-    fieldName: string,
-    value: string | number
+    fieldName: keyof Account,
+    value: string | number | any,
   ) => {
+          console.log("in api call 1");
+
     const isDropdown = dropdownFieldMap[fieldName];
+    const permission = permissionVerification();
+    if (!permission) {
+      revert(fieldName);
+                console.log("in api call 2");
 
-    const permission = permissionVerification(fieldName);
-    if (!permission) return;
-
+      return;
+    }
     //  Validate correctly
     if (!isDropdown) {
-      const error = validateField(fieldName, value.toLocaleString());
-
+      const error = validateField(fieldName, value);
       if (error) {
         toast.error(error);
         setErrors((prev) => ({ ...prev, [fieldName]: error }));
-
-        //  revert immediately
         setFormData((prev) => ({
           ...prev,
           [fieldName]: originalValues[fieldName],
@@ -332,7 +287,6 @@ const AccountDetails: React.FC = () => {
         return;
       }
     }
-
     setErrors((prev) => ({ ...prev, [fieldName]: "" }));
 
     //  Build base payload
@@ -359,72 +313,49 @@ const AccountDetails: React.FC = () => {
       updatedby_id: loginStatus.id,
     };
 
-    //  Override ONLY the changed field
-    // Override changed dropdown field
-    if (isDropdown) {
-      postData[isDropdown.apiKey] = Number(value);
-
-      //  Reset dependent fields in API payload
-      isDropdown.resetApiKeys?.forEach((key) => {
-        postData[key] = null;
-      });
-    } else {
-      postData[fieldName] = value;
-    }
+              console.log("in api call 3");
 
     try {
       const response = await axiosClient.post(
         POST_API.UPDATE_ACCOUNT,
         postData,
-        { withCredentials: true }
+        { withCredentials: true },
       );
 
       if (!response.data.status) {
         toast.error(response.data.message);
-          setFormData((prev) => ({
+
+        setFormData((prev) => ({
           ...prev,
           [fieldName]: originalValues[fieldName],
         }));
         return;
-      }
-
-      toast.success(response.data.message);
-
-      //  Update local state correctly
-      if (isDropdown) {
-        setFormData((prev) => {
-          const updated: any = {
-            ...prev,
-            [isDropdown.idKey]: Number(value),
-          };
-
-          //  Reset dependent state fields
-          if (isDropdown.apiKey === "country_id") {
-            updated.stateId = null;
-            updated.stateName = "";
-            updated.districtId = null;
-            updated.districtName = "";
-          }
-
-          if (isDropdown.apiKey === "state_id") {
-            updated.districtId = null;
-            updated.districtName = "";
-          }
-
-          return updated;
-        });
-
-        setOriginalValues((prev) => ({
-          ...prev,
-          [fieldName]: prev[isDropdown.nameKey],
-        }));
       } else {
-        setFormData((prev) => ({ ...prev, [fieldName]: value }));
-        // error here
-        setOriginalValues((prev) => ({
-          ...prev,
-          [fieldName]: value.toLocaleString(),
-        }));
+        if (isDropdown) {
+          const { idKey, nameKey } = isDropdown;
+
+          setOriginalValues((prev) => ({
+            ...prev,
+            [idKey]: formData[idKey],
+            [nameKey]: formData[nameKey],
+          }));
+        } else {
+          setOriginalValues((prev) => ({
+            ...prev,
+            [fieldName]: formData[fieldName],
+          }));
+        }
+      }
+      toast.success(response.data.message);
+      // PATCH #2
+      if (fieldName === "name") {
+        navigate(location.pathname, {
+          replace: true,
+          state: {
+            ...location.state,
+            accountName: String(value).trim(),
+          },
+        });
       }
     } catch (error: any) {
       if (error.status === STATUS_CODE.UNATHORISED) {
@@ -439,8 +370,16 @@ const AccountDetails: React.FC = () => {
   };
 
   const handleAccountStatusToggle = async (
-    event: React.ChangeEvent<HTMLInputElement>
+    event: React.ChangeEvent<HTMLInputElement>,
   ) => {
+    console.log("inside the toggle api call : 1 line");
+    
+    if (!userHasAccessToUpdateAccount) {
+      console.log("in api call toggle check block 1");
+      toast.error(MESSAGE.MODULE_ACCESS.ACCOUNT_ACCESS.DENIED_UPDATE_ACCESS);
+      return;
+    }
+  console.log("in api call toggle");
     const { checked } = event.target;
     const postData = {
       id: formData.id,
@@ -464,6 +403,7 @@ const AccountDetails: React.FC = () => {
       isactive: checked,
       updatedby_id: loginStatus.id,
     };
+      console.log("in api call toggle final ");
 
     await axiosClient
       .post(POST_API.UPDATE_ACCOUNT, postData, { withCredentials: true })
@@ -490,46 +430,18 @@ const AccountDetails: React.FC = () => {
       });
   };
 
-  // NOte : ori value 
-  // const handleFieldClick = (fieldName: string) => {
-  //   if (!["createdOn", "createdBy"].includes(fieldName)) {
-  //     setEditingField(fieldName);
-  //     // Store original value when starting to edit
-  //     setOriginalValues((prev) => ({
-  //       ...prev,
-  //       [fieldName]: formData[fieldName as keyof Account] as string,
-  //     }));
-  //   }
-  // };
+  // Note :
+  const handleFieldClick = (fieldName: keyof Account) => {
+    if (!userHasAccessToUpdateAccount) {
+      toast.error(MESSAGE.MODULE_ACCESS.ACCOUNT_ACCESS.DENIED_UPDATE_ACCESS);
+      return;
+    }
+    if (!["createdOn", "createdBy"].includes(fieldName)) {
+      setEditingField(fieldName);
+    }
+  };
 
-  const handleFieldClick = (fieldName: string) => {
-  if (!["createdOn", "createdBy"].includes(fieldName)) {
-    setEditingField(fieldName);
-
-    const idField = dropdownIdMap[fieldName];
-
-    console.log("idField : "+ idField);
-    
-    setOriginalValues((prev) => ({
-      ...prev,
-      [fieldName]: idField
-        ? (formData[idField] as number)
-        : (formData[fieldName as keyof Account] as string),
-    }));
-    
-  }
-};
-
-useEffect(()=> {
-  console.log("original value log");
-  
-  console.log(originalValues);
-  
-}, [originalValues])
-
-
-
-  const handleInputChange = (fieldName: string, value: string) => {
+  const handleInputChange = (fieldName: keyof Account, value: string) => {
     // Apply character limits during typing
     let processedValue = value;
     if (fieldName === "name" && value.length > 40) {
@@ -547,12 +459,10 @@ useEffect(()=> {
   };
 
   const handleDropdownChange = (
-    fieldName: string,
+    fieldName: keyof Account,
     selectedId: string,
-    selectedName: string
+    selectedName: string,
   ) => {
-    console.log(fieldName + selectedId + selectedName);
-
     if (fieldName === "businessTypeName") {
       setFormData((prev) => ({
         ...prev,
@@ -592,86 +502,83 @@ useEffect(()=> {
     }
   };
 
-  const handleInputBlur = (fieldName: string) => {
-    const currentValue = formData[fieldName as keyof Account] as string;
-    const originalValue =
-      originalValues[fieldName] ||
-      (company![fieldName as keyof Account] as string);
+  // Note : changes string
+  const handleInputBlur = (fieldName: keyof Account) => {
+    const currentValue = formData[fieldName];
+    const originalValue = originalValues[fieldName];
+
+    console.log("ori value");
+    console.log(originalValue);
+
+    console.log("curr value");
+    console.log(currentValue);
 
     // Only call API if value actually changed
     if (currentValue !== originalValue) {
+    console.log("inside the api call input blur");
       handleUpdateAccountDetails(fieldName, currentValue);
-      console.log(" this are the values ");
-
-      console.log(fieldName);
-      console.log("this si the current  value : " +currentValue);
-      console.log("this si the original value : " + originalValue);
-      
     }
     setEditingField(null);
   };
 
-  // const handleDropdownBlur = (fieldName: string, newValue: number) => {
-  //   const currentValue = newValue;
+  // Note : need to make changes here
+  const handleDropdownBlur = (fieldName: keyof Account ) => {
 
-  //   const originalValue =
-  //     fieldName === "businessTypeName"
-  //       ? originalValues.businessTypeId
-  //       : fieldName === "industryTypeName"
-  //       ? originalValues.industryTypeId
-  //       : fieldName === "countryName"
-  //       ? originalValues.countryId
-  //       : fieldName === "stateName"
-  //       ? originalValues.stateId
-  //       : originalValues.districtId;
+    const dropdownMeta= dropdownFieldMap[fieldName];
+    if(!dropdownMeta) return;
 
-  //   console.log(" this is  the field name :" + fieldName);
+    const {idKey } =dropdownMeta;
 
-  //   console.log(" this is the original value "+originalValue);
-  //   console.log(" this is the current value "+currentValue);
+    const originalId = originalValues[idKey]
+    const curretntId =   formData[idKey]
 
-  //   // Note : errors comes here
-  //   if (currentValue !== Number(originalValue)) {
-  //     handleUpdateAccountDetails(fieldName, currentValue);
-  //   }
+      console.log("ori value");
+    console.log(originalId);
 
-  //   setEditingField(null);
-  // };
-  const handleDropdownBlur = (fieldName: string, newValue: number) => {
-  const originalValue = originalValues[fieldName];
+    console.log("curr value");
+    console.log(curretntId);
 
-  console.log("field:", fieldName);
-  console.log("original:", originalValue);
-  console.log("current:", newValue);
+    // comparing the id's
+    if(originalId !== curretntId){
+      console.log("inside the api call dropdown");
+      
+      handleUpdateAccountDetails(fieldName, curretntId)
+    }
 
-  if (originalValue !== newValue) {
-    handleUpdateAccountDetails(fieldName, newValue);
-  }
+    // const originalValue = originalValues[fieldName];
+    // console.log("ori value");
+    // console.log(originalValue);
+    // console.log("curr value");
+    // console.log(formData[fieldName]);
+    // console.log("field name : " + fieldName);
+    // if (originalValue !== formData[fieldName]) {
+    //   handleUpdateAccountDetails(fieldName, formData[fieldName]);
+    // }
+    setEditingField(null);
+  };
 
-  setEditingField(null);
-};
-
-
-  const handleKeyPress = (e: React.KeyboardEvent, fieldName: string) => {
+  // Note : changes string
+  const handleKeyPress = (e: React.KeyboardEvent, fieldName: keyof Account) => {
     if (e.key === "Enter") {
       handleInputBlur(fieldName);
     } else if (e.key === "Escape") {
       // Revert to original value
       setFormData((prev) => ({
         ...prev,
-        [fieldName]:
-          originalValues[fieldName] || company![fieldName as keyof Account],
+        [fieldName]: originalValues[fieldName],
       }));
       setEditingField(null);
       setErrors((prev) => ({ ...prev, [fieldName]: "" }));
     }
   };
 
+  // Note : changes string
   const renderDropdownField = (
-    fieldName: string,
+    fieldName: keyof Account,
     value: string,
-    options: BusinessType[] | industryType[],
-    placeholder: string = "Select option"
+    options: BusinessType[] | industryType[] | State[] | Country[] | District[],
+    placeholder: string = "Select option",
+    // hasUpdateAccess: boolean,
   ) => {
     const isEditing = editingField === fieldName;
     const hasError = errors[fieldName];
@@ -685,46 +592,28 @@ useEffect(()=> {
                 fieldName === "businessTypeName"
                   ? formData.businessTypeId || ""
                   : fieldName === "industryTypeName"
-                  ? formData.industryTypeId || ""
-                  : fieldName === "countryName"
-                  ? formData.countryId || ""
-                  : fieldName === "stateName"
-                  ? formData.stateId
-                  : formData.districtId
+                    ? formData.industryTypeId || ""
+                    : fieldName === "countryName"
+                      ? formData.countryId || ""
+                      : fieldName === "stateName"
+                        ? formData.stateId
+                        : formData.districtId
               }
-              // onChange={(e) => {
-              //   const selectedOption = options.find(
-              //     (opt) => opt.id!.toString() === e.target.value
-              //   );
-              //   if (!selectedOption) return;
-
-              //   handleDropdownChange(
-              //     fieldName,
-              //     e.target.value,
-              //     selectedOption.name!
-              //   );
-              //   setTimeout(() => {
-              //     handleDropdownBlur(fieldName, selectedOption.name!);
-              //   }, 0);
-              // }}
-
               onChange={(e) => {
                 const selectedOption = options.find(
-                  (opt) => opt.id!.toString() === e.target.value
+                  (opt) => opt.id!.toString() === e.target.value,
                 );
                 if (!selectedOption) return;
-
-                const selectedId = Number(e.target.value);
-
+                // const selectedId = Number(e.target.value);
                 handleDropdownChange(
                   fieldName,
                   e.target.value,
-                  selectedOption.name!
+                  selectedOption.name!,
                 );
 
-                handleDropdownBlur(fieldName, selectedId);
+                //  handleDropdownBlur(fieldName)
               }}
-              // onBlur={() => handleDropdownBlur(fieldName)}
+              onBlur={() => handleDropdownBlur(fieldName)}
               className={`w-full table-data-custom bg-white border-2 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                 hasError ? "border-red-500" : "border-blue-500"
               }`}
@@ -758,12 +647,13 @@ useEffect(()=> {
     );
   };
 
+  // Note : changes string
   const renderEditableField = (
-    fieldName: string,
+    fieldName: keyof Account,
     value: string,
     placeholder: string = "Enter value",
     type: string = "text",
-    required: boolean = false
+    required: boolean = false,
   ) => {
     const isEditing = editingField === fieldName;
     const isReadOnly = ["createdOn", "createdBy"].includes(fieldName);
@@ -805,8 +695,8 @@ useEffect(()=> {
                       : "table-data-custom  "
                   } cursor-pointer hover:bg-slate-100 rounded transition-colors`
                 : fieldName === "name"
-                ? "section-header-custom"
-                : "caption-custom"
+                  ? "section-header-custom"
+                  : "caption-custom"
             }  ${
               isMandatory && !value ? "border border-red-300 bg-red-50" : ""
             }`}
@@ -880,7 +770,7 @@ useEffect(()=> {
                     "countryName",
                     formData.countryName,
                     countries,
-                    "Select Country"
+                    "Select Country",
                   )}
                 </div>
               </div>
@@ -896,7 +786,7 @@ useEffect(()=> {
                     "industryTypeName",
                     formData.industryTypeName,
                     industryTypeData,
-                    "Select industry type"
+                    "Select industry type",
                   )}
                 </div>
               </div>
@@ -912,7 +802,7 @@ useEffect(()=> {
                     "stateName",
                     formData.stateName,
                     states,
-                    "Select State"
+                    "Select State",
                   )}
                 </div>
               </div>
@@ -931,7 +821,7 @@ useEffect(()=> {
                         "businessTypeName",
                         formData.businessTypeName,
                         businessType || [],
-                        "Select business type"
+                        "Select business type",
                       )}
                     </div>
                   </div>
@@ -952,7 +842,7 @@ useEffect(()=> {
                         "districtName",
                         formData.districtName,
                         districts,
-                        "Select District"
+                        "Select District",
                       )}
                     </div>
                   </div>
@@ -978,7 +868,7 @@ useEffect(()=> {
                   formData.email,
                   "Enter email address",
                   "email",
-                  true
+                  true,
                 )}
               </div>
             </div>
@@ -996,7 +886,7 @@ useEffect(()=> {
                   formData.mobileNumber,
                   "Enter mobile number",
                   "text",
-                  true
+                  true,
                 )}
               </div>
             </div>
@@ -1013,7 +903,7 @@ useEffect(()=> {
                     "website",
                     formData.website,
                     "Enter website URL",
-                    "url"
+                    "url",
                   )
                 ) : (
                   <div
@@ -1076,7 +966,7 @@ useEffect(()=> {
               {renderEditableField(
                 "businessResgistrationNumber",
                 formData.businessResgistrationNumber,
-                "Enter registration number"
+                "Enter registration number",
               )}
             </div>
           </div>
@@ -1094,7 +984,7 @@ useEffect(()=> {
                 {renderEditableField(
                   "billingAddress",
                   formData.billingAddress,
-                  "Enter billing address"
+                  "Enter billing address",
                 )}
               </div>
             </div>
@@ -1107,20 +997,20 @@ useEffect(()=> {
                 {renderEditableField(
                   "shippingAddress",
                   formData.shippingAddress,
-                  "Enter shipping address"
+                  "Enter shipping address",
                 )}
               </div>
             </div>
             <div className="space-y-1">
               <h3 className="font-medium text-slate-700 flex items-center">
                 <div className="w-2 h-2 bg-purple-500 rounded-full mr-2"></div>
-                <span className="caption-custom">Registered Office</span>
+                <span className="caption-custom">Registered Office Address</span>
               </h3>
               <div className="text-sm text-slate-600 bg-purple-50 p-2 rounded-lg border border-purple-100">
                 {renderEditableField(
                   "registeredOfficeAddress",
                   formData.registeredOfficeAddress,
-                  "Enter registered office address"
+                  "Enter registered office address",
                 )}
               </div>
             </div>
@@ -1132,23 +1022,11 @@ useEffect(()=> {
     }
   };
 
-  // const [showName, setShowName] = useState<boolean>(false);
-  // const [showAccountCompanyProductName, setShowAccountCompanyProductName]= useState<boolean>(false);
-  //   const [showAccountCompanyProductData, setShowAccountCompanyProductData]= useState<AccountProduct | null>(null
-  //   );
-
-  // function handleShowCompanyProductData(accountCompanyProductData : AccountProduct) {
-  //   console.log("This is the data ");
-  //   if(accountCompanyProductData){
-  //     setShowAccountCompanyProductName(true);
-  //     setShowAccountCompanyProductData(accountCompanyProductData)
-  //   }
-  // }
   if (isIndustryTypeLoading || isBusinessTypeLoading || accountDetailsLoading) {
     return (
       <div
         className={` ${
-          userPreference.isLeftMenu ? " ml-11 " : ""
+          userPreference.isLeftMenu ? " ml-5 " : ""
         }fixed mt-11  inset-0 z-10 bg-white p-8`}
       >
         <Skeleton />
@@ -1158,139 +1036,149 @@ useEffect(()=> {
 
   return (
     // <>
-     
 
-      <div className="pb-3 mt-0.5">
-        {/* Header Section */}
-        <div className="bg-white rounded-2xl  p-2 mb-1 border">
-          {/* Main header */}
-          <div className="flex items-start justify-between">
-            <div className="flex items-center space-x-3">
-              <div
-                className={`p-4 rounded-xl ${
-                  formData.isActive
-                    ? "bg-gradient-to-br from-blue-500 to-indigo-600"
-                    : "bg-gradient-to-br from-red-500 to-amber-600"
-                }`}
-              >
-                <Building2 className="h-6 w-6 text-white" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <h1 className="section-header-custom truncate">
-                  {renderEditableField(
-                    "name",
-                    formData.name,
-                    "Enter company name"
-                  )}
-                </h1>
-              </div>
+    <div className="pb-3 mt-0.5">
+      {/* Header Section */}
+      <div className="bg-white rounded-2xl  p-2 mb-1 border">
+        {/* Main header */}
+        <div className="flex items-start justify-between">
+          <div className="flex items-center space-x-3">
+            <div
+              className={`p-4 rounded-xl ${
+                formData.isActive
+                  ? "bg-gradient-to-br from-blue-500 to-indigo-600"
+                  : "bg-gradient-to-br from-red-500 to-amber-600"
+              }`}
+            >
+              <Building2 className="h-6 w-6 text-white" />
             </div>
+            <div className="flex-1 min-w-0">
+              <h1 className="section-header-custom truncate">
+                {renderEditableField(
+                  "name",
+                  formData.name,
+                  "Enter company name",
+                )}
+              </h1>
+            </div>
+          </div>
 
-            {/* Right side */}
-            <div className="grid gap-2 font-semibold text-gray-700">
-              <div className="flex items-center justify-between gap-4">
-                <span className="grid">
-                  <span className="input-label-custom">Created By</span>
-                  <span className="caption-custom truncate">
-                    {formData.createdBy}
-                  </span>
+          {/* Right side */}
+          <div className="grid gap-2 font-semibold text-gray-700">
+            <div className="flex items-center justify-between gap-4">
+              <span className="grid">
+                <span className="input-label-custom">Created By</span>
+                <span className="caption-custom truncate">
+                  {formData.createdBy}
                 </span>
-                <span className="grid">
-                  <span className="input-label-custom">Created On</span>
-                  <span className="caption-custom truncate">
-                    {formData.createdOn}
-                  </span>
+              </span>
+              <span className="grid">
+                <span className="input-label-custom">Created On</span>
+                <span className="caption-custom truncate">
+                  {formData.createdOn}
                 </span>
-              </div>
+              </span>
             </div>
-          </div>
-        </div>
-
-        {/* Main Content Grid */}
-        <div className="grid sm:grid-cols-1 md:grid-cols-2    gap-1">
-          {/* Left Card with Tabs */}
-          <div className="bg-white rounded-xl p-1 border border-slate-200">
-            {/* Tab Navigation */}
-            <div className="flex border-b  border-gray-200 mb-1">
-              <button
-                onClick={() => setActiveTab("details")}
-                className={`flex items-center px-4 py-1 rounded-t-lg border-b-2 ${
-                  activeTab === "details"
-                    ? "border-teal-600 table-header-custom active"
-                    : "border-transparent table-header-custom"
-                }`}
-              >
-                <FileText className="h-4 w-4 mr-2" />
-                Details
-              </button>
-              <button
-                onClick={() => setActiveTab("primary contact")}
-                className={`flex items-center px-2 rounded-t-lg border-b-2 ${
-                  activeTab === "primary contact"
-                    ? "border-teal-600 table-header-custom active"
-                    : "border-transparent table-header-custom"
-                }`}
-              >
-                <Mail className="h-4 w-4 mr-2" />
-                Primary Contact
-              </button>
-              <button
-                onClick={() => setActiveTab("legal")}
-                className={`flex items-center px-4 py-1 rounded-t-lg border-b-2 ${
-                  activeTab === "legal"
-                    ? "border-teal-600 table-header-custom active"
-                    : "border-transparent table-header-custom"
-                }`}
-              >
-                <FileText className="h-4 w-4 mr-2" />
-                Legal
-              </button>
-              <button
-                onClick={() => setActiveTab("address")}
-                className={`flex items-center px-4 py-1 rounded-t-lg border-b-2 ${
-                  activeTab === "address"
-                    ? "border-teal-600 table-header-custom active"
-                    : "border-transparent table-header-custom"
-                }`}
-              >
-                <MapPin className="h-4 w-4 mr-2" />
-                Address
-              </button>
-            </div>
-
-            {/* Tab Content */}
-            {renderTabContent()}
-          </div>
-
-          {/* Right Card - Empty for future use */}
-          <div className="bg-white rounded-xl border p-1 border-slate-200">
-            <h3 className="bg-gray-100 table-header-custom rounded-t-md px-2">
-              Account Contacts
-            </h3>
-            <AccountContact accountId={company!.id} />
-          </div>
-          {/* Account Lead */}
-          <div>
-            <AccountLead account={company!} />
-          </div>
-          {/* Account company type */}
-          <div className="min-h-28">
-            
-            <AccountCompanyType accountId={company!.id} />
-          </div>
-          {/* Account company product */}
-          <div className="bg-white col-span-2 rounded-xl border p-1 border-slate-200">
-            <h3 className="bg-gray-100 table-header-custom rounded-t-md px-2">
-              Product Details
-            </h3>
-            <AccountCompanyProduct
-              accountId={company!.id}
-              // handleShowCompanyProductData={handleShowCompanyProductData}
-            />
           </div>
         </div>
       </div>
-      
+
+      {/* Main Content Grid */}
+      <div className="grid sm:grid-cols-1 md:grid-cols-2    gap-1">
+        {/* Left Card with Tabs */}
+        <div className="bg-white rounded-xl p-1 border border-slate-200">
+          {/* Tab Navigation */}
+          <div className="flex border-b  border-gray-200 mb-1">
+            <button
+              onClick={() => setActiveTab("details")}
+              className={`flex items-center px-4 py-1 rounded-t-lg border-b-2 ${
+                activeTab === "details"
+                  ? "border-teal-600 table-header-custom active"
+                  : "border-transparent table-header-custom"
+              }`}
+            >
+              <FileText className="h-4 w-4 mr-2" />
+              Details
+            </button>
+            <button
+              onClick={() => setActiveTab("primary contact")}
+              className={`flex items-center px-2 rounded-t-lg border-b-2 ${
+                activeTab === "primary contact"
+                  ? "border-teal-600 table-header-custom active"
+                  : "border-transparent table-header-custom"
+              }`}
+            >
+              <Mail className="h-4 w-4 mr-2" />
+              Primary Contact
+            </button>
+            <button
+              onClick={() => setActiveTab("legal")}
+              className={`flex items-center px-4 py-1 rounded-t-lg border-b-2 ${
+                activeTab === "legal"
+                  ? "border-teal-600 table-header-custom active"
+                  : "border-transparent table-header-custom"
+              }`}
+            >
+              <FileText className="h-4 w-4 mr-2" />
+              Legal
+            </button>
+            <button
+              onClick={() => setActiveTab("address")}
+              className={`flex items-center px-4 py-1 rounded-t-lg border-b-2 ${
+                activeTab === "address"
+                  ? "border-teal-600 table-header-custom active"
+                  : "border-transparent table-header-custom"
+              }`}
+            >
+              <MapPin className="h-4 w-4 mr-2" />
+              Address
+            </button>
+          </div>
+
+          {/* Tab Content */}
+          {renderTabContent()}
+        </div>
+
+        {/* Right Card - Empty for future use */}
+
+        <div className="bg-white rounded-xl border p-1 border-slate-200">
+          <h3 className="bg-gray-100 table-header-custom rounded-t-md px-2">
+            Account Contacts
+          </h3>
+          <AccountContact accountId={company!.id} />
+        </div>
+
+        {/* Account Lead */}
+
+        <div className="bg-white rounded-xl border p-1 border-slate-200">
+          {/* Header */}
+          <div className="bg-gray-100 table-header-custom rounded-t-md px-2 ">
+            <span>Account related leads</span>
+          </div>
+          <AccountLead account={company!} />
+        </div>
+
+        {/* Account company type */}
+
+        <div className="bg-white rounded-xl border p-1 border-slate-200">
+          <div className="bg-gray-100 table-header-custom rounded-t-md px-2 ">
+            <span>Company Account Type</span>
+          </div>
+          <AccountCompanyType accountId={company!.id} />
+        </div>
+
+        {/* Account company product */}
+        <div className="bg-white col-span-2 rounded-xl border p-1 border-slate-200">
+          <h3 className="bg-gray-100 table-header-custom rounded-t-md px-2">
+            Product Details
+          </h3>
+          <AccountCompanyProduct
+            accountId={company!.id}
+            // handleShowCompanyProductData={handleShowCompanyProductData}
+          />
+        </div>
+      </div>
+    </div>
   );
 };
 

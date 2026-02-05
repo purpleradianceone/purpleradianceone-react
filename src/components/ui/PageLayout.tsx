@@ -1,35 +1,9 @@
-// import { ReactNode } from "react";
-// import { useUserPreference } from "../../context/user/UserPreference"
-
 import { ReactNode } from "react";
 import { useUserPreference } from "../../context/user/UserPreference";
 
-// export const PageLayout=(
-  
-//   {
-//     children,
-//     bgColor ="bg-white",
-//   }
-//   :
-//   {
-//     children : ReactNode,
-//     bgColor? : string,
-//   }
-
-// ) =>{
-
-//     const {userPreference} = useUserPreference();
-//     return(
-//          <div
-//       className={` fixed top-8 inset-0 z-10 ${bgColor} ${
-//         userPreference.isLeftMenu ? "ml-[58px] mr-0.5 mt-4" : " mt-6 p-1"
-//       }  overflow-auto`}
-//     >
-//         {children}
-//     </div>
-//     )
-// }
-
+// Use this when showing the any details 
+// wrap the component in the page layout , so it will take care of the padding and the margin
+// on scroll of want to show any data then onScrollChange is usefull
 export const PageLayout = ({
   children,
   bgColor = "bg-white",
@@ -53,7 +27,7 @@ export const PageLayout = ({
     <div
       onScroll={handleScroll}
       className={`fixed top-8 inset-0 z-10 ${bgColor} ${
-        userPreference.isLeftMenu ? "ml-[58px] mr-0.5 mt-4" : "mt-6 p-1"
+        userPreference.isLeftMenu ? "ml-[50px] mr-0 mt-3" : "mt-4"
       } overflow-auto`}
     >
       {children}

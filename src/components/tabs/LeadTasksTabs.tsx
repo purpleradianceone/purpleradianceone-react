@@ -12,6 +12,9 @@ import LeadActivityType from "../../@types/lead-management/LeadActivityType";
 import LeadTaskStageType from "../../@types/lead-management/LeadTaskStageType";
 import LeadTaskType from "../../@types/lead-management/LeadTaskType";
 import { useMeetingPlatform } from "../../config/hooks/useMeetingPlatforms";
+import { useUserAccessModules } from "../../config/hooks/useAccessModules";
+import AccessDeniedMessagePage from "../views/not-found/AccessDeniedMessagePage";
+import MESSAGE from "../../constants/Messages";
 
 function LeadTaskTabs({
   leadTaskStage,
@@ -37,6 +40,8 @@ function LeadTaskTabs({
 
    const [activeTab, setActiveTab] = useState("allTasks");
    const {meetingPlatform} = useMeetingPlatform();
+
+   const {userHasAccessToViewLeadTasks} = useUserAccessModules()
 
   const data = [
     {
@@ -113,6 +118,7 @@ function LeadTaskTabs({
     },
   ];
 
+  if(!userHasAccessToViewLeadTasks) return <AccessDeniedMessagePage message={MESSAGE.MODULE_ACCESS.LEAD_TASKS.DENIED_VIEW_ACCESS}/>
   return (
     <div className="relative">
       <Tabs value={activeTab}>

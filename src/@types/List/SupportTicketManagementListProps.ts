@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import PaginationDataProps from "../ag-grid/PaginationDataProps";
-import CompanyUser from "../company-users/CompanyUser";
+import { PaginationDataWithoutCountProps } from "../../components/ag-grid/PaginationWithoutCount";
 import HandleSearchOptionProps from "../company-users/HandleSearchOptionProps";
 import PostDataTypeForLeadSourceAndStatusAndStates from "../lead-management/PostDataTypeForLeadSourceAndStatusAndStates";
-import { Product } from "../products/ProductsManagementProps";
+import LookupCompanyProduct from "../lookup/LookupCompanyProduct";
+import LookupCompanyUser from "../lookup/LookupCompanyUser";
 import SupportTicketProps from "../support-ticket-management/SupportTicketProps";
 
 type SupportTicketManagementListProps = {
@@ -12,21 +12,19 @@ type SupportTicketManagementListProps = {
     onEndDateChange: (date: Date) => void;
     supportTicketData : SupportTicketProps[];
     handleAddSupportTicket : () => void;
-    paginationData: PaginationDataProps;
+    paginationData: PaginationDataWithoutCountProps;
 
 
-    selectedAssignTo : CompanyUser;
-    persistedSelectedUserId : number | null;
-    handleSelectedAssignToCheckBoxChange: ( params: CompanyUser | null) => void;
+    selectedAssignTo : LookupCompanyUser;
+    handleSelectedAssignToCheckBoxChange: ( params: LookupCompanyUser | null) => void;
 
 
-    selectedResolvedBy: CompanyUser;
-    persistedSelectedResolvedById: number | null;
-    handleSelectedResolvedByCheckBoxChange:  ( params: CompanyUser | null) => void;
+    selectedResolvedBy: LookupCompanyUser;
+    handleSelectedResolvedByCheckBoxChange:  ( params: LookupCompanyUser | null) => void;
 
 
-    handleSelectedCompanyProductCheckBoxChange: ( params: Product | null) => void;
-    selectedCompanyProduct : Product;
+    handleSelectedCompanyProductCheckBoxChange: ( params: LookupCompanyProduct | null) => void;
+    selectedCompanyProduct : LookupCompanyProduct;
     supportTicketCategory :  PostDataTypeForLeadSourceAndStatusAndStates[];
     supportTicketLifecycle : PostDataTypeForLeadSourceAndStatusAndStates[];
     supportTicketSource : PostDataTypeForLeadSourceAndStatusAndStates[];

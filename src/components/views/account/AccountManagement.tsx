@@ -72,12 +72,14 @@ const savedFilters = JSON.parse(
 );
   const {
     currentPage,
+    currentPageData,
     pageSize,
     dateRangeId,
     concatDate,
+    startDate,
+    endDate,
     searchParameter,
-    totalPages,
-    setTotalPages,
+    setCurrentPageData,
     handleDatePageIdChange,
     handleEndDateChange,
     handlePageChange,
@@ -88,6 +90,7 @@ const savedFilters = JSON.parse(
 
   // Fetch data function
   const fetchAccounts = async () => {
+    if (dateRangeId === 8 && concatDate.trim() === "") return;
     const offset = (currentPage - 1) * pageSize;
 
     const effectiveDateRangeId =
@@ -101,7 +104,7 @@ const savedFilters = JSON.parse(
       offset,
       search_company_specific_date_range_id: effectiveDateRangeId,
       search_parameter: searchParameter,
-      isactive: null,
+      isactive: isUsedForAccountLead ? true : null,
       search_parameter_date: concatDate,
     };
 
@@ -109,6 +112,8 @@ const savedFilters = JSON.parse(
       const response = await axiosClient.post(POST_API.GET_ACCOUNT, postData, {
         withCredentials: true,
       });
+
+      setCurrentPageData({currentPage: currentPage, pageDataLength: response.data.length});
 
       const formattedData: Account[] = response.data.map((res: any) => ({
         count: res.count,
@@ -141,9 +146,6 @@ const savedFilters = JSON.parse(
       }));
       setAccounts(formattedData);
       
-      if (response.data[0]?.count) {
-        setTotalPages(Math.ceil(response.data[0].count / pageSize));
-      }
     } catch (error: ApiError | any) {
       if (error.status === STATUS_CODE.UNATHORISED) {
         const refreshTokenStatus = await RefreshToken({
@@ -181,6 +183,9 @@ const savedFilters = JSON.parse(
       size: pageSize,
       search: searchParameter,
       dateRangeId,
+      concatDate,
+      customStartDate: startDate,
+      customEndDate: endDate,
     };
 
     localStorage.setItem(
@@ -191,7 +196,10 @@ const savedFilters = JSON.parse(
     currentPage,
     pageSize,
     searchParameter,
-    dateRangeId
+    dateRangeId,
+    startDate,
+    endDate,
+    concatDate
   ]);
 
   // Note : On refresh button click clear the storage
@@ -220,16 +228,18 @@ const savedFilters = JSON.parse(
                   handleSearchParameterChange,
                   handleDateRangeIdChange: handleDatePageIdChange,
                   dateRangeId,
-                  searchParameter
+                  startDate,
+                  endDate,
+                  searchParameter,
                 }}
                 onEndDateChange={handleEndDateChange}
                 onStartDateChange={handleStartDateChange}
                 paginationData={{
-                  selectedPageSize: handlePageSizeChange,
-                  currentPage,
-                  handlePageChange,
-                  totalPages,
                   pageSize,
+                  currentPage,
+                  currentPageData,
+                  onPageSizeChange: handlePageSizeChange,
+                  onPageChange:handlePageChange,
                 }}
                 handleCreateCompanyAccountType={handleCreateCompanyAccountType}
                 isUsedForAccountLead={isUsedForAccountLead}

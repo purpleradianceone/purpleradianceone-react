@@ -3,14 +3,23 @@ import { AccountCompanyProductWarranty } from "../../@types/account/AccountCompa
 import { AllCommunityModule, ColDef, themeBalham } from "ag-grid-community";
 import StatusIndicator from "../ui/StatusIndicator";
 import { AgGridReact } from "ag-grid-react";
+import { useUserAccessModules } from "../../config/hooks/useAccessModules";
+import toast from "react-hot-toast";
+import MESSAGE from "../../constants/Messages";
+import Button from "../ui/Button";
 
 
 interface AccountCompanyProductWarrantyAgGrid {
   data: AccountCompanyProductWarranty[];
+    onRowSelect : (data : AccountCompanyProductWarranty)=> void
+
 }
 export const AccountCompanyProductWarrantyAgGrid : React.FC<
   AccountCompanyProductWarrantyAgGrid
-> = ({ data }) => {
+   
+> = ({ data , onRowSelect }) => {
+
+  const {userHasAccessToUpdateAccountProductsWarranty} = useUserAccessModules();
   const columnDefs = useMemo<ColDef[]>(
     () => [
       {
@@ -24,6 +33,10 @@ export const AccountCompanyProductWarrantyAgGrid : React.FC<
       {
         field: "details",
         headerName: "Details",
+      },
+      {
+        field: "warrantyTerms",
+        headerName: "Warranty Terms",
       },
       {
         field: "isActive",
@@ -61,6 +74,33 @@ export const AccountCompanyProductWarrantyAgGrid : React.FC<
         field: "updatedOn",
         headerName: "updated On ",
       },
+      {
+              headerName: "Actions",
+              field: "view",
+              pinned: "right",
+              maxWidth: 80,
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              cellRenderer: (params: AccountCompanyProductWarranty | any) => {
+                return (
+                  <div className="flex items-center justify-center  ">
+                    <Button
+                    disabled={!userHasAccessToUpdateAccountProductsWarranty}
+                      className={`lead-details  text-blue-600 ${userHasAccessToUpdateAccountProductsWarranty ? "hover:cursor-not-allowed" : "cursor-pointer"}  `}
+                      onClick={() => {
+                        if(!userHasAccessToUpdateAccountProductsWarranty){
+                          toast.error(MESSAGE.MODULE_ACCESS.ACCOUNT_COMPANY_PRODUCT_WARRANTY.DENIED_UPDATE_ACCESS);
+                          return;
+                        }
+                          params.context.handleRowSelect(params.data);
+                        
+                      }}
+                    >
+                      Update
+                    </Button>
+                  </div>
+                );
+              },
+            },
     ],
     []
   );
@@ -85,6 +125,7 @@ export const AccountCompanyProductWarrantyAgGrid : React.FC<
         defaultColDef={defaultColDef}
         modules={[AllCommunityModule]}
         theme={themeBalham}
+         context={{ handleRowSelect: onRowSelect }}
       />
     </div>
   );

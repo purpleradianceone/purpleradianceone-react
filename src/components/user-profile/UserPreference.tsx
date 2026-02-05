@@ -21,6 +21,7 @@ import { useUserAccessModules } from "../../config/hooks/useAccessModules";
 import MESSAGE from "../../constants/Messages";
 import { useCountries } from "../../config/hooks/useCountries";
 import Country from "../../@types/general/Country";
+import { AppVersionViewCard } from "../views/card/AppVersionViewCard";
 
 const UserPreference = () => {
   const { countries } = useCountries();
@@ -31,7 +32,7 @@ const UserPreference = () => {
 
   const navigate = useNavigate();
   const {
-    userHasAccessToUpdateUser,
+    // userHasAccessToUpdateUser,
     userHasAccessToUpdateSettingGeneral,
     userHasAccessToViewSettingGeneral,
   } = useUserAccessModules();
@@ -312,7 +313,6 @@ const UserPreference = () => {
       });
 
       const newTimezones: Timezone[] = response.data || [];
-      const count: number = response.data[0].count;
 
       if (newOffset === 0) {
         setTimezoneList(newTimezones);
@@ -328,10 +328,7 @@ const UserPreference = () => {
 
       const nextOffset = newOffset + effectiveLimit;
       setOffset(nextOffset);
-
       if (searchTextToUse) {
-        setHasMore(nextOffset < count);
-      } else {
         setHasMore(newTimezones.length === effectiveLimit);
       }
     } catch (err) {
@@ -433,7 +430,7 @@ const UserPreference = () => {
                   }}
                 `}
               onClick={() => {
-                if (userHasAccessToUpdateUser) {
+                if (userHasAccessToUpdateSettingGeneral) {
                   handleEditClick();
                 } else {
                   toast.error(
@@ -747,8 +744,8 @@ const UserPreference = () => {
           </div>
         </div>
       </div>
+      <AppVersionViewCard/>
     </div>
-    
 </div>
   );
 };

@@ -21,6 +21,7 @@ import SearchInput from "../../ui/SearchInput";
 import toast from "react-hot-toast";
 import FormHeader from "../../ui/FormHeader";
 import { createPortal } from "react-dom";
+import MESSAGE from "../../../constants/Messages";
 function CompanyProductTeamsModal({
   isOpen,
   onClose,
@@ -124,7 +125,10 @@ function CompanyProductTeamsModal({
   };
 
   const handleAddCompanyProductTeam = async () => {
-    if (userHasAccessToAddProductTeam) {
+    if (!userHasAccessToAddProductTeam) {
+      toast.error(MESSAGE.MODULE_ACCESS.PRODUCT_TEAMS.DENIED_ADD_ACCESS)
+      return;
+    }
       const createCompanyProductTeamPostData = {
         company_id: loginStatus.companyId,
         company_product_id: companyProduct.id,
@@ -174,7 +178,7 @@ function CompanyProductTeamsModal({
             }
           }
         });
-    }
+    
   };
 
   const fetchCompanyProductTeams = async (
@@ -598,20 +602,6 @@ function CompanyProductTeamsModal({
    [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full"
         >
           <div className="p-4">
-            {/* <div className="flex border-b items-center gap-2 mb-6  sticky bg-white py-1">
-              <EditIcon className="text-blue-500" size={SIZE.TWENTY} />
-              <h2 className="text-lg font-semibold text-gray-800">
-                Edit product {companyProduct.name} Teams
-              </h2>
-              <button
-                onClick={() => {
-                  onClose();
-                }}
-                className="absolute right-1 top-4 text-gray-400 hover:text-gray-600"
-              >
-                <X size={SIZE.TWENTY} />
-              </button>
-            </div> */}
             <FormHeader
               icon={EditIcon}
               onClose={onClose}
@@ -704,13 +694,6 @@ function CompanyProductTeamsModal({
           </div>
         </div>
       </div>
-      {/* <MessageSnackBar
-        isOpen={messageSnackbar.open}
-        message={messageSnackbar.message}
-        type={messageSnackbar.type}
-        onClose={handleMessageSnackbarClose}
-        duration={NUMBER_VALUES.SNACKBAR_DURATION}
-      /> */}
     </div>,
     document.body
   );

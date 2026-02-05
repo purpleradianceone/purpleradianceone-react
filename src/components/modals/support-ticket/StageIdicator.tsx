@@ -17,7 +17,7 @@ const StageIndicator: React.FC<StageIndicatorProps> = ({ stage, onStageChange })
   };
 
   return (
-    <div className="flex items-center justify-center gap-4 mt-4">
+    <div className="flex items-center justify-center gap-4 mt-2 mb-2">
       {stages.map((s, index) => {
         const isActive = stage === s.id;
         const isFilled = stage >= s.id;

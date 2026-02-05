@@ -26,6 +26,7 @@ import toast from "react-hot-toast";
 import FormHeader from "../../ui/FormHeader";
 import ToggleButton from "../../ui/ToggleButton";
 import { createPortal } from "react-dom";
+import AccessDeniedMessagePage from "../../views/not-found/AccessDeniedMessagePage";
 
 function EditCompanyTeamModal({
   isOpen,
@@ -36,6 +37,8 @@ function EditCompanyTeamModal({
   const {
     userHasAccessToUpdateTeamManagement,
     userHasAccessToViewTeamManagement,
+    userHasAccessToViewTeamUsers,
+    userHasAccessToUpdateTeamUSers
   } = useUserAccessModules();
 
   const intialUpdateCompanyTeamFormData = {
@@ -135,7 +138,10 @@ function EditCompanyTeamModal({
   };
 
   const handleAddCompanyTeamUsers = async () => {
-    if (userHasAccessToUpdateTeamManagement) {
+    if (!userHasAccessToUpdateTeamUSers) {
+      toast.error(MESSAGE.MODULE_ACCESS.TEAM_USERS.DENIED_ADD_ACCESS)
+      return;
+    }
       const createCompanyTeamCompanyUser = {
         company_id: loginStatus.companyId,
         company_team_id: companyTeam!.id,
@@ -177,7 +183,7 @@ function EditCompanyTeamModal({
             }
           }
         });
-    }
+    
   };
 
   const fetchCompanyTeamUsers = async (
@@ -381,7 +387,7 @@ function EditCompanyTeamModal({
             }
           });
     }else{
-      toast.error(MESSAGE.ERROR.NOT_ATHORISED)
+      toast.error(MESSAGE.MODULE_ACCESS.TEAMS.DENIED_UPDATE_ACCESS)
     }
   }
   const { isSmallScreen } = useScreenSize();
@@ -434,6 +440,9 @@ function EditCompanyTeamModal({
       } else {
         toast.error(MESSAGE.ERROR.NO_CHANGES)
       }
+    }else{
+      toast.error(MESSAGE.MODULE_ACCESS.TEAMS.DENIED_UPDATE_ACCESS)
+      return;
     }
   };
 
@@ -553,44 +562,26 @@ function EditCompanyTeamModal({
                 rows={3}
                 maxLength={256}
                 required={true}
-               
                 onChange={handleUpdateCompanyFormDataChange}
               />
-
-              {userHasAccessToUpdateTeamManagement ? (
                 <div className="flex justify-self-end m-2 min-w-70 gap-2">
-                <Button type="button" onClick={onClose}>
+                <Button  type="button" onClick={onClose}>
                   <div className="flex items-center justify-center gap-0.5">
                     <X size={16} />
                     Cancel
                   </div>
                 </Button>
-                <Button type="submit">
+                <Button disabled={!userHasAccessToUpdateTeamManagement} type="submit">
                   <div className="flex items-center justify-center gap-1">
                     <Save size={16} />
                     Save
                   </div>
                 </Button>
               </div>
-              ) : (
-
-                <div className="flex justify-self-end max-w-70 m-2 gap-2">
-                  <Button type="button" onClick={onClose}>
-                  <div className="flex items-center justify-center gap-0.5">
-                    <X size={16} />
-                    Cancel
-                  </div>
-                </Button>
-                  <Button type="submit" onClick={(e) => {e.preventDefault()}} disabled>
-                    <div className="flex items-center justify-center gap-1">
-                    <Save size={16} />
-                    Save
-                  </div>
-                  </Button>
-                </div>
-              )}
             </form>
-            <CompanyTeamUsersAgGrid
+            {
+              userHasAccessToViewTeamUsers ?
+              <CompanyTeamUsersAgGrid
               companyTeam={companyTeam}
               isOpen={isOpen}
               isGridForProductUser={false}
@@ -608,7 +599,9 @@ function EditCompanyTeamModal({
               }
               isAddUsersCompleted={isCompanyTeamUsersAddCompleted}
               usersUpdateCount={companyTeamUsersUpdateCount}
-            ></CompanyTeamUsersAgGrid>
+              />
+              :<AccessDeniedMessagePage message={MESSAGE.MODULE_ACCESS.TEAM_USERS.DENIED_VIEW_ACCESS}/>
+            }
           </div>
         </div>
       </div>
