@@ -3,7 +3,7 @@
 import React from "react";
 import { useEditor } from "@craftjs/core";
 
-import "./Sidebar.css"; // 👈 Import the CSS
+import "./Sidebar.css"; 
 
 import { ButtonBlock } from "../template-blocks/ButtonBlock";
 import { ColumnBlock } from "../template-blocks/ColumnBlock";
@@ -29,30 +29,37 @@ export const Sidebar: React.FC = () => {
         <div id="section" ref={(ref: HTMLDivElement) => { ref && connectors.create(ref, <SectionBlock />); }} className="sidebar-block caption-custom">
           <span><LucidePackage/></span>
           <span>Section</span>
+          <span className="info-icon" title="This block is used for creating different sections in template." >i</span>
         </div>
         <div id="text" ref={(ref: HTMLDivElement) => { ref && connectors.create(ref, <LexicalText />); }} className="sidebar-block caption-custom">
           <span><LucideClipboardEdit/></span>
           <span>Text</span>
+          <span className="info-icon" title="This block is used for adding text in the template." >i</span>
         </div>
         <div id="image" ref={(ref: HTMLDivElement) => { ref && connectors.create(ref, <ImageBlock src="" width={0} height={0} alignment={"left"} />); }} className="sidebar-block caption-custom">
           <span><LucideImage/></span>
           <span>Image</span>
+          <span className="info-icon" title="This block is used for adding image in the template." >i</span>
         </div>
         <div id="button" ref={(ref: HTMLDivElement) => { ref && connectors.create(ref, <ButtonBlock />); }} className="sidebar-block caption-custom">
           <span><MousePointerSquare/></span>
           <span>Button</span>
+          <span className="info-icon" title="This block is used for adding button in the template." >i</span>
         </div>
         <div id="divider" ref={(ref: HTMLDivElement) => { ref && connectors.create(ref, <DividerBlock />); }} className="sidebar-block caption-custom">
           <span><LucideSeparatorHorizontal/></span>
           <span>Divider</span>
+          <span className="info-icon" title="This block is used for adding divider between two blocks in the template." >i</span>
         </div>
         <div id="column" ref={(ref: HTMLDivElement) => { ref && connectors.create(ref, <ColumnBlock />); }}  className="sidebar-block caption-custom">
           <span><LucideColumns/></span>
           <span>Column</span>
+          <span className="info-icon" title="This block is used for adding column in the template." >i</span>
         </div>
         <div id="table" ref={(ref: HTMLDivElement) => { ref && connectors.create(ref, <TableBlock />); }}  className="sidebar-block caption-custom">
           <span><LucideTable/></span>
           <span>Table</span>
+          <span className="info-icon" title="This block is used for adding table in the template." >i</span>
         </div>
         {/* <div id="dynamic_fields" ref={(ref: HTMLDivElement) => { ref && connectors.create(ref, <DynamicFieldBlock />); }} className="sidebar-block">
           <span>∯</span>

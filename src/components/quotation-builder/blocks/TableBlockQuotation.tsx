@@ -95,7 +95,7 @@ export const TableBlockQuotation: React.FC = () => {
     >
       {/* ================= HOVER DELETE ================= */}
       {hovered && (
-        <div className="absolute right-0 -top-2"
+        <div className="absolute right-0 -top-0"
         style={{
             zIndex:9999
         }}>

@@ -283,7 +283,7 @@ function SignUpForm() {
               <Link to={ROUTES_URL.SIGN_IN}>Log In</Link>
             </button>
           </span>
-          <span className="flex justify-center items-center text-gray-400 mb-1">{APP_VERSION}</span>
+          <span className="flex justify-center items-center caption-custom mb-1">{APP_VERSION}</span>
         </div>
       </form>
 

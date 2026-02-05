@@ -108,7 +108,7 @@ function ForgotPasswordForm() {
             Reset Password
           </Button>
         </Link>
-        <div className="flex justify-center items-center text-gray-400 mb-1">{APP_VERSION}</div>
+        <div className="flex justify-center items-center caption-custom mb-1">{APP_VERSION}</div>
         
       </form>
       {showEmailSentAnimation && (

@@ -19,41 +19,39 @@ export const SidebarQuotation: React.FC = () => {
       <h1 className="sidebar-title table-header-custom">Quotation Blocks</h1>
       <div className="sidebar-grid">
        
-         <div id="pageBlock" ref={(ref: HTMLDivElement) => { ref && connectors.create(ref, <PageBlockQuotation />); }} className="sidebar-block caption-custom">
+        <div id="pageBlock" ref={(ref: HTMLDivElement) => { ref && connectors.create(ref, <PageBlockQuotation />); }} className="sidebar-block caption-custom">
           <span><LucideClipboardPlus/></span>
           <span>Page</span>
+          <span className="info-icon"
+          title="This block represent the A4 size page for quotation.">i</span>
         </div>
-        <div id="section" ref={(ref: HTMLDivElement) => { ref && connectors.create(ref, <SectionBlockQuotation />); }} className="sidebar-block caption-custom">
+
+
+        <div id="sectionBlock" ref={(ref: HTMLDivElement) => { ref && connectors.create(ref, <SectionBlockQuotation />); }} className="sidebar-block caption-custom">
           <span><LucidePackage/></span>
           <span>Section</span>
+          <span className="info-icon" title="This block is used for creating different sections in page block." >i</span>
         </div>
         
-        {/* <div id="image" ref={(ref: HTMLDivElement) => { ref && connectors.create(ref, <ImageBlockQuotation alignment="left" height={0} width={0} src="" />); }} className="sidebar-block caption-custom">
-          <span><LucideImage/></span>
-          <span>Image</span>
-        </div> */}
 
         <div id="contentBlock" ref={(ref: HTMLDivElement) => { ref && connectors.create(ref, <ContentBlockQuotation/>); }} className="sidebar-block caption-custom">
           <span><LucideTextSelection/></span>
           <span>Content Block</span>
+          <span className="info-icon"
+          title="This block is use to add different type of content in quotation."
+          >i</span>
+          
         </div>
+
 
          <div id="dynamicTableBlock" ref={(ref: HTMLDivElement) => { ref && connectors.create(ref, <TableBlockQuotation/>); }} className="sidebar-block caption-custom">
           <span><LucideTable/></span>
           <span>Dynamic Table Block</span>
-        </div>
-        
-        {/* <div id="image" ref={(ref: HTMLDivElement) => { ref && connectors.create(ref, <HeaderBlockQuotation/>); }} className="sidebar-block caption-custom">
-          <span><LucideHeading/></span>
-          <span>Header</span>
-        </div> */}
-        
-        {/* <div id="image" ref={(ref: HTMLDivElement) => { ref && connectors.create(ref, <FooterBlockQuotation/>); }} className="sidebar-block caption-custom">
-          <span><LucideFootprints/></span>
-          <span>Footer</span>
-        </div> */}
 
-        
+          <span className="info-icon"
+            title="This table block represent the position where the runtime product pricing table is generate."
+          >i</span>
+        </div>
         
       </div>
     </div>

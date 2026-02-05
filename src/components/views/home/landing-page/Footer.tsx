@@ -117,7 +117,7 @@ function Footer() {
               </a>
             </div>
           </div>
-          <div className="flex justify-center items-center text-gray-400">{APP_VERSION}</div>
+          <div className="flex justify-center items-center caption-custom">{APP_VERSION}</div>
         </div>
       </div>
     </motion.footer>

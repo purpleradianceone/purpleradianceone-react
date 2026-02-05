@@ -516,7 +516,7 @@ function SignInForm() {
                 <Link to={ROUTES_URL.SIGN_UP}>Sign Up</Link>
               </button>
             </span>
-            <span className="flex w-full justify-center items-center text-gray-400 mb-1">{APP_VERSION} </span>
+            <span className="flex w-full justify-center items-center caption-custom mb-1">{APP_VERSION} </span>
           </div>
         </form>
         {
