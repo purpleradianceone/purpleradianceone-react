@@ -637,10 +637,18 @@ export const CreateMultipleAccountCompanyProduct = () => {
       return;
     }
 
+     if (rows.some((r, i) => r.productId === item.id && i === index)) {
+      toast.error(MESSAGE.ERROR.SAME_PRODUCT_SELECTED);
+      return;
+    }
+
     //  Enable loader for this row
+    
+    // Note : When user selected another product in selected product row then need to scrap given data such as 
+    // unit_id , unitName , con factor , con factor string , serial number array
     setRows((prev) =>
       prev.map((row, i) =>
-        i === index ? { ...row, isLoading: true, unit_id: 0 } : row,
+        i === index ? { ...row, isLoading: true, unit_id: 0 ,unitName:"" , conversionFactorString:"" , conversionFactor:0,  serialNumber:[]} : row,
       ),
     );
 
@@ -807,6 +815,10 @@ export const CreateMultipleAccountCompanyProduct = () => {
   const [selectedCompanyProductId, setSelectedCompanyProductId] = useState<
     number | null
   >(null);
+
+   useEffect(()=>{
+      console.log(rows);
+    },[rows])
 
   // separate state just for the serial number pop up
   // const [serialRowIndex, setSerialRowIndex] = useState<number | null>(null);
@@ -1045,8 +1057,10 @@ export const CreateMultipleAccountCompanyProduct = () => {
                       <div>
                         <div className="pt-0.5">
                           <CustomDropdown
+                          key={row.unit_id}
                             labelName="Unit :"
                             logo={LucideTimer}
+                            
                             readOnly={!row.productId || row.isSerialNumber}
                             selectedValue={row.unit_id}
                             onSelect={(unit) => {
