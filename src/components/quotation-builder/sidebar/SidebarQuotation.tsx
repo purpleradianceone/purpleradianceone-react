@@ -26,28 +26,23 @@ export const SidebarQuotation: React.FC = () => {
           title="This block represent the A4 size page for quotation.">i</span>
         </div>
 
-
         <div id="sectionBlock" ref={(ref: HTMLDivElement) => { ref && connectors.create(ref, <SectionBlockQuotation />); }} className="sidebar-block caption-custom">
           <span><LucidePackage/></span>
           <span>Section</span>
           <span className="info-icon" title="This block is used for creating different sections in page block." >i</span>
         </div>
         
-
         <div id="contentBlock" ref={(ref: HTMLDivElement) => { ref && connectors.create(ref, <ContentBlockQuotation/>); }} className="sidebar-block caption-custom">
           <span><LucideTextSelection/></span>
           <span>Content Block</span>
           <span className="info-icon"
           title="This block is use to add different type of content in quotation."
           >i</span>
-          
         </div>
-
 
          <div id="dynamicTableBlock" ref={(ref: HTMLDivElement) => { ref && connectors.create(ref, <TableBlockQuotation/>); }} className="sidebar-block caption-custom">
           <span><LucideTable/></span>
           <span>Dynamic Table Block</span>
-
           <span className="info-icon"
             title="This table block represent the position where the runtime product pricing table is generate."
           >i</span>
