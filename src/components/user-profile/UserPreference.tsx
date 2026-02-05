@@ -21,7 +21,7 @@ import { useUserAccessModules } from "../../config/hooks/useAccessModules";
 import MESSAGE from "../../constants/Messages";
 import { useCountries } from "../../config/hooks/useCountries";
 import Country from "../../@types/general/Country";
-import { APP_VERSION } from "../../@types/config/AppVersion";
+import { AppVersionViewCard } from "../views/card/AppVersionViewCard";
 
 const UserPreference = () => {
   const { countries } = useCountries();
@@ -744,8 +744,7 @@ const UserPreference = () => {
           </div>
         </div>
       </div>
-      <span className="flex justify-center items-center text-gray-400 mb-1">{APP_VERSION}</span>
-      
+          <AppVersionViewCard/>
     </div>
     
 </div>

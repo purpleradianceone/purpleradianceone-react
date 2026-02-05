@@ -1,7 +1,7 @@
 import { Activity, Mail, Phone } from "lucide-react";
 import ROUTES_URL from "../../../../constants/Routes";
 import { motion } from "framer-motion";
-import { APP_VERSION } from "../../../../@types/config/AppVersion";
+import { AppVersionViewCard } from "../../card/AppVersionViewCard";
 
 function Footer() {
   return (
@@ -21,7 +21,7 @@ function Footer() {
               </div>
               <h3 className="text-xl font-bold">PurpleRadianceOne</h3>
             </div>
-            <p className="text-gray-400 mb-6 max-w-md">
+            <p className="caption-custom mb-6 max-w-md">
               The comprehensive customer relationship management platform trusted by businesses worldwide. Streamline your sales process and grow your business with PurpleRadianceOne CRM
             </p>
             <div className="flex space-x-4">
@@ -42,7 +42,7 @@ function Footer() {
 
           <div>
             <h4 className="font-semibold mb-4">Product</h4>
-            <ul className="space-y-2 text-gray-400">
+            <ul className="space-y-2 caption-custom">
               <li>
                 <a href={ROUTES_URL.FEATURES} className="hover:text-white transition-colors">
                   Features
@@ -58,24 +58,24 @@ function Footer() {
 
           <div>
             <h4 className="font-semibold mb-4">Company</h4>
-            <ul className="space-y-2 text-gray-400">
+            <ul className="space-y-2 caption-custom">
               <li>
-                <a href={ROUTES_URL.ABOUT_US} className="hover:text-white transition-colors">
+                <a href={ROUTES_URL.ABOUT_US} className="caption-custom hover:text-white transition-colors">
                   About Us
                 </a>
               </li>
               <li>
-                <a href={ROUTES_URL.CAREERS} className="hover:text-white transition-colors">
+                <a href={ROUTES_URL.CAREERS} className="caption-custom hover:text-white transition-colors">
                   Careers
                 </a>
               </li>
               <li>
-                <a href={ROUTES_URL.CONTACT_US} className="hover:text-white transition-colors">
+                <a href={ROUTES_URL.CONTACT_US} className="caption-custom hover:text-white transition-colors">
                   Contact
                 </a>
               </li>
               <li>
-                <a href="mailto:crm@purpleradiance.com" className="hover:text-white transition-colors">
+                <a href="mailto:crm@purpleradiance.com" className="caption-custom hover:text-white transition-colors">
                   Support
                 </a>
               </li>
@@ -85,7 +85,7 @@ function Footer() {
 
         <div className="border-t border-gray-800 mt-8 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
-            <p className="text-gray-400 mb-4 md:mb-0">
+            <p className="caption-custom mb-4 md:mb-0">
               © 2025 PurpleRadianceOne.com All rights reserved.
             </p>
 
@@ -93,7 +93,7 @@ function Footer() {
             <div className="flex space-x-6 text-sm">
               <a
                 href={ROUTES_URL.PRIVACY_POLICY}
-                className="text-gray-400 hover:text-white transition-colors"
+                className="caption-custom hover:text-white transition-colors"
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -101,7 +101,7 @@ function Footer() {
               </a>
               <a
                 href={ROUTES_URL.TERMS_OF_SERVICE}
-                className="text-gray-400 hover:text-white transition-colors"
+                className="caption-custom hover:text-white transition-colors"
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -109,7 +109,7 @@ function Footer() {
               </a>
               <a
                 href={ROUTES_URL.COOKIE_POLICY}
-                className="text-gray-400 hover:text-white transition-colors"
+                className="caption-custom hover:text-white transition-colors"
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -117,7 +117,7 @@ function Footer() {
               </a>
             </div>
           </div>
-          <div className="flex justify-center items-center text-gray-400">{APP_VERSION}</div>
+          <AppVersionViewCard/>
         </div>
       </div>
     </motion.footer>
