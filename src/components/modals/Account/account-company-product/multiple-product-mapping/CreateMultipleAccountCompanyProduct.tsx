@@ -58,6 +58,7 @@ import AccessDeniedMessagePage from "../../../../views/not-found/AccessDeniedMes
 import Account from "../../../../../@types/account/Account";
 import { ControlledMuiDatePicker } from "../../../../ui/ControlledMuiDatePicker";
 import { Dayjs } from "dayjs";
+import { SelectedSerialNumber } from "../../../../ag-grid/StockAvailableSerialNumberAgGrid";
 
 interface ProductRow {
   rowNaNoId: string;
@@ -65,7 +66,8 @@ interface ProductRow {
   productId: number | null;
   unit_id: number;
   quantity: number;
-  serialNumber: number[];
+  serialNumber: SelectedSerialNumber[];
+  // serialNumber: number[];
   isSerialNumber: boolean;
   productQuantity?: number;
   purchaseDate: Date | null;
@@ -620,6 +622,16 @@ export const CreateMultipleAccountCompanyProduct = () => {
     setShowProductsSelectedSerialNumber,
   ] = useState<boolean>(false);
 
+  const [selectedrowIdForPopUp, setSelectedrowIdForPopUp] = useState<
+    string | undefined
+  >("");
+  // Note : used for showing the selected serial numbers in the pop up card
+  const handleViewSerialNumberCard = (rowId: string) => {
+    if (!rowId || rowId === undefined) return;
+
+    const row = rows.find((r) => r.rowNaNoId === rowId);
+    setSelectedrowIdForPopUp(row?.rowNaNoId);
+  };
   const { unitForProduct, getUnitForProduct } = useUnitForProduct({});
 
   // ==============================
@@ -637,18 +649,28 @@ export const CreateMultipleAccountCompanyProduct = () => {
       return;
     }
 
-     if (rows.some((r, i) => r.productId === item.id && i === index)) {
+    if (rows.some((r, i) => r.productId === item.id && i === index)) {
       toast.error(MESSAGE.ERROR.SAME_PRODUCT_SELECTED);
       return;
     }
 
     //  Enable loader for this row
-    
-    // Note : When user selected another product in selected product row then need to scrap given data such as 
+
+    // Note : When user selected another product in selected product row then need to scrap given data such as
     // unit_id , unitName , con factor , con factor string , serial number array
     setRows((prev) =>
       prev.map((row, i) =>
-        i === index ? { ...row, isLoading: true, unit_id: 0 ,unitName:"" , conversionFactorString:"" , conversionFactor:0,  serialNumber:[]} : row,
+        i === index
+          ? {
+              ...row,
+              isLoading: true,
+              unit_id: 0,
+              unitName: "",
+              conversionFactorString: "",
+              conversionFactor: 0,
+              serialNumber: [],
+            }
+          : row,
       ),
     );
 
@@ -694,7 +716,6 @@ export const CreateMultipleAccountCompanyProduct = () => {
             productWarranty: item.defaultWarrantyName,
             productWarrantyNumber: item.defaultWarranty,
             productWarrantyId: item.defaultWarrantyIntervalTypeId,
-
             productAmc: item.defaultAmcCycleName,
             productAmcNumber: item.defaultAmcCycle,
             productAmcId: item.defaultAmcCycleIntervalTypeId,
@@ -734,13 +755,12 @@ export const CreateMultipleAccountCompanyProduct = () => {
   // Note : Create api call
   const handleCreateAccountCompanyProduct = async () => {
     if (!validateRows()) {
-      // toast.error("Please fill all mandatory fields");
       return;
     }
     const payloadList = rows.map((row) => ({
       unit_id: row.unit_id,
       quantity: row.quantity,
-      stock_inward_id_array: row.serialNumber ?? [],
+      stock_inward_id_array: row.serialNumber.map((item)=> item.stockInwardId) ?? [],
       company_id: loginStatus.companyId,
       account_id: Number(accountId),
       company_product_id: row.productId,
@@ -779,6 +799,9 @@ export const CreateMultipleAccountCompanyProduct = () => {
       createdby_id: loginStatus.id,
     }));
 
+    console.log("this is the payload");
+    console.log(payloadList);
+    
     try {
       setShowLoadingAnimationForAssignApi(true);
       const response = await createMultipleAccountCompanyProduct(payloadList);
@@ -816,9 +839,9 @@ export const CreateMultipleAccountCompanyProduct = () => {
     number | null
   >(null);
 
-   useEffect(()=>{
-      console.log(rows);
-    },[rows])
+  useEffect(() => {
+    console.log(rows);
+  }, [rows]);
 
   // separate state just for the serial number pop up
   // const [serialRowIndex, setSerialRowIndex] = useState<number | null>(null);
@@ -993,18 +1016,15 @@ export const CreateMultipleAccountCompanyProduct = () => {
                   </div>
 
                   {/* GRID */}
-                  <div className="grid  md:grid-cols-2 gap-1">
+                  <div className="grid  grid-cols-5 gap-1">
                     {/* QTY + UNIT */}
-                    <div
-                      className={` grid  ${
-                        row.isSerialNumber ? "grid-cols-3 " : "grid-cols-2"
-                      } gap-1 `}
-                    >
-                      <div>
-                        <div className="pt-0.5">
+
+                    <div>
+                      <div className="flex items-center justify-between gap-1">
+                        <div className="w-1/2">
                           <FormInput
                             logo={Box}
-                            label="Quantity :"
+                            label="Quantity "
                             readonly={!row.productId}
                             required
                             placeholder="Enter Product Quantity"
@@ -1032,35 +1052,12 @@ export const CreateMultipleAccountCompanyProduct = () => {
                               updateRow(index, "quantity", qty);
                             }}
                           />
-                          {row.hasError?.zeroQuantity && (
-                            <p className="text-red-500 text-xs mt-1">
-                              Quantity is required.
-                            </p>
-                          )}
-                          {row.hasError?.quantity === true && (
-                            <p className="text-red-500 text-xs mt-1">
-                              qty should be as per the stock
-                            </p>
-                          )}
                         </div>
-                        <ControlledMuiDatePicker
-                          readonly={!row.productId}
-                          label="Installation Date"
-                          value={row.installationDate}
-                          onCommit={(date) => {
-                            handleDateCommit(index, "installationDate", date);
-                          }}
-                          logo={Calendar}
-                        />
-                      </div>
-                      {/* Unit */}
-                      <div>
-                        <div className="pt-0.5">
+                        <div className="w-1/2 mt-0.5 ">
                           <CustomDropdown
-                          key={row.unit_id}
-                            labelName="Unit :"
+                            key={row.unit_id}
+                            labelName="Unit"
                             logo={LucideTimer}
-                            
                             readOnly={!row.productId || row.isSerialNumber}
                             selectedValue={row.unit_id}
                             onSelect={(unit) => {
@@ -1099,130 +1096,139 @@ export const CreateMultipleAccountCompanyProduct = () => {
                               Unit is required
                             </p>
                           )}
-                          <div className="col-span-2 text-xs">
-                            {!Number.isNaN(row.conversionFactor) &&
-                              row.quantity !== 0 &&
-                              row.conversionFactor !== 0 && (
-                                <p
-                                  title="Quantity is converted automatically based on the product base unit and current selected unit."
-                                  className="caption-custom-active flex items-center cursor-pointer gap-1"
-                                >
-                                  Quantity deduction : 
-                                  {/* Quantity will be deducted from stock :{" "} */}
-                                  {row.conversionFactor + row.unitName}
-                                  {/* {row.conversionFactor} */}
-                                  {/* {
+                        </div>
+                      </div>
+                      <div className=" ">
+                        {row.hasError?.zeroQuantity && (
+                          <p className="text-red-500 text-xs mt-1">
+                            Quantity is required.
+                          </p>
+                        )}
+                        {row.hasError?.quantity === true && (
+                          <p className="text-red-500 text-xs mt-1">
+                            qty should be as per the stock
+                          </p>
+                        )}
+                        {!Number.isNaN(row.conversionFactor) &&
+                          row.quantity !== 0 &&
+                          row.conversionFactor !== 0 && (
+                            <p
+                              title="Quantity is converted automatically based on the product base unit and current selected unit."
+                              className="caption-custom-active flex items-center cursor-pointer gap-1"
+                            >
+                              Quantity deduction :
+                              {/* Quantity will be deducted from stock :{" "} */}
+                              {row.conversionFactor + row.unitName}
+                              {/* {row.conversionFactor} */}
+                              {/* {
                                   unitForProduct.find(
                                     (item) =>
                                       item.conversionFactor ===
                                     row.conversionFactor
                                     )?.unitNameInStock
                                     } */}
-                                  <Info size={12} className="" />
-                                </p>
-                              )}
-                          </div>
-                          {/* INSTALLED BY */}
-                          <div className=" ">
-                            <CompanyUserSearchFieldInput
-                              readOnly={!row.productId}
-                              label="Installed By :"
-                              required
-                              onUserSelected={(data) => {
-                                if (!row.product) return;
-                                if (data) {
-                                  updateRow(index, "installedById", data?.id);
-                                  updateRow(
-                                    index,
-                                    "installedBy",
-                                    data?.fullname,
-                                  );
-                                } else {
-                                  updateRow(index, "installedById", 0);
-                                  updateRow(index, "installedBy", "");
-                                }
-                              }}
-                              defaultValue={loginStatus.fullName}
-                              // disabledMessage={ }
-                              error=""
-                              logo={User}
-                              placeholder="Select User"
-                            />
-                            {(row.hasError?.installedBy ||
-                              row.hasError?.installedById) && (
-                              <p className="text-red-500 text-xs mt-1">
-                                Installed by is required
-                              </p>
-                            )}
-                          </div>
-                        </div>
+                              <Info size={12} className="" />
+                            </p>
+                          )}
                       </div>
+                    </div>
+                    {/* serial number */}
+                    {row !== undefined && row?.isSerialNumber === true && (
+                      <div className=" w-full  mt-1">
+                        <div className="relative w-full flex items-center justify-end h-fit ">
+                          <div className="w-full ">
+                            <label className=" input-label-custom text-sm   flex items-center gap-1 text-gray-700  ">
+                              <FileDigit className="text-blue-500" size={15} />
+                              <div>
+                                Serial Number :
+                                <span className="ml-0 text-red-400">*</span>
+                              </div>
+                            </label>
 
-                      {row !== undefined && row?.isSerialNumber === true && (
-                        <div className="mt-1">
-                          <div className="relative flex items-center justify-end h-fit ">
-                            <div className="w-full ">
-                              <label className=" input-label-custom text-sm   flex items-center gap-1 text-gray-700  ">
-                                <FileDigit
-                                  className="text-blue-500"
-                                  size={15}
-                                />
-                                <div>
-                                  Serial Number :
-                                  <span className="ml-0 text-red-400">*</span>
-                                </div>
-                              </label>
+                            <div className="flex items-center justify-between border border-gray-300 rounded px-1 bg-white shadow-sm focus-within:ring-2 focus-within:ring-blue-500">
+                              <span className="table-header-custom w-full   truncate">
+                                {row.serialNumber.length > 0 ? (
+                                  <ul className="space-y-1 max-h-9 pt-1  overflow-y-auto">
+                                    {row.serialNumber.map(
+                                      (
+                                        item: SelectedSerialNumber,
+                                        index: number,
+                                      ) => (
+                                        <li
+                                          key={item.serialNumber}
+                                          className="flex items-center gap-1 text-sm text-gray-600  py-0.5 rounded hover:bg-gray-100"
+                                        >
+                                          {/* Sr No */}
+                                          <span className="w-4 text-right text-gray-700">
+                                            {index + 1}.
+                                          </span>
 
-                              <div className="flex items-center justify-between border border-gray-300 rounded px-3 py-1 bg-white shadow-sm focus-within:ring-2 focus-within:ring-blue-500">
-                                <span className="table-header-custom  truncate">
-                                  {row.serialNumber.length > 0 ? (
-                                    <div className="flex items-center justify-between gap-1">
-                                      <span className="">
-                                        Item count: {row.serialNumber.length}
-                                      </span>
-                                      <button
-                                      className="hidden"
-                                        type="button"
-                                        onMouseEnter={() =>
-                                          setShowProductsSelectedSerialNumber(
-                                            true,
-                                          )
-                                        }
-                                        onMouseLeave={() =>
-                                          setShowProductsSelectedSerialNumber(
-                                            false,
-                                          )
-                                        }
-                                      >
-                                        <InfoIcon
-                                          size={12}
-                                          className="text-black"
-                                        />
-                                      </button>
-                                    </div>
-                                  ) : (
-                                    "No item chosen"
+                                          {/* Serial Number */}
+                                          <span className="input-label-custom">
+                                            {item.serialNumber}
+                                          </span>
+                                        </li>
+                                      ),
+                                    )}
+                                  </ul>
+                                ) : (
+                                  "No item chosen"
+                                )}
+                              </span>
+
+                              {/* second block - length and change button */}
+                              <div>
+                                <div className="caption-custom flex gap-1 items-center">
+                                  {row.serialNumber.length > 0 && (
+                                    <button
+                                      className="relative col-span-1 flex justify-end"
+                                      type="button"
+                                      onMouseEnter={() => {
+                                        handleViewSerialNumberCard(
+                                          row.rowNaNoId,
+                                        );
+                                        setShowProductsSelectedSerialNumber(
+                                          true,
+                                        );
+                                      }}
+                                      onMouseLeave={() => {
+                                        handleViewSerialNumberCard(
+                                          row.rowNaNoId,
+                                        );
+                                        setShowProductsSelectedSerialNumber(
+                                          false,
+                                        );
+                                      }}
+                                    >
+                                      <InfoIcon
+                                        size={12}
+                                        className="text-black"
+                                      />
+                                    </button>
                                   )}
-                                </span>
-
+                                  {row.serialNumber &&
+                                    row.serialNumber.length > 0 && (
+                                      <span>({row.serialNumber.length})</span>
+                                    )}
+                                </div>
                                 <Button
                                   type="button"
-                                  className="text-blue-600 text-sm underline hover:text-blue-800"
+                                  className="caption-custom-blue text-sm   hover:text-blue-800"
                                   onClick={(e) => {
                                     e.preventDefault();
-                                    // openSerialNumberPopup(index);
-
                                     // nondid changes
                                     openSerialNumberPopup(row.rowNaNoId);
                                   }}
                                 >
                                   {row.serialNumber.length > 0
-                                    ? "View/Change"
+                                    ? "Change"
                                     : "Select"}
                                 </Button>
-                                {showProductsSelectedSerialNumber && (
+                              </div>
+                              {showProductsSelectedSerialNumber &&
+                                selectedrowIdForPopUp === row.rowNaNoId && (
                                   <div
-                                    className="absolute top-10 bg-pink-500 p-11"
+                                    className="absolute top-9 z-50 min-w-[220px] bg-white border border-gray-200 rounded-md shadow-lg p-4"
                                     onMouseLeave={() =>
                                       setShowProductsSelectedSerialNumber(false)
                                     }
@@ -1230,116 +1236,147 @@ export const CreateMultipleAccountCompanyProduct = () => {
                                       setShowProductsSelectedSerialNumber(true)
                                     }
                                   >
-                                    {row.serialNumber.map((item) => (
-                                      <span className="block">{item}</span>
-                                    ))}
+                                    {/* Header */}
+                                    <div className="table-header-custom mb-3 border-b ">
+                                      Selected Serial Numbers
+                                    </div>
+
+                                    {/* List */}
+                                    <ul className="space-y-1 max-h-48 overflow-y-auto input-data-custom">
+                                      {row.serialNumber.map(
+                                        (
+                                          item: SelectedSerialNumber,
+                                          index: number,
+                                        ) => (
+                                          <li
+                                            key={item.serialNumber}
+                                            className="flex items-center gap-2 text-sm text-gray-600 px-2 py-1 rounded hover:bg-gray-100"
+                                          >
+                                            {/* Sr No */}
+                                            <span className="w-5 text-right text-gray-400">
+                                              {index + 1}.
+                                            </span>
+
+                                            {/* Serial Number */}
+                                            <span className="table-data-custom">
+                                              {item.serialNumber}
+                                            </span>
+                                          </li>
+                                        ),
+                                      )}
+                                    </ul>
                                   </div>
                                 )}
-                              </div>
                             </div>
                           </div>
                         </div>
-                      )}
-                      <div
-                        className={`col-span-2 grid   gap-1 bg-pink-00 mt-1.5`}
-                      >
-                        {/* old position for serial number */}
                       </div>
-                    </div>
-                    <div className=" grid grid-cols-3 gap-x-1">
-                      <div>
-                        <div>
-                          <ControlledMuiDatePicker
-                            readonly={!row.productId}
-                            label="Purchase Date"
-                            value={row.purchaseDate}
-                            onCommit={(date) => {
-                              handleDateCommit(index, "purchaseDate", date);
-                            }}
-                            isRequired
-                            logo={Calendar}
-                          />
-                          {row.hasError?.purchaseDate && (
-                            <p className="text-red-500 text-xs mt-1">
-                              Purchase Date is required
-                            </p>
-                          )}
-                        </div>
-                        <ControlledMuiDatePicker
-                          readonly={!row.productId}
-                          label="Delivery Date"
-                          value={row.deliveryDate}
-                          onCommit={(date) => {
-                            handleDateCommit(index, "deliveryDate", date);
-                          }}
-                          logo={Calendar}
-                        />
-                      </div>
-                      {/* Warranty start date */}
-                      <div>
-                        <ControlledMuiDatePicker
-                          readonly={!row.productId}
-                          label="Warranty Start Date"
-                          value={row.warrantyStartDate}
-                          onCommit={(date) => {
-                            handleDateCommit(index, "warrantyStartDate", date);
-                          }}
-                          logo={Calendar}
-                        />
-                        {/* Warranty end date */}
-                        <ControlledMuiDatePicker
-                          readonly={!row.productId}
-                          label="Warranty End Date"
-                          value={row.warrantyEndDate}
-                          onCommit={(date) => {
-                            handleDateCommit(index, "warrantyEndDate", date);
-                          }}
-                          logo={Calendar}
-                        />
-                      </div>
-
-                      <div>
-                        <ControlledMuiDatePicker
-                          readonly={!row.productId}
-                          label="AMC Start Date"
-                          value={row.amcCycleStartDate}
-                          onCommit={(date) => {
-                            handleDateCommit(index, "amcCycleStartDate", date);
-                          }}
-                          logo={Calendar}
-                        />
-                        {/* This working */}
-                        {/* <ControlledDatePicker
+                    )}
+                    <div>
+                      <ControlledMuiDatePicker
                         readonly={!row.productId}
-                        logo={Calendar}
-                        label="AMC Start Date"
+                        label="Purchase Date"
+                        value={row.purchaseDate}
                         onCommit={(date) => {
-                          updateRow(index, "amcCycleStartDate", date);
-                          }}
-                          value={row.amcCycleStartDate}
-                      /> */}
-
-                        <ControlledMuiDatePicker
-                          readonly={!row.productId}
-                          label="AMC End Date"
-                          value={row.amcCycleEndDate}
-                          onCommit={(date) => {
-                            handleDateCommit(index, "amcCycleEndDate", date);
-                          }}
-                          logo={Calendar}
-                        />
-                      </div>
-                      {/* <ControlledDatePicker
-                        readonly={!row.productId}
-                        logo={Calendar}
-                        label="Amc End Date"
-                        onCommit={(date) => {
-                          updateRow(index, "amcCycleEndDate", date);
+                          handleDateCommit(index, "purchaseDate", date);
                         }}
-                        value={row.amcCycleEndDate}
-                      /> */}
+                        isRequired
+                        logo={Calendar}
+                      />
+                      {row.hasError?.purchaseDate && (
+                        <p className="text-red-500 text-xs mt-1">
+                          Purchase Date is required
+                        </p>
+                      )}
                     </div>
-                    {/* here */}
+                   
+                    {/* Warranty start date */}
+                    <ControlledMuiDatePicker
+                      readonly={!row.productId}
+                      label="Warranty Start Date"
+                      value={row.warrantyStartDate}
+                      onCommit={(date) => {
+                        handleDateCommit(index, "warrantyStartDate", date);
+                      }}
+                      logo={Calendar}
+                    />
+                    {/* Warranty end date */}
+                    <ControlledMuiDatePicker
+                      readonly={!row.productId}
+                      label="Warranty End Date"
+                      value={row.warrantyEndDate}
+                      onCommit={(date) => {
+                        handleDateCommit(index, "warrantyEndDate", date);
+                      }}
+                      logo={Calendar}
+                    />
+                     <ControlledMuiDatePicker
+                      readonly={!row.productId}
+                      label="Delivery Date"
+                      value={row.deliveryDate}
+                      onCommit={(date) => {
+                        handleDateCommit(index, "deliveryDate", date);
+                      }}
+                      logo={Calendar}
+                    />
+                     <ControlledMuiDatePicker
+                      readonly={!row.productId}
+                      label="AMC Start Date"
+                      value={row.amcCycleStartDate}
+                      onCommit={(date) => {
+                        handleDateCommit(index, "amcCycleStartDate", date);
+                      }}
+                      logo={Calendar}
+                    />
+                    <ControlledMuiDatePicker
+                      readonly={!row.productId}
+                      label="AMC End Date"
+                      value={row.amcCycleEndDate}
+                      onCommit={(date) => {
+                        handleDateCommit(index, "amcCycleEndDate", date);
+                      }}
+                      logo={Calendar}
+                    />
+
+                    <ControlledMuiDatePicker
+                      readonly={!row.productId}
+                      label="Installation Date"
+                      value={row.installationDate}
+                      onCommit={(date) => {
+                        handleDateCommit(index, "installationDate", date);
+                      }}
+                      logo={Calendar}
+                    />
+                    {/* INSTALLED BY */}
+                    <div className=" mt-0.5">
+                      <CompanyUserSearchFieldInput
+                        readOnly={!row.productId}
+                        label="Installed By "
+                        required
+                        onUserSelected={(data) => {
+                          if (!row.product) return;
+                          if (data) {
+                            updateRow(index, "installedById", data?.id);
+                            updateRow(index, "installedBy", data?.fullname);
+                          } else {
+                            updateRow(index, "installedById", 0);
+                            updateRow(index, "installedBy", "");
+                          }
+                        }}
+                        defaultValue={loginStatus.fullName}
+                        // disabledMessage={ }
+                        error=""
+                        logo={User}
+                        placeholder="Select User"
+                      />
+                      {(row.hasError?.installedBy ||
+                        row.hasError?.installedById) && (
+                        <p className="text-red-500 text-xs mt-1">
+                          Installed by is required
+                        </p>
+                      )}
+                    </div>
+                   
                   </div>
 
                   <div className="col-span-4 grid grid-cols-3 gap-x-1">
@@ -1419,14 +1456,14 @@ export const CreateMultipleAccountCompanyProduct = () => {
       {showSerialNumberModule && serialRowIndex !== null && (
         <StockSerialNumber
           companyProductId={selectedCompanyProductId!} // required for API call
-          selectedInwardIds={
-            rows.find((r) => r.rowNaNoId === serialRowIndex)?.serialNumber || []
-          }
           onClose={() => {
             // new code
             setSerialRowIndex(null);
             setShowSerialNumberModule(false);
           }}
+          selectedInwardIds={
+            rows.find((r) => r.rowNaNoId === serialRowIndex)?.serialNumber || []
+          }
           // nanoid changes
           handleStockSerialNumberChange={(selectedSerialIds) => {
             setRows((prev) =>
@@ -1438,6 +1475,27 @@ export const CreateMultipleAccountCompanyProduct = () => {
             );
           }}
         />
+        // <StockSerialNumber
+        //   companyProductId={selectedCompanyProductId!} // required for API call
+        //   onClose={() => {
+        //     // new code
+        //     setSerialRowIndex(null);
+        //     setShowSerialNumberModule(false);
+        //   }}
+        //   selectedInwardIds={
+        //     rows.find((r) => r.rowNaNoId === serialRowIndex)?.serialNumber || []
+        //   }
+        //   // nanoid changes
+        //   handleStockSerialNumberChange={(selectedSerialIds) => {
+        //     setRows((prev) =>
+        //       prev.map((r) =>
+        //         r.rowNaNoId === serialRowIndex
+        //           ? { ...r, serialNumber: selectedSerialIds }
+        //           : r,
+        //       ),
+        //     );
+        //   }}
+        // />
       )}
     </>
   );

@@ -35,6 +35,7 @@ import LoadingPopUpAnimation from "../../../views/card/LoadingPopUpAnimation";
 import { StockSerialNumber } from "../../stock/stock-available-serial-number/StockSerialNumber";
 import FormLayout from "../../../ui/FormLayout";
 import axiosClient from "../../../../axios-client/AxiosClient";
+import { SelectedSerialNumber } from "../../../ag-grid/StockAvailableSerialNumberAgGrid";
 
 const CreateAccountCompanyProduct = ({
   onClose,
@@ -394,8 +395,8 @@ const CreateAccountCompanyProduct = ({
     setSelectedUnitId(undefined);
   }, [selectedProduct]);
 
-  const [selectedInwardIds, setSelectedInwardIds] = useState<number[]>([]);
-  function handleStockSerialNumberChange(ids: number[]) {
+  const [selectedInwardIds, setSelectedInwardIds] = useState<SelectedSerialNumber[]>([]);
+  function handleStockSerialNumberChange(ids: SelectedSerialNumber[]) {
     setSelectedInwardIds(ids);
   }
 
