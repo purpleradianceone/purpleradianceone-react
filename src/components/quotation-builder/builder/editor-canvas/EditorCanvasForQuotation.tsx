@@ -8,7 +8,7 @@
 //  |
 //  ├── blocks/
 //  │        PageBlock (A4)
-//  │            ├── SectionBlock
+//  │            ├── SectionBlock  --optional
 //  │            │    ├── ContentBlock
 //  │            │    ├── TableBlock
 //  │            │    ├── HeaderBlock
