@@ -98,7 +98,6 @@ export const ControlledMuiDatePicker: React.FC<
               error,
               helperText,
               sx: {
-
                 "& input": {
                   minHeight: 20,
                   height: 20,
@@ -106,6 +105,9 @@ export const ControlledMuiDatePicker: React.FC<
                   fontSize: "14px",
                 },
                 "& .MuiOutlinedInput-root": {
+                   "&:hover .MuiOutlinedInput-notchedOutline": {
+            borderColor: "#D1D5DB",
+          },
                   height: 28,
                   fontSize: "10px",
                   paddingRight: penLogo ? "22px" : undefined,

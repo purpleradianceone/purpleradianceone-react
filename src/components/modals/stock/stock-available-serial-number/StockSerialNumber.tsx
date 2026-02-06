@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import POST_API from "../../../../constants/PostApi";
-import { StockAvailableSerialNumberAgGrid } from "../../../ag-grid/StockAvailableSerialNumberAgGrid";
+import { SelectedSerialNumber, StockAvailableSerialNumberAgGrid } from "../../../ag-grid/StockAvailableSerialNumberAgGrid";
 import { STATUS_CODE } from "../../../../constants/AppConstants";
 import { StockAvaibleSerialNumber } from "../../../../@types/stock/StockAvailableSerialNumber";
 import ApiError from "../../../../@types/error/ApiError";
@@ -23,8 +23,8 @@ export const StockSerialNumber = ({
 }: {
   companyProductId: number | undefined;
   onClose: () => void;
-  handleStockSerialNumberChange: (id: number[]) => void;
-  selectedInwardIds: number[] ;
+  handleStockSerialNumberChange: (id: SelectedSerialNumber[]) => void;
+  selectedInwardIds: SelectedSerialNumber[] ;
 }) => {
   const { loginStatus } = useLoggedInUserContext();
 
@@ -108,11 +108,6 @@ export const StockSerialNumber = ({
         />
         <StockRulesCard availableStock={availableStock} />
         <div
-          // className={`ag-theme-balham bg-pink-400 w-full ${
-          //   userPreference.isLeftMenu
-          //     ? "h-[calc(100vh-140px)]"
-          //     : "h-[calc(100vh-148px)]"
-          // }`
           className={`ag-theme-balham bg-pink-400 w-full h-[40vh] `
         }
         >

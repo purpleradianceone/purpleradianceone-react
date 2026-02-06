@@ -129,7 +129,7 @@ const CustomDropdown: React.FC<DropdownProps> = ({
             ? "Select Option"
             : options.find((o) => o.id === selectedOption)?.name ?? ""}
         </div> */}
-        <div className="input-label-custom">
+        <div className="input-label-custom text-nowrap">
           {labelName === "status" ||
           labelName === "source" ||
           labelName === "type" ||

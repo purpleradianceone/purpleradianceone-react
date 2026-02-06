@@ -668,9 +668,9 @@ const AccountDetails: React.FC = () => {
               type={type}
               required={required}
               value={(formData[fieldName as keyof Account] as string) || ""}
-              onChange={(e) => handleInputChange(fieldName, e.target.value)}
-              onBlur={() => handleInputBlur(fieldName)}
-              onKeyDown={(e) => handleKeyPress(e, fieldName)}
+              onChange={(e) => handleInputChange(fieldName as keyof Account, e.target.value)}
+              onBlur={() => handleInputBlur(fieldName as keyof Account)}
+              onKeyDown={(e) => handleKeyPress(e, fieldName as keyof Account)}
               placeholder={placeholder}
               className={`w-full h-full bg-white border-1 rounded px-2 py-1 mt-2 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                 fieldName === "name"

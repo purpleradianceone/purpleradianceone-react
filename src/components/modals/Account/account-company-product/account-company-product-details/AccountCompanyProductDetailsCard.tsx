@@ -359,20 +359,11 @@ export const AccountCompanyProductDetailsCard = ({
            onChange={handleSerialNumberChange}
           inputMode="text"
           type="text"
+          penLogo={Pen}
           />
         )}
-        {/* {productData?.serialNumber && (
-          <DisplayComponent
-            icon={FileDigit}
-            title="Serial Number"
-            value={productData!.serialNumber ? productData!.serialNumber : ""}
-            penLogo={false}
-          />
-        )} */}
       </div>
 
-      {/* Content */}
-      {/* <div className="px-2 pb-2"> */}
       {/* Left Section */}
       <div className="grid  grid-cols-2 md:grid-cols-4 gap-1   rounded p-0.5 ">
         <ControlledDatePicker

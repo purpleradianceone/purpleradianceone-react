@@ -43,7 +43,8 @@ type FormInputProps = {
     logo?: LucideIcon;
     autoFocus?:boolean;
     onKeyDown?: React.KeyboardEventHandler<HTMLInputElement> | undefined;
-    paddingy? : number
+    paddingy? : number;
+    penLogo? : LucideIcon
   }
 
   /**
