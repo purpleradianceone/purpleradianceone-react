@@ -30,7 +30,7 @@ import { useUserPreference } from "../../context/user/UserPreference";
 import { useNotificationCountContext } from "../../context/notification/NotificationCountContext";
 import toast from "react-hot-toast";
 import { KeySquare, Mail } from "lucide-react";
-import {TutorailDataType} from "../../@types/tutorail/TutorailDataType";
+import { TutorailDataType } from "../../@types/tutorail/TutorailDataType";
 import { useTutorailDataContext } from "../../context/tutorail/useTutorailDataContext";
 
 function SignInForm() {
@@ -39,7 +39,7 @@ function SignInForm() {
   const { setAccessModules } = useAccessManagementContext();
   const { setUserPreference } = useUserPreference();
   const { setNotificationCount } = useNotificationCountContext();
-  const {setTutorailData} = useTutorailDataContext();
+  const { setTutorailData } = useTutorailDataContext();
 
   const { captchaToken, handleRecaptcha, recaptchaRef } = useRecaptcha();
   const [showPassword, setShowPassword] = useState(false);
@@ -59,7 +59,7 @@ function SignInForm() {
   } = useFormChange(initialSignInFormState);
   const { errors, handleBlur } = useFormValidation(
     loginUserCredentials,
-    "registered"
+    "registered",
   );
 
   const secretKey = "S7qXRmjdLZhGv3Kunc1tlBbZiFkymrIt";
@@ -108,24 +108,24 @@ function SignInForm() {
     });
     setTutorailData({
       id: 0,
-          companyUserId: 0,
-          isNavbarSeen: false,
-          isDashboardSeen: false,
-          isCrmDashboardSeen: false,
-          isCompanyUserSeen: false,
-          isCompanyUserActionsSeen : false,
-          isLeadSeen: false,
-          isAccountSeen: false,
-          isProductSeen: false,
-          isTeamSeen: false,
-          isSettingCompanySeen: false,
-          isSettingEmailTemplateSeen: false,
-          isSettingIntegrationSeen: false,
-          createdBy: "",
-          updatedBy: "",
-          createdOn: "",
-          updatedOn: "",
-    })
+      companyUserId: 0,
+      isNavbarSeen: false,
+      isDashboardSeen: false,
+      isCrmDashboardSeen: false,
+      isCompanyUserSeen: false,
+      isCompanyUserActionsSeen: false,
+      isLeadSeen: false,
+      isAccountSeen: false,
+      isProductSeen: false,
+      isTeamSeen: false,
+      isSettingCompanySeen: false,
+      isSettingEmailTemplateSeen: false,
+      isSettingIntegrationSeen: false,
+      createdBy: "",
+      updatedBy: "",
+      createdOn: "",
+      updatedOn: "",
+    });
     setNotificationCount(0);
   };
 
@@ -192,21 +192,30 @@ function SignInForm() {
             endDateSubscription: response.data.end_date_subscription,
           });
 
+           const getCrmModuleAccessData = {
+            company_id: response.data.company_id,
+            company_user_id: response.data.id,
+            requestedby: response.data.id,
+          };
           // note: is status false , then it will navigate to create subscription page
           if (!response.data.isactive_subscription) {
             setTimeout(() => {
               toast.error(MESSAGE.ERROR.SUBSCRIPTION_PLAN_ERROR);
 
-              navigate(ROUTES_URL.CREATE_SUBSCRIPTION);
+              axios
+                .post(POST_API.GET_CRM_MODULE_ACCESS, getCrmModuleAccessData, {
+                  withCredentials: true,
+                })
+                .then((response) => {
+                  setAccessModules(response.data);
+                  navigate(ROUTES_URL.CREATE_SUBSCRIPTION);
+                });
+
             }, 1500);
             return; //  Stops further execution
           }
 
-          const getCrmModuleAccessData = {
-            company_id: response.data.company_id,
-            company_user_id: response.data.id,
-            requestedby: response.data.id,
-          };
+         
 
           axios
             .post(POST_API.GET_CRM_MODULE_ACCESS, getCrmModuleAccessData, {
@@ -254,7 +263,7 @@ function SignInForm() {
                         createdBy: res.createdby,
                         createdOn: res.createdon,
                         id: res.id,
-                        countryId : res.country_id,
+                        countryId: res.country_id,
                         timezoneId: res.timezone_id,
                         updatedBy: res.updatedby,
                         updatedOn: res.updatedon,
@@ -268,44 +277,49 @@ function SignInForm() {
                       });
                     }
                   });
-                  const GetCompanyUserTutorailPostData = {
-      company_id: loginStatusRef.current.company_id,
-      company_user_id: loginStatusRef.current.id,
-      requestedby: loginStatusRef.current.id
-    };
-                  axios.post(
-        POST_API.GET_COMPANY_USER_TUTORAIL,
-        GetCompanyUserTutorailPostData,
-        {
-          withCredentials: true,
-        }
-      ).then((response) => {
-        if(response.status === STATUS_CODE.OK){
-          const formattedData: TutorailDataType =  {
-            id: response.data.id,
-            companyUserId: response.data.company_user_id,
-            isNavbarSeen: response.data.is_navbar_seen,
-            isDashboardSeen: response.data.is_dashboard_seen,
-            isCrmDashboardSeen: response.data.is_crm_dashboard_seen,
-            isCompanyUserSeen: response.data.is_company_user_seen,
-            isCompanyUserActionsSeen : response.data.is_company_user_actions_seen,
-            isLeadSeen: response.data.is_lead_seen,
-            isAccountSeen: response.data.is_account_seen,
-            isProductSeen: response.data.is_product_seen,
-            isTeamSeen: response.data.is_team_seen,
-            isSettingCompanySeen: response.data.is_setting_company_seen,
-            isSettingEmailTemplateSeen: response.data.is_setting_email_template_seen,
-            isSettingIntegrationSeen: response.data.is_setting_integration_seen,
-            createdBy: response.data.createdby,
-            updatedBy: response.data.updatedby,
-            createdOn: response.data.createdon,
-            updatedOn: response.data.updatedon,
-          };
-       
-        setTutorailData(formattedData);
+                const GetCompanyUserTutorailPostData = {
+                  company_id: loginStatusRef.current.company_id,
+                  company_user_id: loginStatusRef.current.id,
+                  requestedby: loginStatusRef.current.id,
+                };
+                axios
+                  .post(
+                    POST_API.GET_COMPANY_USER_TUTORAIL,
+                    GetCompanyUserTutorailPostData,
+                    {
+                      withCredentials: true,
+                    },
+                  )
+                  .then((response) => {
+                    if (response.status === STATUS_CODE.OK) {
+                      const formattedData: TutorailDataType = {
+                        id: response.data.id,
+                        companyUserId: response.data.company_user_id,
+                        isNavbarSeen: response.data.is_navbar_seen,
+                        isDashboardSeen: response.data.is_dashboard_seen,
+                        isCrmDashboardSeen: response.data.is_crm_dashboard_seen,
+                        isCompanyUserSeen: response.data.is_company_user_seen,
+                        isCompanyUserActionsSeen:
+                          response.data.is_company_user_actions_seen,
+                        isLeadSeen: response.data.is_lead_seen,
+                        isAccountSeen: response.data.is_account_seen,
+                        isProductSeen: response.data.is_product_seen,
+                        isTeamSeen: response.data.is_team_seen,
+                        isSettingCompanySeen:
+                          response.data.is_setting_company_seen,
+                        isSettingEmailTemplateSeen:
+                          response.data.is_setting_email_template_seen,
+                        isSettingIntegrationSeen:
+                          response.data.is_setting_integration_seen,
+                        createdBy: response.data.createdby,
+                        updatedBy: response.data.updatedby,
+                        createdOn: response.data.createdon,
+                        updatedOn: response.data.updatedon,
+                      };
 
-        }
-      })
+                      setTutorailData(formattedData);
+                    }
+                  });
                 setTimeout(() => {
                   navigate(ROUTES_URL.HOME); // Navigates ONLY if subscription checks pass
                 }, 1000);
@@ -349,15 +363,15 @@ function SignInForm() {
   useEffect(() => {
     resetLoginStatus();
     setAccessModules([]);
-    
+
     const remember = localStorage.getItem(LOCALSTORAGE_KEYS.REMEMBER_ME);
     if (remember === "true") {
       setRememberMe(true);
       const storedEmail = localStorage.getItem(
-        LOCALSTORAGE_KEYS.LOGIN_CREDENTIALS
+        LOCALSTORAGE_KEYS.LOGIN_CREDENTIALS,
       );
       const storedPass = localStorage.getItem(
-        LOCALSTORAGE_KEYS.LOGINCREDENTAILSPASS
+        LOCALSTORAGE_KEYS.LOGINCREDENTAILSPASS,
       );
       if (storedEmail) {
         setInitialSignInFormState((prev) => ({
@@ -396,18 +410,18 @@ function SignInForm() {
   }, [navigate]);
 
   const handleRememberMeCheckBoxChange = (
-    event: React.ChangeEvent<HTMLInputElement>
+    event: React.ChangeEvent<HTMLInputElement>,
   ) => {
     if (event.target.checked) {
       localStorage.setItem(LOCALSTORAGE_KEYS.REMEMBER_ME, STRING_VALUES.TRUE);
       setRememberMe(true);
       localStorage.setItem(
         LOCALSTORAGE_KEYS.LOGIN_CREDENTIALS,
-        loginUserCredentials.email
+        loginUserCredentials.email,
       );
       localStorage.setItem(
         LOCALSTORAGE_KEYS.LOGINCREDENTAILSPASS,
-        encryptData(loginUserCredentials.password)
+        encryptData(loginUserCredentials.password),
       );
     } else {
       localStorage.removeItem(LOCALSTORAGE_KEYS.REMEMBER_ME);
@@ -436,7 +450,7 @@ function SignInForm() {
               if (rememberMe) {
                 localStorage.setItem(
                   LOCALSTORAGE_KEYS.LOGIN_CREDENTIALS,
-                  e.target.value
+                  e.target.value,
                 );
               } else {
                 localStorage.removeItem(LOCALSTORAGE_KEYS.LOGIN_CREDENTIALS);
@@ -459,7 +473,7 @@ function SignInForm() {
               if (rememberMe) {
                 localStorage.setItem(
                   LOCALSTORAGE_KEYS.LOGINCREDENTAILSPASS,
-                  encryptData(e.target.value)
+                  encryptData(e.target.value),
                 );
               } else {
                 localStorage.removeItem(LOCALSTORAGE_KEYS.LOGINCREDENTAILSPASS);
@@ -487,7 +501,12 @@ function SignInForm() {
               type="button"
               className="text-sm font-medium text-blue-600 hover:text-blue-500"
             >
-              <Link to={ROUTES_URL.FORGOT_PASSWORD} className="table-header-custom-blue">Forgot Password?</Link>
+              <Link
+                to={ROUTES_URL.FORGOT_PASSWORD}
+                className="table-header-custom-blue"
+              >
+                Forgot Password?
+              </Link>
             </button>
           </div>
 
@@ -518,67 +537,66 @@ function SignInForm() {
             {/* <AppVersionViewCard/> */}
           </div>
         </form>
-        {
-          showSubscriptionOrInActivePopUp && <SubscriptionDialogueBox
-          isOpen={showSubscriptionOrInActivePopUp}
-          cardTitle="User Management"
-          message="Get the Subscription / Inactive Some users."
-          onClose={() => {
-            setShowSubscriptionOrInActivePopUp(false);
-            localStorage.removeItem(LOCALSTORAGE_KEYS.LOGIN_STATUS);
-            localStorage.removeItem(LOCALSTORAGE_KEYS.ACCESS_MANAGEMENT);
-            localStorage.removeItem(LOCALSTORAGE_KEYS.GOOGLE_MEET_STATUS);
-            localStorage.removeItem(LOCALSTORAGE_KEYS.ZOOM_MEETING_STATUS);
-            localStorage.removeItem(LOCALSTORAGE_KEYS.USER_PREFERENCE);
-            localStorage.removeItem(LOCALSTORAGE_KEYS.NOTIFICATION_COUNT);
-            setLoginStatus({
-              companyId: 0,
-              companyName: "",
-              createdOn: "",
-              email: "",
-              fullName: "",
-              id: 0,
-              message: "",
-              mobileNumber: "",
-              status: false,
-              token: "",
-              isActiveSubscription: false,
-              isSuperUser: false,
-              subscriptionAllowedUsers: 0,
-              activeUsersInCompany: 0,
-              subscriptionId: 0,
-              startDateSubscription: "",
-              endDateSubscription: "",
-            });
-            setTutorailData({
-              id: 0,
-          companyUserId: 0,
-          isNavbarSeen: false,
-          isDashboardSeen: false,
-          isCrmDashboardSeen: false,
-          isCompanyUserSeen: false,
-          isCompanyUserActionsSeen : false,
-          isLeadSeen: false,
-          isAccountSeen: false,
-          isProductSeen: false,
-          isTeamSeen: false,
-          isSettingCompanySeen: false,
-          isSettingEmailTemplateSeen: false,
-          isSettingIntegrationSeen: false,
-          createdBy: "",
-          updatedBy: "",
-          createdOn: "",
-          updatedOn: "",
-            })
-            navigate(ROUTES_URL.SIGN_IN);
-            setSpinnerAnimation({
-              status: "idle",
-              message: "",
-            });
-          }}
-        />
-        }
-        
+        {showSubscriptionOrInActivePopUp && (
+          <SubscriptionDialogueBox
+            isOpen={showSubscriptionOrInActivePopUp}
+            cardTitle="User Management"
+            message="Get the Subscription / Inactive Some users."
+            onClose={() => {
+              setShowSubscriptionOrInActivePopUp(false);
+              localStorage.removeItem(LOCALSTORAGE_KEYS.LOGIN_STATUS);
+              localStorage.removeItem(LOCALSTORAGE_KEYS.ACCESS_MANAGEMENT);
+              localStorage.removeItem(LOCALSTORAGE_KEYS.GOOGLE_MEET_STATUS);
+              localStorage.removeItem(LOCALSTORAGE_KEYS.ZOOM_MEETING_STATUS);
+              localStorage.removeItem(LOCALSTORAGE_KEYS.USER_PREFERENCE);
+              localStorage.removeItem(LOCALSTORAGE_KEYS.NOTIFICATION_COUNT);
+              setLoginStatus({
+                companyId: 0,
+                companyName: "",
+                createdOn: "",
+                email: "",
+                fullName: "",
+                id: 0,
+                message: "",
+                mobileNumber: "",
+                status: false,
+                token: "",
+                isActiveSubscription: false,
+                isSuperUser: false,
+                subscriptionAllowedUsers: 0,
+                activeUsersInCompany: 0,
+                subscriptionId: 0,
+                startDateSubscription: "",
+                endDateSubscription: "",
+              });
+              setTutorailData({
+                id: 0,
+                companyUserId: 0,
+                isNavbarSeen: false,
+                isDashboardSeen: false,
+                isCrmDashboardSeen: false,
+                isCompanyUserSeen: false,
+                isCompanyUserActionsSeen: false,
+                isLeadSeen: false,
+                isAccountSeen: false,
+                isProductSeen: false,
+                isTeamSeen: false,
+                isSettingCompanySeen: false,
+                isSettingEmailTemplateSeen: false,
+                isSettingIntegrationSeen: false,
+                createdBy: "",
+                updatedBy: "",
+                createdOn: "",
+                updatedOn: "",
+              });
+              navigate(ROUTES_URL.SIGN_IN);
+              setSpinnerAnimation({
+                status: "idle",
+                message: "",
+              });
+            }}
+          />
+        )}
       </div>
 
       {/* <MessageSnackBar
