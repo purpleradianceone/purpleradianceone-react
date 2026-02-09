@@ -443,7 +443,7 @@ export const router = createBrowserRouter([
           <div>
             <AuthLayout
               title="Activate Subscription!"
-              subtitle="Enter the number of users and subscription duration to proceed"
+              // subtitle="Enter the number of users and subscription duration to proceed"
             >
               <CreateSubscription
                 isOpen={true}

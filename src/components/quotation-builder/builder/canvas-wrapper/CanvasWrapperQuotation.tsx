@@ -33,6 +33,7 @@ export const CanvasWrapperQuotation = ({ data }: { data: string }) => {
         const serialized = query.serialize();
         const data = JSON.parse(serialized);
         const result = isCanvasTrulyEmpty(data, "ROOT");
+        console.log(`Craft Json: ${serialized}`);
         if (!result) localStorage.setItem(STORAGE_KEY+loginStatus.id, serialized);
       },
     );

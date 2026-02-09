@@ -143,7 +143,7 @@ function SubscriptionManagementList({
             >
               <div className="flex min-h-screen mb-5 items-center justify-center">
                 <div
-                  className="relative w-full max-w-xl max-h-[100vh] overflow-y-scroll bg-white rounded-lg shadow-xl animate-fadeIn [&::-webkit-scrollbar]:w-2
+                  className="relative w-full  max-w-xl min-h-[50vh] max-h-[100vh]  bg-white rounded-lg shadow-xl animate-fadeIn [&::-webkit-scrollbar]:w-2
       [&::-webkit-scrollbar-track]:bg-gray-300
       [&::-webkit-scrollbar-thumb]:bg-gray-400
        [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full"
