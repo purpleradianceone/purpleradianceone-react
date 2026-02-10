@@ -71,13 +71,13 @@ function SubscriptionDialogueBox({
                 setIsEditSubscriptionUserModalOpen(true);
               }}
             >
-              Users Modal
+              Deactivate Users Modal
             </Button>
           </div>
 
           <div className="flex">
             <Button
-            type="submit"
+              type="submit"
               onClick={(e) => {
                 e.preventDefault();
                 setIsUpgradeSubscriptionModalOpen(true);
@@ -88,29 +88,33 @@ function SubscriptionDialogueBox({
           </div>
         </div>
       </div>
-      <UpdateSubscription
-        endDate={loginStatus.endDateSubscription}
-        startDate={loginStatus.startDateSubscription}
-        existingUserCount={loginStatus.subscriptionAllowedUsers}
-        isOpen={isUpgradeSubscriptionModalOpen}
-        subscriptionId={loginStatus.subscriptionId}
-        onClose={() => {
-          setIsUpgradeSubscriptionModalOpen(false);
-          onClose();
-        }}
-      />
-      <EditSubscriptionUsersModal
-        isOpen={isEditSubscriptionUserModalOpen}
-        onClose={() => {
-          setIsEditSubscriptionUserModalOpen(false);
-        }}
-        onRedirectToLoginPage={() => {
-          setIsEditSubscriptionUserModalOpen(false);
-          onClose();
-        }}
-      />
+      {isUpgradeSubscriptionModalOpen && (
+        <UpdateSubscription
+          endDate={loginStatus.endDateSubscription}
+          startDate={loginStatus.startDateSubscription}
+          existingUserCount={loginStatus.subscriptionAllowedUsers}
+          isOpen={isUpgradeSubscriptionModalOpen}
+          subscriptionId={loginStatus.subscriptionId}
+          onClose={() => {
+            setIsUpgradeSubscriptionModalOpen(false);
+            onClose();
+          }}
+        />
+      )}
+      {isEditSubscriptionUserModalOpen && (
+        <EditSubscriptionUsersModal
+          isOpen={isEditSubscriptionUserModalOpen}
+          onClose={() => {
+            setIsEditSubscriptionUserModalOpen(false);
+          }}
+          onRedirectToLoginPage={() => {
+            setIsEditSubscriptionUserModalOpen(false);
+            onClose();
+          }}
+        />
+      )}
     </div>,
-    document.body
+    document.body,
   );
 }
 

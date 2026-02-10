@@ -1,6 +1,7 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { EditIcon, Save, Users, X } from "lucide-react";
-import {  STATUS_CODE } from "../../constants/AppConstants";
+import { STATUS_CODE } from "../../constants/AppConstants";
 import useScreenSize from "../../config/hooks/useScreenSize";
 import Button from "../ui/Button";
 import FormInput from "../ui/FormInput";
@@ -15,6 +16,9 @@ import PaymentSubscription from "./PaymentSubscription";
 import ApiError from "../../@types/error/ApiError";
 import RefreshToken from "../../config/validations/RefreshToken";
 import FormHeader from "../ui/FormHeader";
+import { useUserAccessModules } from "../../config/hooks/useAccessModules";
+import AccessDeniedMessagePage from "../views/not-found/AccessDeniedMessagePage";
+import MESSAGE from "../../constants/Messages";
 
 export default function UpdateSubscription({
   isOpen,
@@ -35,6 +39,7 @@ export default function UpdateSubscription({
 }) {
   const { isSmallScreen } = useScreenSize();
   const { loginStatus } = useLoggedInUserContext();
+  const { userHasAccessToAddSubscription } = useUserAccessModules();
   //initial state of input fields data
   const initialUpdateSubscriptionFormData: UpdateSubscriptionType = {
     companyUserCountForUpdateSubscription: 0,
@@ -67,7 +72,7 @@ export default function UpdateSubscription({
     setIsPaymentSubscriptionOpen(false);
   };
   const handleUpdateFormSubmit = async (
-    event: React.FormEvent<HTMLFormElement>
+    event: React.FormEvent<HTMLFormElement>,
   ) => {
     event.preventDefault();
 
@@ -100,7 +105,7 @@ export default function UpdateSubscription({
         .post(
           POST_API.GET_SUBSCRIPTION_AMOUNT,
           SubscriptionAmountRequestPostData,
-          { withCredentials: true }
+          { withCredentials: true },
         )
         .then((response) => {
           if (response.status === STATUS_CODE.OK) {
@@ -145,7 +150,7 @@ export default function UpdateSubscription({
       >
         <div className="flex  min-h-screen items-center justify-center">
           <div
-            className="relative w-full border border-gray-300 max-w-md max-h-[70vh] overflow-y-auto bg-white rounded-lg shadow-lg animate-fadeIn 
+            className="relative w-full border border-gray-300 max-w-[40%] max-h-[70vh] overflow-y-auto bg-white rounded-lg shadow-lg animate-fadeIn 
         [&::-webkit-scrollbar]:w-2
         [&::-webkit-scrollbar-track]:bg-gray-300
         [&::-webkit-scrollbar-thumb]:bg-gray-400
@@ -167,67 +172,79 @@ export default function UpdateSubscription({
             <FormHeader
               icon={EditIcon}
               onClose={onClose}
-              preText={`Update Subscription for  ${startDate} - ${endDate}`}
+              preText={`Update Subscription for  Date: ${startDate} to ${endDate}`}
               description="Update the subscription plan as per the needs."
             />
 
-            {/* Information Section - Two Column Layout */}
-            <div className="grid grid-cols-[auto_1fr] gap-x-2 gap-y-1 text-sm text-gray-700 mb-3">
-              <span className="table-header-custom">Subscription allowed users</span>{" "}
-              <span className="input-label-custom">: {existingUserCount}</span>
-              <span className="table-header-custom">Start Date</span>{" "}
-              <span className="input-label-custom">: {startDate}</span>
-              <span className="table-header-custom">End Date</span>{" "}
-              <span className="input-label-custom">: {endDate}</span>
-            </div>
+            {userHasAccessToAddSubscription ? (
+              <div className=" ">
+                {/* Information Section - Two Column Layout */}
+                <div className="grid grid-cols-[auto_1fr] gap-x-2 gap-y-1 text-sm text-gray-700 mb-3">
+                  <span className="table-header-custom">
+                    Subscription allowed users
+                  </span>{" "}
+                  <span className="input-label-custom">
+                    : {existingUserCount}
+                  </span>
+                  <span className="table-header-custom">Start Date</span>{" "}
+                  <span className="input-label-custom">: {startDate}</span>
+                  <span className="table-header-custom">End Date</span>{" "}
+                  <span className="input-label-custom">: {endDate}</span>
+                </div>
 
-            {/* Input */}
-            <form onSubmit={handleUpdateFormSubmit}>
-              {/* <label className="block text-xs font-medium text-gray-700 mb-1">
+                {/* Input */}
+                <form onSubmit={handleUpdateFormSubmit}>
+                  {/* <label className="block text-xs font-medium text-gray-700 mb-1">
                 Users to Add in Subscription* :
               </label> */}
-              <FormInput
-                logo={Users}
-                label="Users to Add in Subscription :"
-                type="number"
-                required
-                value={createUpdateSubscriptionFormData.companyUserCountForUpdateSubscription.toString()}
-                placeholder="Number of users to add in subscription"
-                name="companyUserCountForUpdateSubscription"
-                min={1}
-                onChange={handleInputValueChange}
-                onBlur={handleBlurUpdateSubscription}
-                error={
-                  updateSubscriptionErrors.companyUserCountForUpdateSubscription
-                }
-                className="w-full px-2 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
+                  <FormInput
+                    logo={Users}
+                    label="Users to Add in Subscription :"
+                    type="number"
+                    required
+                    value={createUpdateSubscriptionFormData.companyUserCountForUpdateSubscription.toString()}
+                    placeholder="Number of users to add in subscription"
+                    name="companyUserCountForUpdateSubscription"
+                    min={1}
+                    onChange={handleInputValueChange}
+                    onBlur={handleBlurUpdateSubscription}
+                    error={
+                      updateSubscriptionErrors.companyUserCountForUpdateSubscription
+                    }
+                    className="w-full px-2 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
 
-              {/* Submit Button */}
-              <div className="flex justify-end   mt-3">
-               <div className="flex gap-1">
-                 <Button onClick={onClose} type="button">
-                  <div className="flex items-center ">
-                    <X size={16} />
-                    Cancel
+                  {/* Submit Button */}
+                  <div className="flex justify-end   mt-3">
+                    <div className="flex gap-1">
+                      <Button onClick={onClose} type="button">
+                        <div className="flex items-center ">
+                          <X size={16} />
+                          Cancel
+                        </div>
+                      </Button>
+                      <Button type="submit">
+                        <div className="flex items-center  gap-1">
+                          <Save size={16} />
+                          Save
+                        </div>
+                      </Button>
+                    </div>
                   </div>
-                </Button>
-                <Button type="submit">
-                  <div className="flex items-center  gap-1">
-                    <Save size={16} />
-                    Save
-                  </div>
-                </Button>
-               </div>
+                </form>
               </div>
-            </form>
+            ) : (
+              <AccessDeniedMessagePage
+                message={MESSAGE.MODULE_ACCESS.SUBSCRIPTION.DENIED_ADD_ACCESS}
+              />
+            )}
           </div>
         </div>
       </div>
       {isPaymentSubscriptionOpen && (
         <PaymentSubscription
           updateSubscriptionUsersCount={parseInt(
-            createUpdateSubscriptionFormData.companyUserCountForUpdateSubscription.toString()
+            createUpdateSubscriptionFormData.companyUserCountForUpdateSubscription.toString(),
           )}
           isSubscriptionForUpdate={true}
           descriptionInformation="Confirm & Pay for Subscription"
@@ -242,7 +259,7 @@ export default function UpdateSubscription({
           // }
           onClose={onClose!}
           numberOfCompanyUsers={parseInt(
-            createUpdateSubscriptionFormData.companyUserCountForUpdateSubscription.toString()
+            createUpdateSubscriptionFormData.companyUserCountForUpdateSubscription.toString(),
           )}
           isSubscrptionFromLoginPage={false}
           handleSubscriptionListChange={handleSubscriptionListChange!}

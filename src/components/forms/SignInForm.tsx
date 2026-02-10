@@ -540,8 +540,8 @@ function SignInForm() {
         {showSubscriptionOrInActivePopUp && (
           <SubscriptionDialogueBox
             isOpen={showSubscriptionOrInActivePopUp}
-            cardTitle="User Management"
-            message="Get the Subscription / Inactive Some users."
+            cardTitle="Subscription Management"
+            message="You currently have more active users than your subscription allows. You can upgrade your subscription to add users (additional charges may apply) or deactivate some users to continue."
             onClose={() => {
               setShowSubscriptionOrInActivePopUp(false);
               localStorage.removeItem(LOCALSTORAGE_KEYS.LOGIN_STATUS);

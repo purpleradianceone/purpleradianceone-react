@@ -175,7 +175,11 @@ const MESSAGE = {
             DENIED_VIEW_ACCESS: "You do not have permission to view product teams.",
             DENIED_ADD_ACCESS: "You do not have permission to assign team to product.",
             DENIED_UPDATE_ACCESS: "You do not have permission to update product team.",
-        },SETTING: {
+        },
+        SUBSCRIPTION:{
+            DENIED_ADD_ACCESS:"You do not have permission to purchase subscription."
+        },
+        SETTING: {
 
             ACCOUNT_SETTING: {
                 DENIED_VIEW_ACCESS: "You do not have permission to view account type setting.",
