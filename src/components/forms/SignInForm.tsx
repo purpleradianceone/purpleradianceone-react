@@ -35,7 +35,7 @@ import { useTutorailDataContext } from "../../context/tutorail/useTutorailDataCo
 
 function SignInForm() {
   const navigate = useNavigate();
-  const { setLoginStatus } = useLoggedInUserContext();
+  const { loginStatus, setLoginStatus } = useLoggedInUserContext();
   const { setAccessModules } = useAccessManagementContext();
   const { setUserPreference } = useUserPreference();
   const { setNotificationCount } = useNotificationCountContext();
@@ -227,7 +227,7 @@ function SignInForm() {
                 status: "success",
                 message: MESSAGE.SUCCESS.LOGGED_IN,
               });
-              toast.success(MESSAGE.SUCCESS.LOGIN_SUCCESSFUL);
+              
 
               // note : changes done here
               if (
@@ -237,6 +237,8 @@ function SignInForm() {
                 setShowSubscriptionOrInActivePopUp(true);
 
                 return;
+              }else{
+                toast.success(MESSAGE.SUCCESS.LOGIN_SUCCESSFUL);
               }
               if (!loginStatusRef.current.isactive_subscription) {
                 navigate(ROUTES_URL.CREATE_SUBSCRIPTION);
@@ -541,7 +543,7 @@ function SignInForm() {
           <SubscriptionDialogueBox
             isOpen={showSubscriptionOrInActivePopUp}
             cardTitle="Subscription Management"
-            message="You currently have more active users than your subscription allows. You can upgrade your subscription to add users (additional charges may apply) or deactivate some users to continue."
+            message={`You currently have ${loginStatus.activeUsersInCompany-loginStatus.subscriptionAllowedUsers} more active users than your subscription allows. You can upgrade your subscription to add users (additional charges may apply) or deactivate some users to continue.`}
             onClose={() => {
               setShowSubscriptionOrInActivePopUp(false);
               localStorage.removeItem(LOCALSTORAGE_KEYS.LOGIN_STATUS);
