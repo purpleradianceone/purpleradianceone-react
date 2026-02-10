@@ -7,6 +7,8 @@ import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContex
 import ROUTES_URL from "../../../constants/Routes";
 import { useNavigate } from "react-router-dom";
 import LOCALSTORAGE_KEYS from "../../../constants/LocalStorage";
+import FormHeader from "../../ui/FormHeader";
+import { CreditCard } from "lucide-react";
 
 function SubscriptionDialogueBox({
   isOpen,
@@ -57,9 +59,17 @@ function SubscriptionDialogueBox({
       <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" />
 
       <div className="relative bg-white rounded-lg shadow-xl w-full max-w-md mx-4 p-2 animate-in fade-in zoom-in duration-200">
+        <FormHeader
+        icon={CreditCard }
+        preText={cardTitle}
+        description={
+          "Additional charges may apply!"
+        }
+        onClose={onClose}
+        />
         <div className="mb-6">
-          <h2 className="section-header-custom ">{cardTitle}</h2>
-          <p className="input-label-custom">{message}</p>
+          {/* <h2 className="section-header-custom ">{cardTitle}</h2> */}
+          <p className="input-label-custom mt-1">{message}</p>
         </div>
 
         <div className="flex justify-end gap-3">
