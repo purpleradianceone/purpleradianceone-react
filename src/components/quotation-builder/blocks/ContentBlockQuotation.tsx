@@ -107,6 +107,7 @@ export const ContentBlockQuotation: React.FC = () => {
         borderTop: "1px dashed #ddd",
         position: "relative",
       }}
+      onDoubleClick={()=>{setEditing(true)}}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >

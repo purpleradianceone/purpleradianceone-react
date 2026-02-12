@@ -154,6 +154,8 @@ export const PageBlockQuotation: React.FC = () => {
         <Element
           id={`${id}-header`}
           key={`${id}-header`}
+          // id={`global-header`}
+          // key={`global-header`}
           is={HeaderBlockQuotation}
         />
       )}
@@ -189,6 +191,8 @@ export const PageBlockQuotation: React.FC = () => {
           is={FooterBlockQuotation}
           id={`${id}-footer`}
           key={`${id}-footer`}
+        //   id={`global-header`}
+        //   key={`global-header`}
         />
       )}
 
