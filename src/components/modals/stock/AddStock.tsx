@@ -258,7 +258,6 @@ const AddStock = ({
       description: addStockFormData.description,
       createdby_id: loginStatus.id,
     };
-
     setIsSaving(true);
     await axios
       .post(POST_API.CREATE_ADJUSTMENT_STOCK, postData, {
