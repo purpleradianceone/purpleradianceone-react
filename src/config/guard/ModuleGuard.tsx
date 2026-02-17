@@ -17,7 +17,7 @@ export function ModuleGuard({
   if (!permission[permissionKey]) {
     return (
       <div className="w-full h-96 flex items-center justify-center">
-        <AccessDeniedMessagePage message={deniedMessage} />;
+        <AccessDeniedMessagePage message={deniedMessage} />
       </div>
     );
   }

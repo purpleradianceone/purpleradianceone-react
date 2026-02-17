@@ -9,7 +9,7 @@ export default defineConfig({
   ,
   server: {
     allowedHosts: [
-      '167513946451.ngrok-free.app', 'https://71f374734896.ngrok-free.app','https://167513946451.ngrok-free.app', 'https://315d7d0f7560.ngrok-free.app' // ← Add your ngrok domain here
+      '167513946451.ngrok-free.app', 'https://71f374734896.ngrok-free.app','https://167513946451.ngrok-free.app', 'https://315d7d0f7560.ngrok-free.app', // ← Add your ngrok domain here
     ]
   },
   plugins: [react()],
