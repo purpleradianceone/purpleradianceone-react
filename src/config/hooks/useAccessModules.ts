@@ -724,6 +724,22 @@ const userHasAccessToAddEmailTemplateSetting = accessModules.some(
     (accessModule) =>
       accessModule.crm_module_id === 47 && accessModule.update
   );
+  //lead-setting
+  const userHasAccessToAddLeadNote = accessModules.some(
+    (accessModules) => 
+      accessModules.crm_module_id === 44 && accessModules.add
+  );
+
+   const userHasAccessToViewLeadNote= accessModules.some(
+    (accessModule) =>
+      accessModule.crm_module_id === 44 && accessModule.view
+  );
+
+  const userHasAccessToUpdateLeadNote= accessModules.some(
+    (accessModule) =>
+      accessModule.crm_module_id === 44 && accessModule.update
+  );
+
 
   return {
     userHasAccessToAddUser,
@@ -905,5 +921,8 @@ const userHasAccessToAddEmailTemplateSetting = accessModules.some(
     userHasAccessToAddMasterTasks,
     userHasAccessToViewMasterTasks,
     userHasAccessToUpdateMasterTasks
+    userHasAccessToAddLeadNote,
+    userHasAccessToViewLeadNote,
+    userHasAccessToUpdateLeadNote
   };
 };

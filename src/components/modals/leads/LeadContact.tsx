@@ -63,7 +63,11 @@ const LeadContact = ({
   selectedLeadData: any;
 }) => {
   const { loginStatus } = useLoggedInUserContext();
-  const { userHasAccessToViewLeadContacts,  userHasAccessToAddLeadContacts , userHasAccessToUpdateLeadContacts} = useUserAccessModules();
+  const {
+    userHasAccessToViewLeadContacts,
+    userHasAccessToAddLeadContacts,
+    userHasAccessToUpdateLeadContacts,
+  } = useUserAccessModules();
   const [isOpenAddLeadContactForm, setIsOpenAddLeadContactForm] =
     useState(false);
   const [editContactData, setEditContactData] =
@@ -107,7 +111,7 @@ const LeadContact = ({
   const handleBlur = (
     e:
       | React.FocusEvent<HTMLInputElement>
-      | React.FocusEvent<HTMLTextAreaElement>
+      | React.FocusEvent<HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
 
@@ -152,7 +156,7 @@ const LeadContact = ({
   const handleFormInputChange = (
     e:
       | React.ChangeEvent<HTMLInputElement>
-      | React.ChangeEvent<HTMLTextAreaElement>
+      | React.ChangeEvent<HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
     setLeadContactForm({ ...leadContactForm, [name]: value.trim() });
@@ -160,7 +164,7 @@ const LeadContact = ({
 
   // to change the status of contact
   const handleActiveStatusChange = async (
-    selectedContactCard: LeadContactType
+    selectedContactCard: LeadContactType,
   ) => {
     const previousStatus = isActive;
     const newStatus = !isActive;
@@ -196,7 +200,7 @@ const LeadContact = ({
         const data = response.data;
         if (response.data.status === true) {
           toast.success(data.message);
-          if(userHasAccessToViewLeadContacts){
+          if (userHasAccessToViewLeadContacts) {
             fetchLeadContact();
           }
         } else {
@@ -332,8 +336,7 @@ const LeadContact = ({
           address: "",
         });
         setSocialMediaHandles([]);
-        if(userHasAccessToViewLeadContacts){
-
+        if (userHasAccessToViewLeadContacts) {
           fetchLeadContact();
         }
       });
@@ -364,21 +367,20 @@ const LeadContact = ({
   //   }
   // };
   const handleAddSocialMedia = () => {
-  const newHandle = tempHandle.trim();
+    const newHandle = tempHandle.trim();
 
-  if (!newHandle) return;
+    if (!newHandle) return;
 
-  if (socialMediaHandles.includes(newHandle)) {
-    toast.error("Already added.")
+    if (socialMediaHandles.includes(newHandle)) {
+      toast.error("Already added.");
       setTempHandle("");
 
-    return;
-  }
+      return;
+    }
 
-  setSocialMediaHandles(prev => [...prev, newHandle]);
-  setTempHandle("");
-};
-
+    setSocialMediaHandles((prev) => [...prev, newHandle]);
+    setTempHandle("");
+  };
 
   const handleEditLeadContactClick = (selectedContactCard: LeadContactType) => {
     // for to distinguish between edit and add
@@ -395,7 +397,7 @@ const LeadContact = ({
             .split(",")
             .map((handle) => handle.trim())
             .filter((handle) => handle !== "")
-        : []
+        : [],
     );
     setLeadContactForm({
       name: selectedContactCard.name || "",
@@ -415,7 +417,12 @@ const LeadContact = ({
       setIsActive(selectedContactCard.isActive);
     }
   }, [selectedContactCard]);
-  if(!userHasAccessToViewLeadContacts) return <AccessDeniedMessagePage message={MESSAGE.MODULE_ACCESS.LEAD_CONTACT.DENIED_VIEW_ACCESS}/> ;
+  if (!userHasAccessToViewLeadContacts)
+    return (
+      <AccessDeniedMessagePage
+        message={MESSAGE.MODULE_ACCESS.LEAD_CONTACT.DENIED_VIEW_ACCESS}
+      />
+    );
   return (
     <div className={`w-full z-10 px-1  `}>
       {/* Header */}
@@ -448,9 +455,7 @@ const LeadContact = ({
               setIsOpenAddLeadContactForm(true);
               // setIsOpenAddLeadContactForm(!isOpenAddLeadContactForm);
             } else {
-              toast.error(
-                MESSAGE.MODULE_ACCESS.LEAD_CONTACT.DENIED_ADD_ACCESS
-              );
+              toast.error(MESSAGE.MODULE_ACCESS.LEAD_CONTACT.DENIED_ADD_ACCESS);
             }
           }}
           className={COLORS.ADD_BUTTON}
@@ -461,12 +466,13 @@ const LeadContact = ({
 
       {/* Contacts List */}
       <div className="space-y-2 ">
-        {userHasAccessToViewLeadContacts && leadContact  && leadContact.length > 0 ? (
+        {userHasAccessToViewLeadContacts &&
+        leadContact &&
+        leadContact.length > 0 ? (
           leadContact.map((contact, index) => (
             <div
-            
               key={index}
-              className={`${COLORS.CONTACT_CARD}  ${userHasAccessToUpdateLeadContacts ? "": ""}`}
+              className={`${COLORS.CONTACT_CARD}  ${userHasAccessToUpdateLeadContacts ? "" : ""}`}
               onClick={() => setSelectedContactCard(contact)}
             >
               {/* Left: Contact Info */}
@@ -477,14 +483,11 @@ const LeadContact = ({
                     contact.isActive ? "bg-blue-500 " : "bg-red-500"
                   } text-white flex items-center justify-center w-9 h-9 rounded-full border  font-semibold shadow-sm`}
                 >
-                 {
-  contact?.name?.trim()
-    ? contact.name.trim().charAt(0).toUpperCase()
-    : contact?.email?.trim()
-      ? contact.email.trim().charAt(0).toUpperCase()
-      : "?"
-}
-
+                  {contact?.name?.trim()
+                    ? contact.name.trim().charAt(0).toUpperCase()
+                    : contact?.email?.trim()
+                      ? contact.email.trim().charAt(0).toUpperCase()
+                      : "?"}
                 </div>
 
                 {/* Text Info */}
@@ -523,19 +526,18 @@ const LeadContact = ({
 
               {/* Right: Badges */}
               <div className="flex  items-end gap-1">
-                <PrimarySecondaryChip isPrimary={contact.isPrimary} />
+                <StatusChip isActive={contact.isPrimary} />
+                {/* <PrimarySecondaryChip isPrimary={contact.isPrimary} /> */}
                 <StatusChip isActive={contact.isActive} />
               </div>
             </div>
           ))
+        ) : !userHasAccessToViewLeadContacts ? (
+          <p className="caption-custom italic flex items-center justify-center text-center">
+            No view access
+          </p>
         ) : (
-          !userHasAccessToViewLeadContacts? (
-
-             <p className="caption-custom italic flex items-center justify-center text-center">No view access</p>
-          ) : (
-                         <p className="caption-custom text-center">No contacts available</p>
-
-          )
+          <p className="caption-custom text-center">No contacts available</p>
         )}
       </div>
       {/* view in pop up card  */}
@@ -567,7 +569,7 @@ const LeadContact = ({
                       title={selectedContactCard.name ?? ""}
                       className="section-header-custom"
                     >
-                      {selectedContactCard.name  &&
+                      {selectedContactCard.name &&
                       selectedContactCard.name.length > 40 ? (
                         selectedContactCard.name.substring(0, 49) + "..."
                       ) : selectedContactCard.name ? (
@@ -595,7 +597,7 @@ const LeadContact = ({
                   </div>
                   <div>
                     <Button
-                    disabled={!userHasAccessToUpdateLeadContacts}
+                      disabled={!userHasAccessToUpdateLeadContacts}
                       type="submit"
                       onClick={(e) => {
                         e.preventDefault();
@@ -603,7 +605,8 @@ const LeadContact = ({
                           handleEditLeadContactClick(selectedContactCard);
                         } else {
                           toast.error(
-                            MESSAGE.MODULE_ACCESS.LEAD_CONTACT.DENIED_UPDATE_ACCESS
+                            MESSAGE.MODULE_ACCESS.LEAD_CONTACT
+                              .DENIED_UPDATE_ACCESS,
                           );
                         }
                       }}
@@ -745,17 +748,18 @@ const LeadContact = ({
                               userHasAccessToUpdateLeadContacts
                                 ? () => {
                                     handleActiveStatusChange(
-                                      selectedContactCard
+                                      selectedContactCard,
                                     );
                                   }
                                 : () => {
                                     if (selectedContactCard.isPrimary) {
                                       toast.error(
-                                        "Update request denied — the user is designated as the Primary Contact."
+                                        "Update request denied — the user is designated as the Primary Contact.",
                                       );
                                     } else {
                                       toast.error(
-                                        MESSAGE.MODULE_ACCESS.LEAD_CONTACT.DENIED_UPDATE_ACCESS
+                                        MESSAGE.MODULE_ACCESS.LEAD_CONTACT
+                                          .DENIED_UPDATE_ACCESS,
                                       );
                                     }
                                   }
@@ -816,7 +820,7 @@ const LeadContact = ({
               </div>
             </div>
           </div>,
-          document.body
+          document.body,
         )}
 
       {/* Add Contact Form Modal */}
@@ -1051,7 +1055,7 @@ const LeadContact = ({
                         size="icon"
                         onClick={() =>
                           setSocialMediaHandles((prev) =>
-                            prev.filter((h) => h !== handle)
+                            prev.filter((h) => h !== handle),
                           )
                         }
                         className="caption-custom hover:text-red-500"

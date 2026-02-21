@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useMemo, useState } from "react";
 import { useNode, useEditor } from "@craftjs/core";
-import { Trash2, Plus } from "lucide-react";
+import { Trash2, Plus, Edit, Save } from "lucide-react";
 import Button from "../../ui/Button";
 import { SIZE } from "../../../constants/AppConstants";
 
@@ -27,6 +27,7 @@ export const TableBlockQuotation: React.FC = () => {
 
   const { actions } = useEditor();
   const [hovered, setHovered] = useState(false);
+  const [editing, setEditing] = useState(false);
 
   /* ================= CALCULATIONS ================= */
   const calculatedRows = useMemo(() => {
@@ -46,22 +47,18 @@ export const TableBlockQuotation: React.FC = () => {
 
   const grandTotal = useMemo(
     () =>
-      calculatedRows.reduce(
-        (sum: number, r: any) => sum + r.effectivePrice,
-        0
-      ),
-    [calculatedRows]
+      calculatedRows.reduce((sum: number, r: any) => sum + r.effectivePrice, 0),
+    [calculatedRows],
   );
 
   /* ================= UPDATE CELL ================= */
   const updateCell = (
     index: number,
     key: keyof Row,
-    value: string | number
+    value: string | number,
   ) => {
     setProp((p: any) => {
-      p.rows[index][key] =
-        key === "productName" ? value : Number(value);
+      p.rows[index][key] = key === "productName" ? value : Number(value);
     });
   };
 
@@ -81,6 +78,7 @@ export const TableBlockQuotation: React.FC = () => {
   return (
     <div
       ref={(ref) => ref && connect(drag(ref))}
+      onDoubleClick={() => setEditing(true)}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
@@ -93,16 +91,36 @@ export const TableBlockQuotation: React.FC = () => {
         boxSizing: "border-box",
       }}
     >
-      {/* ================= HOVER DELETE ================= */}
-      {hovered && (
-        <div className="absolute right-0 -top-0"
-        style={{
-            zIndex:9999
-        }}>
-          <Button onClick={() => actions.delete(id)}>
-            <Trash2 size={SIZE.SIXTEEN} />
-            Delete Table
-          </Button>
+      {/* ================= Hover and Editing Details ================= */}
+      {(hovered || editing) && (
+        <div className="flex justify-between">
+          <div
+            className="absolute left-0 -top-0"
+            style={{
+              zIndex: 9999,
+            }}
+          >
+            <Button onClick={() => setEditing(!editing)}>
+              {editing ? (
+                <Save size={SIZE.SIXTEEN} />
+              ) : (
+                <Edit size={SIZE.SIXTEEN} />
+              )}
+              {editing ? "Save Table" : "Edit Table"}
+            </Button>
+          </div>
+
+          <div
+            className="absolute right-0 -top-0"
+            style={{
+              zIndex: 9999,
+            }}
+          >
+            <Button onClick={() => actions.delete(id)}>
+              <Trash2 size={SIZE.SIXTEEN} />
+              Delete Table
+            </Button>
+          </div>
         </div>
       )}
 
@@ -156,9 +174,7 @@ export const TableBlockQuotation: React.FC = () => {
                 <input
                   style={input}
                   value={row.productName}
-                  onChange={(e) =>
-                    updateCell(i, "productName", e.target.value)
-                  }
+                  onChange={(e) => updateCell(i, "productName", e.target.value)}
                 />
               </td>
 
@@ -167,9 +183,7 @@ export const TableBlockQuotation: React.FC = () => {
                   type="number"
                   style={input}
                   value={row.quantity}
-                  onChange={(e) =>
-                    updateCell(i, "quantity", e.target.value)
-                  }
+                  onChange={(e) => updateCell(i, "quantity", e.target.value)}
                 />
               </td>
 
@@ -178,9 +192,7 @@ export const TableBlockQuotation: React.FC = () => {
                   type="number"
                   style={input}
                   value={row.price}
-                  onChange={(e) =>
-                    updateCell(i, "price", e.target.value)
-                  }
+                  onChange={(e) => updateCell(i, "price", e.target.value)}
                 />
               </td>
 
@@ -191,9 +203,7 @@ export const TableBlockQuotation: React.FC = () => {
                   type="number"
                   style={input}
                   value={row.gst}
-                  onChange={(e) =>
-                    updateCell(i, "gst", e.target.value)
-                  }
+                  onChange={(e) => updateCell(i, "gst", e.target.value)}
                 />
               </td>
 
@@ -202,15 +212,11 @@ export const TableBlockQuotation: React.FC = () => {
                   type="number"
                   style={input}
                   value={row.cgst}
-                  onChange={(e) =>
-                    updateCell(i, "cgst", e.target.value)
-                  }
+                  onChange={(e) => updateCell(i, "cgst", e.target.value)}
                 />
               </td>
 
-              <td style={cell}>
-                {row.effectivePrice.toFixed(2)}
-              </td>
+              <td style={cell}>{row.effectivePrice.toFixed(2)}</td>
             </tr>
           ))}
 
@@ -227,11 +233,13 @@ export const TableBlockQuotation: React.FC = () => {
       </table>
 
       {/* ================= ADD ROW ================= */}
-      <div style={{ padding: "8px" }}>
-        <Button onClick={addRow}>
-          <Plus size={SIZE.SIXTEEN} /> Add Item
-        </Button>
-      </div>
+      {editing && (
+        <div style={{ padding: "8px" }}>
+          <Button onClick={addRow}>
+            <Plus size={SIZE.SIXTEEN} /> Add Item
+          </Button>
+        </div>
+      )}
     </div>
   );
 };

@@ -56,6 +56,8 @@ import LeadDataProps from "../../../@types/lead-management/LeadProps";
 import { handleApiError } from "../../../config/error/handleApiError";
 import LoadingPopUpAnimation from "../../views/card/LoadingPopUpAnimation";
 import FormLayout from "../../ui/FormLayout";
+import { LeadNotes } from "./lead-notes/LeadNotes";
+import { ModuleGuard } from "../../../config/guard/ModuleGuard";
 
 const ViewLeadManagement = () => {
   const navigate = useNavigate();
@@ -684,33 +686,13 @@ const ViewLeadManagement = () => {
       }
     }
   };
-  type ActiveCard = "meeting" | "contact" | "LeadTeams" | "leadUsers";
+  type ActiveCard = "meeting" | "contact" | "LeadTeams" | "leadUsers" | "LeadNotes";
   const [activeTab, setActiveTab] = useState<ActiveCard>("contact");
-  const [activeCard, setActiveCard] = useState<ActiveCard>("contact");
 
   const handleClickCards = (event: React.MouseEvent<HTMLElement>) => {
     const id = event.currentTarget.id as ActiveCard;
     setActiveTab(id);
-    setActiveCard(id);
   };
-  // const handleClickCards = (event: React.MouseEvent<HTMLElement>) => {
-  //   const id = event.currentTarget.id;
-  //   setActiveTab(id); // set active tab for border effect
-
-  //   if (id === "meeting") {
-  //     setIsOpenProductCard(false);
-  //     setIsOpenMeetingsModal(true);
-  //     setIsOpenLeadTeamsCard(false);
-  //   } else if (id === "contact") {
-  //     setIsOpenProductCard(true);
-  //     setIsOpenMeetingsModal(false);
-  //     setIsOpenLeadTeamsCard(false);
-  //   } else if (id === "LeadTeams") {
-  //     setIsOpenProductCard(false);
-  //     setIsOpenMeetingsModal(false);
-  //     setIsOpenLeadTeamsCard(true);
-  //   }
-  // };
 
   // const getHeightAboveTasks = useCallback(() => {
   //   if (isOpenMeetingsModal) {
@@ -1030,11 +1012,11 @@ const ViewLeadManagement = () => {
         )}
 
         {/* Sections  */}
-        <div className="w-full flex flex-col md:flex-row gap-1 mt-1">
+        <div className="w-full  flex flex-col md:flex-row gap-1 mt-1">
           {/* Column 1 */}
           <div className="w-full md:w-1/2 flex flex-col gap-2">
             {/* Lead Basic Info */}
-            <div className=" flex   shadow-sm border rounded-sm p-1  ">
+            <div className=" flex    rounded-sm p-1  ">
               <div className="mx-1 grid md:grid-cols-3 bg-pink-00 sm:grid-cols-1  gap-2  ">
                 <div className=" flex items-center gap-3 col-span-3  ">
                   <div className="bg-blue-600  p-2 rounded text-white">
@@ -1316,6 +1298,18 @@ const ViewLeadManagement = () => {
               >
                 Lead Teams
               </span>
+
+               <span
+                id="LeadNotes"
+                className={`cursor-pointer ${
+                  activeTab === "LeadNotes"
+                    ? "border-b-2 border-blue-500 caption-custom-blue"
+                    : "hover:text-blue-500"
+                }`}
+                onClick={handleClickCards}
+              >
+                Notes
+              </span>
               {/* <span
                 id="leadUsers" 
                 className={`cursor-pointer ${
@@ -1336,7 +1330,7 @@ const ViewLeadManagement = () => {
              [&::-webkit-scrollbar-thumb]:bg-gray-50
               [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full`}
               >
-                {activeCard === "meeting" && (
+                {activeTab === "meeting" && (
                   <div className="flex  items-center justify-center   min-h-72">
                     <div className="flex flex-col items-center justify-center p-6 text-center space-y-3 border rounded-xl bg-gray-50 shadow-sm">
                       <h2 className="table-header-custom">
@@ -1415,18 +1409,26 @@ const ViewLeadManagement = () => {
                     fetchLeadContact={fetchLeadContact}
                   />
                 )} */}
-                {activeCard === "contact" && (
+                {activeTab === "contact" && (
                   <LeadContact
                     selectedLeadData={selectedLeadData}
                     leadContact={leadContact}
                     fetchLeadContact={fetchLeadContact}
                   />
                 )}
-                {activeCard === "LeadTeams" && (
+                {activeTab === "LeadTeams" && (
                   <LeadAssignedTeams
                     selectedLeadData={selectedLeadData}
                     // isOpen={isOpenLeadTeamsCard}
                   />
+                )}
+
+                 {activeTab === "LeadNotes" && (
+                  <ModuleGuard permissionKey="userHasAccessToViewLeadNote" >
+                  <LeadNotes
+                    selectedLeadData={selectedLeadData}
+                    />
+                    </ModuleGuard>
                 )}
 
                 {/* {isOpenLeadTeamsCard && (

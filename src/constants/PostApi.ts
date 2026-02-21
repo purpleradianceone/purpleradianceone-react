@@ -228,7 +228,9 @@ const POST_API = {
     UPDATE_GENERAL_TASK_MASTER : `${BASE_URL}${import.meta.env.VITE_UPDATE_GENERAL_TASK_MASTER}`,
     GET_GENERAL_TASK : `${BASE_URL}${import.meta.env.VITE_GET_GENERAL_TASK}`,
     UPDATE_GENERAL_TASK : `${BASE_URL}${import.meta.env.VITE_UPDATE_GENERAL_TASK}`,
-
-}   
+    GET_LEADS_NOTES  : `${BASE_URL}${import.meta.env.VITE_GET_LEADS_NOTES}`,
+    CREATE_LEADS_NOTE :  `${BASE_URL}${import.meta.env.VITE_CREATE_LEADS_NOTE}`,
+    UPDATE_LEADS_NOTE : `${BASE_URL}${import.meta.env.VITE_UPDATE_LEADS_NOTE}`,
+}
 
 export default POST_API;

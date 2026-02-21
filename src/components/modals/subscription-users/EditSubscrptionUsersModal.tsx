@@ -80,7 +80,7 @@ function EditSubscriptionUsersModal({
     setCurrentPageData,
     handlePageSizeChange,
     handlePageChange,
-  } = useSearchFilterPaginationDateHandlers();
+  } = useSearchFilterPaginationDateHandlers({size:25});
 
   const fetchCompanyUsers = async (comapnyUserSearchParameter: string) => {
     const offset = (currentPage - 1) * pageSize;
@@ -100,7 +100,7 @@ function EditSubscriptionUsersModal({
       const getCompanyUserPostData = {
         company_id: loginStatus.companyId,
         requestedby: loginStatus.id,
-        isactive: null,
+        isactive: true,
         limit: pageSize,
         offset: offset,
         search_company_specific_date_range_id: 0,
