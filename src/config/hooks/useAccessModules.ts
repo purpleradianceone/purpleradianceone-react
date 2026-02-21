@@ -694,6 +694,36 @@ const userHasAccessToAddEmailTemplateSetting = accessModules.some(
       accessModule.crm_module_id === 43 && accessModule.update
   );
 
+    //All Tasks
+  const userHasAccessToAddAllTasks = accessModules.some(
+    (accessModules) => 
+      accessModules.crm_module_id === 46 && accessModules.add
+  );
+
+   const userHasAccessToViewAllTasks = accessModules.some(
+    (accessModule) =>
+      accessModule.crm_module_id === 46 && accessModule.view
+  );
+
+  const userHasAccessToUpdateAllTasks = accessModules.some(
+    (accessModule) =>
+      accessModule.crm_module_id === 46 && accessModule.update
+  );
+
+   const userHasAccessToAddMasterTasks = accessModules.some(
+    (accessModules) => 
+      accessModules.crm_module_id === 47 && accessModules.add
+  );
+
+   const userHasAccessToViewMasterTasks = accessModules.some(
+    (accessModule) =>
+      accessModule.crm_module_id === 47 && accessModule.view
+  );
+
+  const userHasAccessToUpdateMasterTasks = accessModules.some(
+    (accessModule) =>
+      accessModule.crm_module_id === 47 && accessModule.update
+  );
   //lead-setting
   const userHasAccessToAddLeadNote = accessModules.some(
     (accessModules) => 
@@ -883,6 +913,14 @@ const userHasAccessToAddEmailTemplateSetting = accessModules.some(
     userHasAccessToViewLeadSettings,
     userHasAccessToUpdateLeadSettings,
 
+    userHasAccessToAddAllTasks,
+    userHasAccessToViewAllTasks,
+    userHasAccessToUpdateAllTasks,
+
+    
+    userHasAccessToAddMasterTasks,
+    userHasAccessToViewMasterTasks,
+    userHasAccessToUpdateMasterTasks
     userHasAccessToAddLeadNote,
     userHasAccessToViewLeadNote,
     userHasAccessToUpdateLeadNote

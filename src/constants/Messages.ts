@@ -235,6 +235,24 @@ const MESSAGE = {
                 DENIED_ADD_ACCESS: "You do not have permission to create integration setting.",
                 DENIED_UPDATE_ACCESS: "You do not have permission to update integration setting .",  
             }
+        },
+        MY_TASK : {
+
+            TASK : {
+            DENIED_VIEW_ACCESS: "You do not have permission to view product users.",
+            DENIED_ADD_ACCESS: "You do not have permission to add users to product.",
+            DENIED_UPDATE_ACCESS: "You do not have permission to update product users.",
+            },
+            MY_TASK :{
+                DENIED_VIEW_ACCESS: "You do not have permission to view my tasks.",
+                DENIED_ADD_ACCESS: "You do not have permission to create my tasks.",
+                DENIED_UPDATE_ACCESS: "You do not have permission to update my tasks.",
+            },
+            MASTER_TASK :{
+                DENIED_VIEW_ACCESS: "You do not have permission to view master tasks.", 
+                DENIED_ADD_ACCESS: "You do not have permission to create master tasks.",
+                DENIED_UPDATE_ACCESS: "You do not have permission to update master tasks.",
+            },
         }
 
     }

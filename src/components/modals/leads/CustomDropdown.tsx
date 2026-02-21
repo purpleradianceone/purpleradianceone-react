@@ -13,7 +13,7 @@ interface DropdownProps {
   preselectedOption?: number;
   requiredRedDot?: boolean;
   logo?: LucideIcon;
-  paddingy? : number
+  paddingy?: number
 }
 
 const CustomDropdown: React.FC<DropdownProps> = ({
@@ -25,7 +25,7 @@ const CustomDropdown: React.FC<DropdownProps> = ({
   preselectedOption,
   requiredRedDot,
   logo: Icon,
-  paddingy=1
+  paddingy = 1
 }) => {
   const [selectedOption, setSelectedOption] = useState<number | undefined>(
     () => {
@@ -81,12 +81,13 @@ const CustomDropdown: React.FC<DropdownProps> = ({
       <label className="block input-label-custom">
         {Icon && <Icon size={14} className="inline mr-1 text-blue-500" />}
         {labelName === "status" ||
-        labelName === "source" ||
-        labelName === "type" ||
-        labelName === "category" ||
-        labelName === "lifecycle" ||
-        labelName === "priority" ||
-        labelName === "stage"
+          labelName === "source" ||
+          labelName === "type" ||
+          labelName === "category" ||
+          labelName === "lifecycle" ||
+          labelName === "priority" ||
+          labelName === "stage" ||
+          labelName === "frequency"
           ? ""
           : labelName}{" "}
         {requiredRedDot && <span className="text-rose-500">*</span>}
@@ -131,22 +132,23 @@ const CustomDropdown: React.FC<DropdownProps> = ({
         </div> */}
         <div className="input-label-custom text-nowrap">
           {labelName === "status" ||
-          labelName === "source" ||
-          labelName === "type" ||
-          labelName === "category" ||
-          labelName === "lifecycle" ||
-          labelName === "priority" ||
-          labelName === "stage"
+            labelName === "source" ||
+            labelName === "type" ||
+            labelName === "category" ||
+            labelName === "lifecycle" ||
+            labelName === "priority" ||
+            labelName === "stage" ||
+            labelName === "frequency"
             ? selectedOption === undefined
               ? labelName.charAt(0).toUpperCase() + labelName.slice(1)
               : options && Array.isArray(options)
-              ? options.find((o) => o.id === selectedOption)?.name
-              : ""
+                ? options.find((o) => o.id === selectedOption)?.name
+                : ""
             : selectedOption === undefined
-            ? "Select Option"
-            : options && Array.isArray(options)
-            ? options.find((o) => o.id === selectedOption)?.name
-            : ""}
+              ? "Select Option"
+              : options && Array.isArray(options)
+                ? options.find((o) => o.id === selectedOption)?.name
+                : ""}
         </div>
 
         {showDropdown ? <ChevronUp size={18} /> : <ChevronDown size={18} />}

@@ -92,7 +92,13 @@ const ROUTES_URL = {
     SETTING_META_APP: "meta-app",
     SETTING_INDIAMART :"indiamart",
     SETTING_LINKEDIN : "linkedin",
-    SETTING_GOOGLE_ADS : "google-ads"
+    SETTING_GOOGLE_ADS : "google-ads",
+
+    //TASKS
+   TASKS_MANAGEMENT: "/home/manage-tasks/tasks",
+   MY_TASKS: "my-tasks",
+   GENERAL_TASK : "/home/manage-tasks/general-task/:taskId",
+   MASTER_TASK_DETAILS: "/home/master-task/details/:taskId",
 
 }
 export default ROUTES_URL;
