@@ -1322,7 +1322,7 @@ const ViewLeadManagement = () => {
                 Lead Users
               </span> */}
             </div>
-            <div className="flex flex-col min-h-72 gap-2">
+            <div className="flex flex-col min-h-72  gap-2">
               <div
                 // ${getHeightAboveTasks()}
                 className={`flex min-h-72 max-h-72  overflow-y-scroll flex-col  gap-2 [&::-webkit-scrollbar]:w-2
@@ -1424,7 +1424,7 @@ const ViewLeadManagement = () => {
                 )}
 
                  {activeTab === "LeadNotes" && (
-                  <ModuleGuard permissionKey="userHasAccessToViewLeadNote" >
+                  <ModuleGuard permissionKey="userHasAccessToViewLeadNote">
                   <LeadNotes
                     selectedLeadData={selectedLeadData}
                     />
