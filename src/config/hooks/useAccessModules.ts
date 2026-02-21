@@ -920,7 +920,7 @@ const userHasAccessToAddEmailTemplateSetting = accessModules.some(
     
     userHasAccessToAddMasterTasks,
     userHasAccessToViewMasterTasks,
-    userHasAccessToUpdateMasterTasks
+    userHasAccessToUpdateMasterTasks,
     userHasAccessToAddLeadNote,
     userHasAccessToViewLeadNote,
     userHasAccessToUpdateLeadNote
