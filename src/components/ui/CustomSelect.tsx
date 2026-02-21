@@ -18,7 +18,7 @@ interface AppSelectProps {
   isRequired?: boolean;
   icon?: LucideIcon;
   className?: string;
-  isClearable? : boolean
+  isClearable?: boolean
 
   // New Props for scroll api data and onSearchApiCall
   onMenuOpen?: () => void;
@@ -48,9 +48,9 @@ const CustomSelect: React.FC<AppSelectProps> = ({
   className,
   isClearable = true,
   isLoading,
-  onInputChange ,
-  onMenuOpen ,
-  onMenuScrollToBottom 
+  onInputChange,
+  onMenuOpen,
+  onMenuScrollToBottom
 }) => {
   const selectedOption = useMemo(
     () => options.find((opt) => opt.value === value) ?? null,
@@ -90,21 +90,36 @@ const CustomSelect: React.FC<AppSelectProps> = ({
         onMenuScrollToBottom={onMenuScrollToBottom}
         // above props are used for the search and scroll api call
         classNames={{
-            placeholder : ()=> "input-label-custom placeholder-gray-400",
-            input: ()=> "caption-custom",
+          placeholder: () => "input-label-custom placeholder-gray-400",
+          input: () => "caption-custom",
         }}
         styles={{
           control: (base, state) => ({
             ...base,
             minHeight: 30,
             height: 30,
+            alignItems: "center",
+            fontSize: 12,            // 👈 smaller text
             borderColor: state.isFocused ? "#2563eb" : base.borderColor,
             boxShadow: state.isFocused ? "0 0 0 1px #2563eb" : "none",
+          }),
+          option: (base, state) => ({
+            ...base,
+            fontSize: 12,           // 👈 smaller text
+            minHeight: 28,         // 👈 smaller row height
+            padding: "4px 8px",    // 👈 compact padding
+            backgroundColor: state.isFocused
+              ? "#e0e7ff"
+              : state.isSelected
+                ? "#c7d2fe"
+                : "white",
+            color: "#111827",
           }),
           valueContainer: (base) => ({
             ...base,
             height: 30,
-            padding: "0 12px",
+            // padding: "0 8px",       // 👈 tighter padding
+            fontSize: 12,
           }),
           input: (base) => ({
             ...base,
@@ -114,6 +129,11 @@ const CustomSelect: React.FC<AppSelectProps> = ({
           indicatorsContainer: (base) => ({
             ...base,
             height: 30,
+          }),
+          menuList: (base) => ({
+            ...base,
+            padding: 4,            // 👈 reduce top/bottom spacing
+            maxHeight: 180,       // 👈 optional: smaller dropdown height
           }),
           menuPortal: (base) => ({ ...base, zIndex: 9999 }),
           menu: (base) => ({ ...base, zIndex: 9999 }),

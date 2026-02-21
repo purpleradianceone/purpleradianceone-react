@@ -8,5 +8,7 @@ export enum LocalStorageKeys {
     ACCOUNT_COMPANY_PRODUCT_FOR_SUPPORT_TICKET = 'account_company_product_for_support_ticket_filters',
     SUPPORT_TICKET_MANAGEMENT_FILTERS = 'support_ticket_management_filters',
     EMAIL_TEMPLATE_MANAGEMENT_FILTERS = 'email_template_management_filters',
+    MY_TASK_MANAGEMENT_FILTERS = 'my_task_management_filters',
+    MASTER_TASK_MANAGEMENT_FILTER = "master_task_management_filters"
 
 }

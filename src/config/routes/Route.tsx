@@ -77,6 +77,11 @@ import { ModuleGuard } from "../guard/ModuleGuard";
 import MESSAGE from "../../constants/Messages";
 import MetaAppsIntegration from "../../components/views/settings/social-media-integration/MetaAppsIntegration";
 import WebFormIntegration from "../../components/views/settings/web-form-integration/WebFormIntegration";
+import MyTaskManagement from "../../components/views/my-task-management/MyTaskManegement";
+import TaskPage from "../../components/views/my-task-management/TaskPage";
+import MasterTaskManagement from "../../components/views/my-task-management/MasterTaskManagement";
+import GeneralTask from "../../components/views/my-task-management/GeneralTask";
+import MasterTaskUpdate from "../../components/modals/general-task-master/MasterTaskUpdate";
 
 export const router = createBrowserRouter([
   {
@@ -232,7 +237,6 @@ export const router = createBrowserRouter([
       </MobileRedirectWrapper>
     ),
   },
-
   {
     path: ROUTES_URL.GET_COMPANY_USERS,
     element: (
@@ -279,6 +283,77 @@ export const router = createBrowserRouter([
       </MobileRedirectWrapper>
     ),
   },
+  {
+    path: ROUTES_URL.GENERAL_TASK,
+    element: (
+      <MobileRedirectWrapper>
+        <PrivateRoute>
+          <div>
+            <Navbar>
+              <GeneralTask />
+            </Navbar>
+          </div>
+        </PrivateRoute>
+      </MobileRedirectWrapper>
+    ),
+  },
+  {
+    path: ROUTES_URL.MASTER_TASK_DETAILS,
+    element: (
+      <MobileRedirectWrapper>
+        <PrivateRoute>
+          <div>
+            <Navbar>
+              <MasterTaskUpdate />
+            </Navbar>
+          </div>
+        </PrivateRoute>
+      </MobileRedirectWrapper>
+    ),
+  },
+
+  {
+    path: ROUTES_URL.TASKS_MANAGEMENT,
+    element: (
+      <MobileRedirectWrapper>
+        <PrivateRoute>
+          <div>
+            <Navbar>
+              <TaskPage />
+            </Navbar>
+          </div>
+        </PrivateRoute>
+      </MobileRedirectWrapper>
+    ),
+    children: [
+      {
+        index: true,
+        element: (
+          <ModuleGuard
+            permissionKey="userHasAccessToViewAllTasks"
+            deniedMessage={
+              MESSAGE.MODULE_ACCESS.MY_TASK.MY_TASK.DENIED_VIEW_ACCESS
+            }
+          >
+            <MyTaskManagement isUsedInAllTasksModule={true} />
+          </ModuleGuard>
+        ),
+      },
+      {
+        path: ROUTES_URL.MY_TASKS,   // ✅ relative path
+        element: (
+          <ModuleGuard
+            permissionKey="userHasAccessToViewMasterTasks"
+            deniedMessage={
+              MESSAGE.MODULE_ACCESS.MY_TASK.MASTER_TASK.DENIED_VIEW_ACCESS
+            }
+          >
+            <MasterTaskManagement isUsedInAllTasksModule={true} />
+          </ModuleGuard>
+        ),
+      },
+    ],
+  },
   // {
   //   path: ROUTES_URL.COMPANY_SETTING,
   //   element: (
@@ -293,6 +368,7 @@ export const router = createBrowserRouter([
   //     </MobileRedirectWrapper>
   //   ),
   // },
+
 
   {
     path: ROUTES_URL.COMPANY_SETTING,
@@ -443,7 +519,7 @@ export const router = createBrowserRouter([
           <div>
             <AuthLayout
               title="Activate Subscription!"
-              // subtitle="Enter the number of users and subscription duration to proceed"
+            // subtitle="Enter the number of users and subscription duration to proceed"
             >
               <CreateSubscription
                 isOpen={true}
@@ -714,7 +790,7 @@ export const router = createBrowserRouter([
                 onClose={() => {
                   window.history.back();
                 }}
-                handleProductChangeOnAdd={() => {}}
+                handleProductChangeOnAdd={() => { }}
               ></AddProductModal>
             </Navbar>
           </div>
@@ -734,7 +810,7 @@ export const router = createBrowserRouter([
                 onClose={() => {
                   window.history.back();
                 }}
-                handleCompanyTeamChangeOnAdd={() => {}}
+                handleCompanyTeamChangeOnAdd={() => { }}
               ></AddTeamModal>
             </Navbar>
           </div>
@@ -787,7 +863,7 @@ export const router = createBrowserRouter([
     element: (
       <MobileRedirectWrapper>
         <PrivateRoute>
-          <FacebookOAuthConsent/>
+          <FacebookOAuthConsent />
         </PrivateRoute>
       </MobileRedirectWrapper>
     ),
@@ -901,6 +977,20 @@ export const router = createBrowserRouter([
       </MobileRedirectWrapper>
     ),
   },
+  // {
+  //   path: ROUTES_URL.MY_TASKS,
+  //   element: (
+  //     <MobileRedirectWrapper>
+  //       <PrivateRoute>
+  //         <div>
+  //           <Navbar>
+  //             <MyTaskManagement isUsedInAllTasksModule={true} />
+  //           </Navbar>
+  //         </div>
+  //       </PrivateRoute>
+  //     </MobileRedirectWrapper>
+  //   ),
+  // },
   {
     path: ROUTES_URL.SUPPORT_TICKET_DETAILS,
     element: (

@@ -138,7 +138,8 @@ export const JSX_CHILDREN_NAME = {
     CREATE_SUPPORT_TICKET : "Create",
     DETAILS :"Details",
     TRANSACRTIONS : "Trans...",
-    ADD_STOCK :"Stock"
+    ADD_STOCK :"Stock",
+    ADD_GENERAL_TASK: "Add Task"
 }
 
 export const SIZE = {
