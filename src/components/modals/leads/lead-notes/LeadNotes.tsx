@@ -33,8 +33,7 @@ export const LeadNotes = ({
   selectedLeadData: any;
 }) => {
   const { loginStatus } = useLoggedInUserContext();
-  const { userHasAccessToAddLeadNote } =
-    useUserAccessModules();
+  const { userHasAccessToAddLeadNote } = useUserAccessModules();
 
   const [isLoading, setIsLoading] = useState<{
     leadNote: boolean;
@@ -111,17 +110,32 @@ export const LeadNotes = ({
     id: number,
     changedData: string,
     status?: boolean,
-    // updateValue ? : updateField
   ) => {
-    await handleLeadNoteUpdate(id, changedData, status);
+    try {
+      const response = await handleLeadNoteUpdate(id, changedData, status);
+      if (response) {
+        if (response.data.status) {
+          toast.success(response.data.message);
+        } else {
+          toast.error(response.data.message);
+        }
+        setLeadNotesInactive([]);
+        await getLeadNote(false, setLeadNotesInactive);
+      }
+    } catch (error) {
+      handleApiError(error);
+      setLeadNotesInactive([]);
+      await getLeadNote(false, setLeadNotesInactive);
+    } finally {
+      setIsLoading((prev) => ({
+        ...prev,
+        leadNote: false,
+      }));
+    }
     // if(updateValue==="value"){
 
-    setIsLoading((prev) => ({
-      ...prev,
-      inactiveLeadNote: true,
-    }));
-    setLeadNotesInactive([]);
-    await getLeadNote(false, setLeadNotesInactive);
+    // setLeadNotesInactive([]);
+    // await getLeadNote(false, setLeadNotesInactive);
     // }
   };
   const handleLeadNoteUpdateCall = async (
@@ -150,7 +164,6 @@ export const LeadNotes = ({
           await getLeadNote(true, setLeadNotes);
           toast.error(response.data.message);
         }
-        // note : if want we can improve this logic based on which field is edited
       }
     } catch (error) {
       handleApiError(error);
@@ -269,7 +282,7 @@ export const LeadNotes = ({
     if (leadNotes.length === 0) {
       return (
         <>
-          <div className="flex items-endn justify-end">
+          {/* <div className="flex items-endn justify-end">
             <Popover
               onTriggerClick={() => handleShowDeletedLeadNote()}
               trigger={
@@ -293,7 +306,6 @@ export const LeadNotes = ({
                   <div className="caption-custom flex items-center justify-between sticky top-0  bg-gray-50 w-full ">
                     <span className="flex items-center px-2">
                       <span className="table-data-custom ">Note : </span>
-                      {/* Following notes are deleted , you can undo the action. */}
                       Following notes have been deleted. Click “
                       <Undo2 className="text-green-500" size={12} />” to undo
                       action.
@@ -329,10 +341,8 @@ export const LeadNotes = ({
                               key={note.id}
                               note={note}
                               onUpdate={handleLeadNoteInactiveUpdateCall}
-                              //   onUpdate={handleLeadNoteUpdate}
                               isUsedInDelete={true}
                             >
-                              {/* {note.note} */}
                             </AccordionItem>
                           ))}
                       </div>
@@ -341,7 +351,7 @@ export const LeadNotes = ({
                 </>
               )}
             </Popover>
-          </div>
+          </div> */}
 
           <div className=" w-full h-full flex items-center justify-center">
             <Popover
@@ -411,141 +421,11 @@ export const LeadNotes = ({
 
     return (
       <div>
-        <div className=" w-full h-full flex  items-center justify-end">
-          <div className="flex items-center  gap-1">
-            <Popover
-              onTriggerClick={() => handleShowDeletedLeadNote()}
-              trigger={
-                <button
-                  type="button"
-                  className=" caption-custom hover:text-gray-600 flex items-center "
-                >
-                  <History size={12} />
-                  Deleted
-                </button>
-              }
-              align="right"
-              width={400}
-              padding={3}
-              onClose={() => {
-                getLeadNote(true, setLeadNotes);
-              }}
-            >
-              {(handleCloseButton) => (
-                <>
-                  <div className="caption-custom flex items-center justify-between sticky top-0  bg-gray-50 w-full ">
-                    <span className="flex items-center px-2">
-                      <span className="table-data-custom ">Note : </span>
-                      {/* Following notes are deleted , you can undo the action. */}
-                      Following notes have been deleted. Click “
-                      <Undo2 className="text-green-500" size={12} />” to undo
-                      action.
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        handleCloseButton();
-                      }}
-                    >
-                      <X size={14} className="hover:text-gray-600" />
-                    </button>
-                  </div>
-                  {isLoading.inactiveLeadNote && (
-                    <div className="w-full h-full flex justify-center items-center">
-                      <LoadingSpinner />
-                    </div>
-                  )}
-                  {!isLoading.inactiveLeadNote && (
-                    <div className=" ">
-                      <div className="min-h-20 max-h-[400px] overflow-y-auto">
-                        {leadNotesInactive &&
-                          leadNotesInactive.length === 0 && (
-                            <div className="flex items-center  min-h-20 justify-center h-full w-full ">
-                              <div className="text-center caption-custom       ">
-                                No data found.
-                              </div>
-                            </div>
-                          )}
-                        {leadNotesInactive &&
-                          leadNotesInactive.map((note) => (
-                            <AccordionItem
-                              key={note.id}
-                              note={note}
-                              onUpdate={handleLeadNoteInactiveUpdateCall}
-                              //   onUpdate={handleLeadNoteUpdate}
-                              isUsedInDelete={true}
-                            >
-                              {/* {note.note} */}
-                            </AccordionItem>
-                          ))}
-                      </div>
-                    </div>
-                  )}
-                </>
-              )}
-            </Popover>
-            <Popover
-              align="right"
-              width={380}
-              trigger={<Button className={COLORS.ADD_BUTTON}>+Add</Button>}
-              padding={6}
-              onClose={() => {
-                handleCreateLeadNoteFormClose();
-              }}
-              accessRight={userHasAccessToAddLeadNote}
-            >
-              {(close) => (
-                <form
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    // changes done here
-
-                    if (formData.note && formData.note.trim().length > 0) {
-                      setIsLoading((prev) => ({
-                        ...prev,
-                        leadNote: true,
-                      }));
-                      handleSubmit();
-                    }
-                  }}
-                >
-                  <TextAreaInput
-                    logo={NotebookPen}
-                    cols={2}
-                    rows={4}
-                    label="Note"
-                    value={formData.note}
-                    autoFocus
-                    maxLength={VALIDATIONS.MAX_DESCRIPTION_LENGTH}
-                    name="note"
-                    onChange={handleFormInputChange}
-                  />
-
-                  <div className="flex items-center justify-end mt-1">
-                    <div className="flex gap-1 h-fit">
-                      <Button
-                        type="button"
-                        className="caption-custom white-text h-fit px-2 py-1 rounded-md  bg-gray-500 hover:bg-gray-600"
-                        onClick={close}
-                      >
-                        Cancel
-                      </Button>
-                      <Button
-                        type="submit"
-                        disabled={isSubmitting || formData.note.length == 0}
-                        // disabled={isSubmitting}
-                        className={`caption-custom white-text h-fit px-2 py-1 rounded-md
-    ${isSubmitting ? "bg-gray-400 cursor-not-allowed" : COLORS.BG_BLUE_600_COLOR}`}
-                      >
-                        {isSubmitting ? "Saving..." : "Save"}
-                      </Button>
-                    </div>
-                  </div>
-                </form>
-              )}
-            </Popover>
-          </div>
-        </div>
+        {/* <div className=" w-full h-full flex  items-center justify-end"> */}
+          {/* <div className="flex items-center  gap-1"> */}
+            {/* Note : position pop over */}
+          {/* </div> */}
+        {/* </div> */}
         {/* Render Notes List Here */}
         {leadNotes &&
           leadNotes.map((note) => (
@@ -564,7 +444,146 @@ export const LeadNotes = ({
   };
 
   // Note : Single Return
-  return <div className="w-full h-full">{renderContent()}</div>;
+  return (
+    <div className="w-full h-full">
+        
+ <div className="sticky top-0 right-0 bg-white flex  items-center justify-end gap-1">
+        <Popover
+          onTriggerClick={() => handleShowDeletedLeadNote()}
+          trigger={
+            <button
+              type="button"
+              className=" caption-custom hover:text-gray-600 flex items-center "
+            >
+              <History size={12} />
+              Deleted
+            </button>
+          }
+          align="right"
+          width={400}
+          padding={3}
+          onClose={() => {
+            getLeadNote(true, setLeadNotes);
+          }}
+        >
+          {(handleCloseButton) => (
+            <>
+              <div className="caption-custom flex items-center justify-between sticky top-0  bg-gray-50 w-full ">
+                <span className="flex items-center px-2">
+                  <span className="table-data-custom ">Note : </span>
+                  {/* Following notes are deleted , you can undo the action. */}
+                  Following notes have been deleted. Click “
+                  <Undo2 className="text-green-500" size={12} />” to undo
+                  action.
+                </span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    handleCloseButton();
+                  }}
+                >
+                  <X size={14} className="hover:text-gray-600" />
+                </button>
+              </div>
+              {isLoading.inactiveLeadNote && (
+                <div className="w-full h-full flex justify-center items-center">
+                  <LoadingSpinner />
+                </div>
+              )}
+              {!isLoading.inactiveLeadNote && (
+                <div className=" ">
+                  <div className="min-h-20 max-h-[400px] overflow-y-auto">
+                    {leadNotesInactive && leadNotesInactive.length === 0 && (
+                      <div className="flex items-center  min-h-20 justify-center h-full w-full ">
+                        <div className="text-center caption-custom       ">
+                          No data found.
+                        </div>
+                      </div>
+                    )}
+                    {leadNotesInactive &&
+                      leadNotesInactive.map((note) => (
+                        <AccordionItem
+                          key={note.id}
+                          note={note}
+                          onUpdate={handleLeadNoteInactiveUpdateCall}
+                          //   onUpdate={handleLeadNoteUpdate}
+                          isUsedInDelete={true}
+                        >
+                          {/* {note.note} */}
+                        </AccordionItem>
+                      ))}
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+        </Popover>
+        <Popover
+          align="right"
+          width={380}
+          trigger={<Button className={COLORS.ADD_BUTTON}>+Add</Button>}
+          padding={6}
+          onClose={() => {
+            handleCreateLeadNoteFormClose();
+          }}
+          accessRight={userHasAccessToAddLeadNote}
+        >
+          {(close) => (
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                // changes done here
+
+                if (formData.note && formData.note.trim().length > 0) {
+                  setIsLoading((prev) => ({
+                    ...prev,
+                    leadNote: true,
+                  }));
+                  handleSubmit();
+                }
+              }}
+            >
+              <TextAreaInput
+                logo={NotebookPen}
+                cols={2}
+                rows={4}
+                label="Note"
+                value={formData.note}
+                autoFocus
+                maxLength={VALIDATIONS.MAX_DESCRIPTION_LENGTH}
+                name="note"
+                onChange={handleFormInputChange}
+              />
+
+              <div className="flex items-center justify-end mt-1">
+                <div className="flex gap-1 h-fit">
+                  <Button
+                    type="button"
+                    className="caption-custom white-text h-fit px-2 py-1 rounded-md  bg-gray-500 hover:bg-gray-600"
+                    onClick={close}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    type="submit"
+                    disabled={isSubmitting || formData.note.length == 0}
+                    // disabled={isSubmitting}
+                    className={`caption-custom white-text h-fit px-2 py-1 rounded-md
+    ${isSubmitting ? "bg-gray-400 cursor-not-allowed" : COLORS.BG_BLUE_600_COLOR}`}
+                  >
+                    {isSubmitting ? "Saving..." : "Save"}
+                  </Button>
+                </div>
+              </div>
+            </form>
+          )}
+        </Popover>
+      </div>
+            
+     
+      {renderContent()}
+    </div>
+  );
 };
 
 type AccordionItemProps = {
@@ -632,13 +651,15 @@ export function AccordionItem({
   return (
     <div ref={wrapperRef} key={note.id} className="w-full px-1 pb-1">
       <div
-        className="bg-white border border-blue-200 rounded-md shadow-sm  
+        className="bg-white border  border-blue-200 rounded-md shadow-sm  
         hover:shadow-md transition-all duration-300"
       >
         {/* HEADER */}
-        <button
+        <div className="flex">
+            <button
           onClick={() => {
-            if (isUsedInDelete && userHasAccessToUpdateLeadNote) {
+            if (!isUsedInDelete && userHasAccessToUpdateLeadNote) {
+                
               setIsEditing(true);
             }
           }}
@@ -656,20 +677,20 @@ export function AccordionItem({
             {/* Expanded → Full Note */}
             {isOpen && !isEditing && (
               <span
-                className={`${isUsedInDelete ? "" : "cursor-pointer"} text-sm px-2 text-gray-800 whitespace-pre-wrap `}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  if (!isUsedInDelete && userHasAccessToUpdateLeadNote) {
-                    setIsEditing(true);
-                  }
-                }}
+                className={`${!isUsedInDelete ? "" : "cursor-pointer"} text-sm px-2 text-gray-800 whitespace-pre-wrap `}
+                // onClick={(e) => {
+                //   e.stopPropagation();
+                //   if (!isUsedInDelete && userHasAccessToUpdateLeadNote) {
+                //     setIsEditing(true);
+                //   }
+                // }}
               >
                 {value}
               </span>
             )}
 
             {/* Edit Mode */}
-            {isOpen && isEditing && !isUsedInDelete && (
+            {isOpen&& isEditing && !isUsedInDelete && (
               <textarea
                 ref={textareaRef}
                 value={value}
@@ -682,15 +703,20 @@ export function AccordionItem({
             )}
           </div>
 
-          <span
+         
+        </button>
+         <span
             onClick={() => {
-              if (!isUsedInDelete && userHasAccessToUpdateLeadNote) {
+              if (!isUsedInDelete  &&  userHasAccessToUpdateLeadNote) {
+                console.log(isEditing);
+                
                 setIsEditing(!isEditing);
+
               }
 
               // setIsEditing(!isEditing)
             }}
-            className="ml-3 text-blue-600 mt-1"
+            className="ml-3 text-blue-600 mt-1 "
           >
             {!isUsedInDelete ? (
               isEditing ? (
@@ -702,14 +728,16 @@ export function AccordionItem({
               ""
             )}
           </span>
-        </button>
+
+        </div>
+        
 
         {/* EXPANDED META DATA */}
         <div
           //   onClick={() => setIsEditing(false)}
-          className={`overflow-hidden transition-all duration-400 ease-in-out ${
-            isOpen ? "max-h-40 opacity-100" : "max-h-0 opacity-0"
-          }`}
+          className={`overflow-hidden transition-all duration-400 ease-in-out max-h-40 opacity-100 `
+        
+        }
         >
           <div className="flex justify-between pl-3 pr-2 py-1 border-t bg-gray-100 text-xs text-gray-600 rounded-b-md">
             <span>
@@ -722,8 +750,10 @@ export function AccordionItem({
                   if (userHasAccessToUpdateLeadNote) {
                     onUpdate(note.id, value, !note.isActive, "status");
                     return;
-                  }else{
-                    toast.error("you dont have required permission to perform this activity")
+                  } else {
+                    toast.error(
+                      "you dont have required permission to perform this activity",
+                    );
                   }
                 }}
                 type="button"
