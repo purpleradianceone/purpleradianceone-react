@@ -23,7 +23,7 @@ function FacebookOAuthConsent() {
 
   const handleConfirm = () => {
     const baseUrl =
-      "http://localhost:8080/api/main/purple-crm-api/authentication/facebook";
+      "http://localhost:8080/api/main/purple-crm-api/main/facebook";
     const params = new URLSearchParams();
     params.append("company_id", loginStatus.companyId.toString());
     params.append("company_user_id", loginStatus.id.toString());
