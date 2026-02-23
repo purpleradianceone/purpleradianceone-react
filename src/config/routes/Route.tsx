@@ -82,6 +82,7 @@ import TaskPage from "../../components/views/my-task-management/TaskPage";
 import MasterTaskManagement from "../../components/views/my-task-management/MasterTaskManagement";
 import GeneralTask from "../../components/views/my-task-management/GeneralTask";
 import MasterTaskUpdate from "../../components/modals/general-task-master/MasterTaskUpdate";
+import { QuotationPage } from "../../components/quotation-builder/QuotationPage";
 
 export const router = createBrowserRouter([
   {
@@ -631,6 +632,20 @@ export const router = createBrowserRouter([
   },
   {
     path: ROUTES_URL.QUOTATION_SETTINGS,
+    element: (
+      <MobileRedirectWrapper>
+        <PrivateRoute>
+          <div>
+            <Navbar>
+              <QuotationPage />
+            </Navbar>
+          </div>
+        </PrivateRoute>
+      </MobileRedirectWrapper>
+    ),
+  },
+  {
+    path: ROUTES_URL.QUOTATION_SETTINGS_CREATE_Template,
     element: (
       <MobileRedirectWrapper>
         <PrivateRoute>

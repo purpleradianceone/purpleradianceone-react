@@ -276,6 +276,7 @@ function SignInForm() {
                         timezone: res.Timezone,
                         timezoneName: res["Timezone Name"],
                         timezoneUTCOffset: res["Timezone UTC Offset"],
+                        sidebarOpen:false,
                       });
                     }
                   });

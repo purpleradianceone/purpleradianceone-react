@@ -60,7 +60,10 @@ const ROUTES_URL = {
 
     FACEBOOK_OAUTH : "/authenticate/facebook",
     INTEGRATIONS_SETTINGS : "/settings/integrations",
+
+    // Quotation module
     QUOTATION_SETTINGS : "/settings/quotations",
+    QUOTATION_SETTINGS_CREATE_Template : "/settings/quotations/create",
 
     // Account module
     ACCOUNT_MANAGEMENT : "/home/manage-accounts/accounts",

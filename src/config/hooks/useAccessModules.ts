@@ -741,6 +741,40 @@ const userHasAccessToAddEmailTemplateSetting = accessModules.some(
   );
 
 
+    //setting-company-detail
+  const userHasAccessToAddCompanyDetail = accessModules.some(
+    (accessModules) => 
+      accessModules.crm_module_id === 48 && accessModules.add
+  );
+
+   const userHasAccessToViewCompanyDetail = accessModules.some(
+    (accessModule) =>
+      accessModule.crm_module_id === 48 && accessModule.view
+  );
+
+  const userHasAccessToUpdateCompanyDetail = accessModules.some(
+    (accessModule) =>
+      accessModule.crm_module_id === 48 && accessModule.update
+  );
+
+    //setting-quotation-template
+  const userHasAccessToAddQuotationTemplate = accessModules.some(
+    (accessModules) => 
+      accessModules.crm_module_id === 49 && accessModules.add
+  );
+
+   const userHasAccessToViewQuotationTemplate = accessModules.some(
+    (accessModule) =>
+      accessModule.crm_module_id === 49 && accessModule.view
+  );
+
+  const userHasAccessToUpdateQuotationTemplate = accessModules.some(
+    (accessModule) =>
+      accessModule.crm_module_id === 49 && accessModule.update
+  );
+
+
+
   return {
     userHasAccessToAddUser,
     userHasAccessToViewUser,
@@ -923,6 +957,14 @@ const userHasAccessToAddEmailTemplateSetting = accessModules.some(
     userHasAccessToUpdateMasterTasks,
     userHasAccessToAddLeadNote,
     userHasAccessToViewLeadNote,
-    userHasAccessToUpdateLeadNote
+    userHasAccessToUpdateLeadNote,
+
+    userHasAccessToAddCompanyDetail,
+    userHasAccessToViewCompanyDetail,
+    userHasAccessToUpdateCompanyDetail,
+
+    userHasAccessToAddQuotationTemplate,
+    userHasAccessToViewQuotationTemplate,
+    userHasAccessToUpdateQuotationTemplate,
   };
 };

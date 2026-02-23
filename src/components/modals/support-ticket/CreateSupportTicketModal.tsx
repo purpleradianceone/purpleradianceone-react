@@ -661,14 +661,14 @@ function CreateSupportTicketModal({
                         value={
                           createSupportTicketModalFormData.query_description
                         }
-                        defaultValue={
-                          createSupportTicketModalFormData.query_description
-                        }
+                        // defaultValue={
+                        //   createSupportTicketModalFormData.query_description
+                        // }
                         onChange={handleSupportTicketModalFormDataChange}
                         required={true}
                         onBlur={handleBlur}
-                        cols={0}
                         rows={3}
+                        cols={0}
                         error={error.query_description}
                       />
                     </div>
@@ -680,12 +680,12 @@ function CreateSupportTicketModal({
                         name="public_notes"
                         placeholder="Enter public notes "
                         value={createSupportTicketModalFormData.public_notes}
-                        defaultValue={
-                          createSupportTicketModalFormData.public_notes
-                        }
+                        // defaultValue={
+                        //   createSupportTicketModalFormData.public_notes
+                        // }
                         onChange={handleSupportTicketModalFormDataChange}
-                        cols={0}
                         rows={3}
+                        cols={0}
                         // onBlur={handleBlur}
                       />
                     </div>
@@ -699,13 +699,13 @@ function CreateSupportTicketModal({
                         value={
                           createSupportTicketModalFormData.resolution_applied
                         }
-                        defaultValue={
-                          createSupportTicketModalFormData.resolution_applied
-                        }
+                        // defaultValue={
+                        //   createSupportTicketModalFormData.resolution_applied
+                        // }
                         // onBlur={handleBlur}
                         onChange={handleSupportTicketModalFormDataChange}
-                        cols={0}
                         rows={3}
+                        cols={0}
                       />
                     </div>
 

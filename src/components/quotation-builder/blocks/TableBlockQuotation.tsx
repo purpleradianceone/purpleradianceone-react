@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useNode, useEditor } from "@craftjs/core";
 import { Trash2, Plus, Edit, Save } from "lucide-react";
 import Button from "../../ui/Button";
@@ -75,6 +75,18 @@ export const TableBlockQuotation: React.FC = () => {
     });
   };
 
+    //For Ctrl+s
+    useEffect(() => {
+      const handleKeyDown = (e: KeyboardEvent) => {
+        if (e.ctrlKey && e.key === "s") {
+         setEditing(false);
+        }
+      };
+  
+      window.addEventListener("keydown", handleKeyDown);
+      return () => window.removeEventListener("keydown", handleKeyDown);
+    }, [actions]);
+
   return (
     <div
       ref={(ref) => ref && connect(drag(ref))}
@@ -93,9 +105,9 @@ export const TableBlockQuotation: React.FC = () => {
     >
       {/* ================= Hover and Editing Details ================= */}
       {(hovered || editing) && (
-        <div className="flex justify-between">
+        <div className="group flex justify-between">
           <div
-            className="absolute left-0 -top-0"
+            className={`absolute left-0 -top-0 ${editing?"":"scale-75 group-hover:scale-100 transition-transform duration-200"}`}
             style={{
               zIndex: 9999,
             }}
@@ -111,12 +123,14 @@ export const TableBlockQuotation: React.FC = () => {
           </div>
 
           <div
-            className="absolute right-0 -top-0"
+            className="absolute right-0 -top-0 scale-75 group-hover:scale-100 transition-transform duration-200"
             style={{
               zIndex: 9999,
             }}
           >
-            <Button onClick={() => actions.delete(id)}>
+            <Button 
+            type="button"
+            onClick={() => actions.delete(id)}>
               <Trash2 size={SIZE.SIXTEEN} />
               Delete Table
             </Button>
