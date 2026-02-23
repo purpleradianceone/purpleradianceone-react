@@ -11,6 +11,7 @@ import {
   Home,
   Layers,
   LayoutPanelLeft,
+  ListChecks,
   LogOut,
   LucideSettings,
   Menu,
@@ -72,6 +73,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
     userHasAccessToUpdateSettingGeneral,
     userHasAccessToViewStock,
     userHasAccessToViewSupportTicket,
+    userHasAccessToViewAllTasks,
   } = useUserAccessModules();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [accessDeniedPopUpView, setAccessDeniedPopUpView] =
@@ -144,10 +146,10 @@ function Navbar({ children }: { children: React.ReactNode }) {
       .then((response) => {
         if (response.status === 200) {
           localStorage.removeItem(
-            LocalStorageKeys.SUPPORT_TICKET_MANAGEMENT_FILTERS
+            LocalStorageKeys.SUPPORT_TICKET_MANAGEMENT_FILTERS,
           );
           localStorage.removeItem(
-            LocalStorageKeys.ACCOUNT_COMPANY_PRODUCT_FOR_SUPPORT_TICKET
+            LocalStorageKeys.ACCOUNT_COMPANY_PRODUCT_FOR_SUPPORT_TICKET,
           );
           toast.success(response.data);
           setLoginStatus({
@@ -485,7 +487,12 @@ function Navbar({ children }: { children: React.ReactNode }) {
                           icon={<Building2 size={SIZE.TWENTY} />}
                           label="Manage Users"
                         />
-
+                        <NavItem
+                          disable={!userHasAccessToViewAllTasks}
+                          to={ROUTES_URL.TASKS_MANAGEMENT}
+                          icon={<ListChecks size={SIZE.TWENTY} />}
+                          label="Tasks"
+                        />
                         {/* {userHasAccessToViewLead && ( */}
                         <NavItem
                           disable={!userHasAccessToViewLead}
@@ -703,7 +710,6 @@ function Navbar({ children }: { children: React.ReactNode }) {
                         </div>
                       )}
                     </div>
-                    
                   </>
                 )}
 
@@ -736,7 +742,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
                           onClick={() => {
                             resetNotificationCount();
                             setIsOpenPopUpOfNotification(
-                              !isOpenPopUpOfNotification
+                              !isOpenPopUpOfNotification,
                             );
                             // unreadCount=0;
                           }}
@@ -773,7 +779,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
                           onClick={() => {
                             toast.error(
                               MESSAGE.MODULE_ACCESS.GENERAL_SETTING
-                                .DENIED_UPDATE_ACCESS
+                                .DENIED_UPDATE_ACCESS,
                             );
                           }}
                           id="panel-layout-navbar"
@@ -792,7 +798,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
                   >
                     <div
                       className={`w-9 h-9 rounded-full grid place-content-center section-header-custom-white border border-gray-300 ${getColor(
-                        loginStatus.email
+                        loginStatus.email,
                       )}`}
                     >
                       {loginStatus.fullName
@@ -820,7 +826,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
                         <div className="p-3 border-b border-gray-200 flex items-center space-x-3">
                           <div
                             className={`w-9 h-9 rounded-full grid place-content-center section-header-custom-white border border-gray-300 ${getColor(
-                              loginStatus.email
+                              loginStatus.email,
                             )}`}
                           >
                             {loginStatus.fullName
@@ -913,7 +919,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
                             </div>
                           </button>
 
-                          <AppVersionViewCard/>
+                          <AppVersionViewCard />
                         </div>
                       </div>
                     )}

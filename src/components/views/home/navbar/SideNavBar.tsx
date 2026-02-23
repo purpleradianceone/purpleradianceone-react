@@ -29,7 +29,8 @@ function SideNavBar({ isOpen, onToggle }: SideBarProps) {
     userHasAccessToViewTeamManagement,
     userHasAccessToViewMeeting,
     userHasAccessToViewStock,
-    userHasAccessToViewSupportTicket
+    userHasAccessToViewSupportTicket,
+    userHasAccessToViewAllTasks,
   } = useUserAccessModules();
 
   return (
@@ -38,7 +39,9 @@ function SideNavBar({ isOpen, onToggle }: SideBarProps) {
       className={`fixed  top-0 left-0 h-full bg-white border-r transition-all duration-300 z-30
           ${isOpen ? "w-64" : "w-12"}`}
     >
-      <div className={`flex items-center border-b justify-center ${SIZE.NAVBAR.TOP_HEIGHT_USER_PREF_LEFT}`}>
+      <div
+        className={`flex items-center border-b justify-center ${SIZE.NAVBAR.TOP_HEIGHT_USER_PREF_LEFT}`}
+      >
         {isOpen && (
           <span className="section-header-custom-blue">PurpleRadiance One</span>
         )}
@@ -80,7 +83,7 @@ function SideNavBar({ isOpen, onToggle }: SideBarProps) {
               label="Tasks"
               isOpen={isOpen}
               isActive={isActive}
-              disabled={!userHasAccessToViewUser}
+              disabled={!userHasAccessToViewAllTasks}
             />
           )}
         </NavLink>
@@ -175,8 +178,9 @@ function SideNavBar({ isOpen, onToggle }: SideBarProps) {
             <NavLink key="company-settings" to={ROUTES_URL.COMPANY_SETTING}>
               {({ isActive }) => (
                 <div
-                  className={`px-2 py-1 rounded-lg hover:bg-blue-50 ${isActive ? "input-label-custom-blue" : "input-label-custom"
-                    }`}
+                  className={`px-2 py-1 rounded-lg hover:bg-blue-50 ${
+                    isActive ? "input-label-custom-blue" : "input-label-custom"
+                  }`}
                 >
                   Settings
                 </div>
@@ -185,8 +189,9 @@ function SideNavBar({ isOpen, onToggle }: SideBarProps) {
             <NavLink key="email-template" to={ROUTES_URL.EMAIL_TEMPLATE}>
               {({ isActive }) => (
                 <div
-                  className={`px-2 py-1 rounded-lg hover:bg-blue-50 text-nowrap ${isActive ? "input-label-custom-blue" : "input-label-custom"
-                    }`}
+                  className={`px-2 py-1 rounded-lg hover:bg-blue-50 text-nowrap ${
+                    isActive ? "input-label-custom-blue" : "input-label-custom"
+                  }`}
                 >
                   Email Template
                 </div>
@@ -195,8 +200,9 @@ function SideNavBar({ isOpen, onToggle }: SideBarProps) {
             <NavLink key="integrations" to={ROUTES_URL.INTEGRATIONS_SETTINGS}>
               {({ isActive }) => (
                 <div
-                  className={`px-2 py-1 rounded-lg hover:bg-blue-50 ${isActive ? "input-label-custom-blue" : "input-label-custom"
-                    }`}
+                  className={`px-2 py-1 rounded-lg hover:bg-blue-50 ${
+                    isActive ? "input-label-custom-blue" : "input-label-custom"
+                  }`}
                 >
                   Integration
                 </div>
@@ -205,8 +211,9 @@ function SideNavBar({ isOpen, onToggle }: SideBarProps) {
             <NavLink key="quotations" to={ROUTES_URL.QUOTATION_SETTINGS}>
               {({ isActive }) => (
                 <div
-                  className={`px-2 py-1 rounded-lg hover:bg-blue-50 ${isActive ? "input-label-custom-blue" : "input-label-custom"
-                    }`}
+                  className={`px-2 py-1 rounded-lg hover:bg-blue-50 ${
+                    isActive ? "input-label-custom-blue" : "input-label-custom"
+                  }`}
                 >
                   Quotation
                 </div>

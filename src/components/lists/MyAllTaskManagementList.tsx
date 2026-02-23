@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { ListChecks } from "lucide-react";
+import { Calendar, ListChecks } from "lucide-react";
 import qs from "query-string";
 import { useState } from "react";
 import toast from "react-hot-toast";
@@ -30,6 +30,8 @@ import DateRangeFilterDropdown from "../ui/DateRangeFilterDropdown";
 import DateRangePicker from "../ui/DateRangePicker";
 import SearchInput from "../ui/SearchInput";
 import { supportTicketDataUrlSearchParamKey } from "./SupportTicketManagementList";
+
+export const MytaskQueryKey = "task";
 
 function MyAllTaskManagementList({
   isUsedInAllTasksModule,
@@ -213,7 +215,7 @@ function MyAllTaskManagementList({
         switch (rowData.source) {
           case source[0].name: {
             const queryParams = qs.stringify({
-              ["task"]: JSON.stringify(rowData),
+              [MytaskQueryKey]: JSON.stringify(rowData),
             });
             navigate(ROUTES_URL.GENERAL_TASK + `?${queryParams}`);
 
@@ -296,7 +298,7 @@ function MyAllTaskManagementList({
                   {/* Search Box */}
                   <div
                     className={`relative flex items-start ${
-                      isCustomDateOptionSelected ? "w-44 " : "w-44"
+                      isCustomDateOptionSelected ? "w-56 " : "w-56 "
                     }`}
                   >
                     <SearchInput
@@ -314,6 +316,9 @@ function MyAllTaskManagementList({
                         {/* Shared width wrapper */}
                         <div className="relative w-fit flex justify-center gap-1">
                           <div className="flex col-span-2 w-fit">
+                            <div className="flex input-label-custom items-center size-4 justify-center mt-2 mr-2 gap-2">
+                              <Calendar className="input-label-custom" />
+                            </div>
                             <DateRangeFilterDropdown
                               dropdownOptions={dateRangeDropdownOptions}
                               handleDateIdChange={handleDateRangeIdChange}
@@ -340,7 +345,7 @@ function MyAllTaskManagementList({
                     {isUsedInAllTasksModule && (
                       <div className="flex flex-wrap gap-2 w-full md:w-auto">
                         {/* Source */}
-                        <div className="min-w-[110px]">
+                        <div className="min-w-[150px]">
                           <CustomDropdown
                             labelName="source"
                             preselectedOption={
@@ -356,7 +361,7 @@ function MyAllTaskManagementList({
                         </div>
                         {/* priority */}
 
-                        <div className="min-w-[110px]">
+                        <div className="min-w-[150px]">
                           <CustomDropdown
                             preselectedOption={
                               // savedFilters.selectedtaskType || null
@@ -370,7 +375,7 @@ function MyAllTaskManagementList({
 
                         {/* Category */}
 
-                        <div className="min-w-[110px]">
+                        <div className="min-w-[150px]">
                           <CustomDropdown
                             preselectedOption={
                               // savedFilters.selectedtaskType || null
@@ -427,8 +432,8 @@ function MyAllTaskManagementList({
           <div
             className={
               userPreference.isLeftMenu
-                ? `ag-theme-balham w-full ${userHasAccessToViewMasterTasks ? "h-[calc(100vh-160px)]" : "h-[calc(100vh-120px)]"}`
-                : `ag-theme-balham w-full  ${userHasAccessToViewMasterTasks ? "h-[calc(100vh-162px)]" : "h-[calc(100vh-124px)]"}`
+                ? `ag-theme-balham w-full ${userHasAccessToViewMasterTasks ? "h-[calc(100vh-190px)]" : "h-[calc(100vh-120px)]"}`
+                : `ag-theme-balham w-full  ${userHasAccessToViewMasterTasks ? "h-[calc(100vh-192px)]" : "h-[calc(100vh-124px)]"}`
             }
           >
             <MyTaskManagementAgGrid

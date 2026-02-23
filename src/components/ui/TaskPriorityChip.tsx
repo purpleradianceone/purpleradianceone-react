@@ -38,9 +38,7 @@ function TaskPriorityChip({ priorityName }: { priorityName: string }) {
   }
 
   return (
-    <span
-      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full ${color}`}
-    >
+    <span className={` rounded-full ${color}`}>
       <span>{priorityName}</span>
     </span>
   );
