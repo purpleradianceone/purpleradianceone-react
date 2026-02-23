@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Element, useEditor, useNode } from "@craftjs/core";
 import { Save, X, Trash2, Edit } from "lucide-react";
 import { SIZE } from "../../../constants/AppConstants";
@@ -7,9 +7,13 @@ import Button from "../../ui/Button";
 import FormInput from "../../ui/FormInput";
 import { HeaderBlockQuotation } from "./HeaderBlockQuotation";
 import { FooterBlockQuotation } from "./FooterBlockQuotation";
+import ConfirmationDialog from "../../dialogue-box/ConfirmationDialogue";
+import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
 
 const A4_WIDTH = 794;
 const A4_HEIGHT = 1123;
+
+export const PageBlockLayoutKey = "page_block_layout_key=";
 
 export const PageBlockQuotation: React.FC = () => {
   const {
@@ -30,6 +34,7 @@ export const PageBlockQuotation: React.FC = () => {
   const [tempPadding, setTempPadding] = useState(props.padding);
   const [tempBackground, setTempBackground] = useState(props.backgroundColor);
   const [tempAlign, setTempAlign] = useState(props.align);
+  const { loginStatus } = useLoggedInUserContext();
 
   /* ---------- Detect Header / Footer ---------- */
   const childNodes = node.data.nodes || [];
@@ -41,6 +46,8 @@ export const PageBlockQuotation: React.FC = () => {
     (id) => query.node(id).get().data.displayName === "Footer Block",
   );
 
+  const [isConfirmationPopupOpen, setIsConfirmationPopupOpen] =
+    useState<boolean>(false);
   const [isHeaderRequired, setIsHeaderRequired] = useState<boolean>(hasHeader);
   const [isFooterRequired, setIsFooterRequired] = useState<boolean>(hasFooter);
 
@@ -70,6 +77,43 @@ export const PageBlockQuotation: React.FC = () => {
     });
     setEditing(false);
   };
+
+  const handleSavePageLayout = () => {
+    setProp((p: any) => {
+      p.padding = tempPadding;
+      p.backgroundColor = tempBackground;
+      p.align = tempAlign;
+      p.isHeader = isHeaderRequired;
+      p.isFooter = isFooterRequired;
+    });
+    console.log(JSON.stringify(props));
+    localStorage.setItem(
+      PageBlockLayoutKey + loginStatus.id,
+      JSON.stringify(props),
+    );
+    setEditing(false);
+    setIsConfirmationPopupOpen(false);
+    window.location.reload();
+
+  };
+
+  useEffect(() => {
+    const stored = localStorage.getItem(PageBlockLayoutKey + loginStatus.id);
+    if (!stored) return;
+
+    try {
+      const parsed = JSON.parse(stored);
+      setProp((p: any) => {
+        p.padding = parsed.padding;
+        p.backgroundColor = parsed.backgroundColor;
+        p.align = parsed.align;
+        // p.isHeader = false;
+        // p.isFooter = false;
+      });
+    } catch (err) {
+      console.log("Error loading page props:", err);
+    }
+  }, [id]);
 
   const addHeader = () => {
     const headerNode = query.createNode(
@@ -124,14 +168,18 @@ export const PageBlockQuotation: React.FC = () => {
     >
       {/* Toolbar */}
       {(hovered || editing) && (
-        <div className="absolute w-full flex justify-between top-0 z-50">
-          <div>
+        <div className="group absolute w-full flex justify-between top-0 z-50">
+          <div
+            className={`scale-50 group-hover:scale-100 transition-transform duration-200`}
+          >
             <Button onClick={() => setEditing(true)}>
               <Edit size={SIZE.SIXTEEN} />
               Edit Page
             </Button>
           </div>
-          <div>
+          <div
+            className={`scale-50 group-hover:scale-100 transition-transform duration-200`}
+          >
             <Button type="button" onClick={() => actions.delete(id)}>
               <Trash2 size={SIZE.SIXTEEN} />
               Delete Page
@@ -191,28 +239,30 @@ export const PageBlockQuotation: React.FC = () => {
           is={FooterBlockQuotation}
           id={`${id}-footer`}
           key={`${id}-footer`}
-        //   id={`global-header`}
-        //   key={`global-header`}
+          //   id={`global-header`}
+          //   key={`global-header`}
         />
       )}
 
       {/* Settings */}
       {editing && (
         <div
+          className="bg-white/80 backdrop-blur-lg 
+                  shadow-xl rounded-xl border border-gray-200"
           style={{
             position: "absolute",
             top: "0px",
             left: "0px",
-            background: "#fff",
-            border: "1px solid #ccc",
+            // background: "#fff",
+            // border: "1px solid #ccc",
             padding: "10px",
-            borderRadius: "6px",
-            zIndex: 100,
+            // borderRadius: "6px",
+            zIndex: 50,
             width: "220px",
           }}
         >
           <FormInput
-            label="Padding"
+            label="Page Padding"
             placeholder="eg: 16px"
             value={tempPadding}
             onChange={(e) => setTempPadding(e.target.value)}
@@ -262,13 +312,43 @@ export const PageBlockQuotation: React.FC = () => {
             ></input>
           </label>
 
-          <div className="flex justify-between mt-3">
-            <Button type="button" onClick={() => setEditing(false)}>
+          <div className="flex justify-between mt-3 gap-2">
+            <Button
+              type="button"
+              onClick={() => {
+                setEditing(false);
+                setIsConfirmationPopupOpen(false);
+              }}
+            >
               <X size={SIZE.SIXTEEN} /> Cancel
             </Button>
             <Button onClick={handleSave}>
               <Save size={SIZE.SIXTEEN} /> Save
             </Button>
+          </div>
+          <div className="flex justify-center items-center mt-2">
+            <Button onClick={() => setIsConfirmationPopupOpen(true)}>
+              <Save size={SIZE.SIXTEEN} /> Save This Page layout
+            </Button>
+          </div>
+          <div
+            className=""
+            style={{
+              zIndex: 1000,
+            }}
+          >
+            <ConfirmationDialog
+              open={isConfirmationPopupOpen}
+              icon={Save}
+              onCancel={() => setIsConfirmationPopupOpen(false)}
+              onConfirm={handleSavePageLayout}
+              title="Set this layout as the default for new pages?"
+              description="Newly created pages will automatically follow this layout structure."
+              message="This will apply the same layout settings — including padding, alignment, background styling, and spacing — to all future pages."
+              messageDescription="Note: Header and footer must be configured separately."
+              cancelButtonText="Cancel"
+              confirmButtonText="Save Page Layout"
+            />
           </div>
         </div>
       )}

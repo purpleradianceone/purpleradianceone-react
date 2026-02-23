@@ -52,6 +52,7 @@ import { TutorailColumnName } from "../../../../constants/Tutorail";
 import { cancelAllRequests } from "../../../../axios-client/AxiosClient";
 import { LocalStorageKeys } from "../../../../enums/LocalStorageKeys";
 import { AppVersionViewCard } from "../../card/AppVersionViewCard";
+import { useUserPreference } from "../../../../context/user/UserPreference";
 
 function Navbar({ children }: { children: React.ReactNode }) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -79,6 +80,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
   const Navigate = useNavigate();
   const { position } = usePanel();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const {userPreference, setUserPreference} = useUserPreference();
 
   // const position = localStorage.getItem('panel_position');
 
@@ -116,6 +118,13 @@ function Navbar({ children }: { children: React.ReactNode }) {
       }
     }
   }, [location]);
+
+  useEffect(() => {
+    setUserPreference({
+      ...userPreference,
+      sidebarOpen: sidebarOpen,
+    });
+  }, [sidebarOpen]);
 
   useEffect(() => {
     const element = location.pathname;

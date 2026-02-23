@@ -13,6 +13,8 @@ type UserPreference = {
     createdBy: string,
     updatedBy: string,
     createdOn: string,
-    updatedOn: string
+    updatedOn: string,
+    sidebarOpen: boolean,
+
 }
 export default UserPreference;

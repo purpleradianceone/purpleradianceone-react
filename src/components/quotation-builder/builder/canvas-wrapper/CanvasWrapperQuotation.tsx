@@ -2,15 +2,20 @@
 import { Frame, Element, useEditor } from "@craftjs/core";
 import { useEffect, useState } from "react";
 import { DocumentCanvasQuotation } from "../../blocks/DocumentCanvasQuotation";
-import { LucideClipboardPaste } from "lucide-react";
+import { LucideClipboardPaste, Redo, Undo } from "lucide-react";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
 export const STORAGE_KEY = "quotation_editor_json_user_id=";
 
 export const CanvasWrapperQuotation = ({ data }: { data: string }) => {
-  const { query, store } = useEditor();
+  const { canUndo, canRedo, actions, query, store } = useEditor(
+    (state, query) => ({
+      state,
+      canUndo: query.history.canUndo(),
+      canRedo: query.history.canRedo(),
+    }),
+  );
   const [isEmpty, setIsEmpty] = useState(true);
-  const {loginStatus} = useLoggedInUserContext();
-
+  const { loginStatus } = useLoggedInUserContext();
 
   useEffect(() => {
     const checkCanvasEmpty = () => {
@@ -33,18 +38,111 @@ export const CanvasWrapperQuotation = ({ data }: { data: string }) => {
         const serialized = query.serialize();
         const data = JSON.parse(serialized);
         const result = isCanvasTrulyEmpty(data, "ROOT");
-        console.log(`Craft Json: ${serialized}`);
-        if (!result) localStorage.setItem(STORAGE_KEY+loginStatus.id, serialized);
+        // console.log(`Craft Json: ${serialized}`);
+        if (!result)
+          localStorage.setItem(STORAGE_KEY + loginStatus.id, serialized);
       },
     );
 
     return () => unsubscribe();
   }, [store, query]);
 
- 
+  //For undo and redo handler
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.ctrlKey && e.key === "z") {
+        actions.history.undo();
+      }
+      if (e.ctrlKey && e.key === "y") {
+        actions.history.redo();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [actions]);
+
+  //preventing default browser behavior
+  useEffect(() => {
+  const handleKeyDown = (e: KeyboardEvent) => {
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "s") {
+      e.preventDefault(); 
+      console.log("Ctrl + S blocked");
+
+    }
+  };
+  window.addEventListener("keydown", handleKeyDown);
+  return () => {
+    window.removeEventListener("keydown", handleKeyDown);
+  };
+}, []);
 
   return (
     <div style={{ position: "relative" }} className="table-data-custom">
+      {/* Redo Undo */}
+      <div className="fixed top-28 right-9 "
+      style={{zIndex: 51}}>
+        <div
+          className="flex items-center gap-2 px-2 py-1 
+                  bg-white/80 backdrop-blur-lg 
+                  shadow-xl rounded-xl border border-gray-200"
+        >
+          {/* Undo */}
+          <button
+            disabled={!canUndo}
+            onClick={() => actions.history.undo()}
+            title="Undo (Ctrl + Z)"
+            className={`group relative flex items-center justify-center
+                  w-9 h-9 rounded-xl transition-all duration-200
+                  ${
+                    canUndo
+                      ? "hover:bg-primary/10 text-gray-600 hover:text-primary"
+                      : "text-gray-300 cursor-not-allowed"
+                  }`}
+          >
+            <Undo size={20} strokeWidth={2} />
+
+            {/* Tooltip */}
+            <span
+              className="absolute w-28 -top-7 scale-0 group-hover:scale-100 transition-transform duration-200
+                       bg-black text-white text-xs px-2 py-1 rounded-md shadow-lg"
+            >
+              Undo (Ctrl + Z)
+            </span>
+          </button>
+
+          {/* Divider */}
+          <div className="w-px h-6 bg-gray-200" />
+
+          {/* Redo */}
+          <button
+            disabled={!canRedo}
+            onClick={() => actions.history.redo()}
+            title="Redo (Ctrl + Y)"
+            className={`group relative flex items-center justify-center
+                  w-9 h-9 rounded-xl transition-all duration-200
+                  ${
+                    canRedo
+                      ? "hover:bg-primary/10 text-gray-600 hover:text-primary"
+                      : "text-gray-300 cursor-not-allowed"
+                  }`}
+          >
+            <Redo size={20} strokeWidth={2} />
+
+            {/* Tooltip */}
+            <span
+              className="absolute w-28 -top-7 scale-0 group-hover:scale-100
+                       transition-transform duration-200
+                       bg-black text-white text-xs px-2 py-1 rounded-md shadow-lg"
+            >
+              Redo (Ctrl + Y)
+            </span>
+          </button>
+        </div>
+      </div>
+
+      {/* Redo Undo end */}
+
       {/* Canvas frame */}
       <Frame data={data}>
         <Element

@@ -30,6 +30,7 @@ export const UserPreferenceContextProvider : React.FC<{children : ReactNode}>=({
         timezoneUTCOffset : "",
         updatedBy : "",
         updatedOn : "",
+        sidebarOpen: false,
     }});
  useEffect(() => {
       localStorage.setItem(LOCALSTORAGE_KEYS.USER_PREFERENCE, JSON.stringify(userPreference));

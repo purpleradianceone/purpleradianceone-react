@@ -38,6 +38,7 @@ import { useTutorailDataContext } from "../../../../../context/tutorail/useTutor
 import { DashboardComponentJsxKey } from "../../../../../enums/dashboard/DashboardComponentJsxKey.enum";
 import { DashboardLoadingSpinner } from "../dashboards_components/DashboardLoadingSpinner";
 import { AccessManagementType } from "../../../../../@types/company-users/AccessManagementContextType";
+import { useUserPreference } from "../../../../../context/user/UserPreference";
 
 // import DashboardChartComponent from "../../../dashboarcrmcomponents/DashboardChartComponent";
 // import { PieDataItem } from "../../../../@types/dashboard/PieDataItem";
@@ -51,6 +52,7 @@ interface DashboardCRMProp {
 const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
   const navigate = useNavigate();
   const { loginStatus } = useLoggedInUserContext();
+  const {userPreference} = useUserPreference();
 
   const [isTasksLoading, setIsTasksLoading] = useState<boolean>(true); // Set to true initially
   const [upcomingTask, setUpcomingTasks] = useState<LeadTaskType[]>([]);
@@ -273,9 +275,9 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
     [DashboardComponentJsxKey.TOTAL_LEADS]: (
       <div
         key="Total Leads"
-        className="flex col-span-2 w-full gap-4 justify-around"
+        className="group flex col-span-2 w-full gap-4 justify-around"
       >
-        <div className="flex grid-cols-6 sm:gap-1 md:gap-2 lg:gap-11 w-full">
+        <div className={`${(userPreference.sidebarOpen && userPreference.isLeftMenu)?"grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 w-full items-stretch":"flex grid-cols-6 sm:gap-1 md:gap-2 lg:gap-4 w-full"}`}>
           <MetricCard
             title="Total Leads"
             id="totalLeadsMetricCard"

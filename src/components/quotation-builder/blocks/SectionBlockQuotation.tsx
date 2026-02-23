@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNode, useEditor, Element } from "@craftjs/core";
 import Button from "../../ui/Button";
 import { Edit, Save, Trash2, X } from "lucide-react";
@@ -27,6 +27,8 @@ export const SectionBlockQuotation: React.FC = () => {
   const [tempPadding, setTempPadding] = useState(props.padding || "20px");
   const [tempAlign, setTempAlign] = useState(props.align || "left");
 
+  
+
   const handleSave = () => {
     setProp((props: any) => {
       props.background = tempBackground;
@@ -40,8 +42,23 @@ export const SectionBlockQuotation: React.FC = () => {
     editorActions.delete(id);
   };
 
+   //For Ctrl+s
+    useEffect(() => {
+      const handleKeyDown = (e: KeyboardEvent) => {
+        if (e.ctrlKey && e.key === "s") {
+          handleSave();
+        }
+      };
+  
+      window.addEventListener("keydown", handleKeyDown);
+      return () => window.removeEventListener("keydown", handleKeyDown);
+    }, [editorActions]);
+
   return (
     <div
+      // onDoubleClick={()=>{    
+      //   setEditing(true);
+      // }}
       ref={(ref: HTMLDivElement) => {
         if (ref) connect(drag(ref));
       }}
@@ -59,26 +76,26 @@ export const SectionBlockQuotation: React.FC = () => {
     >
       {(hovered || editing) && (
         <div
-          className="absolute w-full flex justify-between items-center -top-3 left-0 z-10 "
+          className="absolute group w-full flex justify-between items-center -top-3 left-0 z-10 "
           onMouseEnter={() => setHovered(true)}
           onMouseLeave={() => setHovered(false)}
         >
-          <div className="w-fit">
+          <div className="w-fit scale-50 group-hover:scale-100 transition-transform duration-200">
             <Button type="submit" onClick={(e) => {
               e.preventDefault();
               setEditing(true);
             }} title="Edit Section">
               <div className="flex items-center justify-center gap-1">
                 <Edit size={SIZE.SIXTEEN} />
-                Edit Section Bock
+                Edit Section
               </div>
             </Button>
           </div>
-          <div>
+          <div className="scale-50 group-hover:scale-100 transition-transform duration-200">
             <Button type="button" onClick={handleDelete} title="Delete Section">
               <div className="flex items-center justify-center gap-1">
                 <Trash2 size={SIZE.SIXTEEN} />
-                Delete Section Block
+                Delete Section
               </div>
             </Button>
           </div>
@@ -86,32 +103,18 @@ export const SectionBlockQuotation: React.FC = () => {
       )}
 
       {editing && (
-        <div
-          style={{
-            position: "absolute",
-            top: "-10px",
-            left: "10%",
-            transform: "translateX(-50%)",
-            background: "#fff",
-            padding: "10px",
-            border: "1px solid #ccc",
-            borderRadius: "6px",
-            zIndex: 10000,
-            display: "flex",
-            flexDirection: "column",
-            gap: "6px",
-          }}
+        <div className="absolute -top-5 left-0  p-3 w-[220px] z-50 bg-white/80 backdrop-blur-lg 
+                  shadow-xl rounded-xl border border-gray-200"
         >
-
           <FormInput
             type="text"
-            label="Padding"
+            label="Section Padding"
             placeholder="Enter padding(eg 16px)"
             value={tempPadding}
             defaultValue={tempPadding}
             onChange={(e) => setTempPadding(e.target.value)}
           />
-          <label className="input-label-custom flex justify-between items-center">
+          <label className="input-label-custom flex justify-between items-center mt-1">
             Background:
             <input
               className="caption-custom"
@@ -120,7 +123,7 @@ export const SectionBlockQuotation: React.FC = () => {
               onChange={(e) => setTempBackground(e.target.value)}
             />
           </label>
-          <label className="input-label-custom flex justify-between items-center">
+          <label className="input-label-custom flex justify-between items-center mt-1">
             Align:
             <select
               className="caption-custom"
@@ -132,16 +135,13 @@ export const SectionBlockQuotation: React.FC = () => {
               <option value="right">Right</option>
             </select>
           </label>
-          <div className="flex justify-between">
-            <div className="w-fit h-fit">
+          <div className="flex justify-between gap-2 mt-3">
               <Button type="button" onClick={() => setEditing(false)}>
                 <div className="flex items-center justify-center gap-0.5">
                   <X size={SIZE.SIXTEEN} />
                   Cancel
                 </div>
               </Button>
-            </div>
-            <div className="w-fit h-fit">
               <Button type="submit" onClick={(e) => {
                 e.preventDefault();
                 handleSave();
@@ -151,8 +151,8 @@ export const SectionBlockQuotation: React.FC = () => {
                   Save
                 </div>
               </Button>
-            </div>
           </div>
+        
         </div>
       )}
 
