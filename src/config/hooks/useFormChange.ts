@@ -17,7 +17,7 @@ export const useFormChange = <T extends Record<string, string | number | boolean
     } else {
       setFormData((prev) => ({
         ...prev,
-        [name]: value.trim(),
+        [name]: value,
       }));
     }
   };
