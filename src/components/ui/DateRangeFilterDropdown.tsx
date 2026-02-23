@@ -1,41 +1,43 @@
-import { useState, useRef, useEffect } from 'react';
-import { ChevronDown, Delete,  } from 'lucide-react';
-import DateRangeFilterDropdownProps from '../../@types/ui/DateRangeFilterDropdown';
+import { useState, useRef, useEffect } from "react";
+import { ChevronDown, Delete } from "lucide-react";
+import DateRangeFilterDropdownProps from "../../@types/ui/DateRangeFilterDropdown";
 
 function DateRangeFilterDropdown(props: DateRangeFilterDropdownProps) {
-    const [isOpen, setIsOpen] = useState(false);
-    const [selectedOption, setSelectedOption] = useState("Date Filter");
-    const dropdownRef = useRef<HTMLDivElement>(null);
-  
-    useEffect(() => {
-      function handleClickOutside(event: MouseEvent) {
-        if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-          setIsOpen(false);
-        }
-      }
-  
-      document.addEventListener('mousedown', handleClickOutside);
-      return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, []);
-  
-    const handleOptionClick = (dateId : number, dateName : string) => {
-      props.handleDateIdChange!(dateId);
-      setSelectedOption(dateName)
-      setIsOpen(false);
-    };
+  const [isOpen, setIsOpen] = useState(false);
+  const [selectedOption, setSelectedOption] = useState("Date Filter");
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
-    
   useEffect(() => {
-  if (props.selectedOption) {
-    setSelectedOption(props.selectedOption);
-  }
-}, [props.selectedOption]);
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsOpen(false);
+      }
+    }
 
-    return (
-      <div className="relative inline-block" ref={dropdownRef}>
-        <button
-          type="button"
-          className={`
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleOptionClick = (dateId: number, dateName: string) => {
+    props.handleDateIdChange!(dateId);
+    setSelectedOption(dateName);
+    setIsOpen(false);
+  };
+
+  useEffect(() => {
+    if (props.selectedOption) {
+      setSelectedOption(props.selectedOption);
+    }
+  }, [props.selectedOption]);
+
+  return (
+    <div className="relative inline-block" ref={dropdownRef}>
+      <button
+        type="button"
+        className={`
             bg-white
             border border-gray-300
             input-label-custom
@@ -50,51 +52,58 @@ function DateRangeFilterDropdown(props: DateRangeFilterDropdownProps) {
             hover:border-gray-400
             flex items-center justify-between
           `}
-          onClick={() => setIsOpen(!isOpen)}
-          disabled={props.dropdownOptions.length === 0}
-        >
-          <span className="truncate">{selectedOption}</span>
-          <ChevronDown 
-            className={`h-4 w-4 input-label-custom transition-transform duration-200 ${
-              isOpen ? 'transform rotate-180' : ''
-            }`}
-          />
-        </button>
-  
-        {isOpen && (
-          <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg">
-            <div className="py-1 max-h-60 overflow-auto">
+        onClick={() => setIsOpen(!isOpen)}
+        disabled={props.dropdownOptions.length === 0}
+      >
+        <span className="truncate">{selectedOption}</span>
+        <ChevronDown
+          className={`h-4 w-4 input-label-custom transition-transform duration-200 ${
+            isOpen ? "transform rotate-180" : ""
+          }`}
+        />
+      </button>
+
+      {isOpen && (
+        <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg">
+          <div className="py-1 max-h-60 overflow-auto">
+            <button
+              id="0"
+              className="w-full px-4 py-1 text-left input-label-custom hover:bg-gray-50 focus:bg-gray-50 focus:outline-none"
+              onClick={() => handleOptionClick(0, "Date Filter")}
+            >
+              <div className="flex gap-2 text-center caption-custom items-center">
+                <Delete size={18} />
+                <span className="mt-0.5 caption-custom">Clear</span>
+              </div>
+            </button>
+            {props.dropdownOptions.map((option) => (
               <button
-              id = "0"
-                className="w-full px-4 py-2 text-left input-label-custom hover:bg-gray-50 focus:bg-gray-50 focus:outline-none"
-                onClick={() => handleOptionClick(0,"Date Filter")}
-              >
-                <div className='flex gap-2 text-center input-label-custom'><Delete></Delete>
-                <span className='mt-0.5 input-label-custom'>Clear Filter</span></div>
-                
-              </button>
-              {props.dropdownOptions.map((option) => (
-                <button
-                  key={option.id}
-                  id = {option.search_date_range_id?.toString()}
-                  className={`
-                    w-full px-4 py-2 text-left
-                    ${selectedOption === option.date_range
-                      ? 'bg-blue-50 text-blue-700'
-                      : 'input-label-custom hover:bg-gray-50'}
+                key={option.id}
+                id={option.search_date_range_id?.toString()}
+                className={`
+                    w-full px-4 py-1 text-left border-t
+                    ${
+                      selectedOption === option.date_range
+                        ? "bg-blue-50 text-blue-700"
+                        : "caption-custom hover:bg-gray-50"
+                    }
                     focus:outline-none focus:bg-gray-50
                   `}
-
-                  onClick={() => handleOptionClick(option.search_date_range_id,option.date_range)}
-                >
-                  {option.date_range}
-                </button>
-              ))}
-            </div>
+                onClick={() =>
+                  handleOptionClick(
+                    option.search_date_range_id,
+                    option.date_range,
+                  )
+                }
+              >
+                {option.date_range}
+              </button>
+            ))}
           </div>
-        )}
-      </div>
-    );
-  }
+        </div>
+      )}
+    </div>
+  );
+}
 
-  export default DateRangeFilterDropdown;
+export default DateRangeFilterDropdown;

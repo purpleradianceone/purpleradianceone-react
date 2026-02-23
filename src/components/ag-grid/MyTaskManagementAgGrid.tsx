@@ -5,7 +5,7 @@ import { AgGridReact } from "ag-grid-react";
 import { INNERHTML, JSX_CHILDREN_NAME } from "../../constants/AppConstants";
 import { AllCommunityModule, ColDef, themeBalham } from "ag-grid-community";
 import MyAllTaskProps from "../../@types/my-task-management/MyAlltaskProps";
-import { CheckCircle2, Circle, Clock, Flag } from "lucide-react";
+import { Flag } from "lucide-react";
 import TaskStageChip from "../ui/TaskStageChip";
 import TaskPriorityChip from "../ui/TaskPriorityChip";
 import StatusIndicator from "../ui/StatusIndicator";
@@ -39,21 +39,27 @@ function MyTaskManagementAgGrid({
         filter: true,
         // cellRenderer: PriorityCellRenderer,
         cellRenderer: (params: any) => {
-          return <TaskPriorityChip priorityName={params.value} />;
+          return (
+            <div className="flex items-center">
+              <TaskPriorityChip priorityName={params.value} />
+            </div>
+          );
         },
       },
       {
         field: "taskStage",
         headerName: "Task Stage",
-        maxWidth: 140,
+        maxWidth: 180,
         sortable: true,
         filter: true,
-        cellRenderer: (params: any) => {
+        cellRenderer: (params: MyAllTaskProps | any) => {
           return (
-            <TaskStageChip
-              stageId={params.data.taskStageId}
-              stageName={params.data.taskStage}
-            />
+            <div className="flex items-center">
+              <TaskStageChip
+                stageName={params.value}
+                stageId={params.data.taskStageId}
+              />
+            </div>
           );
         },
       },
@@ -88,7 +94,7 @@ function MyTaskManagementAgGrid({
         sortable: true,
         filter: true,
         // hide: isUsedForAccountLead,
-        cellRenderer: (params: any) => {
+        cellRenderer: (params: MyAllTaskProps | any) => {
           return (
             <div className="flex items-center text-sm gap-1 mt-1">
               <StatusIndicator isActive={params.value} />
@@ -110,6 +116,11 @@ function MyTaskManagementAgGrid({
           cursor: "pointer",
           fontWeight: "400",
         },
+      },
+      {
+        field: "createdBy",
+        headerName: "Created by",
+        filter: true,
       },
       {
         headerName: "Actions",
@@ -245,46 +256,5 @@ export const PriorityCellRenderer = (params: any) => {
       <Flag size={14} />
       {item.label}
     </span>
-  );
-};
-
-export const TaskStageRenderer = ({ value }: any) => {
-  const config: any = {
-    Completed: {
-      icon: <CheckCircle2 size={14} />,
-      className: "bg-green-100 text-green-700 border border-green-200",
-    },
-    "In Progress": {
-      icon: <Clock size={14} />,
-      className: "bg-blue-100 text-blue-700 border border-blue-200",
-    },
-    "Not Yet Started": {
-      icon: <Circle size={14} />,
-      className: "bg-gray-100 text-red-600 border border-gray-200",
-    },
-  };
-
-  const stage = config[value] || {
-    icon: null,
-    className: "bg-gray-100 text-gray-700 border border-gray-200",
-  };
-
-  return (
-    <div className="flex justify-center">
-      <span
-        className={`
-          inline-flex items-center justify-center gap-1
-          w-[140px]
-          px-3 py-1
-          rounded-full
-          text-xs font-medium
-          whitespace-nowrap
-          ${stage.className}
-        `}
-      >
-        {stage.icon}
-        {value}
-      </span>
-    </div>
   );
 };

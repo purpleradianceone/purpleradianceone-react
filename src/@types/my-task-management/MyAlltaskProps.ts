@@ -5,11 +5,13 @@ export type MyAllTaskProps = {
     taskType: string;
     taskPriority: string;
     taskStage: string;
+    taskStageId: number;
     description: string;
     remark: string;
     dueDateTime: string | null;
     completedAtDateTime: string | null;
     isActive: boolean;
+    createdby?: number;
     
 };
 

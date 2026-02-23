@@ -23,6 +23,8 @@ import MasterTaskProps from "../../../@types/my-task-management/MasterTaskProps"
 import RefreshToken from "../../../config/validations/RefreshToken";
 import ROUTES_URL from "../../../constants/Routes";
 import TaskPriorityChip from "../../ui/TaskPriorityChip";
+import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
+import AccessDeniedPopup from "../../views/not-found/AccessDeniedPage";
 
 function MasterTaskUpdate() {
   const navigate = useNavigate();
@@ -30,10 +32,12 @@ function MasterTaskUpdate() {
   const { loginStatus } = useLoggedInUserContext();
   const { taskPriority } = useTaskPriority();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [accessDeniedPopUpOpen, setAccessDeniedPopUpOpen] = useState(false);
   const [taskList, setTaskList] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [selectedSupportTicket, setSelectedSupportTicket] =
     useState<MasterTaskProps | null>(null);
+  const { userHasAccessToUpdateMasterTasks } = useUserAccessModules();
   const [selectedCompanyUser, setSelectedCompanyUser] = useState<CompanyUser>({
     company_id: 0,
     id: 0,
@@ -148,6 +152,12 @@ function MasterTaskUpdate() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (!userHasAccessToUpdateMasterTasks) {
+      setAccessDeniedPopUpOpen(true);
+    }
+  }, [userHasAccessToUpdateMasterTasks]);
   // ⭐ PREFILL FORM
   useEffect(() => {
     const controller = new AbortController();
@@ -227,153 +237,169 @@ function MasterTaskUpdate() {
 
   return (
     <>
-      {" "}
-      <div className=" w-full pl-5 pt-2 ">
-        <div className=" sticky top-10 z-20 bg-slate-100 flex text-center justify-start items-center gap-3 ml-0.5 ">
-          <Link to={ROUTES_URL.TASKS_MANAGEMENT + "/my-tasks"}>
-            <Button className="caption-custom flex items-center justify-center hover:text-gray-800">
-              Master Tasks
-            </Button>
-          </Link>
+      {userHasAccessToUpdateMasterTasks ? (
+        <div className=" w-full pl-5 pt-2 ">
+          {" "}
+          <div>
+            <div className=" sticky top-10 z-20 bg-slate-100 flex text-center justify-start items-center gap-3 ml-0.5 ">
+              <Link to={ROUTES_URL.TASKS_MANAGEMENT + "/my-tasks"}>
+                <Button className="caption-custom flex items-center justify-center hover:text-gray-800">
+                  Master Tasks
+                </Button>
+              </Link>
 
-          <ChevronRight size={16} />
+              <ChevronRight size={16} />
 
-          <h1 className="table-header-custom">Master Task Details</h1>
-        </div>
-        <div className="bg-gray-50 w-full px-2 pt-1 rounded">
-          {isSubmitting && <LoadingPopUpAnimation show={isSubmitting} />}
-          <div className="bg-white border rounded-lg p-2 space-y-3">
-            {/* HEADER */}
-            <div className="flex justify-between items-center border-b pb-2">
-              <h1 className="font-semibold text-gray-800">
-                Master Task Details
-              </h1>
+              <h1 className="table-header-custom">Master Task Details</h1>
             </div>
-            {/* ROW 1 */}
-            <div className="grid grid-cols-5 gap-3 items-end text-sm">
-              <CustomDropdown
-                logo={Flag}
-                labelName="Priority"
-                options={taskPriority!}
-                preselectedOption={formData.taskPriority}
-                onSelect={(v) => handleDropdownChange("taskPriority", v)}
-              />
-              {/* TYPE */}
-              <div>
-                <label className="text-xs text-gray-500">Task Type</label>
-                <p className="text-sm font-medium">
-                  {selectedSupportTicket?.generalTaskTypeName}
-                </p>
-              </div>
-              {/* FREQUENCY */}
-              <div>
-                <label className="text-xs text-gray-500">Frequency</label>
-                <p className="text-sm">
-                  {selectedSupportTicket?.frequencyName}
-                </p>
-              </div>
-              <div>
-                <label className="text-xs text-gray-500">Start</label>
-                <p>{selectedSupportTicket?.startDate}</p>
-              </div>
-              <div>
-                <label className="text-xs text-gray-500">End</label>
-                <p>{selectedSupportTicket?.endDate}</p>
-              </div>
-            </div>
-            {/* ROW 2 */}
-            <div className="grid grid-cols-5 gap-3 text-sm">
-              {/* ASSIGN */}
-              <CompanyUserSearchFieldInput
-                label="Assign"
-                logo={User}
-                defaultValue={selectedSupportTicket?.assignedToName ?? ""}
-                onUserSelected={(user: any) => {
-                  if (user) {
-                    setSelectedCompanyUser(user);
-                  }
-                }}
-                has={{
-                  searchLogo: false,
-                  border: true,
-                  xLogo: true,
-                  // penLogo: true
-                }}
-              />
-
-              {/* STATUS */}
-              <div>
-                <label className="text-xs text-gray-500">Status</label>
-                <div className="flex gap-2 items-center">
-                  <ToggleButton
-                    checked={formData.isActive}
-                    name="isActive"
-                    onToggle={handleCompanyUserToggle}
+            <div className="bg-gray-50 w-full px-2 pt-1 rounded">
+              {isSubmitting && <LoadingPopUpAnimation show={isSubmitting} />}
+              <div className="bg-white border rounded-lg p-2 space-y-3">
+                {/* HEADER */}
+                <div className="flex justify-between items-center border-b pb-2">
+                  <h1 className="font-semibold text-gray-800">
+                    Master Task Details
+                  </h1>
+                </div>
+                {/* ROW 1 */}
+                <div className="grid grid-cols-5 gap-3 items-end text-sm">
+                  <CustomDropdown
+                    logo={Flag}
+                    labelName="Priority"
+                    options={taskPriority!}
+                    preselectedOption={formData.taskPriority}
+                    onSelect={(v) => handleDropdownChange("taskPriority", v)}
                   />
-                  <span
-                    className={`text-sm ${
-                      formData.isActive ? "text-green-600" : "text-red-600"
-                    }`}
-                  >
-                    {formData.isActive ? "Active" : "Inactive"}
-                  </span>
+                  {/* TYPE */}
+                  <div>
+                    <label className="text-xs text-gray-500">Task Type</label>
+                    <p className="text-sm font-medium">
+                      {selectedSupportTicket?.generalTaskTypeName}
+                    </p>
+                  </div>
+                  {/* FREQUENCY */}
+                  <div>
+                    <label className="text-xs text-gray-500">Frequency</label>
+                    <p className="text-sm">
+                      {selectedSupportTicket?.frequencyName}
+                    </p>
+                  </div>
+                  <div>
+                    <label className="text-xs text-gray-500">Start</label>
+                    <p>{selectedSupportTicket?.startDate}</p>
+                  </div>
+                  <div>
+                    <label className="text-xs text-gray-500">End</label>
+                    <p>{selectedSupportTicket?.endDate}</p>
+                  </div>
+                </div>
+                {/* ROW 2 */}
+                <div className="grid grid-cols-5 gap-3 text-sm">
+                  {/* ASSIGN */}
+                  <CompanyUserSearchFieldInput
+                    label="Assign"
+                    logo={User}
+                    defaultValue={selectedSupportTicket?.assignedToName ?? ""}
+                    onUserSelected={(user: any) => {
+                      if (user) {
+                        setSelectedCompanyUser(user);
+                      }
+                    }}
+                    has={{
+                      searchLogo: false,
+                      border: true,
+                      xLogo: true,
+                      // penLogo: true
+                    }}
+                  />
+
+                  {/* STATUS */}
+                  <div>
+                    <label className="text-xs text-gray-500">Status</label>
+                    <div className="flex gap-2 items-center">
+                      <ToggleButton
+                        checked={formData.isActive}
+                        name="isActive"
+                        onToggle={handleCompanyUserToggle}
+                      />
+                      <span
+                        className={`text-sm ${
+                          formData.isActive ? "text-green-600" : "text-red-600"
+                        }`}
+                      >
+                        {formData.isActive ? "Active" : "Inactive"}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-xs text-gray-500">Time</label>
+                    <p>{selectedSupportTicket?.taskTime}</p>
+                  </div>
+                  <div>
+                    <label className="text-xs text-gray-500">Created By</label>
+                    <p>{selectedSupportTicket?.createdByName}</p>
+                  </div>
+                  <div>
+                    <label className="text-xs text-gray-500">Updated By</label>
+                    <p>{selectedSupportTicket?.updatedByName}</p>
+                  </div>
+                </div>
+                {/* DESCRIPTION */}
+                <div className="grid grid-cols-2">
+                  <TextAreaInput
+                    label="Description"
+                    logo={FileText}
+                    value={formData.description}
+                    onChange={(e: any) =>
+                      handleInputChange("description", e.target.value)
+                    }
+                    cols={3}
+                    rows={3}
+                  />
+                </div>
+                <div className="flex justify-end">
+                  <div>
+                    <Button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        updateTask();
+                      }}
+                    >
+                      <div className="flex gap-2 items-center">
+                        <Save size={15} />
+                        Save
+                      </div>
+                    </Button>
+                  </div>
                 </div>
               </div>
-
-              <div>
-                <label className="text-xs text-gray-500">Time</label>
-                <p>{selectedSupportTicket?.taskTime}</p>
-              </div>
-              <div>
-                <label className="text-xs text-gray-500">Created By</label>
-                <p>{selectedSupportTicket?.createdByName}</p>
-              </div>
-              <div>
-                <label className="text-xs text-gray-500">Updated By</label>
-                <p>{selectedSupportTicket?.updatedByName}</p>
-              </div>
-            </div>
-            {/* DESCRIPTION */}
-            <div className="grid grid-cols-2">
-              <TextAreaInput
-                label="Description"
-                logo={FileText}
-                value={formData.description}
-                onChange={(e: any) =>
-                  handleInputChange("description", e.target.value)
-                }
-                cols={3}
-                rows={3}
-              />
-            </div>
-            <div className="flex justify-end">
-              <div>
-                <Button
-                  onClick={(e) => {
-                    e.preventDefault();
-                    updateTask();
-                  }}
-                >
-                  <div className="flex gap-2 items-center">
-                    <Save size={15} />
-                    Save
+              <div className="p-2 mt-2 border rounded h-[60vh] overflow-auto">
+                <h3 className="font-semibold text-gray-800 mb-3">
+                  General tasks
+                </h3>
+                {taskList && (
+                  <div className="space-y-2">
+                    {taskList.map((task) => (
+                      <TaskCard key={task.id} task={task} />
+                    ))}
                   </div>
-                </Button>
+                )}
               </div>
             </div>
-          </div>
-          <div className="p-2 mt-2 border rounded h-[60vh] overflow-auto">
-            <h3 className="font-semibold text-gray-800 mb-3">General tasks</h3>
-            {taskList && (
-              <div className="space-y-2">
-                {taskList.map((task) => (
-                  <TaskCard key={task.id} task={task} />
-                ))}
-              </div>
-            )}
           </div>
         </div>
-      </div>
+      ) : (
+        <div className="flex-none mx-96 mt-14">
+          <AccessDeniedPopup
+            isOpen={accessDeniedPopUpOpen}
+            onClose={() => {
+              setAccessDeniedPopUpOpen(false);
+              window.history.back();
+            }}
+          />
+        </div>
+      )}
     </>
   );
 }

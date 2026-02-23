@@ -13,7 +13,7 @@ interface DropdownProps {
   preselectedOption?: number;
   requiredRedDot?: boolean;
   logo?: LucideIcon;
-  paddingy?: number
+  paddingy?: number;
 }
 
 const CustomDropdown: React.FC<DropdownProps> = ({
@@ -25,13 +25,13 @@ const CustomDropdown: React.FC<DropdownProps> = ({
   preselectedOption,
   requiredRedDot,
   logo: Icon,
-  paddingy = 1
+  paddingy = 1,
 }) => {
   const [selectedOption, setSelectedOption] = useState<number | undefined>(
     () => {
       if (selectedValue) return selectedValue;
       else return undefined;
-    }
+    },
   );
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -81,13 +81,13 @@ const CustomDropdown: React.FC<DropdownProps> = ({
       <label className="block input-label-custom">
         {Icon && <Icon size={14} className="inline mr-1 text-blue-500" />}
         {labelName === "status" ||
-          labelName === "source" ||
-          labelName === "type" ||
-          labelName === "category" ||
-          labelName === "lifecycle" ||
-          labelName === "priority" ||
-          labelName === "stage" ||
-          labelName === "frequency"
+        labelName === "source" ||
+        labelName === "type" ||
+        labelName === "category" ||
+        labelName === "lifecycle" ||
+        labelName === "priority" ||
+        labelName === "stage" ||
+        labelName === "frequency"
           ? ""
           : labelName}{" "}
         {requiredRedDot && <span className="text-rose-500">*</span>}
@@ -132,13 +132,13 @@ const CustomDropdown: React.FC<DropdownProps> = ({
         </div> */}
         <div className="input-label-custom text-nowrap">
           {labelName === "status" ||
-            labelName === "source" ||
-            labelName === "type" ||
-            labelName === "category" ||
-            labelName === "lifecycle" ||
-            labelName === "priority" ||
-            labelName === "stage" ||
-            labelName === "frequency"
+          labelName === "source" ||
+          labelName === "type" ||
+          labelName === "category" ||
+          labelName === "lifecycle" ||
+          labelName === "priority" ||
+          labelName === "stage" ||
+          labelName === "frequency"
             ? selectedOption === undefined
               ? labelName.charAt(0).toUpperCase() + labelName.slice(1)
               : options && Array.isArray(options)
@@ -164,8 +164,7 @@ const CustomDropdown: React.FC<DropdownProps> = ({
             }}
             className="px-4 py-0.5 flex gap-2 items-center caption-custom hover:bg-gray-200 cursor-pointer text-gray-800 border-b"
           >
-            <Delete size={18} />{" "}
-            <span className="caption-custom"> Clear Selection</span>
+            <Delete size={18} /> <span className="caption-custom"> Clear</span>
           </div>
 
           {Array.isArray(options) &&
