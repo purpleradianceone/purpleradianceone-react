@@ -1,5 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import {
+  ListOrdered,
   LucideAirplay,
   LucideCalendar,
   LucideClock,
@@ -55,7 +56,6 @@ function AddProductModal({
   const { loading: intervalTypeLoading, intervalTypeData } = useIntervalType();
   const { loading: productTypeLoading, productTypeData } = useProductType();
   const { userHasAccessToAddProduct } = useUserAccessModules();
-  // const { isSmallScreen } = useScreenSize();
   const { loginStatus } = useLoggedInUserContext();
   const [isSaving, setIsSaving] = useState<boolean>(false);
 
@@ -121,6 +121,7 @@ function AddProductModal({
       createdBy: "",
       createdOn: "",
       unitNameInStock: "",
+      minimumStock :0
     });
 
   const [selectedUnitId, setUnitId] = useState<number | undefined>(0);
@@ -181,12 +182,29 @@ function AddProductModal({
     }
   };
 
+  function validate()  {
+    // Validation the minimum stock field here also before the api call
+    if(addProductFormData.minimumStock ==0 || addProductFormData.minimumStock==null || addProductFormData.minimumStock===undefined){
+      setErrors((prev)=>({
+        ...prev,
+        mininumStock : "minimum stock is required."
+      }))
+    }else{
+      setErrors((prev)=>({
+        ...prev,
+        mininumStock : ""
+      }))
+    }
+    return true;
+  }
 
 
   const handleAddProductFormSubmit = async (
     event: React.FormEvent<HTMLFormElement>
   ) => {
     event.preventDefault();
+    const isvalid =validate();
+    if(!isvalid) return;
     validateDropdown();
     if (isSaving) return;
     if (userHasAccessToAddProduct) {
@@ -226,7 +244,8 @@ function AddProductModal({
             // selectedDefaultAmc !== undefined &&
             selectedUnitId !== 0 &&
             selectedUnitId !== undefined &&
-            addProductFormData.cost !== null
+            addProductFormData.cost !== null && 
+            addProductFormData.minimumStock !=0
           ) {
             setIsSaving(true);
             const addProductPostData = {
@@ -243,6 +262,7 @@ function AddProductModal({
               cost: addProductFormData.cost,
               description: addProductFormData.description,
               version: addProductFormData.version,
+              minimum_stock: addProductFormData.minimumStock,
               url: addProductFormData.url,
               hsn: selectedTaxCode === "hsn" ? addProductFormData.hsn : null,
               sac: selectedTaxCode === "sac" ? addProductFormData.sac : null,
@@ -282,6 +302,8 @@ function AddProductModal({
               .finally(() => {
                 setIsSaving(false);
               });
+          }else{
+                    toast.error(MESSAGE.ERROR.REQUIRED_FIELDS);
           }
         }
       } else {
@@ -329,6 +351,7 @@ function AddProductModal({
       createdBy: "",
       createdOn: "",
       unitNameInStock: "",
+      minimumStock :0
     });
 
     addProductFormData.description = "";
@@ -420,6 +443,7 @@ useEffect(() => {
               onChange={handleAddProductFormDataChange}
               onBlur={handleBlur}
               error={errors.name}
+              autoFocus={true}
             />
             <div className="grid grid-cols-2 gap-3 ">
               {/* Unit */}
@@ -466,19 +490,36 @@ useEffect(() => {
                 )}
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-3 ">
+            <div className="grid grid-cols-3 gap-3 ">
               {/* basic cost */}
-              <FormInput
+               <FormInput
                 label="Basic Cost : "
                 logo={LucideIndianRupee}
                 type="number"
                 name="cost"
-                value={addProductFormData.cost?.toString()}
+                value={addProductFormData.cost}
+                // value={addProductFormData.cost ==0 ? "" : addProductFormData.cost}
                 placeholder="Product Price"
                 onChange={handleAddProductFormDataChange}
                 error={errors.cost}
                 min={0}
               />
+              {/* Minimum Stock */}
+              <FormInput
+                label="Minimum Stock : "
+                logo={ListOrdered}
+                type="number"
+                name="minimumStock"
+                value={addProductFormData.minimumStock}
+                // value={addProductFormData.minimumStock ==0 ? "" : addProductFormData.minimumStock} 
+                placeholder="Enter Mininum Stock"
+                onChange={handleAddProductFormDataChange}
+                error={errors.mininumStock}
+                min={0}
+                onBlur={handleBlur}
+                required ={true}
+              />
+             
               {/* version */}
               <FormInput
                 label="Version :"

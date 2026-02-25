@@ -3,6 +3,7 @@ import {
   CheckCircle2,
   ClipboardPlus,
   EditIcon,
+  ListOrdered,
   LucideAirplay,
   LucideClock,
   LucideGroup,
@@ -80,7 +81,8 @@ function EditCompanyProductModal({
     url: product.url,
     isActive: product.isActive,
     isSerialNumber: product.isSerialNumber,
-    unitId : product.unitId
+    unitId : product.unitId,
+    minimumStock : product.minimumStock
   };
 
   const [selectedProductTypeId, setSelectedProductTypeId] = useState<
@@ -236,6 +238,18 @@ function EditCompanyProductModal({
   };
 
   function validate()  {
+    // Validation the minimum stock field here also before the api call
+    if(updateCompanyProductFormData.minimumStock ==0 || updateCompanyProductFormData.minimumStock==null || updateCompanyProductFormData.minimumStock===undefined){
+      setErrors((prev)=>({
+        ...prev,
+        mininumStock : "minimum stock is required."
+      }))
+    }else{
+      setErrors((prev)=>({
+        ...prev,
+        mininumStock : ""
+      }))
+    }
     if(errors.url ){
       toast.error(MESSAGE.ERROR.REQUIRED_FIELDS)
       return false;
@@ -255,8 +269,11 @@ function EditCompanyProductModal({
       updateCompanyProductFormData.version !== null &&
       updateCompanyProductFormData.version !== undefined &&
       selectedProductTypeId !== 0 &&
-      selectedProductTypeId !== undefined
-      // selectedWarrantyIntervalTypeId !== 0 &&
+      selectedProductTypeId !== undefined &&
+      updateCompanyProductFormData.minimumStock !== null &&
+      updateCompanyProductFormData.minimumStock !== undefined && 
+      updateCompanyProductFormData.minimumStock != 0 
+          // selectedWarrantyIntervalTypeId !== 0 &&
       // selectedWarrantyIntervalTypeId !== undefined &&
       // selectedDefaultWarranty !== 0 &&
       // selectedDefaultWarranty !== undefined &&
@@ -289,7 +306,8 @@ function EditCompanyProductModal({
         updateCompanyProductFormData.url !==
           intialEditCompanyProductFormData.url ||
         updateCompanyProductFormData.isSerialNumber !== isSerialNumberChecked ||
-        selectedUnitId !== intialEditCompanyProductFormData.unitId 
+        selectedUnitId !== intialEditCompanyProductFormData.unitId ||
+       updateCompanyProductFormData.minimumStock !== Number( intialEditCompanyProductFormData.minimumStock) 
       ) {
         if (userHasAccessToUpdateProduct) {
           const updateProductPostData = {
@@ -322,6 +340,7 @@ function EditCompanyProductModal({
             cost: updateCompanyProductFormData.cost,
             description: updateCompanyProductFormData.description,
             version: updateCompanyProductFormData.version,
+            minimum_stock : Number(updateCompanyProductFormData.minimumStock),
             url: updateCompanyProductFormData.url,
             updatedby_id: loginStatus.id,
           };
@@ -337,9 +356,12 @@ function EditCompanyProductModal({
                 toast.success(response.data.message);
                 handleCompanyProductChange();
                 setTimeout(() => {
-                  // onClose();
+                  onClose();
                   setIsCreateCompanyProductTaxModalOpen(false);
                 }, 500);
+              }else{
+                toast.error(response.data.messge
+                )
               }
             })
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -354,7 +376,7 @@ function EditCompanyProductModal({
               }
             })
             .finally(()=>{
-              onClose();
+              
             });
         } else {
           toast.error(
@@ -522,7 +544,7 @@ function EditCompanyProductModal({
               error={errors.name}
               onBlur={handleBlur}
             />
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-2 gap-3">
               <div className="">
 
                <CustomDropdown
@@ -568,21 +590,9 @@ function EditCompanyProductModal({
                   </div>
                 )}
               </div>
-              <FormInput
-                label="URL : "
-                logo={LucideLink}
-                type="text"
-                name="url"
-                // required={false}
-                defaultValue={intialEditCompanyProductFormData.url}
-                // value={intialEditCompanyProductFormData.url}
-                placeholder="Product URL"
-                onChange={handleEditCompanyProductFormDataChange}
-                onBlur={handleBlur}
-                error={errors.url}
-              />
+             
             </div>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-3 gap-3">
               <FormInput
                 logo={LucideIndianRupee}
                 label="Cost :"
@@ -592,6 +602,20 @@ function EditCompanyProductModal({
                 placeholder="Enter Product Cost"
                 defaultValue={intialEditCompanyProductFormData.cost}
                 onChange={handleEditCompanyProductFormDataChange}
+              />
+               {/* Minimum Stock */}
+              <FormInput
+                label="Minimum Stock : "
+                logo={ListOrdered}
+                type="number"
+                name="minimumStock"
+                defaultValue={intialEditCompanyProductFormData.minimumStock==0 ? "" : intialEditCompanyProductFormData.minimumStock}
+                // value={addProductFormData.minimumStock ===0 ? "" : addProductFormData.minimumStock} 
+                placeholder="Enter Mininum Stock"
+                onChange={handleEditCompanyProductFormDataChange}
+                error={errors.mininumStock}
+                min={0}
+                required ={true}
               />
               <FormInput
                 label="Version :"
@@ -714,7 +738,22 @@ function EditCompanyProductModal({
                   )} */}
               </div>
             </div>
-            <div className="col-span-1">
+             <div className="mt-0.5">
+              <FormInput
+                label="URL : "
+                logo={LucideLink}
+                type="text"
+                name="url"
+                // required={false}
+                defaultValue={intialEditCompanyProductFormData.url}
+                // value={intialEditCompanyProductFormData.url}
+                placeholder="Product URL"
+                onChange={handleEditCompanyProductFormDataChange}
+                onBlur={handleBlur}
+                error={errors.url}
+              />
+             </div>
+              <div className="col-span-1">
               <TextAreaInput
                 logo={Text}
                 label="Description :"

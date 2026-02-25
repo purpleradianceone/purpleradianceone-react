@@ -32,6 +32,7 @@ export type ErrorType = {
   quantity?: string;
   version?: string;
   location?: string;
+  mininumStock? : string
 
 };
 
@@ -284,6 +285,15 @@ export const useFormValidation = (formData: Record<string, string | number | boo
           }));
         } else {
           setErrors((prev) => ({ ...prev, location: "" }));
+        }
+        break;
+         case "minimumStock":
+        if (formType === STRING_VALUES.REGISTRATION && Number(value)<=0) {
+          setErrors((prev) => ({ ...prev,
+          mininumStock  : "Minimum stock is required.",
+          }));
+        } else {
+          setErrors((prev) => ({ ...prev, mininumStock: "" }));
         }
         break;
     }
