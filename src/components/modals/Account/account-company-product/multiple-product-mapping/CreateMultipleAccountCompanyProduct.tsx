@@ -70,6 +70,7 @@ interface ProductRow {
   // serialNumber: number[];
   isSerialNumber: boolean;
   productQuantity?: number;
+  totalCost : number ,
   purchaseDate: Date | null;
   deliveryDate: Date | null;
   deliveryAddress: string;
@@ -102,6 +103,7 @@ interface ProductRow {
     quantity?: boolean;
     zeroQuantity?: boolean;
     installedById?: boolean;
+    totalCost? :boolean
   };
   hasValueGiven?: {
     deliveryDate?: boolean;
@@ -173,6 +175,7 @@ export const CreateMultipleAccountCompanyProduct = () => {
         loginStatus.fullName || loginStatus.email || loginStatus.mobileNumber,
       amcCycleEndDate: null,
       amcCycleStartDate: null,
+      totalCost:0,
       billingAddress: "",
       deliveryAddress: "",
       deliveryDate: null,
@@ -195,6 +198,7 @@ export const CreateMultipleAccountCompanyProduct = () => {
         quantity: false,
         unit: false,
         zeroQuantity: false,
+        totalCost : false
       },
       hasValueGiven: {
         amcEndDate: false,
@@ -359,6 +363,7 @@ export const CreateMultipleAccountCompanyProduct = () => {
         purchaseDate: null,
         warranty: 12,
         amc: 1,
+        totalCost : 0,
         installedBy:
           loginStatus.fullName || loginStatus.email || loginStatus.mobileNumber,
         amcCycleEndDate: null,
@@ -412,6 +417,7 @@ export const CreateMultipleAccountCompanyProduct = () => {
         purchaseDate: !row.purchaseDate,
         zeroQuantity: qty < 1,
         quantity: false,
+        totalCost: row.totalCost <=0
       };
 
       //  FINAL STOCK VALIDATION
@@ -428,7 +434,8 @@ export const CreateMultipleAccountCompanyProduct = () => {
         errors.installedBy ||
         errors.purchaseDate ||
         errors.zeroQuantity ||
-        errors.installedById
+        errors.installedById ||
+        errors.totalCost 
       ) {
         hasMandatoryError = true;
         isValid = false;
@@ -507,6 +514,7 @@ export const CreateMultipleAccountCompanyProduct = () => {
         } else {
           newRow[field] = value;
         }
+        
 
         if (field === "unit_id") {
           newHasError.unit = false;
@@ -523,12 +531,13 @@ export const CreateMultipleAccountCompanyProduct = () => {
         /* -----------------------------
          4. Clear errors for allowed fields
       ----------------------------- */
-        const errorFields = [
+        const errorFields  = [
           "unit",
           "installedBy",
           "purchaseDate",
           "product",
           "installedById",
+          "totalCost"
         ] as const;
 
         if (errorFields.includes(field as any)) {
@@ -764,6 +773,7 @@ export const CreateMultipleAccountCompanyProduct = () => {
       company_id: loginStatus.companyId,
       account_id: Number(accountId),
       company_product_id: row.productId,
+      total_cost : row.totalCost,
       purchase_date: row.purchaseDate
         ? format(row.purchaseDate, "yyyy-MM-dd")
         : null,
@@ -1052,7 +1062,7 @@ export const CreateMultipleAccountCompanyProduct = () => {
                               updateRow(index, "quantity", qty);
                             }}
                           />
-                        </div>
+                        </div> 
                         <div className="w-1/2 mt-0.5 ">
                           <CustomDropdown
                             key={row.unit_id}
@@ -1272,7 +1282,30 @@ export const CreateMultipleAccountCompanyProduct = () => {
                         </div>
                       </div>
                     )}
+                     <div className="">
+                          <FormInput
+                            logo={Box}
+                            label="Total Cost "
+                            readonly={!row.productId}
+                            required
+                            placeholder="Enter Total Cost"
+                            type="number"
+                            value={row.totalCost ==0 ?"" : row.totalCost}
+                            // min={0}
+                            // max={row.productQuantity!}
+                            onChange={(e) => {
+                              const totalCost = Number(e.target.value);
+                              updateRow(index, "totalCost", totalCost);
+                            }}
+                          />
+                        {row.hasError?.totalCost && (
+                          <p className="text-red-500 text-xs mt-1">
+                            Total cost is required.
+                          </p>
+                        )}
+                        </div>
                     <div>
+
                       <ControlledMuiDatePicker
                         readonly={!row.productId}
                         label="Purchase Date"
@@ -1348,7 +1381,7 @@ export const CreateMultipleAccountCompanyProduct = () => {
                       logo={Calendar}
                     />
                     {/* INSTALLED BY */}
-                    <div className=" mt-0.5">
+                    <div className="mt-0.5">
                       <CompanyUserSearchFieldInput
                         readOnly={!row.productId}
                         label="Installed By "

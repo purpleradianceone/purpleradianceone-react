@@ -123,7 +123,8 @@ function FormInput({
   step,
   value,
   paddingy=1,
-  penLogo : PenIcon
+  penLogo : PenIcon,
+  disabled
   // onClick
 }: FormInputProps) {
   const { isSmallScreen } = useScreenSize();
@@ -210,6 +211,7 @@ function FormInput({
             pattern={pattern}
             autoFocus={autoFocus}
             value={value}
+            disabled={disabled}
           />
         )}
 

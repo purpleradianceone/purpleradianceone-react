@@ -157,6 +157,7 @@ const StockManagementList = ({
         validFrom: product.valid_from,
         createdBy: product.created_by,
         createdOn: product.created_on,
+        minimumStock : product.minimum_stock
       };
 
       // 1️ Set data first
