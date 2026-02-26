@@ -82,7 +82,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
   const Navigate = useNavigate();
   const { position } = usePanel();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const {userPreference, setUserPreference} = useUserPreference();
+  const { userPreference, setUserPreference } = useUserPreference();
 
   // const position = localStorage.getItem('panel_position');
 

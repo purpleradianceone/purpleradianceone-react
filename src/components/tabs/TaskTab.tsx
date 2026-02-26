@@ -6,11 +6,6 @@ import { useUserAccessModules } from "../../config/hooks/useAccessModules";
 function TaskTab() {
 
     const { userHasAccessToViewMasterTasks } = useUserAccessModules();
-
-    // const TABS = [
-    //     { label: "My Tasks", value: "my-tasks", path: "" }, // index route
-    //     { label: "Master Tasks", value: "master-tasks", path: ROUTES_URL.MY_TASKS },
-    // ];
     const TABS = [
         userHasAccessToViewMasterTasks && { label: "My Tasks", value: "my-tasks", path: "" },
         userHasAccessToViewMasterTasks && {
