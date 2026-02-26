@@ -59,7 +59,7 @@ import GetAccounts from "../../components/views/account/AccountManagement";
 import FacebookOAuthConsent from "../../components/dialogue-box/FacebookOAuthConsent";
 import IntegrationsPage from "../../components/views/integrations/IntegrationsPage";
 import AccountImportCsvManagement from "../../components/modals/Account/import-account/AccountImportCsvManagement";
-import StockManagement from "../../components/views/stock-management/StockManagement";
+// import StockManagement from "../../components/views/stock-management/StockManagement";
 import SupportTicketManagement from "../../components/views/support-ticket-management/SupportTicketManagement";
 import ViewSupportTicketManagement from "../../components/modals/support-ticket/ViewSupportTicketManagement";
 import { CreateMultipleAccountCompanyProduct } from "../../components/modals/Account/account-company-product/multiple-product-mapping/CreateMultipleAccountCompanyProduct";
@@ -83,6 +83,10 @@ import MasterTaskManagement from "../../components/views/my-task-management/Mast
 import GeneralTask from "../../components/views/my-task-management/GeneralTask";
 import MasterTaskUpdate from "../../components/modals/general-task-master/MasterTaskUpdate";
 import { QuotationPage } from "../../components/quotation-builder/QuotationPage";
+import StockPage from "../../components/views/stock-management/StockPage";
+import StockManagement from "../../components/views/stock-management/StockManagement";
+import WareHouseWiseStock from "../../components/views/stock-management/WareHouseWiseStock";
+import StockLedgerManagement from "../../components/views/stock-management/StockLedgerManagement";
 
 export const router = createBrowserRouter([
   {
@@ -341,7 +345,7 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: ROUTES_URL.MY_TASKS,   // ✅ relative path
+        path: ROUTES_URL.MY_TASKS, // ✅ relative path
         element: (
           <ModuleGuard
             permissionKey="userHasAccessToViewMasterTasks"
@@ -369,7 +373,6 @@ export const router = createBrowserRouter([
   //     </MobileRedirectWrapper>
   //   ),
   // },
-
 
   {
     path: ROUTES_URL.COMPANY_SETTING,
@@ -520,7 +523,7 @@ export const router = createBrowserRouter([
           <div>
             <AuthLayout
               title="Activate Subscription!"
-            // subtitle="Enter the number of users and subscription duration to proceed"
+              // subtitle="Enter the number of users and subscription duration to proceed"
             >
               <CreateSubscription
                 isOpen={true}
@@ -805,7 +808,7 @@ export const router = createBrowserRouter([
                 onClose={() => {
                   window.history.back();
                 }}
-                handleProductChangeOnAdd={() => { }}
+                handleProductChangeOnAdd={() => {}}
               ></AddProductModal>
             </Navbar>
           </div>
@@ -825,7 +828,7 @@ export const router = createBrowserRouter([
                 onClose={() => {
                   window.history.back();
                 }}
-                handleCompanyTeamChangeOnAdd={() => { }}
+                handleCompanyTeamChangeOnAdd={() => {}}
               ></AddTeamModal>
             </Navbar>
           </div>
@@ -964,6 +967,22 @@ export const router = createBrowserRouter([
       },
     ],
   },
+  // {
+  //   path: ROUTES_URL.STOCK_MANAGEMENT,
+  //   element: (
+  //     <MobileRedirectWrapper>
+  //       <PrivateRoute>
+  //         <div>
+  //           <Navbar>
+  //             <StockManagement />
+  //           </Navbar>
+  //         </div>
+  //       </PrivateRoute>
+  //     </MobileRedirectWrapper>
+  //   ),
+  // },
+
+  // stock management routes
   {
     path: ROUTES_URL.STOCK_MANAGEMENT,
     element: (
@@ -971,12 +990,72 @@ export const router = createBrowserRouter([
         <PrivateRoute>
           <div>
             <Navbar>
-              <StockManagement />
+              <StockPage />
             </Navbar>
           </div>
         </PrivateRoute>
       </MobileRedirectWrapper>
     ),
+    children: [
+      {
+        index: true,
+        element: (
+          <ModuleGuard
+            permissionKey="userHasAccessToViewProductWiseStock"
+            deniedMessage={
+              MESSAGE.MODULE_ACCESS.STOCK.PRODUCT_WISE_STOCK.DENIED_VIEW_ACCESS
+            }
+          >
+            <StockManagement />
+          </ModuleGuard>
+        ),
+      },
+      {
+        path: ROUTES_URL.WAREHOUSE_WISE_STOCK, // ✅ relative path
+        element: (
+          <ModuleGuard
+            permissionKey="userHasAccessToViewWarehouseWiseStock"
+            deniedMessage={
+              MESSAGE.MODULE_ACCESS.STOCK.WAREHOUSE_WISE_STOCK
+                .DENIED_VIEW_ACCESS
+            }
+          >
+            <WareHouseWiseStock />
+          </ModuleGuard>
+        ),
+      },
+      {
+        path: ROUTES_URL.STOCK_LEDGER, // ✅ relative path
+        element: (
+          <ModuleGuard
+            permissionKey="userHasAccessToViewMasterTasks"
+            deniedMessage={
+              MESSAGE.MODULE_ACCESS.STOCK.STOCK_LEDGER.DENIED_VIEW_ACCESS
+            }
+          >
+            <StockLedgerManagement />
+          </ModuleGuard>
+        ),
+      },
+      {
+        path: ROUTES_URL.STOCK_AGEING, // ✅ relative path
+        element: (
+          <ModuleGuard
+            permissionKey="userHasAccessToViewMasterTasks"
+            deniedMessage={
+              MESSAGE.MODULE_ACCESS.STOCK.STOCK_AGEING.DENIED_VIEW_ACCESS
+            }
+          >
+            {/* <MasterTaskManagement isUsedInAllTasksModule={true} /> */}
+            <>
+            <div className="h-screen items-center justify-center w-full">
+            stock ageing comming soon...
+            </div>
+            </>
+          </ModuleGuard>
+        ),
+      },
+    ],
   },
   {
     path: ROUTES_URL.SUPPORT_TICKET_MANAGEMENT,

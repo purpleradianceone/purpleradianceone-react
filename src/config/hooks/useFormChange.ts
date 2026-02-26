@@ -11,10 +11,16 @@ export const useFormChange = <T extends Record<string, string | number | boolean
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-
+    console.log(name + ' value : ' + value );
+    
     if (name === 'isActive') {
       setFormData(prevFormData => ({ ...prevFormData, [name]: convertToBoolean(value) }));
-    } else {
+    } else if (name === "total_cost"  && (Number(value)>0)){
+      setFormData(prev=>({
+        ...prev,
+        [name] : Number(value)
+      }) )
+    }else {
       setFormData((prev) => ({
         ...prev,
         [name]: value,

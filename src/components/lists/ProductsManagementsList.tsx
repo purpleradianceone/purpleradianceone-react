@@ -80,6 +80,7 @@ ProductsManagementListProps) {
     unitId: 0,
     unitName: "",
     unitNameInStock: "",
+    minimumStock : 0
   });
 
   const handleSelectedProductChange = (product: Product) => {

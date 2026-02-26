@@ -3,7 +3,7 @@ import { AllCommunityModule, ColDef, themeBalham } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import {  INNERHTML, JSX_CHILDREN_NAME } from "../../constants/AppConstants";
+import { INNERHTML, JSX_CHILDREN_NAME } from "../../constants/AppConstants";
 import { CLASS_NAMES } from "../../constants/ClassNames";
 import ActionsDropdownButton from "../ui/ActionsDropdownButton";
 import { Edit, Network, Plus, UserPlus } from "lucide-react";
@@ -30,7 +30,7 @@ function ProductsManagementGrid({
     userHasAccessToViewProductTax,
     userHasAccessToUpdateProduct,
     userHasAccessToViewProductTeam,
-    userHasAccessToViewProductUsers
+    userHasAccessToViewProductUsers,
   } = useUserAccessModules();
 
   const columnDefs = useMemo<ColDef[]>(
@@ -51,15 +51,7 @@ function ProductsManagementGrid({
           return valueA.toLowerCase().localeCompare(valueB.toLowerCase());
         },
       },
-      {
-        field: "barcode",
-        headerName: "Barcode",
-        sortable: true,
-        maxWidth: 130,
-        filter: true,
-        flex: 1,
-        hide: isGridForAccountProduct
-      },
+      
       {
         field: "cost",
         headerName: "Basic Cost",
@@ -67,9 +59,24 @@ function ProductsManagementGrid({
         maxWidth: 130,
         filter: true,
         flex: 1,
-        hide: isGridForAccountProduct
+        hide: isGridForAccountProduct,
       },
+      {
+        // hide: true,
+        field: "minimumStock",
+        headerName: "Minimum Stock",
+        sortable: true,
+        filter: true,
+        flex: 1,
+        valueFormatter: (params) => {
+          if(!params.data) return "";
 
+          const minStock = params.value;
+          const  unit = params.data.unitName; 
+          return `${minStock} ${unit}`
+          // return params.value ? `${params.value} ${}` : "";
+        },
+      },
       {
         field: "productTypeName",
         headerName: "Product Type",
@@ -77,7 +84,7 @@ function ProductsManagementGrid({
         maxWidth: 120,
         filter: true,
         flex: 1,
-        hide: isGridForAccountProduct
+        hide: isGridForAccountProduct,
       },
       {
         field: "unitName",
@@ -86,8 +93,18 @@ function ProductsManagementGrid({
         filter: true,
         flex: 1,
         hide: isGridForAccountProduct,
-
       },
+      
+      {
+        field: "barcode",
+        headerName: "Barcode",
+        sortable: true,
+        maxWidth: 130,
+        filter: true,
+        flex: 1,
+        hide: isGridForAccountProduct,
+      },
+      
 
       {
         field: "isActive",
@@ -104,7 +121,6 @@ function ProductsManagementGrid({
           );
         },
         hide: isGridForAccountProduct,
-
       },
       {
         field: "isSerialNumber",
@@ -126,7 +142,6 @@ function ProductsManagementGrid({
           );
         },
         hide: isGridForAccountProduct,
-
       },
 
       {
@@ -146,7 +161,6 @@ function ProductsManagementGrid({
         filter: true,
         flex: 1,
         hide: !userHasAccessToViewProduct || isGridForAccountProduct,
-
       },
       {
         field: "version",
@@ -156,7 +170,6 @@ function ProductsManagementGrid({
         filter: true,
         flex: 1,
         hide: !userHasAccessToViewProduct || isGridForAccountProduct,
-
       },
       {
         field: "url",
@@ -175,7 +188,6 @@ function ProductsManagementGrid({
           }
         },
         cellStyle: { color: "blue", cursor: "pointer" },
-
       },
       {
         field: "hsn",
@@ -236,7 +248,6 @@ function ProductsManagementGrid({
         },
         hide: isGridForAccountProduct,
       },
-
       {
         hide: true,
         field: "unitId",
@@ -268,8 +279,7 @@ function ProductsManagementGrid({
         sortable: true,
         filter: true,
         flex: 1,
-                hide: isGridForAccountProduct,
-
+        hide: isGridForAccountProduct,
       },
       {
         headerName: "Actions",
@@ -343,12 +353,12 @@ function ProductsManagementGrid({
 
             document.addEventListener(
               "mousedown",
-              handleClickOutsideActionsDropDown
+              handleClickOutsideActionsDropDown,
             );
             return () =>
               document.removeEventListener(
                 "mousedown",
-                handleClickOutsideActionsDropDown
+                handleClickOutsideActionsDropDown,
               );
           }, []);
 
@@ -379,14 +389,14 @@ function ProductsManagementGrid({
                           } else {
                             toast.error(
                               MESSAGE.MODULE_ACCESS.PRODUCT_MANAGEMENT
-                                .DENIED_UPDATE_ACCESS
+                                .DENIED_UPDATE_ACCESS,
                             );
                           }
                         }}
                       >
                         <div>
-                        <Edit className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR} />{" "}
-                        {JSX_CHILDREN_NAME.EDIT}
+                          <Edit className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR} />{" "}
+                          {JSX_CHILDREN_NAME.EDIT}
                         </div>
                       </ActionsDropdownButton>
                     </>
@@ -401,14 +411,14 @@ function ProductsManagementGrid({
                             handleSelectedProductChange(params.data);
                           } else {
                             toast.error(
-                              MESSAGE.MODULE_ACCESS.STOCK.DENIED_ADD_ACCESS
+                              MESSAGE.MODULE_ACCESS.STOCK.DENIED_ADD_ACCESS,
                             );
                           }
                         }}
                       >
                         <div className="">
                           <Plus className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR} />
-                         {JSX_CHILDREN_NAME.ADD_STOCK}
+                          {JSX_CHILDREN_NAME.ADD_STOCK}
                         </div>
                       </ActionsDropdownButton>
                     </>
@@ -424,7 +434,8 @@ function ProductsManagementGrid({
                               handleSelectedProductChange(params.data);
                             } else {
                               toast.error(
-                                MESSAGE.MODULE_ACCESS.PRODUCT_USERS.DENIED_VIEW_ACCESS
+                                MESSAGE.MODULE_ACCESS.PRODUCT_USERS
+                                  .DENIED_VIEW_ACCESS,
                               );
                             }
                           }}
@@ -443,7 +454,8 @@ function ProductsManagementGrid({
                               handleSelectedProductChange(params.data);
                             } else {
                               toast.error(
-                                MESSAGE.MODULE_ACCESS.PRODUCT_TEAMS.DENIED_VIEW_ACCESS
+                                MESSAGE.MODULE_ACCESS.PRODUCT_TEAMS
+                                  .DENIED_VIEW_ACCESS,
                               );
                             }
                           }}
@@ -457,7 +469,7 @@ function ProductsManagementGrid({
                       </>
                     </>
                   </div>,
-                  document.body // Render dropdown in body to avoid clipping
+                  document.body, // Render dropdown in body to avoid clipping
                 )}
             </>
           );
@@ -465,7 +477,7 @@ function ProductsManagementGrid({
       },
     ],
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+    [],
   );
 
   const defaultColDef = useMemo(() => {

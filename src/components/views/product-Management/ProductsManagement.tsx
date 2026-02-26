@@ -150,6 +150,7 @@ const savedFilters = JSON.parse(
             validFrom: res.valid_from,
             createdBy: res.createdby,
             createdOn: res.createdon,
+            minimumStock: res.minimum_stock
 
           }));
           setProductsData(formattedData);

@@ -25,8 +25,8 @@ type MasterTaskManagementProps = {
     handleSelectedPriority : (selectedPriority: number | undefined ) => void;
     selectedCompanyUser  : CompanyUser;
     handleSelectedCompanyUser : (selectedUser: CompanyUser) => void;
-    isActive : boolean;
-    setIsActive : (isActive: boolean) => void;
+    isActive : boolean | null;
+    setIsActive : (isActive: boolean | null) => void;
    
 }
 export default MasterTaskManagementProps;

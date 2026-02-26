@@ -1,10 +1,11 @@
- type LiveStockForCompanyProduct ={
-    count : number,
-    companyProductId : number,
-    companyProductName : string ,
-    quantityInward : number ,
-    quantityOutward : number,
-    quantityLive : number
- }
+type LiveStockForCompanyProduct = {
+  count: number;
+  companyProductId: number;
+  companyProductName: string;
+  quantityInward: number;
+  quantityOutward: number;
+  quantityLive: number;
+  availability: string;
+};
 
- export default LiveStockForCompanyProduct;
+export default LiveStockForCompanyProduct;

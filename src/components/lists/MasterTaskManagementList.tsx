@@ -281,7 +281,7 @@ function MasterTaskManagementList({
                             }}
                           />
                         </div>
-                        <div className="hidden">
+                        <div className="min-w-[100px]">
                           <BooleanDropdown
                             // labelName="Active"
                             value={isActive}

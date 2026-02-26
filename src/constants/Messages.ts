@@ -88,9 +88,32 @@ const MESSAGE = {
             DENIED_ADD_ACCESS: "You do not have permission to add new Company Warehouse.",
             DENIED_UPDATE_ACCESS: "You do not have permission to update Company Warehouse.",
         }, STOCK: {
+            STOCK :{
             DENIED_VIEW_ACCESS: "You do not have permission to view Stock.",
             DENIED_ADD_ACCESS: "You do not have permission to add new Stock.",
             DENIED_UPDATE_ACCESS: "You do not have permission to update Stock.",
+            },
+            PRODUCT_WISE_STOCK :{
+                DENIED_VIEW_ACCESS: "You do not have permission to view Product wise Company Stock.",
+                DENIED_ADD_ACCESS: "You do not have permission to add Product wise Company Stock.",
+                DENIED_UPDATE_ACCESS: "You do not have permission to update Product wise Company Stock.",
+            },
+            WAREHOUSE_WISE_STOCK :{
+                DENIED_VIEW_ACCESS: "You do not have permission to view Warehouse wise Company Stock.",
+                DENIED_ADD_ACCESS: "You do not have permission to add Warehouse wise Company Stock.",
+                DENIED_UPDATE_ACCESS: "You do not have permission to update Warehouse wise Company Stock.",
+            },
+            STOCK_LEDGER :{
+                DENIED_VIEW_ACCESS: "You do not have permission to view Stock Ledger.",
+                DENIED_ADD_ACCESS: "You do not have permission to add Stock Ledger.",
+                DENIED_UPDATE_ACCESS: "You do not have permission to update Stock Ledger.",
+            },
+            STOCK_AGEING :{
+                DENIED_VIEW_ACCESS: "You do not have permission to view Stock Ageing.",
+                DENIED_ADD_ACCESS: "You do not have permission to add Stock Ageing.",
+                DENIED_UPDATE_ACCESS: "You do not have permission to update Stock Ageing.",
+            }
+
         }, SUPPORT_MODULE: {
             DENIED_VIEW_ACCESS: "You do not have permission to view support ticket.",
             DENIED_ADD_ACCESS: "You do not have permission to create support ticket.",
