@@ -70,6 +70,7 @@ function MasterTaskUpdate() {
       general_task_type_id: null,
       frequency_id: null,
       assignedto: null,
+      isactive: null,
     };
     try {
       const response = await axiosClient.post(
@@ -247,14 +248,12 @@ function MasterTaskUpdate() {
                   Master Tasks
                 </Button>
               </Link>
-
               <ChevronRight size={16} />
-
               <h1 className="table-header-custom">Master Task Details</h1>
             </div>
             <div className="bg-gray-50 w-full px-2 pt-1 rounded">
               {isSubmitting && <LoadingPopUpAnimation show={isSubmitting} />}
-              <div className="bg-white border rounded-lg p-2 space-y-3">
+              <div className="bg-white border rounded-lg p-2 space-y-2">
                 {/* HEADER */}
                 <div className="flex justify-between items-center border-b pb-2">
                   <h1 className="font-semibold text-gray-800">

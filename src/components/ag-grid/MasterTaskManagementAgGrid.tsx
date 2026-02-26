@@ -28,9 +28,11 @@ function MasterTaskManagementAgGrid({
         sortable: true,
         filter: true,
         cellRenderer: (params: any) => (
-          <TaskPriorityChip
-            priorityName={params.data.generalTaskPriorityName}
-          />
+          <div className="flex items-center">
+            <TaskPriorityChip
+              priorityName={params.data.generalTaskPriorityName}
+            />
+          </div>
         ),
       },
       {

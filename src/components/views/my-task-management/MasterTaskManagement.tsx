@@ -38,8 +38,6 @@ function MasterTaskManagement({
   const [supportTicketUpdateCount, setSupportTicketUpdateCount] =
     useState<number>(0);
 
-  const [isActive, setIsActive] = useState<boolean>(false);
-
   // Read filters from LocalStorage (before hook initializes)
   const savedFilters = JSON.parse(
     localStorage.getItem(LocalStorageKeys.MASTER_TASK_MANAGEMENT_FILTER) ||
@@ -69,6 +67,9 @@ function MasterTaskManagement({
   );
   const [selectedPriority, setselectedPriority] = useState<number | undefined>(
     savedFilters.selectedPrioritytype,
+  );
+  const [isActive, setIsActive] = useState<boolean | null>(
+    savedFilters.isActive,
   );
   const [selectedCompanyUser, setSelectedCompanyUser] = useState<CompanyUser>({
     company_id: 0,
@@ -114,6 +115,7 @@ function MasterTaskManagement({
       general_task_type_id: selectedTaskType ?? null,
       frequency_id: selectedFrequency ?? null,
       assignedto: selectedCompanyUser?.id || null,
+      isactive: isActive,
     };
     try {
       if (PostDataToGetAllTask.company_id === 0 || pageSize === 10) return;
@@ -191,6 +193,7 @@ function MasterTaskManagement({
     selectedFrequency,
     selectedCompanyUser,
     supportTicketUpdateCount,
+    isActive,
   ]);
 
   const handleAddAllTask = () => {
@@ -217,6 +220,7 @@ function MasterTaskManagement({
       selectedPriority: selectedPriority,
       selectedFrequency: selectedFrequency,
       selectedCompanyUser: selectedCompanyUser,
+      isActive: isActive,
     };
 
     localStorage.setItem(
@@ -236,6 +240,7 @@ function MasterTaskManagement({
     selectedPriority,
     selectedFrequency,
     selectedCompanyUser,
+    isActive,
   ]);
   // Note : On refresh button click clear the storage
   useEffect(() => {

@@ -4,16 +4,15 @@ import { useMemo } from "react";
 import LiveStock from "../../@types/stock/LiveStock";
 
 const StockLiveAgGrid = ({ data }: { data: LiveStock[] }) => {
-
   const columnDefs = useMemo<ColDef[]>(
     () => [
       {
-        hide: true,
+        hide: false,
         field: "companyProductName",
         headerName: " Product",
         cellStyle: {
           color: "black",
-          fontWeight: "bold",
+          // fontWeight: "bold",
         },
       },
       {
@@ -22,7 +21,7 @@ const StockLiveAgGrid = ({ data }: { data: LiveStock[] }) => {
         hide: false,
         cellStyle: {
           color: "black",
-          fontWeight: "bold",
+          // fontWeight: "bold",
         },
       },
       {
@@ -38,7 +37,7 @@ const StockLiveAgGrid = ({ data }: { data: LiveStock[] }) => {
         headerName: "Outward",
       },
     ],
-    []
+    [],
   );
 
   const defaultColDef = useMemo(() => {

@@ -1,36 +1,34 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect, useState } from "react";
-import AccessDeniedPopup from "../not-found/AccessDeniedPage";
 import { motion } from "framer-motion";
-import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
+import { useEffect, useState } from "react";
 import { useInView } from "react-intersection-observer";
-import StockManagementList from "../../lists/StockManagementList";
-import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
-import axios from "axios";
-import POST_API from "../../../constants/PostApi";
 import ApiError from "../../../@types/error/ApiError";
-import { DEBOUNCE_DELAY, STATUS_CODE } from "../../../constants/AppConstants";
-import LiveStockForCompanyProduct from "../../../@types/stock/LiveStockForCompanyProduct";
-import { useSearchFilterPaginationDateHandlers } from "../../../config/hooks/usePaginationHandler";
-import { LocalStorageKeys } from "../../../enums/LocalStorageKeys";
+import LiveStock from "../../../@types/stock/LiveStock";
+import axiosClient from "../../../axios-client/AxiosClient";
 import { handleApiError } from "../../../config/error/handleApiError";
+import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
+import { useSearchFilterPaginationDateHandlers } from "../../../config/hooks/usePaginationHandler";
+import { DEBOUNCE_DELAY, STATUS_CODE } from "../../../constants/AppConstants";
+import POST_API from "../../../constants/PostApi";
+import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
+import { LocalStorageKeys } from "../../../enums/LocalStorageKeys";
+import AccessDeniedPopup from "../not-found/AccessDeniedPage";
+import WareHouseWiseStockList from "../../lists/WareHouseWiseStockList";
 
-const StockManagement = () => {
-  const { userHasAccessToViewProductWiseStock } = useUserAccessModules();
+function WareHouseWiseStock() {
+  const { userHasAccessToViewWarehouseWiseStock } = useUserAccessModules();
   const { loginStatus } = useLoggedInUserContext();
   const [ref, inView] = useInView({ fallbackInView: true, threshold: 0.1 });
 
-  const [liveStockForCompanyProduct, setLiveStockForCompanyProduct] = useState<
-    LiveStockForCompanyProduct[]
-  >([]);
+  const [liveStock, setLiveStock] = useState<LiveStock[]>([]);
   const [accessDeniedPopUpOpen, setAccessDeniedPopUpOpen] =
     useState<boolean>(false);
 
   useEffect(() => {
-    if (!userHasAccessToViewProductWiseStock) {
+    if (!userHasAccessToViewWarehouseWiseStock) {
       setAccessDeniedPopUpOpen(true);
     }
-  }, [userHasAccessToViewProductWiseStock]);
+  }, [userHasAccessToViewWarehouseWiseStock]);
 
   // Read filters from LocalStorage (before hook initializes)
   const savedFilters = JSON.parse(
@@ -47,7 +45,7 @@ const StockManagement = () => {
     handleSearchParameterChange,
   } = useSearchFilterPaginationDateHandlers(savedFilters);
 
-  const getStockLiveForCompanyProduct = async (signal: AbortSignal) => {
+  const getWareHouseWiseStock = async (signal: AbortSignal) => {
     const offset = (currentPage - 1) * pageSize;
     const postData = {
       company_id: loginStatus.companyId,
@@ -57,8 +55,8 @@ const StockManagement = () => {
       requestedby_id: loginStatus.id,
     };
 
-    await axios
-      .post(POST_API.GET_STOCK_LIVE_COMPANY_PRODUCT, postData, {
+    await axiosClient
+      .post(POST_API.GET_STOCK_LIVE, postData, {
         signal: signal,
         withCredentials: true,
       })
@@ -71,19 +69,17 @@ const StockManagement = () => {
           const responseData = response.data;
           console.log(responseData);
 
-          const formattedData: LiveStockForCompanyProduct[] = responseData.map(
-            (item: any) => ({
-              count: item.count,
-              companyProductId: item.company_product_id,
-              companyProductName: item.company_product_name,
-              quantityInward: item.quantity_inward,
-              quantityOutward: item.quantity_outward,
-              quantityLive: item.quantity_live,
-              availability: item.availability,
-            }),
-          );
+          const formattedData: LiveStock[] = responseData.map((item: any) => ({
+            count: item.count,
+            companyProductId: item.company_product_id,
+            companyProductName: item.company_product_name,
+            companyWarehouseName: item.company_warehouse_name,
+            quantityInward: item.quantity_inward,
+            quantityOutward: item.quantity_outward,
+            quantityLive: item.quantity_live,
+          }));
 
-          setLiveStockForCompanyProduct(formattedData);
+          setLiveStock(formattedData);
         }
       })
       .catch(async (error: ApiError | any) => {
@@ -98,7 +94,7 @@ const StockManagement = () => {
 
     //  Debounce timer
     const debounceTimer = setTimeout(() => {
-      getStockLiveForCompanyProduct(signal);
+      getWareHouseWiseStock(signal);
     }, DEBOUNCE_DELAY);
 
     // Cleanup
@@ -139,10 +135,10 @@ const StockManagement = () => {
         animate={inView ? { opacity: 1, y: 0 } : {}}
         transition={{ duration: 0.4, ease: "easeOut" }}
       >
-        {userHasAccessToViewProductWiseStock ? (
+        {userHasAccessToViewWarehouseWiseStock ? (
           <>
-            <StockManagementList
-              liveStockForCompanyProduct={liveStockForCompanyProduct}
+            <WareHouseWiseStockList
+              warehouseStock={liveStock}
               paginationData={{
                 onPageSizeChange: handlePageSizeChange,
                 currentPage,
@@ -168,6 +164,5 @@ const StockManagement = () => {
       </motion.section>
     </div>
   );
-};
-
-export default StockManagement;
+}
+export default WareHouseWiseStock;

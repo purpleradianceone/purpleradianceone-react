@@ -11,5 +11,6 @@ type PostDataToGetMasterTask = {
     general_task_type_id: number | null;
     frequency_id: number | null;
     assignedto: number | null;
+    isactive: boolean | null;
 };
 export default PostDataToGetMasterTask;

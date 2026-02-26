@@ -212,7 +212,7 @@ function MyAllTaskManagementList({
       if (isUsedInAllTasksModule) {
         const rowData: MyAllTaskProps = event.data;
         console.log(rowData);
-        switch (rowData.source) {
+        switch (rowData?.source?.split(" ")[0]) {
           case source[0].name: {
             const queryParams = qs.stringify({
               [MytaskQueryKey]: JSON.stringify(rowData),

@@ -1,81 +1,92 @@
-import { Calendar, Layers, Plus } from "lucide-react";
-import COLORS from "../../constants/Colors";
-import { useUserPreference } from "../../context/user/UserPreference";
-import Button from "../ui/Button";
-import MESSAGE from "../../constants/Messages";
+import { Package, Plus } from "lucide-react";
+import { useState } from "react";
 import toast from "react-hot-toast";
-import { ActionTypeForStockMOdule, SIZE } from "../../constants/AppConstants";
-import { useUserAccessModules } from "../../config/hooks/useAccessModules";
-import { useEffect, useState } from "react";
-import AddStock from "../modals/stock/AddStock";
+// import { Product } from "../../@types/products/ProductsManagementProps";
+// import LiveStockForCompanyProduct from "../../@types/stock/LiveStockForCompanyProduct";
 import StockManagementListProps from "../../@types/stock/StockManagementListProps";
-import StockLiveForCompanyProductAgGrid from "../ag-grid/StockLiveForCompanyProductAgGrid";
-import LiveStockForCompanyProduct from "../../@types/stock/LiveStockForCompanyProduct";
-import DateRangeFilterDropdown from "../ui/DateRangeFilterDropdown";
-import DateRangePicker from "../ui/DateRangePicker";
-import SearchInput from "../ui/SearchInput";
-import { useDateRangeIdChange } from "../../config/hooks/useDateRangeIdChange";
-import { useComapanySpecificSearchDateRange } from "../../config/hooks/useCompanySpecificDateRange";
-import StockLiveForCompanyProduct from "../modals/stock/StockLiveForCompanyProduct";
-import StockTransactions from "../modals/stock/StockTransactions";
-import { fetchCompanyProduct } from "../../config/apis/api";
-import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
-import { handleApiError } from "../../config/error/handleApiError";
-import { Product } from "../../@types/products/ProductsManagementProps";
+// import { fetchCompanyProduct } from "../../config/apis/api";
+// import { handleApiError } from "../../config/error/handleApiError";
+import { useUserAccessModules } from "../../config/hooks/useAccessModules";
+// import { ActionTypeForStockMOdule, SIZE } from "../../constants/AppConstants";
+import COLORS from "../../constants/Colors";
+import MESSAGE from "../../constants/Messages";
+// import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
+import { useUserPreference } from "../../context/user/UserPreference";
 import PaginationWithoutCount from "../ag-grid/PaginationWithoutCount";
+import StockLiveForCompanyProductAgGrid from "../ag-grid/StockLiveForCompanyProductAgGrid";
+import AddStock from "../modals/stock/AddStock";
+// import StockLiveForCompanyProduct from "../modals/stock/StockLiveForCompanyProduct";
+// import StockTransactions from "../modals/stock/StockTransactions";
+import Button from "../ui/Button";
+import SearchInput from "../ui/SearchInput";
+import { SIZE } from "../../constants/AppConstants";
 
-type StockView = ActionTypeForStockMOdule | null;
+// type StockView = ActionTypeForStockMOdule | null;
 
 const StockManagementList = ({
   liveStockForCompanyProduct,
   paginationData,
-  handleSearchOption,
-  onStartDateChange,
-  onEndDateChange,
+  searchParameter,
+  handleSearchParameterChange,
 }: StockManagementListProps) => {
-  const { loginStatus } = useLoggedInUserContext();
+  // const { loginStatus } = useLoggedInUserContext();
   const { userPreference } = useUserPreference();
-  const { userHasAccessToAddStock } = useUserAccessModules();
+  const { userHasAccessToAddProductWiseStock } = useUserAccessModules();
   const [isAddStockModalOpen, setIsAddStockModalOpen] =
     useState<boolean>(false);
-  const [isAddStockModalOpenFromStock, setIsAddStockModalOpenFromStock] =
-    useState<boolean>(false);
-  // const [openStockLivePage, setOpenStockLivePage] = useState<boolean>(false);
-  const [openAllTransactionPage, setOpenAllTransactionPage] =
-    useState<boolean>(false);
-  // const [openTransactionsPage, setOpenTransactionsPage] =
+  // const [isAddStockModalOpenFromStock, setIsAddStockModalOpenFromStock] =
   //   useState<boolean>(false);
-  // const [stockForCompanyProductLive, setStockLiveForCompanyProduct] =
+  // const [openAllTransactionPage, setOpenAllTransactionPage] =
+  //   useState<boolean>(false);
+  // const [activeStockView, setActiveStockview] = useState<StockView>(null);
+  // const [selectedStock, setSelectedStock] =
   //   useState<LiveStockForCompanyProduct | null>(null);
-  // const [selectedStockForTransaction, setSelectedStockForTransaction] =
-  // useState<LiveStockForCompanyProduct | null>(null);
-  const [activeStockView, setActiveStockview] = useState<StockView>(null);
-  const [selectedStock, setSelectedStock] =
-    useState<LiveStockForCompanyProduct | null>(null);
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  // const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  // const [isCreateStockLoading, setIsCreateStockLoading] = useState(false);
 
   // function handleSelectedStockLiveForCompanyProduct(
   //   data: LiveStockForCompanyProduct,
-  //   action: ActionTypeForStockMOdule
+  //   action: ActionTypeForStockMOdule,
   // ) {
   //   switch (action) {
   //     case ActionTypeForStockMOdule.DETAILS:
   //       if (data !== null && data !== undefined) {
-  //         setStockLiveForCompanyProduct(data);
-  //         setOpenStockLivePage(true);
+  //         setSelectedStock(data);
+  //         setActiveStockview(ActionTypeForStockMOdule.DETAILS);
   //       }
   //       break;
   //     case ActionTypeForStockMOdule.TRANSACTIONS:
   //       if (data !== null && data !== undefined) {
-  //         setSelectedStockForTransaction(data);
-  //         setOpenTransactionsPage(true);
+  //         setSelectedStock(data);
+  //         setActiveStockview(ActionTypeForStockMOdule.TRANSACTIONS);
   //       }
   //       break;
   //     case ActionTypeForStockMOdule.CREATE_STOCK:
-
+  //       if (data !== null && data !== undefined) {
+  //         handleCreateStock(data);
+  //       }
+  //       break;
   //   }
-
   // }
+  // const [isCreateStockReady, setIsCreateStockReady] = useState(false);
+  // const handleCreateStock = async (data: LiveStockForCompanyProduct) => {
+  //   setIsCreateStockReady(false);
+  //   setIsCreateStockLoading(true);
+
+
+  //   try {
+  //     const postData = {
+  //       company_id: loginStatus.companyId,
+  //       id: data.companyProductId,
+  //       limit: 1,
+  //       offset: 0,
+  //       search_company_specific_date_range_id: null,
+  //       search_parameter: null,
+  //       search_parameter_date: null,
+  //       requestedby_id: loginStatus.id,
+  //     };
+  //     const response = await fetchCompanyProduct(postData);
+  //     const product = response?.data?.[0] ?? response?.data;
 
   const [isCreateStockLoading, setIsCreateStockLoading] = useState(false);
 
@@ -163,48 +174,63 @@ const StockManagementList = ({
       // 1️ Set data first
       setSelectedProduct(formattedProduct);
 
-      // 2️ Mark ready
-      setIsCreateStockReady(true);
 
-      // 3️ Open view LAST
-      setActiveStockview(ActionTypeForStockMOdule.CREATE_STOCK);
-      setIsAddStockModalOpenFromStock(true);
-    } catch (err) {
-      handleApiError(err);
-    } finally {
-      setIsCreateStockLoading(false);
-    }
-  };
+  //     if (!product) return;
 
-  function handleShowAllTransactionButtonClick() {
-    setOpenAllTransactionPage(true);
-  }
-  const { dateRangeDropdownOptions } = useComapanySpecificSearchDateRange();
-  const {
-    handleDateRangeIdChange,
-    isCustomDateOptionSelected,
-    setIsCustomDateOptionSelected,
-  } = useDateRangeIdChange({ dateRangeDropdownOptions, handleSearchOption });
+  //     const formattedProduct: Product = {
+  //       count: product.count,
+  //       id: product.id,
+  //       companyId: product.company_id,
+  //       productTypeId: product.product_type_id,
+  //       unitName: product.unit_name,
+  //       unitId: product.unit_id,
+  //       unitNameInStock: product.unit_name_in_stock,
+  //       productTypeName: product.product_type_name,
+  //       defaultWarrantyIntervalTypeId:
+  //         product.default_warranty_interval_type_id,
+  //       defaultWarranty: product.default_warranty,
+  //       defaultWarrantyName: product.default_warranty_name,
+  //       defaultAmcCycleIntervalTypeId:
+  //         product.default_amc_cycle_interval_type_id,
+  //       defaultAmcCycle: product.default_amc_cycle,
+  //       defaultAmcCycleName: product.default_amc_cycle_name,
+  //       name: product.name,
+  //       barcode: product.barcode,
+  //       parentUnitId: product.parent_unit_id,
+  //       isSerialNumber: product.is_serial_number,
+  //       cost: product.cost,
+  //       description: product.description,
+  //       version: product.version,
+  //       url: product.url,
+  //       isActive: product.is_active,
+  //       hsn: product.hsn,
+  //       sac: product.sac,
+  //       taxRate: product.tax_rate,
+  //       validFrom: product.valid_from,
+  //       createdBy: product.created_by,
+  //       createdOn: product.created_on,
+  //     };
 
-  const selectedDateName =
-    dateRangeDropdownOptions.find(
-      (o) => o.search_date_range_id === handleSearchOption.dateRangeId
-    )?.date_range || "Date Filter";
+  //     // 1️ Set data first
+  //     setSelectedProduct(formattedProduct);
 
-  useEffect(() => {
-    if (handleSearchOption.dateRangeId === 8) {
-      setIsCustomDateOptionSelected(true);
-    }
-  }, [
-    handleSearchOption.searchParameter,
-    handleSearchOption.dateRangeId,
-    setIsCustomDateOptionSelected,
-  ]);
+  //     // 2️ Mark ready
+  //     setIsCreateStockReady(true);
+
+  //     // 3️ Open view LAST
+  //     setActiveStockview(ActionTypeForStockMOdule.CREATE_STOCK);
+  //     setIsAddStockModalOpenFromStock(true);
+  //   } catch (err) {
+  //     handleApiError(err);
+  //   } finally {
+  //     setIsCreateStockLoading(false);
+  //   }
+  // };
 
   return (
     <div
       className={`w-full  pt-1  ${
-        userPreference.isLeftMenu ? "pl-5" : "pl-1"
+        userPreference.isLeftMenu ? "pl-1" : "pl-1"
       } pr-1 gap-1`}
     >
       <div
@@ -212,61 +238,21 @@ const StockManagementList = ({
       >
         <div className="flex items-center pl-1 gap-5">
           <div className="flex gap-1">
-            <Layers className={COLORS.GRID_HEADER_ICONS_COLOR_AND_SIZE} />
-            <span className="section-header-custom">Stock Management</span>
+            <Package className={COLORS.GRID_HEADER_ICONS_COLOR_AND_SIZE} />
+            <span className="section-header-custom">Product Stock</span>
           </div>
 
           <div className="flex justify-center items-center  gap-1">
             {/* search box flex div */}
-
             <div className="flex items-start w-80">
               <SearchInput
                 id="company-user-module-search-box"
                 onChange={(e) => {
-                  handleSearchOption.handleSearchParameterChange(
-                    e.target.value,
-                  );
+                  handleSearchParameterChange(e.target.value);
                 }}
-                value={handleSearchOption.searchParameter}
+                value={searchParameter}
               ></SearchInput>
             </div>
-
-            {/* Date FIlters Dropdown */}
-            <div
-              className={`flex flex-wrap items-center gap-0.5 ${
-                isCustomDateOptionSelected ? "max-h-12" : "max-h-8"
-              }`}
-            >
-              <div className="flex gap-1">
-                <div className="flex ">
-                  <div className="flex input-label-custom items-center size-4 justify-center mt-2 mr-2 gap-2">
-                    <Calendar className="input-label-custom" />
-                  </div>
-                  <DateRangeFilterDropdown
-                    dropdownOptions={dateRangeDropdownOptions}
-                    handleDateIdChange={handleDateRangeIdChange}
-                    selectedOption={selectedDateName}
-                  ></DateRangeFilterDropdown>
-                </div>
-              </div>
-            </div>
-            {/* Custom Date Picker Div Flex Box*/}
-            {isCustomDateOptionSelected && (
-              <div
-                style={
-                  isCustomDateOptionSelected
-                    ? { visibility: "visible" }
-                    : { visibility: "hidden" }
-                }
-              >
-                <DateRangePicker
-                  onStartDateChange={onStartDateChange}
-                  onEndDateChange={onEndDateChange}
-                  initialStartDate={handleSearchOption.startDate}
-                  initialEndDate={handleSearchOption.endDate}
-                />
-              </div>
-            )}
           </div>
         </div>
         <div
@@ -274,23 +260,15 @@ const StockManagementList = ({
           className="flex gap-1 items-center"
         >
           <Button
-            type="button"
-            onClick={handleShowAllTransactionButtonClick}
-            className="flex items-center gap-2 h-7 px-2 py-1 caption-custom border border-gray-300 
-                      rounded-md bg-white  hover:bg-gray-50 
-                      focus:outline-none shadow-sm"
-          >
-            <span className="inline md:hidden">Transa...</span>
-            <span className="hidden md:inline"> Transactions</span>
-          </Button>
-
-          <Button
             type="submit"
-            disabled={!userHasAccessToAddStock}
+            disabled={!userHasAccessToAddProductWiseStock}
             onClick={(e) => {
               e.preventDefault();
-              if (!userHasAccessToAddStock) {
-                toast.error(MESSAGE.MODULE_ACCESS.STOCK.DENIED_ADD_ACCESS);
+              if (!userHasAccessToAddProductWiseStock) {
+                toast.error(
+                  MESSAGE.MODULE_ACCESS.STOCK.PRODUCT_WISE_STOCK
+                    .DENIED_ADD_ACCESS,
+                );
                 return;
               } else {
                 setIsAddStockModalOpen(true);
@@ -308,13 +286,13 @@ const StockManagementList = ({
         <div
           className={
             userPreference.isLeftMenu
-              ? `ag-theme-balham w-full h-[calc(100vh-116px)]`
-              : "ag-theme-balham w-full h-[calc(100vh-120px)]"
+              ? `ag-theme-balham w-full h-[calc(100vh-190px)]`
+              : "ag-theme-balham w-full h-[calc(100vh-192px)]"
           }
         >
           <StockLiveForCompanyProductAgGrid
             data={liveStockForCompanyProduct}
-            onRowSelect={handleSelectedStockLiveForCompanyProduct}
+            // onRowSelect={handleSelectedStockLiveForCompanyProduct}
           />
         </div>
         <div className="flex items-center justify-end ">
@@ -335,7 +313,7 @@ const StockManagementList = ({
           }}
         />
       )}
-      {activeStockView === ActionTypeForStockMOdule.CREATE_STOCK &&
+      {/* {activeStockView === ActionTypeForStockMOdule.CREATE_STOCK &&
         isCreateStockReady &&
         !isCreateStockLoading &&
         selectedProduct && (
@@ -349,8 +327,8 @@ const StockManagementList = ({
               setIsCreateStockReady(false);
             }}
           />
-        )}
-      {activeStockView === ActionTypeForStockMOdule.DETAILS && (
+        )} */}
+      {/* {activeStockView === ActionTypeForStockMOdule.DETAILS && (
         <StockLiveForCompanyProduct
           companyStockLive={selectedStock!}
           handleClose={() => {
@@ -372,7 +350,7 @@ const StockManagementList = ({
             setOpenAllTransactionPage(false);
           }}
         />
-      )}
+      )} */}
     </div>
   );
 };
