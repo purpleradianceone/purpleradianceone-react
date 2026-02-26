@@ -14,6 +14,7 @@ import AccountCompanyProductForSupportTicket from "../../@types/support-ticket-m
 import AccountCompanyProductForSupportTicketAgGrid from "../ag-grid/AccountCompanyProductForSupportTicketAgGrid";
 import { useEffect } from "react";
 import PaginationWithoutCount, { PaginationDataWithoutCountProps } from "../ag-grid/PaginationWithoutCount";
+import { customDateRangeId } from "../../config/hooks/usePaginationHandler";
 
 
 function AccountCompanyProductForSupportTicketList({
@@ -52,7 +53,7 @@ function AccountCompanyProductForSupportTicketList({
     )?.date_range || "Date Filter";
 
   useEffect(() => {
-    if (handleSearchOption.dateRangeId === 8) {
+    if (handleSearchOption.dateRangeId === customDateRangeId) {
       setIsCustomDateOptionSelected(true);
     }
   }, [

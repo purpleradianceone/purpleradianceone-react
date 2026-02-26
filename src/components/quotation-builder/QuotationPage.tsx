@@ -13,7 +13,7 @@ import DateRangeFilterDropdown from "../ui/DateRangeFilterDropdown";
 import SearchInput from "../ui/SearchInput";
 import { useDateRangeIdChange } from "../../config/hooks/useDateRangeIdChange";
 import { useEffect, useState } from "react";
-import { useSearchFilterPaginationDateHandlers } from "../../config/hooks/usePaginationHandler";
+import { customDateRangeId, useSearchFilterPaginationDateHandlers } from "../../config/hooks/usePaginationHandler";
 import { useComapanySpecificSearchDateRange } from "../../config/hooks/useCompanySpecificDateRange";
 import DateRangePicker from "../ui/DateRangePicker";
 import { useUserAccessModules } from "../../config/hooks/useAccessModules";
@@ -65,7 +65,7 @@ export const QuotationPage: React.FC = () => {
   }, [userHasAccessToViewQuotationTemplate]);
 
   useEffect(() => {
-    if (dateRangeId === 8) {
+    if (dateRangeId === customDateRangeId) {
       setIsCustomDateOptionSelected(true);
     }
   }, [searchParameter, dateRangeId, setIsCustomDateOptionSelected]);

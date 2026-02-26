@@ -11,7 +11,7 @@ import { Product } from "../../../@types/products/ProductsManagementProps";
 import RefreshToken from "../../../config/validations/RefreshToken";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import ApiError from "../../../@types/error/ApiError";
-import { useSearchFilterPaginationDateHandlers } from "../../../config/hooks/usePaginationHandler";
+import { customDateRangeId, useSearchFilterPaginationDateHandlers } from "../../../config/hooks/usePaginationHandler";
 import { useInView } from "react-intersection-observer";
 import { motion } from "framer-motion";
 import { LocalStorageKeys } from "../../../enums/LocalStorageKeys";
@@ -87,12 +87,12 @@ const savedFilters = JSON.parse(
   };
 
   const fetchCompanyProducts = async (signal : AbortSignal) => {
-    if (dateRangeId === 8 && concatDate.trim() === "") return;
+    if (dateRangeId === customDateRangeId && concatDate.trim() === "") return;
     if (userHasAccessToViewProduct || isGridForAccountProduct) {
       const offset = (currentPage - 1) * pageSize;
 
       const effectiveDateRangeId =
-        dateRangeId === 8 && !concatDate ? 0 : dateRangeId;
+        dateRangeId === customDateRangeId && !concatDate ? 0 : dateRangeId;
 
       setProductsData([]);
       setAccessDeniedPopUpOpen(false);

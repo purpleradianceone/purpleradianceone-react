@@ -3,6 +3,8 @@ import { STRING_VALUES } from '../../constants/AppConstants';
 import { useUserPreference } from '../../context/user/UserPreference';
 import { PageData } from '../../components/ag-grid/PaginationWithoutCount';
 
+export const customDateRangeId = 9;
+
 interface UseSearchFilterPaginationDateHandlersResult {
   pageSize: number;
   currentPage: number;

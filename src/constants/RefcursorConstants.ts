@@ -49,6 +49,13 @@ export const REFCURSOR_KEY = {
 
     MY_FIXED_CURSOR_RECENT_TICKETS : "my_fixed_cursor_recent_tickets",
 
+    //Inventory dashboard refcursors name
+    MY_FIXED_CURSOR_TOTAL_PRODUCTS : "my_fixed_cursor_total_products",
+    MY_FIXED_CURSOR_TOTAL_STOCK_VALUE:"my_fixed_cursor_total_stock_value",
+    MY_FIXED_CURSOR_LOW_STOCK_PRODUCTS : "my_fixed_cursor_low_stock_products",
+    MY_FIXED_CURSOR_OUT_OF_STOCK_PRODUCTS : "my_fixed_cursor_outof_stock_products",
+    MY_FIXED_CURSOR_TODAYS_INWARD_VALUE : "my_fixed_cursor_today_inward_value",
+    MY_FIXED_CURSOR_TODAYS_OUTWARD_VALUE : "my_fixed_cursor_today_outward_value",
 
 
 

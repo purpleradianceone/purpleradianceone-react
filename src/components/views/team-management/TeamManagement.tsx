@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { STATUS_CODE } from "../../../constants/AppConstants";
 import AccessDeniedPopup from "../not-found/AccessDeniedPage";
 import TeamManagementList from "../../lists/TeamManagementList";
-import { useSearchFilterPaginationDateHandlers } from "../../../config/hooks/usePaginationHandler";
+import { customDateRangeId, useSearchFilterPaginationDateHandlers } from "../../../config/hooks/usePaginationHandler";
 import axios from "axios";
 import POST_API from "../../../constants/PostApi";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
@@ -72,10 +72,10 @@ const savedFilters = JSON.parse(
   } = useSearchFilterPaginationDateHandlers(savedFilters);
 
   const effectiveDateRangeId =
-    dateRangeId === 8 && !concatDate ? 0 : dateRangeId;
+    dateRangeId === customDateRangeId && !concatDate ? 0 : dateRangeId;
 
   const fetchCompanyTeam = async (signal : AbortSignal) => {
-    if (dateRangeId === 8 && concatDate.trim() === "") return;
+    if (dateRangeId === customDateRangeId && concatDate.trim() === "") return;
     const offset = (currentPage - 1) * pageSize;
     if (userHasAccessToViewTeamManagement) {
 
