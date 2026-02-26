@@ -87,6 +87,7 @@ import StockPage from "../../components/views/stock-management/StockPage";
 import StockManagement from "../../components/views/stock-management/StockManagement";
 import WareHouseWiseStock from "../../components/views/stock-management/WareHouseWiseStock";
 import StockLedgerManagement from "../../components/views/stock-management/StockLedgerManagement";
+import StockAgeingManagement from "../../components/views/stock-management/StockAgeingManagement";
 
 export const router = createBrowserRouter([
   {
@@ -1046,12 +1047,7 @@ export const router = createBrowserRouter([
               MESSAGE.MODULE_ACCESS.STOCK.STOCK_AGEING.DENIED_VIEW_ACCESS
             }
           >
-            {/* <MasterTaskManagement isUsedInAllTasksModule={true} /> */}
-            <>
-            <div className="h-screen items-center justify-center w-full">
-            stock ageing comming soon...
-            </div>
-            </>
+            <StockAgeingManagement />
           </ModuleGuard>
         ),
       },

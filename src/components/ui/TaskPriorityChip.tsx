@@ -11,7 +11,7 @@ function TaskPriorityChip({ priorityName }: { priorityName: string }) {
       // LOW
       case "Low":
         return {
-          color: COLORS.CHIP_INACTIVE,
+          color: COLORS.CHIP_ACTIVE,
         };
 
       // MEDIUM
@@ -23,7 +23,7 @@ function TaskPriorityChip({ priorityName }: { priorityName: string }) {
       // HIGH
       case "High":
         return {
-          color: COLORS.CHIP_ACTIVE,
+          color: COLORS.CHIP_INACTIVE,
         };
       default:
         return {
