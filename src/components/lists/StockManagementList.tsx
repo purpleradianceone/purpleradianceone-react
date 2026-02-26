@@ -73,6 +73,7 @@ const StockManagementList = ({
   //   setIsCreateStockReady(false);
   //   setIsCreateStockLoading(true);
 
+
   //   try {
   //     const postData = {
   //       company_id: loginStatus.companyId,
@@ -86,6 +87,93 @@ const StockManagementList = ({
   //     };
   //     const response = await fetchCompanyProduct(postData);
   //     const product = response?.data?.[0] ?? response?.data;
+
+  const [isCreateStockLoading, setIsCreateStockLoading] = useState(false);
+
+  function handleSelectedStockLiveForCompanyProduct(
+    data: LiveStockForCompanyProduct,
+    action: ActionTypeForStockMOdule
+  ) {
+    switch (action) {
+      case ActionTypeForStockMOdule.DETAILS:
+        if (data !== null && data !== undefined) {
+          setSelectedStock(data);
+          setActiveStockview(ActionTypeForStockMOdule.DETAILS);
+        }
+        break;
+      case ActionTypeForStockMOdule.TRANSACTIONS:
+        if (data !== null && data !== undefined) {
+          setSelectedStock(data);
+          setActiveStockview(ActionTypeForStockMOdule.TRANSACTIONS);
+        }
+        break;
+      case ActionTypeForStockMOdule.CREATE_STOCK:
+        if (data !== null && data !== undefined) {
+          handleCreateStock(data);
+        }
+        break;
+    }
+  }
+  const [isCreateStockReady, setIsCreateStockReady] = useState(false);
+
+  const handleCreateStock = async (data: LiveStockForCompanyProduct) => {
+    setIsCreateStockReady(false);
+    setIsCreateStockLoading(true);
+
+    try {
+      const postData = {
+        company_id: loginStatus.companyId,
+        id: data.companyProductId,
+        limit: 1,
+        offset: 0,
+        search_company_specific_date_range_id: null,
+        search_parameter: null,
+        search_parameter_date: null,
+        requestedby_id: loginStatus.id,
+      };
+      const response = await fetchCompanyProduct(postData);
+      const product = response?.data?.[0] ?? response?.data;
+
+      if (!product) return;
+
+      const formattedProduct: Product = {
+        count: product.count,
+        id: product.id,
+        companyId: product.company_id,
+        productTypeId: product.product_type_id,
+        unitName: product.unit_name,
+        unitId: product.unit_id,
+        unitNameInStock: product.unit_name_in_stock,
+        productTypeName: product.product_type_name,
+        defaultWarrantyIntervalTypeId:
+          product.default_warranty_interval_type_id,
+        defaultWarranty: product.default_warranty,
+        defaultWarrantyName: product.default_warranty_name,
+        defaultAmcCycleIntervalTypeId:
+          product.default_amc_cycle_interval_type_id,
+        defaultAmcCycle: product.default_amc_cycle,
+        defaultAmcCycleName: product.default_amc_cycle_name,
+        name: product.name,
+        barcode: product.barcode,
+        parentUnitId: product.parent_unit_id,
+        isSerialNumber: product.is_serial_number,
+        cost: product.cost,
+        description: product.description,
+        version: product.version,
+        url: product.url,
+        isActive: product.is_active,
+        hsn: product.hsn,
+        sac: product.sac,
+        taxRate: product.tax_rate,
+        validFrom: product.valid_from,
+        createdBy: product.created_by,
+        createdOn: product.created_on,
+        minimumStock : product.minimum_stock
+      };
+
+      // 1️ Set data first
+      setSelectedProduct(formattedProduct);
+
 
   //     if (!product) return;
 

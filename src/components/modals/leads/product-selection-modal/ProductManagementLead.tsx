@@ -244,6 +244,7 @@ function ProductManagementLead({
           unitId: res.unit_id,
           unitName: res.unit_name,
           unitNameInStock: res.unit_name_in_stock,
+          minimumStock : res.minimum_stock
         }));
 
         // Update products list state
