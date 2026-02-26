@@ -1,19 +1,19 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect, useState } from "react";
-import AccessDeniedPopup from "../not-found/AccessDeniedPage";
-import { motion } from "framer-motion";
-import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
-import { useInView } from "react-intersection-observer";
-import StockManagementList from "../../lists/StockManagementList";
-import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
 import axios from "axios";
-import POST_API from "../../../constants/PostApi";
+import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
+import { useInView } from "react-intersection-observer";
 import ApiError from "../../../@types/error/ApiError";
-import { DEBOUNCE_DELAY, STATUS_CODE } from "../../../constants/AppConstants";
 import LiveStockForCompanyProduct from "../../../@types/stock/LiveStockForCompanyProduct";
-import { customDateRangeId, useSearchFilterPaginationDateHandlers } from "../../../config/hooks/usePaginationHandler";
-import { LocalStorageKeys } from "../../../enums/LocalStorageKeys";
 import { handleApiError } from "../../../config/error/handleApiError";
+import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
+import { useSearchFilterPaginationDateHandlers } from "../../../config/hooks/usePaginationHandler";
+import { DEBOUNCE_DELAY, STATUS_CODE } from "../../../constants/AppConstants";
+import POST_API from "../../../constants/PostApi";
+import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
+import { LocalStorageKeys } from "../../../enums/LocalStorageKeys";
+import StockManagementList from "../../lists/StockManagementList";
+import AccessDeniedPopup from "../not-found/AccessDeniedPage";
 
 const StockManagement = () => {
   const { userHasAccessToViewProductWiseStock } = useUserAccessModules();
@@ -48,8 +48,6 @@ const StockManagement = () => {
   } = useSearchFilterPaginationDateHandlers(savedFilters);
 
   const getStockLiveForCompanyProduct = async (signal: AbortSignal) => {
-    if (dateRangeId === customDateRangeId && concatDate.trim() === "") return;
-
     const offset = (currentPage - 1) * pageSize;
     const postData = {
       company_id: loginStatus.companyId,
