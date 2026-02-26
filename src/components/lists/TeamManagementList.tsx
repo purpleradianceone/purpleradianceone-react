@@ -17,6 +17,7 @@ import TeamManagementListProps from "../../@types/List/TeamManagementListProps";
 import { useUserPreference } from "../../context/user/UserPreference";
 import COLORS from "../../constants/Colors";
 import PaginationWithoutCount from "../ag-grid/PaginationWithoutCount";
+import { customDateRangeId } from "../../config/hooks/usePaginationHandler";
 
 function TeamManagementList({
   companyTeamList,
@@ -69,7 +70,7 @@ function TeamManagementList({
     )?.date_range || "Date Filter";
 
   useEffect(() => {
-    if (handleSearchOption.dateRangeId === 8) {
+    if (handleSearchOption.dateRangeId === customDateRangeId) {
       setIsCustomDateOptionSelected(true);
     }
   }, [

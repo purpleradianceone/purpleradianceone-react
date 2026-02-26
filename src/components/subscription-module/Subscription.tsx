@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import axios from "axios";
-import { useSearchFilterPaginationDateHandlers } from "../../config/hooks/usePaginationHandler";
+import { customDateRangeId, useSearchFilterPaginationDateHandlers } from "../../config/hooks/usePaginationHandler";
 import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
 import POST_API from "../../constants/PostApi";
 import { STATUS_CODE } from "../../constants/AppConstants";
@@ -43,7 +43,7 @@ function SubscriptionManagement() {
     const offset = (currentPage - 1) * pageSize;
 
     const effectiveDateRangeId =
-      dateRangeId === 8 && !concatDate ? 0 : dateRangeId;
+      dateRangeId === customDateRangeId && !concatDate ? 0 : dateRangeId;
 
     //NOTE : POST DATA
     const postData = {

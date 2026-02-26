@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import SearchDropDownOptions from '../../@types/ag-grid/SearchDropDownOptions'; // Adjust path as needed
+import { customDateRangeId } from './usePaginationHandler';
 
 type UseDateIdChangeProps = {
   dateRangeDropdownOptions: SearchDropDownOptions[];
@@ -31,7 +32,7 @@ export const useDateRangeIdChange = ({
     }
     dateRangeDropdownOptions.forEach((option) => {
       if (option.search_date_range_id === dateId) {
-        if (dateId === 8) {
+        if (dateId === customDateRangeId) {
           setIsCustomDateOptionSelected(true);
         } else {
           setIsCustomDateOptionSelected(false);

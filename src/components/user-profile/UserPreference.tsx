@@ -22,6 +22,20 @@ import MESSAGE from "../../constants/Messages";
 import { useCountries } from "../../config/hooks/useCountries";
 import Country from "../../@types/general/Country";
 import { AppVersionViewCard } from "../views/card/AppVersionViewCard";
+import axiosClient from "../../axios-client/AxiosClient";
+import {
+  CompanyDetail,
+  isCompanyDetailEqual,
+} from "../../@types/company-detail/CompanyDetail";
+import { handleApiError } from "../../config/error/handleApiError";
+import FormInput from "../ui/FormInput";
+import TextAreaInput from "../ui/TextAreaInput";
+import State from "../../@types/general/State";
+import District from "../../@types/general/District";
+import CustomDropdown from "../modals/leads/CustomDropdown";
+import EditableSection from "./EditableSection";
+import { usebusinessType } from "../../config/hooks/useBusinessType";
+import { useIndustryType } from "../../config/hooks/useIndustryType";
 
 const UserPreference = () => {
   const { countries } = useCountries();
@@ -32,27 +46,108 @@ const UserPreference = () => {
 
   const navigate = useNavigate();
   const {
-    // userHasAccessToUpdateUser,
+    userHasAccessToUpdateUser,
     userHasAccessToUpdateSettingGeneral,
     userHasAccessToViewSettingGeneral,
+    userHasAccessToViewCompanyDetail,
+    userHasAccessToUpdateCompanyDetail,
   } = useUserAccessModules();
 
   const [selectedRowsPerPage, setSelectedRowsPerPage] = useState<number>(
-    userPreference.rowsInGrid
+    userPreference.rowsInGrid,
   );
   const [selectedCountry, setSelectedCountry] = useState<Country | null>(null);
 
-  // useEffect(() => {
-  //   const country = countries.find(
-  //     (country: Country) => country.id === userPreference.countryId
-  //   );
-  //   setSelectedCountry(country);
-  // }, [userPreference]);
+  const [companyDetail, setCompanyDetail] = useState<CompanyDetail>({
+    id: 0,
+
+    company_id: 0,
+
+    industry_type_id: 0,
+    industry_type_name: "string",
+
+    business_type_id: 0,
+    business_type_name: "string",
+
+    state_id: 0,
+    state_name: "string",
+
+    district_id: 0,
+    district_name: "string",
+
+    pan: "string",
+    gst: "string",
+    tan: "string",
+    cin: "string",
+
+    business_registration_number: "string",
+
+    billing_address: "string",
+    shipping_address: "string",
+    registered_office_address: "string",
+
+    website: "string",
+
+    logo_file_extension: "string",
+    logo_origin_url: "string",
+    logo_cdn_url: "string",
+
+    isactive: false,
+
+    createdby: "string",
+    updatedby: "string",
+
+    createdon: "string",
+    updatedon: "string",
+  });
+  const [previousCompanyDetail, setPriviousCompanyDetail] =
+    useState<CompanyDetail>({
+      id: 0,
+
+      company_id: 0,
+
+      industry_type_id: 0,
+      industry_type_name: "string",
+
+      business_type_id: 0,
+      business_type_name: "string",
+
+      state_id: 0,
+      state_name: "string",
+
+      district_id: 0,
+      district_name: "string",
+
+      pan: "string",
+      gst: "string",
+      tan: "string",
+      cin: "string",
+
+      business_registration_number: "string",
+
+      billing_address: "string",
+      shipping_address: "string",
+      registered_office_address: "string",
+
+      website: "string",
+
+      logo_file_extension: "string",
+      logo_origin_url: "string",
+      logo_cdn_url: "string",
+
+      isactive: false,
+
+      createdby: "string",
+      updatedby: "string",
+
+      createdon: "string",
+      updatedon: "string",
+    });
 
   useEffect(() => {
     if (userPreference.countryId && countries.length > 0) {
       const found = countries.find(
-        (c: Country) => c.id === userPreference.countryId
+        (c: Country) => c.id === userPreference.countryId,
       );
       setSelectedCountry(found || null);
     }
@@ -76,7 +171,6 @@ const UserPreference = () => {
     mobileNumber: loginStatus.mobileNumber || "",
   });
 
-  const [isEditing, setIsEditing] = useState<boolean>(false);
   const [initialData, setInitialData] = useState(formData);
   const [isSaveEnabled, setIsSaveEnabled] = useState<boolean>(false);
 
@@ -88,7 +182,7 @@ const UserPreference = () => {
   const prevTimezoneId = useRef<number>(userPreference.timezoneId);
 
   const [selectedTimezoneId, setSelectedTimezoneId] = React.useState<number>(
-    userPreference.timezoneId
+    userPreference.timezoneId,
   );
 
   // timezone states
@@ -103,7 +197,7 @@ const UserPreference = () => {
   const handleTimezonePreferenceChange = async () => {
     //getting the id as per value
     const selectedMasterRowInGrid = rowsInGridDropdownOptions.find(
-      (option) => parseInt(option.rowsInGrid) === selectedRowsPerPage
+      (option) => parseInt(option.rowsInGrid) === selectedRowsPerPage,
     );
 
     const postData = {
@@ -116,14 +210,14 @@ const UserPreference = () => {
       timezone_id: selectedTimezoneId,
       updatedby: loginStatus.id,
     };
-    
+
     try {
       const response = await axios.post(
         POST_API.UPDATE_COMPANY_USER_PREFERENCE,
         postData,
         {
           withCredentials: true,
-        }
+        },
       );
 
       if (response.status === STATUS_CODE.OK) {
@@ -146,7 +240,7 @@ const UserPreference = () => {
                 ? userPreference.timezone
                 : selectedTimeZoneData.timezone,
             rowsInGrid: parseInt(selectedMasterRowInGrid!.rowsInGrid),
-            countryId : selectedCountry?.id || userPreference.countryId
+            countryId: selectedCountry?.id || userPreference.countryId,
           });
           setShowTimeZoneData(false);
         }
@@ -184,15 +278,21 @@ const UserPreference = () => {
     setIsSaveEnabled(hasChanged && !hasErrors);
   };
 
-  const handleEditClick = async () => {
-    if (isEditing) {
-      if (isSaveEnabled) {
-        await updateUserProfile();
-        setInitialData(formData);
-        setIsSaveEnabled(false);
-      }
+  const handleUserDetailSave = async () => {
+    if (isSaveEnabled) {
+      await updateUserProfile();
+      setInitialData(formData);
+      setIsSaveEnabled(false);
+    } else {
+      toast("No Details Changed", {
+        icon: "⚠️",
+        style: {
+          border: "1px solid #facc15",
+          background: "#fffbeb",
+          color: "#92400e",
+        },
+      });
     }
-    setIsEditing(!isEditing);
   };
 
   const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
@@ -262,6 +362,7 @@ const UserPreference = () => {
         //   type: "success",
         // });
         if (res.status) {
+          setEditingSection(null);
           toast.success(response.data.message);
           setLoginStatus({
             ...loginStatus,
@@ -295,7 +396,7 @@ const UserPreference = () => {
   const loadTimezones = async (
     newOffset: number,
     searchTextToUse = "",
-    customLimit?: number
+    customLimit?: number,
   ) => {
     const effectiveLimit = customLimit !== undefined ? customLimit : limit;
 
@@ -337,7 +438,7 @@ const UserPreference = () => {
   };
 
   const handleSelectRowInGridOptionChange = (
-    event: ChangeEvent<HTMLSelectElement>
+    event: ChangeEvent<HTMLSelectElement>,
   ) => {
     const selectedOptionValue = parseInt(event.target.value, 10);
 
@@ -346,11 +447,13 @@ const UserPreference = () => {
     }
   };
 
-  const handleSelectCountryOptionChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-  const id = Number(e.target.value);
-  const selected = countries.find((c) => c.id === id) || null;
-  setSelectedCountry(selected);
-};
+  const handleSelectCountryOptionChange = (
+    e: React.ChangeEvent<HTMLSelectElement>,
+  ) => {
+    const id = Number(e.target.value);
+    const selected = countries.find((c) => c.id === id) || null;
+    setSelectedCountry(selected);
+  };
 
   // Initial load (now triggered by showing the dropdown)
   useEffect(() => {
@@ -395,358 +498,979 @@ const UserPreference = () => {
     return backgroundColors[index];
   };
 
+  //For company details
+  
+  const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [logoPreview, setLogoPreview] = useState<string | null>(null);
+
+  const [stateData, setStateData] = useState<State[]>([]);
+  const [districts, setDistrict] = useState<District[]>([]);
+
+  const getCompanyDetail = () => {
+    try {
+      axiosClient
+        .post(POST_API.GET_COMPANY_DETAIL, {
+          company_id: loginStatus.companyId,
+          requestedby_id: loginStatus.id,
+        })
+        .then((response) => {
+          console.log(response.data);
+          if (response.status === STATUS_CODE.OK) {
+            setCompanyDetail(response.data[0]);
+            setPriviousCompanyDetail(response.data[0]);
+          }
+        })
+        .catch((e) => {
+          handleApiError(e);
+        });
+    } catch (ex) {
+      handleApiError(ex);
+    }
+  };
+
+  
+
+  const handleCompanyDetailsChange = (
+    e:
+      | React.ChangeEvent<HTMLInputElement>
+      | React.ChangeEvent<HTMLTextAreaElement>,
+  ) => {
+    const { name, value } = e.target;
+    const updatedCompanyDetail = { ...companyDetail, [name]: value };
+    setCompanyDetail(updatedCompanyDetail);
+  };
+
+  // const handleCompanyLogoUpload = () =>{
+
+  //   if (logoFile?.type) {
+  //     try {
+  //       axiosClient
+  //         .post(POST_API.UPDATE_COMPANY_DETAIL, {
+  //           company_id: loginStatus.companyId,
+  //           logo_file_extension: companyDetail.logo_file_extension,
+  //           logo_origin_url: companyDetail?.logo_origin_url,
+  //           logo_cdn_url: companyDetail?.logo_cdn_url,
+  //           updatedby_id: loginStatus.id,
+  //         })
+  //         .then((response) => {
+  //           if (response.data.status) {
+  //             toast.success(response.data.message);
+  //             getCompanyDetail();
+  //           } else {
+  //             toast.error(response.data.message);
+  //           }
+  //         })
+  //         .catch((e) => {
+  //           handleApiError(e);
+  //         });
+  //       console.log("inside if condition");
+  //     } catch (ex) {
+  //       console.log(ex);
+  //       handleApiError(ex);
+  //     }
+  //   } else {
+  //     toast("No File Selected For Upload", {
+  //       icon: "⚠️",
+  //       style: {
+  //         border: "1px solid #facc15",
+  //         background: "#fffbeb",
+  //         color: "#92400e",
+  //       },
+  //     });
+  //   }
+
+  // }
+
+  const updateCompanyDetail = () => {
+    if (!isCompanyDetailEqual(previousCompanyDetail, companyDetail)) {
+      try {
+        axiosClient
+          .post(POST_API.UPDATE_COMPANY_DETAIL, {
+            company_id: loginStatus.companyId,
+            industry_type_id: companyDetail.industry_type_id,
+            business_type_id: companyDetail.business_type_id,
+            state_id: companyDetail.state_id,
+            district_id: companyDetail.district_id,
+            pan: companyDetail.pan,
+            gst: companyDetail.gst,
+            tan: companyDetail.tan,
+            cin: companyDetail.cin,
+            business_registration_number: companyDetail.business_registration_number,
+            billing_address: companyDetail.billing_address,
+            shipping_address: companyDetail.shipping_address,
+            registered_office_address: companyDetail.registered_office_address,
+            website: companyDetail.website,
+            // logo_file_extension: companyDetail.logo_file_extension,
+            // logo_origin_url: companyDetail?.logo_origin_url,
+            // logo_cdn_url: companyDetail?.logo_cdn_url,
+            isactive: companyDetail?.isactive,
+            updatedby_id: loginStatus.id,
+          })
+          .then((response) => {
+            if (response.data.status) {
+              toast.success(response.data.message);
+              getCompanyDetail();
+              setEditingSection(null);
+            } else {
+              toast.error(response.data.message);
+            }
+          })
+          .catch((e) => {
+            handleApiError(e);
+          });
+        console.log("inside if condition");
+      } catch (ex) {
+        console.log(ex);
+        handleApiError(ex);
+      }
+    } else {
+      toast("No Details Changed", {
+        icon: "⚠️",
+        style: {
+          border: "1px solid #facc15",
+          background: "#fffbeb",
+          color: "#92400e",
+        },
+      });
+    }
+  };
+
+  useEffect(() => {
+    getCompanyDetail();
+  }, [loginStatus.companyId]);
+
+
+  const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setLogoFile(file);
+    console.log(logoFile);
+
+    // preview
+    const previewUrl = URL.createObjectURL(file);
+    setLogoPreview(previewUrl);
+  };
+
+  const [editingSection, setEditingSection] = useState<string | null>(null);
+
+  const handleEditableSectionSave = () => {
+    updateCompanyDetail();
+  };
+
+  const getAllState = async (countryId: number | null) => {
+    if (!countryId) return;
+    const PostDataForState: State = {
+      id: null,
+      country_id: countryId,
+      name: null,
+      description: null,
+      isactive: true,
+    };
+    try {
+      const response = await axiosClient.post(
+        POST_API.GET_STATE,
+        PostDataForState,
+        {
+          withCredentials: true,
+          headers: {
+            "Content-Type": "application/json",
+          },
+        },
+      );
+      if (response.status === STATUS_CODE.OK) {
+        setStateData(response.data);
+      } else {
+        throw new Error("Failed to fetch states");
+      }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      if (error.status === STATUS_CODE.UNATHORISED) {
+        const refreshTokenStatus = await RefreshToken({
+          callFunctionWithParamsNotEvent: getAllState,
+        });
+        if (refreshTokenStatus) {
+          getAllState(countryId);
+        }
+      }
+      handleApiError(error);
+    }
+  };
+
+  const { businessType } = usebusinessType();
+  const { industryTypeData } = useIndustryType();
+
+  useEffect(() => {
+    getAllState(userPreference.countryId);
+  }, [userPreference.countryId]);
+
+  useEffect(() => {
+    if (companyDetail.state_id) {
+      getAllDistrict(companyDetail.state_id);
+    }
+  }, [companyDetail.state_id]);
+
+  const getAllDistrict = async (stateId: number | null) => {
+    if (!stateId) return;
+    const PostDataForDistrict: District = {
+      id: null,
+      state_id: stateId,
+      name: null,
+      description: null,
+      isactive: true,
+    };
+
+    try {
+      const response = await axiosClient.post(
+        POST_API.GET_DISTRICT,
+        PostDataForDistrict,
+        {
+          withCredentials: true,
+          headers: {
+            "Content-Type": "application/json",
+          },
+        },
+      );
+
+      if (response.status === STATUS_CODE.OK) {
+        setDistrict(response.data);
+      }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      if (error.status === STATUS_CODE.UNATHORISED) {
+        const refreshTokenStatus = await RefreshToken({
+          callFunctionWithParamsNotEvent: getAllDistrict,
+        });
+        if (refreshTokenStatus) {
+          getAllDistrict(stateId);
+        }
+      }
+    }
+  };
+
   return (
     <div className="w-full mx-24 min-h-screen bg-gray-100 py-8 px-2 space-y-10">
       {/* Profile Info Card */}
-
-      <div className=" bg-white rounded-2xl shadow-lg p-8 md:p-12 space-y-8">
-        {/* Header */}
-        <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
-          <div
-            className={`w-32 h-32 rounded-full grid place-content-center text-white text-8xl font-semibold pb-3 border-2 border-gray-300 ${getColor(
-              loginStatus.email
-            )}`}
-          >
-            {loginStatus.fullName ? loginStatus.fullName.charAt(0) : ""}
-          </div>
-          <div className="flex-1 space-y-1 text-center md:text-left">
-            <h2
-              title={formData.fullName ?? "Not Provided"}
-              className="section-header-custom block truncate w-full  "
-            >
-              {loginStatus.fullName}
-            </h2>
-            <p className="table-header-custom">
-              {loginStatus.companyName || ""}
-            </p>
-            <button
-              className={`mt-2 px-4 py-2 bg-blue-600 action-btn-custom rounded-md hover:bg-blue-700 transition
-                  ${
-                    isEditing
-                      ? isSaveEnabled
-                        ? "bg-green-600 hover:bg-green-700"
-                        : "bg-gray-400 cursor-not-allowed"
-                      : "bg-blue-600 hover:bg-blue-700"
-                  }}
-                `}
-              onClick={() => {
-                if (userHasAccessToUpdateSettingGeneral) {
-                  handleEditClick();
-                } else {
-                  toast.error(
-                    "you do not have access to update user information."
-                  );
-                }
-              }}
-              disabled={isEditing && !isSaveEnabled}
-            >
-              {isEditing ? "Save" : "Edit Profile"}
-            </button>
-          </div>
+      <div className="  bg-white rounded-2xl shadow-lg  p-8 space-y-2">
+        <div className="flex items-center justify-between ">
+          <h3 className="section-header-custom">
+            My Profile{" "}
+            <span className="caption-custom">(Click edit to change)</span>
+          </h3>
         </div>
-
-        {/* Basic Info Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-          <div className="">
-            <h4 className="table-header-custom">Name</h4>
-            {isEditing ? (
-              <>
-                <input
-                  type="text"
-                  name="fullName"
-                  value={formData.fullName}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  maxLength={VALIDATIONS.MAX_NAME_LENGTH}
-                  minLength={VALIDATIONS.MIN_NAME_LENGTH}
-                  className="w-full p-2 border rounded"
-                />
-                {formErrors.fullName && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {formErrors.fullName}
-                  </p>
-                )}
-              </>
-            ) : (
-              <p
-                title={formData.fullName ?? "Not Provided"}
-                className="table-data-custom block truncate w-full "
-              >
-                {formData.fullName || "Not Provided"}
-              </p>
-            )}
+        <div className="border-t pt-4 w-full"></div>
+        <div className="flex justify-center items-center gap-8 ">
+          {/* Header */}
+          <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
+            <div
+              className={`relative w-32 h-32 rounded-full flex items-center justify-center text-white text-6xl font-semibold  border-4 border-white shadow-xl ring-2 ring-gray-200  transition-all duration-300 hover:scale-105 hover:shadow-2xl ${getColor(loginStatus.email)}`}
+            >
+              {loginStatus.fullName?.charAt(0)?.toUpperCase()}
+            </div>
           </div>
 
-          <div>
-            <h4 className="table-header-custom">Email</h4>
-            <p className={classnameForParagragh}>
-              {formData.email || "Not Provided"}
-            </p>
-          </div>
+          {/* Basic Info Grid */}
+          <div className="w-full">
+            <EditableSection
+              title=""
+              hasAccess={userHasAccessToUpdateUser}
+              onEdit={() => {
+                setEditingSection("user detail");
+              }}
+              isEditing={editingSection === "user detail"}
+              onCancel={() => setEditingSection(null)}
+              sectionKey="user detail"
+              onSave={handleUserDetailSave}
+            >
+              {editingSection === "user detail" ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  <div className="">
+                    <h4 className="table-header-custom">Name</h4>
+                    <FormInput
+                      type="text"
+                      name="fullName"
+                      value={formData.fullName}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      maxLength={VALIDATIONS.MAX_NAME_LENGTH}
+                      minLength={VALIDATIONS.MIN_NAME_LENGTH}
+                      className="w-full p-2 border rounded"
+                    />
+                    {formErrors.fullName && (
+                      <p className="text-red-500 text-sm mt-1">
+                        {formErrors.fullName}
+                      </p>
+                    )}
+                  </div>
 
-          <div>
+                  <div>
+                    <h4 className="table-header-custom">Email</h4>
+                    <p className={classnameForParagragh}>
+                      {formData.email || "Not Provided"}
+                    </p>
+                  </div>
+
+                  {/* <div>
             <h4 className="table-header-custom">Company</h4>
             <p className={classnameForParagragh}>{loginStatus.companyName}</p>
-          </div>
+            </div> */}
 
-          <div>
-            <h4 className="table-header-custom">Contact Number</h4>
-            {isEditing ? (
-              <>
-                <input
-                  type="text"
-                  name="mobileNumber"
-                  value={formData.mobileNumber}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  maxLength={VALIDATIONS.MOBILE_NUMBER_LENGTH}
-                  minLength={VALIDATIONS.MOBILE_NUMBER_LENGTH}
-                  className="w-full p-2 border rounded"
-                />
-                {formErrors.mobileNumber && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {formErrors.mobileNumber}
-                  </p>
-                )}
-              </>
-            ) : (
-              <p className={classnameForParagragh}>
-                {formData.mobileNumber || "Not Provided"}
-              </p>
-            )}
-          </div>
+                  <div>
+                    <h4 className="table-header-custom">Contact Number</h4>
+                    <FormInput
+                      type="text"
+                      name="mobileNumber"
+                      value={formData.mobileNumber}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      maxLength={VALIDATIONS.MOBILE_NUMBER_LENGTH}
+                      minLength={VALIDATIONS.MOBILE_NUMBER_LENGTH}
+                      className="w-full p-2 border rounded"
+                    />
+                    {formErrors.mobileNumber && (
+                      <p className="text-red-500 text-sm mt-1">
+                        {formErrors.mobileNumber}
+                      </p>
+                    )}
+                  </div>
 
-          <div>
-            <h4 className="table-header-custom">Profile Status</h4>
-            <p className={classnameForParagragh}>
-              {loginStatus.status === true ? "Active" : "Inactive"}
-            </p>
+                  <div className="mt-1 justify-center items-center">
+                    <h4 className="table-header-custom">Profile Status</h4>
+                    <p className={classnameForParagragh}>
+                      {loginStatus.status === true ? "Active" : "Inactive"}
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  <div className="">
+                    <h4 className="table-header-custom">Name</h4>
+                    <p
+                      title={formData.fullName ?? "Not Provided"}
+                      className="table-data-custom block truncate w-full "
+                    >
+                      {formData.fullName || "Not Provided"}
+                    </p>
+                  </div>
+
+                  <div>
+                    <h4 className="table-header-custom">Email</h4>
+                    <p className={classnameForParagragh}>
+                      {formData.email || "Not Provided"}
+                    </p>
+                  </div>
+
+                  {/* <div>
+            <h4 className="table-header-custom">Company</h4>
+            <p className={classnameForParagragh}>{loginStatus.companyName}</p>
+            </div> */}
+
+                  <div>
+                    <h4 className="table-header-custom">Contact Number</h4>
+
+                    <p className={classnameForParagragh}>
+                      {formData.mobileNumber || "Not Provided"}
+                    </p>
+                  </div>
+
+                  <div className="mt-1 justify-center items-center">
+                    <h4 className="table-header-custom">Profile Status</h4>
+                    <p className={classnameForParagragh}>
+                      {loginStatus.status === true ? "Active" : "Inactive"}
+                    </p>
+                  </div>
+                </div>
+              )}
+            </EditableSection>
           </div>
         </div>
       </div>
-      <div className="grid grid-cols-1  gap-3">
 
-      {/* PREFERENCE CARD */}
-      <div
-        className={` ${
-          !userHasAccessToViewSettingGeneral ? "hidden" : ""
-        }   bg-white rounded-2xl shadow-lg px-8 py-6 space-y-2`}
-      >
-        {/* button */}
-        <div className="flex items-center justify-between">
-          <h3 className="section-header-custom">
-            Preferences{" "}
-            <span className="caption-custom">(Click to change)</span>
-          </h3>
-          {(prevTimezoneId.current !== selectedTimezoneId ||
-            userPreference.rowsInGrid != selectedRowsPerPage || userPreference.countryId !==selectedCountry?.id) && (
+      <div className="grid grid-cols-1  gap-5">
+        {/* Company Detail CARD */}
+        <div
+          className={` ${
+            !userHasAccessToViewCompanyDetail ? "hidden" : ""
+          }   bg-white rounded-2xl shadow-lg px-8 py-6 space-y-2 `}
+        >
+          <div className="flex items-center justify-between">
+            <h3 className="section-header-custom">
+              Company Details{" "}
+              <span className="caption-custom">(Click edit to change)</span>
+            </h3>
+          </div>
+
+          {/** Company Logo */}
+          <div className="border-t pt-4">
+            {/* <h4 className="input-label-custom mb-2">Company Logo:</h4> */}
+
+            {/* Left aligned container */}
+            <div className="flex flex-col items-start">
+              {/* Image */}
+              <div className="w-40 h-40 border rounded-lg overflow-hidden flex items-center justify-center bg-gray-50">
+                {logoPreview || companyDetail?.logo_cdn_url ? (
+                  <img
+                    src={logoPreview ?? companyDetail?.logo_cdn_url}
+                    alt="Company Logo"
+                    className="w-full h-full object-contain"
+                  />
+                ) : (
+                  <span className="caption-custom">No Logo</span>
+                )}
+              </div>
+
+              {/* Button centered under image */}
+              {userHasAccessToUpdateCompanyDetail && (
+                <div className="w-40 flex justify-center mt-2">
+                  <label className="cursor-pointer px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                    {logoPreview || companyDetail?.logo_cdn_url
+                      ? "Edit Logo"
+                      : "Upload Logo"}
+
+                    <input
+                      type="file"
+                      accept="image/*"
+                      hidden
+                      onChange={handleLogoChange}
+                    />
+                  </label>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* COMPANY DETAILS SECTION */}
+          <div className="flex flex-col space-y-6">
+            {/* ================= COMPANY INFO ================= */}
+            <div>
+              <EditableSection
+                title={loginStatus?.companyName ?? "Company Name"}
+                hasAccess={userHasAccessToUpdateCompanyDetail}
+                onEdit={() => setEditingSection("company")}
+                isEditing={editingSection === "company"}
+                onCancel={() => setEditingSection(null)}
+                sectionKey="company"
+                onSave={() => {
+                  handleEditableSectionSave();
+                }}
+              >
+                {editingSection === "company" ? (
+                  <FormInput
+                    label="Website:"
+                    name="website"
+                    value={companyDetail?.website ?? ""}
+                    onChange={handleCompanyDetailsChange}
+                    className="input-custom"
+                    placeholder="eg. www.abc.com"
+                  />
+                ) : (
+                  <div className="caption-custom">
+                    Website:
+                    <span className="caption-custom-blue ml-1">
+                      {companyDetail?.website ?? "-"}
+                    </span>
+                  </div>
+                )}
+              </EditableSection>
+            </div>
+
+            {/* ================= BUSINESS ================= */}
+            <div>
+              <EditableSection
+                title="Business Information"
+                sectionKey="business"
+                hasAccess={userHasAccessToUpdateCompanyDetail}
+                onEdit={() => setEditingSection("business")}
+                isEditing={editingSection === "business"}
+                onCancel={() => setEditingSection(null)}
+                onSave={() => {
+                  handleEditableSectionSave();
+                }}
+              >
+                {editingSection === "business" ? (
+                  <div className="grid grid-cols-2 gap-2">
+                    <CustomDropdown
+                      labelName="Business Type: "
+                      preselectedOption={companyDetail.business_type_id}
+                      selectedValue={companyDetail.business_type_id}
+                      options={businessType}
+                      onSelect={(businessTypeId) => {
+                        setCompanyDetail((prev) => {
+                          return {
+                            ...prev,
+                            business_type_id: businessTypeId ?? 0,
+                          };
+                        });
+                      }}
+                    />
+                    <CustomDropdown
+                      labelName="Industry Type: "
+                      preselectedOption={companyDetail.industry_type_id}
+                      selectedValue={companyDetail.industry_type_id}
+                      options={industryTypeData}
+                      onSelect={(industryTypeId) => {
+                        setCompanyDetail((prev) => {
+                          return {
+                            ...prev,
+                            industry_type_id: industryTypeId ?? 0,
+                          };
+                        });
+                      }}
+                    />
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-2">
+                    <div className="caption-custom">
+                      Business Type: {companyDetail?.business_type_name ?? "-"}
+                    </div>
+                    <div className="caption-custom">
+                      Industry Type: {companyDetail?.industry_type_name ?? "-"}
+                    </div>
+                  </div>
+                )}
+              </EditableSection>
+            </div>
+
+            {/* ================= LOCATION ================= */}
+            <div>
+              <EditableSection
+                title="Location Information"
+                sectionKey="location"
+                hasAccess={userHasAccessToUpdateCompanyDetail}
+                onEdit={() => setEditingSection("location")}
+                isEditing={editingSection === "location"}
+                onCancel={() => setEditingSection(null)}
+                onSave={() => {
+                  if (companyDetail.state_id && companyDetail.district_id) {
+                    handleEditableSectionSave();
+                  } else {
+                    // toast.error("Please select both state and district.");
+                    toast("Please select both state and district.", {
+                      icon: "⚠️",
+                      style: {
+                        border: "1px solid #facc15",
+                        background: "#fffbeb",
+                        color: "#92400e",
+                      },
+                    });
+                  }
+                }}
+              >
+                {editingSection === "location" ? (
+                  <div className="grid grid-cols-2 gap-2">
+                    <CustomDropdown
+                      labelName="State: "
+                      preselectedOption={companyDetail.state_id}
+                      selectedValue={companyDetail.state_id}
+                      options={stateData}
+                      onSelect={(e) => {
+                        setCompanyDetail((prev) => {
+                          return {
+                            ...prev,
+                            state_id: e ?? 0,
+                          };
+                        });
+                        if (previousCompanyDetail.state_id !== e) {
+                          setCompanyDetail((prev) => {
+                            return {
+                              ...prev,
+                              district_id: 0,
+                            };
+                          });
+                        }
+                      }}
+                    />
+                    <CustomDropdown
+                      labelName="District: "
+                      readOnly={!companyDetail.state_id}
+                      preselectedOption={companyDetail.district_id}
+                      selectedValue={companyDetail.district_id}
+                      options={districts}
+                      onSelect={(e) => {
+                        setCompanyDetail((prev) => {
+                          return {
+                            ...prev,
+                            district_id: e ?? 0,
+                          };
+                        });
+                      }}
+                      errorMessage="Please select state first!"
+                    />
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-2">
+                    <div className="caption-custom">
+                      State: {companyDetail?.state_name ?? "-"}
+                    </div>
+                    <div className="caption-custom">
+                      District: {companyDetail?.district_name ?? "-"}
+                    </div>
+                  </div>
+                )}
+              </EditableSection>
+            </div>
+
+            {/* ================= TAX INFORMATION ================= */}
+            <div>
+              <EditableSection
+                title="Tax Information"
+                hasAccess={userHasAccessToUpdateCompanyDetail}
+                onEdit={() => setEditingSection("tax")}
+                isEditing={editingSection === "tax"}
+                onCancel={() => setEditingSection(null)}
+                sectionKey="tax"
+                onSave={() => {
+                  handleEditableSectionSave();
+                }}
+              >
+                {editingSection === "tax" ? (
+                  <div className="grid grid-cols-2 gap-2">
+                    <FormInput
+                      label="PAN: "
+                      name="pan"
+                      value={companyDetail?.pan ?? ""}
+                      onChange={handleCompanyDetailsChange}
+                    />
+
+                    <FormInput
+                      label="GST: "
+                      name="gst"
+                      value={companyDetail?.gst ?? ""}
+                      onChange={handleCompanyDetailsChange}
+                    />
+
+                    <FormInput
+                      label="TAN: "
+                      name="tan"
+                      value={companyDetail?.tan ?? ""}
+                      onChange={handleCompanyDetailsChange}
+                    />
+
+                    <FormInput
+                      label="CIN: "
+                      name="cin"
+                      value={companyDetail?.cin ?? ""}
+                      onChange={handleCompanyDetailsChange}
+                    />
+
+                    <FormInput
+                      label="Business Registration Number: "
+                      name="business_registration_number"
+                      value={companyDetail?.business_registration_number ?? ""}
+                      onChange={handleCompanyDetailsChange}
+                    />
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-2 gap-y-1">
+                    <div className="caption-custom">
+                      PAN: {companyDetail?.pan ?? ""}
+                    </div>
+                    <div className="caption-custom">
+                      GST: {companyDetail?.gst ?? ""}
+                    </div>
+                    <div className="caption-custom">
+                      TAN: {companyDetail?.tan ?? ""}
+                    </div>
+                    <div className="caption-custom">
+                      CIN: {companyDetail?.cin ?? ""}
+                    </div>
+                    <div className="col-span-2 caption-custom">
+                      Business Reg No:
+                      {companyDetail?.business_registration_number ?? ""}
+                    </div>
+                  </div>
+                )}
+              </EditableSection>
+            </div>
+
+            {/* ================= ADDRESS ================= */}
+            <div>
+              <EditableSection
+                title="Address Information"
+                sectionKey="address"
+                hasAccess={userHasAccessToUpdateCompanyDetail}
+                onEdit={() => setEditingSection("address")}
+                isEditing={editingSection === "address"}
+                onCancel={() => setEditingSection(null)}
+                onSave={() => {
+                  handleEditableSectionSave();
+                }}
+              >
+                {editingSection === "address" ? (
+                  <div className="space-y-2">
+                    <TextAreaInput
+                      label="Registered Office Address: "
+                      name="registered_office_address"
+                      value={companyDetail?.registered_office_address ?? ""}
+                      onChange={handleCompanyDetailsChange}
+                      rows={1}
+                      cols={0}
+                    />
+
+                    <TextAreaInput
+                      label="Billing Address: "
+                      name="billing_address"
+                      value={companyDetail?.billing_address ?? ""}
+                      onChange={handleCompanyDetailsChange}
+                      rows={1}
+                      cols={0}
+                    />
+
+                    <TextAreaInput
+                      label="Shipping Address: "
+                      value={companyDetail?.shipping_address ?? ""}
+                      name="shipping_address"
+                      onChange={handleCompanyDetailsChange}
+                      rows={1}
+                      cols={0}
+                    />
+                  </div>
+                ) : (
+                  <div className="space-y-1">
+                    <div className="caption-custom">
+                      Registered:{" "}
+                      {companyDetail?.registered_office_address ?? ""}
+                    </div>
+                    <div className="caption-custom">
+                      Billing: {companyDetail?.billing_address ?? ""}
+                    </div>
+                    <div className="caption-custom">
+                      Shipping: {companyDetail?.shipping_address ?? ""}
+                    </div>
+                  </div>
+                )}
+              </EditableSection>
+            </div>
+          </div>
+        </div>
+
+        {/* PREFERENCE CARD */}
+        <div
+          className={` ${
+            !userHasAccessToViewSettingGeneral ? "hidden" : ""
+          }   bg-white rounded-2xl shadow-lg px-8 py-6 space-y-2`}
+        >
+          {/* button */}
+          <div className="flex items-center justify-between">
+            <h3 className="section-header-custom">
+              Preferences{" "}
+              <span className="caption-custom">(Click to change)</span>
+            </h3>
+            {(prevTimezoneId.current !== selectedTimezoneId ||
+              userPreference.rowsInGrid != selectedRowsPerPage ||
+              userPreference.countryId !== selectedCountry?.id) && (
+              <button
+                onClick={() => {
+                  if (userHasAccessToUpdateSettingGeneral) {
+                    if (prevTimezoneId.current !== selectedTimezoneId) {
+                      handleTimezonePreferenceChange();
+                      prevTimezoneId.current = selectedTimezoneId;
+                    } else if (
+                      userPreference.rowsInGrid !== selectedRowsPerPage
+                    ) {
+                      handleTimezonePreferenceChange();
+                    } else if (
+                      userPreference.countryId !== selectedCountry?.id
+                    ) {
+                      handleTimezonePreferenceChange();
+                    }
+                  } else {
+                    toast.error(
+                      MESSAGE.MODULE_ACCESS.GENERAL_SETTING
+                        .DENIED_UPDATE_ACCESS,
+                    );
+                  }
+                }}
+                className="px-4 py-2 bg-blue-600 action-btn-custom rounded-md hover:bg-blue-700 transition"
+              >
+                Save
+              </button>
+            )}
+          </div>
+          {/* time zone */}
+          <div className="flex items-center space-x-4 border-b pb-1">
+            {/* Label for the Time Zone setting */}
+            <h4 className="input-label-custom whitespace-nowrap">Time Zone:</h4>
+
+            {/* Conditional rendering for either the display text or the dropdown */}
+            {showTimeZoneData ? (
+              // When the dropdown should be visible (showTimeZoneData is true)
+              <div className="relative z-10 w-auto">
+                {" "}
+                {/* Add relative and z-index for dropdown positioning */}
+                <CustomTimezoneDropdown
+                  setShowTimeZoneData={setShowTimeZoneData}
+                  timezoneData={timezoneList}
+                  hasMore={hasMore}
+                  loadMore={loadMore}
+                  onSearchChange={handleSearchChange}
+                  onSelect={(zone) => {
+                    setSelectedTimeZoneData(zone);
+                    setSelectedTimezoneId(zone.id);
+                    // setShowTimeZoneData(false); // Often desirable to close after selection
+                  }}
+                />
+              </div>
+            ) : (
+              // When the display text should be visible (showTimeZoneData is false)
+              <p
+                onClick={() => {
+                  if (userHasAccessToUpdateSettingGeneral) {
+                    setShowTimeZoneData(!showTimeZoneData); // Toggle to show the dropdown
+                  } else {
+                    toast.error(
+                      MESSAGE.MODULE_ACCESS.GENERAL_SETTING
+                        .DENIED_UPDATE_ACCESS,
+                    );
+                  }
+                }}
+                className="caption-custom text-blue-600 cursor-pointer hover:text-blue-700
+                 rounded-md py-1.5 px-3  // Adds padding to match select height
+                 focus:outline-none focus:ring-2 focus:ring-indigo-500" // Focus styles for clickability
+                tabIndex={0} // Makes the paragraph focusable for keyboard navigation
+                role="button" // Indicates it's a clickable element
+                aria-label="Click to change time zone"
+              >
+                {userPreference.timezone}
+              </p>
+            )}
+          </div>
+          {/* rows in grid  */}
+          <div className="flex items-center space-x-4 border-b pb-2">
+            {/* Label for accessibility and clear identification */}
+            <label
+              htmlFor="records-per-page-select"
+              className="input-label-custom whitespace-nowrap"
+            >
+              Records Per Page:
+            </label>
+
+            {/* Display current preference, visually distinct */}
+            <div className="flex items-center space-x-1">
+              <span className="caption-custom">Current:</span>
+              <span className="caption-custom-blue">
+                {userPreference.rowsInGrid}
+              </span>
+            </div>
+
+            {/* The styled select dropdown */}
+            <select
+              // disabled={!userHasAccessToUpdateSettingGeneral}
+              onClick={() => {
+                if (!userHasAccessToUpdateSettingGeneral) {
+                  toast.error(
+                    MESSAGE.MODULE_ACCESS.GENERAL_SETTING.DENIED_UPDATE_ACCESS,
+                  );
+                  return;
+                }
+              }}
+              onChange={(e) => {
+                if (userHasAccessToUpdateSettingGeneral) {
+                  handleSelectRowInGridOptionChange(e);
+                }
+              }}
+              value={selectedRowsPerPage}
+              id="records-per-page-select" // Link with label's htmlFor
+              className="block caption-custom w-36 max-w-fit border rounded border-gray-300 shadow-sm
+               focus:border-indigo-500 focus:ring-indigo-500
+               sm:pl-1 pr-1 // Added padding for better appearance
+               text-gray-900" // Default text color
+              aria-label="Select number of records per page" // Good for accessibility
+              // You'd add value={selectedValue} and onChange={handleChange} props here in your React component
+            >
+              <option className="caption-custom" value="">
+                Select
+              </option>
+              {rowsInGridDropdownOptions &&
+                rowsInGridDropdownOptions.map((data) => (
+                  <option key={data.id} value={data.rowsInGrid}>
+                    {data.rowsInGrid}
+                  </option>
+                ))}
+            </select>
+          </div>
+          <div className="flex input-label-custom gap-2">
+            {/* Country Id :{userPreference.countryId} */}
+            Country :{/* Display current preference, visually distinct */}
+            <div className="flex items-center space-x-1">
+              <span className="caption-custom">Current:</span>
+              <span className="caption-custom-blue">
+                {
+                  countries.find(
+                    (country: Country) =>
+                      country.id === userPreference.countryId,
+                  )?.name
+                }
+              </span>
+            </div>
+            {/* The styled select dropdown */}
+            <select
+              // disabled={!userHasAccessToUpdateSettingGeneral}
+              onClick={() => {
+                if (!userHasAccessToUpdateSettingGeneral) {
+                  toast.error(
+                    MESSAGE.MODULE_ACCESS.GENERAL_SETTING.DENIED_UPDATE_ACCESS,
+                  );
+                  return;
+                }
+              }}
+              onChange={(e) => {
+                if (userHasAccessToUpdateSettingGeneral) {
+                  handleSelectCountryOptionChange(e);
+                }
+              }}
+              value={selectedCountry?.id?.toString() ?? ""}
+              id="records-per-page-select" // Link with label's htmlFor
+              className="block caption-custom w-36 max-w-fit border rounded border-gray-300 shadow-sm
+               focus:border-indigo-500 focus:ring-indigo-500
+               sm:pl-1 pr-1 // Added padding for better appearance
+               text-gray-900" // Default text color
+              aria-label="Select number of records per page" // Good for accessibility
+              // You'd add value={selectedValue} and onChange={handleChange} props here in your React component
+            >
+              <option className="caption-custom" value="">
+                Select {}
+              </option>
+              {countries &&
+                countries.map((data) => (
+                  <option key={data.id} value={data.id!}>
+                    {data.name}
+                  </option>
+                ))}
+            </select>
+          </div>
+        </div>
+        {/* Subscription Card */}
+        <div className="  bg-white rounded-2xl shadow-lg p-8 space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="section-header-custom">Subscription</h3>
             <button
               onClick={() => {
-                if (userHasAccessToUpdateSettingGeneral) {
-                  if (prevTimezoneId.current !== selectedTimezoneId) {
-                    handleTimezonePreferenceChange();
-                    prevTimezoneId.current = selectedTimezoneId;
-                  } else if (
-                    userPreference.rowsInGrid !== selectedRowsPerPage
-                  ) {
-                    handleTimezonePreferenceChange();
-                  }else if (userPreference.countryId !== selectedCountry?.id){
-                                        handleTimezonePreferenceChange();
-                  }
-                } else {
-                  toast.error(
-                    MESSAGE.MODULE_ACCESS.GENERAL_SETTING.DENIED_UPDATE_ACCESS
-                  );
-                }
+                navigate(ROUTES_URL.GET_SUBSCRIPTION);
               }}
               className="px-4 py-2 bg-blue-600 action-btn-custom rounded-md hover:bg-blue-700 transition"
             >
-              Save
+              Update Subscription
             </button>
-          )}
-        </div>
-        {/* time zone */}
-        <div className="flex items-center space-x-4 border-b pb-1">
-          {/* Label for the Time Zone setting */}
-          <h4 className="input-label-custom whitespace-nowrap">Time Zone:</h4>
-
-          {/* Conditional rendering for either the display text or the dropdown */}
-          {showTimeZoneData ? (
-            // When the dropdown should be visible (showTimeZoneData is true)
-            <div className="relative z-10 w-auto">
-              {" "}
-              {/* Add relative and z-index for dropdown positioning */}
-              <CustomTimezoneDropdown
-                setShowTimeZoneData={setShowTimeZoneData}
-                timezoneData={timezoneList}
-                hasMore={hasMore}
-                loadMore={loadMore}
-                onSearchChange={handleSearchChange}
-                onSelect={(zone) => {
-                  setSelectedTimeZoneData(zone);
-                  setSelectedTimezoneId(zone.id);
-                  // setShowTimeZoneData(false); // Often desirable to close after selection
-                }}
-              />
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div>
+              <h4 className="table-header-custom">Started On</h4>
+              <p className={classnameForParagragh}>
+                {loginStatus.startDateSubscription || "-"}
+              </p>
             </div>
-          ) : (
-            // When the display text should be visible (showTimeZoneData is false)
-            <p
-              onClick={() => {
-                if (userHasAccessToUpdateSettingGeneral) {
-                  setShowTimeZoneData(!showTimeZoneData); // Toggle to show the dropdown
-                } else {
-                  toast.error(
-                    MESSAGE.MODULE_ACCESS.GENERAL_SETTING.DENIED_UPDATE_ACCESS
-                  );
-                }
-              }}
-              className="caption-custom text-blue-600 cursor-pointer hover:text-blue-700
-                 rounded-md py-1.5 px-3  // Adds padding to match select height
-                 focus:outline-none focus:ring-2 focus:ring-indigo-500" // Focus styles for clickability
-              tabIndex={0} // Makes the paragraph focusable for keyboard navigation
-              role="button" // Indicates it's a clickable element
-              aria-label="Click to change time zone"
-            >
-              {userPreference.timezone}
-            </p>
-          )}
-        </div>
-        {/* rows in grid  */}
-        <div className="flex items-center space-x-4 border-b pb-2">
-          {/* Label for accessibility and clear identification */}
-          <label
-            htmlFor="records-per-page-select"
-            className="input-label-custom whitespace-nowrap"
-          >
-            Records Per Page:
-          </label>
-
-          {/* Display current preference, visually distinct */}
-          <div className="flex items-center space-x-1">
-            <span className="caption-custom">Current:</span>
-            <span className="caption-custom-blue">
-              {userPreference.rowsInGrid}
-            </span>
+            <div>
+              <h4 className="table-header-custom">Ending On</h4>
+              <p className={classnameForParagragh}>
+                {loginStatus.endDateSubscription || "Not Provided"}
+              </p>
+            </div>
           </div>
-
-          {/* The styled select dropdown */}
-          <select
-            // disabled={!userHasAccessToUpdateSettingGeneral}
-            onClick={() => {
-              if (!userHasAccessToUpdateSettingGeneral) {
-                toast.error(
-                  MESSAGE.MODULE_ACCESS.GENERAL_SETTING.DENIED_UPDATE_ACCESS
-                );
-                return;
-              }
-            }}
-            onChange={(e) => {
-              if (userHasAccessToUpdateSettingGeneral) {
-                handleSelectRowInGridOptionChange(e);
-              }
-            }}
-            value={selectedRowsPerPage}
-            id="records-per-page-select" // Link with label's htmlFor
-            className="block caption-custom w-36 max-w-fit border rounded border-gray-300 shadow-sm
-               focus:border-indigo-500 focus:ring-indigo-500
-               sm:pl-1 pr-1 // Added padding for better appearance
-               text-gray-900" // Default text color
-            aria-label="Select number of records per page" // Good for accessibility
-            // You'd add value={selectedValue} and onChange={handleChange} props here in your React component
-          >
-            <option className="caption-custom" value="">
-              Select
-            </option>
-            {rowsInGridDropdownOptions &&
-              rowsInGridDropdownOptions.map((data) => (
-                <option key={data.id} value={data.rowsInGrid}>
-                  {data.rowsInGrid}
-                </option>
-              ))}
-          </select>
         </div>
-        <div className="flex input-label-custom gap-2">
-          {/* Country Id :{userPreference.countryId} */}
-          Country :{/* Display current preference, visually distinct */}
-          <div className="flex items-center space-x-1">
-            <span className="caption-custom">Current:</span>
-            <span className="caption-custom-blue">
-              {
-                countries.find(
-                  (country: Country) => country.id === userPreference.countryId
-                )?.name
-              }
-            </span>
-          </div>
-          {/* The styled select dropdown */}
-          <select
-            // disabled={!userHasAccessToUpdateSettingGeneral}
-            onClick={() => {
-              if (!userHasAccessToUpdateSettingGeneral) {
-                toast.error(
-                  MESSAGE.MODULE_ACCESS.GENERAL_SETTING.DENIED_UPDATE_ACCESS
-                );
-                return;
-              }
-            }}
-            onChange={(e) => {
-              if (userHasAccessToUpdateSettingGeneral) {
-                handleSelectCountryOptionChange(e);
-              }
-            }}
-            value={selectedCountry?.id?.toString() ?? ""}
-            id="records-per-page-select" // Link with label's htmlFor
-            className="block caption-custom w-36 max-w-fit border rounded border-gray-300 shadow-sm
-               focus:border-indigo-500 focus:ring-indigo-500
-               sm:pl-1 pr-1 // Added padding for better appearance
-               text-gray-900" // Default text color
-            aria-label="Select number of records per page" // Good for accessibility
-            // You'd add value={selectedValue} and onChange={handleChange} props here in your React component
-          >
-            <option className="caption-custom" value="">
-              Select {}
-            </option>
-            {countries &&
-              countries.map((data) => (
-                <option key={data.id} value={data.id!}>
-                  {data.name}
-                </option>
-              ))}
-          </select>
-        </div>
+        <AppVersionViewCard />
       </div>
-      {/* Subscription Card */}
-      <div className="  bg-white rounded-2xl shadow-lg p-8 space-y-4">
-        <div className="flex items-center justify-between">
-          <h3 className="section-header-custom">Subscription</h3>
-          <button
-            onClick={() => {
-              navigate(ROUTES_URL.GET_SUBSCRIPTION);
-            }}
-            className="px-4 py-2 bg-blue-600 action-btn-custom rounded-md hover:bg-blue-700 transition"
-          >
-            Update Subscription
-          </button>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-          <div>
-            <h4 className="table-header-custom">Started On</h4>
-            <p className={classnameForParagragh}>
-              {loginStatus.startDateSubscription || "-"}
-            </p>
-          </div>
-          <div>
-            <h4 className="table-header-custom">Ending On</h4>
-            <p className={classnameForParagragh}>
-              {loginStatus.endDateSubscription || "Not Provided"}
-            </p>
-          </div>
-        </div>
-      </div>
-      <AppVersionViewCard/>
     </div>
-</div>
   );
 };
 
