@@ -660,6 +660,18 @@ export const useUserAccessModules = () => {
   const userHasAccessToUpdateStockLedger = accessModules.some(
     (accessModule) => accessModule.crm_module_id === 52 && accessModule.update,
   );
+  // stock management - Stock Ledger view
+  const userHasAccessToAddStockAgeing = accessModules.some(
+    (accessModules) => accessModules.crm_module_id === 53 && accessModules.add,
+  );
+
+  const userHasAccessToViewStockAgeing = accessModules.some(
+    (accessModule) => accessModule.crm_module_id === 53 && accessModule.view,
+  );
+
+  const userHasAccessToUpdateStockAgeing = accessModules.some(
+    (accessModule) => accessModule.crm_module_id === 53 && accessModule.update,
+  );
 
   return {
     userHasAccessToAddUser,
@@ -863,5 +875,9 @@ export const useUserAccessModules = () => {
     userHasAccessToAddStockLedger,
     userHasAccessToViewStockLedger,
     userHasAccessToUpdateStockLedger,
+
+    userHasAccessToAddStockAgeing,
+    userHasAccessToViewStockAgeing,
+    userHasAccessToUpdateStockAgeing,
   };
 };

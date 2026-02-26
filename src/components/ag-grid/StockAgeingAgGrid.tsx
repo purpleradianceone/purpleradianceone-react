@@ -1,10 +1,10 @@
-import { AllCommunityModule, ColDef, themeBalham } from "ag-grid-community";
-import { AgGridReact } from "ag-grid-react";
 import { useMemo } from "react";
+import { AllCommunityModule, ColDef, themeBalham } from "ag-grid-community";
+import StockAgeing from "../../@types/stock/StockAgeing";
+import { AgGridReact } from "ag-grid-react";
 import { INNERHTML } from "../../constants/AppConstants";
-import LiveStock from "../../@types/stock/LiveStock";
 
-const StockLiveAgGrid = ({ data }: { data: LiveStock[] }) => {
+const StockAgeingAgGrid = ({ data }: { data: StockAgeing[] }) => {
   const columnDefs = useMemo<ColDef[]>(
     () => [
       {
@@ -17,8 +17,8 @@ const StockLiveAgGrid = ({ data }: { data: LiveStock[] }) => {
         },
       },
       {
-        field: "companyWarehouseName",
-        headerName: "Warehouse",
+        field: "unitName",
+        headerName: "unit",
         hide: false,
         cellStyle: {
           color: "black",
@@ -26,16 +26,20 @@ const StockLiveAgGrid = ({ data }: { data: LiveStock[] }) => {
         },
       },
       {
-        field: "quantityLive",
-        headerName: "Current Quantity",
+        field: "zeroToThirtyDays",
+        headerName: "0 - 30 Days",
       },
       {
-        field: "quantityInward",
-        headerName: "Inward",
+        field: "thirtyToSixtyDays",
+        headerName: "31 - 60 Days",
       },
       {
-        field: "quantityOutward",
-        headerName: "Outward",
+        field: "sixtyToNinetyDays",
+        headerName: "61 - 90 Days",
+      },
+      {
+        field: "ninetyPlusDays",
+        headerName: "90+ Days",
       },
     ],
     [],
@@ -50,6 +54,7 @@ const StockLiveAgGrid = ({ data }: { data: LiveStock[] }) => {
       suppressHeaderContextMenu: true,
     };
   }, []);
+
   return (
     <div
       className="ag-theme-balham w-full"
@@ -67,4 +72,4 @@ const StockLiveAgGrid = ({ data }: { data: LiveStock[] }) => {
   );
 };
 
-export default StockLiveAgGrid;
+export default StockAgeingAgGrid;

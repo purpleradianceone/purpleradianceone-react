@@ -231,6 +231,7 @@ const POST_API = {
     GET_LEADS_NOTES  : `${BASE_URL}${import.meta.env.VITE_GET_LEADS_NOTES}`,
     CREATE_LEADS_NOTE :  `${BASE_URL}${import.meta.env.VITE_CREATE_LEADS_NOTE}`,
     UPDATE_LEADS_NOTE : `${BASE_URL}${import.meta.env.VITE_UPDATE_LEADS_NOTE}`,
+    GET_STOCK_AGEING: `${BASE_URL}${import.meta.env.VITE_GET_STOCK_AGEING}`,
 }
 
 export default POST_API;

@@ -51,7 +51,7 @@ function ProductsManagementGrid({
           return valueA.toLowerCase().localeCompare(valueB.toLowerCase());
         },
       },
-      
+
       {
         field: "cost",
         headerName: "Basic Cost",
@@ -69,11 +69,11 @@ function ProductsManagementGrid({
         filter: true,
         flex: 1,
         valueFormatter: (params) => {
-          if(!params.data) return "";
+          if (!params.data) return "";
 
           const minStock = params.value;
-          const  unit = params.data.unitName; 
-          return `${minStock} ${unit}`
+          const unit = params.data.unitName;
+          return `${minStock} ${unit}`;
           // return params.value ? `${params.value} ${}` : "";
         },
       },
@@ -94,7 +94,7 @@ function ProductsManagementGrid({
         flex: 1,
         hide: isGridForAccountProduct,
       },
-      
+
       {
         field: "barcode",
         headerName: "Barcode",
@@ -104,7 +104,6 @@ function ProductsManagementGrid({
         flex: 1,
         hide: isGridForAccountProduct,
       },
-      
 
       {
         field: "isActive",
@@ -411,7 +410,8 @@ function ProductsManagementGrid({
                             handleSelectedProductChange(params.data);
                           } else {
                             toast.error(
-                              MESSAGE.MODULE_ACCESS.STOCK.DENIED_ADD_ACCESS,
+                              MESSAGE.MODULE_ACCESS.STOCK.STOCK
+                                .DENIED_ADD_ACCESS,
                             );
                           }
                         }}
