@@ -54,7 +54,7 @@ const StockLedgerManagement = () => {
 
   // Read filters from LocalStorage (before hook initializes)
   const savedFilters = JSON.parse(
-    localStorage.getItem(LocalStorageKeys.STOCK_MANAGEMEMNT_FILTERS) || "{}",
+    localStorage.getItem(LocalStorageKeys.STOCK_LEDGER_FILTERS) || "{}",
   );
   const {
     currentPage,

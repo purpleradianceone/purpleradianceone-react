@@ -113,7 +113,7 @@ function StockAgeingManagement() {
     };
 
     localStorage.setItem(
-      LocalStorageKeys.STOCK_MANAGEMEMNT_FILTERS,
+      LocalStorageKeys.STOCK_AGEING_FILTERS,
       JSON.stringify(filters),
     );
   }, [currentPage, pageSize, searchParameter]);

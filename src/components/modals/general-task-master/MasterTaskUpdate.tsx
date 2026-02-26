@@ -33,7 +33,10 @@ import TaskPriorityChip from "../../ui/TaskPriorityChip";
 import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
 import AccessDeniedPopup from "../../views/not-found/AccessDeniedPage";
 import PaginationWithoutCount from "../../ag-grid/PaginationWithoutCount";
-import { useSearchFilterPaginationDateHandlers } from "../../../config/hooks/usePaginationHandler";
+import {
+  customDateRangeId,
+  useSearchFilterPaginationDateHandlers,
+} from "../../../config/hooks/usePaginationHandler";
 import TaskStageChip from "../../ui/TaskStageChip";
 import SearchInput from "../../ui/SearchInput";
 import DateRangeFilterDropdown from "../../ui/DateRangeFilterDropdown";
@@ -464,7 +467,7 @@ function MasterTaskUpdate() {
                             handleDateIdChange={handleDatePageIdChange}
                             selectedOption={selectedDateName}
                           />
-                          {dateRangeId === 9 && (
+                          {dateRangeId === customDateRangeId && (
                             <div className="mt-1 ml-2 w-fit">
                               <DateRangePicker
                                 onStartDateChange={handleStartDateChange}
