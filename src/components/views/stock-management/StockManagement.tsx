@@ -12,7 +12,7 @@ import ApiError from "../../../@types/error/ApiError";
 import { DEBOUNCE_DELAY, STATUS_CODE } from "../../../constants/AppConstants";
 import RefreshToken from "../../../config/validations/RefreshToken";
 import LiveStockForCompanyProduct from "../../../@types/stock/LiveStockForCompanyProduct";
-import { useSearchFilterPaginationDateHandlers } from "../../../config/hooks/usePaginationHandler";
+import { customDateRangeId, useSearchFilterPaginationDateHandlers } from "../../../config/hooks/usePaginationHandler";
 import { LocalStorageKeys } from "../../../enums/LocalStorageKeys";
 
 const StockManagement = () => {
@@ -73,7 +73,7 @@ const StockManagement = () => {
   } = useSearchFilterPaginationDateHandlers(savedFilters);
 
   const getStockLiveForCompanyProduct = async (signal: AbortSignal) => {
-    if (dateRangeId === 8 && concatDate.trim() === "") return;
+    if (dateRangeId === customDateRangeId && concatDate.trim() === "") return;
     const offset = (currentPage - 1) * pageSize;
 
     const effectiveDateRangeId = dateRangeId;

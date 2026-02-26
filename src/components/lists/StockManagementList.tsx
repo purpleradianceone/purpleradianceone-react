@@ -23,6 +23,7 @@ import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
 import { handleApiError } from "../../config/error/handleApiError";
 import { Product } from "../../@types/products/ProductsManagementProps";
 import PaginationWithoutCount from "../ag-grid/PaginationWithoutCount";
+import { customDateRangeId } from "../../config/hooks/usePaginationHandler";
 
 type StockView = ActionTypeForStockMOdule | null;
 
@@ -191,7 +192,7 @@ const StockManagementList = ({
     )?.date_range || "Date Filter";
 
   useEffect(() => {
-    if (handleSearchOption.dateRangeId === 8) {
+    if (handleSearchOption.dateRangeId === customDateRangeId) {
       setIsCustomDateOptionSelected(true);
     }
   }, [

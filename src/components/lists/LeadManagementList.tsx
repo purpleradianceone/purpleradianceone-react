@@ -34,6 +34,7 @@ import FormHeader from "../ui/FormHeader";
 import COLORS from "../../constants/Colors";
 import { createPortal } from "react-dom";
 import PaginationWithoutCount from "../ag-grid/PaginationWithoutCount";
+import { customDateRangeId } from "../../config/hooks/usePaginationHandler";
 function LeadManagementList({
   handleSearchOption,
   onStartDateChange,
@@ -146,7 +147,7 @@ function LeadManagementList({
   };
 
    useEffect(() => {
-      if(handleSearchOption.dateRangeId === 8){
+      if(handleSearchOption.dateRangeId === customDateRangeId){
         setIsCustomDateOptionSelected(true);
       }
     }, [handleSearchOption.searchParameter, handleSearchOption.dateRangeId, setIsCustomDateOptionSelected]);

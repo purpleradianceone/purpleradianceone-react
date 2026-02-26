@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import useTaskPriority from "../../../config/hooks/useTaskPriority";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
 import { LocalStorageKeys } from "../../../enums/LocalStorageKeys";
-import { useSearchFilterPaginationDateHandlers } from "../../../config/hooks/usePaginationHandler";
+import { customDateRangeId, useSearchFilterPaginationDateHandlers } from "../../../config/hooks/usePaginationHandler";
 import POST_API from "../../../constants/PostApi";
 import axiosClient from "../../../axios-client/AxiosClient";
 import { STATUS_CODE } from "../../../constants/AppConstants";
@@ -97,7 +97,7 @@ function MasterTaskManagement({
   };
 
   const getMasterTaskData = async (signal: AbortSignal) => {
-    if (dateRangeId === 8 && concatDate.trim() === "") return;
+    if (dateRangeId === customDateRangeId && concatDate.trim() === "") return;
     const offset = (currentPage - 1) * pageSize;
     const effectiveDateRangeId = dateRangeId;
     const PostDataToGetAllTask: PostDataToGetMasterTask = {

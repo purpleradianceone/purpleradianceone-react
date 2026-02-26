@@ -33,6 +33,7 @@ import CreateSupportTicketModal from "../modals/support-ticket/CreateSupportTick
 import LookupCompanyUserSelection from "../views/lookups/lookup-company-user/LookupCompanyUserSelection";
 import LookupCompanyProductSelection from "../views/lookups/lookup-company-product/LookupCompanyProductSelection";
 import PaginationWithoutCount from "../ag-grid/PaginationWithoutCount";
+import { customDateRangeId } from "../../config/hooks/usePaginationHandler";
 
 export const supportTicketDataUrlSearchParamKey: string = "supportTicketData";
 
@@ -176,7 +177,7 @@ function SupportTicketManagementList({
 
     // eslint-disable-next-line react-hooks/rules-of-hooks
     useEffect(() => {
-      if (handleSearchOption.dateRangeId === 8) {
+      if (handleSearchOption.dateRangeId === customDateRangeId) {
         setIsCustomDateOptionSelected(true);
       }
     }, [
@@ -250,7 +251,7 @@ function SupportTicketManagementList({
                           selectedOption={selectedDateName}
                         />
                         {isCustomDateOptionSelected && (
-                          <div className="mt-1 w-fit">
+                          <div className="mt-1 ml-1 w-fit">
                             <DateRangePicker
                               onStartDateChange={onStartDateChange}
                               onEndDateChange={onEndDateChange}

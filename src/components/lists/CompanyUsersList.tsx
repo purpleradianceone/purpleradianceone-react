@@ -29,6 +29,7 @@ import { TutorailColumnName } from "../../constants/Tutorail";
 import RefreshToken from "../../config/validations/RefreshToken";
 import PaginationWithoutCount from "../ag-grid/PaginationWithoutCount";
 import CompanyUserAccessManagementModalNew from "../modals/company-user/CompanyUserAccessManagementModalNew";
+import { customDateRangeId } from "../../config/hooks/usePaginationHandler";
 
 function GetCompanyUsersList({
   users,
@@ -230,7 +231,7 @@ function GetCompanyUsersList({
     )?.date_range || "Date Filter";
 
   useEffect(() => {
-    if (handleSearchOption.dateRangeId === 8) {
+    if (handleSearchOption.dateRangeId === customDateRangeId) {
       setIsCustomDateOptionSelected(true);
     }
   }, [

@@ -22,6 +22,7 @@ import MESSAGE from "../../constants/Messages";
 import COLORS from "../../constants/Colors";
 import AddStock from "../modals/stock/AddStock";
 import PaginationWithoutCount from "../ag-grid/PaginationWithoutCount";
+import { customDateRangeId } from "../../config/hooks/usePaginationHandler";
 
 function ProductsManagementList({
   products,
@@ -118,7 +119,7 @@ ProductsManagementListProps) {
     )?.date_range || "Date Filter";
 
   useEffect(() => {
-    if (handleSearchOption.dateRangeId === 8) {
+    if (handleSearchOption.dateRangeId === customDateRangeId) {
       setIsCustomDateOptionSelected(true);
     }
   }, [

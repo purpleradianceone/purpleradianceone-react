@@ -7,7 +7,7 @@ import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContex
 import POST_API from "../../../constants/PostApi";
 import { STATUS_CODE } from "../../../constants/AppConstants";
 import RefreshToken from "../../../config/validations/RefreshToken";
-import { useSearchFilterPaginationDateHandlers } from "../../../config/hooks/usePaginationHandler";
+import { customDateRangeId, useSearchFilterPaginationDateHandlers } from "../../../config/hooks/usePaginationHandler";
 import { useInView } from "react-intersection-observer";
 import { motion } from "framer-motion";
 import SupportTicketManagementList from "../../lists/SupportTicketManagementList";
@@ -140,7 +140,7 @@ function SupportTicketManagement({
   };
 
   const getSupportTicketData = async (signal: AbortSignal) => {
-    if (dateRangeId === 8 && concatDate.trim() === "") return;
+    if (dateRangeId === customDateRangeId && concatDate.trim() === "") return;
     const offset = (currentPage - 1) * pageSize;
     const effectiveDateRangeId = dateRangeId;
     const postDataToGetSupportTickets: PostDataToGetSupportTicketData = {
