@@ -18,11 +18,13 @@ import RefreshToken from "../../../config/validations/RefreshToken";
 import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
 import toast from "react-hot-toast";
 import COLORS from "../../../constants/Colors";
-import {  Pen, Save } from "lucide-react";
+import { Pen, Save } from "lucide-react";
 import { useUserPreference } from "../../../context/user/UserPreference";
 import axiosClient from "../../../axios-client/AxiosClient";
 import AccessDeniedMessagePage from "../../views/not-found/AccessDeniedMessagePage";
 import MESSAGE from "../../../constants/Messages";
+import { handleApiError } from "../../../config/error/handleApiError";
+import LoadingSpinner from "../../../assets/animations/LoadingSpinner";
 
 const LeadDetails = ({
   leadDetailsData,
@@ -39,15 +41,17 @@ const LeadDetails = ({
 
   getLeadDetails: () => void;
   handleSaveEditLeadDetailsCallback: (
-    editLeadDetailsData: LeadDetailsData
+    editLeadDetailsData: LeadDetailsData,
   ) => void;
 }) => {
-  const {    userHasAccessToUpdateLeadDetails, userHasAccessToViewLeadDetails} = useUserAccessModules();
+  const { userPreference } = useUserPreference();
+  const { userHasAccessToUpdateLeadDetails, userHasAccessToViewLeadDetails } =
+    useUserAccessModules();
 
   const [editLeadDetails, setEditLeadDetails] = useState<LeadDetailsData>({
     additional_contact_number: "",
     address: "",
-    country_id: 0,
+    country_id: userPreference.countryId,
     district_id: 0,
     country_name: "",
     createdby: "",
@@ -67,6 +71,7 @@ const LeadDetails = ({
   });
 
   const [countries, setCountries] = useState<Country[]>([]);
+
   const [industryType, setIndustryType] = useState<industryType[]>([]);
   const [stateData, setStateData] = useState<State[]>([]);
   const [district, setDistrict] = useState<District[]>([]);
@@ -100,15 +105,18 @@ const LeadDetails = ({
   const { loginStatus } = useLoggedInUserContext();
   const createNewDetailRef = useRef<boolean>(false);
 
+  const [isSavingLeadDetailsData , setIsSavingLeadDetailsData] = useState<boolean>(false);
   // Note : Create or Edit save api call
   const handleSave = async (e: React.MouseEvent) => {
     e.preventDefault();
 
+    // Note : if the is Saving is true and then user again clicks the button then will check here 
+    if(isSavingLeadDetailsData)return;
     if (
       editLeadDetails.additional_contact_number !== "" &&
       editLeadDetails.additional_contact_number !== null &&
       !editLeadDetails.additional_contact_number?.match(
-        MOBILE_NUMBER_VALIDATION.MOBILE_NUMBER_PATTERN_INDIAN
+        MOBILE_NUMBER_VALIDATION.MOBILE_NUMBER_PATTERN_INDIAN,
       )
     ) {
       toast.error(MOBILE_NUMBER_VALIDATION.ERROR_MESSAGE_MOBILE_NUMBER_INDIAN);
@@ -120,6 +128,9 @@ const LeadDetails = ({
     } else {
       createNewDetailRef.current = false;
     }
+
+    //Note : state true to disable the save button
+    setIsSavingLeadDetailsData(true);
     const PostDataCreateLead: CreateOrUpdateLeadDetails = {
       ...(createNewDetailRef.current
         ? { lead_id: selectedLeadData.id }
@@ -166,16 +177,9 @@ const LeadDetails = ({
         }
       }
     } catch (error: any) {
-      if (error.status === STATUS_CODE.UNATHORISED) {
-        const refreshTokenStatus = await RefreshToken({
-          callFunctionWithEvent: handleSave,
-        });
-
-        // setIsDialogueOpen(!refreshTokenStatus);
-        if (refreshTokenStatus) {
-          handleSave(e);
-        }
-      }
+      handleApiError(error)
+    }finally{
+      setIsSavingLeadDetailsData(false)
     }
   };
 
@@ -187,9 +191,13 @@ const LeadDetails = ({
       isactive: true,
     };
     try {
-      const response = await axiosClient.post(POST_API.GET_INDUSTRY_TYPE, postData, {
-        withCredentials: true,
-      });
+      const response = await axiosClient.post(
+        POST_API.GET_INDUSTRY_TYPE,
+        postData,
+        {
+          withCredentials: true,
+        },
+      );
 
       if (response.status === STATUS_CODE.OK) {
         setIndustryType(response.data);
@@ -228,17 +236,21 @@ const LeadDetails = ({
         setCountries(response.data);
       }
     } catch (error: any) {
-      if (error.status === STATUS_CODE.UNATHORISED) {
-        const refreshTokenStatus = await RefreshToken({
-          callFunctionWithEvent: getAllCountries,
-        });
-        if (refreshTokenStatus) {
-          getAllCountries();
-        }
-      }
+      handleApiError(error);
+      // if (error.status === STATUS_CODE.UNATHORISED) {
+      //   const refreshTokenStatus = await RefreshToken({
+      //     callFunctionWithEvent: getAllCountries,
+      //   });
+      //   if (refreshTokenStatus) {
+      //     getAllCountries();
+      //   }
+      // }
     }
   };
 
+  useEffect(() => {
+    getAllCountries();
+  }, []);
   //Note : function to get state
   const getAllState = async (countryId: number | null) => {
     if (!countryId) return;
@@ -250,12 +262,16 @@ const LeadDetails = ({
       isactive: true,
     };
     try {
-      const response = await axiosClient.post(POST_API.GET_STATE, PostDataForState, {
-        withCredentials: true,
-        headers: {
-          "Content-Type": "application/json",
+      const response = await axiosClient.post(
+        POST_API.GET_STATE,
+        PostDataForState,
+        {
+          withCredentials: true,
+          headers: {
+            "Content-Type": "application/json",
+          },
         },
-      });
+      );
       if (response.status === STATUS_CODE.OK) {
         setStateData(response.data);
       } else {
@@ -293,7 +309,7 @@ const LeadDetails = ({
           headers: {
             "Content-Type": "application/json",
           },
-        }
+        },
       );
 
       if (response.status === STATUS_CODE.OK) {
@@ -353,8 +369,6 @@ const LeadDetails = ({
       }))
     : [];
 
-  const { userPreference } = useUserPreference();
-
   // useEffect(() => {
   //   if (!userPreference || !editLeadDetails) return;
 
@@ -376,31 +390,64 @@ const LeadDetails = ({
   //   }
   // }, [userPreference, editLeadDetails]);
 
-  if(!userHasAccessToViewLeadDetails) return <>
-  <HeaderInfo/>
-  <AccessDeniedMessagePage/>
-  </>
+  // useEffect(() => {
+  //   console.log(leadDetailsData);
+  // }, [leadDetailsData]);
+
+  if (!userHasAccessToViewLeadDetails)
+    return (  
+      <>
+        <HeaderInfo />
+        <AccessDeniedMessagePage />
+      </>
+    );
+
+  // if (!leadDetailsData.id) {
+  //   return (
+  //      <div className="w-full    bg-slate-200 px-1 mb-1 ">
+  //       <HeaderInfo />
+  //       <div className="min-h-20 bg-white flex items-center justify-center">
+
+  //       <LoadingSpinner />
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   return (
     <div>
       <form>
-        {/* <div className="w-auto flex justify-between  bg-slate-200 px-1 mb-1  "> */}
+        <div className="w-full flex justify-between  bg-slate-200 px-1 mb-1 ">
+          {/* <div className="w-auto flex justify-between  bg-slate-200 px-1 mb-1  "> */}
           {/* <span className="table-header-custom">Details</span> */}
-          <HeaderInfo/>
+          <HeaderInfo />
           {showSaveLeadButton && (
-            <button type="submit" className={COLORS.ADD_BUTTON} onClick={handleSave}>
+            <button
+            disabled={isSavingLeadDetailsData}
+              type="submit"
+              className={isSavingLeadDetailsData? "border rounded-md caption-custom  px-1 py-0.5 bg-gray-100 text-gray-500 cursor-not-allowed ": COLORS.ADD_BUTTON}
+              onClick={handleSave}
+            >
               <div className="flex items-center gap-0.5">
-                <Save className="w-3 h-3 -mt-0.5" />
-                Save
+                {
+                  !isSavingLeadDetailsData ? <>
+                  <Save className="w-3 h-3 -mt-0.5" />
+                  Save
+                  </>
+                   : <>
+                    <LoadingSpinner height={14} width={14} colour="gray"/>Saving
+                  </>
+                }
               </div>
             </button>
           )}
+        </div>
         {/* </div> */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-2">
           <FormField
             maxLength={30}
             userHasAccessToUpdate={userHasAccessToUpdateLeadDetails}
-            type="text"
+            type="textarea"
             label="Job title"
             value={editLeadDetails.job_title}
             onChange={(e) => {
@@ -467,9 +514,9 @@ const LeadDetails = ({
             userHasAccessToUpdate={userHasAccessToUpdateLeadDetails}
             type="select"
             label="Country"
-            handleGetDropdownData={() => {
-              getAllCountries();
-            }}
+            // handleGetDropdownData={() => {
+            //   getAllCountries();
+            // }}
             selectOptions={countryOptions}
             value={editLeadDetails.country_name}
             selectedId={countryid}
@@ -481,10 +528,14 @@ const LeadDetails = ({
 
               const selectedCountryId = parseInt(e.target.value);
 
+              const userPrefCountry = countries.find(
+                (item) => item.id == userPreference.countryId,
+              )?.name;
               const selectedCountryName =
-                countryOptions.find((option) => option.id === selectedCountryId)
-                  ?.value || "";
-
+                countryOptions.find((option) => option.id == selectedCountryId)
+                  ?.value ??
+                userPrefCountry ??
+                "";
               // check if changed or not
               const isCountryChanged =
                 changedCountryId !== parseInt(e.target.value);
@@ -542,7 +593,7 @@ const LeadDetails = ({
               const selectedStateId = parseInt(e.target.value);
               const selectedStateName =
                 stateOptions.find(
-                  (option) => option.id === parseInt(e.target.value)
+                  (option) => option.id === parseInt(e.target.value),
                 )?.value || "";
 
               const isStateChanged =
@@ -596,7 +647,7 @@ const LeadDetails = ({
                 district_id: parseInt(e.target.value),
                 district_name:
                   districtOptions.find(
-                    (opt) => opt.id === parseInt(e.target.value)
+                    (opt) => opt.id === parseInt(e.target.value),
                   )?.value || "",
               });
             }}
@@ -607,13 +658,13 @@ const LeadDetails = ({
   );
 };
 
-const HeaderInfo=()=>{
-  return(
-            <div className="w-auto flex justify-between  bg-slate-200 px-1 mb-1  ">
-              <span className="table-header-custom">Details</span>
-              </div>
-  )
-}
+const HeaderInfo = () => {
+  return (
+    <div className=" ">
+      <span className="table-header-custom">Details</span>
+    </div>
+  );
+};
 
 type OptionType = {
   label: string | null;
@@ -627,7 +678,7 @@ type FormFieldProps = {
   onChange?: (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-    >
+    >,
   ) => void;
   type: "text" | "number" | "select" | "textarea";
   selectOptions?: OptionType[];
@@ -682,7 +733,9 @@ const FormField = ({
               onChange?.(event);
             }
           } else {
-            toast.error(MESSAGE.MODULE_ACCESS.LEAD_DETAILS.DENIED_UPDATE_ACCESS);
+            toast.error(
+              MESSAGE.MODULE_ACCESS.LEAD_DETAILS.DENIED_UPDATE_ACCESS,
+            );
           }
         }}
       >
@@ -696,7 +749,7 @@ const FormField = ({
             ) : (
               <span className="caption-custom italic">Add here...</span>
             )}
-            <Pen size={9} className="text-gray-600"/>
+            <Pen size={9} className="text-gray-600" />
           </span>
         ) : type === "select" ? (
           <select
@@ -722,7 +775,6 @@ const FormField = ({
             onChange={onChange}
             onBlur={handleBlur}
             autoFocus
-            
             className="caption-custom border border-gray-300 rounded p-1 focus:outline-none "
           />
         ) : (

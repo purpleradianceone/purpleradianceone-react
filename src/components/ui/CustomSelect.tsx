@@ -9,10 +9,10 @@ export interface SelectOption {
 }
 
 interface AppSelectProps {
-  label: string;
+  label?: string;
   options: SelectOption[];
   value?: number;
-  onChange: (value: number | undefined) => void;
+  onChange: (value: number | undefined , name?: string ) => void;
   placeholder?: string;
   isDisabled?: boolean;
   isRequired?: boolean;
@@ -50,7 +50,7 @@ const CustomSelect: React.FC<AppSelectProps> = ({
   isLoading,
   onInputChange,
   onMenuOpen,
-  onMenuScrollToBottom
+  onMenuScrollToBottom,
 }) => {
   const selectedOption = useMemo(
     () => options.find((opt) => opt.value === value) ?? null,
@@ -62,14 +62,14 @@ const CustomSelect: React.FC<AppSelectProps> = ({
       toast.error(`Can't update ${label}`);
       return;
     }
-    onChange(option?.value);
+    onChange(option?.value );
   };
 
   return (
     <div className={`w-full ${className ?? ""}`}>
       <label className="block input-label-custom ">
         {Icon && <Icon size={14} className="inline mr-1 text-blue-500" />}
-        {label}
+        {label && <span>{label}</span> }
         {isRequired && <span className="text-rose-500 ml-0.5">*</span>}
       </label>
 

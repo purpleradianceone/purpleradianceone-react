@@ -526,8 +526,8 @@ const LeadContact = ({
 
               {/* Right: Badges */}
               <div className="flex  items-end gap-1">
-                <StatusChip isActive={contact.isPrimary} />
-                {/* <PrimarySecondaryChip isPrimary={contact.isPrimary} /> */}
+                {/* <StatusChip isActive={contact.isPrimary}  /> */}
+                <PrimarySecondaryChip isPrimary={contact.isPrimary} />
                 <StatusChip isActive={contact.isActive} />
               </div>
             </div>

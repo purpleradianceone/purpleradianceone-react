@@ -323,6 +323,14 @@
   color: #eb9225;
 }
 
+
+.url{
+  font-family: "Roboto", sans-serif;
+  font-size: 14px;
+  font-weight: 400; 
+   color: #445bef;
+  
+}
 .custom-height-scrollbar {
   overflow: auto; /* Use 'auto' to apply to both vertical and horizontal scrollbars as needed */
 }

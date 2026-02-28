@@ -6,6 +6,7 @@ import { CheckCircle, Settings } from "lucide-react";
 import ROUTES_URL from "../../../../constants/Routes";
 import MetaIcon from "../../../../assets/svg/MetaIcon";
 import Button from "../../../ui/Button";
+import PageIdIntegration from "./PageIdIntegration";
 
 const MetaIntegration: React.FC = () => {
   const navigate = useNavigate();
@@ -87,6 +88,8 @@ const MetaIntegration: React.FC = () => {
           </div>
         </div>
       </div>
+
+      <PageIdIntegration  />    
     </div>
   );
 };
