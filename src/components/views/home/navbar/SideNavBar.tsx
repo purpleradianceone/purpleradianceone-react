@@ -30,7 +30,7 @@ function SideNavBar({ isOpen, onToggle }: SideBarProps) {
     userHasAccessToViewMeeting,
     userHasAccessToViewStock,
     userHasAccessToViewSupportTicket,
-    userHasAccessToViewAllTasks,
+    userHasAccessToViewTasks,
   } = useUserAccessModules();
 
   return (
@@ -83,7 +83,7 @@ function SideNavBar({ isOpen, onToggle }: SideBarProps) {
               label="Tasks"
               isOpen={isOpen}
               isActive={isActive}
-              disabled={!userHasAccessToViewAllTasks}
+              disabled={!userHasAccessToViewTasks}
             />
           )}
         </NavLink>

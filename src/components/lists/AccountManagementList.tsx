@@ -22,6 +22,7 @@ import ROUTES_URL from "../../constants/Routes";
 import { SIZE } from "../../constants/AppConstants";
 import COLORS from "../../constants/Colors";
 import PaginationWithoutCount, { PaginationDataWithoutCountProps } from "../ag-grid/PaginationWithoutCount";
+import { customDateRangeId } from "../../config/hooks/usePaginationHandler";
 
 function AccountManagementList({
   accounts,
@@ -105,7 +106,7 @@ function AccountManagementList({
     )?.date_range || "Date Filter";
 
   useEffect(() => {
-    if (handleSearchOption.dateRangeId === 8) {
+    if (handleSearchOption.dateRangeId === customDateRangeId) {
       setIsCustomDateOptionSelected(true);
     }
   }, [

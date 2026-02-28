@@ -27,7 +27,9 @@ const CRM: React.FC<{ companyUserId: number | null }> = ({ companyUserId }) => (
 const Support: React.FC<{ companyUserId: number | null }> = ({
   companyUserId,
 }) => <DashboardSupport companyUserId={companyUserId} />;
-const Inventory: React.FC = () => <InventoryDashboard />;
+const Inventory: React.FC<{ companyUserId: number | null }> = ({
+  companyUserId,
+}) => <InventoryDashboard companyUserId={companyUserId} />;
 const Finance: React.FC = () => <FinanceDashboard />;
 const HRMS: React.FC = () => <HRMSDashboard />;
 
@@ -72,7 +74,14 @@ const Home: React.FC = () => {
             />
           );
         case 3:
-          return <Inventory />;
+          return (
+            <Inventory
+              companyUserId={
+                selectedUser?.id ??
+                (loginStatus.isSuperUser ? null : loginStatus.id)
+              }
+            />
+          );
         case 4:
           return <Finance />;
         case 5:
@@ -189,7 +198,7 @@ const Home: React.FC = () => {
   useEffect(() => {
     setTourFinished(tutorailData.isDashboardSeen);
     fetchCompanyUserDashboardAssigned();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedUser]);
 
   return (

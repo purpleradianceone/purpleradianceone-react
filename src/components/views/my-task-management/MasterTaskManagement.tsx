@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 import useTaskPriority from "../../../config/hooks/useTaskPriority";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
 import { LocalStorageKeys } from "../../../enums/LocalStorageKeys";
-import { useSearchFilterPaginationDateHandlers } from "../../../config/hooks/usePaginationHandler";
+import { customDateRangeId, useSearchFilterPaginationDateHandlers } from "../../../config/hooks/usePaginationHandler";
 import POST_API from "../../../constants/PostApi";
 import axiosClient from "../../../axios-client/AxiosClient";
 import { STATUS_CODE } from "../../../constants/AppConstants";
@@ -37,8 +37,6 @@ function MasterTaskManagement({
   const { taskFrequency } = useTaskFrequency();
   const [supportTicketUpdateCount, setSupportTicketUpdateCount] =
     useState<number>(0);
-
-  const [isActive, setIsActive] = useState<boolean>(false);
 
   // Read filters from LocalStorage (before hook initializes)
   const savedFilters = JSON.parse(
@@ -70,6 +68,9 @@ function MasterTaskManagement({
   const [selectedPriority, setselectedPriority] = useState<number | undefined>(
     savedFilters.selectedPrioritytype,
   );
+  const [isActive, setIsActive] = useState<boolean | null>(
+    savedFilters.isActive,
+  );
   const [selectedCompanyUser, setSelectedCompanyUser] = useState<CompanyUser>({
     company_id: 0,
     id: 0,
@@ -97,7 +98,7 @@ function MasterTaskManagement({
   };
 
   const getMasterTaskData = async (signal: AbortSignal) => {
-    if (dateRangeId === 8 && concatDate.trim() === "") return;
+    if (dateRangeId === customDateRangeId && concatDate.trim() === "") return;
     const offset = (currentPage - 1) * pageSize;
     const effectiveDateRangeId = dateRangeId;
     const PostDataToGetAllTask: PostDataToGetMasterTask = {
@@ -114,6 +115,7 @@ function MasterTaskManagement({
       general_task_type_id: selectedTaskType ?? null,
       frequency_id: selectedFrequency ?? null,
       assignedto: selectedCompanyUser?.id || null,
+      isactive: isActive,
     };
     try {
       if (PostDataToGetAllTask.company_id === 0 || pageSize === 10) return;
@@ -191,6 +193,7 @@ function MasterTaskManagement({
     selectedFrequency,
     selectedCompanyUser,
     supportTicketUpdateCount,
+    isActive,
   ]);
 
   const handleAddAllTask = () => {
@@ -217,6 +220,7 @@ function MasterTaskManagement({
       selectedPriority: selectedPriority,
       selectedFrequency: selectedFrequency,
       selectedCompanyUser: selectedCompanyUser,
+      isActive: isActive,
     };
 
     localStorage.setItem(
@@ -236,6 +240,7 @@ function MasterTaskManagement({
     selectedPriority,
     selectedFrequency,
     selectedCompanyUser,
+    isActive,
   ]);
   // Note : On refresh button click clear the storage
   useEffect(() => {

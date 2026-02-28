@@ -14,7 +14,7 @@ import { useDateRangeIdChange } from "../../config/hooks/useDateRangeIdChange";
 import DateRangeFilterDropdown from "../ui/DateRangeFilterDropdown";
 import DateRangePicker from "../ui/DateRangePicker";
 import SearchInput from "../ui/SearchInput";
-import { useSearchFilterPaginationDateHandlers } from "../../config/hooks/usePaginationHandler";
+import { customDateRangeId, useSearchFilterPaginationDateHandlers } from "../../config/hooks/usePaginationHandler";
 import { useUserAccessModules } from "../../config/hooks/useAccessModules";
 import EmailTemplate from "../../@types/email-template/EmailTemplateType";
 import MESSAGE from "../../constants/Messages";
@@ -151,7 +151,7 @@ export const TemplatesPage: React.FC = () => {
   const getTemplatesOfCompany = useCallback(
     async ({ typeId, reset = false }: { typeId: number; reset?: boolean }) => {
       if(loginStatus.companyId === 0 )return;
-      if (dateRangeId === 8 && concatDate.trim() === "") return;
+      if (dateRangeId === customDateRangeId && concatDate.trim() === "") return;
       // We use a functional update for setOffset to get the latest value
       // and avoid including 'offset' in useCallback dependencies.
       setLoadingTemplates(true); // Set loading state for templates
@@ -351,7 +351,7 @@ export const TemplatesPage: React.FC = () => {
       ?.date_range || "Date Filter";
 
   useEffect(() => {
-    if (dateRangeId === 8) {
+    if (dateRangeId === customDateRangeId) {
       setIsCustomDateOptionSelected(true);
     }
   }, [searchParameter, dateRangeId, setIsCustomDateOptionSelected]);

@@ -76,6 +76,11 @@ const ROUTES_URL = {
     // Stock
     STOCK_MANAGEMENT : "/home/manage-stock/stock",
     STOCK_LIVE_FOR_COMPANY_PRODUCT : '/home/manage-stock/stock/live-stock-for-company-product/',
+    WAREHOUSE_WISE_STOCK : "warehouse-wise-stock",
+    STOCK_LEDGER : "stock-ledger",
+    STOCK_AGEING : "stock-ageing",
+
+
 
     //Support Tickets
     SUPPORT_TICKET_MANAGEMENT : "/home/manage-support-ticket/support-tickets",

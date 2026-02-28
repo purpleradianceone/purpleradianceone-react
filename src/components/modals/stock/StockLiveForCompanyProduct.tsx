@@ -58,7 +58,10 @@ const StockLiveForCompanyProduct = ({
       })
       .then((response) => {
         if (response.status === STATUS_CODE.OK) {
-          setCurrentPageData({currentPage: currentPage, pageDataLength: response.data.length});
+          setCurrentPageData({
+            currentPage: currentPage,
+            pageDataLength: response.data.length,
+          });
           const data = response.data;
           const formattedData: LiveStock[] = data.map((item: any) => ({
             count: item.count,

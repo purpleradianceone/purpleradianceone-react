@@ -14,6 +14,7 @@ interface DropdownProps {
   requiredRedDot?: boolean;
   logo?: LucideIcon;
   paddingy?: number;
+  errorMessage?: string;
 }
 
 const CustomDropdown: React.FC<DropdownProps> = ({
@@ -26,6 +27,7 @@ const CustomDropdown: React.FC<DropdownProps> = ({
   requiredRedDot,
   logo: Icon,
   paddingy = 1,
+  errorMessage,
 }) => {
   const [selectedOption, setSelectedOption] = useState<number | undefined>(
     () => {
@@ -102,7 +104,11 @@ const CustomDropdown: React.FC<DropdownProps> = ({
           if (!readOnly) {
             setShowDropdown((prev) => !prev);
           } else {
+            if(errorMessage){
+              toast.error(errorMessage);
+            }else{
             toast.error(`Can't Update ${labelName}`);
+            }
           }
         }}
         onKeyDown={(e) => {
