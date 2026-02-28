@@ -1,19 +1,23 @@
-import { Package, Plus } from "lucide-react";
+import { Package } from "lucide-react";
 import { useState } from "react";
 import toast from "react-hot-toast";
+import { Product } from "../../@types/products/ProductsManagementProps";
+import LiveStockForCompanyProduct from "../../@types/stock/LiveStockForCompanyProduct";
 import StockManagementListProps from "../../@types/stock/StockManagementListProps";
+import { fetchCompanyProduct } from "../../config/apis/api";
+import { handleApiError } from "../../config/error/handleApiError";
 import { useUserAccessModules } from "../../config/hooks/useAccessModules";
-import { SIZE } from "../../constants/AppConstants";
+import { ActionTypeForStockMOdule } from "../../constants/AppConstants";
 import COLORS from "../../constants/Colors";
 import MESSAGE from "../../constants/Messages";
+import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
 import { useUserPreference } from "../../context/user/UserPreference";
 import PaginationWithoutCount from "../ag-grid/PaginationWithoutCount";
 import StockLiveForCompanyProductAgGrid from "../ag-grid/StockLiveForCompanyProductAgGrid";
 import AddStock from "../modals/stock/AddStock";
-import Button from "../ui/Button";
 import SearchInput from "../ui/SearchInput";
 
-// type StockView = ActionTypeForStockMOdule | null;
+type StockView = ActionTypeForStockMOdule | null;
 
 const StockManagementList = ({
   liveStockForCompanyProduct,
@@ -25,113 +29,99 @@ const StockManagementList = ({
   const { userHasAccessToAddProductWiseStock } = useUserAccessModules();
   const [isAddStockModalOpen, setIsAddStockModalOpen] =
     useState<boolean>(false);
-  // const [isAddStockModalOpenFromStock, setIsAddStockModalOpenFromStock] =
-  //   useState<boolean>(false);
+  const [isAddStockModalOpenFromStock, setIsAddStockModalOpenFromStock] =
+    useState<boolean>(false);
   // const [openAllTransactionPage, setOpenAllTransactionPage] =
   //   useState<boolean>(false);
-  // const [activeStockView, setActiveStockview] = useState<StockView>(null);
-  // const [selectedStock, setSelectedStock] =
-  //   useState<LiveStockForCompanyProduct | null>(null);
-  // const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [activeStockView, setActiveStockview] = useState<StockView>(null);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   // const [isCreateStockLoading, setIsCreateStockLoading] = useState(false);
 
-  // const [isCreateStockLoading, setIsCreateStockLoading] = useState(false);
+  const { loginStatus } = useLoggedInUserContext();
 
-  // function handleSelectedStockLiveForCompanyProduct(
-  //   data: LiveStockForCompanyProduct,
-  //   action: ActionTypeForStockMOdule,
-  // ) {
-  //   switch (action) {
-  //     case ActionTypeForStockMOdule.DETAILS:
-  //       if (data !== null && data !== undefined) {
-  //         setSelectedStock(data);
-  //         setActiveStockview(ActionTypeForStockMOdule.DETAILS);
-  //       }
-  //       break;
-  //     case ActionTypeForStockMOdule.TRANSACTIONS:
-  //       if (data !== null && data !== undefined) {
-  //         setSelectedStock(data);
-  //         setActiveStockview(ActionTypeForStockMOdule.TRANSACTIONS);
-  //       }
-  //       break;
-  //     case ActionTypeForStockMOdule.CREATE_STOCK:
-  //       if (data !== null && data !== undefined) {
-  //         handleCreateStock(data);
-  //       }
-  //       break;
-  //   }
-  // }
-  // const [isCreateStockReady, setIsCreateStockReady] = useState(false);
+  const [isCreateStockLoading, setIsCreateStockLoading] = useState(false);
 
-  // const handleCreateStock = async (data: LiveStockForCompanyProduct) => {
-  //   setIsCreateStockReady(false);
-  //   setIsCreateStockLoading(true);
+  function handleSelectedStockLiveForCompanyProduct(
+    data: LiveStockForCompanyProduct,
+  ) {
+    if (userHasAccessToAddProductWiseStock) {
+      handleCreateStock(data);
+    } else {
+      toast.error(MESSAGE.MODULE_ACCESS.STOCK.STOCK.DENIED_ADD_ACCESS);
+    }
+  }
+  const [isCreateStockReady, setIsCreateStockReady] = useState(false);
 
-  //   try {
-  //     const postData = {
-  //       company_id: loginStatus.companyId,
-  //       id: data.companyProductId,
-  //       limit: 1,
-  //       offset: 0,
-  //       search_company_specific_date_range_id: null,
-  //       search_parameter: null,
-  //       search_parameter_date: null,
-  //       requestedby_id: loginStatus.id,
-  //     };
-  //     const response = await fetchCompanyProduct(postData);
-  //     const product = response?.data?.[0] ?? response?.data;
+  const handleCreateStock = async (data: LiveStockForCompanyProduct) => {
+    setIsCreateStockReady(false);
+    setIsCreateStockLoading(true);
 
-  //     if (!product) return;
+    try {
+      const postData = {
+        company_id: loginStatus.companyId,
+        id: data.companyProductId,
+        limit: 1,
+        offset: 0,
+        search_company_specific_date_range_id: null,
+        search_parameter: null,
+        search_parameter_date: null,
+        requestedby_id: loginStatus.id,
+      };
+      const response = await fetchCompanyProduct(postData);
+      const product = response?.data?.[0] ?? response?.data;
 
-  //     const formattedProduct: Product = {
-  //       count: product.count,
-  //       id: product.id,
-  //       companyId: product.company_id,
-  //       productTypeId: product.product_type_id,
-  //       unitName: product.unit_name,
-  //       unitId: product.unit_id,
-  //       unitNameInStock: product.unit_name_in_stock,
-  //       productTypeName: product.product_type_name,
-  //       defaultWarrantyIntervalTypeId:
-  //         product.default_warranty_interval_type_id,
-  //       defaultWarranty: product.default_warranty,
-  //       defaultWarrantyName: product.default_warranty_name,
-  //       defaultAmcCycleIntervalTypeId:
-  //         product.default_amc_cycle_interval_type_id,
-  //       defaultAmcCycle: product.default_amc_cycle,
-  //       defaultAmcCycleName: product.default_amc_cycle_name,
-  //       name: product.name,
-  //       barcode: product.barcode,
-  //       parentUnitId: product.parent_unit_id,
-  //       isSerialNumber: product.is_serial_number,
-  //       cost: product.cost,
-  //       description: product.description,
-  //       version: product.version,
-  //       url: product.url,
-  //       isActive: product.is_active,
-  //       hsn: product.hsn,
-  //       sac: product.sac,
-  //       taxRate: product.tax_rate,
-  //       validFrom: product.valid_from,
-  //       createdBy: product.created_by,
-  //       createdOn: product.created_on,
-  //       minimumStock: product.minimum_stock,
-  //     };
+      if (!product) return;
 
-  //     // 1️ Set data first
-  //     setSelectedProduct(formattedProduct);
+      const formattedProduct: Product = {
+        count: product.count,
+        id: product.id,
+        companyId: product.company_id,
+        productTypeId: product.product_type_id,
+        unitName: product.unit_name,
+        unitId: product.unit_id,
+        unitNameInStock: product.unit_name_in_stock,
+        productTypeName: product.product_type_name,
+        defaultWarrantyIntervalTypeId:
+          product.default_warranty_interval_type_id,
+        defaultWarranty: product.default_warranty,
+        defaultWarrantyName: product.default_warranty_name,
+        defaultAmcCycleIntervalTypeId:
+          product.default_amc_cycle_interval_type_id,
+        defaultAmcCycle: product.default_amc_cycle,
+        defaultAmcCycleName: product.default_amc_cycle_name,
+        name: product.name,
+        barcode: product.barcode,
+        parentUnitId: product.parent_unit_id,
+        isSerialNumber: product.is_serial_number,
+        cost: product.cost,
+        description: product.description,
+        version: product.version,
+        url: product.url,
+        isActive: product.is_active,
+        hsn: product.hsn,
+        sac: product.sac,
+        taxRate: product.tax_rate,
+        validFrom: product.valid_from,
+        createdBy: product.created_by,
+        createdOn: product.created_on,
+        minimumStock: product.minimum_stock,
+      };
 
-  //     // 2️ Mark ready
-  //     setIsCreateStockReady(true);
+      // 1️ Set data first
+      setSelectedProduct(formattedProduct);
 
-  //     // 3️ Open view LAST
-  //     setActiveStockview(ActionTypeForStockMOdule.CREATE_STOCK);
-  //     setIsAddStockModalOpenFromStock(true);
-  //   } catch (err) {
-  //     handleApiError(err);
-  //   } finally {
-  //     setIsCreateStockLoading(false);
-  //   }
+      // 2️ Mark ready
+      setIsCreateStockReady(true);
+
+      // 3️ Open view LAST
+      setActiveStockview(ActionTypeForStockMOdule.CREATE_STOCK);
+      setIsAddStockModalOpenFromStock(true);
+    } catch (err) {
+      handleApiError(err);
+    } finally {
+      setIsCreateStockLoading(false);
+    }
+  };
 
   return (
     <div
@@ -161,7 +151,7 @@ const StockManagementList = ({
             </div>
           </div>
         </div>
-        <div
+        {/* <div
           id="company-users-module-add-button"
           className="flex gap-1 items-center"
         >
@@ -186,7 +176,7 @@ const StockManagementList = ({
               <span className="hidden md:inline">Add</span>
             </div>
           </Button>
-        </div>
+        </div> */}
       </div>
       <div className="bg-white  overflow-y-auto rounded-lg shadow-sm ">
         <div
@@ -198,7 +188,8 @@ const StockManagementList = ({
         >
           <StockLiveForCompanyProductAgGrid
             data={liveStockForCompanyProduct}
-            // onRowSelect={handleSelectedStockLiveForCompanyProduct}
+            onRowSelect={handleSelectedStockLiveForCompanyProduct}
+            // handleRowClick={}
           />
         </div>
         <div className="flex items-center justify-end ">
@@ -219,7 +210,7 @@ const StockManagementList = ({
           }}
         />
       )}
-      {/* {activeStockView === ActionTypeForStockMOdule.CREATE_STOCK &&
+      {activeStockView === ActionTypeForStockMOdule.CREATE_STOCK &&
         isCreateStockReady &&
         !isCreateStockLoading &&
         selectedProduct && (
@@ -233,7 +224,7 @@ const StockManagementList = ({
               setIsCreateStockReady(false);
             }}
           />
-        )} */}
+        )}
       {/* {activeStockView === ActionTypeForStockMOdule.DETAILS && (
         <StockLiveForCompanyProduct
           companyStockLive={selectedStock!}

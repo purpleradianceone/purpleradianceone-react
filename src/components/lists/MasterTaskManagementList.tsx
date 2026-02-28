@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { BookCheck, ClipboardList } from "lucide-react";
 import qs from "query-string";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import MasterTaskManagementProps from "../../@types/List/MasterTaskManagementProps";
@@ -27,6 +27,7 @@ import DateRangeFilterDropdown from "../ui/DateRangeFilterDropdown";
 import DateRangePicker from "../ui/DateRangePicker";
 import SearchInput from "../ui/SearchInput";
 import BooleanDropdown from "../ui/BooleanDropdown";
+import { customDateRangeId } from "../../config/hooks/usePaginationHandler";
 
 function MasterTaskManagementList({
   isUsedInAllTasksModule,
@@ -59,12 +60,21 @@ function MasterTaskManagementList({
   const {
     handleDateRangeIdChange,
     isCustomDateOptionSelected,
-    // setIsCustomDateOptionSelected,
+    setIsCustomDateOptionSelected,
   } = useDateRangeIdChange({ dateRangeDropdownOptions, handleSearchOption });
   const [isCreateTaskMasterModalOpen, setIsCreateTaskMasterModalOpen] =
     useState<boolean>(searchParams.get("fromDashboard") === "true");
   // const [selectedRowData, setSelectedRowData] = useState<MasterTaskProps>()
 
+  useEffect(() => {
+    if (handleSearchOption.dateRangeId === customDateRangeId) {
+      setIsCustomDateOptionSelected(true);
+    }
+  }, [
+    handleSearchOption.searchParameter,
+    handleSearchOption.dateRangeId,
+    setIsCustomDateOptionSelected,
+  ]);
   if (userHasAccessToViewAllTasks) {
     const handleCreateTaskMasterModalClose = () => {
       setIsCreateTaskMasterModalOpen(false);
