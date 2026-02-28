@@ -187,7 +187,7 @@ const AccountLead = ({ account }: CreateAccountLeadType) => {
 
   if(!userHasAccessToViewAccountLeads)return <AccessDeniedMessagePage message={MESSAGE.MODULE_ACCESS.ACCOUNT_LEADS.DENIED_VIEW_ACCESS}/>
   return (
-    <div className="bg-white  flex flex-col h-full   max-h-96 overflow-auto">
+    <div className=" flex flex-col min-h-14 h-full   max-h-96 overflow-auto">
       {/* Header */}
       {/* <div className="bg-gray-100 table-header-custom rounded-t-md px-2 ">
       <span>Account related leads</span> */}
@@ -195,7 +195,7 @@ const AccountLead = ({ account }: CreateAccountLeadType) => {
 
       {/* Empty State */}
       {!isLoading && accountLead.length === 0 && (
-        <div className="flex items-center justify-center  min-h-20 ">
+        <div className="flex items-center justify-center h-full bg-pink-0 ">
           <span className="italic caption-custom flex gap-1 items-center ">
             <CreateAccountLead
               account={account}

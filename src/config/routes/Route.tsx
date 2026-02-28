@@ -63,7 +63,6 @@ import StockManagement from "../../components/views/stock-management/StockManage
 import SupportTicketManagement from "../../components/views/support-ticket-management/SupportTicketManagement";
 import ViewSupportTicketManagement from "../../components/modals/support-ticket/ViewSupportTicketManagement";
 import { CreateMultipleAccountCompanyProduct } from "../../components/modals/Account/account-company-product/multiple-product-mapping/CreateMultipleAccountCompanyProduct";
-import AccountDetails from "../../components/modals/Account/AccountDetails";
 import { AccountCompanyProductDetails } from "../../components/modals/Account/account-company-product/account-company-product-details/AccountCompanyProductDetails";
 import AccountNavbarBreadcrumb from "../../components/modals/Account/nav-wrapper/AccountNavbarBreadcrumb";
 import { EditorCanvasForQuotation } from "../../components/quotation-builder/builder/editor-canvas/EditorCanvasForQuotation";
@@ -83,6 +82,7 @@ import MasterTaskManagement from "../../components/views/my-task-management/Mast
 import GeneralTask from "../../components/views/my-task-management/GeneralTask";
 import MasterTaskUpdate from "../../components/modals/general-task-master/MasterTaskUpdate";
 import { QuotationPage } from "../../components/quotation-builder/QuotationPage";
+import AccountManagement from "../../components/modals/Account/AccountManagement";
 
 export const router = createBrowserRouter([
   {
@@ -861,7 +861,10 @@ export const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <AccountDetails />,
+        element: 
+        // <AccountDetailsUpdated />
+        <AccountManagement/>
+        ,
       },
       {
         path: "products/:productId",
