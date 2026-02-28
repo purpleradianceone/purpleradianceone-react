@@ -36,6 +36,7 @@ import CustomDropdown from "../modals/leads/CustomDropdown";
 import EditableSection from "./EditableSection";
 import { usebusinessType } from "../../config/hooks/useBusinessType";
 import { useIndustryType } from "../../config/hooks/useIndustryType";
+import Button from "../ui/Button";
 
 const UserPreference = () => {
   const { countries } = useCountries();
@@ -64,41 +65,41 @@ const UserPreference = () => {
     company_id: 0,
 
     industry_type_id: 0,
-    industry_type_name: "string",
+    industry_type_name: "",
 
     business_type_id: 0,
-    business_type_name: "string",
+    business_type_name: "",
 
     state_id: 0,
-    state_name: "string",
+    state_name: "",
 
     district_id: 0,
-    district_name: "string",
+    district_name: "",
 
-    pan: "string",
-    gst: "string",
-    tan: "string",
-    cin: "string",
+    pan: "",
+    gst: "",
+    tan: "",
+    cin: "",
 
-    business_registration_number: "string",
+    business_registration_number: "",
 
-    billing_address: "string",
-    shipping_address: "string",
-    registered_office_address: "string",
+    billing_address: "",
+    shipping_address: "",
+    registered_office_address: "",
 
-    website: "string",
+    website: "",
 
-    logo_file_extension: "string",
-    logo_origin_url: "string",
-    logo_cdn_url: "string",
+    logo_file_extension: "",
+    logo_origin_url: "",
+    logo_cdn_url: "",
 
     isactive: false,
 
-    createdby: "string",
-    updatedby: "string",
+    createdby: "",
+    updatedby: "",
 
-    createdon: "string",
-    updatedon: "string",
+    createdon: "",
+    updatedon: "",
   });
   const [previousCompanyDetail, setPriviousCompanyDetail] =
     useState<CompanyDetail>({
@@ -107,41 +108,41 @@ const UserPreference = () => {
       company_id: 0,
 
       industry_type_id: 0,
-      industry_type_name: "string",
+      industry_type_name: "",
 
       business_type_id: 0,
-      business_type_name: "string",
+      business_type_name: "",
 
       state_id: 0,
-      state_name: "string",
+      state_name: "",
 
       district_id: 0,
-      district_name: "string",
+      district_name: "",
 
-      pan: "string",
-      gst: "string",
-      tan: "string",
-      cin: "string",
+      pan: "",
+      gst: "",
+      tan: "",
+      cin: "",
 
-      business_registration_number: "string",
+      business_registration_number: "",
 
-      billing_address: "string",
-      shipping_address: "string",
-      registered_office_address: "string",
+      billing_address: "",
+      shipping_address: "",
+      registered_office_address: "",
 
-      website: "string",
+      website: "",
 
-      logo_file_extension: "string",
-      logo_origin_url: "string",
-      logo_cdn_url: "string",
+      logo_file_extension: "",
+      logo_origin_url: "",
+      logo_cdn_url: "",
 
       isactive: false,
 
-      createdby: "string",
-      updatedby: "string",
+      createdby: "",
+      updatedby: "",
 
-      createdon: "string",
-      updatedon: "string",
+      createdon: "",
+      updatedon: "",
     });
 
   useEffect(() => {
@@ -195,6 +196,7 @@ const UserPreference = () => {
   // const [totalCount, setTotalCount] = useState<number | null>(null);
 
   const handleTimezonePreferenceChange = async () => {
+    if(loginStatus.companyId === 0)return;
     //getting the id as per value
     const selectedMasterRowInGrid = rowsInGridDropdownOptions.find(
       (option) => parseInt(option.rowsInGrid) === selectedRowsPerPage,
@@ -342,6 +344,7 @@ const UserPreference = () => {
   };
 
   const updateUserProfile = async () => {
+    if(loginStatus.companyId === 0)return;
     try {
       const postData = {
         company_id: loginStatus.companyId,
@@ -398,6 +401,7 @@ const UserPreference = () => {
     searchTextToUse = "",
     customLimit?: number,
   ) => {
+    if(loginStatus.companyId === 0)return;
     const effectiveLimit = customLimit !== undefined ? customLimit : limit;
 
     const postData = {
@@ -499,14 +503,16 @@ const UserPreference = () => {
   };
 
   //For company details
-  
+
   const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [logoPreviousPreview, setPreviousLogoPreview] = useState<string | null>(null);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
 
   const [stateData, setStateData] = useState<State[]>([]);
   const [districts, setDistrict] = useState<District[]>([]);
 
   const getCompanyDetail = () => {
+    if(loginStatus.companyId === 0)return;
     try {
       axiosClient
         .post(POST_API.GET_COMPANY_DETAIL, {
@@ -521,14 +527,13 @@ const UserPreference = () => {
           }
         })
         .catch((e) => {
+          console.log("inside get company detail catch");
           handleApiError(e);
         });
     } catch (ex) {
       handleApiError(ex);
     }
   };
-
-  
 
   const handleCompanyDetailsChange = (
     e:
@@ -540,49 +545,70 @@ const UserPreference = () => {
     setCompanyDetail(updatedCompanyDetail);
   };
 
-  // const handleCompanyLogoUpload = () =>{
+  const handleCompanyLogoUpload = async () => {
+    if(loginStatus.companyId === 0)return;
+    if (logoFile) {
+      try {
+        const formData = new FormData();
+        formData.append("file", logoFile);
+        formData.append("id", companyDetail.id.toString());
+        formData.append("company_id", loginStatus.companyId.toString());
+        formData.append("updatedby_id", loginStatus.id.toString());
+        console.log(formData);
 
-  //   if (logoFile?.type) {
-  //     try {
-  //       axiosClient
-  //         .post(POST_API.UPDATE_COMPANY_DETAIL, {
-  //           company_id: loginStatus.companyId,
-  //           logo_file_extension: companyDetail.logo_file_extension,
-  //           logo_origin_url: companyDetail?.logo_origin_url,
-  //           logo_cdn_url: companyDetail?.logo_cdn_url,
-  //           updatedby_id: loginStatus.id,
-  //         })
-  //         .then((response) => {
-  //           if (response.data.status) {
-  //             toast.success(response.data.message);
-  //             getCompanyDetail();
-  //           } else {
-  //             toast.error(response.data.message);
-  //           }
-  //         })
-  //         .catch((e) => {
-  //           handleApiError(e);
-  //         });
-  //       console.log("inside if condition");
-  //     } catch (ex) {
-  //       console.log(ex);
-  //       handleApiError(ex);
-  //     }
-  //   } else {
-  //     toast("No File Selected For Upload", {
-  //       icon: "⚠️",
-  //       style: {
-  //         border: "1px solid #facc15",
-  //         background: "#fffbeb",
-  //         color: "#92400e",
-  //       },
-  //     });
-  //   }
+        await axiosClient
+          .post(POST_API.UPLOAD_COMPANY_LOGO, formData, {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+            maxContentLength: Infinity,
+            maxBodyLength: Infinity,
+            withCredentials: true,
+          })
+          .then((response) => {
+            const data = response.data;
 
-  // }
+            if (data.status) {
+              toast.success(data.message);
+            } else {
+              toast.error(data.message);
+            }
+          })
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          .catch(async (error: any) => {
+            handleApiError(error);
+            setLogoPreview(logoPreviousPreview);
+          })
+          .finally(() => {
+            setIsLogoChange(false);
+          });
+        console.log("inside if condition");
+      } catch (ex) {
+        console.log(ex);
+        handleApiError(ex);
+      }
+    } else {
+      toast("No File Selected For Upload", {
+        icon: "⚠️",
+        style: {
+          border: "1px solid #facc15",
+          background: "#fffbeb",
+          color: "#92400e",
+        },
+      });
+    }
+  };
+
+  const [
+    isLoadingForCompanyDetailsUpdate,
+    setIsLoadingForCompanyDetailsUpdate,
+  ] = useState<boolean>(false);
 
   const updateCompanyDetail = () => {
+        if(loginStatus.companyId === 0)return;
+
     if (!isCompanyDetailEqual(previousCompanyDetail, companyDetail)) {
+      setIsLoadingForCompanyDetailsUpdate(true);
       try {
         axiosClient
           .post(POST_API.UPDATE_COMPANY_DETAIL, {
@@ -595,7 +621,8 @@ const UserPreference = () => {
             gst: companyDetail.gst,
             tan: companyDetail.tan,
             cin: companyDetail.cin,
-            business_registration_number: companyDetail.business_registration_number,
+            business_registration_number:
+              companyDetail.business_registration_number,
             billing_address: companyDetail.billing_address,
             shipping_address: companyDetail.shipping_address,
             registered_office_address: companyDetail.registered_office_address,
@@ -622,6 +649,8 @@ const UserPreference = () => {
       } catch (ex) {
         console.log(ex);
         handleApiError(ex);
+      } finally {
+        setIsLoadingForCompanyDetailsUpdate(false);
       }
     } else {
       toast("No Details Changed", {
@@ -639,6 +668,45 @@ const UserPreference = () => {
     getCompanyDetail();
   }, [loginStatus.companyId]);
 
+  const getCompanyLogo =()=>{
+    if(loginStatus.companyId === 0)return;
+     axios
+      .post(
+        POST_API.GET_COMPANY_LOGO,
+        {
+          company_id: loginStatus.companyId,
+          id: companyDetail.id,
+          logo_file_extension: companyDetail.logo_file_extension,
+          requestedby_id: loginStatus.id,
+        },
+        {
+          responseType: "arraybuffer",
+          withCredentials: true
+        },
+      )
+      .then((response) => {
+        const blob = new Blob([response.data], {
+          type: companyDetail.logo_file_extension,
+        });
+
+        const imageUrl = URL.createObjectURL(blob);
+        setLogoPreview(imageUrl);
+        setPreviousLogoPreview(imageUrl);
+        console.log("inside get logo")
+
+      }).catch((e)=>{
+        console.log("inside get company logo catch"+e)
+      });
+  }
+
+  useEffect(()=>{
+    if(companyDetail.logo_file_extension && companyDetail.logo_file_extension!==""){
+      getCompanyLogo();
+    }
+
+  },[companyDetail.logo_file_extension])
+
+  const [isLogoChange, setIsLogoChange] = useState<boolean>(false);
 
   const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -647,10 +715,21 @@ const UserPreference = () => {
     setLogoFile(file);
     console.log(logoFile);
 
+
     // preview
     const previewUrl = URL.createObjectURL(file);
     setLogoPreview(previewUrl);
   };
+
+  useEffect(()=>{
+
+    if(logoPreview !== logoPreviousPreview){
+       setIsLogoChange(true);
+    } else {
+      setIsLogoChange(false);
+    }
+
+  },[logoPreview])
 
   const [editingSection, setEditingSection] = useState<string | null>(null);
 
@@ -658,7 +737,14 @@ const UserPreference = () => {
     updateCompanyDetail();
   };
 
+  const handleEditableSectionCancel = () => {
+    setCompanyDetail(previousCompanyDetail);
+    setEditingSection(null);
+  };
+
   const getAllState = async (countryId: number | null) => {
+    if(loginStatus.companyId === 0)return;
+
     if (!countryId) return;
     const PostDataForState: State = {
       id: null,
@@ -711,6 +797,7 @@ const UserPreference = () => {
   }, [companyDetail.state_id]);
 
   const getAllDistrict = async (stateId: number | null) => {
+    if(loginStatus.companyId === 0)return;
     if (!stateId) return;
     const PostDataForDistrict: District = {
       id: null,
@@ -755,7 +842,9 @@ const UserPreference = () => {
         <div className="flex items-center justify-between ">
           <h3 className="section-header-custom">
             My Profile{" "}
-            <span className="caption-custom">(Click edit to change)</span>
+            {userHasAccessToUpdateUser && (
+              <span className="caption-custom">(Click edit to change)</span>
+            )}
           </h3>
         </div>
         <div className="border-t pt-4 w-full"></div>
@@ -778,7 +867,7 @@ const UserPreference = () => {
                 setEditingSection("user detail");
               }}
               isEditing={editingSection === "user detail"}
-              onCancel={() => setEditingSection(null)}
+              onCancel={handleEditableSectionCancel}
               sectionKey="user detail"
               onSave={handleUserDetailSave}
             >
@@ -896,7 +985,9 @@ const UserPreference = () => {
           <div className="flex items-center justify-between">
             <h3 className="section-header-custom">
               Company Details{" "}
-              <span className="caption-custom">(Click edit to change)</span>
+              {userHasAccessToUpdateCompanyDetail && (
+                <span className="caption-custom">(Click edit to change)</span>
+              )}
             </h3>
           </div>
 
@@ -908,7 +999,7 @@ const UserPreference = () => {
             <div className="flex flex-col items-start">
               {/* Image */}
               <div className="w-40 h-40 border rounded-lg overflow-hidden flex items-center justify-center bg-gray-50">
-                {logoPreview || companyDetail?.logo_cdn_url ? (
+                {logoPreview || companyDetail?.logo_file_extension ? (
                   <img
                     src={logoPreview ?? companyDetail?.logo_cdn_url}
                     alt="Company Logo"
@@ -920,22 +1011,42 @@ const UserPreference = () => {
               </div>
 
               {/* Button centered under image */}
-              {userHasAccessToUpdateCompanyDetail && (
-                <div className="w-40 flex justify-center mt-2">
-                  <label className="cursor-pointer px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700">
-                    {logoPreview || companyDetail?.logo_cdn_url
-                      ? "Edit Logo"
-                      : "Upload Logo"}
+              {userHasAccessToUpdateCompanyDetail &&
+                (!isLogoChange ? (
+                  <div className="w-40 flex justify-center mt-2">
+                    <label className="cursor-pointer px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                      {logoPreview || companyDetail?.logo_file_extension
+                        ? "Change Logo"
+                        : "Upload Logo"}
 
-                    <input
-                      type="file"
-                      accept="image/*"
-                      hidden
-                      onChange={handleLogoChange}
-                    />
-                  </label>
-                </div>
-              )}
+                      <input
+                        type="file"
+                        accept="image/*"
+                        hidden
+                        onChange={handleLogoChange}
+                      />
+                    </label>
+                  </div>
+                ) : (
+                  <div className="w-55 flex justify-center mt-2 gap-2">
+                    <div>
+                     <Button
+                     type="button"
+                      onClick={()=>setLogoPreview(logoPreviousPreview)}
+                    >
+                      Cancel
+                    </Button>
+                    </div>
+                    <div>
+                    <Button
+                      className="cursor-pointer px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                      onClick={handleCompanyLogoUpload}
+                    >
+                      Save Logo
+                    </Button>
+                    </div>
+                  </div>
+                ))}
             </div>
           </div>
 
@@ -948,11 +1059,12 @@ const UserPreference = () => {
                 hasAccess={userHasAccessToUpdateCompanyDetail}
                 onEdit={() => setEditingSection("company")}
                 isEditing={editingSection === "company"}
-                onCancel={() => setEditingSection(null)}
+                onCancel={handleEditableSectionCancel}
                 sectionKey="company"
                 onSave={() => {
                   handleEditableSectionSave();
                 }}
+                isLoading={isLoadingForCompanyDetailsUpdate}
               >
                 {editingSection === "company" ? (
                   <FormInput
@@ -964,11 +1076,16 @@ const UserPreference = () => {
                     placeholder="eg. www.abc.com"
                   />
                 ) : (
-                  <div className="caption-custom">
+                  <div className="table-header-custom">
                     Website:
-                    <span className="caption-custom-blue ml-1">
-                      {companyDetail?.website ?? "-"}
-                    </span>
+                    <a
+                      href={companyDetail?.website}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="caption-custom-blue ml-1"
+                    >
+                      {companyDetail?.website ?? ""}
+                    </a>
                   </div>
                 )}
               </EditableSection>
@@ -982,10 +1099,11 @@ const UserPreference = () => {
                 hasAccess={userHasAccessToUpdateCompanyDetail}
                 onEdit={() => setEditingSection("business")}
                 isEditing={editingSection === "business"}
-                onCancel={() => setEditingSection(null)}
+                onCancel={handleEditableSectionCancel}
                 onSave={() => {
                   handleEditableSectionSave();
                 }}
+                isLoading={isLoadingForCompanyDetailsUpdate}
               >
                 {editingSection === "business" ? (
                   <div className="grid grid-cols-2 gap-2">
@@ -1020,11 +1138,18 @@ const UserPreference = () => {
                   </div>
                 ) : (
                   <div className="grid grid-cols-2">
-                    <div className="caption-custom">
-                      Business Type: {companyDetail?.business_type_name ?? "-"}
+                    <div className="table-header-custom">
+                      Business Type:{"  "}
+                      <span className="table-data-custom">
+                        {companyDetail?.business_type_name ?? "-"}
+                      </span>
                     </div>
-                    <div className="caption-custom">
-                      Industry Type: {companyDetail?.industry_type_name ?? "-"}
+                    <div className="table-header-custom">
+                      Industry Type:{"  "}
+                      <span className="table-data-custom">
+                        {"  "}
+                        {companyDetail?.industry_type_name ?? "-"}
+                      </span>
                     </div>
                   </div>
                 )}
@@ -1039,7 +1164,7 @@ const UserPreference = () => {
                 hasAccess={userHasAccessToUpdateCompanyDetail}
                 onEdit={() => setEditingSection("location")}
                 isEditing={editingSection === "location"}
-                onCancel={() => setEditingSection(null)}
+                onCancel={handleEditableSectionCancel}
                 onSave={() => {
                   if (companyDetail.state_id && companyDetail.district_id) {
                     handleEditableSectionSave();
@@ -1055,6 +1180,7 @@ const UserPreference = () => {
                     });
                   }
                 }}
+                isLoading={isLoadingForCompanyDetailsUpdate}
               >
                 {editingSection === "location" ? (
                   <div className="grid grid-cols-2 gap-2">
@@ -1099,11 +1225,17 @@ const UserPreference = () => {
                   </div>
                 ) : (
                   <div className="grid grid-cols-2">
-                    <div className="caption-custom">
-                      State: {companyDetail?.state_name ?? "-"}
+                    <div className="table-header-custom">
+                      State:{"  "}
+                      <span className="table-data-custom">
+                        {companyDetail?.state_name ?? "-"}
+                      </span>
                     </div>
-                    <div className="caption-custom">
-                      District: {companyDetail?.district_name ?? "-"}
+                    <div className="table-header-custom">
+                      District:{"  "}
+                      <span className="table-data-custom">
+                        {companyDetail?.district_name ?? "-"}
+                      </span>
                     </div>
                   </div>
                 )}
@@ -1117,11 +1249,12 @@ const UserPreference = () => {
                 hasAccess={userHasAccessToUpdateCompanyDetail}
                 onEdit={() => setEditingSection("tax")}
                 isEditing={editingSection === "tax"}
-                onCancel={() => setEditingSection(null)}
+                onCancel={handleEditableSectionCancel}
                 sectionKey="tax"
                 onSave={() => {
                   handleEditableSectionSave();
                 }}
+                isLoading={isLoadingForCompanyDetailsUpdate}
               >
                 {editingSection === "tax" ? (
                   <div className="grid grid-cols-2 gap-2">
@@ -1162,21 +1295,35 @@ const UserPreference = () => {
                   </div>
                 ) : (
                   <div className="grid grid-cols-2 gap-y-1">
-                    <div className="caption-custom">
-                      PAN: {companyDetail?.pan ?? ""}
+                    <div className="table-header-custom">
+                      PAN:{" "}
+                      <span className="table-data-custom">
+                        {companyDetail?.pan ?? ""}
+                      </span>
                     </div>
-                    <div className="caption-custom">
-                      GST: {companyDetail?.gst ?? ""}
+                    <div className="table-header-custom">
+                      GST:{" "}
+                      <span className="table-data-custom">
+                        {companyDetail?.gst ?? ""}
+                      </span>
                     </div>
-                    <div className="caption-custom">
-                      TAN: {companyDetail?.tan ?? ""}
+                    <div className="table-header-custom">
+                      TAN:{" "}
+                      <span className="table-data-custom">
+                        {companyDetail?.tan ?? ""}
+                      </span>
                     </div>
-                    <div className="caption-custom">
-                      CIN: {companyDetail?.cin ?? ""}
+                    <div className="table-header-custom">
+                      CIN:{" "}
+                      <span className="table-data-custom">
+                        {companyDetail?.cin ?? ""}
+                      </span>
                     </div>
-                    <div className="col-span-2 caption-custom">
+                    <div className="col-span-2 table-header-custom">
                       Business Reg No:
-                      {companyDetail?.business_registration_number ?? ""}
+                      <span className="table-data-custom">
+                        {companyDetail?.business_registration_number ?? ""}
+                      </span>
                     </div>
                   </div>
                 )}
@@ -1191,10 +1338,11 @@ const UserPreference = () => {
                 hasAccess={userHasAccessToUpdateCompanyDetail}
                 onEdit={() => setEditingSection("address")}
                 isEditing={editingSection === "address"}
-                onCancel={() => setEditingSection(null)}
+                onCancel={handleEditableSectionCancel}
                 onSave={() => {
                   handleEditableSectionSave();
                 }}
+                isLoading={isLoadingForCompanyDetailsUpdate}
               >
                 {editingSection === "address" ? (
                   <div className="space-y-2">
@@ -1227,15 +1375,23 @@ const UserPreference = () => {
                   </div>
                 ) : (
                   <div className="space-y-1">
-                    <div className="caption-custom">
-                      Registered:{" "}
-                      {companyDetail?.registered_office_address ?? ""}
+                    <div className="table-header-custom mb-2">
+                      Registered:{"  "}
+                      <span className="table-data-custom">
+                        {companyDetail?.registered_office_address ?? ""}
+                      </span>
                     </div>
-                    <div className="caption-custom">
-                      Billing: {companyDetail?.billing_address ?? ""}
+                    <div className="table-header-custom mb-2">
+                      Billing:{"  "}
+                      <span className="table-data-custom">
+                        {companyDetail?.billing_address ?? ""}
+                      </span>
                     </div>
-                    <div className="caption-custom">
-                      Shipping: {companyDetail?.shipping_address ?? ""}
+                    <div className="table-header-custom">
+                      Shipping:{"  "}
+                      <span className="table-data-custom">
+                        {companyDetail?.shipping_address ?? ""}
+                      </span>
                     </div>
                   </div>
                 )}

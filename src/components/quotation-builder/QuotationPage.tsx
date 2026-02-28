@@ -13,12 +13,16 @@ import DateRangeFilterDropdown from "../ui/DateRangeFilterDropdown";
 import SearchInput from "../ui/SearchInput";
 import { useDateRangeIdChange } from "../../config/hooks/useDateRangeIdChange";
 import { useEffect, useState } from "react";
-import { customDateRangeId, useSearchFilterPaginationDateHandlers } from "../../config/hooks/usePaginationHandler";
+import {
+  customDateRangeId,
+  useSearchFilterPaginationDateHandlers,
+} from "../../config/hooks/usePaginationHandler";
 import { useComapanySpecificSearchDateRange } from "../../config/hooks/useCompanySpecificDateRange";
 import DateRangePicker from "../ui/DateRangePicker";
 import { useUserAccessModules } from "../../config/hooks/useAccessModules";
 import ROUTES_URL from "../../constants/Routes";
 import AccessDeniedPopup from "../views/not-found/AccessDeniedPage";
+import POST_API from "../../constants/PostApi";
 
 export const QuotationPage: React.FC = () => {
   const { userPreference } = useUserPreference();
@@ -165,7 +169,7 @@ export const QuotationPage: React.FC = () => {
       };
 
       const response = await axiosClient.post(
-        "http://localhost:8080/api/main/purple-crm-api/quotation/pdf",
+        POST_API.DEMO_QUOTATION_PDF,
         payload,
         {
           responseType: "blob",
@@ -294,7 +298,9 @@ export const QuotationPage: React.FC = () => {
         <div className="bg-white shadow-lg rounded-2xl p-10 text-center max-w-md w-full border">
           {/* Icon */}
           <div className="flex justify-center mb-4">
-            <div className="bg-blue-100 text-yellow-600 p-4 rounded-full"><LucideConstruction/></div>
+            <div className="bg-blue-100 text-yellow-600 p-4 rounded-full">
+              <LucideConstruction />
+            </div>
           </div>
 
           {/* Title */}
