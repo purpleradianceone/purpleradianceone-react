@@ -9,6 +9,7 @@ interface EditableSectionProps {
   onSave: () => void;
   children: React.ReactNode;
   hasAccess: boolean;
+  isLoading?: boolean; 
 }
 
 const EditableSection = ({
@@ -19,6 +20,7 @@ const EditableSection = ({
   onSave,
   children,
   hasAccess,
+  isLoading = false,
 }: EditableSectionProps) => {
   return (
     <div className="border rounded-xl p-4 bg-gray-50 relative">
@@ -42,11 +44,21 @@ const EditableSection = ({
           )
         ) : (
           <div className="flex gap-2">
-            <Button onClick={onSave}>Save</Button>
+            <Button onClick={onSave} disabled={isLoading}>
+              {isLoading ? (
+                <span className="flex items-center gap-2">
+                  <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                  Saving...
+                </span>
+              ) : (
+                "Save"
+              )}
+            </Button>
 
             <Button
               type="button"
               onClick={onCancel}
+              disabled={isLoading}
               className="px-3 py-1 bg-gray-400 text-white rounded"
             >
               Cancel
