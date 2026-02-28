@@ -73,7 +73,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
     userHasAccessToUpdateSettingGeneral,
     userHasAccessToViewStock,
     userHasAccessToViewSupportTicket,
-    userHasAccessToViewAllTasks,
+    userHasAccessToViewTasks,
   } = useUserAccessModules();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [accessDeniedPopUpView, setAccessDeniedPopUpView] =
@@ -488,7 +488,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
                           label="Manage Users"
                         />
                         <NavItem
-                          disable={!userHasAccessToViewAllTasks}
+                          disable={!userHasAccessToViewTasks}
                           to={ROUTES_URL.TASKS_MANAGEMENT}
                           icon={<ListChecks size={SIZE.TWENTY} />}
                           label="Tasks"

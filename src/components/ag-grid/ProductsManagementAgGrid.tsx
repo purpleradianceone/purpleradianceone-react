@@ -31,6 +31,7 @@ function ProductsManagementGrid({
     userHasAccessToUpdateProduct,
     userHasAccessToViewProductTeam,
     userHasAccessToViewProductUsers,
+    userHasAccessToAddProductStock,
   } = useUserAccessModules();
 
   const columnDefs = useMemo<ColDef[]>(
@@ -402,9 +403,9 @@ function ProductsManagementGrid({
 
                     <>
                       <ActionsDropdownButton
-                        disabled={!userHasAccessToUpdateProduct}
+                        disabled={!userHasAccessToAddProductStock}
                         onClick={() => {
-                          if (userHasAccessToUpdateProduct) {
+                          if (userHasAccessToAddProductStock) {
                             setIsActionsDropDownOpen(false);
                             handleCreateStockModalOpen!(true);
                             handleSelectedProductChange(params.data);

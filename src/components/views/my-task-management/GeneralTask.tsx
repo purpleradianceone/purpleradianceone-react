@@ -1,23 +1,22 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
+import { ChevronRight, FileText, Flag } from "lucide-react";
 import { useEffect, useState } from "react";
-import axiosClient from "../../../axios-client/AxiosClient";
-import POST_API from "../../../constants/PostApi";
 import toast from "react-hot-toast";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import axiosClient from "../../../axios-client/AxiosClient";
+import { handleApiError } from "../../../config/error/handleApiError";
+import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
+import useTaskStage from "../../../config/hooks/useTaskStage";
+import POST_API from "../../../constants/PostApi";
+import ROUTES_URL from "../../../constants/Routes";
+import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
+import { MytaskQueryKey } from "../../lists/MyAllTaskManagementList";
+import CustomDropdown from "../../modals/leads/CustomDropdown";
 import Button from "../../ui/Button";
 import TextAreaInput from "../../ui/TextAreaInput";
-import ToggleButton from "../../ui/ToggleButton";
 import LoadingPopUpAnimation from "../card/LoadingPopUpAnimation";
-import CustomDropdown from "../../modals/leads/CustomDropdown";
-import { FileText, Flag, ChevronRight } from "lucide-react";
-import useTaskStage from "../../../config/hooks/useTaskStage";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
-import ROUTES_URL from "../../../constants/Routes";
-import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
 import AccessDeniedPopup from "../not-found/AccessDeniedPage";
-import { handleApiError } from "../../../config/error/handleApiError";
-import { MytaskQueryKey } from "../../lists/MyAllTaskManagementList";
 
 function GeneralTask() {
   const { loginStatus } = useLoggedInUserContext();
@@ -84,46 +83,46 @@ function GeneralTask() {
     }));
   };
 
-  const handleCompanyUserToggle = (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    const { checked } = event.target;
+  // const handleCompanyUserToggle = (
+  //   event: React.ChangeEvent<HTMLInputElement>,
+  // ) => {
+  //   const { checked } = event.target;
 
-    axiosClient
-      .post(
-        POST_API.UPDATE_GENERAL_TASK,
-        {
-          company_id: loginStatus.companyId,
-          updatedby_id: loginStatus.id,
-          id: selectedGeneralTask.id,
-          isactive: checked,
-        },
-        {
-          withCredentials: true,
-        },
-      )
-      .then((res) => {
-        if (res.data.status) {
-          toast.success(res.data.message);
-          const updatedTask = {
-            ...selectedGeneralTask,
-            isActive: checked,
-          };
-          setSelectedGeneralTask(updatedTask);
-          const params = new URLSearchParams(location.search);
-          params.set(MytaskQueryKey, JSON.stringify(updatedTask));
+  //   axiosClient
+  //     .post(
+  //       POST_API.UPDATE_GENERAL_TASK,
+  //       {
+  //         company_id: loginStatus.companyId,
+  //         updatedby_id: loginStatus.id,
+  //         id: selectedGeneralTask.id,
+  //         isactive: checked,
+  //       },
+  //       {
+  //         withCredentials: true,
+  //       },
+  //     )
+  //     .then((res) => {
+  //       if (res.data.status) {
+  //         toast.success(res.data.message);
+  //         const updatedTask = {
+  //           ...selectedGeneralTask,
+  //           isActive: checked,
+  //         };
+  //         setSelectedGeneralTask(updatedTask);
+  //         const params = new URLSearchParams(location.search);
+  //         params.set(MytaskQueryKey, JSON.stringify(updatedTask));
 
-          navigate(`${location.pathname}?${params.toString()}`, {
-            replace: true,
-          });
-        } else {
-          toast.error(res.data.message);
-        }
-      })
-      .catch((error) => {
-        handleApiError(error);
-      });
-  };
+  //         navigate(`${location.pathname}?${params.toString()}`, {
+  //           replace: true,
+  //         });
+  //       } else {
+  //         toast.error(res.data.message);
+  //       }
+  //     })
+  //     .catch((error) => {
+  //       handleApiError(error);
+  //     });
+  // };
 
   const autoSave = async () => {
     if (!hasChanges()) return; // 🚀 no changes = no API
@@ -185,7 +184,7 @@ function GeneralTask() {
     <>
       {userHasAccessToUpdateAllTasks ? (
         <div className=" w-full h-[100vh] pl-5 pt-2 ">
-          <div className=" sticky top-10 z-20 bg-slate-100 flex text-center justify-start items-center gap-3 ml-0.5 ">
+          <div className=" sticky top-10 z-10 bg-slate-100 flex text-center justify-start items-center gap-3 ml-0.5 ">
             <Link to={ROUTES_URL.TASKS_MANAGEMENT}>
               <Button className="caption-custom flex items-center justify-center hover:text-gray-800">
                 My Tasks
@@ -215,13 +214,13 @@ function GeneralTask() {
                     }}
                   />
                   <div className="flex w-full items-end justify-end ">
-                    <ToggleButton
+                    {/* <ToggleButton
                       label="Status"
                       wantLabel={true}
                       checked={formData.isActive}
                       name="isActive"
                       onToggle={handleCompanyUserToggle}
-                    />
+                    /> */}
                   </div>
 
                   <div className="col-span-2">

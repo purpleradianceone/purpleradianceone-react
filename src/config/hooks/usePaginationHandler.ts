@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react';
-import { STRING_VALUES } from '../../constants/AppConstants';
-import { useUserPreference } from '../../context/user/UserPreference';
-import { PageData } from '../../components/ag-grid/PaginationWithoutCount';
+import { useEffect, useState } from "react";
+import { STRING_VALUES } from "../../constants/AppConstants";
+import { useUserPreference } from "../../context/user/UserPreference";
+import { PageData } from "../../components/ag-grid/PaginationWithoutCount";
 
 export const customDateRangeId = 9;
 
@@ -27,26 +27,34 @@ interface UseSearchFilterPaginationDateHandlersResult {
 
 export const useSearchFilterPaginationDateHandlers = (
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  initialValue ? : any
+  initialValue?: any,
 ): UseSearchFilterPaginationDateHandlersResult => {
   const { userPreference } = useUserPreference();
   const firstValue = userPreference.rowsInGrid;
-  // const [totalPages, setTotalPages] = useState(1); 
-  const [concatDate, setConcatDate] = useState('');
+  // const [totalPages, setTotalPages] = useState(1);
+  const [concatDate, setConcatDate] = useState("");
   const [currentPage, setCurrentPage] = useState(initialValue?.page || 1);
-  const [pageSize, setPageSize] = useState(initialValue?.size || firstValue || 25);
-  const [dateRangeId, setDateRangeId] = useState(initialValue?.dateRangeId || null);
-  const [searchParameter, setSearchParameter] = useState(initialValue?.search || "");
-  const [startDate, setStartDate] = useState(initialValue?.customStartDate || "");
+  const [pageSize, setPageSize] = useState(
+    initialValue?.size || firstValue || 25,
+  );
+  const [dateRangeId, setDateRangeId] = useState(
+    initialValue?.dateRangeId || null,
+  );
+  const [searchParameter, setSearchParameter] = useState(
+    initialValue?.search || "",
+  );
+  const [startDate, setStartDate] = useState(
+    initialValue?.customStartDate || "",
+  );
   const [endDate, setEndDate] = useState(initialValue?.customEndDate || "");
-  const [pageData, setPageData] = useState<PageData>({currentPage:0, pageDataLength:0});
-  
-
+  const [pageData, setPageData] = useState<PageData>({
+    currentPage: 0,
+    pageDataLength: 0,
+  });
 
   useEffect(() => {
-    setPageSize(initialValue?.size || firstValue)
-  }, [firstValue, initialValue?.size])
-
+    setPageSize(initialValue?.size || firstValue);
+  }, [firstValue, initialValue?.size]);
 
   const formatDate = (date: Date): string => {
     if (!date || date.toString() === STRING_VALUES.INVALID_DATE) return "";
@@ -69,9 +77,9 @@ export const useSearchFilterPaginationDateHandlers = (
     return `${day}-${month}-${today.getFullYear()}`;
   };
 
-  const setCurrentPageData = (currentPageData: PageData)=>{
+  const setCurrentPageData = (currentPageData: PageData) => {
     setPageData(currentPageData);
-  }
+  };
   const handlePageSizeChange = (size: number) => {
     setPageSize(size);
     setCurrentPage(1);
@@ -87,19 +95,17 @@ export const useSearchFilterPaginationDateHandlers = (
       setCurrentPage(page);
     }
 
-    if(page>=1 && page < currentPage){
+    if (page >= 1 && page < currentPage) {
       setCurrentPage(page);
     }
-
   };
-
 
   const handleStartDateChange = (date: Date | null) => {
     if (!date) {
-      setStartDate('');
+      setStartDate("");
       if (!endDate) {
         setDateRangeId(0);
-        setConcatDate('');
+        setConcatDate("");
       }
       return;
     }
@@ -110,10 +116,10 @@ export const useSearchFilterPaginationDateHandlers = (
 
   const handleEndDateChange = (date: Date | null) => {
     if (!date) {
-      setEndDate('');
+      setEndDate("");
       if (!startDate) {
         setDateRangeId(0);
-        setConcatDate('');
+        setConcatDate("");
       }
       return;
     }
@@ -127,18 +133,16 @@ export const useSearchFilterPaginationDateHandlers = (
     setCurrentPage(1);
     setDateRangeId(id);
 
-
     if (id !== 8) {
-      setStartDate('');
-      setEndDate('');
-      setConcatDate('');
+      setStartDate("");
+      setEndDate("");
+      setConcatDate("");
     }
   };
 
   const handleSearchParameterChange = (inputSearchParam?: string) => {
-    setSearchParameter(inputSearchParam || '');
+    setSearchParameter(inputSearchParam || "");
     setCurrentPage(1);
-
   };
 
   // Update concatenated date string
@@ -167,7 +171,6 @@ export const useSearchFilterPaginationDateHandlers = (
       }
     }
   }, [startDate, endDate, dateRangeId]);
-
 
   return {
     pageSize,

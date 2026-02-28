@@ -43,6 +43,13 @@ import DateRangeFilterDropdown from "../../ui/DateRangeFilterDropdown";
 import DateRangePicker from "../../ui/DateRangePicker";
 import { useComapanySpecificSearchDateRange } from "../../../config/hooks/useCompanySpecificDateRange";
 import useTaskStage from "../../../config/hooks/useTaskStage";
+import { handleApiError } from "../../../config/error/handleApiError";
+import ConfirmationDialog from "../../dialogue-box/ConfirmationDialogue";
+
+interface TaskCardProps {
+  task: any;
+  setTaskList: React.Dispatch<React.SetStateAction<any[]>>;
+}
 
 function MasterTaskUpdate() {
   const navigate = useNavigate();
@@ -53,6 +60,8 @@ function MasterTaskUpdate() {
   const { dateRangeDropdownOptions } = useComapanySpecificSearchDateRange();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [accessDeniedPopUpOpen, setAccessDeniedPopUpOpen] = useState(false);
+  const [confirmationOpen, setConfirmationOpen] = useState<boolean>(false);
+  const [generalTaskUpdate, setGeneralTaskUpdate] = useState<number>(0);
   const [taskList, setTaskList] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [selectedSupportTicket, setSelectedSupportTicket] =
@@ -82,7 +91,6 @@ function MasterTaskUpdate() {
     concatDate,
     startDate,
     endDate,
-
     handleEndDateChange,
     handleStartDateChange,
     handleDatePageIdChange,
@@ -181,7 +189,7 @@ function MasterTaskUpdate() {
       }
     }
   };
-  const getGeneralTask = async (signal: AbortSignal) => {
+  const getGeneralTask = async (signal?: AbortSignal) => {
     if (loginStatus.companyId === 0) return;
     const offset = (currentPage - 1) * pageSize;
     try {
@@ -189,8 +197,8 @@ function MasterTaskUpdate() {
       const postData = {
         company_id: loginStatus.companyId,
         requestedby_id: loginStatus.id,
-        general_task_master_id: Number(taskId),
-        general_task_stage_id: Number(selectedTaskStage),
+        general_task_master_id: taskId,
+        general_task_stage_id: selectedTaskStage,
         search_parameter: searchParameter,
         search_parameter_date: concatDate,
         search_company_specific_date_range_id: dateRangeId,
@@ -207,10 +215,12 @@ function MasterTaskUpdate() {
         currentPage: currentPage,
         pageDataLength: res.data.length,
       });
-      if (res.data) {
+      if (res.data.length > 0) {
         console.log(res.data);
         console.log(loading);
         setTaskList(res.data);
+      } else {
+        navigate(-1);
       }
     } catch (error: any) {
       // toast.error("Failed to load tasks", error.response?.data?.message || "");
@@ -232,7 +242,7 @@ function MasterTaskUpdate() {
     return () => {
       controller.abort();
     };
-  }, [taskId]);
+  }, [taskId, generalTaskUpdate]);
   useEffect(() => {
     const controller = new AbortController();
     getGeneralTask(controller.signal);
@@ -245,8 +255,8 @@ function MasterTaskUpdate() {
     dateRangeId,
     searchParameter,
     concatDate,
-    searchParameter,
     selectedTaskStage,
+    generalTaskUpdate,
   ]);
 
   const handleDropdownChange = (field: string, value: number | undefined) => {
@@ -256,6 +266,42 @@ function MasterTaskUpdate() {
     }));
   };
 
+  const handleConfirmation = async () => {
+    try {
+      const res = await axiosClient.post(
+        POST_API.UPDATE_GENERAL_TASK_MASTER,
+        {
+          id: selectedSupportTicket?.id,
+          company_id: loginStatus.companyId,
+          updatedby_id: loginStatus.id,
+          isactive: !formData.isActive,
+        },
+        {
+          withCredentials: true,
+        },
+      );
+
+      if (res.data.status) {
+        toast.success(res.data.message);
+        setGeneralTaskUpdate(generalTaskUpdate + 1);
+      } else {
+        toast.error(res.data.message);
+        setFormData((prev) => ({
+          ...prev,
+          isActive: formData.isActive,
+        }));
+      }
+    } catch (error) {
+      // ⭐ Rollback if failed
+      setFormData((prev) => ({
+        ...prev,
+        isActive: formData.isActive,
+      }));
+
+      handleApiError(error);
+    }
+  };
+
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({
       ...prev,
@@ -263,16 +309,6 @@ function MasterTaskUpdate() {
     }));
   };
 
-  const handleCompanyUserToggle = (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    const { checked } = event.target;
-
-    setFormData((prev) => ({
-      ...prev,
-      isActive: checked,
-    }));
-  };
   const validateForm = () => {
     if (!formData.description) {
       toast.error("Description is required");
@@ -322,6 +358,15 @@ function MasterTaskUpdate() {
         <div className=" w-full pl-5 pt-2 min-h-[90vh] ">
           {" "}
           <div>
+            <ConfirmationDialog
+              message="Please Confirm"
+              onCancel={() => {
+                setConfirmationOpen(false);
+              }}
+              onConfirm={handleConfirmation}
+              open={confirmationOpen}
+              title="Master Inactive"
+            />
             <div className=" sticky top-10 z-10 bg-slate-100 flex text-center justify-start items-center gap-3 ml-0.5 ">
               <Link to={ROUTES_URL.TASKS_MANAGEMENT + "/my-tasks"}>
                 <Button className="caption-custom flex items-center justify-center hover:text-gray-800">
@@ -333,119 +378,129 @@ function MasterTaskUpdate() {
             </div>
             <div className="bg-gray-50 w-full px-2 pt-1 rounded">
               {isSubmitting && <LoadingPopUpAnimation show={isSubmitting} />}
-              <div className="bg-white border rounded p-2 space-y-2">
-                {/* ROW 1 */}
-                <div className="grid grid-cols-7 gap-3 items-end text-sm">
-                  {/* TYPE */}
-                  <div>
-                    <label className="text-xs text-gray-500">Task Type</label>
-                    <p className="text-sm font-medium">
-                      {selectedSupportTicket?.generalTaskTypeName}
-                    </p>
-                  </div>
-                  {/* FREQUENCY */}
-                  <div>
-                    <label className="text-xs text-gray-500">Frequency</label>
-                    <p className="text-sm">
-                      {selectedSupportTicket?.frequencyName}
-                    </p>
-                  </div>
-                  <div>
-                    <label className="text-xs text-gray-500">Start</label>
-                    <p>{selectedSupportTicket?.startDate}</p>
-                  </div>
-                  <div>
-                    <label className="text-xs text-gray-500">End</label>
-                    <p>{selectedSupportTicket?.endDate}</p>
-                  </div>
-                  <div>
-                    <label className="text-xs text-gray-500">Time</label>
-                    <p>{selectedSupportTicket?.taskTime}</p>
-                  </div>
-                  <div>
-                    <label className="text-xs text-gray-500">Created By</label>
-                    <p>{selectedSupportTicket?.createdByName}</p>
-                  </div>
-                  <div>
-                    <label className="text-xs text-gray-500">Updated By</label>
-                    <p>{selectedSupportTicket?.updatedByName}</p>
-                  </div>
-                </div>
-                {/* ROW 2 */}
-                <div className="grid grid-cols-7 gap-3 text-sm">
-                  <CustomDropdown
-                    logo={Flag}
-                    labelName="Priority"
-                    options={taskPriority!}
-                    preselectedOption={formData.taskPriority}
-                    onSelect={(v) => handleDropdownChange("taskPriority", v)}
-                  />
-                  {/* ASSIGN */}
-                  <CompanyUserSearchFieldInput
-                    label="Assign"
-                    logo={User}
-                    defaultValue={selectedSupportTicket?.assignedToName ?? ""}
-                    onUserSelected={(user: any) => {
-                      if (user) {
-                        setSelectedCompanyUser(user);
-                      }
-                    }}
-                    has={{
-                      searchLogo: false,
-                      border: true,
-                      xLogo: true,
-                      // penLogo: true
-                    }}
-                  />
-
-                  {/* STATUS */}
-                  <div>
-                    <label className="text-xs text-gray-500">Status</label>
-                    <div className="flex gap-2 items-center">
-                      <ToggleButton
-                        checked={formData.isActive}
-                        name="isActive"
-                        onToggle={handleCompanyUserToggle}
-                      />
-                      <span
-                        className={`text-sm ${
-                          formData.isActive ? "text-green-600" : "text-red-600"
-                        }`}
-                      >
-                        {formData.isActive ? "Active" : "Inactive"}
-                      </span>
-                    </div>
-                  </div>
-                  {/* DESCRIPTION */}
-                  <div className="col-span-3">
-                    <TextAreaInput
-                      label="Description"
-                      logo={FileText}
-                      value={formData.description}
-                      onChange={(e: any) =>
-                        handleInputChange("description", e.target.value)
-                      }
-                      cols={3}
-                      rows={2}
-                    />
-                  </div>
-                  <div className="flex justify-end items-end pr-8">
+              {!selectedSupportTicket ? (
+                <MasterTaskSkeleton />
+              ) : (
+                <div className="bg-white border rounded p-2 space-y-2">
+                  {/* ROW 1 */}
+                  <div className="grid grid-cols-7 gap-3 items-end text-sm">
+                    {/* TYPE */}
                     <div>
-                      <Button
-                        onClick={(e) => {
-                          e.preventDefault();
-                          updateTask();
-                        }}
-                      >
-                        <div className="flex gap-2 items-center">
-                          <Save size={15} />
-                          Save
-                        </div>
-                      </Button>
+                      <label className="text-xs text-gray-500">Task Type</label>
+                      <p className="text-sm font-medium">
+                        {selectedSupportTicket?.generalTaskTypeName}
+                      </p>
+                    </div>
+                    {/* FREQUENCY */}
+                    <div>
+                      <label className="text-xs text-gray-500">Frequency</label>
+                      <p className="text-sm">
+                        {selectedSupportTicket?.frequencyName}
+                      </p>
+                    </div>
+                    <div>
+                      <label className="text-xs text-gray-500">Start</label>
+                      <p>{selectedSupportTicket?.startDate}</p>
+                    </div>
+                    <div>
+                      <label className="text-xs text-gray-500">End</label>
+                      <p>{selectedSupportTicket?.endDate}</p>
+                    </div>
+                    <div>
+                      <label className="text-xs text-gray-500">Time</label>
+                      <p>{selectedSupportTicket?.taskTime}</p>
+                    </div>
+                    <div>
+                      <label className="text-xs text-gray-500">
+                        Created By
+                      </label>
+                      <p>{selectedSupportTicket?.createdByName}</p>
+                    </div>
+                    <div>
+                      <label className="text-xs text-gray-500">
+                        Updated By
+                      </label>
+                      <p>{selectedSupportTicket?.updatedByName}</p>
+                    </div>
+                  </div>
+                  {/* ROW 2 */}
+                  <div className="grid grid-cols-7 gap-3 text-sm">
+                    <CustomDropdown
+                      logo={Flag}
+                      labelName="Priority"
+                      options={taskPriority!}
+                      preselectedOption={formData.taskPriority}
+                      onSelect={(v) => handleDropdownChange("taskPriority", v)}
+                    />
+                    {/* ASSIGN */}
+                    <CompanyUserSearchFieldInput
+                      label="Assign"
+                      logo={User}
+                      defaultValue={selectedSupportTicket?.assignedToName ?? ""}
+                      onUserSelected={(user: any) => {
+                        if (user) {
+                          setSelectedCompanyUser(user);
+                        }
+                      }}
+                      has={{
+                        searchLogo: false,
+                        border: true,
+                        xLogo: true,
+                        // penLogo: true
+                      }}
+                    />
+
+                    {/* STATUS */}
+                    <div>
+                      <label className="text-xs text-gray-500">Status</label>
+                      <div className="flex gap-2 items-center">
+                        <ToggleButton
+                          checked={formData.isActive}
+                          name="isActive"
+                          onToggle={() => setConfirmationOpen(true)}
+                        />
+                        <span
+                          className={`text-sm ${
+                            formData.isActive
+                              ? "text-green-600"
+                              : "text-red-600"
+                          }`}
+                        >
+                          {formData.isActive ? "Active" : "Inactive"}
+                        </span>
+                      </div>
+                    </div>
+                    {/* DESCRIPTION */}
+                    <div className="col-span-3">
+                      <TextAreaInput
+                        label="Description"
+                        logo={FileText}
+                        value={formData.description}
+                        onChange={(e: any) =>
+                          handleInputChange("description", e.target.value)
+                        }
+                        cols={3}
+                        rows={2}
+                      />
+                    </div>
+                    <div className="flex justify-end items-end pr-8">
+                      <div>
+                        <Button
+                          onClick={(e) => {
+                            e.preventDefault();
+                            updateTask();
+                          }}
+                        >
+                          <div className="flex gap-2 items-center">
+                            <Save size={15} />
+                            Save
+                          </div>
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
+              )}
               <div className="p-2 mt-2 border rounded ">
                 <div className="flex gap-2 border-b">
                   <h3 className="font-semibold text-gray-800 mb-3 ">
@@ -493,12 +548,24 @@ function MasterTaskUpdate() {
                     />
                   </div>
                 </div>
-                {taskList && (
+                {loading ? (
                   <div className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] pt-2 gap-x-2 h-[54vh] overflow-auto">
-                    {taskList.map((task) => (
-                      <TaskCard key={task.id} task={task} />
+                    {Array.from({ length: 8 }).map((_, index) => (
+                      <TaskCardSkeleton key={index} />
                     ))}
                   </div>
+                ) : (
+                  taskList && (
+                    <div className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] pt-2 gap-x-2 h-[54vh] overflow-auto">
+                      {taskList.map((task) => (
+                        <TaskCard
+                          key={task.id}
+                          task={task}
+                          setTaskList={setTaskList}
+                        />
+                      ))}
+                    </div>
+                  )
                 )}
                 <div className="flex items-center justify-end border-t ">
                   <PaginationWithoutCount
@@ -530,7 +597,102 @@ function MasterTaskUpdate() {
 
 export default MasterTaskUpdate;
 
-export const TaskCard = ({ task }: any) => {
+export const TaskCard = ({ task, setTaskList }: TaskCardProps) => {
+  const { loginStatus } = useLoggedInUserContext();
+
+  // const handleGeneralTaskToggle = async (
+  //   event: React.ChangeEvent<HTMLInputElement>,
+  //   taskId: number,
+  // ) => {
+  //   const { checked } = event.target;
+
+  //   axiosClient
+  //     .post(
+  //       POST_API.UPDATE_GENERAL_TASK,
+  //       {
+  //         company_id: loginStatus.companyId,
+  //         updatedby_id: loginStatus.id,
+  //         id: taskId,
+  //         isactive: checked,
+  //       },
+  //       {
+  //         withCredentials: true,
+  //       },
+  //     )
+  //     .then(async (res) => {
+  //       if (res.data.status) {
+  //         toast.success(res.data.message);
+
+  //         setTaskList((prev: any[]) =>
+  //           prev.map((t: any) =>
+  //             t.id === taskId
+  //               ? {
+  //                   ...t,
+  //                   isactive: checked,
+  //                 }
+  //               : t,
+  //           ),
+  //         );
+  //       }
+  //     })
+  //     .catch((error) => {
+  //       handleApiError(error);
+  //     });
+  // };
+
+  const handleGeneralTaskToggle = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+    taskId: number,
+  ) => {
+    const checked = event.target.checked;
+
+    const previousValue = task.isactive;
+
+    // ⭐ Instant UI Update
+    setTaskList((prev: any[]) =>
+      prev.map((t: any) =>
+        t.id === taskId
+          ? {
+              ...t,
+              isactive: checked,
+            }
+          : t,
+      ),
+    );
+
+    try {
+      const res = await axiosClient.post(
+        POST_API.UPDATE_GENERAL_TASK,
+        {
+          company_id: loginStatus.companyId,
+          updatedby_id: loginStatus.id,
+          id: taskId,
+          isactive: checked,
+        },
+        { withCredentials: true },
+      );
+
+      if (res.data.status) {
+        toast.success(res.data.message);
+      } else {
+        throw new Error(res.data.message);
+      }
+    } catch (error) {
+      // ⭐ Rollback UI
+      setTaskList((prev: any[]) =>
+        prev.map((t: any) =>
+          t.id === taskId
+            ? {
+                ...t,
+                isactive: previousValue,
+              }
+            : t,
+        ),
+      );
+
+      handleApiError(error);
+    }
+  };
   return (
     <div
       className="
@@ -609,6 +771,94 @@ export const TaskCard = ({ task }: any) => {
           {task.remark || "-"}
         </span>
       </div>
+      <div className="flex w-full items-end justify-end ">
+        <ToggleButton
+          label="Status"
+          wantLabel={true}
+          checked={task.isactive}
+          name="isActive"
+          onToggle={(e) => handleGeneralTaskToggle(e, task.id)}
+        />
+      </div>
     </div>
   );
 };
+
+interface SkeletonProps {
+  className?: string;
+}
+
+export function Skeleton({ className = "" }: SkeletonProps) {
+  return (
+    <div
+      className={`
+        animate-pulse
+        bg-gray-200
+        rounded-md
+        ${className}
+      `}
+    />
+  );
+}
+
+export function MasterTaskSkeleton() {
+  return (
+    <div className="bg-white border rounded p-3 space-y-4">
+      {/* Row 1 */}
+      <div className="grid grid-cols-7 gap-3">
+        {Array.from({ length: 7 }).map((_, i) => (
+          <div key={i}>
+            <Skeleton className="h-3 w-16 mb-2" />
+
+            <Skeleton className="h-5 w-full" />
+          </div>
+        ))}
+      </div>
+
+      {/* Row 2 */}
+
+      <div className="grid grid-cols-7 gap-3">
+        <Skeleton className="h-10 w-full" />
+
+        <Skeleton className="h-10 w-full" />
+
+        <Skeleton className="h-10 w-20" />
+
+        <Skeleton className="h-16 col-span-3" />
+
+        <Skeleton className="h-10 w-24" />
+      </div>
+    </div>
+  );
+}
+
+export function TaskCardSkeleton() {
+  return (
+    <div
+      className="
+      bg-white
+      rounded-xl
+      border
+      shadow-sm
+      p-4
+      mb-3
+      w-full
+      max-w-[420px]
+    "
+    >
+      <Skeleton className="h-4 w-full mb-3" />
+
+      <Skeleton className="h-3 w-1/2 mb-3" />
+
+      <Skeleton className="h-3 w-1/3 mb-2" />
+
+      <Skeleton className="h-3 w-2/3 mb-2" />
+
+      <Skeleton className="h-3 w-1/2 mb-4" />
+
+      <div className="flex justify-end">
+        <Skeleton className="h-6 w-16" />
+      </div>
+    </div>
+  );
+}

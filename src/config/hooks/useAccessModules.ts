@@ -561,6 +561,18 @@ export const useUserAccessModules = () => {
     (accessModule) => accessModule.crm_module_id === 43 && accessModule.update,
   );
 
+  // Tasks
+  const userHasAccessToAddTasks = accessModules.some(
+    (accessModules) => accessModules.crm_module_id === 45 && accessModules.add,
+  );
+
+  const userHasAccessToViewTasks = accessModules.some(
+    (accessModule) => accessModule.crm_module_id === 45 && accessModule.view,
+  );
+
+  const userHasAccessToUpdateTasks = accessModules.some(
+    (accessModule) => accessModule.crm_module_id === 45 && accessModule.update,
+  );
   //All Tasks
   const userHasAccessToAddAllTasks = accessModules.some(
     (accessModules) => accessModules.crm_module_id === 46 && accessModules.add,
@@ -879,5 +891,9 @@ export const useUserAccessModules = () => {
     userHasAccessToAddStockAgeing,
     userHasAccessToViewStockAgeing,
     userHasAccessToUpdateStockAgeing,
+
+    userHasAccessToViewTasks,
+    userHasAccessToAddTasks,
+    userHasAccessToUpdateTasks,
   };
 };

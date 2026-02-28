@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Calendar, ListChecks } from "lucide-react";
 import qs from "query-string";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import ApiError from "../../@types/error/ApiError";
@@ -30,6 +30,7 @@ import DateRangeFilterDropdown from "../ui/DateRangeFilterDropdown";
 import DateRangePicker from "../ui/DateRangePicker";
 import SearchInput from "../ui/SearchInput";
 import { supportTicketDataUrlSearchParamKey } from "./SupportTicketManagementList";
+import { customDateRangeId } from "../../config/hooks/usePaginationHandler";
 
 export const MytaskQueryKey = "task";
 
@@ -59,7 +60,7 @@ function MyAllTaskManagementList({
   const {
     handleDateRangeIdChange,
     isCustomDateOptionSelected,
-    // setIsCustomDateOptionSelected,
+    setIsCustomDateOptionSelected,
   } = useDateRangeIdChange({ dateRangeDropdownOptions, handleSearchOption });
   const { userHasAccessToViewAllTasks } = useUserAccessModules();
   const { userHasAccessToViewMasterTasks, userHasAccessToViewSupportTicket } =
@@ -69,6 +70,15 @@ function MyAllTaskManagementList({
   const [isLoadingForNavigate, setIsLoadingForNavigate] =
     useState<boolean>(false);
   const { loginStatus } = useLoggedInUserContext();
+  useEffect(() => {
+    if (handleSearchOption.dateRangeId === customDateRangeId) {
+      setIsCustomDateOptionSelected(true);
+    }
+  }, [
+    handleSearchOption.searchParameter,
+    handleSearchOption.dateRangeId,
+    setIsCustomDateOptionSelected,
+  ]);
 
   if (userHasAccessToViewAllTasks) {
     const getLeadDetails = async (leadId: number) => {
@@ -211,6 +221,10 @@ function MyAllTaskManagementList({
     const handleRowClicked = (event: any) => {
       if (isUsedInAllTasksModule) {
         const rowData: MyAllTaskProps = event.data;
+        if (!rowData.isActive) {
+          toast.error("Not accessable.");
+          return;
+        }
         console.log(rowData);
         switch (rowData?.source?.split(" ")[0]) {
           case source[0].name: {
