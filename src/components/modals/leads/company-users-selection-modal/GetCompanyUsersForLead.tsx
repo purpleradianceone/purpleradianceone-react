@@ -4,7 +4,6 @@ import AccessDeniedPopup from "../../../views/not-found/AccessDeniedPage";
 import { STATUS_CODE } from "../../../../constants/AppConstants";
 import RefreshToken from "../../../../config/validations/RefreshToken";
 
-import axios from "axios";
 import POST_API from "../../../../constants/PostApi";
 import CompanyUser from "../../../../@types/company-users/CompanyUser";
 import { useSearchFilterPaginationDateHandlers } from "../../../../config/hooks/usePaginationHandler";
@@ -12,18 +11,20 @@ import CompanyUsersSearchProps from "../../../../@types/company-users/CompanyUse
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
 import { useUserAccessModules } from "../../../../config/hooks/useAccessModules";
 import GetCompanyUserListForLeadAssignment from "./GetCompanyUserListForLeadAssignment";
+import axiosClient from "../../../../axios-client/AxiosClient";
+import axios from "axios";
 // import ApiError from "../../../../@types/error/ApiError";
 
 function GetCompanyUsersForLead({
   handleSelectedCompanyUserChange,
   selectedUserId,
   isUsedForSettings,
-  handleUpdateLeadUser
+  handleUpdateLeadUser,
 }: {
   handleSelectedCompanyUserChange: (params: CompanyUser | null) => void;
   selectedUserId: number | null;
   isUsedForSettings: boolean;
-  handleUpdateLeadUser? : (params: CompanyUser | null) => boolean;
+  handleUpdateLeadUser?: (params: CompanyUser | null) => boolean;
 }) {
   const [companyUsers, setCompanyUsers] = useState<CompanyUsersSearchProps[]>(
     []
@@ -36,12 +37,12 @@ function GetCompanyUsersForLead({
 
   const {
     currentPage,
+    currentPageData,
     pageSize,
     dateRangeId,
     concatDate,
     searchParameter,
-    totalPages,
-    setTotalPages,
+    setCurrentPageData,
     handleDatePageIdChange,
     handleEndDateChange,
     handlePageChange,
@@ -61,6 +62,7 @@ function GetCompanyUsersForLead({
 
   // Fetch data function
   const fetchCompanyUsers = async () => {
+    if (loginStatus.companyId === 0) return;
     const offset = (currentPage - 1) * pageSize;
 
     const effectiveDateRangeId =
@@ -85,26 +87,24 @@ function GetCompanyUsersForLead({
       search_company_specific_date_range_id: effectiveDateRangeId,
       search_parameter: searchParameter,
       search_parameter_date: concatDate,
-      ...
-        (!isUsedForSettings && {isactive: true}),
-      ...(isUsedForSettings && { all_leads_visible : null})
+      ...(!isUsedForSettings && { isactive: true }),
+      ...(isUsedForSettings && { all_leads_visible: null }),
     };
 
     try {
-      const response = await axios.post(
+      const response = await (isUsedForSettings ? axiosClient : axios).post(
         isUsedForSettings
           ? POST_API.GET_LEAD_COMPANY_USERS
-          : POST_API.GET_COMPANY_USERS,
+          : POST_API.GET_LOOKUP_COMPANY_USERS,
         isUsedForSettings ? postDataForSettings : postDataForLeads,
         {
           withCredentials: true,
         }
       );
+      setCurrentPageData({currentPage: currentPage, pageDataLength: response.data.length});
 
       setCompanyUsers(response.data);
-      if (response.data[0]?.count) {
-        setTotalPages(Math.ceil(response.data[0].count / pageSize));
-      }
+     
     } catch (error: any) {
       console.log(error);
       if (error.status === STATUS_CODE.UNATHORISED) {
@@ -135,14 +135,14 @@ function GetCompanyUsersForLead({
   ]);
 
   useEffect(() => {
-    if (!userHasAccessToViewUser) {
+    if (!userHasAccessToViewUser && isUsedForSettings) {
       setAccessDeniedPopUpOpen(true);
     }
   }, [userHasAccessToViewUser]);
 
   return (
     <div className="w-full">
-      {userHasAccessToViewUser ? (
+      {userHasAccessToViewUser || !isUsedForSettings ? (
         <>
           <div>
             <GetCompanyUserListForLeadAssignment
@@ -158,11 +158,11 @@ function GetCompanyUsersForLead({
                 handleDateRangeIdChange: handleDatePageIdChange,
               }}
               paginationData={{
-                selectedPageSize: handlePageSizeChange,
-                currentPage,
-                handlePageChange,
-                totalPages,
                 pageSize,
+                currentPage,
+                currentPageData,
+                onPageSizeChange: handlePageSizeChange,
+                onPageChange:handlePageChange,
               }}
               users={companyUsers}
               isUsedForSettings={isUsedForSettings}

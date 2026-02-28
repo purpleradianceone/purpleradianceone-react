@@ -11,7 +11,7 @@ import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContex
 import RefreshToken from "../../../config/validations/RefreshToken";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import ApiError from "../../../@types/error/ApiError";
-import { useSearchFilterPaginationDateHandlers } from "../../../config/hooks/usePaginationHandler";
+import { customDateRangeId, useSearchFilterPaginationDateHandlers } from "../../../config/hooks/usePaginationHandler";
 import { Product } from "../../../@types/products/ProductsManagementProps";
 import ProductsManagementList from "../../lists/ProductsManagementsList";
 import { useInView } from "react-intersection-observer";
@@ -31,12 +31,12 @@ function ProductTeamManagement() {
 
   const {
     currentPage,
+    currentPageData,
     pageSize,
     dateRangeId,
     concatDate,
     searchParameter,
-    totalPages,
-    setTotalPages,
+    setCurrentPageData,
     handleDatePageIdChange,
     handleEndDateChange,
     handlePageChange,
@@ -51,7 +51,7 @@ function ProductTeamManagement() {
       const offset = (currentPage - 1) * pageSize;
 
       const effectiveDateRangeId =
-        dateRangeId === 8 && !concatDate
+        dateRangeId === customDateRangeId && !concatDate
           ? 0
           : dateRangeId;
 
@@ -77,6 +77,7 @@ function ProductTeamManagement() {
         );
 
         if (response.data && response.status === STATUS_CODE.OK) {
+          setCurrentPageData({currentPage:currentPage, pageDataLength: response.data.length});
  const formattedData: Product[] = response.data.map(
           (res: any) => ({
                 code: res.code,
@@ -97,11 +98,7 @@ function ProductTeamManagement() {
             })
         );
           setProductsData(formattedData)
-          if (response.data[0]?.count) {
-            setTotalPages(
-              Math.ceil(response.data[0].count / pageSize)
-            );
-          }
+        
         }
       } catch (error: ApiError | any) {
         console.log(error);
@@ -163,11 +160,12 @@ function ProductTeamManagement() {
                 handleDateRangeIdChange: handleDatePageIdChange,
               }}
               paginationData={{
-                selectedPageSize: handlePageSizeChange,
-                currentPage,
-                handlePageChange,
-                totalPages,
                 pageSize,
+                currentPage,
+                currentPageData,
+                onPageSizeChange: handlePageSizeChange,
+                onPageChange: handlePageChange,
+
               }}
               products={productsData}
               // isListForProductUser={true}

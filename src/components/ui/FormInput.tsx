@@ -120,14 +120,18 @@ function FormInput({
   autoComplete,
   logo : Icon,
   autoFocus,
-  step
+  step,
+  value,
+  paddingy=1,
+  penLogo : PenIcon,
+  disabled
   // onClick
 }: FormInputProps) {
   const { isSmallScreen } = useScreenSize();
   const isMobileNumberInput =useCountry;
 
   return (
-    <div className={isSmallScreen ? "mt-1" : "mt-2"}>
+    <div className={isSmallScreen ? "mt-0" : "mt-0"}>
       <label htmlFor={name} className={(center ? 'text-center ' : '') + 'flex items-center input-label-custom'}>
       {Icon  && <Icon size={14} className={COLORS.INPUT_LABEL_ICONS_COLOR}/>}
         {label}{required && <span className="caption-custom-inactive align-top">*</span> }
@@ -193,10 +197,11 @@ function FormInput({
             placeholder={placeholder}
             onChange={onChange}
             onBlur={onBlur}
-            className={readonly ?
-              "appearance-none block w-full px-3 py-2 mt-1 border bg-gray-200 border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            className={`relative ${  readonly ?
+              `input-label-custom appearance-none block w-full px-2 py-${paddingy}  border bg-gray-100 border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm`
               :
-              "appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              `input-label-custom appearance-none block w-full px-2 py-${paddingy} border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm`
+            }`
             }
             inputMode={inputMode}
             min={min}
@@ -205,6 +210,8 @@ function FormInput({
             maxLength={maxLength}
             pattern={pattern}
             autoFocus={autoFocus}
+            value={value}
+            disabled={disabled}
           />
         )}
 
@@ -213,6 +220,14 @@ function FormInput({
             {rightElement}
           </div>
         )}
+        {
+          PenIcon && (
+            <span className="pointer-events-none absolute right-1 top-1/2 -translate-y-1/2 text-gray-400">
+
+            <PenIcon size={12} />
+            </span>
+          ) 
+        }
       </div>
       {error && <div className="mt-0 ml-0.5 caption-custom-inactive">{error}</div>}
     </div>

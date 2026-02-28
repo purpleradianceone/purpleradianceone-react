@@ -1,11 +1,9 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from "react";
 import POST_API from "../../../../constants/PostApi";
-import { useUserPreference } from "../../../../context/user/UserPreference";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
-import axios from "axios";
 import LoadingSpinner from "../../../../assets/animations/LoadingSpinner";
-import Pagination from "../../../ag-grid/Pagination";
 import { useUserAccessModules } from "../../../../config/hooks/useAccessModules";
 
 import { SIZE, STATUS_CODE } from "../../../../constants/AppConstants";
@@ -18,6 +16,9 @@ import COLORS from "../../../../constants/Colors";
 import toast from "react-hot-toast";
 import ConfirmationDialog from "../../../dialogue-box/ConfirmationDialogue";
 import LoadingPopUpAnimation from "../../../views/card/LoadingPopUpAnimation";
+import axiosClient from "../../../../axios-client/AxiosClient";
+import { useSearchFilterPaginationDateHandlers } from "../../../../config/hooks/usePaginationHandler";
+import PaginationWithoutCount from "../../../ag-grid/PaginationWithoutCount";
 
 const AccountImportData = ({
   onCloseOrUnselectTag,
@@ -28,36 +29,40 @@ const AccountImportData = ({
   selectedAccountTag: string;
   getAccountImportTags: () => Promise<void>;
 }) => {
-  const { userPreference } = useUserPreference();
   const { userHasAccessToUpdateLead } = useUserAccessModules();
   const { loginStatus } = useLoggedInUserContext();
 
   const [accountImportData, setAccountImportData] = useState<
     AccountImportDataType[]
   >([]);
-  const [pageSize, setPageSize] = useState<number>(
-    userPreference.rowsInGrid || 25
-  );
-  const [pageNumber, setPageNumber] = useState<number>(1);
-  const [searchInput, setSearchInput] = useState<string>("");
-  const [totalCount, setTotalCount] = useState<number>(0);
+
   const [responseCame, setResponeCame] = useState<boolean>(true);
   const [showLoadingSpinner, setShowLoadingSpinner] = useState<boolean>(false);
   const [openFinalPopup, setOpenFinalPopup] = useState<boolean>(false);
   // const [isLoading, setIsLoading] = useState<boolean>(false);
 
+  const {
+    pageSize,
+    currentPage,
+    currentPageData,
+    searchParameter,
+    setCurrentPageData,
+    handleSearchParameterChange,
+    handlePageChange,
+    handlePageSizeChange,
+  } = useSearchFilterPaginationDateHandlers();
+
   //note : Message Snackbar
 
   const getAccountImportData = async () => {
-    setAccountImportData([]);
-    const offset = (pageNumber - 1) * pageSize;
+    const offset = (currentPage - 1) * pageSize;
 
     const postDataToGetAccountImportData = {
       import_tag: selectedAccountTag,
       requestedby: loginStatus.id,
       company_id: loginStatus.companyId,
       search_company_specific_date_range_id: null,
-      search_parameter: searchInput.trim() !== "" ? searchInput : null,
+      search_parameter: searchParameter.trim() !== "" ? searchParameter : null,
       search_parameter_date: null,
       offset,
       limit: pageSize,
@@ -65,20 +70,20 @@ const AccountImportData = ({
 
     try {
       setResponeCame(true);
-      const response = await axios.post(
+      const response = await axiosClient.post(
         POST_API.GET_ACCOUNT_IMPORT_DATA,
         postDataToGetAccountImportData,
-        { withCredentials: true }
+        { withCredentials: true },
       );
+      setAccountImportData([]);
 
+      setCurrentPageData({
+        currentPage: currentPage,
+        pageDataLength: response.data.length,
+      });
       const data = response.data;
       setAccountImportData(data);
       setResponeCame(false);
-      if (data.length > 0 && data[0].count !== undefined) {
-        setTotalCount(data[0].count);
-      } else {
-        setTotalCount(0);
-      }
     } catch (error: any) {
       setResponeCame(false);
 
@@ -96,23 +101,22 @@ const AccountImportData = ({
   };
 
   const handleOnPageChange = (page: number) => {
-    setPageNumber(page);
+    handlePageChange(page);
   };
 
   const handleOnPageSizeChange = (size: number) => {
-    setPageSize(size);
-    setPageNumber(1); // Reset to first page on size change
+    handlePageSizeChange(size);
+    handlePageChange(1); // Reset to first page on size change
   };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchInput(e.target.value);
-    setPageNumber(1); // Reset to first page on search
+    handleSearchParameterChange(e.target.value);
+    handlePageChange(1); // Reset to first page on search
   };
 
   useEffect(() => {
-    setAccountImportData([]);
     getAccountImportData();
-  }, [selectedAccountTag, pageSize, pageNumber, searchInput]);
+  }, [selectedAccountTag, pageSize, currentPage, searchParameter]);
 
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
 
@@ -138,13 +142,13 @@ const AccountImportData = ({
       updatedby: loginStatus.id,
     };
 
-    await axios
+    await axiosClient
       .post(
         POST_API.UPDATE_ACCOUNT_IMPORT_DATA,
         postDataToUpdateAccountImport,
         {
           withCredentials: true,
-        }
+        },
       )
       .then((response) => {
         if (response.data.status) {
@@ -177,7 +181,7 @@ const AccountImportData = ({
       createdby: loginStatus.id,
     };
     setShowLoadingSpinner(true);
-    await axios
+    await axiosClient
       .post(POST_API.CREATE_ACCOUNT_IMPORT_FROM_IMPORT_TAG, postData, {
         withCredentials: true,
       })
@@ -187,7 +191,6 @@ const AccountImportData = ({
           setShowLoadingSpinner(false);
           getAccountImportTags();
           setOpenFinalPopup(false);
-          // making aggrid table null
           setAccountImportData([]);
         } else {
           toast.error(reposne.data.message);
@@ -211,12 +214,11 @@ const AccountImportData = ({
         setShowLoadingSpinner(false);
         // setIsLoading(false);
         onCloseOrUnselectTag();
-
       });
   };
 
   useEffect(() => {
-    setSearchInput("");
+    handleSearchParameterChange("");
     setSelectedIds([]);
   }, [selectedAccountTag]);
 
@@ -282,7 +284,7 @@ const AccountImportData = ({
             <input
               type="text"
               placeholder="Search by Name, Email, or Mobile..."
-              value={searchInput}
+              value={searchParameter}
               onChange={handleSearchChange}
               className="border border-gray-300 pl-9 pr-3 py-1.5 caption-custom rounded-lg w-80 shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
@@ -309,15 +311,14 @@ const AccountImportData = ({
 
       {/* Pagination */}
       <div className="flex justify-end mt-3">
-        <Pagination
-          currentPage={pageNumber}
+        <PaginationWithoutCount
+          currentPage={currentPage}
           onPageChange={handleOnPageChange}
           onPageSizeChange={handleOnPageSizeChange}
           pageSize={pageSize}
-          totalPages={Math.ceil(totalCount / pageSize)}
+          currentPageData={currentPageData}
         />
       </div>
-
 
       {/* Confirmation */}
       <ConfirmationDialog
@@ -330,9 +331,12 @@ const AccountImportData = ({
         onConfirm={handleCreateMoveAccountsToAccountTable}
         onCancel={() => setOpenFinalPopup(false)}
       />
-      {
-        showLoadingSpinner&&<LoadingPopUpAnimation show={showLoadingSpinner} text="Final Account Importing..."/>
-      }
+      {showLoadingSpinner && (
+        <LoadingPopUpAnimation
+          show={showLoadingSpinner}
+          text="Final Account Importing..."
+        />
+      )}
     </div>
   );
 };

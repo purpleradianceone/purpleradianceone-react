@@ -1,16 +1,21 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { AllCommunityModule, ColDef, themeBalham } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
-import { ActionTypeForStockMOdule, INNERHTML } from "../../constants/AppConstants";
-import { useMemo, useRef } from "react";
+import {
+  ActionTypeForStockMOdule,
+  INNERHTML,
+} from "../../constants/AppConstants";
 import LiveStockForCompanyProduct from "../../@types/stock/LiveStockForCompanyProduct";
+import { useMemo, useRef } from "react";
 
 const StockLiveForCompanyProductAgGrid = ({
   data,
+  handleRowClick,
   onRowSelect,
 }: {
   data: LiveStockForCompanyProduct[];
-  onRowSelect: (data: LiveStockForCompanyProduct , action : ActionTypeForStockMOdule) => void;
+  handleRowClick?: (event: any) => void;
+  onRowSelect?: (data: LiveStockForCompanyProduct | any) => void;
 }) => {
   const gridRef = useRef<AgGridReact>(null); // Ref to the AgGridReact component
 
@@ -54,25 +59,36 @@ const StockLiveForCompanyProductAgGrid = ({
         comparator: (a, b) => a?.toLowerCase().localeCompare(b?.toLowerCase()),
       },
       {
+        field: "availability",
+        headerName: "Availability",
+        sortable: true,
+        filter: "agTextColumnFilter",
+      },
+      // NOTE : IT IS HIDDEN , NEW ACTIONS TAB IS USED i.e WRITTEN BELOW
+      {
+        hide: true,
         headerName: "Actions",
         field: "actions",
+
         pinned: "right",
         cellRenderer: (params: LiveStockForCompanyProduct | any) => {
-          const handleClick = (action : ActionTypeForStockMOdule) => {
-            params.context.handleRowSelect(params.data , action);
+          const handleClick = (action: ActionTypeForStockMOdule) => {
+            params.context.handleRowSelect(params.data, action);
           };
 
           return (
             <div className="flex  items-center justify-center gap-1">
               <span
                 className="lead-details cursor-pointer text-blue-600  "
-                onClick={() =>handleClick(ActionTypeForStockMOdule.DETAILS)}
+                onClick={() => handleClick(ActionTypeForStockMOdule.DETAILS)}
               >
                 Details
               </span>
               <span
                 className="lead-details cursor-pointer text-blue-600  "
-                onClick={() => handleClick(ActionTypeForStockMOdule.TRANSACTIONS)}
+                onClick={() =>
+                  handleClick(ActionTypeForStockMOdule.TRANSACTIONS)
+                }
               >
                 Transactions
               </span>
@@ -80,8 +96,28 @@ const StockLiveForCompanyProductAgGrid = ({
           );
         },
       },
+      {
+        headerName: "Actions",
+        field: "view",
+        pinned: "right",
+        maxWidth: 80,
+        cellRenderer: (params: LiveStockForCompanyProduct | any) => {
+          return (
+            <div className="flex items-center justify-center">
+              <span
+                className="lead-details"
+                onClick={() => {
+                  params.context.handleRowSelect(params.data);
+                }}
+              >
+                {"Add Stock"}
+              </span>
+            </div>
+          );
+        },
+      },
     ],
-    []
+    [],
   );
 
   const defaultColDef = useMemo(
@@ -91,7 +127,7 @@ const StockLiveForCompanyProductAgGrid = ({
       suppressHeaderMenuButton: true,
       suppressHeaderContextMenu: true,
     }),
-    []
+    [],
   );
 
   return (
@@ -100,7 +136,7 @@ const StockLiveForCompanyProductAgGrid = ({
       style={{ height: "100%", width: "100%" }}
     >
       <AgGridReact
-        ref={gridRef} // Attach the ref
+        ref={gridRef}
         rowData={data}
         columnDefs={columnDefs}
         defaultColDef={defaultColDef}
@@ -108,7 +144,7 @@ const StockLiveForCompanyProductAgGrid = ({
         theme={themeBalham}
         overlayNoRowsTemplate={INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
         context={{ handleRowSelect: onRowSelect }}
-        // onRowClicked={handleRowClick}
+        onRowClicked={handleRowClick}
       />
     </div>
   );

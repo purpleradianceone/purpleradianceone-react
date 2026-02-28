@@ -47,6 +47,8 @@ function CompanyUserAccessManagementModal({
       crm_module_id: 0,
       id: 0,
       module_name: "",
+      is_base_module: false,
+      parent_module_id: 0,
       update: false,
       updatedby: 0,
       updatedby_user: "",
@@ -95,22 +97,26 @@ function CompanyUserAccessManagementModal({
   };
 
   useEffect(() => {
-    fetchUserAccessModules();
+    if (isOpen) {
+      fetchUserAccessModules();
+    }
   }, [isOpen]);
 
   if (!isOpen) return null;
 
   const handleCheckboxChange = (
     moduleId: number,
-    field: "add" | "view" | "update"
+    field: "add" | "view" | "update",
   ) => {
     setModules((prevModules) => {
       const updatedModules = prevModules.map((module) =>
-        module.id === moduleId ? { ...module, [field]: !module[field] } : module
+        module.id === moduleId
+          ? { ...module, [field]: !module[field] }
+          : module,
       );
 
       const initialModule = initialModulesRef.current.find(
-        (m) => m.id === moduleId
+        (m) => m.id === moduleId,
       );
       const updatedModule = updatedModules.find((m) => m.id === moduleId);
 
@@ -144,7 +150,7 @@ function CompanyUserAccessManagementModal({
       setChangedAccessModules(() => {
         return updatedModules.filter((updatedModule) => {
           const initialModule = initialModulesRef.current.find(
-            (m) => m.id === updatedModule.id
+            (m) => m.id === updatedModule.id,
           );
           return (
             initialModule &&
@@ -229,9 +235,9 @@ function CompanyUserAccessManagementModal({
   };
 
   return createPortal(
-    <div  className="fixed inset-0 z-50 p-4 overflow-hidden bg-black bg-opacity-5">
+    <div className="fixed inset-0 z-50 p-4 overflow-hidden bg-black bg-opacity-5">
       <div className="flex min-h-screen items-center justify-center">
-        <div  className="relative p-4 w-full max-w-5xl h-[80vh] bg-white rounded-lg shadow-xl animate-fadeIn flex flex-col">
+        <div className="relative p-4 w-full max-w-5xl h-[80vh] bg-white rounded-lg shadow-xl animate-fadeIn flex flex-col">
           {/* Header */}
           {/* <div className="flex justify-between items-center p-3 border-b">
               <h2 className="text-xl flex items-center gap-2 font-medium text-gray-900">
@@ -253,13 +259,13 @@ function CompanyUserAccessManagementModal({
           />
 
           {/* Content Area */}
-          <div  className="flex-1 overflow-hidden">
+          <div className="flex-1 overflow-hidden">
             {dataStatus ? (
               <div className="flex w-full h-full justify-center items-center">
                 <LoadingSpinner />
               </div>
             ) : (
-              <div  className="flex flex-col h-full">
+              <div className="flex flex-col h-full">
                 {/* Fixed Header */}
                 <div className="bg-white border-b">
                   <table className="w-full table-fixed">
@@ -313,7 +319,10 @@ function CompanyUserAccessManagementModal({
                 </div>
 
                 {/* Scrollable Body */}
-                <div id="company-user-access-management-modal" className="flex-1 overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-400 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full">
+                <div
+                  id="company-user-access-management-modal"
+                  className="flex-1 overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-400 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full"
+                >
                   <table className="w-full table-fixed">
                     <colgroup>
                       <col className={columnClasses.srNo} />
@@ -402,11 +411,11 @@ function CompanyUserAccessManagementModal({
                         e.preventDefault();
                         if (users.id === loginStatus.id) {
                           toast.error(
-                            "For security reasons, users are unable to update their own Access Module."
+                            "For security reasons, users are unable to update their own Access Module.",
                           );
                         } else if (!userHasAccessToUpdateAccess) {
                           toast.error(
-                            "You do not have permission to Update the access modules of Another user."
+                            "You do not have permission to Update the access modules of Another user.",
                           );
                         }
                       }
@@ -430,7 +439,7 @@ function CompanyUserAccessManagementModal({
         </div>
       </div>
     </div>,
-    document.body
+    document.body,
   );
 }
 

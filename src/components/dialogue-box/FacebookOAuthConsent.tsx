@@ -1,14 +1,10 @@
 import { Check, X } from "lucide-react";
 import Button from "../ui/Button";
 import { createPortal } from "react-dom";
-import { SIZE, STATUS_CODE, STRING_VALUES } from "../../constants/AppConstants";
-import { useEffect } from "react";
-import axios from "axios";
-import POST_API from "../../constants/PostApi";
+import { SIZE, STRING_VALUES } from "../../constants/AppConstants";
 import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
 import { useNavigate } from "react-router-dom";
 import ROUTES_URL from "../../constants/Routes";
-import toast from "react-hot-toast";
 
 function FacebookOAuthConsent() {
   const { loginStatus } = useLoggedInUserContext();
@@ -18,85 +14,88 @@ function FacebookOAuthConsent() {
     if (isFlowCompleted) {
       window.history.go(-7);
     }
-    window.history.back();
+    // NOTE : Navigating back when clicked on the cancel button or outside the card
+    navigate(
+      ROUTES_URL.INTEGRATIONS_SETTINGS + "/" + ROUTES_URL.SETTING_META_APP,
+    );
+    // window.history.back();
   };
 
   const handleConfirm = () => {
     const baseUrl =
-      "http://localhost:8080/api/main/purple-crm-api/authentication/facebook";
+      "http://localhost:8080/api/main/purple-crm-api/main/facebook";
     const params = new URLSearchParams();
     params.append("company_id", loginStatus.companyId.toString());
     params.append("company_user_id", loginStatus.id.toString());
     window.location.href = `${baseUrl}?${params}`;
   };
 
-  useEffect(() => {
-    const urlFragment = window.location.hash;
-    if (urlFragment) {
-      const fragmentString = urlFragment.substring(1);
-      const params = new URLSearchParams(fragmentString);
+  // useEffect(() => {
+  //   const urlFragment = window.location.hash;
+  //   if (urlFragment) {
+  //     const fragmentString = urlFragment.substring(1);
+  //     const params = new URLSearchParams(fragmentString);
 
-      const accessToken = params.get("access_token");
-      // const expiresIn = params.get('expires_in');
-      const longLivedToken = params.get("long_lived_token");
+  //     const accessToken = params.get("access_token");
+  //     // const expiresIn = params.get('expires_in');
+  //     const longLivedToken = params.get("long_lived_token");
 
-      // console.log("redirected from facebook");
-      // console.log("Token : " + accessToken);
-      // console.log("expires in : " + expiresIn);
-      // console.log("Long Lived Token : " + longLivedToken);
-      // console.log("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-      handleFacebookCallback(accessToken, longLivedToken);
-    }
+  //     // console.log("redirected from facebook");
+  //     // console.log("Token : " + accessToken);
+  //     // console.log("expires in : " + expiresIn);
+  //     // console.log("Long Lived Token : " + longLivedToken);
+  //     // console.log("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+  //     handleFacebookCallback(accessToken, longLivedToken);
+  //   }
 
-    window.history.pushState(null, document.title, window.location.href);
-    const handleBackButton = (event: PopStateEvent) => {
-      event.preventDefault();
-      navigate(ROUTES_URL.INTEGRATIONS_SETTINGS, { replace: true });
-    };
+  //   window.history.pushState(null, document.title, window.location.href);
 
-    window.addEventListener("popstate", handleBackButton);
+  //   const handleBackButton = (event: PopStateEvent) => {
+  //     event.preventDefault();
+  //     navigate(ROUTES_URL.INTEGRATIONS_SETTINGS + "/" + ROUTES_URL.SETTING_META_APP,);
+  //     // navigate(ROUTES_URL.INTEGRATIONS_SETTINGS, { replace: true });
+  //   };
 
-    return () => {
-      window.removeEventListener("popstate", handleBackButton);
-    };
-  }, []);
+  //   window.addEventListener("popstate", handleBackButton);
+  //   return () => {
+  //     window.removeEventListener("popstate", handleBackButton);
+  //   };
+  // }, []);
 
-  const handleFacebookCallback = (
-    accessToken: string | null,
-    longLivedToken: string | null
-  ) => {
-    if (accessToken) {
-      const postDataFacebookCallback = {
-        company_id: loginStatus.companyId,
-        company_user_id: loginStatus.id,
-        short_lived_access_token: accessToken,
-        long_lived_access_token: longLivedToken,
-      };
-      axios
-        .post(POST_API.FACEBOOK_CALLBACK, postDataFacebookCallback, {
-          withCredentials: true,
-        })
-        .then((response) => {
-          if (response.status === STATUS_CODE.OK) {
-            if(response.data.status){
-                toast.success(response.data.message);
-            }
-            else{
-              toast.error(response.data.message);
-            }
-            // setTimeout(()=>{
-            //   navigate(ROUTES_URL.COMPANY_SETTING);
-            // },3000)
-            
-          }
-        });
-    }
-  };
+  // const handleFacebookCallback = (
+  //   accessToken: string | null,
+  //   longLivedToken: string | null,
+  // ) => {
+  //   if (accessToken) {
+  //     const postDataFacebookCallback = {
+  //       company_id: loginStatus.companyId,
+  //       company_user_id: loginStatus.id,
+  //       short_lived_access_token: accessToken,
+  //       long_lived_access_token: longLivedToken,
+  //     };
+  //     axios
+  //       .post(POST_API.FACEBOOK_CALLBACK, postDataFacebookCallback, {
+  //         withCredentials: true,
+  //       })
+  //       .then((response) => {
+  //         if (response.status === STATUS_CODE.OK) {
+  //           if (response.data.status) {
+  //             toast.success(response.data.message);
+  //           } else {
+  //             toast.error(response.data.message);
+  //           }
+  //           // setTimeout(()=>{
+  //           //   navigate(ROUTES_URL.COMPANY_SETTING);
+  //           // },3000)
+  //         }
+  //       });
+  //   }
+  // };
 
   return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div
-        className="fixed inset-0 bg-black/50 backdrop-blur-sm"
+        className="fixed inset-0 bg-black/50 opacity-50 backdrop-blur-sm"
         onClick={() => {
           handleClose(false);
         }}
@@ -113,9 +112,7 @@ function FacebookOAuthConsent() {
         </button>
 
         <div className="mb-6">
-          <h2 className="section-header-custom mb-2">
-            Sign In With Facebook
-          </h2>
+          <h2 className="section-header-custom mb-2">Sign In With Facebook</h2>
           <p className="input-label-custom">
             Do you want to signin with your Facebook account for managing leads
           </p>
@@ -129,11 +126,10 @@ function FacebookOAuthConsent() {
               }}
               type="button"
             >
-              <div className='flex items-center gap-1'>
-              <X size={SIZE.SIXTEEN}/>
-               {STRING_VALUES.CANCEL}
-            </div>
-              
+              <div className="flex items-center gap-1">
+                <X size={SIZE.SIXTEEN} />
+                {STRING_VALUES.CANCEL}
+              </div>
             </Button>
           </div>
 
@@ -146,17 +142,16 @@ function FacebookOAuthConsent() {
               }}
               type="submit"
             >
-              <div className='flex items-center gap-1'>
-              <Check size={SIZE.SIXTEEN}/>
-               {STRING_VALUES.CONFIRM}
-            </div>
-              
+              <div className="flex items-center gap-1">
+                <Check size={SIZE.SIXTEEN} />
+                {STRING_VALUES.CONFIRM}
+              </div>
             </Button>
           </div>
         </div>
       </div>
     </div>,
-    document.body
+    document.body,
   );
 }
 

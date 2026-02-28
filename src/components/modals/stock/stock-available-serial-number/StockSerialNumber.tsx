@@ -1,56 +1,46 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import axios from "axios";
 import POST_API from "../../../../constants/PostApi";
-import { StockAvailableSerialNumberAgGrid } from "../../../ag-grid/StockAvailableSerialNumberAgGrid";
+import { SelectedSerialNumber, StockAvailableSerialNumberAgGrid } from "../../../ag-grid/StockAvailableSerialNumberAgGrid";
 import { STATUS_CODE } from "../../../../constants/AppConstants";
 import { StockAvaibleSerialNumber } from "../../../../@types/stock/StockAvailableSerialNumber";
 import ApiError from "../../../../@types/error/ApiError";
 import RefreshToken from "../../../../config/validations/RefreshToken";
 import { useEffect, useState } from "react";
-import Pagination from "../../../ag-grid/Pagination";
-import { useUserPreference } from "../../../../context/user/UserPreference";
 import { useSearchFilterPaginationDateHandlers } from "../../../../config/hooks/usePaginationHandler";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
 import FormHeader from "../../../ui/FormHeader";
 import { Box } from "lucide-react";
 import FormLayout from "../../../ui/FormLayout";
 import StockRulesCard from "./StockRuledCard";
+import axiosClient from "../../../../axios-client/AxiosClient";
+import PaginationWithoutCount from "../../../ag-grid/PaginationWithoutCount";
 
 export const StockSerialNumber = ({
   companyProductId,
   onClose,
   handleStockSerialNumberChange,
-  selectedInwardIds
+  selectedInwardIds,
 }: {
   companyProductId: number | undefined;
   onClose: () => void;
-  handleStockSerialNumberChange : (id : number[])=> void;
-  selectedInwardIds : number[]
+  handleStockSerialNumberChange: (id: SelectedSerialNumber[]) => void;
+  selectedInwardIds: SelectedSerialNumber[] ;
 }) => {
-  const { userPreference } = useUserPreference();
   const { loginStatus } = useLoggedInUserContext();
 
   const [stockAvailableSerialNumberState, setStockAvailableSerialNumberState] =
     useState<StockAvaibleSerialNumber[]>([]);
 
   const {
-    currentPage,
     pageSize,
-    totalPages,
-    setTotalPages,
+    currentPage,
+    currentPageData,
+    setCurrentPageData,
     handlePageChange,
     handlePageSizeChange,
   } = useSearchFilterPaginationDateHandlers();
 
-  // const [selectedInwardIds, setSelectedInwardIds] = useState<number[]>([]);
-
-  // function handleStockSerialNumberChange(ids : number[]){
-  //    setSelectedInwardIds(ids)
-  // }
-  // useEffect(() => {
-  //   console.log(selectedInwardIds);
-  // }, [selectedInwardIds]);
-  const getTransactionType = async () => {
+  const getStockAvailableSerialNumber = async () => {
     const offset = (currentPage - 1) * pageSize;
     const PostData = {
       company_id: loginStatus.companyId,
@@ -61,7 +51,7 @@ export const StockSerialNumber = ({
     };
 
     try {
-      const response = await axios.post(
+      const response = await axiosClient.post(
         POST_API.GET_STOCK_AVAILABLE_SERIAL_NUMBER,
         PostData,
         {
@@ -69,9 +59,7 @@ export const StockSerialNumber = ({
         }
       );
       if (response.status == STATUS_CODE.OK) {
-        if (response.data.length > 0) {
-          setTotalPages(Math.ceil(response.data[0].count / pageSize));
-        }
+       setCurrentPageData({currentPage: currentPage, pageDataLength: response.data.length});
         const responseData = response.data;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const formattedData: StockAvaibleSerialNumber[] = responseData.map(
@@ -94,17 +82,17 @@ export const StockSerialNumber = ({
     } catch (error: ApiError | any) {
       if (error.status === STATUS_CODE.UNATHORISED) {
         const refreshTokenStatus = await RefreshToken({
-          callFunctionWithEvent: getTransactionType,
+          callFunctionWithEvent: getStockAvailableSerialNumber,
         });
         if (refreshTokenStatus) {
-          getTransactionType();
+          getStockAvailableSerialNumber();
         }
       }
     }
   };
   useEffect(() => {
-    getTransactionType();
-  }, [currentPage, pageSize]);
+    getStockAvailableSerialNumber();
+  }, [currentPage, pageSize , companyProductId ]);
 
   const availableStock =
     stockAvailableSerialNumberState.length > 0 &&
@@ -112,36 +100,28 @@ export const StockSerialNumber = ({
   return (
     <>
       <FormLayout>
-        {/* Data Grid Section */}
-
+        <FormHeader
+          icon={Box}
+          onClose={onClose}
+          preText="Select the Stock as per the serial number"
+          description="Select the serial number from the stock for the product."
+        />
+        <StockRulesCard availableStock={availableStock} />
         <div
-          className={`ag-theme-balham bg-pink-400 w-full ${
-            userPreference.isLeftMenu
-              ? "h-[calc(100vh-140px)]"
-              : "h-[calc(100vh-148px)]"
-          }`}
+          className={`ag-theme-balham bg-pink-400 w-full h-[40vh] `
+        }
         >
-          <FormHeader
-            icon={Box}
-            onClose={onClose}
-            preText="Select the Product available in the Stock"
-            description="Select the product from the stock."
-          />
-          <StockRulesCard
-            availableStock={availableStock}
-          />
-
           <StockAvailableSerialNumberAgGrid
             data={stockAvailableSerialNumberState}
-            selectedIds={selectedInwardIds}
+            selectedIds={selectedInwardIds!}
             onSelectionChange={handleStockSerialNumberChange}
           />
         </div>
         <div className="flex items-center justify-end ">
-          <Pagination
-            totalPages={totalPages}
-            currentPage={currentPage}
+          <PaginationWithoutCount
             pageSize={pageSize}
+            currentPage={currentPage}
+            currentPageData={currentPageData}
             onPageChange={handlePageChange}
             onPageSizeChange={handlePageSizeChange}
           />

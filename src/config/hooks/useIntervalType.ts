@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import axios from "axios";
 import POST_API from "../../constants/PostApi";
 import { STATUS_CODE } from "../../constants/AppConstants";
 import { useEffect, useState } from "react";
@@ -8,6 +7,7 @@ import RefreshToken from "../validations/RefreshToken";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import ApiError from "../../@types/error/ApiError";
 import IntervalType from "../../@types/interval/IntervalType";
+import axiosClient from "../../axios-client/AxiosClient";
 
 export const useIntervalType = () => {
   const [intervalTypeData, setIntervalTypeData] = useState<
@@ -24,11 +24,10 @@ export const useIntervalType = () => {
     };
 
     try {
-      const response = await axios.post(POST_API.GET_INTERVAL_TYPE, PostData, {
+      const response = await axiosClient.post(POST_API.GET_INTERVAL_TYPE, PostData, {
         withCredentials: true,
       });
       if (response.status == STATUS_CODE.OK) {
-        console.log(response.data);
         setLoading(false)
         setIntervalTypeData(response.data);
       }

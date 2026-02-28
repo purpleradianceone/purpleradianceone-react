@@ -6,13 +6,12 @@ import { JSX_CHILDREN_NAME, SIZE } from "../../constants/AppConstants";
 import { Product } from "../../@types/products/ProductsManagementProps";
 import ProductsManagementGrid from "../ag-grid/ProductsManagementAgGrid";
 import AddProductModal from "../modals/products/AddProductModal";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useUserAccessModules } from "../../config/hooks/useAccessModules";
 import DateRangeFilterDropdown from "../ui/DateRangeFilterDropdown";
 import DateRangePicker from "../ui/DateRangePicker";
 import { useComapanySpecificSearchDateRange } from "../../config/hooks/useCompanySpecificDateRange";
 import { useDateRangeIdChange } from "../../config/hooks/useDateRangeIdChange";
-import Pagination from "../ag-grid/Pagination";
 import EditCompanyProductModal from "../modals/products/EditProductModal";
 import CompanyProductUsersModal from "../modals/company-product-user/CompanyProductUsersModal";
 import CompanyProductTeamsModal from "../modals/company-product-team/CompanyProductTeamsModal";
@@ -22,6 +21,8 @@ import toast from "react-hot-toast";
 import MESSAGE from "../../constants/Messages";
 import COLORS from "../../constants/Colors";
 import AddStock from "../modals/stock/AddStock";
+import PaginationWithoutCount from "../ag-grid/PaginationWithoutCount";
+import { customDateRangeId } from "../../config/hooks/usePaginationHandler";
 
 function ProductsManagementList({
   products,
@@ -40,7 +41,8 @@ ProductsManagementListProps) {
   const { userPreference } = useUserPreference();
   const [isEditComapanyProductModalOpen, setIsEditCompanyProductModalOpen] =
     useState<boolean>(false);
-  const [openCreateStockModal  , setOpenCreateStockModal] = useState<boolean>(false); 
+  const [openCreateStockModal, setOpenCreateStockModal] =
+    useState<boolean>(false);
   const [isCompanyProductUserModalOpen, setIsCompanyProductUserModalOpen] =
     useState<boolean>(false);
   const [isCompanyProductTeamModalOpen, setIsCompanyProductTeamModalOpen] =
@@ -75,17 +77,21 @@ ProductsManagementListProps) {
     validFrom: "",
     createdBy: "",
     createdOn: "",
-    unitId : 0,
-    unitName : "",
-    unitNameInStock : ""
+    unitId: 0,
+    unitName: "",
+    unitNameInStock: "",
+    minimumStock : 0
   });
 
   const handleSelectedProductChange = (product: Product) => {
     setSelectedProduct(product);
   };
 
-  const { handleDateRangeIdChange, isCustomDateOptionSelected } =
-    useDateRangeIdChange({ dateRangeDropdownOptions, handleSearchOption });
+  const {
+    handleDateRangeIdChange,
+    isCustomDateOptionSelected,
+    setIsCustomDateOptionSelected,
+  } = useDateRangeIdChange({ dateRangeDropdownOptions, handleSearchOption });
 
   const [isAddProductModalOpen, setIsAddProductModalOpen] = useState(false);
   function handleAddProductModalClose() {
@@ -108,7 +114,22 @@ ProductsManagementListProps) {
     setIsCompanyProductTeamModalOpen(status);
   };
 
-  if (userHasAccessToViewProduct) {
+  const selectedDateName =
+    dateRangeDropdownOptions.find(
+      (o) => o.search_date_range_id === handleSearchOption.dateRangeId
+    )?.date_range || "Date Filter";
+
+  useEffect(() => {
+    if (handleSearchOption.dateRangeId === customDateRangeId) {
+      setIsCustomDateOptionSelected(true);
+    }
+  }, [
+    handleSearchOption.searchParameter,
+    handleSearchOption.dateRangeId,
+    setIsCustomDateOptionSelected,
+  ]);
+
+  if (userHasAccessToViewProduct || isGridForAccountProduct) {
     return (
       <div
         className={`w-full  ${
@@ -119,34 +140,37 @@ ProductsManagementListProps) {
           className={`sticky z-10 top-12 mt-1  flex items-center justify-between ${COLORS.GRID_HEADER_SECTION_BG_COLOR} rounded-lg shadow-sm  mb-1 w-full`}
         >
           <div className="flex  justify-between w-full ">
-            <div className="flex items-center gap-2">
-              <Store
-                className={`${COLORS.GRID_HEADER_ICONS_COLOR_AND_SIZE} `}
-              />
+            <div className="flex items-center gap-5">
+              <div className="flex mt-1 gap-1">
+                <Store
+                  className={`${COLORS.GRID_HEADER_ICONS_COLOR_AND_SIZE} `}
+                />
 
-              {(isMediumScreen || isLargeScreen) && (
-                <>
-                  <span className="section-header-custom ">Products</span>
-                </>
-              )}
-            </div>
+                {(isMediumScreen || isLargeScreen) && (
+                  <>
+                    <span className="section-header-custom ">Products</span>
+                  </>
+                )}
+              </div>
 
-            {isLargeScreen && (
-              <>
-                <div className="flex gap-1 justify-center">
-                  {/* search box flex div */}
-                  <div className="relative flex items-start w-80 mt-1">
-                    <SearchInput
-                      onChange={(e) => {
-                        handleSearchOption.handleSearchParameterChange(
-                          e.target.value
-                        );
-                      }}
-                    ></SearchInput>
-                  </div>
+              {/* {isLargeScreen && ( */}
+              {/* <> */}
+              <div className="flex gap-1 justify-center items-center">
+                {/* search box flex div */}
+                <div className="relative flex items-start w-80">
+                  <SearchInput
+                    onChange={(e) => {
+                      handleSearchOption.handleSearchParameterChange(
+                        e.target.value,
+                      );
+                    }}
+                    value={handleSearchOption.searchParameter}
+                  ></SearchInput>
+                </div>
 
-                  {/* Date FIlters Dropdown */}
-                  <div className="flex mx-3 mt-1">
+                {/* Date FIlters Dropdown */}
+                {!isGridForAccountProduct && (
+                  <div className="flex mx-3 mt-1 gap-1">
                     <div className="flex">
                       <div className="flex items-center size-4 justify-center mt-1 mr-2 gap-2 input-label-custom">
                         <Calendar className="input-label-custom mt-1" />
@@ -155,27 +179,34 @@ ProductsManagementListProps) {
                       <DateRangeFilterDropdown
                         dropdownOptions={dateRangeDropdownOptions}
                         handleDateIdChange={handleDateRangeIdChange}
+                        selectedOption={selectedDateName}
                       ></DateRangeFilterDropdown>
                     </div>
+                    {/* Custom Date Picker Div Flex Box*/}
+                    {isCustomDateOptionSelected && (
+                      <div
+                        className="flex"
+                        style={
+                          isCustomDateOptionSelected
+                            ? { visibility: "visible" }
+                            : { visibility: "hidden" }
+                        }
+                      >
+                        <DateRangePicker
+                          onStartDateChange={onStartDateChange}
+                          onEndDateChange={onEndDateChange}
+                          initialStartDate={handleSearchOption.startDate}
+                          initialEndDate={handleSearchOption.endDate}
+                        />
+                      </div>
+                    )}
                   </div>
-                </div>
+                )}
+              </div>
 
-                {/* Custom Date Picker Div Flex Box*/}
-                <div
-                  className="flex"
-                  style={
-                    isCustomDateOptionSelected
-                      ? { visibility: "visible" }
-                      : { visibility: "hidden" }
-                  }
-                >
-                  <DateRangePicker
-                    onStartDateChange={onStartDateChange}
-                    onEndDateChange={onEndDateChange}
-                  />
-                </div>
-              </>
-            )}
+              {/* </> */}
+              {/* )} */}
+            </div>
 
             {!isGridForAccountProduct && (
               <>
@@ -201,7 +232,7 @@ ProductsManagementListProps) {
                         e.preventDefault();
                         toast.error(
                           MESSAGE.MODULE_ACCESS.PRODUCT_MANAGEMENT
-                            .DENIED_ADD_ACCESS
+                            .DENIED_ADD_ACCESS,
                         );
                       }}
                     >
@@ -256,26 +287,26 @@ ProductsManagementListProps) {
                 companyProduct={selectedProduct}
               />
             )}
-            {
-              openCreateStockModal && (
-                <AddStock
+            {openCreateStockModal && (
+              <AddStock
                 product={selectedProduct}
                 isUsedInProductModal={true}
-                  isOpen={openCreateStockModal}
-                  onClose={() =>{
-                    setOpenCreateStockModal(false)
-                  }}
-                />
-              )
-            }
+                isOpen={openCreateStockModal}
+                onClose={() => {
+                  setOpenCreateStockModal(false);
+                }}
+              />
+            )}
           </div>
         </div>
         <div className="bg-white overflow-y-auto rounded-lg shadow-sm p-0">
           <div
             className={
-              userPreference.isLeftMenu
-                ? `ag-theme-balham w-full h-[calc(100vh-112px)]`
-                : "ag-theme-balham w-full h-[calc(100vh-120px)]"
+              isGridForAccountProduct
+                ? "ag-theme-balham w-full h-[60vh]"
+                : userPreference.isLeftMenu
+                  ? `ag-theme-balham w-full h-[calc(100vh-112px)]`
+                  : "ag-theme-balham w-full h-[calc(100vh-120px)]"
             }
           >
             <ProductsManagementGrid
@@ -298,12 +329,12 @@ ProductsManagementListProps) {
           </div>
         </div>
         <div className="flex items-center justify-end ">
-          <Pagination
-            totalPages={paginationData.totalPages}
-            currentPage={paginationData.currentPage}
+          <PaginationWithoutCount
             pageSize={paginationData.pageSize}
-            onPageChange={paginationData.handlePageChange}
-            onPageSizeChange={paginationData.selectedPageSize}
+            currentPage={paginationData.currentPage}
+            currentPageData={paginationData.currentPageData}
+            onPageChange={paginationData.onPageChange}
+            onPageSizeChange={paginationData.onPageSizeChange}
           />
         </div>
       </div>

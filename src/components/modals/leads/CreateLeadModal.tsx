@@ -8,7 +8,6 @@ import {
   Phone,
   Save,
   User,
-  UserRoundPlus,
   X,
 } from "lucide-react";
 import {
@@ -20,13 +19,9 @@ import Button from "../../ui/Button";
 import React, { useEffect, useState } from "react";
 import { useFormValidation } from "../../../config/hooks/useFormValidation";
 import { useFormChange } from "../../../config/hooks/useFormChange";
-import axios from "axios";
 import POST_API from "../../../constants/PostApi";
 import PostDataTypeForLeadSourceAndStatusAndStates from "../../../@types/lead-management/PostDataTypeForLeadSourceAndStatusAndStates";
-import CustomDropdown from "./CustomDropdown";
 import CreateManualLead from "../../../@types/lead-management/CreateManualLead";
-import GetCompanyUsersForLead from "./company-users-selection-modal/GetCompanyUsersForLead";
-import CompanyUser from "../../../@types/company-users/CompanyUser";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
 import PostDataForCreateLead from "../../../@types/List/PostDataForCreateLead";
 import RefreshToken from "../../../config/validations/RefreshToken";
@@ -35,19 +30,18 @@ import ApiError from "../../../@types/error/ApiError";
 import toast from "react-hot-toast";
 import FormHeader from "../../ui/FormHeader";
 import FormInput from "../../ui/FormInput";
-import { createPortal } from "react-dom";
 import LoadingPopUpAnimation from "../../views/card/LoadingPopUpAnimation";
-import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
-import MESSAGE from "../../../constants/Messages";
+import axiosClient from "../../../axios-client/AxiosClient";
+import CustomSelect from "../../ui/CustomSelect";
+import { toSelectOptions } from "../../../utils/toSelectOption";
+import FormLayout from "../../ui/FormLayout";
+import { CustomSelectLookupCompanyUser } from "../../custom-select-component/CustomSelectLookupCompanyUser";
 
 function CreateLeadModal({
   isOpen,
   onClose,
   onCreateLeadRefreshLeadData,
 }: CreateLeadModalProps) {
-
-
-  const {userHasAccessToViewUser} = useUserAccessModules();
   const initialCreatLeadFormData: CreateManualLead = {
     name: "",
     email: "",
@@ -67,12 +61,13 @@ function CreateLeadModal({
 
   //states for lead status and source and state
   const [leadSource, setLeadSource] = useState<
-    PostDataTypeForLeadSourceAndStatusAndStates[] | null
-  >(null);
+    PostDataTypeForLeadSourceAndStatusAndStates[]
+  >([]);
 
+  // Note : changes done here
   const [leadStatus, setLeadStatus] = useState<
-    PostDataTypeForLeadSourceAndStatusAndStates[] | null
-  >(null);
+    PostDataTypeForLeadSourceAndStatusAndStates[]
+  >([]);
 
   // note : changes needs to be done
   const [error, setError] = useState<{
@@ -93,14 +88,22 @@ function CreateLeadModal({
     undefined
   );
 
-  const [openPopUpOfCompanyUserModal, setOpenPopUpOfCompanyUserModal] =
-    useState(false);
+  // const [openPopUpOfCompanyUserModal, setOpenPopUpOfCompanyUserModal] =
+  //   useState(false);
 
-  const handleCompanyUserPopUp = () => {
-    setOpenPopUpOfCompanyUserModal(true);
-  };
+    // Note : lead owner state 
+    const [selectedLeadOwner, setSelectedLeadOwner] =
+    useState<number | null>(null);
 
-  const [isSaving , setIsSaving] = useState<boolean>(false);
+  const leadOwnerId =
+    selectedLeadOwner || loginStatus.id; //  default rule applied here
+
+
+  // const handleCompanyUserPopUp = () => {
+  //   setOpenPopUpOfCompanyUserModal(true);
+  // };
+
+  const [isSaving, setIsSaving] = useState<boolean>(false);
   //note : these 3 functions that handles changed values from dropdown
   const handleLeadSelectedStatus = (value: number | undefined) => {
     setSelectedStatus(value);
@@ -116,53 +119,53 @@ function CreateLeadModal({
     useState<boolean>(false);
   //note : this is the selected company user data
 
-  const [persistedSelectedUserId, setPersistedSelectedUserId] = useState<
-    number | null
-  >(loginStatus.id);
+  // const [persistedSelectedUserId, setPersistedSelectedUserId] = useState<
+  //   number | null
+  // >(loginStatus.id);
 
-  const [selectedCompanyUser, setSelectedCompanyUser] = useState<CompanyUser>({
-    company_id: 0,
-    id: 0,
-    fullname: "",
-    email: "",
-    mobilenumber: "",
-    createdby: "",
-    isactive: false,
-    requestedby: "",
-    generate_password: "",
-  });
+  // const [selectedCompanyUser, setSelectedCompanyUser] = useState<CompanyUser>({
+  //   company_id: 0,
+  //   id: 0,
+  //   fullname: "",
+  //   email: "",
+  //   mobilenumber: "",
+  //   createdby: "",
+  //   isactive: false,
+  //   requestedby: "",
+  //   generate_password: "",
+  // });
 
-  const handleSelectedCompanyUserChange = (params: CompanyUser | null) => {
-    if (params) {
-      setPersistedSelectedUserId(params.id);
+  // const handleSelectedCompanyUserChange = (params: CompanyUser | null) => {
+  //   if (params) {
+  //     setPersistedSelectedUserId(params.id);
 
-      setSelectedCompanyUser({
-        company_id: params.company_id,
-        id: params.id,
-        fullname: params.fullname,
-        email: params.email,
-        mobilenumber: params.mobilenumber,
-        createdby: "",
-        isactive: params.isactive,
-        requestedby: "",
-        generate_password: "",
-      });
-    } else {
-      setPersistedSelectedUserId(null);
-      // Reset selectedCompanyUser to its initial state when null is received
-      setSelectedCompanyUser({
-        company_id: 0,
-        id: 0,
-        fullname: "",
-        email: "",
-        mobilenumber: "",
-        createdby: "",
-        isactive: false,
-        requestedby: "",
-        generate_password: "",
-      });
-    }
-  };
+  //     setSelectedCompanyUser({
+  //       company_id: params.company_id,
+  //       id: params.id,
+  //       fullname: params.fullname,
+  //       email: params.email,
+  //       mobilenumber: params.mobilenumber,
+  //       createdby: "",
+  //       isactive: params.isactive,
+  //       requestedby: "",
+  //       generate_password: "",
+  //     });
+  //   } else {
+  //     setPersistedSelectedUserId(null);
+  //     // Reset selectedCompanyUser to its initial state when null is received
+  //     setSelectedCompanyUser({
+  //       company_id: 0,
+  //       id: 0,
+  //       fullname: "",
+  //       email: "",
+  //       mobilenumber: "",
+  //       createdby: "",
+  //       isactive: false,
+  //       requestedby: "",
+  //       generate_password: "",
+  //     });
+  //   }
+  // };
 
   //   NOTE : FUNCTIONS GET THE DATA FROM BACKEND
   const getLeadSourceOptions = async () => {
@@ -173,7 +176,7 @@ function CreateLeadModal({
       isactive: true,
     };
     try {
-      const response = await axios.post(
+      const response = await axiosClient.post(
         POST_API.GET_LEAD_SOURCE,
         postDataForLeadSource,
         {
@@ -207,7 +210,7 @@ function CreateLeadModal({
     };
 
     try {
-      const response = await axios.post(
+      const response = await axiosClient.post(
         POST_API.GET_LEAD_STATUS,
         postDataForLeadStatus,
         {
@@ -270,7 +273,7 @@ function CreateLeadModal({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if(isSaving) return;
+    if (isSaving) return;
     if (error.mobileNumber !== "") {
       // showMessageSnackbar({
       //   message: "Please enter a valid mobile number.",
@@ -306,18 +309,20 @@ function CreateLeadModal({
       toast.error("Please select source and status");
       return;
     }
+
+
     if (
       createLeadModalFormData.email !== "" ||
       createLeadModalFormData.mobileNumber !== "" ||
       selectedSource !== undefined ||
       selectedStatus !== undefined
     ) {
-      const PostDataForCreateLead: PostDataForCreateLead = {
+      const postDataForCreateLead: PostDataForCreateLead = {
         company_id: loginStatus.companyId,
         ownerid:
-          selectedCompanyUser.id === 0
+          leadOwnerId === 0
             ? loginStatus.id
-            : selectedCompanyUser.id,
+            :leadOwnerId,
         name:
           createLeadModalFormData.name === ""
             ? null
@@ -334,16 +339,14 @@ function CreateLeadModal({
             ? null
             : createLeadModalFormData.mobileNumber,
       };
-
-      setIsSaving(true)
-      await axios
-        .post(POST_API.CREATE_LEAD, PostDataForCreateLead, {
+      setIsSaving(true);
+      await axiosClient
+        .post(POST_API.CREATE_LEAD, postDataForCreateLead, {
           withCredentials: true,
         })
         .then((response) => {
           if (response.data.status === true) {
             toast.success(response.data.message);
-          
           } else if (response.data.status == false) {
             toast.error(response.data.message);
           }
@@ -357,11 +360,12 @@ function CreateLeadModal({
               handleSubmit(e);
             }
           }
-        }).finally(()=>{
-            // note : this callback will run to refresh the list of aggrid
-            onClose!();
-            setIsSaving(false);
-            onCreateLeadRefreshLeadData!();
+        })
+        .finally(() => {
+          // note : this callback will run to refresh the list of aggrid
+          onClose!();
+          setIsSaving(false);
+          onCreateLeadRefreshLeadData!();
         });
     }
   };
@@ -370,19 +374,20 @@ function CreateLeadModal({
     if (!isOpen) {
       errors.email = "";
       errors.name = "";
-      setOpenPopUpOfCompanyUserModal(false);
-      setPersistedSelectedUserId(null);
-      setSelectedCompanyUser({
-        company_id: 0,
-        id: 0,
-        fullname: "",
-        email: "",
-        mobilenumber: "",
-        createdby: "",
-        isactive: false,
-        requestedby: "",
-        generate_password: "",
-      });
+      setSelectedLeadOwner(null)
+      // setOpenPopUpOfCompanyUserModal(false);
+      // setPersistedSelectedUserId(null);
+      // setSelectedCompanyUser({
+      //   company_id: 0,
+      //   id: 0,
+      //   fullname: "",
+      //   email: "",
+      //   mobilenumber: "",
+      //   createdby: "",
+      //   isactive: false,
+      //   requestedby: "",
+      //   generate_password: "",
+      // });
       setError({
         email: "",
         mobileNumber: "",
@@ -399,10 +404,14 @@ function CreateLeadModal({
     }
   }, [isOpen]);
 
+  // Note : Options for the dropdowns
+  const leadStatusOptions = toSelectOptions(leadStatus, "id", "name");
+  const leadSourceOptions = toSelectOptions(leadSource, "id", "name");
+
   if (!isOpen) return null;
   return (
-    <div className="fixed inset-0 z-20 bg-black bg-opacity-5 flex items-center justify-center  overflow-y-auto">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-xl relative animate-fadeIn p-5 max-h-[90vh] overflow-y-auto">
+   
+      <FormLayout width={3} padding={3}>
         {/* Header */}
         <FormHeader
           icon={Handshake}
@@ -412,34 +421,23 @@ function CreateLeadModal({
           description="Fill in the details below to create a new lead."
         />
 
-        {isSaving && <LoadingPopUpAnimation
-        show={isSaving}
-          />}
+        {isSaving && <LoadingPopUpAnimation show={isSaving} />}
         {/* Form */}
-        <form className="space-y-4 mt-2" onSubmit={handleSubmit}>
-          <div className="flex flex-col space-y-1">
-            {/* <div className=""> */}
-            <FormInput
-              label="Name:"
-              logo={User}
-              type="text"
-              name="name"
-              placeholder="Enter Name: "
-              value={createLeadModalFormData.name}
-              onChange={handleCreateLeadModalFormDataChange}
-            />
-            {/* <label className={createLeadLabelCss} htmlFor="name">
-                Name:
-              </label>
-              <input
-                className={createLeadInputTagCss}
+        <form className="space-y-2 mt-2" onSubmit={handleSubmit}>
+          <div className="grid grid-cols-2 space-y-1 gap-2">
+            <div className="col-span-2">
+              <FormInput
+                label="Name:"
+                logo={User}
                 type="text"
                 name="name"
-                placeholder="Enter Name: "
+                placeholder="Enter name "
                 value={createLeadModalFormData.name}
                 onChange={handleCreateLeadModalFormDataChange}
-              /> */}
-            {/* </div> */}
+                autoFocus
+              />
+            </div>
+
             {/* NOTE : EIGHTER ONE THEM IS REQUIRED FIELD (from email and mobile number) */}
             <div className="">
               <FormInput
@@ -447,7 +445,7 @@ function CreateLeadModal({
                 logo={Mail}
                 type="email"
                 name="email"
-                placeholder="Enter Email: "
+                placeholder="Enter email "
                 value={createLeadModalFormData.email}
                 onChange={handleCreateLeadModalFormDataChange}
                 onBlur={handleBlur}
@@ -457,16 +455,6 @@ function CreateLeadModal({
               )}
             </div>
 
-            {/* <FormInput
-              label="Email : "
-              type="email"
-              name="email"
-              placeholder="Enter Email"
-              value={createLeadModalFormData.email}
-              onChange={handleCreateLeadModalFormDataChange}
-              error={errors.email}
-              onBlur={handleBlur}
-            /> */}
             <div className="">
               <FormInput
                 type="text"
@@ -474,68 +462,57 @@ function CreateLeadModal({
                 logo={Phone}
                 className={createLeadInputTagCss}
                 name="mobileNumber"
-                placeholder="Enter Mobile Number: "
+                placeholder="Enter mobile number "
                 value={createLeadModalFormData.mobileNumber}
                 onBlur={handleBlur}
                 onChange={handleCreateLeadModalFormDataChange}
               />
-              {/* <label className={createLeadLabelCss} htmlFor="mobileNumber">
-                Mobile Number:
-              </label>
-              <input */}
-
-              {/* /> */}
               {error.mobileNumber && (
                 <div className="caption-custom-inactive">
                   {error.mobileNumber}
                 </div>
               )}
             </div>
-
-            <div>
-              <div className="flex items-center justify-between pr-60 gap-1 w-full">
-                <Button
-                  onClick={(e) => {
-
-                    e.preventDefault();
-                    if(userHasAccessToViewUser){
-
-                      handleCompanyUserPopUp();
-                    }else{
-                      toast.error(MESSAGE.MODULE_ACCESS.COMPANY_USER.DENIED_VIEW_ACCESS)
-                    }
-                  }}
-                  type="submit"
-                >
-                  <div className="flex gap-1 items-center whitespace-nowrap">
-                    <UserRoundPlus size={16} />
-                    <span>Assign</span>
-                  </div>
-                </Button>
-
-                <span className="caption-custom whitespace-nowrap">
-                  <span className="input-label-custom">Lead Owner :</span>{" "}
-                  {/* {selectedCompanyUser.fullname || loginStatus.fullName +`(if not assigned)`} */}
-                  {selectedCompanyUser.fullname || loginStatus.fullName}
-                </span>
-              </div>
-
-              <span className="caption-custom">
-                <span className="">Note :</span> If a lead owner is not
-                selected, then lead will be assigned to the lead
-                <span className=""> Creator</span> by default.
-              </span>
+            {/* Lead Source */}
+            <div className="space-y-1">
+              <CustomSelect
+                label="Lead Source"
+                value={selectedSource}
+                onChange={handleLeadSelectedSource}
+                options={leadSourceOptions}
+                icon={Link}
+                isRequired={true}
+              />
+              {/* <CustomDropdown
+                logo={Link}
+                requiredRedDot
+                labelName="Lead Source :"
+                options={leadSource!}
+                onSelect={handleLeadSelectedSource}
+              /> */}
+              {showErrorAtLeadSource && !selectedSource && (
+                <div className="text-red-500 text-xs">
+                  Please select Lead Source
+                </div>
+              )}
             </div>
-
             {/* Lead Status */}
             <div className="space-y-1">
-              <CustomDropdown
+              <CustomSelect
+                label="Lead Status"
+                value={selectedStatus}
+                onChange={handleLeadSelectedStatus}
+                options={leadStatusOptions}
+                icon={Clock}
+                isRequired={true}
+              />
+              {/* <CustomDropdown
                 logo={Clock}
                 requiredRedDot
                 labelName="Lead Status :"
                 options={leadStatus!}
                 onSelect={handleLeadSelectedStatus}
-              />
+              /> */}
               {showErrorAtLeadStatus && !selectedStatus && (
                 <div className="text-red-500 text-xs">
                   Please select Lead Status
@@ -543,21 +520,50 @@ function CreateLeadModal({
               )}
             </div>
 
-            {/* Lead Source */}
-            <div className="space-y-1">
-              <CustomDropdown
-                logo={Link}
-                requiredRedDot
-                labelName="Lead Source :"
-                options={leadSource!}
-                onSelect={handleLeadSelectedSource}
-              />
-              {showErrorAtLeadSource && !selectedSource && (
-                <div className="text-red-500 text-xs">
-                  Please select Lead Source
-                </div>
-              )}
+            <CustomSelectLookupCompanyUser
+            onChange={setSelectedLeadOwner}
+            value={selectedLeadOwner}
+            />
+            <div>
+              <span className="caption-custom">
+                <span className="">Note :</span> If no lead owner is selected, the lead will be assigned to the lead creator by default.
+              </span>
             </div>
+            {/* <div className="col-span-2">
+            <div className="flex items-center justify-between  gap-1 w-full">
+             <div className="flex items-center gap-x-2">
+               <Button
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (userHasAccessToViewUser) {
+                    handleCompanyUserPopUp();
+                  } else {
+                    toast.error(
+                      MESSAGE.MODULE_ACCESS.COMPANY_USER.DENIED_VIEW_ACCESS
+                    );
+                  }
+                }}
+                type="submit"
+              >
+                <div className="flex gap-1 items-center whitespace-nowrap">
+                  <UserRoundPlus size={16} />
+                  <span>Assign</span>
+                </div>
+              </Button>
+
+              <span className="caption-custom whitespace-nowrap">
+                <span className="input-label-custom">Lead Owner :</span>{" "}
+                {selectedCompanyUser.fullname || loginStatus.fullName}
+              </span>
+             </div>
+            </div>
+
+            <span className="caption-custom">
+              <span className="">Note :</span> If a lead owner is not selected,
+              then lead will be assigned to the lead
+              <span className=""> Creator</span> by default.
+            </span>
+          </div> */}
           </div>
 
           <div className="flex justify-end ">
@@ -577,46 +583,32 @@ function CreateLeadModal({
             </div>
           </div>
         </form>
-      </div>
+        {/* </div> */}
 
-      {openPopUpOfCompanyUserModal &&
-        createPortal(
-          <div className="fixed inset-0 z-50 bg-black bg-opacity-40 flex items-center justify-center p-4">
-            <div className="bg-white rounded-2xl p-3 shadow-lg w-full max-w-5xl max-h-[100vh] overflow-y-auto relative animate-fadeIn">
-              {/* Header with Close Button */}
-              {/* <div className="flex justify-between items-center p-3 border-b border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-800">
-                Select Company User
-              </h3>
-              <button
-                onClick={() => setOpenPopUpOfCompanyUserModal(false)}
-                className="text-gray-500 hover:text-gray-700"
-              >
-                <X size={20} />
-              </button>
-            </div> */}
-
-              <FormHeader
-                icon={UserRoundPlus}
-                onClose={() => setOpenPopUpOfCompanyUserModal(false)}
-                preText="Select Company User"
-                description="Select the user to assign him/her as lead owner"
-              />
-              {/* NOTE : CALL TO THE MODAL COMPONENT */}
-              <div className="p-1">
-                <GetCompanyUsersForLead
-                  selectedUserId={persistedSelectedUserId} // Pass the persisted ID
-                  handleSelectedCompanyUserChange={
-                    handleSelectedCompanyUserChange
-                  }
-                  isUsedForSettings={false}
+        {/* {openPopUpOfCompanyUserModal &&
+          createPortal(
+            <div className="fixed inset-0 z-50 bg-black bg-opacity-40 flex items-center justify-center p-4">
+              <div className="bg-white rounded-2xl p-3 shadow-lg w-full max-w-5xl max-h-[100vh] overflow-y-auto relative animate-fadeIn">
+                <FormHeader
+                  icon={UserRoundPlus}
+                  onClose={() => setOpenPopUpOfCompanyUserModal(false)}
+                  preText="Select Company User"
+                  description="Select the user to assign him/her as lead owner"
                 />
+                <div className="p-1">
+                  <GetCompanyUsersForLead
+                    selectedUserId={persistedSelectedUserId} // Pass the persisted ID
+                    handleSelectedCompanyUserChange={
+                      handleSelectedCompanyUserChange
+                    }
+                    isUsedForSettings={false}
+                  />
+                </div>
               </div>
-            </div>
-          </div>,
-          document.body
-        )}
-    </div>
+            </div>,
+            document.body
+          )} */}
+    </FormLayout>
   );
 }
 

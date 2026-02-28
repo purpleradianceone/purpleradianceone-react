@@ -4,14 +4,14 @@ import LeadTaskType from "../../../../@types/lead-management/LeadTaskType";
 import LeadContactType from "../../../../@types/lead-management/LeadContact";
 import { useEffect, useState } from "react";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
-import axios from "axios";
 import POST_API from "../../../../constants/PostApi";
 import ApiError from "../../../../@types/error/ApiError";
 import RefreshToken from "../../../../config/validations/RefreshToken";
 import { STATUS_CODE } from "../../../../constants/AppConstants";
 import LoadingSpinner from "../../../../assets/animations/LoadingSpinner";
-import { createPortal } from "react-dom";
 import FormHeader from "../../../ui/FormHeader";
+import axiosClient from "../../../../axios-client/AxiosClient";
+import FormLayout from "../../../ui/FormLayout";
 
 interface LeadTaskHistoryModalProps {
   isOpen: boolean;
@@ -48,7 +48,7 @@ function LeadTaskHistoryModal({
         requestedby_id : loginStatus.id 
     }
 
-    await axios.post(POST_API.GET_LEAD_TASK_HISTORY,getLeadTaskHistoryPostData,{
+    await axiosClient.post(POST_API.GET_LEAD_TASK_HISTORY,getLeadTaskHistoryPostData,{
         withCredentials : true
     }).then((response) =>{
          response.data.map((res : any) => {
@@ -229,9 +229,10 @@ function LeadTaskHistoryModal({
   
   if (!isOpen) return null;
   return (
-    createPortal(
-      <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center  z-50 pt-24 pb-14">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-5xl min-h-full p-6 relative">
+    <FormLayout width={5} padding={2}>
+    {/* // createPortal(
+      // <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center  z-50 pt-24 pb-14">
+      // <div className="bg-white rounded-lg shadow-xl w-full max-w-5xl min-h-full p-3 relative"> */}
         {/* Close Button */}
         {/* <button
           onClick={() => handleClose(false)}
@@ -309,10 +310,11 @@ function LeadTaskHistoryModal({
           )}
          
         </div>
-      </div>
-    </div>,
-    document.body
-    )
+      {/* </div> */}
+    {/* // </div>, */}
+    {/* // document.body */}
+    </FormLayout>
+    // )
   );
 }
 

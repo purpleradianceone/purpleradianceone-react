@@ -1,19 +1,19 @@
 import { AllCommunityModule, ColDef, themeBalham } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 import { useMemo } from "react";
+import { INNERHTML } from "../../constants/AppConstants";
 import LiveStock from "../../@types/stock/LiveStock";
 
 const StockLiveAgGrid = ({ data }: { data: LiveStock[] }) => {
-
   const columnDefs = useMemo<ColDef[]>(
     () => [
       {
-        hide: true,
+        hide: false,
         field: "companyProductName",
         headerName: " Product",
         cellStyle: {
           color: "black",
-          fontWeight: "bold",
+          // fontWeight: "bold",
         },
       },
       {
@@ -22,7 +22,7 @@ const StockLiveAgGrid = ({ data }: { data: LiveStock[] }) => {
         hide: false,
         cellStyle: {
           color: "black",
-          fontWeight: "bold",
+          // fontWeight: "bold",
         },
       },
       {
@@ -38,7 +38,7 @@ const StockLiveAgGrid = ({ data }: { data: LiveStock[] }) => {
         headerName: "Outward",
       },
     ],
-    []
+    [],
   );
 
   const defaultColDef = useMemo(() => {
@@ -60,7 +60,7 @@ const StockLiveAgGrid = ({ data }: { data: LiveStock[] }) => {
         columnDefs={columnDefs}
         defaultColDef={defaultColDef}
         modules={[AllCommunityModule]}
-        // overlayNoRowsTemplate={INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
+        overlayNoRowsTemplate={INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
         theme={themeBalham}
       />
     </div>

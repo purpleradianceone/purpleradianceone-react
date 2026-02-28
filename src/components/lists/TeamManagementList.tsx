@@ -5,18 +5,19 @@ import DateRangeFilterDropdown from "../ui/DateRangeFilterDropdown";
 import { useComapanySpecificSearchDateRange } from "../../config/hooks/useCompanySpecificDateRange";
 import { useDateRangeIdChange } from "../../config/hooks/useDateRangeIdChange";
 import DateRangePicker from "../ui/DateRangePicker";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { JSX_CHILDREN_NAME, SIZE } from "../../constants/AppConstants";
 import Button from "../ui/Button";
 import { useUserAccessModules } from "../../config/hooks/useAccessModules";
 import AddTeamModal from "../modals/teams/AddTeamModal";
 import CompanyTeamSearchProps from "../../@types/team-management/CompanyTeamListProps";
 import TeamManagementAgGrid from "../ag-grid/TeamManagementAgGrid";
-import Pagination from "../ag-grid/Pagination";
 import EditCompanyTeamModal from "../modals/teams/EditCompanyTeamModal";
 import TeamManagementListProps from "../../@types/List/TeamManagementListProps";
 import { useUserPreference } from "../../context/user/UserPreference";
 import COLORS from "../../constants/Colors";
+import PaginationWithoutCount from "../ag-grid/PaginationWithoutCount";
+import { customDateRangeId } from "../../config/hooks/usePaginationHandler";
 
 function TeamManagementList({
   companyTeamList,
@@ -33,8 +34,11 @@ function TeamManagementList({
 
   const { dateRangeDropdownOptions } = useComapanySpecificSearchDateRange();
 
-  const { handleDateRangeIdChange, isCustomDateOptionSelected } =
-    useDateRangeIdChange({ dateRangeDropdownOptions, handleSearchOption });
+  const {
+    handleDateRangeIdChange,
+    isCustomDateOptionSelected,
+    setIsCustomDateOptionSelected,
+  } = useDateRangeIdChange({ dateRangeDropdownOptions, handleSearchOption });
 
   const [isAddTeamModalOpen, setIsAddTeamModalOpen] = useState<boolean>(false);
   const [isUpdateCompanyTeamModalOpen, setIsUpdateCompanyTeamModalOpen] =
@@ -60,32 +64,54 @@ function TeamManagementList({
     }
   };
 
+  const selectedDateName =
+    dateRangeDropdownOptions.find(
+      (o) => o.search_date_range_id === handleSearchOption.dateRangeId
+    )?.date_range || "Date Filter";
+
+  useEffect(() => {
+    if (handleSearchOption.dateRangeId === customDateRangeId) {
+      setIsCustomDateOptionSelected(true);
+    }
+  }, [
+    handleSearchOption.searchParameter,
+    handleSearchOption.dateRangeId,
+    setIsCustomDateOptionSelected,
+  ]);
+
   return (
     <div
       className={`w-full  ${
         userPreference.isLeftMenu ? "pl-5" : "pl-1"
       } pr-1 gap-1`}
     >
-      <div className={`sticky z-10 top-9 mt-1 p-0.5 flex items-center justify-between ${COLORS.GRID_HEADER_SECTION_BG_COLOR} bg-gray-50 rounded-lg shadow-sm  mb-1.5 w-full`}>
-        <div className="flex  gap-2">
-          {!isSmallScreen && <Network className={`${COLORS.GRID_HEADER_ICONS_COLOR_AND_SIZE} mt-1`} />}
+      <div
+        className={`sticky z-10 top-9 mt-1 p-0.5 flex items-center justify-between ${COLORS.GRID_HEADER_SECTION_BG_COLOR} bg-gray-50 rounded-lg shadow-sm  mb-1.5 w-full`}
+      >
+        <div className="flex justify-center items-center gap-5">
+          <div className="flex gap-1">
+            {!isSmallScreen && (
+              <Network
+                className={`${COLORS.GRID_HEADER_ICONS_COLOR_AND_SIZE}`}
+              />
+            )}
 
-          {(isMediumScreen || isLargeScreen) && (
-            <span className="section-header-custom">Teams</span>
-          )}
-        </div>
+            {(isMediumScreen || isLargeScreen) && (
+              <span className="section-header-custom">Teams</span>
+            )}
+          </div>
 
-        {isLargeScreen && (
-          <>
+          {isLargeScreen && (
             <div className="flex gap-1">
               {/* search box flex div */}
               <div className="relative flex items-start w-80 ">
                 <SearchInput
                   onChange={(e) => {
                     handleSearchOption.handleSearchParameterChange(
-                      e.target.value
+                      e.target.value,
                     );
                   }}
+                  value={handleSearchOption.searchParameter}
                 ></SearchInput>
               </div>
 
@@ -99,42 +125,49 @@ function TeamManagementList({
                   <DateRangeFilterDropdown
                     dropdownOptions={dateRangeDropdownOptions}
                     handleDateIdChange={handleDateRangeIdChange}
+                    selectedOption={selectedDateName}
                   ></DateRangeFilterDropdown>
                 </div>
+                {/* Custom Date Picker Div Flex Box*/}
+                {isCustomDateOptionSelected && (
+                  <div
+                    style={
+                      isCustomDateOptionSelected
+                        ? { visibility: "visible" }
+                        : { visibility: "hidden" }
+                    }
+                  >
+                    <DateRangePicker
+                      onStartDateChange={onStartDateChange}
+                      onEndDateChange={onEndDateChange}
+                      initialStartDate={handleSearchOption.startDate}
+                      initialEndDate={handleSearchOption.endDate}
+                    />
+                  </div>
+                )}
               </div>
             </div>
-
-            {/* Custom Date Picker Div Flex Box*/}
-            <div
-              style={
-                isCustomDateOptionSelected
-                  ? { visibility: "visible" }
-                  : { visibility: "hidden" }
-              }
-            >
-              <DateRangePicker
-                onStartDateChange={onStartDateChange}
-                onEndDateChange={onEndDateChange}
-              />
-            </div>
-          </>
-        )}
+          )}
+        </div>
 
         {/* new end */}
 
         {userHasAccessToAddTeamManagement ? (
           <>
             <div className="flex gap-1">
-              <Button type="submit" onClick={(e) => {
-                e.preventDefault();
-                setIsAddTeamModalOpen(true);
-              }}>
+              <Button
+                type="submit"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setIsAddTeamModalOpen(true);
+                }}
+              >
                 {/* {!isSmallScreen && <Network size={SIZE.TWENTY} />}
                 {isSmallScreen && <Network size={SIZE.EIGHT} />}
                 {isLargeScreen && JSX_CHILDREN_NAME.ADD_TEAM} */}
                 <div className="flex items-center gap-0.5">
-            <Network size={SIZE.SIXTEEN}/> {JSX_CHILDREN_NAME.ADD_TEAM}</div>
-                
+                  <Network size={SIZE.SIXTEEN} /> {JSX_CHILDREN_NAME.ADD_TEAM}
+                </div>
               </Button>
             </div>
             <AddTeamModal
@@ -156,9 +189,14 @@ function TeamManagementList({
           </>
         ) : (
           <div className="flex gap-1">
-            <Button type="submit" onClick={(e) => e.preventDefault} disabled={true}>
+            <Button
+              type="submit"
+              onClick={(e) => e.preventDefault}
+              disabled={true}
+            >
               <div className="flex items-center gap-0.5">
-            <Network size={SIZE.SIXTEEN}/> {JSX_CHILDREN_NAME.ADD_TEAM}</div>
+                <Network size={SIZE.SIXTEEN} /> {JSX_CHILDREN_NAME.ADD_TEAM}
+              </div>
             </Button>
           </div>
         )}
@@ -180,12 +218,12 @@ function TeamManagementList({
         </div>
       </div>
       <div className="flex items-center justify-end ">
-        <Pagination
-          totalPages={paginationData.totalPages}
+        <PaginationWithoutCount
           currentPage={paginationData.currentPage}
+          currentPageData={paginationData.currentPageData}
           pageSize={paginationData.pageSize}
-          onPageChange={paginationData.handlePageChange}
-          onPageSizeChange={paginationData.selectedPageSize}
+          onPageChange={paginationData.onPageChange}
+          onPageSizeChange={paginationData.onPageSizeChange}
         />
       </div>
     </div>

@@ -2,10 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/exhaustive-deps */
 import { Network, Save, Text, Users, X } from "lucide-react";
-import {
-  STATUS_CODE,
-  VALIDATIONS,
-} from "../../../constants/AppConstants";
+import { STATUS_CODE, VALIDATIONS } from "../../../constants/AppConstants";
 import FormInput from "../../ui/FormInput";
 import TextAreaInput from "../../ui/TextAreaInput";
 import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
@@ -36,15 +33,17 @@ function AddTeamModal({
   onClose,
   handleCompanyTeamChangeOnAdd,
 }: AddTeamModalProps) {
-  const { userHasAccessToAddTeamManagement, userHasAccessToViewUser } =
-    useUserAccessModules();
+  const {
+    userHasAccessToAddTeamManagement,
+    userHasAccessToViewUser,
+  } = useUserAccessModules();
 
   const [intialAddTeamFormData, setIntialAddTeamFormData] =
     useState<AddTeamFormDataState>({
       name: "",
       description: "",
     });
-  const [isSaving , setIsSaving] = useState<boolean>(false);
+  const [isSaving, setIsSaving] = useState<boolean>(false);
 
   const { loginStatus } = useLoggedInUserContext();
   const {
@@ -77,9 +76,11 @@ function AddTeamModal({
     companyUsersGridApiRef.current = params.api;
   };
 
-  const handleCompanyUserCheckBoxChange = (params : CompanyUsersSearchProps ,event :React.ChangeEvent<HTMLInputElement>) => {
-    if(event.target.checked){
-      
+  const handleCompanyUserCheckBoxChange = (
+    params: CompanyUsersSearchProps,
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    if (event.target.checked) {
       setAddCompanyTeamUserArray((prev) => [...prev, params.id]);
     } else {
       setAddCompanyTeamUserArray((prev) =>
@@ -92,10 +93,10 @@ function AddTeamModal({
     event: React.FormEvent<HTMLFormElement>
   ) => {
     event.preventDefault();
-    if(isSaving) return;
+    if (isSaving) return;
     if (userHasAccessToAddTeamManagement) {
       if (AddTeamFormData.name !== "" || AddTeamFormData.description !== "") {
-        setIsSaving(true)
+        setIsSaving(true);
         const addTeamPostData = {
           company_id: loginStatus.companyId,
           name: AddTeamFormData.name,
@@ -114,14 +115,13 @@ function AddTeamModal({
           );
 
           if (response.data.status && response.status === STATUS_CODE.OK) {
-            toast.success(response.data.message)
+            toast.success(response.data.message);
             handleCompanyTeamChangeOnAdd();
             setTimeout(() => {
               onClose();
             }, 100);
-          }
-          else if(!response.data.status){
-            toast.error(response.data.message)
+          } else if (!response.data.status) {
+            toast.error(response.data.message);
           }
         } catch (error: ApiError | any) {
           if (error.status === STATUS_CODE.UNATHORISED) {
@@ -134,14 +134,14 @@ function AddTeamModal({
           } else {
             toast.error(error.response.data);
           }
-        }finally{
-          setIsSaving(false)
+        } finally {
+          setIsSaving(false);
         }
       } else {
-        toast.error(MESSAGE.ERROR.REQUIRED_FIELDS)
+        toast.error(MESSAGE.ERROR.REQUIRED_FIELDS);
       }
     } else {
-      toast.error( MESSAGE.ERROR.NOT_ATHORISED)
+      toast.error(MESSAGE.ERROR.NOT_ATHORISED);
     }
   };
 
@@ -171,23 +171,40 @@ function AddTeamModal({
         }
       }
 
-      const getCompanyUserPostData = {
+      // const getCompanyUserPostData = {
+      //   company_id: loginStatus.companyId,
+      //   requestedby: loginStatus.id,
+      //   limit: companyUsersSearchParameter.length > 0 ? 0 : 50,
+      //   offset:
+      //     companyUsersSearchParameter.length > 0
+      //       ? 0
+      //       : 50 * isCompanyUsersFetchedCount,
+      //   isactive: true,
+      //   search_company_specific_date_range_id: 0,
+      //   search_parameter: companyUsersSearchParameter,
+      //   search_parameter_date: "",
+      // };
+
+      const postData = {
         company_id: loginStatus.companyId,
-        requestedby: loginStatus.id,
-        limit: companyUsersSearchParameter.length > 0 ? 0 : 50,
+        // company_team_id: null,
+        // search_company_specific_date_range_id: null,
+        search_parameter: companyUsersSearchParameter,
+        // search_parameter_date: null,
+        isactive: true,
         offset:
           companyUsersSearchParameter.length > 0
             ? 0
             : 50 * isCompanyUsersFetchedCount,
-        isactive: true,
-        search_company_specific_date_range_id: 0,
-        search_parameter: companyUsersSearchParameter,
-        search_parameter_date: "",
+        limit: companyUsersSearchParameter.length > 0 ? 0 : 50,
+        requestedby: loginStatus.id,
       };
 
       const response = await axios.post(
-        POST_API.GET_COMPANY_USERS,
-        getCompanyUserPostData,
+        POST_API.GET_LOOKUP_COMPANY_USERS,
+        // POST_API.GET_COMPANY_TEAM_USERS_NOT_ASSIGNED,
+        // getCompanyUserPostData,
+        postData,
         {
           withCredentials: true,
         }
@@ -332,56 +349,58 @@ function AddTeamModal({
   if (!isOpen) return null;
 
   return (
-    <FormLayout>
-  <>  
-  
-          <div className="">
-            {/* Form header */}
-            <FormHeader
-              preText="Create new team"
-              icon={Network}
-              onClose={onClose}
-              description="Set up a new team to manage tasks and responsibilities efficiently."
+    <FormLayout padding={2} width={5}>
+      <>
+        <div className="">
+          {/* Form header */}
+          <FormHeader
+            preText="Create new team"
+            icon={Network}
+            onClose={onClose}
+            description="Set up a new team to manage tasks and responsibilities efficiently."
+          />
+
+          <form className="space-y-1 " onSubmit={handleAddTeamFormSubmit}>
+            <FormInput
+              logo={Users}
+              label="Name : "
+              maxLength={VALIDATIONS.MAX_NAME_LENGTH}
+              minLength={VALIDATIONS.MIN_NAME_LENGTH}
+              type="text"
+              name="name"
+              required={true}
+              value={AddTeamFormData.name}
+              placeholder="Enter team name"
+              onBlur={handleBlur}
+              error={errors.name}
+              onChange={handleAddTeamFormDataChange}
             />
 
-            <form className="space-y-3" onSubmit={handleAddTeamFormSubmit}>
-
-              <FormInput
-              logo={Users}
-                label="Name : "
-                maxLength={VALIDATIONS.MAX_NAME_LENGTH}
-                minLength={VALIDATIONS.MIN_NAME_LENGTH}
-                type="text"
-                name="name"
-                required={true}
-                value={AddTeamFormData.name}
-                placeholder="Enter team name"
-                onBlur={handleBlur}
-                error={errors.name}
-                onChange={handleAddTeamFormDataChange}
-              />
-
-              <TextAreaInput
+            <TextAreaInput
               logo={Text}
-                label="Description : "
-                name="description"
-                placeholder="Enter team description"
-                value={AddTeamFormData.description}
-                cols={5}
-                rows={3}
-                maxLength={256}
-                onBlur={handleBlur}
-                error={errors.description}
-                onChange={handleAddTeamFormDataChange}
-              />
+              label="Description : "
+              name="description"
+              placeholder="Enter team description"
+              value={AddTeamFormData.description}
+              cols={5}
+              rows={3}
+              maxLength={256}
+              onBlur={handleBlur}
+              error={errors.description}
+              onChange={handleAddTeamFormDataChange}
+            />
               <div
-                style={{ height: "350px", width: "100%", marginBottom: "60px" }}
+                style={{ height: "280px", width: "100%", marginBottom: "50px" }}
               >
                 <div className="flex w-full items-center gap-5 mb-1 ">
                   <div className="place-content-center">
                     <div>
-                      <span className="table-header-custom">Company Members</span>
-                    <div className="caption-custom">Select the company user that needs to be in the team</div>
+                      <span className="table-header-custom">
+                        Company Members
+                      </span>
+                      <div className="caption-custom">
+                        Select the company user that needs to be in the team
+                      </div>
                     </div>
                   </div>
                   <div className="w-56">
@@ -404,35 +423,40 @@ function AddTeamModal({
                 />
               </div>
 
-              {userHasAccessToAddTeamManagement ? (
-                <div className="flex justify-self-end  gap-3">
-                  <div className="min-w-28">
-                    <Button type="button" onClick={()=>{onClose()}}>
-                      <div className="flex gap-1 items-center ">
-                        <X size={18} />
-                        <span>Cancel</span>
-                      </div>
-                    </Button>
-                  </div>
-                  <div className="min-w-28">
-                    <Button type="submit">
-                      <div className="flex gap-1 items-center">
-                        <Save size={18} />
-                        <span>Save</span>
-                      </div>
-                    </Button>
-                  </div>
+            {userHasAccessToAddTeamManagement ? (
+              <div className="flex justify-self-end  gap-3">
+                <div className="min-w-28">
+                  <Button
+                    type="button"
+                    onClick={() => {
+                      onClose();
+                    }}
+                  >
+                    <div className="flex gap-1 items-center ">
+                      <X size={18} />
+                      <span>Cancel</span>
+                    </div>
+                  </Button>
                 </div>
-              ) : (
-                <div className="flex justify-self-end max-w-36 ">
-                  <div></div>
+                <div className="min-w-28">
+                  <Button type="submit">
+                    <div className="flex gap-1 items-center">
+                      <Save size={18} />
+                      <span>Save</span>
+                    </div>
+                  </Button>
                 </div>
-              )}
-            </form>
-          </div>
-        <LoadingPopUpAnimation show={isSaving}/>
-          </>
-          </FormLayout>
+              </div>
+            ) : (
+              <div className="flex justify-self-end max-w-36 ">
+                <div></div>
+              </div>
+            )}
+          </form>
+        </div>
+        <LoadingPopUpAnimation show={isSaving} />
+      </>
+    </FormLayout>
   );
 }
 

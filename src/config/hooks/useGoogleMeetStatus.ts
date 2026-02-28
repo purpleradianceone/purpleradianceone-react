@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/exhaustive-deps */
-import axios from "axios";
 import { useEffect } from "react"; // Import useState
 import POST_API from "../../constants/PostApi";
 import { STATUS_CODE } from "../../constants/AppConstants";
@@ -8,6 +7,7 @@ import RefreshToken from "../validations/RefreshToken";
 import ApiError from "../../@types/error/ApiError";
 import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
 import { useGoogleMeetContext } from "../../context/meeting/GoogleMeetContext";
+import axiosClient from "../../axios-client/AxiosClient";
 
 export const useGoogleMeetStatus = () => {
   const { loginStatus } = useLoggedInUserContext();
@@ -19,7 +19,7 @@ export const useGoogleMeetStatus = () => {
         company_user_id: loginStatus.id,
         requestedby: loginStatus.id,
       };
-      await axios
+      await axiosClient
         .post(
           POST_API.VALIDATE_GOOGLE_MEET_CONNECTION,
           validateGoogleMeetConnectionPostData,

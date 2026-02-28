@@ -48,6 +48,7 @@ import Button from "../../ui/Button";
 import FormInput from "../../ui/FormInput";
 import FormHeader from "../../ui/FormHeader";
 import ConfirmationDialog from "../../dialogue-box/ConfirmationDialogue";
+import { usePanel } from "../../../context/panel/usePanel";
 
 export const EditorCanvas: React.FC = () => {
   const canvasBgColor = "#f9f9f9";
@@ -63,6 +64,7 @@ export const EditorCanvas: React.FC = () => {
   const [searchParams] = useSearchParams();
   const params = searchParams.get("type");
   const [showConfirm, setShowConfirm] = useState(false);
+  const EditorBarPosition = "top-12";
 
   const getPlaceHolderDataFromDatabase = async ({
     templateTypeId,
@@ -164,22 +166,28 @@ export const EditorCanvas: React.FC = () => {
     setHtmlInput(updatedHtml);
     setPreviewHtml(updatedHtml);
   };
+    const { position } = usePanel();
+  
 
   return isLoading ? (
     <div className="flex h-screen w-screen justify-center items-center ">
       <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-600"></div>
     </div>
   ) : (
-    <div className="w-screen h-screen">
-      <div className="sticky z-10 top-14 flex items-start justify-between  bg-gray-50 rounded-lg shadow-sm  p-1 px-3">
+    <div className={`${position === "left"?"pl-5":"pl-1"} w-screen h-screen`}>
+      <div className={`sticky z-10 ${EditorBarPosition} flex items-start justify-between  bg-gray-50 rounded-lg shadow-sm  p-1 px-1`}>
         <div className="flex  gap-1">
+          <div className="flex justify-center items-center gap-1 ">
           {<LucideMail className="w-7 h-7 text-blue-600" />}
-          <span className="section-header-custom">Email Template</span>
-          <span className="section-header-custom">
+          <span className="section-header-custom">Create Template</span>
+          <span
+           title={JSON.parse(params!).name}
+           className="inline-block section-header-custom truncate max-w-[190px]">
             : {JSON.parse(params!).name}
           </span>
+          </div>
           <div
-            className="fixed  inset-0 justify-center top-14"
+            className={`fixed w-fit left-1/2 -translate-x-1/2 inset-0 justify-center ${EditorBarPosition}`}
             style={{ height: "fit-content" }}
           >
             <div className="flex-col gap-2 justify-center justify-items-center ">
@@ -194,8 +202,8 @@ export const EditorCanvas: React.FC = () => {
                   onClick={() => setMode("editor")}
                   className={`cursor-pointer ${
                     mode === "editor"
-                      ? "main-nav-custom active-header"
-                      : "main-nav-custom "
+                      ? "table-header-custom-blue border-b-2 border-blue-500"
+                      : "table-header-custom"
                   }`}
                   style={{
                     padding: "6px 10px",
@@ -211,8 +219,8 @@ export const EditorCanvas: React.FC = () => {
                   }}
                   className={`cursor-pointer ${
                     mode === "insert"
-                      ? "main-nav-custom active-header"
-                      : "main-nav-custom"
+                      ? "table-header-custom-blue border-b-2 border-blue-500"
+                      : "table-header-custom"
                   }`}
                   style={{
                     padding: "6px 10px",
@@ -223,7 +231,7 @@ export const EditorCanvas: React.FC = () => {
                 </div>
               </div>
               <div>
-                {/* <div className="top-12 flex items-center justify-between bg-gray-50 rounded shadow-sm mb-1 w-fit px-2 py-1">
+                {/* <div className={`${EditorBarPosition} flex items-center justify-between bg-gray-50 rounded shadow-sm mb-1 w-fit px-2 py-1'}>
                 <div className="flex items-center gap-1.5">
                   <LucideCode className="w-4 h-4 text-blue-600" />
                   <span className="text-sm font-semibold">
@@ -495,7 +503,7 @@ export const EditorCanvas: React.FC = () => {
                   }}
                 >
                   <div
-                    className="fixed inset-0 justify-self-end top-14 "
+                    className={`fixed inset-0 justify-self-end ${EditorBarPosition}`}
                     style={{
                       zIndex: 11,
                       height: "fit-content",

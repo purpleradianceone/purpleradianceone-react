@@ -45,6 +45,20 @@
 }
 
 /* Main Navigation Links */
+.main-nav-custom-setting {
+  font-family: "Inter", sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: #777575;
+  text-decoration: none;
+  /* border-bottom: 1px solid #757575; */
+  border-top: 0px none transparent;
+  border-left: 0px none transparent;
+  border-right: 0px none transparent;
+  text-wrap: nowrap;
+  /* background-color: #ebebebf5; */
+}
+
 .main-nav-custom {
   font-family: "Inter", sans-serif;
   font-size: 16px;
@@ -56,6 +70,21 @@
   border-left: 0px none transparent;
   border-right: 0px none transparent;
   text-wrap: nowrap;
+}
+.main-nav-custom-setting.active-header-setting {
+  color: #2563eb;
+  /* color: #f01db8; */
+  border-top: 0px none transparent;
+  border-left: 0px none transparent;
+  border-right: 0px none transparent;
+  border: 1px solid #8d8f91;
+  /* border-bottom: 3px solid #f01db8; */
+  box-shadow: none;
+  border-radius: 6px;
+  white-space: nowrap;
+  overflow-x: auto;
+   transition: border-bottom 0.01s ease-in; 
+   background-color: white;
 }
 
 .main-nav-custom.active-header {
@@ -78,6 +107,14 @@
   /* color: #f01db8; */
   color : #2563eb;
   border : none;
+}
+
+.main-nav-custom-setting.active-tab-setting {
+  /* color: #f01db8; */
+  color : #171718;
+  /* border : 1px solid rgb(97, 93, 93);
+  border-radius: 3px; */
+  
 }
 
 
@@ -120,12 +157,24 @@
 /* Table Data */
 .table-data-custom {
   font-family: "Roboto", sans-serif;
-  font-size: 14px;
-  font-weight: 400;
-  color: #333333;
+  font-size: 13px;
+  font-weight: 500;
+  color: #363535;
 }
 
+.card-header {
+  font-family: "Roboto", sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: #363535;
+}
 
+.card-data {
+  font-family: "Roboto", sans-serif;
+  font-size: 13px;
+  font-weight: 400;
+  color: #363535;
+}
 
 
 /* Action Buttons */
@@ -159,6 +208,8 @@
   font-weight: 400; /* Maps to Regular */
   color: #757575;
 }
+
+
 
 .caption-custom.white-text {
   font-family: "Roboto", sans-serif;
@@ -272,6 +323,14 @@
   color: #eb9225;
 }
 
+
+.url{
+  font-family: "Roboto", sans-serif;
+  font-size: 14px;
+  font-weight: 400; 
+   color: #445bef;
+  
+}
 .custom-height-scrollbar {
   overflow: auto; /* Use 'auto' to apply to both vertical and horizontal scrollbars as needed */
 }
@@ -298,4 +357,24 @@
 /* Scrollbar thumb on hover */
 .custom-height-scrollbar::-webkit-scrollbar-thumb:hover {
   background-color: #ededf3; /* A darker shade on hover for interactivity */
+}
+
+
+.datepicker-popper {
+  z-index: 9999 !important;
+}
+
+.datepicker-calendar {
+  background-color: white !important;
+
+}
+/*For scrollbar hiding*/
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE & Edge */
+  scrollbar-width: none;     /* Firefox */
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;             /* Chrome, Safari */
+
 }

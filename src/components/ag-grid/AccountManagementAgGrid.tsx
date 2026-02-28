@@ -10,12 +10,13 @@ function AccountManagementAgGrid({
   accounts,
   handleRowClick,
   onRowSelect,
-  isUsedForAccountLead
+  isUsedForAccountLead,
+
 }: {
   accounts: Account[];
   handleRowClick?: (event:  any) => void;
   onRowSelect?: (data: Account | any) => void;
-  isUsedForAccountLead : boolean
+  isUsedForAccountLead : boolean;
 }) {
   const gridRef = useRef<AgGridReact>(null); // Ref to the AgGridReact component
 
@@ -224,7 +225,7 @@ function AccountManagementAgGrid({
         headerName: "Status",
         sortable: true,
         filter: true,
-        hide: isUsedForAccountLead,
+        // hide: isUsedForAccountLead,
         cellRenderer: (params: any) => {
           return (
             <div className="flex items-center text-sm gap-1 mt-1">

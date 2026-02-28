@@ -1,4 +1,3 @@
-import axios from "axios";
 import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
 import POST_API from "../../constants/PostApi";
 import { STATUS_CODE } from "../../constants/AppConstants";
@@ -6,6 +5,7 @@ import SearchDropDownOptions from "../../@types/ag-grid/SearchDropDownOptions";
 import { useEffect, useState } from "react";
 import RefreshToken from "../validations/RefreshToken";
 import ApiError from "../../@types/error/ApiError";
+import axios from "axios";
 
 export const useComapanySpecificSearchDateRange = () => {
 
@@ -29,7 +29,7 @@ export const useComapanySpecificSearchDateRange = () => {
 const {loginStatus} = useLoggedInUserContext()
 
     const fetchDateRange = async() => {
-        
+        if(loginStatus.companyId===0)return;
         const postData = {
             requestedby: loginStatus.id,
             company_id: loginStatus.companyId,

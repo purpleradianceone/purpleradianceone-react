@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import axios from "axios";
 import { useEffect, useState } from "react"; // Import useState
 import POST_API from "../../constants/PostApi";
 import { STATUS_CODE } from "../../constants/AppConstants";
 import RefreshToken from "../validations/RefreshToken";
 import ApiError from "../../@types/error/ApiError";
+import axiosClient from "../../axios-client/AxiosClient";
 
 export const useServerCurrentTime = () => {
   // 1. Use useState to declare currentTime as a state variable
@@ -14,7 +14,7 @@ export const useServerCurrentTime = () => {
 
   const getServerCurrentTime = async () => {
     try {
-      const response = await axios.get(POST_API.GET_SERVER_CURRENT_TIME, {
+      const response = await axiosClient.get(POST_API.GET_SERVER_CURRENT_TIME, {
         withCredentials: true,
       });
       setCurrentTime(response.data);

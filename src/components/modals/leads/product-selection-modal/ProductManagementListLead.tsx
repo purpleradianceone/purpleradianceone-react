@@ -8,10 +8,10 @@ import SearchInput from "../../../ui/SearchInput";
 import DateRangeFilterDropdown from "../../../ui/DateRangeFilterDropdown";
 import DateRangePicker from "../../../ui/DateRangePicker";
 import { SIZE } from "../../../../constants/AppConstants";
-import Pagination from "../../../ag-grid/Pagination";
 import Button from "../../../ui/Button";
 import ProductsManagementGridLead from "./ProductManagementAgGridLead";
 import LeadProductsManagementListProps from "../../../../@types/lead-management/LeadProductManagementListProps";
+import PaginationWithoutCount from "../../../ag-grid/PaginationWithoutCount";
 
 function ProductsManagementListLead({
   products,
@@ -258,12 +258,12 @@ function ProductsManagementListLead({
           </div>
         </div>
         <div className="flex items-center justify-end mt-1">
-          <Pagination
-            totalPages={paginationData.totalPages}
-            currentPage={paginationData.currentPage}
+          <PaginationWithoutCount
             pageSize={paginationData.pageSize}
-            onPageChange={paginationData.handlePageChange}
-            onPageSizeChange={paginationData.selectedPageSize}
+            currentPage={paginationData.currentPage}
+            currentPageData={paginationData.currentPageData}
+            onPageChange={paginationData.onPageChange}
+            onPageSizeChange={paginationData.onPageSizeChange}
           />
         </div>
       </div>

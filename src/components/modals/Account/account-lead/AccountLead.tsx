@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import axios from "axios";
 import CreateAccountLeadType from "../../../../@types/account/CreateAccountLeadType";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
 import POST_API from "../../../../constants/PostApi";
@@ -17,12 +16,18 @@ import qs from "query-string";
 import { useNavigate } from "react-router-dom";
 import { useUserAccessModules } from "../../../../config/hooks/useAccessModules";
 import MESSAGE from "../../../../constants/Messages";
+import axiosClient from "../../../../axios-client/AxiosClient";
+import AccessDeniedMessagePage from "../../../views/not-found/AccessDeniedMessagePage";
 
 const AccountLead = ({ account }: CreateAccountLeadType) => {
   const { loginStatus } = useLoggedInUserContext();
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [accountLead, setAccountLead] = useState<AccountLeadType[]>([]);
-  const {userHasAccessToViewLead} = useUserAccessModules();
+  const {
+    userHasAccessToViewLead,
+    userHasAccessToUpdateAccountLeads,
+    userHasAccessToViewAccountLeads,
+  } = useUserAccessModules();
   const navigate = useNavigate();
   // Note : get api call
   const getAccountLead = async () => {
@@ -34,7 +39,7 @@ const AccountLead = ({ account }: CreateAccountLeadType) => {
       requestedby: loginStatus.id,
     };
 
-    await axios
+    await axiosClient
       .post(POST_API.GET_ACCOUNT_LEAD, postData, { withCredentials: true })
       .then((response) => {
         if (response.status === STATUS_CODE.OK) {
@@ -72,8 +77,10 @@ const AccountLead = ({ account }: CreateAccountLeadType) => {
   };
   // Note : first time api call when component renders.
   useEffect(() => {
-    getAccountLead();
-  }, []);
+    if (userHasAccessToViewAccountLeads) {
+      getAccountLead();
+    }
+  }, [userHasAccessToViewAccountLeads]);
 
   // update api call
   const handleAccountLeadStatusChange = async (
@@ -89,7 +96,7 @@ const AccountLead = ({ account }: CreateAccountLeadType) => {
       updatedby_id: loginStatus.id,
     };
 
-    await axios
+    await axiosClient
       .post(POST_API.UPDATE_ACCOUNT_LEAD, postData, { withCredentials: true })
       .then((response) => {
         if (response.data.status) {
@@ -121,7 +128,7 @@ const AccountLead = ({ account }: CreateAccountLeadType) => {
       id: leadId,
       requestedby: loginStatus.id,
     };
-    await axios
+    await axiosClient
       .post(POST_API.GET_LEAD, postDataToGetLead, {
         withCredentials: true,
       })
@@ -165,88 +172,133 @@ const AccountLead = ({ account }: CreateAccountLeadType) => {
       });
   };
 
-  const handleAccountLead = (leadId :number) =>{
-    if(leadId!==0) {
+  const handleAccountLead = (leadId: number) => {
+    if (leadId !== 0) {
       getLeadDetails(leadId);
     }
+  };
+  if (userHasAccessToViewAccountLeads && isLoading) {
+    return (
+      <div className="h-20 flex items-center justify-center">
+        <LoadingSpinner />
+      </div>
+    );
   }
 
-return (
-  <div className="bg-white border flex flex-col  rounded-lg p-1 max-h-96 overflow-auto">
-    {/* Header */}
-    <div className="bg-gray-100 table-header-custom rounded-t-md px-2 ">
-      <span>Account related leads</span>
-    </div>
+  if(!userHasAccessToViewAccountLeads)return <AccessDeniedMessagePage message={MESSAGE.MODULE_ACCESS.ACCOUNT_LEADS.DENIED_VIEW_ACCESS}/>
+  return (
+    <div className=" flex flex-col min-h-14 h-full   max-h-96 overflow-auto">
+      {/* Header */}
+      {/* <div className="bg-gray-100 table-header-custom rounded-t-md px-2 ">
+      <span>Account related leads</span> */}
+      {/* </div> */}
 
-    {
-      isLoading && (
-        <div className="h-20 flex items-center justify-center">
-
-          <LoadingSpinner />
+      {/* Empty State */}
+      {!isLoading && accountLead.length === 0 && (
+        <div className="flex items-center justify-center h-full bg-pink-0 ">
+          <span className="italic caption-custom flex gap-1 items-center ">
+            <CreateAccountLead
+              account={account}
+              getAccountLead={getAccountLead}
+            />
+            No leads available.
+          </span>
         </div>
-      )
-    }
-    {/* Empty State */}
-    {!isLoading && accountLead.length === 0 && (
-      <div className="flex items-center justify-center py-4">
-        <span className="italic caption-custom flex gap-1 items-center ">
-          <CreateAccountLead account={account} getAccountLead={getAccountLead} />
-          No leads available.
-        </span>
-      </div>
-    )}
+      )}
 
-    {/* Add button (if data exists) */}
-    {accountLead.length > 0 && (
-      <div className="py-0.5">
-        <CreateAccountLead getAccountLead={getAccountLead} account={account} />
-      </div>
-    )}
+      {/* Add button (if data exists) */}
+      {accountLead.length > 0 && (
+        <div className="py-0.5">
+          <CreateAccountLead
+            getAccountLead={getAccountLead}
+            account={account}
+          />
+        </div>
+      )}
 
-    {/* Leads Grid */}
-    {accountLead.length > 0 && (
-      <div className="grid md:grid-cols-2 gap-1 w-full">
-        {accountLead.map((item: AccountLeadType) => (
-          <div
-          onClick={() =>{
-            if(userHasAccessToViewLead){
-              handleAccountLead(item.leadId)
-            }else{
-              toast.error(MESSAGE.MODULE_ACCESS.LEAD_MODULE.DENIED_VIEW_ACCESS)
-            }
-          }}
-            key={item.id}
-            className="p-2 cursor-pointer hover:white-text  hover:shadow-md  bg-white shadow-sm rounded-xl border border-gray-200 flex flex-col "
-          >
-            {/* Header */}
-            <div className=" flex justify-between items-start">
-              <div className="flex flex-col">
-                <h2 title={item.leadName || ""} className=" input-label-custom hover:text-blue-500 ">
-                  {item.leadName && item.leadName.length>35  ? item.leadName.substring(0,34)+"..." : item.leadName || <><span className="text-xs italic">Name not given</span></>}
-                </h2>
-                <p title={item.leadEmail || ""} className="caption-custom hover:text-blue-500">{item.leadEmail || <><span className="italic">email - not given</span></>}</p>
-                <p  title={item.leadMobileNumber || ""} className="caption-custom hover:text-blue-500">{item.leadMobileNumber || <><span className="italic">mobile number - not given</span></>}</p>
-              </div>
-
-              {/* Toggle */}
-              <div onClick={(e) => e.stopPropagation()}>
-              <ToggleButton
-                  checked={item.isActive}
-                  name={item.id.toString()}
-                  onToggle={() => {
-                    // e.stopPropagation();
-                    handleAccountLeadStatusChange(item);
-                  }}
-                />
+      {/* Leads Grid */}
+      {accountLead.length > 0 && (
+        <div className="grid md:grid-cols-2 gap-1 w-full">
+          {accountLead.map((item: AccountLeadType) => (
+            <div
+              onClick={() => {
+                if (userHasAccessToViewLead) {
+                  handleAccountLead(item.leadId);
+                } else {
+                  toast.error(
+                    MESSAGE.MODULE_ACCESS.LEAD_MODULE.DENIED_VIEW_ACCESS
+                  );
+                }
+              }}
+              key={item.id}
+              className="p-2 cursor-pointer hover:white-text  hover:shadow-md  bg-white shadow-sm rounded-xl border border-gray-200 flex flex-col "
+            >
+              {/* Header */}
+              <div className=" flex justify-between items-start">
+                <div className="flex flex-col">
+                  <h2
+                    title={item.leadName || ""}
+                    className=" input-label-custom hover:text-blue-500 "
+                  >
+                    {item.leadName && item.leadName.length > 35
+                      ? item.leadName.substring(0, 34) + "..."
+                      : item.leadName || (
+                          <>
+                            <span className="text-xs italic">
+                              Name not given
+                            </span>
+                          </>
+                        )}
+                  </h2>
+                  <p
+                    title={item.leadEmail || ""}
+                    className="caption-custom hover:text-blue-500"
+                  >
+                    {item.leadEmail || (
+                      <>
+                        <span className="italic">email - not given</span>
+                      </>
+                    )}
+                  </p>
+                  <p
+                    title={item.leadMobileNumber || ""}
+                    className="caption-custom hover:text-blue-500"
+                  >
+                    {item.leadMobileNumber || (
+                      <>
+                        <span className="italic">
+                          mobile number - not given
+                        </span>
+                      </>
+                    )}
+                  </p>
                 </div>
-            </div>
-          </div>
-        ))}
-      </div>
-    )}
-  </div>
-);
 
+                {/* Toggle */}
+                <div onClick={(e) => e.stopPropagation()}>
+                  <ToggleButton
+                    checked={item.isActive}
+                    name={item.id.toString()}
+                    onToggle={() => {
+                      // e.stopPropagation();
+                      if (userHasAccessToUpdateAccountLeads) {
+                        handleAccountLeadStatusChange(item);
+                      } else {
+                        toast.error(
+                          MESSAGE.MODULE_ACCESS.ACCOUNT_LEADS
+                            .DENIED_UPDATE_ACCESS
+                        );
+                      }
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
 };
 
 export default AccountLead;

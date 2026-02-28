@@ -24,12 +24,12 @@ const ROUTES_URL = {
     CREATE_SUBSCRIPTION : "/create/subscription",
     GET_SUBSCRIPTION : "/subscription",
     PANEL_CUSTOMIZER : "/panel-customizer",
-    LEAD_DETAILS : "/lead/view",
+    LEAD_DETAILS : "/home/manage-leads/leads/lead/view",
     SCHEDULE_MEETING : "/meetings/schedule",
     //for email template
-    EMAIL_TEMPLATE : "/email-template",
-    EMAIL_TEMPLATE_CREATE : "/email-template/create",
-    EMAIL_TEMPLATE_UPDATE : "/email-template/update",
+    EMAIL_TEMPLATE : "/settings/email-template",
+    EMAIL_TEMPLATE_CREATE : "/settings/email-template/create",
+    EMAIL_TEMPLATE_UPDATE : "/settings/email-template/update",
 
     //for meetings
     GOOGLE_OAUTH : "/authenticate/google",
@@ -61,11 +61,52 @@ const ROUTES_URL = {
     FACEBOOK_OAUTH : "/authenticate/facebook",
     INTEGRATIONS_SETTINGS : "/settings/integrations",
 
+    // Quotation module
+    QUOTATION_SETTINGS : "/settings/quotations",
+    QUOTATION_SETTINGS_CREATE_Template : "/settings/quotations/create",
+
+    // Account module
     ACCOUNT_MANAGEMENT : "/home/manage-accounts/accounts",
+    ACCOUNT_DETAILS : "/home/manage-accounts/accounts",
     ACCOUNT_IMPORT_CSV : "/home/manage-accounts/accounts/import",
+    ACCOUNT_COMPANY_PRODUCT_DETAILS: '/home/manage-accounts/accounts/acc-com-prod-details',
+    ACCOUNT_COMPANY_PRODUCT_AMC_DETAILS: '/home/manage-accounts/accounts/prod-details-amc/:accountCompanyProductId',
+    ACCOUNT_MULTIPLE_COMPANY_PRODUCT : "assign-products",
+
     // Stock
     STOCK_MANAGEMENT : "/home/manage-stock/stock",
-    STOCK_LIVE_FOR_COMPANY_PRODUCT : '/home/manage-stock/stock/live-stock-for-company-product/'
+    STOCK_LIVE_FOR_COMPANY_PRODUCT : '/home/manage-stock/stock/live-stock-for-company-product/',
+    WAREHOUSE_WISE_STOCK : "warehouse-wise-stock",
+    STOCK_LEDGER : "stock-ledger",
+    STOCK_AGEING : "stock-ageing",
+
+
+
+    //Support Tickets
+    SUPPORT_TICKET_MANAGEMENT : "/home/manage-support-ticket/support-tickets",
+    SUPPORT_TICKET_DETAILS : "/home/manage-support-ticket/support-tickets/support-ticket/details",
+
+    // setting
+    SETTING_EMAIL : "email",
+    SETTING_MEETINGS : "meetings",
+    SETTING_ACCOUNT_TYPE : "account-type",
+    SETTING_NOTIFICATIONS : "notification",
+    SETTING_GENERAL : "general",
+    SETTING_SUPPORT_TICKET_CATEGORY : "support-ticket-category",
+    SETTING_COMPANY_WAREHOUSE : "company-warehouse",
+
+
+    // setting-integration
+    SETTING_META_APP: "meta-app",
+    SETTING_INDIAMART :"indiamart",
+    SETTING_LINKEDIN : "linkedin",
+    SETTING_GOOGLE_ADS : "google-ads",
+
+    //TASKS
+   TASKS_MANAGEMENT: "/home/manage-tasks/tasks",
+   MY_TASKS: "my-tasks",
+   GENERAL_TASK : "/home/manage-tasks/general-task/:taskId",
+   MASTER_TASK_DETAILS: "/home/master-task/details/:taskId",
 
 }
 export default ROUTES_URL;

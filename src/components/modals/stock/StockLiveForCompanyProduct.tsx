@@ -13,9 +13,9 @@ import { useUserPreference } from "../../../context/user/UserPreference";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import LiveStockForCompanyProduct from "../../../@types/stock/LiveStockForCompanyProduct";
 import Button from "../../ui/Button";
-import Pagination from "../../ag-grid/Pagination";
 import { useSearchFilterPaginationDateHandlers } from "../../../config/hooks/usePaginationHandler";
 import StockTransactions from "./StockTransactions";
+import PaginationWithoutCount from "../../ag-grid/PaginationWithoutCount";
 
 const StockLiveForCompanyProduct = ({
   companyStockLive,
@@ -30,9 +30,9 @@ const StockLiveForCompanyProduct = ({
   const [loading, setLoading] = useState<boolean>(true);
   const {
     currentPage,
+    currentPageData,
     pageSize,
-    totalPages,
-    setTotalPages,
+    setCurrentPageData,
     handlePageChange,
     handlePageSizeChange,
   } = useSearchFilterPaginationDateHandlers();
@@ -58,11 +58,11 @@ const StockLiveForCompanyProduct = ({
       })
       .then((response) => {
         if (response.status === STATUS_CODE.OK) {
+          setCurrentPageData({
+            currentPage: currentPage,
+            pageDataLength: response.data.length,
+          });
           const data = response.data;
-
-          if (data.length > 0) {
-            setTotalPages(Math.ceil(response.data[0].count / pageSize));
-          }
           const formattedData: LiveStock[] = data.map((item: any) => ({
             count: item.count,
             companyProductId: item.company_product_id,
@@ -178,9 +178,9 @@ const StockLiveForCompanyProduct = ({
         <StockLiveAgGrid data={liveStock} />
       </div>
       <div className="flex items-center justify-end ">
-        <Pagination
-          totalPages={totalPages}
+        <PaginationWithoutCount
           currentPage={currentPage}
+          currentPageData={currentPageData}
           pageSize={pageSize}
           onPageChange={handlePageChange}
           onPageSizeChange={handlePageSizeChange}
@@ -188,7 +188,7 @@ const StockLiveForCompanyProduct = ({
       </div>
       {showTransactions && (
         <StockTransactions
-        companyProductId = {companyStockLive.companyProductId}
+          companyProductId={companyStockLive.companyProductId}
           onClose={() => {
             setShowTransactions(false);
           }}

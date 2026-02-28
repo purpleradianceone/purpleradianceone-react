@@ -10,7 +10,11 @@ import ApiError from "../../../../@types/error/ApiError";
 import RefreshToken from "../../../../config/validations/RefreshToken";
 import CompanyPreferencesType from "../../../../@types/settings/CompanyPreferences";
 import toast from "react-hot-toast";
-import ToggleButton from "../../../ui/ToggleButton";
+import { useUserAccessModules } from "../../../../config/hooks/useAccessModules";
+import MESSAGE from "../../../../constants/Messages";
+import LoadingSpinner from "../../../../assets/animations/LoadingSpinner";
+import FormHeader from "../../../ui/FormHeader";
+import { Bell } from "lucide-react";
 
 // New, reusable card component for each company preference
 interface PreferenceCardProps {
@@ -36,7 +40,7 @@ const PreferenceCard: React.FC<PreferenceCardProps> = ({
         </h3>
       </div>
 <p className="caption-custom m-0 p-0">{description}</p>
-      {/* <label className="inline-flex items-center cursor-pointer relative self-end"> 
+      <label className="inline-flex items-center cursor-pointer relative self-end"> 
         <input
           type="checkbox"
           className="sr-only peer"
@@ -46,12 +50,12 @@ const PreferenceCard: React.FC<PreferenceCardProps> = ({
         />
         <div className="w-10 h-5 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:bg-green-500 transition-all duration-300" />
         <div className="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transform peer-checked:translate-x-5 transition-all duration-300" />
-      </label> */}
-      <ToggleButton
+      </label>
+      {/* <ToggleButton
       checked={checked}
       name={name}
-      onToggle={onToggle}
-      />
+      onToggle={onToggle} */}
+      {/* /> */}
     </div>
   );
 };
@@ -63,6 +67,7 @@ function CompanyPreferenceSetting() {
     useState<CompanyPreferencesType | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
+  const {userHasAccessToUpdateCompanyPreferences} = useUserAccessModules();
   const getCompanyPreferences = async () => {
     setIsLoading(true);
     const getCompanyPreferencesPostData = {
@@ -109,6 +114,10 @@ function CompanyPreferenceSetting() {
   const handleCompanyPreferenceCheckboxChange = async (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
+    if(!userHasAccessToUpdateCompanyPreferences) {
+      toast.error(MESSAGE.MODULE_ACCESS.SETTING.COMPANY_PREFERENCE_SETTING.DENIED_UPDATE_ACCESS)
+      return;
+    }
     const { name, checked } = event.target;
 
     const updatedPreferences = {
@@ -171,19 +180,29 @@ function CompanyPreferenceSetting() {
   }
 
   return (
-    <div className="w-full min-h-screen bg-white  lg:p-1">
-      <div className="text-center mb-3">
-        <p className="table-data-custom mt-2">
-          {/* Manage your company's default settings and services. */}
+    <div className="w-full min-h-screen  lg:p-2">
+      {/* <div className="text-center mb-3"> */}
+        {/* <p className="table-data-custom mt-2">
           Choose how you want to receive notifications. You can enable or disable different channels based on your preference. Notifications will be sent through Email, Mobile, or directly in your Web browser.
-        </p>
-      </div>
+        </p> */}
+        <FormHeader
+          preText="Manage your company's default settings and services."
+          description="Choose how you want to receive notifications. You can enable or disable different channels based on your preference. Notifications will be sent through Email, Mobile, or directly in your Web browser.
+"
+          onClose={() => {
+            // setCompanyUserModalOpen(false);
+          }}
+          icon={Bell}
+          isModal={false}
+          wantBorderBottom={false}
+        />
+      {/* </div> */}
       {isLoading ? (
-        <div className="flex justify-center items-center mt-20">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-blue-500" />
-        </div>
+        <>
+        <LoadingSpinner />
+        </>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-1">
           {companyPreferences && (
             <>
               <PreferenceCard

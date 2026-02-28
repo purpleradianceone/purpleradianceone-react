@@ -102,14 +102,7 @@ export const SectionBlock: React.FC = () => {
             gap: "6px",
           }}
         >
-          {/* <label className="input-label-custom">
-            Padding:
-            <input className="caption-custom"
-              type="text"
-              value={tempPadding}
-              onChange={(e) => setTempPadding(e.target.value)}
-            />
-          </label> */}
+
           <FormInput
             type="text"
             label="Padding"

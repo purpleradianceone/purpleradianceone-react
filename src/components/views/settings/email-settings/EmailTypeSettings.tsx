@@ -11,6 +11,7 @@ import { useUserAccessModules } from '../../../../config/hooks/useAccessModules'
 import AccessDeniedMessagePage from '../../not-found/AccessDeniedMessagePage';
 import toast from 'react-hot-toast';
 import SettingToggleCard from '../../../ui/SettingToggleCard';
+import MESSAGE from '../../../../constants/Messages';
 
 
 
@@ -18,7 +19,7 @@ function EmailTypeSettings() {
   const [emailTypeSettings, setEmailTypeSettings] = useState<EmailTypeSettingsType[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const { loginStatus } = useLoggedInUserContext();
-  const { userHasAccessToViewEmailTypeSetting } = useUserAccessModules();
+  const { userHasAccessToViewEmailTypeSetting , userHasAccessToUpdateEmailTypeSetting} = useUserAccessModules();
 
 
 
@@ -88,6 +89,10 @@ const getDescription = (setting : EmailTypeSettingsType) => {
   };
 
   const handleEmailTypeSettingCheckBoxChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    if(!userHasAccessToUpdateEmailTypeSetting) {
+      toast.error(MESSAGE.MODULE_ACCESS.SETTING.EMAIL_TYPE_SETTING.DENIED_UPDATE_ACCESS)
+      return;
+    }
     const id = parseInt(event.target.id);
     const isChecked = event.target.checked;
     const emailTypeSettingPostData = {

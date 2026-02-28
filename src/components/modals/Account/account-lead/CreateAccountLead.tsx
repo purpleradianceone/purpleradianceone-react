@@ -3,9 +3,6 @@ import { useState } from "react";
 import Account from "../../../../@types/account/Account";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
 import Button from "../../../ui/Button";
-import LeadManagement from "../../../views/lead-management/LeadManagement";
-import LeadDataProps from "../../../../@types/lead-management/LeadProps";
-import axios from "axios";
 import POST_API from "../../../../constants/PostApi";
 import ApiError from "../../../../@types/error/ApiError";
 import { STATUS_CODE } from "../../../../constants/AppConstants";
@@ -15,6 +12,10 @@ import FormHeader from "../../../ui/FormHeader";
 import { Handshake } from "lucide-react";
 import { useUserAccessModules } from "../../../../config/hooks/useAccessModules";
 import MESSAGE from "../../../../constants/Messages";
+import axiosClient from "../../../../axios-client/AxiosClient";
+import { LookupLeadManagement } from "../../../views/lookups/lookup-lead/LookupLeadManagement";
+import { LookupLead } from "../../../../@types/lookup/LookupLead";
+import FormLayout from "../../../ui/FormLayout";
 
 const CreateAccountLead = ({
   account,
@@ -25,11 +26,11 @@ const CreateAccountLead = ({
   getAccountLead: () => void;
 }) => {
   const { loginStatus } = useLoggedInUserContext();
-  const {userHasAccessToUpdateAccount} = useUserAccessModules();
+  const { userHasAccessToAddAccountLeads } = useUserAccessModules();
 
   const [showLeadsData, setShowLeadsData] = useState<boolean>(false);
 
-  const handleRowSelectedForShowAccountLead = (rowData: LeadDataProps) => {
+  const handleRowSelectedForShowAccountLead = (rowData: LookupLead) => {
     // calling the api
     if (rowData) {
       createAccountLead(rowData.id);
@@ -47,7 +48,7 @@ const CreateAccountLead = ({
       createdby_id: loginStatus.id,
     };
 
-    await axios
+    await axiosClient
       .post(POST_API.CREATE_ACCOUNT_LEAD, postData, { withCredentials: true })
       .then((response) => {
         if (response.data.status) {
@@ -69,18 +70,19 @@ const CreateAccountLead = ({
         }
       });
   };
-
   return (
     <div className="  flex  justify-end ">
       {/* Header */}
       <div className="flex justify-end items-center text-xs gap-x-2 py-0.5 text-gray-500">
-        <Button 
-          disabled ={!userHasAccessToUpdateAccount}
+        <Button
+          disabled={!userHasAccessToAddAccountLeads}
           onClick={() => {
-            if(userHasAccessToUpdateAccount){
+            if (userHasAccessToAddAccountLeads) {
               setShowLeadsData(!showLeadsData);
-            }else{
-              toast.error(MESSAGE.MODULE_ACCESS.ACCOUNT_ACCESS.DENIED_UPDATE_ACCESS)
+            } else {
+              toast.error(
+                MESSAGE.MODULE_ACCESS.ACCOUNT_LEADS.DENIED_ADD_ACCESS
+              );
             }
           }}
           className="bg-blue-600 hover:bg-blue-700 caption-custom white-text px-1 py-0.5 rounded-md flex items-center gap-1"
@@ -89,25 +91,28 @@ const CreateAccountLead = ({
         </Button>
       </div>
       {showLeadsData && (
-        <div className="fixed inset-0 z-50 mt-10 flex items-center justify-center bg-black bg-opacity-5 ">
-          <div className=" bg-white border rounded-2xl shadow-xl w-full max-w-6xl p-2 max-h-[85vh] overflow-y-auto animate-in fade-in-0 zoom-in-95 duration-300">
-            <FormHeader
-              icon={Handshake}
-              onClose={()=>{
-                setShowLeadsData(false)
-              }}
-              preText="Leads"
-              description="Choose the lead that is linked to this account."
-            />
-            {/* Lead Management Content */}
-            <LeadManagement
+        <FormLayout width={6} padding={2}>
+          <FormHeader
+            icon={Handshake}
+            onClose={() => {
+              setShowLeadsData(false);
+            }}
+            preText="Leads"
+            description="Choose the lead that is linked to this account."
+          />
+          {/* Lead Management Content */}
+          {/* <LeadManagement
               isUsedInLeadModule={false}
               handleRowSelectedForShowAccountLead={
                 handleRowSelectedForShowAccountLead
-              }
-            />
-          </div>
-        </div>
+                }
+                /> */}
+          <LookupLeadManagement
+            handleRowSelectedForShowAccountLead={
+              handleRowSelectedForShowAccountLead
+            }
+          />
+        </FormLayout>
       )}
     </div>
   );

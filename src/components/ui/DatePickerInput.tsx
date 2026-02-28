@@ -56,7 +56,7 @@
 
 // export default DatePickerInput;
 
-import { useRef } from "react";
+import  { useRef } from "react";
 import FormInputProps from "../../@types/ui/FormInputProps";
 
 function DatePickerInput(props: FormInputProps) {
@@ -68,7 +68,7 @@ function DatePickerInput(props: FormInputProps) {
   };
 
   return (
-    <div className="mt-1 cursor-pointer">
+    <div className=" cursor-pointer">
       <label
         htmlFor={props.name}
         className={
@@ -89,13 +89,19 @@ function DatePickerInput(props: FormInputProps) {
         )}
       </label>
 
-      <div className="mt-1 relative">
+      <div className=" relative">
         <input
-          ref={inputRef} // ✅ use local ref instead of props.ref
+          ref={inputRef} //  use local ref instead of props.ref
           readOnly={props.readonly}
           type="date"
+          value={props.value}
+          // onKeyDown={handleKeyDown}
+          // onKeyDown={props.onKeyDown}
+         
+
+  
           defaultValue={props.defaultValue}
-          onClick={openDatePicker} // ✅ click input also opens picker
+          onClick={openDatePicker} //  click input also opens picker
           name={props.name}
           id={props.name}
           required={props.required}
@@ -109,6 +115,7 @@ function DatePickerInput(props: FormInputProps) {
           }
           inputMode={props.inputMode}
           max={props.maxDate}
+          min={props.minDate}
         />
       </div>
 

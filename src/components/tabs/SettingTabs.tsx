@@ -1,21 +1,10 @@
-import { useState } from "react";
 import {
   Tabs,
   TabsHeader,
-  TabsBody,
   Tab,
-  TabPanel,
 } from "@material-tailwind/react";
-import LeadSetting from "../views/settings/lead-settings/LeadSetting";
-import EmailSetting from "../../components/views/settings/email-settings/EmailSetting";
-import MeetingSettings from "../views/settings/meeting-settings/MeetingSetting";
-import CompanyPreferenceSetting from "../views/settings/company-preferences/CompanyPreferenceSetting";
-import { useUserAccessModules } from "../../config/hooks/useAccessModules";
-import AccessDeniedMessagePage from "../views/not-found/AccessDeniedMessagePage";
-import UserPrerefenceManagement from "../user-profile/UserPreferenceManagement";
-import AccountTypeSetting from "../views/settings/account-type/AccountTypeSetting";
-import SupportTicketCategorySetting from "../views/settings/support-ticket-category/SupportTicketCategorySetting";
-import CompanyWarehouseSetting from "../views/settings/company-warehouse/CompanyWarehouseSetting";
+import { useLocation, useNavigate } from "react-router-dom";
+import ROUTES_URL from "../../constants/Routes";
 
 // function SettingsTabs() {
 //   const [activeTab, setActiveTab] = useState("onlineLead");
@@ -196,121 +185,65 @@ import CompanyWarehouseSetting from "../views/settings/company-warehouse/Company
 // }
 
 function SettingsTabs() {
-  const [activeTab, setActiveTab] = useState("onlineLead");
-
-  const {
-    userHasAccessToViewSettingLeady,
-    userHasAccessToViewCompanyPreferences,
-    userHasAccessToViewMeetingSetting,
-    userHasAccessToViewSettingGeneral,
-    userHasAccessToViewCompanyAccountType,
-  } = useUserAccessModules();
-
-  const data = [
-    {
-      label: "Lead",
-      value: "onlineLead",
-      render: () =>
-        userHasAccessToViewSettingLeady ? (
-          <LeadSetting />
-        ) : (
-          <AccessDeniedMessagePage />
-        ),
-    },
-    {
-      label: "Email",
-      value: "emailSettings",
-      render: () => <EmailSetting />,
-    },
-    {
-      label: "Meetings",
-      value: "meeting",
-      render: () =>
-        userHasAccessToViewMeetingSetting ? (
-          <MeetingSettings />
-        ) : (
-          <AccessDeniedMessagePage />
-        ),
-    },
-    {
-      label: "Account Type",
-      value: "accounttype",
-      render: () =>
-        userHasAccessToViewCompanyAccountType ? (
-          <AccountTypeSetting />
-        ) : (
-          <AccessDeniedMessagePage />
-        ),
-    },
+  const TABS = [
+    { label: "Lead", value: "lead", path: "" }, // index route
+    { label: "Email", value: "email-setting", path: ROUTES_URL.SETTING_EMAIL },
+    { label: "Meetings", value: "meeting", path: ROUTES_URL.SETTING_MEETINGS },
+    { label: "Account Type", value: "accounttype", path: ROUTES_URL.SETTING_ACCOUNT_TYPE },
     {
       label: "Notifications",
       value: "companyPreference",
-      render: () =>
-        userHasAccessToViewCompanyPreferences ? (
-          <CompanyPreferenceSetting />
-        ) : (
-          <AccessDeniedMessagePage />
-        ),
+      path: ROUTES_URL.SETTING_NOTIFICATIONS,
     },
-    {
-      label: "General",
-      value: "general",
-      render: () =>
-        userHasAccessToViewSettingGeneral ? (
-          <UserPrerefenceManagement />
-        ) : (
-          <AccessDeniedMessagePage />
-        ),
-    },
+    { label: "General", value: "general", path: ROUTES_URL.SETTING_GENERAL },
     {
       label: "Support Ticket Category",
-      value: "setting",
-      render: () =>
-        userHasAccessToViewSettingGeneral ? (
-          <SupportTicketCategorySetting />
-        ) : (
-          <AccessDeniedMessagePage />
-        ),
+      value: "support-ticket-category",
+      path: ROUTES_URL.SETTING_SUPPORT_TICKET_CATEGORY,
     },
-    {
-      label: "Company Warehouse",
-      value: "warehouse",
-      render: () =>
-        userHasAccessToViewSettingGeneral ? (
-          <CompanyWarehouseSetting />
-        ) : (
-          <AccessDeniedMessagePage />
-        ),
-    },
+    { label: "Company Warehouse", value: "warehouse", path: ROUTES_URL.SETTING_COMPANY_WAREHOUSE },
   ];
+
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const basePath = ROUTES_URL.COMPANY_SETTING;
+
+  const activeTab =
+    TABS.find((tab) =>
+      tab.path
+        ? location.pathname.includes(tab.path)
+        : location.pathname === basePath
+    )?.value || "lead";
 
   return (
     <div className="relative">
       <Tabs value={activeTab}>
-        <div className="sticky top-0 bg-white ">
+        <div className="sticky top-0 left-0 bg-white">
           <TabsHeader
-            placeholder="Online Lead"
+            placeholder=""
             onResize={undefined}
             onResizeCapture={undefined}
             onPointerEnterCapture={undefined}
             onPointerLeaveCapture={undefined}
             indicatorProps={{
-              className:
-                "main-nav-custom active-header shadow-none focus:outline-none",
+              className: "main-nav-custom-setting active-header-setting shadow-none",
             }}
-            className="shadow-none focus:outline-none"
+            className="shadow-none"
           >
-            {data.map(({ label, value }) => (
+            {TABS.map(({ label, value, path }) => (
               <Tab
                 key={value}
                 value={value}
-                onClick={() => setActiveTab(value)}
+                onClick={() =>
+                  navigate(path ? `${basePath}/${path}` : basePath)
+                }
                 className={
                   activeTab === value
-                    ? "main-nav-custom active-tab mt-0.5"
-                    : "main-nav-custom"
+                    ? "main-nav-custom-setting active-tab-setting "
+                    : "main-nav-custom-setting"
                 }
-                placeholder="tab"
+                placeholder=""
                 onResize={undefined}
                 onResizeCapture={undefined}
                 onPointerEnterCapture={undefined}
@@ -320,22 +253,6 @@ function SettingsTabs() {
               </Tab>
             ))}
           </TabsHeader>
-        </div>
-
-        <div className="overflow-y-auto max-h-[calc(100vh-150px)] ">
-          <TabsBody
-            placeholder="body"
-            onResize={undefined}
-            onResizeCapture={undefined}
-            onPointerEnterCapture={undefined}
-            onPointerLeaveCapture={undefined}
-          >
-            {data.map(({ value, render }) => (
-              <TabPanel key={value} value={value}>
-                {activeTab === value && render()}
-              </TabPanel>
-            ))}
-          </TabsBody>
         </div>
       </Tabs>
     </div>

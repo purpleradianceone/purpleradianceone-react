@@ -5,8 +5,8 @@ import ApiError from "../../@types/error/ApiError";
 import { STATUS_CODE } from "../../constants/AppConstants";
 import RefreshToken from "../validations/RefreshToken";
 import POST_API from "../../constants/PostApi";
-import axios from "axios";
 import { AdjustmentReason } from "../../@types/adjustment-reason/AdjustmentReason";
+import axiosClient from "../../axios-client/AxiosClient";
 
 const useAdjustmentReason = () =>{
     const [loading, setIsLoading] = useState<boolean>(true)
@@ -21,7 +21,7 @@ const useAdjustmentReason = () =>{
         };
 
         try {
-            const response = await axios.post(
+            const response = await axiosClient.post(
                 POST_API.GET_ADJUSTMENT_REASON
                 , PostData, {
                 withCredentials: true,

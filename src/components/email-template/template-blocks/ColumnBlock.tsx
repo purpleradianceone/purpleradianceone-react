@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useEffect } from "react";
 import { Element, useEditor, useNode } from "@craftjs/core";
@@ -8,6 +7,8 @@ import "react-resizable/css/styles.css";
 import Button from "../../ui/Button";
 import { Plus, Trash2 } from "lucide-react";
 import { SIZE } from "../../../constants/AppConstants";
+
+const buttonTextStyle = "input-label-custom-white";
 
 interface ColumnBlockProps {
   columnIds?: string[];
@@ -36,6 +37,7 @@ export const ColumnBlock: React.FC<ColumnBlockProps> = ({ columnIds = [] }) => {
     if (JSON.stringify(currentLinkedNodes) !== JSON.stringify(columns)) {
       setColumns(currentLinkedNodes);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [linkedNodes]);
 
   // Update internal state if props change
@@ -81,21 +83,17 @@ export const ColumnBlock: React.FC<ColumnBlockProps> = ({ columnIds = [] }) => {
       // First check if the node exists in the linkedNodes
       const nodeExists = linkedNodes[columnId] !== undefined;
 
-
-
-
       // Also check if it exists in the editor state
       const editorNodeExists = query.node(columnId).get();
 
       if (nodeExists || editorNodeExists) {
-        try {try{
-
-          const nodeToDeleteId = linkedNodes[columnId];
-          actions.delete(nodeToDeleteId);
-
-        }catch(e){
-          console.log("error in deleting nodeToDeleteId"+e);
-        }
+        try {
+          try {
+            const nodeToDeleteId = linkedNodes[columnId];
+            actions.delete(nodeToDeleteId);
+          } catch (e) {
+            console.log("error in deleting nodeToDeleteId" + e);
+          }
 
           actions.delete(columnId);
           actions.delete(linkedNodes[columnId][0]);
@@ -117,6 +115,7 @@ export const ColumnBlock: React.FC<ColumnBlockProps> = ({ columnIds = [] }) => {
       // Also clean up the linkedNodes reference
       nodeActions.setProp((props: any) => {
         if (props.linkedNodes && props.linkedNodes[columnId]) {
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
           const { [columnId]: _, ...rest } = props.linkedNodes;
           props.linkedNodes = rest;
         }
@@ -189,7 +188,7 @@ export const ColumnBlock: React.FC<ColumnBlockProps> = ({ columnIds = [] }) => {
             <Button type="button" onClick={deleteEntireBlock}>
               <div className="flex items-center justify-center gap-1">
                 <Trash2 size={SIZE.SIXTEEN} />
-                Delete Column Block
+                <span className={buttonTextStyle}>Column Block</span>
               </div>
             </Button>
           </div>
@@ -245,7 +244,7 @@ export const ColumnBlock: React.FC<ColumnBlockProps> = ({ columnIds = [] }) => {
             >
               <div className="flex items-center justify-center gap-1">
                 <Plus size={SIZE.SIXTEEN} />
-                Add Column
+                <span className={buttonTextStyle}>Add Column</span>
               </div>
             </Button>
           </div>

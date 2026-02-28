@@ -5,7 +5,6 @@ import { useEffect, useRef, useState } from "react";
 import CompanyUsersSearchProps from "../../../../@types/company-users/CompanyUserProps";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
 import { GridApi, ViewportChangedEvent } from "ag-grid-community";
-import axios from "axios";
 import POST_API from "../../../../constants/PostApi";
 import ApiError from "../../../../@types/error/ApiError";
 import { createPortal } from "react-dom";
@@ -15,6 +14,7 @@ import SearchInput from "../../../ui/SearchInput";
 import AddCompanyTeamUsersAgGrid from "../../../ag-grid/AddCompanyTeamUsersAgGrid";
 import RefreshToken from "../../../../config/validations/RefreshToken";
 import FormHeader from "../../../ui/FormHeader";
+import axiosClient from "../../../../axios-client/AxiosClient";
 
 function LeadAssociatedUsersModal({
   isOpen,
@@ -84,7 +84,7 @@ function LeadAssociatedUsersModal({
       };
 
       // alert("called from here ");
-      const response = await axios.post(
+      const response = await axiosClient.post(
         POST_API.GET_LEAD_ASSOCIATED_USERS,
         getCompanyUserPostData,
         {

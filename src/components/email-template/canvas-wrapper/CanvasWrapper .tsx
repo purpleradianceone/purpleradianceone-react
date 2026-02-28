@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Frame, Element, useEditor } from "@craftjs/core";
+import { LucidePackage } from "lucide-react";
 import { useEffect, useState } from "react";
 
 export const CanvasWrapper = () => {
@@ -52,7 +53,10 @@ export const CanvasWrapper = () => {
           zIndex: isEmpty ? 1 : -1, // hide from interaction when invisible
         }}
       >
-        📦 Drag the blocks here 👉
+        <div className="flex gap-1">
+          <LucidePackage size={19}/>
+          Drag the blocks here 👉
+          </div> 
       </div>
     </div>
   );

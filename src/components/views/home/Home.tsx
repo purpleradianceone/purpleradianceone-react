@@ -5,26 +5,31 @@ import POST_API from "../../../constants/PostApi";
 import ApiError from "../../../@types/error/ApiError";
 import { STATUS_CODE } from "../../../constants/AppConstants";
 import RefreshToken from "../../../config/validations/RefreshToken";
-import SupportDashboard from "./dashboards/SupportDashboard";
-import InventoryDashboard from "./dashboards/InventoryDashboard";
-import FinanceDashboard from "./dashboards/FinanceDashboard";
-import HRMSDashboard from "./dashboards/HRMSDashboard";
-import CompanyUserDropdown, {
-  UserResponse,
-} from "./custom_company_user_dropdown/CustomCompanyUserDropdown";
+import InventoryDashboard from "./dashboards/dashboard-inventory/InventoryDashboard";
+import FinanceDashboard from "./dashboards/dashboard-finance/FinanceDashboard";
+import HRMSDashboard from "./dashboards/dashboard-hrms/HRMSDashboard";
 import { useUserPreference } from "../../../context/user/UserPreference";
-import DashboardCRM from "./dashboard-crm/DashboardCRM";
+import DashboardCRM from "./dashboards/dashboard-crm/DashboardCRM";
 import AppTutorailManager from "../tutorails/AppTutorailManager";
 import { DashboardTabsSteps } from "../../../constants/AppTutorailsSteps";
 import { useTutorailDataContext } from "../../../context/tutorail/useTutorailDataContext";
 import { TutorailColumnName } from "../../../constants/Tutorail";
+import DashboardSupport from "./dashboards/dashboard-support/DashboardSupport";
+import CustomCompanyUserDropdownForDashboard, {
+  UserResponse,
+} from "./dashboards/dashboards_components/CustomCompanyUserDropdownForDashboard";
+import { DashboardLoadingSpinner } from "./dashboards/dashboards_components/DashboardLoadingSpinner";
 
 // ======= Dashboard Components =======
 const CRM: React.FC<{ companyUserId: number | null }> = ({ companyUserId }) => (
   <DashboardCRM companyUserId={companyUserId} />
 );
-const Support: React.FC = () => <SupportDashboard />;
-const Inventory: React.FC = () => <InventoryDashboard />;
+const Support: React.FC<{ companyUserId: number | null }> = ({
+  companyUserId,
+}) => <DashboardSupport companyUserId={companyUserId} />;
+const Inventory: React.FC<{ companyUserId: number | null }> = ({
+  companyUserId,
+}) => <InventoryDashboard companyUserId={companyUserId} />;
 const Finance: React.FC = () => <FinanceDashboard />;
 const HRMS: React.FC = () => <HRMSDashboard />;
 
@@ -51,11 +56,32 @@ const Home: React.FC = () => {
     if (tourFinished) {
       switch (activeTab) {
         case 1:
-          return <CRM companyUserId={selectedUser?.id ?? (loginStatus.isSuperUser ? null : loginStatus.id) } />;
+          return (
+            <CRM
+              companyUserId={
+                selectedUser?.id ??
+                (loginStatus.isSuperUser ? null : loginStatus.id)
+              }
+            />
+          );
         case 2:
-          return <Support />;
+          return (
+            <Support
+              companyUserId={
+                selectedUser?.id ??
+                (loginStatus.isSuperUser ? null : loginStatus.id)
+              }
+            />
+          );
         case 3:
-          return <Inventory />;
+          return (
+            <Inventory
+              companyUserId={
+                selectedUser?.id ??
+                (loginStatus.isSuperUser ? null : loginStatus.id)
+              }
+            />
+          );
         case 4:
           return <Finance />;
         case 5:
@@ -67,7 +93,7 @@ const Home: React.FC = () => {
   };
 
   const fetchCompanyUserDashboardAssigned = async () => {
-    // setLoading(true);
+    setLoading(true);
     if ((selectedUser ?? loginStatus).id === 0 || loginStatus.companyId === 0) {
       return;
     }
@@ -83,7 +109,7 @@ const Home: React.FC = () => {
         .post(
           POST_API.GET_COMPANY_USER_DASHBOARD_ASSIGNED,
           getCompanyUserDashboardPostData,
-          { withCredentials: true }
+          { withCredentials: true },
         )
         .then((response) => {
           if (response.data != null) {
@@ -94,7 +120,7 @@ const Home: React.FC = () => {
             setModules(
               fetchedModules
                 .filter((m) => m.isactive)
-                .sort((a, b) => a.dashboard_id - b.dashboard_id)
+                .sort((a, b) => a.dashboard_id - b.dashboard_id),
             );
 
             if (fetchedModules.length > 0) {
@@ -172,34 +198,8 @@ const Home: React.FC = () => {
   useEffect(() => {
     setTourFinished(tutorailData.isDashboardSeen);
     fetchCompanyUserDashboardAssigned();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedUser]);
-
-  if (loading) {
-    return (
-      <div className="h-screen w-screen flex items-center justify-center bg-gray-100 text-gray-500">
-        <svg
-          className="animate-spin h-8 w-8 text-blue-500"
-          fill="none"
-          viewBox="0 0 24 24"
-        >
-          <circle
-            className="opacity-25"
-            cx="12"
-            cy="12"
-            r="10"
-            stroke="currentColor"
-            strokeWidth="4"
-          />
-          <path
-            className="opacity-75"
-            fill="currentColor"
-            d="M4 12a8 8 0 018-8v4l3.5-3.5L12 0v4a8 8 0 00-8 8h4z"
-          />
-        </svg>
-        <span className="ml-3">Loading dashboards...</span>
-      </div>
-    );
-  }
 
   return (
     <div className="flex flex-col h-screen w-screen bg-gray-100">
@@ -209,9 +209,18 @@ const Home: React.FC = () => {
           handleTourEnd={handleTourEnd}
         />
       )}
+      {loading && (
+        <div
+          className={`grid justify-center items-center min-h-[100vh] ${
+            loading ? "cursor-wait" : "cursor-default"
+          }`}
+        >
+          <DashboardLoadingSpinner />
+        </div>
+      )}
       {loginStatus.isSuperUser && (
         <div className="">
-          <CompanyUserDropdown
+          <CustomCompanyUserDropdownForDashboard
             limit={userPreference.rowsInGrid}
             companyId={loginStatus.companyId}
             requestedBy={loginStatus.id}

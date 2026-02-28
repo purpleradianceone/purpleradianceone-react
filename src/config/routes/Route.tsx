@@ -59,7 +59,36 @@ import GetAccounts from "../../components/views/account/AccountManagement";
 import FacebookOAuthConsent from "../../components/dialogue-box/FacebookOAuthConsent";
 import IntegrationsPage from "../../components/views/integrations/IntegrationsPage";
 import AccountImportCsvManagement from "../../components/modals/Account/import-account/AccountImportCsvManagement";
+// import StockManagement from "../../components/views/stock-management/StockManagement";
+import SupportTicketManagement from "../../components/views/support-ticket-management/SupportTicketManagement";
+import ViewSupportTicketManagement from "../../components/modals/support-ticket/ViewSupportTicketManagement";
+import { CreateMultipleAccountCompanyProduct } from "../../components/modals/Account/account-company-product/multiple-product-mapping/CreateMultipleAccountCompanyProduct";
+import { AccountCompanyProductDetails } from "../../components/modals/Account/account-company-product/account-company-product-details/AccountCompanyProductDetails";
+import AccountNavbarBreadcrumb from "../../components/modals/Account/nav-wrapper/AccountNavbarBreadcrumb";
+import { EditorCanvasForQuotation } from "../../components/quotation-builder/builder/editor-canvas/EditorCanvasForQuotation";
+import LeadSetting from "../../components/views/settings/lead-settings/LeadSetting";
+import MeetingSettings from "../../components/views/settings/meeting-settings/MeetingSetting";
+import AccountTypeSetting from "../../components/views/settings/account-type/AccountTypeSetting";
+import CompanyPreferenceSetting from "../../components/views/settings/company-preferences/CompanyPreferenceSetting";
+import SupportTicketCategorySetting from "../../components/views/settings/support-ticket-category/SupportTicketCategorySetting";
+import CompanyWarehouseSetting from "../../components/views/settings/company-warehouse/CompanyWarehouseSetting";
+import { ModuleGuard } from "../guard/ModuleGuard";
+import MESSAGE from "../../constants/Messages";
+import MetaAppsIntegration from "../../components/views/settings/social-media-integration/MetaAppsIntegration";
+import WebFormIntegration from "../../components/views/settings/web-form-integration/WebFormIntegration";
+import MyTaskManagement from "../../components/views/my-task-management/MyTaskManegement";
+import TaskPage from "../../components/views/my-task-management/TaskPage";
+import MasterTaskManagement from "../../components/views/my-task-management/MasterTaskManagement";
+import GeneralTask from "../../components/views/my-task-management/GeneralTask";
+import MasterTaskUpdate from "../../components/modals/general-task-master/MasterTaskUpdate";
+import { QuotationPage } from "../../components/quotation-builder/QuotationPage";
+import AccountManagement from "../../components/modals/Account/AccountManagement";
+import StockPage from "../../components/views/stock-management/StockPage";
 import StockManagement from "../../components/views/stock-management/StockManagement";
+import WareHouseWiseStock from "../../components/views/stock-management/WareHouseWiseStock";
+import StockLedgerManagement from "../../components/views/stock-management/StockLedgerManagement";
+import StockAgeingManagement from "../../components/views/stock-management/StockAgeingManagement";
+
 
 export const router = createBrowserRouter([
   {
@@ -215,7 +244,6 @@ export const router = createBrowserRouter([
       </MobileRedirectWrapper>
     ),
   },
-
   {
     path: ROUTES_URL.GET_COMPANY_USERS,
     element: (
@@ -263,6 +291,92 @@ export const router = createBrowserRouter([
     ),
   },
   {
+    path: ROUTES_URL.GENERAL_TASK,
+    element: (
+      <MobileRedirectWrapper>
+        <PrivateRoute>
+          <div>
+            <Navbar>
+              <GeneralTask />
+            </Navbar>
+          </div>
+        </PrivateRoute>
+      </MobileRedirectWrapper>
+    ),
+  },
+  {
+    path: ROUTES_URL.MASTER_TASK_DETAILS,
+    element: (
+      <MobileRedirectWrapper>
+        <PrivateRoute>
+          <div>
+            <Navbar>
+              <MasterTaskUpdate />
+            </Navbar>
+          </div>
+        </PrivateRoute>
+      </MobileRedirectWrapper>
+    ),
+  },
+
+  {
+    path: ROUTES_URL.TASKS_MANAGEMENT,
+    element: (
+      <MobileRedirectWrapper>
+        <PrivateRoute>
+          <div>
+            <Navbar>
+              <TaskPage />
+            </Navbar>
+          </div>
+        </PrivateRoute>
+      </MobileRedirectWrapper>
+    ),
+    children: [
+      {
+        index: true,
+        element: (
+          <ModuleGuard
+            permissionKey="userHasAccessToViewAllTasks"
+            deniedMessage={
+              MESSAGE.MODULE_ACCESS.MY_TASK.MY_TASK.DENIED_VIEW_ACCESS
+            }
+          >
+            <MyTaskManagement isUsedInAllTasksModule={true} />
+          </ModuleGuard>
+        ),
+      },
+      {
+        path: ROUTES_URL.MY_TASKS, // ✅ relative path
+        element: (
+          <ModuleGuard
+            permissionKey="userHasAccessToViewMasterTasks"
+            deniedMessage={
+              MESSAGE.MODULE_ACCESS.MY_TASK.MASTER_TASK.DENIED_VIEW_ACCESS
+            }
+          >
+            <MasterTaskManagement isUsedInAllTasksModule={true} />
+          </ModuleGuard>
+        ),
+      },
+    ],
+  },
+  // {
+  //   path: ROUTES_URL.COMPANY_SETTING,
+  //   element: (
+  //     <MobileRedirectWrapper>
+  //       <PrivateRoute>
+  //         <div>
+  //           <Navbar>
+  //             <SettingsPage />
+  //           </Navbar>
+  //         </div>
+  //       </PrivateRoute>
+  //     </MobileRedirectWrapper>
+  //   ),
+  // },
+
+  {
     path: ROUTES_URL.COMPANY_SETTING,
     element: (
       <MobileRedirectWrapper>
@@ -275,7 +389,106 @@ export const router = createBrowserRouter([
         </PrivateRoute>
       </MobileRedirectWrapper>
     ),
+    children: [
+      {
+        index: true,
+        element: (
+          <ModuleGuard
+            permissionKey="userHasAccessToViewSettingLead"
+            deniedMessage={
+              MESSAGE.MODULE_ACCESS.SETTING.LEAD_SETTING.DENIED_VIEW_ACCESS
+            }
+          >
+            <LeadSetting />
+          </ModuleGuard>
+        ),
+      },
+      { path: ROUTES_URL.SETTING_EMAIL, element: <EmailSetting /> },
+      {
+        path: ROUTES_URL.SETTING_MEETINGS,
+        element: (
+          <ModuleGuard
+            permissionKey="userHasAccessToViewMeetingSetting"
+            deniedMessage={
+              MESSAGE.MODULE_ACCESS.SETTING.MEETING_SETTING.DENIED_VIEW_ACCESS
+            }
+          >
+            <MeetingSettings />
+          </ModuleGuard>
+        ),
+      },
+      {
+        path: ROUTES_URL.SETTING_ACCOUNT_TYPE,
+        element: (
+          <ModuleGuard
+            permissionKey="userHasAccessToViewCompanyAccountType"
+            deniedMessage={
+              MESSAGE.MODULE_ACCESS.SETTING.ACCOUNT_SETTING.DENIED_VIEW_ACCESS
+            }
+          >
+            <AccountTypeSetting />
+          </ModuleGuard>
+        ),
+      },
+      {
+        path: ROUTES_URL.SETTING_NOTIFICATIONS,
+        element: (
+          <ModuleGuard
+            permissionKey="userHasAccessToViewCompanyPreferences"
+            deniedMessage={
+              MESSAGE.MODULE_ACCESS.SETTING.COMPANY_PREFERENCE_SETTING
+                .DENIED_VIEW_ACCESS
+            }
+          >
+            <CompanyPreferenceSetting />,
+          </ModuleGuard>
+        ),
+      },
+      {
+        path: ROUTES_URL.SETTING_GENERAL,
+        element: (
+          <ModuleGuard
+            permissionKey="userHasAccessToViewSettingGeneral"
+            deniedMessage={
+              MESSAGE.MODULE_ACCESS.SETTING.GENERAL_USER_SETTING
+                .DENIED_VIEW_ACCESS
+            }
+          >
+            <UserPrerefenceManagement />,
+          </ModuleGuard>
+        ),
+      },
+      {
+        path: ROUTES_URL.SETTING_SUPPORT_TICKET_CATEGORY,
+        element: (
+          <ModuleGuard
+            permissionKey="userHasAccessToViewSettingSupposeTicketCategory"
+            deniedMessage={
+              MESSAGE.MODULE_ACCESS.SETTING.SUPPORT_TICKET_CATEGORY_SETTING
+                .DENIED_VIEW_ACCESS
+            }
+          >
+            <SupportTicketCategorySetting />,
+          </ModuleGuard>
+        ),
+      },
+      {
+        path: ROUTES_URL.SETTING_COMPANY_WAREHOUSE,
+        element: (
+          <ModuleGuard
+            permissionKey="userHasAccessToViewSettingCompanyWarehouse"
+            deniedMessage={
+              MESSAGE.MODULE_ACCESS.SETTING.COMPANY_WAREHOUSE_SETTING
+                .DENIED_VIEW_ACCESS
+            }
+          >
+            <CompanyWarehouseSetting />,
+          </ModuleGuard>
+        ),
+      },
+    ],
   },
+
   {
     path: ROUTES_URL.TEAM_MANAGEMENT,
     element: (
@@ -312,7 +525,7 @@ export const router = createBrowserRouter([
           <div>
             <AuthLayout
               title="Activate Subscription!"
-              subtitle="Enter the number of users and subscription duration to proceed"
+              // subtitle="Enter the number of users and subscription duration to proceed"
             >
               <CreateSubscription
                 isOpen={true}
@@ -416,6 +629,34 @@ export const router = createBrowserRouter([
           <div>
             <Navbar>
               <EditorCanvasWithJson />
+            </Navbar>
+          </div>
+        </PrivateRoute>
+      </MobileRedirectWrapper>
+    ),
+  },
+  {
+    path: ROUTES_URL.QUOTATION_SETTINGS,
+    element: (
+      <MobileRedirectWrapper>
+        <PrivateRoute>
+          <div>
+            <Navbar>
+              <QuotationPage />
+            </Navbar>
+          </div>
+        </PrivateRoute>
+      </MobileRedirectWrapper>
+    ),
+  },
+  {
+    path: ROUTES_URL.QUOTATION_SETTINGS_CREATE_Template,
+    element: (
+      <MobileRedirectWrapper>
+        <PrivateRoute>
+          <div>
+            <Navbar>
+              <EditorCanvasForQuotation />
             </Navbar>
           </div>
         </PrivateRoute>
@@ -612,11 +853,40 @@ export const router = createBrowserRouter([
     ),
   },
   {
+    path: `${ROUTES_URL.ACCOUNT_DETAILS}/:accountId`,
+    element: (
+      <MobileRedirectWrapper>
+        <PrivateRoute>
+          <Navbar>
+            <AccountNavbarBreadcrumb />
+          </Navbar>
+        </PrivateRoute>
+      </MobileRedirectWrapper>
+    ),
+    children: [
+      {
+        index: true,
+        element: 
+        // <AccountDetailsUpdated />
+        <AccountManagement/>
+        ,
+      },
+      {
+        path: "products/:productId",
+        element: <AccountCompanyProductDetails />,
+      },
+      {
+        path: ROUTES_URL.ACCOUNT_MULTIPLE_COMPANY_PRODUCT,
+        element: <CreateMultipleAccountCompanyProduct />,
+      },
+    ],
+  },
+  {
     path: ROUTES_URL.FACEBOOK_OAUTH,
     element: (
       <MobileRedirectWrapper>
         <PrivateRoute>
-          <FacebookOAuthConsent></FacebookOAuthConsent>
+          <FacebookOAuthConsent />
         </PrivateRoute>
       </MobileRedirectWrapper>
     ),
@@ -634,15 +904,197 @@ export const router = createBrowserRouter([
         </PrivateRoute>
       </MobileRedirectWrapper>
     ),
+    children: [
+      {
+        index: true,
+        element: (
+          <ModuleGuard
+            permissionKey="userHasAccessToViewIntegrationSetting"
+            deniedMessage={
+              MESSAGE.MODULE_ACCESS.SETTING.INTEGRATION.DENIED_VIEW_ACCESS
+            }
+          >
+            <WebFormIntegration />
+          </ModuleGuard>
+        ),
+      },
+      {
+        path: ROUTES_URL.SETTING_META_APP,
+        element: (
+          <ModuleGuard
+            permissionKey="userHasAccessToViewIntegrationSetting"
+            deniedMessage={
+              MESSAGE.MODULE_ACCESS.SETTING.INTEGRATION.DENIED_VIEW_ACCESS
+            }
+          >
+            <MetaAppsIntegration />
+          </ModuleGuard>
+        ),
+      },
+      {
+        path: ROUTES_URL.SETTING_INDIAMART,
+        element: (
+          <ModuleGuard
+            permissionKey="userHasAccessToViewIntegrationSetting"
+            deniedMessage={
+              MESSAGE.MODULE_ACCESS.SETTING.INTEGRATION.DENIED_VIEW_ACCESS
+            }
+          >
+            <>INDIA MART</>
+          </ModuleGuard>
+        ),
+      },
+      {
+        path: ROUTES_URL.SETTING_LINKEDIN,
+        element: (
+          <ModuleGuard
+            permissionKey="userHasAccessToViewIntegrationSetting"
+            deniedMessage={
+              MESSAGE.MODULE_ACCESS.SETTING.INTEGRATION.DENIED_VIEW_ACCESS
+            }
+          >
+            <>LINKEDIN</>
+          </ModuleGuard>
+        ),
+      },
+      {
+        path: ROUTES_URL.SETTING_GOOGLE_ADS,
+        element: (
+          <ModuleGuard
+            permissionKey="userHasAccessToViewIntegrationSetting"
+            deniedMessage={
+              MESSAGE.MODULE_ACCESS.SETTING.INTEGRATION.DENIED_VIEW_ACCESS
+            }
+          >
+            <>GOOGLE ADS</>
+          </ModuleGuard>
+        ),
+      },
+    ],
   },
+  // {
+  //   path: ROUTES_URL.STOCK_MANAGEMENT,
+  //   element: (
+  //     <MobileRedirectWrapper>
+  //       <PrivateRoute>
+  //         <div>
+  //           <Navbar>
+  //             <StockManagement />
+  //           </Navbar>
+  //         </div>
+  //       </PrivateRoute>
+  //     </MobileRedirectWrapper>
+  //   ),
+  // },
+
+  // stock management routes
   {
     path: ROUTES_URL.STOCK_MANAGEMENT,
     element: (
       <MobileRedirectWrapper>
         <PrivateRoute>
-          <Navbar>
+          <div>
+            <Navbar>
+              <StockPage />
+            </Navbar>
+          </div>
+        </PrivateRoute>
+      </MobileRedirectWrapper>
+    ),
+    children: [
+      {
+        index: true,
+        element: (
+          <ModuleGuard
+            permissionKey="userHasAccessToViewProductWiseStock"
+            deniedMessage={
+              MESSAGE.MODULE_ACCESS.STOCK.PRODUCT_WISE_STOCK.DENIED_VIEW_ACCESS
+            }
+          >
             <StockManagement />
-          </Navbar>
+          </ModuleGuard>
+        ),
+      },
+      {
+        path: ROUTES_URL.WAREHOUSE_WISE_STOCK, // ✅ relative path
+        element: (
+          <ModuleGuard
+            permissionKey="userHasAccessToViewWarehouseWiseStock"
+            deniedMessage={
+              MESSAGE.MODULE_ACCESS.STOCK.WAREHOUSE_WISE_STOCK
+                .DENIED_VIEW_ACCESS
+            }
+          >
+            <WareHouseWiseStock />
+          </ModuleGuard>
+        ),
+      },
+      {
+        path: ROUTES_URL.STOCK_LEDGER, // ✅ relative path
+        element: (
+          <ModuleGuard
+            permissionKey="userHasAccessToViewMasterTasks"
+            deniedMessage={
+              MESSAGE.MODULE_ACCESS.STOCK.STOCK_LEDGER.DENIED_VIEW_ACCESS
+            }
+          >
+            <StockLedgerManagement />
+          </ModuleGuard>
+        ),
+      },
+      {
+        path: ROUTES_URL.STOCK_AGEING, // ✅ relative path
+        element: (
+          <ModuleGuard
+            permissionKey="userHasAccessToViewMasterTasks"
+            deniedMessage={
+              MESSAGE.MODULE_ACCESS.STOCK.STOCK_AGEING.DENIED_VIEW_ACCESS
+            }
+          >
+            <StockAgeingManagement />
+          </ModuleGuard>
+        ),
+      },
+    ],
+  },
+  {
+    path: ROUTES_URL.SUPPORT_TICKET_MANAGEMENT,
+    element: (
+      <MobileRedirectWrapper>
+        <PrivateRoute>
+          <div>
+            <Navbar>
+              <SupportTicketManagement isUsedInSupportTicketModule={true} />
+            </Navbar>
+          </div>
+        </PrivateRoute>
+      </MobileRedirectWrapper>
+    ),
+  },
+  // {
+  //   path: ROUTES_URL.MY_TASKS,
+  //   element: (
+  //     <MobileRedirectWrapper>
+  //       <PrivateRoute>
+  //         <div>
+  //           <Navbar>
+  //             <MyTaskManagement isUsedInAllTasksModule={true} />
+  //           </Navbar>
+  //         </div>
+  //       </PrivateRoute>
+  //     </MobileRedirectWrapper>
+  //   ),
+  // },
+  {
+    path: ROUTES_URL.SUPPORT_TICKET_DETAILS,
+    element: (
+      <MobileRedirectWrapper>
+        <PrivateRoute>
+          <div>
+            <Navbar>
+              <ViewSupportTicketManagement />
+            </Navbar>
+          </div>
         </PrivateRoute>
       </MobileRedirectWrapper>
     ),

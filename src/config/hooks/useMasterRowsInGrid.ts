@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react"
 import RowsInGridDropdownOptions from "../../@types/ag-grid/RowsInGridDropdownOptions"
 import POST_API from "../../constants/PostApi"
-import axios from "axios"
 import ApiError from "../../@types/error/ApiError"
 import { STATUS_CODE } from "../../constants/AppConstants"
 import RefreshToken from "../validations/RefreshToken"
 import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext"
+import axios from "axios"
 
 interface rowsInGridDropdownOptionsResponse {
     id: number,
@@ -16,6 +16,7 @@ export const useMasterRowsInGrid = () => {
     const {loginStatus} = useLoggedInUserContext();
 
     const fetchMasterRowsInGridDropdownOptions = async () => {
+        if(loginStatus.companyId===0)return;
         if(loginStatus.status){
                 const postData = {
             id: null,

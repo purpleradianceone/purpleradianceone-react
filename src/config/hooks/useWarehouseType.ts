@@ -1,6 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-
-import axios from "axios";
 import POST_API from "../../constants/PostApi";
 import { STATUS_CODE } from "../../constants/AppConstants";
 import { useEffect, useState } from "react";
@@ -10,6 +8,7 @@ import ApiError from "../../@types/error/ApiError";
 
 import WarehouseType from "../../@types/warehouse/WarehouseType";
 import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
+import axiosClient from "../../axios-client/AxiosClient";
 
 export const useWarehouseType = () => {
 
@@ -30,7 +29,7 @@ export const useWarehouseType = () => {
     };
 
     try {
-      const response = await axios.post(
+      const response = await axiosClient.post(
         POST_API.GET_WAREHOUSE_TYPE, PostData, {
         withCredentials: true,
       });

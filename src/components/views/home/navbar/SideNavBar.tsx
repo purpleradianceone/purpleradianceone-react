@@ -2,8 +2,10 @@ import {
   Building2,
   Calendar,
   Handshake,
+  Headset,
   Home,
   Layers,
+  ListChecks,
   Menu,
   Network,
   Settings,
@@ -16,6 +18,7 @@ import SideNavBarItem from "./SideNavBarItem";
 import { NavLink } from "react-router-dom";
 import ROUTES_URL from "../../../../constants/Routes";
 import { useUserAccessModules } from "../../../../config/hooks/useAccessModules";
+import { SIZE } from "../../../../constants/AppConstants";
 
 function SideNavBar({ isOpen, onToggle }: SideBarProps) {
   const {
@@ -25,16 +28,20 @@ function SideNavBar({ isOpen, onToggle }: SideBarProps) {
     userHasAccessToViewProduct,
     userHasAccessToViewTeamManagement,
     userHasAccessToViewMeeting,
-    userHasAccessToViewStock
+    userHasAccessToViewStock,
+    userHasAccessToViewSupportTicket,
+    userHasAccessToViewTasks,
   } = useUserAccessModules();
 
   return (
     <aside
       id="left-side-navbar"
-      className={`fixed top-0 left-0 h-full bg-white border-r transition-all duration-300 z-30
-          ${isOpen ? "w-64" : "w-14"}`}
+      className={`fixed  top-0 left-0 h-full bg-white border-r transition-all duration-300 z-30
+          ${isOpen ? "w-64" : "w-12"}`}
     >
-      <div className="flex items-center border-b justify-between px-4 h-12">
+      <div
+        className={`flex items-center border-b justify-center ${SIZE.NAVBAR.TOP_HEIGHT_USER_PREF_LEFT}`}
+      >
         {isOpen && (
           <span className="section-header-custom-blue">PurpleRadiance One</span>
         )}
@@ -45,7 +52,7 @@ function SideNavBar({ isOpen, onToggle }: SideBarProps) {
           {isOpen ? <X size={20} /> : <Menu size={20} />}
         </button>
       </div>
-      <nav className="p-3 space-y-1">
+      <nav className="p-1 space-y-1">
         <NavLink to={ROUTES_URL.HOME}>
           {({ isActive }) => (
             <SideNavBarItem
@@ -66,6 +73,17 @@ function SideNavBar({ isOpen, onToggle }: SideBarProps) {
               isOpen={isOpen}
               isActive={isActive}
               disabled={!userHasAccessToViewUser}
+            />
+          )}
+        </NavLink>
+        <NavLink to={ROUTES_URL.TASKS_MANAGEMENT}>
+          {({ isActive }) => (
+            <SideNavBarItem
+              icon={ListChecks}
+              label="Tasks"
+              isOpen={isOpen}
+              isActive={isActive}
+              disabled={!userHasAccessToViewTasks}
             />
           )}
         </NavLink>
@@ -114,6 +132,17 @@ function SideNavBar({ isOpen, onToggle }: SideBarProps) {
               isOpen={isOpen}
               isActive={isActive}
               disabled={!userHasAccessToViewStock}
+            />
+          )}
+        </NavLink>
+        <NavLink to={ROUTES_URL.SUPPORT_TICKET_MANAGEMENT}>
+          {({ isActive }) => (
+            <SideNavBarItem
+              icon={Headset}
+              label="Support"
+              isOpen={isOpen}
+              isActive={isActive}
+              disabled={!userHasAccessToViewSupportTicket}
             />
           )}
         </NavLink>
@@ -176,6 +205,17 @@ function SideNavBar({ isOpen, onToggle }: SideBarProps) {
                   }`}
                 >
                   Integration
+                </div>
+              )}
+            </NavLink>,
+            <NavLink key="quotations" to={ROUTES_URL.QUOTATION_SETTINGS}>
+              {({ isActive }) => (
+                <div
+                  className={`px-2 py-1 rounded-lg hover:bg-blue-50 ${
+                    isActive ? "input-label-custom-blue" : "input-label-custom"
+                  }`}
+                >
+                  Quotation
                 </div>
               )}
             </NavLink>,

@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import axios from "axios";
 import { useEffect, useState } from "react";
 import POST_API from "../../constants/PostApi";
 import { STATUS_CODE } from "../../constants/AppConstants";
 import ApiError from "../../@types/error/ApiError";
 import RefreshToken from "../validations/RefreshToken";
 import { StockAvaibleSerialNumber } from "../../@types/stock/StockAvailableSerialNumber";
+import axiosClient from "../../axios-client/AxiosClient";
 
 export const useStockAvailableSerialNumber = () =>{
     const [loading, setIsLoading] = useState<boolean>(true)
@@ -21,7 +21,7 @@ export const useStockAvailableSerialNumber = () =>{
         };
 
         try {
-            const response = await axios.post(
+            const response = await axiosClient.post(
                 POST_API.GET_STOCK_AVAILABLE_SERIAL_NUMBER
                 , PostData, {
                 withCredentials: true,

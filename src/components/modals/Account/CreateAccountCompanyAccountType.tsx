@@ -4,7 +4,6 @@ import FormHeader from "../../ui/FormHeader";
 import { useEffect, useState } from "react";
 import CompanyAccountType from "../../../@types/settings/CompanyAccountType";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
-import axios from "axios";
 import POST_API from "../../../constants/PostApi";
 import { STATUS_CODE } from "../../../constants/AppConstants";
 import RefreshToken from "../../../config/validations/RefreshToken";
@@ -12,6 +11,7 @@ import toast from "react-hot-toast";
 import LoadingSpinner from "../../../assets/animations/LoadingSpinner";
 import AccountCompanyAccountTypeAgGrid from "../../ag-grid/AccountCompanyAccountTypeAgGrid";
 import ApiError from "../../../@types/error/ApiError";
+import axiosClient from "../../../axios-client/AxiosClient";
 
 const CreateAccountCompanyAccountType = ({
   onClose,
@@ -40,7 +40,7 @@ const CreateAccountCompanyAccountType = ({
       isactive: null,
       requestedby_id: loginStatus.id,
     };
-    axios
+    axiosClient
       .post(
         POST_API.GET_COMPANY_ACCOUNT_TYPE,
         PostDataToGetCompanyAccountType,
@@ -94,7 +94,7 @@ const CreateAccountCompanyAccountType = ({
         company_account_type_id : id,
         createdbyid : loginStatus.id
     }
-    await axios.post(POST_API.CREATE_ACCOUNT_COMPANY_ACCOUNT_TYPE, postData, {
+    await axiosClient.post(POST_API.CREATE_ACCOUNT_COMPANY_ACCOUNT_TYPE, postData, {
         withCredentials : true
     })
     .then((response ) =>{

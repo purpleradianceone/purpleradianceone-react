@@ -10,7 +10,7 @@ import AddCompanyTeamUsersAgGrid from "../../ag-grid/AddCompanyTeamUsersAgGrid";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
 import { useEffect, useRef, useState } from "react";
 import companyUsersSearchProps from "../../../@types/company-users/CompanyUserProps";
-import { GridApi, ViewportChangedEvent } from "ag-grid-community";
+import { GridApi, } from "ag-grid-community";
 import ApiError from "../../../@types/error/ApiError";
 import axios from "axios";
 import POST_API from "../../../constants/PostApi";
@@ -19,6 +19,12 @@ import ROUTES_URL from "../../../constants/Routes";
 import RefreshToken from "../../../config/validations/RefreshToken";
 import toast from "react-hot-toast";
 import LOCALSTORAGE_KEYS from "../../../constants/LocalStorage";
+import PaginationWithoutCount from "../../ag-grid/PaginationWithoutCount";
+import { useSearchFilterPaginationDateHandlers } from "../../../config/hooks/usePaginationHandler";
+import LoadingPopUpAnimation from "../../views/card/LoadingPopUpAnimation";
+import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
+import AccessDeniedMessagePage from "../../views/not-found/AccessDeniedMessagePage";
+import MESSAGE from "../../../constants/Messages";
 
 function EditSubscriptionUsersModal({
   isOpen,
@@ -44,19 +50,16 @@ function EditSubscriptionUsersModal({
     statusChangeOfCompanyUserCountFromAggrid,
     setStatusChangeOfCompanyUserCountFromAggrid,
   ] = useState<number>(loginStatus.activeUsersInCompany);
-  const [companyUsersFetchedCount, setCompanyUsersFetchedCount] =
-    useState<number>(0);
+
+  const [statusChangeCount, setStatusChangeCount] = useState<number>(0);
 
   const handleCompanyUserStatusChange = (statusChangeCount: number) => {
     setStatusChangeOfCompanyUserCountFromAggrid(
-      statusChangeOfCompanyUserCountFromAggrid + statusChangeCount
+      statusChangeOfCompanyUserCountFromAggrid + statusChangeCount,
     );
+    setStatusChangeCount(statusChangeCount);
   };
-  const [
-    isCompanyUsersSearchParameterCleared,
-    setIsCompanyUsersSearchParameterCleared,
-  ] = useState<boolean>(true);
-  const [companyUsersHasMore, setCompanyUsersHasMore] = useState<boolean>(true);
+
   const [isCompanyUsersLoading, setIsCompanyUsersLoading] =
     useState<boolean>(false);
   const companyUsersFetchingRef = useRef<boolean>(false);
@@ -66,17 +69,23 @@ function EditSubscriptionUsersModal({
 
   const companyUserSearchParameterRef = useRef<string>("");
 
+  const { userHasAccessToUpdateUser } = useUserAccessModules();
+
+  const {
+    searchParameter,
+    handleSearchParameterChange,
+    pageSize,
+    currentPage,
+    currentPageData,
+    setCurrentPageData,
+    handlePageSizeChange,
+    handlePageChange,
+  } = useSearchFilterPaginationDateHandlers({size:25});
 
   const fetchCompanyUsers = async (comapnyUserSearchParameter: string) => {
-    if (
-      isCompanyUsersLoading ||
-      (!companyUsersHasMore && comapnyUserSearchParameter.length === 0) ||
-      companyUsersFetchingRef.current
-    )
-      return;
+    const offset = (currentPage - 1) * pageSize;
 
     try {
-      companyUserSearchParameterRef.current = comapnyUserSearchParameter;
       setIsCompanyUsersLoading(true);
       companyUsersFetchingRef.current = true;
 
@@ -91,54 +100,29 @@ function EditSubscriptionUsersModal({
       const getCompanyUserPostData = {
         company_id: loginStatus.companyId,
         requestedby: loginStatus.id,
-        limit: comapnyUserSearchParameter.length > 0 ? 0 : 50,
-        offset:
-          comapnyUserSearchParameter.length > 0
-            ? 0
-            : 50 * companyUsersFetchedCount,
+        isactive: true,
+        limit: pageSize,
+        offset: offset,
         search_company_specific_date_range_id: 0,
-        search_parameter: comapnyUserSearchParameter,
+        search_parameter: searchParameter,
         search_parameter_date: "",
       };
 
       // alert("called from here ");
       const response = await axios.post(
-        POST_API.GET_COMPANY_USERS,
+        POST_API.GET_LOOKUP_COMPANY_USERS,
         getCompanyUserPostData,
         {
           withCredentials: true,
-        }
+        },
       );
       if (response.data) {
         const newUsers = response.data;
-
-        if (newUsers.length === 0) {
-          setCompanyUsersHasMore(false);
-
-          return;
-        }
-        if (comapnyUserSearchParameter.length === 0) {
-          setCompanyUsersFetchedCount(companyUsersFetchedCount + 1);
-        }
-        newUsers.map((user: any) => {
-          setCompanyUsersList((prev) => [
-            ...prev,
-            {
-              company_id: user.company_id,
-              createdby: user.createdby,
-              createdon: user.createdon,
-              email: user.email,
-              fullname: user.fullname,
-              isactive: user.isactive,
-              id: user.id,
-              mobilenumber: user.mobilenumber,
-              password: user.password,
-              updatedby: user.upadtedby,
-              updatedon: user.updatedon,
-              count: user.count,
-            },
-          ]);
+        setCurrentPageData({
+          currentPage: currentPage,
+          pageDataLength: response.data.length,
         });
+        setCompanyUsersList(newUsers);
 
         if (
           companyUsersGridApiRef.current &&
@@ -147,18 +131,10 @@ function EditSubscriptionUsersModal({
           setTimeout(() => {
             if (companyUsersGridApiRef.current) {
               companyUsersGridApiRef.current.ensureIndexVisible(
-                companyUserLastScrollPositionRef.current - 11
+                companyUserLastScrollPositionRef.current - 11,
               );
             }
           }, 150);
-        }
-
-        if (
-          newUsers[0]?.count &&
-          companyUsersList.length + newUsers.length >= newUsers[0].count &&
-          !isCompanyUsersSearchParameterCleared
-        ) {
-          setCompanyUsersHasMore(false);
         }
       }
     } catch (error: ApiError | any) {
@@ -174,9 +150,7 @@ function EditSubscriptionUsersModal({
       if (comapnyUserSearchParameter.length > 0) {
         setIsCompanyUsersLoading(false);
         companyUsersFetchingRef.current = false;
-        setCompanyUsersHasMore(true);
         if (companyUserSearchParameterRef.current.length === 1) {
-          setCompanyUsersFetchedCount(0);
           companyUsersGridApiRef.current = null;
           companyUserLastScrollPositionRef.current = 0;
         }
@@ -191,48 +165,7 @@ function EditSubscriptionUsersModal({
     companyUsersGridApiRef.current = params.api;
   };
 
-  const handleCompanyUserViewPortChange = (params: ViewportChangedEvent) => {
-    if (!companyUsersHasMore && !companyUsersList.length) return;
-
-    if (!companyUsersGridApiRef.current && params.api) {
-      companyUsersGridApiRef.current = params.api;
-    }
-
-    const lastVisibleRow = params.lastRow;
-    const totalRowCount = companyUsersList[0]?.count;
-
-    if (
-      totalRowCount &&
-      lastVisibleRow >= companyUsersList.length - 5 &&
-      companyUserSearchParameterRef.current.length === 0
-    ) {
-      fetchCompanyUsers("");
-    }
-  };
-
-  const handleSearchParameterChange = (searchValue: string) => {
-    if (searchValue.length > 0) {
-      setCompanyUsersList([]);
-      setIsCompanyUsersSearchParameterCleared(false);
-      setCompanyUsersHasMore(true);
-
-      companyUsersGridApiRef.current = null;
-      companyUserLastScrollPositionRef.current = 0;
-      companyUsersFetchingRef.current = false;
-      setCompanyUsersFetchedCount(0);
-      fetchCompanyUsers(searchValue);
-    } else if (searchValue.length === 0) {
-      setCompanyUsersList([]);
-      setIsCompanyUsersSearchParameterCleared(true);
-      setCompanyUsersHasMore(true);
-      setIsCompanyUsersLoading(false);
-      companyUsersGridApiRef.current = null;
-      companyUserLastScrollPositionRef.current = 0;
-      companyUsersFetchingRef.current = false;
-      setCompanyUsersFetchedCount(0);
-      fetchCompanyUsers("");
-    }
-  };
+  const handleCompanyUserViewPortChange = () => {};
 
   const handleCompanyUserToggleChange = (message: string, status: boolean) => {
     if (status) {
@@ -244,19 +177,16 @@ function EditSubscriptionUsersModal({
 
   useEffect(() => {
     if (isOpen) {
-      fetchCompanyUsers("");
+      fetchCompanyUsers(searchParameter);
     } else if (!isOpen) {
       setCompanyUsersList([]);
-      setCompanyUsersFetchedCount(0);
-      setIsCompanyUsersSearchParameterCleared(true);
-      setCompanyUsersHasMore(true);
       setIsCompanyUsersLoading(false);
       companyUsersFetchingRef.current = false;
       companyUsersGridApiRef.current = null;
       companyUserLastScrollPositionRef.current = 0;
       companyUserSearchParameterRef.current = "";
     }
-  }, [isOpen]);
+  }, [isOpen, pageSize, currentPage, searchParameter]);
   if (!isOpen) return null;
   return (
     <div
@@ -268,12 +198,12 @@ function EditSubscriptionUsersModal({
     >
       <div className="flex min-h-screen mb-5 items-center justify-center">
         <div
-          className="relative w-full max-w-6xl max-h-[90vh] overflow-y-scroll bg-white rounded-lg shadow-xl animate-fadeIn [&::-webkit-scrollbar]:w-2
+          className="relative w-full max-w-6xl max-h-[95vh] bg-white rounded-lg shadow-xl animate-fadeIn [&::-webkit-scrollbar]:w-2
         [&::-webkit-scrollbar-track]:bg-gray-300
         [&::-webkit-scrollbar-thumb]:bg-gray-400
          [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full"
         >
-          <div className="p-7 mb-20">
+          <div className="p-4">
             <div className="flex items-center gap-3 mb-6">
               <Edit className="text-blue-500" size={SIZE.TWENTY_FOUR} />
               <h2 className="text-xl font-semibold text-gray-800">
@@ -317,17 +247,17 @@ function EditSubscriptionUsersModal({
                   ) {
                     localStorage.removeItem(LOCALSTORAGE_KEYS.LOGIN_STATUS);
                     localStorage.removeItem(
-                      LOCALSTORAGE_KEYS.ACCESS_MANAGEMENT
+                      LOCALSTORAGE_KEYS.ACCESS_MANAGEMENT,
                     );
                     localStorage.removeItem(
-                      LOCALSTORAGE_KEYS.GOOGLE_MEET_STATUS
+                      LOCALSTORAGE_KEYS.GOOGLE_MEET_STATUS,
                     );
                     localStorage.removeItem(
-                      LOCALSTORAGE_KEYS.ZOOM_MEETING_STATUS
+                      LOCALSTORAGE_KEYS.ZOOM_MEETING_STATUS,
                     );
                     localStorage.removeItem(LOCALSTORAGE_KEYS.USER_PREFERENCE);
                     localStorage.removeItem(
-                      LOCALSTORAGE_KEYS.NOTIFICATION_COUNT
+                      LOCALSTORAGE_KEYS.NOTIFICATION_COUNT,
                     );
                     onRedirectToLoginPage();
                     navigate(ROUTES_URL.SIGN_IN);
@@ -335,36 +265,74 @@ function EditSubscriptionUsersModal({
                     onClose();
                   }
                 }}
-                className="absolute right-4 top-4 text-gray-400 hover:text-gray-600"
+                className="absolute right-4 top-5 text-gray-400 hover:text-gray-600"
               >
                 <X size={SIZE.TWENTY} />
               </button>
             </div>
 
-            <div
-              className="ag-theme-balham"
-              style={{ height: "300px", width: "100%" }}
-            >
-              <div className="flex gap-2 mb-2 justify-between">
-                <div className="flex gap-28">
-                  {/* <span className="font-semibold">Search the User</span> */}
-                  <SearchInput
-                    onChange={(event) => {
-                      handleSearchParameterChange(event.target.value);
-                    }}
-                  ></SearchInput>
+            {userHasAccessToUpdateUser ? (
+              <div className=" ">
+                <div
+                  className="ag-theme-balham"
+                  style={{ height: "450px", width: "100%" }}
+                >
+                  <div className="flex gap-2 justify-between">
+                    <div className=" w-full gap-28 translate-x-1">
+                      <div className="flex w-full justify-center items-center ">
+                        <span className="font-semibold">
+                          Net Status Change Count:{" "}
+                        </span>
+                        <span>{statusChangeCount}</span>
+                      </div>
+                      {/* <span className="font-semibold">Search the User</span> */}
+                      <div className="mb-1">
+                        <SearchInput
+                          placeholder="Search user by name, email, mobile number."
+                          value={searchParameter}
+                          onChange={(e) => {
+                            handleSearchParameterChange(e.target.value);
+                          }}
+                        ></SearchInput>
+                      </div>
+                      {isCompanyUsersLoading && (
+                        <div>
+                          <LoadingPopUpAnimation show={isCompanyUsersLoading} />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  <AddCompanyTeamUsersAgGrid
+                    companyUsers={companyUsersList}
+                    handleViewPortChanged={handleCompanyUserViewPortChange}
+                    onGridReady={onCompanyUserGridReady}
+                    isGridForUpdateCompanyUser={true}
+                    handleCompanyUserStatusChange={
+                      handleCompanyUserStatusChange
+                    }
+                    isGridForSubscription={true}
+                    handleCompanyUserToggleChange={
+                      handleCompanyUserToggleChange
+                    }
+                  />
+                </div>
+                <div className="flex items-center justify-end col-span-1 mt-1">
+                  <PaginationWithoutCount
+                    pageSize={pageSize}
+                    currentPage={currentPage}
+                    currentPageData={currentPageData}
+                    onPageSizeChange={handlePageSizeChange}
+                    onPageChange={handlePageChange}
+                  />
                 </div>
               </div>
-              <AddCompanyTeamUsersAgGrid
-                companyUsers={companyUsersList}
-                handleViewPortChanged={handleCompanyUserViewPortChange}
-                onGridReady={onCompanyUserGridReady}
-                isGridForUpdateCompanyUser={true}
-                handleCompanyUserStatusChange={handleCompanyUserStatusChange}
-                isGridForSubscription={true}
-                handleCompanyUserToggleChange={handleCompanyUserToggleChange}
-              />
-            </div>
+            ) : (
+              <div>
+                <AccessDeniedMessagePage 
+                message={`${MESSAGE.MODULE_ACCESS.COMPANY_USER.DENIED_UPDATE_ACCESS_COMPANY_USER}`}
+                />
+              </div>
+            )}
           </div>
         </div>
       </div>

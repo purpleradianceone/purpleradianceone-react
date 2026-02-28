@@ -13,6 +13,8 @@ interface DropdownProps {
   preselectedOption?: number;
   requiredRedDot?: boolean;
   logo?: LucideIcon;
+  paddingy?: number;
+  errorMessage?: string;
 }
 
 const CustomDropdown: React.FC<DropdownProps> = ({
@@ -24,17 +26,24 @@ const CustomDropdown: React.FC<DropdownProps> = ({
   preselectedOption,
   requiredRedDot,
   logo: Icon,
+  paddingy = 1,
+  errorMessage,
 }) => {
-  const [selectedOption, setSelectedOption] = useState<number | undefined>(() => {
-    if (selectedValue) return selectedValue;
-    else return undefined;
-  });
+  const [selectedOption, setSelectedOption] = useState<number | undefined>(
+    () => {
+      if (selectedValue) return selectedValue;
+      else return undefined;
+    },
+  );
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setShowDropdown(false);
       }
     };
@@ -46,37 +55,28 @@ const CustomDropdown: React.FC<DropdownProps> = ({
   const handleSelect = (value: number | undefined) => {
     setSelectedOption(value);
     onSelect(value);
-    setShowDropdown(false); 
+    setShowDropdown(false);
   };
 
-
-
-  // old code working 
-  // useEffect(() => {
-  //   if (preselectedOption) {
-  //     handleSelect(preselectedOption);
-  //   }
-  // }, []);
-
-  // its working but if problem occurs use above code and comment below code 
+  // its working but if problem occurs use above code and comment below code
   useEffect(() => {
-  //  If preselectedOption is given, select it
-  if (preselectedOption !== undefined && preselectedOption !== null&& preselectedOption !== 0) {
-    handleSelect(preselectedOption);
-  }
-  //  Else, fall back to selectedValue
-  else if (selectedValue !== undefined  && selectedValue !== null && selectedValue !== 0 ) {
-    handleSelect(selectedValue);
-  }
-}, [preselectedOption, selectedValue]);
-
-//   useEffect(() => {
-//   if (preselectedOption !== undefined) {
-//     handleSelect(preselectedOption);
-//   }
-// }, [preselectedOption]);
-
-
+    //  If preselectedOption is given, select it
+    if (
+      preselectedOption !== undefined &&
+      preselectedOption !== null &&
+      preselectedOption !== 0
+    ) {
+      handleSelect(preselectedOption);
+    }
+    //  Else, fall back to selectedValue
+    else if (
+      selectedValue !== undefined &&
+      selectedValue !== null &&
+      selectedValue !== 0
+    ) {
+      handleSelect(selectedValue);
+    }
+  }, [preselectedOption, selectedValue]);
 
   return (
     <div className="relative w-auto" ref={dropdownRef}>
@@ -85,8 +85,11 @@ const CustomDropdown: React.FC<DropdownProps> = ({
         {labelName === "status" ||
         labelName === "source" ||
         labelName === "type" ||
+        labelName === "category" ||
+        labelName === "lifecycle" ||
         labelName === "priority" ||
-        labelName === "stage"
+        labelName === "stage" ||
+        labelName === "frequency"
           ? ""
           : labelName}{" "}
         {requiredRedDot && <span className="text-rose-500">*</span>}
@@ -95,25 +98,32 @@ const CustomDropdown: React.FC<DropdownProps> = ({
       <div
         role="button"
         tabIndex={0}
-        className={`w-full flex justify-between py-1 px-1 border-2 rounded-md cursor-pointer text-gray-700 
-          ${readOnly ? "bg-gray-200" : "bg-white"}`}
+        className={`w-full flex justify-between py-${paddingy} px-1 border-2 rounded-md cursor-pointer text-gray-700 
+          ${readOnly ? "bg-gray-100" : "bg-white"}`}
         onClick={() => {
           if (!readOnly) {
             setShowDropdown((prev) => !prev);
           } else {
-
+            if(errorMessage){
+              toast.error(errorMessage);
+            }else{
             toast.error(`Can't Update ${labelName}`);
+            }
           }
         }}
         onKeyDown={(e) => {
           if (readOnly) return;
-          if (e.key === "Enter" || e.key === " " || (e.key === "Tab" && requiredRedDot)) {
+          if (
+            e.key === "Enter" ||
+            e.key === " " ||
+            (e.key === "Tab" && requiredRedDot)
+          ) {
             e.preventDefault();
             setShowDropdown((prev) => !prev);
           }
         }}
       >
-        <div className="caption-custom">
+        {/* <div className="caption-custom">
           {labelName === "status" ||
           labelName === "source" ||
           labelName === "type" ||
@@ -121,11 +131,32 @@ const CustomDropdown: React.FC<DropdownProps> = ({
           labelName === "stage"
             ? selectedOption === undefined
               ? labelName.charAt(0).toUpperCase() + labelName.slice(1)
-              : options.find((o) => o.id === selectedOption)?.name
+              : options.find((o) => o.id === selectedOption)?.name ?? ""
             : selectedOption === undefined
             ? "Select Option"
-            : options.find((o) => o.id === selectedOption)?.name}
+            : options.find((o) => o.id === selectedOption)?.name ?? ""}
+        </div> */}
+        <div className="input-label-custom text-nowrap">
+          {labelName === "status" ||
+          labelName === "source" ||
+          labelName === "type" ||
+          labelName === "category" ||
+          labelName === "lifecycle" ||
+          labelName === "priority" ||
+          labelName === "stage" ||
+          labelName === "frequency"
+            ? selectedOption === undefined
+              ? labelName.charAt(0).toUpperCase() + labelName.slice(1)
+              : options && Array.isArray(options)
+                ? options.find((o) => o.id === selectedOption)?.name
+                : ""
+            : selectedOption === undefined
+              ? "Select Option"
+              : options && Array.isArray(options)
+                ? options.find((o) => o.id === selectedOption)?.name
+                : ""}
         </div>
+
         {showDropdown ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
       </div>
 
@@ -139,8 +170,7 @@ const CustomDropdown: React.FC<DropdownProps> = ({
             }}
             className="px-4 py-0.5 flex gap-2 items-center caption-custom hover:bg-gray-200 cursor-pointer text-gray-800 border-b"
           >
-            <Delete size={18} />{" "}
-            <span className="caption-custom"> Clear Selection</span>
+            <Delete size={18} /> <span className="caption-custom"> Clear</span>
           </div>
 
           {Array.isArray(options) &&

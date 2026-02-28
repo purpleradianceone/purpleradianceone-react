@@ -4,6 +4,7 @@ type UserPreference = {
     companyUserId: number,
     timezoneId: number,
     isLeftMenu : boolean,
+    countryId : number,
     isHamburgerMenuCollapsed : boolean,
     timezoneName : string,
     timezoneUTCOffset : string,
@@ -12,6 +13,8 @@ type UserPreference = {
     createdBy: string,
     updatedBy: string,
     createdOn: string,
-    updatedOn: string
+    updatedOn: string,
+    sidebarOpen: boolean,
+
 }
 export default UserPreference;

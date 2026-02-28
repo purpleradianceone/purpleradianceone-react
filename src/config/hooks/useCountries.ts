@@ -1,8 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-
-
-
-  import axios from "axios";
   import POST_API from "../../constants/PostApi";
   import { STATUS_CODE } from "../../constants/AppConstants";
   import { useEffect, useState } from "react";
@@ -10,11 +6,14 @@
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   import ApiError from "../../@types/error/ApiError";
 import Country from "../../@types/general/Country";
+import axiosClient from "../../axios-client/AxiosClient";
+import axios from "axios";
+import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
   
   export const useCountries = () => {
-
-      const [countries, setCountries] = useState<Country[]>([]);
-  
+    const { loginStatus } = useLoggedInUserContext();
+    const [countries, setCountries] = useState<Country[]>([]);
+    const [loading , setLoading] = useState<boolean>(true); 
     const getAllCountries = async () => {
     const PostData: Country = {
       id: null,
@@ -26,11 +25,11 @@ import Country from "../../@types/general/Country";
     };
 
     try {
-      const response = await axios.post(POST_API.GET_COUNTRY, PostData, {
+      const response = await (loginStatus.status?axiosClient:axios).post(POST_API.GET_COUNTRY, PostData, {
         withCredentials: true,
       });
       if (response.status == STATUS_CODE.OK) {
-        console.log(response.data);
+        setLoading(false);
         setCountries(response.data);
       }
     } catch (error: ApiError | any) {
@@ -51,6 +50,7 @@ import Country from "../../@types/general/Country";
         }, []);
       
       return{
+        loading,
           countries,
       }
   

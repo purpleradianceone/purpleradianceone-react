@@ -16,7 +16,8 @@ export const  STRING_VALUES = {
 
 export enum ActionTypeForStockMOdule{
   DETAILS = "DETAILS",
-  TRANSACTIONS = "TRANSACTIONS"
+  TRANSACTIONS = "TRANSACTIONS",
+  CREATE_STOCK = "CREATE-STOCK"
 }
 
 export const DEBOUNCE_DELAY = 300;
@@ -90,7 +91,6 @@ export const notificationsDesription = {
 
 
 export const  SUBSCRIPTION = {
-    // RAZORPAY_KEY : "rzp_test_89ANnSe3ncNGe5",
     RAZORPAY_KEY : import.meta.env.VITE_RAZORPAY_API_ID_KEY,
     COMPANY_NAME : "PurpleRadiance Technologies Pvt Ltd.",
     RAZORPAY_CURRENCY : "INR",
@@ -104,10 +104,10 @@ export const DATA_TYPE = {
     UNDEFINED : undefined,
 }
 // company purpleradianceone captcha key
-export const SITE_KEY = "6LeMDvMrAAAAAGIkcoyi3CG1F23jqvKuouUgUXNR";
-
+// export const SITE_KEY = "6LeMDvMrAAAAAGIkcoyi3CG1F23jqvKuouUgUXNR";
+  export const SITE_KEY = import.meta.env.VITE_SITE_KEY_OF_CAPTCHA
 // company captcha key
-//export const SITE_KEY = "6Lcs7fIrAAAAAOp4c77x69ruZ5_KPKQuVGdL-PCY";
+// export const SITE_KEY = "6LcB-m0rAAAAAI46H69SXH_TnYONFtZxvbVE_mR6";
 
 // vaibhav captcha key
 // export const SITE_KEY = "6Lfk8W0rAAAAAOTUzGGWBnX9C0Jhta2zRZYt3fXf";
@@ -117,6 +117,7 @@ export const STATUS_CODE = {
     FORBIDDEN : 403,
     PERMANENT_REDIRECT : 308,
     ACCEPTED : 202,
+    INTERNAL_SERVER_ERROR : 500,
 
 }
 export const JSX_CHILDREN_NAME = {
@@ -134,7 +135,11 @@ export const JSX_CHILDREN_NAME = {
     USER : "User",
     UPDATE : "Update",
     MEETINGS : "Meetings",
-
+    CREATE_SUPPORT_TICKET : "Create",
+    DETAILS :"Details",
+    TRANSACRTIONS : "Trans...",
+    ADD_STOCK :"Stock",
+    ADD_GENERAL_TASK: "Add Task"
 }
 
 export const SIZE = {
@@ -144,6 +149,11 @@ export const SIZE = {
     TWELEVE : 12,
     FOURTEEN : 14,
     SIXTEEN : 16,
+    LUCIDE_LOGO_INPUT_LABEL_SIZE: 14,
+    NAVBAR : {
+      TOP_HEIGHT_USER_PREF_LEFT : 'h-11',
+      TOP_HEIGHT_USER_PREF_RIGHT : 'h-12'
+    }
 }
 
 export const INNERHTML = {
@@ -174,7 +184,8 @@ export const VALIDATIONS ={
     MIN_EMAIL_LENGTH :3,
     MIN_NAME_LENGTH : 6,
     MAX_PASSWORD_LENGTH: 20,
-    MIN_PASSWORD_LENGTH: 8
+    MIN_PASSWORD_LENGTH: 8,
+    MAX_DESCRIPTION_LENGTH: 400
 }
 
 

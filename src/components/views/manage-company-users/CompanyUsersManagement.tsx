@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import CompanyUsersSearchProps from "../../../@types/company-users/CompanyUserProps";
 import GetCompanyUsersList from "../../lists/CompanyUsersList";
-import axios from "axios";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
 import AccessDeniedPopup from "../not-found/AccessDeniedPage";
 import POST_API from "../../../constants/PostApi";
@@ -10,10 +9,12 @@ import { STATUS_CODE } from "../../../constants/AppConstants";
 import ApiError from "../../../@types/error/ApiError";
 import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
 import RefreshToken from "../../../config/validations/RefreshToken";
-import { useSearchFilterPaginationDateHandlers } from "../../../config/hooks/usePaginationHandler";
+import { customDateRangeId, useSearchFilterPaginationDateHandlers } from "../../../config/hooks/usePaginationHandler";
 import CompanyUser from "../../../@types/company-users/CompanyUser";
 import { useInView } from "react-intersection-observer";
 import { motion } from "framer-motion";
+import { LocalStorageKeys } from "../../../enums/LocalStorageKeys";
+import axiosClient from "../../../axios-client/AxiosClient";
 
 function GetCompanyUsers({
   isUsedInAccountProductForAssingingInstalledBy,
@@ -23,6 +24,35 @@ function GetCompanyUsers({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onRowSelect?: (data: any) => void;
 }) {
+
+  // Restore saved filters when opening this module
+    // useEffect(() => {
+    //   const saved = localStorage.getItem(LocalStorageKeys.COMPANY_MANAGEMEMNT_FILTERS);
+    //   if (!saved) return;
+  
+    //   const filters = JSON.parse(saved);
+  
+    //   // Ensure URL & hook initialize first before restoring
+    //   requestAnimationFrame(() => {
+    //     if (filters.page) handlePageChange(filters.page);
+    //     if (filters.size) handlePageSizeChange(filters.size);
+    //     if (filters.search) handleSearchParameterChange(filters.search);
+    //     if (filters.dateRangeId) handleDatePageIdChange(filters.dateRangeId);
+  
+    //     // if (filters.leadStatus) setSelectedLeadStatus(filters.leadStatus);
+    //     // if (filters.leadSource) setSelectedLeadSource(filters.leadSource);
+        
+    //     if(filters.customStartDate) handleStartDateChange(filters.customStartDate)
+    //       if(filters.customEndDate) handleEndDateChange(filters.customEndDate)
+    //     // if (filters.userId) {
+    //     //   setSelectedCompanyUser((prev) => ({
+    //     //     ...prev,
+    //     //     id: filters.userId,
+    //     //     fullname : filters.userName
+    //     //   }));
+    //     // }
+    //   });
+    // }, []);
   const [companyUsers, setCompanyUsers] = useState<CompanyUsersSearchProps[]>(
     []
   );
@@ -33,21 +63,27 @@ function GetCompanyUsers({
   const { userHasAccessToViewUser } = useUserAccessModules();
   const [userUpdateCount, setUserUpdateCount] = useState(0);
 
+  // Read filters from LocalStorage (before hook initializes)
+const savedFilters = JSON.parse(
+  localStorage.getItem(LocalStorageKeys.COMPANY_MANAGEMEMNT_FILTERS) || "{}"
+);
   const {
     currentPage,
+    currentPageData,
     pageSize,
     dateRangeId,
     concatDate,
+    startDate,
+    endDate,
     searchParameter,
-    totalPages,
-    setTotalPages,
+    setCurrentPageData,
     handleDatePageIdChange,
     handleEndDateChange,
     handlePageChange,
     handlePageSizeChange,
     handleSearchParameterChange,
     handleStartDateChange,
-  } = useSearchFilterPaginationDateHandlers();
+  } = useSearchFilterPaginationDateHandlers(savedFilters);
 
   const handleCompanyUserChangeOnEdit = (user: CompanyUser) => {
     const userMatches = companyUsers.some(
@@ -60,10 +96,11 @@ function GetCompanyUsers({
 
   // Fetch data function
   const fetchCompanyUsers = async (signal: AbortSignal) => {
+    if (dateRangeId === customDateRangeId && concatDate.trim() === "") return;
     const offset = (currentPage - 1) * pageSize;
 
     const effectiveDateRangeId =
-      dateRangeId === 8 && !concatDate ? 0 : dateRangeId;
+      dateRangeId === customDateRangeId && !concatDate ? 0 : dateRangeId;
 
     const postData = {
       company_id: loginStatus.companyId,
@@ -77,16 +114,13 @@ function GetCompanyUsers({
     };
 
     try {
-      const response = await axios.post(POST_API.GET_COMPANY_USERS, postData, {
+      const response = await axiosClient.post(POST_API.GET_COMPANY_USERS, postData, {
         signal,
         withCredentials: true,
       });
-
+      setCurrentPageData({currentPage: currentPage, pageDataLength: response.data.length});
       setCompanyUsers(response.data);
-      // console.log(response.data);
-      if (response.data[0]?.count) {
-        setTotalPages(Math.ceil(response.data[0].count / pageSize));
-      }
+
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: ApiError | any) {
       if (error.status === STATUS_CODE.UNATHORISED) {
@@ -120,6 +154,8 @@ function GetCompanyUsers({
     currentPage,
     dateRangeId,
     searchParameter,
+    startDate,
+    endDate,
     concatDate,
     userUpdateCount,
   ]);
@@ -130,6 +166,40 @@ function GetCompanyUsers({
     }
   }, [userHasAccessToViewUser]);
 
+  // Save all filters to localStorage whenever they change
+  useEffect(() => {
+    const filters = {
+      page: currentPage,
+      size: pageSize,
+      search: searchParameter,
+      dateRangeId,
+      concatDate,
+      customStartDate: startDate,
+      customEndDate: endDate,
+    };
+
+    localStorage.setItem(
+      LocalStorageKeys.COMPANY_MANAGEMEMNT_FILTERS,
+      JSON.stringify(filters)
+    );
+  }, [
+    currentPage,
+    pageSize,
+    searchParameter,
+    dateRangeId,
+    concatDate,
+    startDate,
+    endDate,
+  ]);
+
+  // Note : On refresh button click clear the storage
+  useEffect(() => {
+    window.addEventListener("beforeunload", clearLeadFilters);
+    function clearLeadFilters() {
+      localStorage.removeItem(LocalStorageKeys.COMPANY_MANAGEMEMNT_FILTERS);
+    }
+    return () => window.removeEventListener("beforeunload", clearLeadFilters);
+  }, []);
   return (
     <div className="w-full">
       {userHasAccessToViewUser ? (
@@ -148,13 +218,17 @@ function GetCompanyUsers({
                 handleSearchOption={{
                   handleSearchParameterChange,
                   handleDateRangeIdChange: handleDatePageIdChange,
+                  dateRangeId,
+                  startDate,
+                  endDate,
+                  searchParameter
                 }}
                 paginationData={{
-                  selectedPageSize: handlePageSizeChange,
-                  currentPage,
-                  handlePageChange,
-                  totalPages,
                   pageSize,
+                  currentPage,
+                  currentPageData,
+                  onPageSizeChange: handlePageSizeChange,
+                  onPageChange:handlePageChange,
                 }}
                 users={companyUsers}
                 isUsedInAccountProductForAssingingInstalledBy={

@@ -24,11 +24,13 @@ export const UserPreferenceContextProvider : React.FC<{children : ReactNode}>=({
         isLeftMenu : false,
         rowsInGrid : 0,
         timezone : "",
+        countryId : 0,
         timezoneId : 0,
         timezoneName : "",
         timezoneUTCOffset : "",
         updatedBy : "",
         updatedOn : "",
+        sidebarOpen: false,
     }});
  useEffect(() => {
       localStorage.setItem(LOCALSTORAGE_KEYS.USER_PREFERENCE, JSON.stringify(userPreference));

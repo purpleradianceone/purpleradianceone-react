@@ -49,7 +49,7 @@ const NotificationPopup: React.FC<NotificationPopupProps> = ({ onClose }) => {
 
   const getNotificationListForWeb = async (currentOffset: number = 0) => {
     setShowLoadingSpinner(true);
-
+    if(loginStatus.companyId === 0)return;
     const postDataToGetNotificationListForWeb = {
       company_id: loginStatus.companyId,
       id: null,
