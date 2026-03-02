@@ -88,7 +88,6 @@ const MetaIntegration: React.FC = () => {
           </div>
         </div>
       </div>
-
       <PageIdIntegration  />    
     </div>
   );
