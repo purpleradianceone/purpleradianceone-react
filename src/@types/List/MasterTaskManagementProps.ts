@@ -27,6 +27,7 @@ type MasterTaskManagementProps = {
     handleSelectedCompanyUser : (selectedUser: CompanyUser) => void;
     isActive : boolean | null;
     setIsActive : (isActive: boolean | null) => void;
+    downloadTaskDocument: (taskId : number) => void;
    
 }
 export default MasterTaskManagementProps;

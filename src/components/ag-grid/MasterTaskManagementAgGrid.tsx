@@ -1,11 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable react-hooks/rules-of-hooks */
+import { AllCommunityModule, ColDef, themeBalham } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 import { useMemo, useRef } from "react";
-import { INNERHTML, JSX_CHILDREN_NAME } from "../../constants/AppConstants";
-import { AllCommunityModule, ColDef, themeBalham } from "ag-grid-community";
 import MasterTaskManagementAgGridProps from "../../@types/ag-grid/MasterTaskManagementAgGridProps";
-import TaskPriorityChip from "../ui/TaskPriorityChip";
+import { INNERHTML, JSX_CHILDREN_NAME } from "../../constants/AppConstants";
 import StatusIndicator from "../ui/StatusIndicator";
+import TaskPriorityChip from "../ui/TaskPriorityChip";
 
 function MasterTaskManagementAgGrid({
   MasterTaskData,
@@ -16,6 +18,12 @@ function MasterTaskManagementAgGrid({
   const gridRef = useRef<AgGridReact>(null); // Ref to the AgGridReact component
   const columnDefs = useMemo<ColDef[]>(
     () => [
+      {
+        field: "subject",
+        headerName: "subject",
+        sortable: true,
+        filter: true,
+      },
       {
         field: "generalTaskTypeName",
         headerName: "Task Type",
@@ -142,8 +150,113 @@ function MasterTaskManagementAgGrid({
           );
         },
       },
+      // {
+      //   headerName: "Actions",
+      //   sortable: false,
+      //   maxWidth: 110,
+      //   pinned: "right",
+
+      //   cellRenderer: (params: any) => {
+      //     const [isActionsDropDownOpen, setIsActionsDropDownOpen] =
+      //       useState(false);
+      //     const [position, setPosition] = useState({
+      //       top: 0,
+      //       left: 0,
+      //       isUpward: false,
+      //     });
+
+      //     const dropdownRef = useRef<HTMLDivElement | null>(null);
+
+      //     const handleActionsButtonClick = (event: React.MouseEvent) => {
+      //       event.stopPropagation();
+      //       setIsActionsDropDownOpen((prev: any) => !prev);
+
+      //       const rect = (
+      //         event.currentTarget as HTMLButtonElement
+      //       ).getBoundingClientRect();
+
+      //       const dropdownHeight = 110;
+      //       const windowHeight = window.innerHeight;
+      //       const spaceBelow = windowHeight - rect.bottom;
+      //       const isUpward = spaceBelow < dropdownHeight;
+
+      //       setPosition({
+      //         top: isUpward
+      //           ? rect.top + window.scrollY - dropdownHeight + 10
+      //           : rect.bottom + window.scrollY - 10,
+      //         left: rect.left + window.scrollX - 25,
+      //         isUpward,
+      //       });
+      //     };
+
+      //     useEffect(() => {
+      //       const handleClickOutside = (event: MouseEvent) => {
+      //         if (
+      //           dropdownRef.current &&
+      //           !dropdownRef.current.contains(event.target as Node)
+      //         ) {
+      //           setIsActionsDropDownOpen(false);
+      //         }
+      //       };
+
+      //       document.addEventListener("mousedown", handleClickOutside);
+      //       return () =>
+      //         document.removeEventListener("mousedown", handleClickOutside);
+      //     }, []);
+
+      //     return (
+      //       <>
+      //         <button
+      //           className="text-blue-600"
+      //           onClick={handleActionsButtonClick}
+      //         >
+      //           {JSX_CHILDREN_NAME.ACTIONS}
+      //         </button>
+
+      //         {isActionsDropDownOpen &&
+      //           createPortal(
+      //             <div
+      //               ref={dropdownRef}
+      //               className="absolute bg-white border rounded-md shadow-lg w-32 ml-2 z-50"
+      //               style={{ top: position.top, left: position.left }}
+      //             >
+      //               {/* DETAILS */}
+      //               <ActionsDropdownButton
+      //                 onClick={() => {
+      //                   setIsActionsDropDownOpen(false);
+      //                   console.log(params.data);
+
+      //                   params.context.handleRowClick(params);
+      //                   // isUpdateCompanyTeamModalOpen!(params.data);
+      //                 }}
+      //                 // disabled={!userHasAccessToViewTeamManagement}
+      //               >
+      //                 <ReceiptText
+      //                   className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR}
+      //                 />
+      //                 Details
+      //               </ActionsDropdownButton>
+
+      //               {/* DOWNLOAD */}
+      //               <ActionsDropdownButton
+      //                 onClick={() => {
+      //                   setIsActionsDropDownOpen(false);
+      //                   params.context.downloadTaskDocument(params);
+      //                 }}
+      //                 // disabled={!params.data?.document_file_extension}
+      //               >
+      //                 <Download className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR} />
+      //                 Download
+      //               </ActionsDropdownButton>
+      //             </div>,
+      //             document.body,
+      //           )}
+      //       </>
+      //     );
+      //   },
+      // },
     ],
-    [],
+    [handleRowClick],
   );
 
   const defaultColDef = useMemo(
@@ -170,7 +283,9 @@ function MasterTaskManagementAgGrid({
         modules={[AllCommunityModule]}
         theme={themeBalham}
         overlayNoRowsTemplate={INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
-        context={{ handleRowSelect: onRowSelect }}
+        context={{
+          handleRowSelect: onRowSelect,
+        }}
         onRowClicked={handleRowClick}
       />
     </div>

@@ -8,7 +8,10 @@ import { motion } from "framer-motion";
 import { useInView } from "react-intersection-observer";
 import { LocalStorageKeys } from "../../../enums/LocalStorageKeys";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
-import { customDateRangeId, useSearchFilterPaginationDateHandlers } from "../../../config/hooks/usePaginationHandler";
+import {
+  customDateRangeId,
+  useSearchFilterPaginationDateHandlers,
+} from "../../../config/hooks/usePaginationHandler";
 import { STATUS_CODE } from "../../../constants/AppConstants";
 import RefreshToken from "../../../config/validations/RefreshToken";
 import POST_API from "../../../constants/PostApi";
@@ -126,7 +129,9 @@ function MyTaskManagement({
           (item: any) => ({
             id: item.id,
             source: item.source,
+            subject: item.subject,
             sourceId: item.source_id,
+            masterId: item.master_id,
             taskType: item.task_type,
             taskPriority: item.task_priority,
             taskStage: item.task_stage,
