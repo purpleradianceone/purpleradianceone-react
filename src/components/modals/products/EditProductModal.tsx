@@ -259,7 +259,7 @@ function EditCompanyProductModal({
   const hanldeUpdateCompanyProductFormSubmit = async () => {
     // event.preventDefault();
     const isvalid = validate();
-    alert(JSON.stringify(updateCompanyProductFormData, null, 2));
+    // alert(JSON.stringify(updateCompanyProductFormData, null, 2));
     if (!isvalid) return;
     if (!validateDropdown()) return;
     if (
