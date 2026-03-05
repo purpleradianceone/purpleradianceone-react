@@ -215,6 +215,12 @@ function GeneralTask() {
   };
 
   const downloadTaskDocument = async () => {
+    if (
+      generalMasterTask?.extension === null ||
+      generalMasterTask?.extension === ""
+    ) {
+      return;
+    }
     try {
       const response = await axiosClient.post(
         POST_API.GET_GENERAL_TASK_MASTER_DOCUMENT,
