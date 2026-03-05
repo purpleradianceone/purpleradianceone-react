@@ -1,7 +1,9 @@
 export type MyAllTaskProps = {
  id: number;
     source: string;
+    subject:string,
     sourceId: number;
+    masterId:number;
     taskType: string;
     taskPriority: string;
     taskStage: string;

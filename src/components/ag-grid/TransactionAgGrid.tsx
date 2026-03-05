@@ -74,6 +74,7 @@ const TransactionAgGrid: React.FC<{
         headerName: "createdBy",
       },
       {
+        hide: true,
         field: "createdOn",
         headerName: "createdOn",
       },

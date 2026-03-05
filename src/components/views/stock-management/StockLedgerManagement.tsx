@@ -73,12 +73,13 @@ const StockLedgerManagement = () => {
         company_id: loginStatus.companyId,
         id: null,
         company_product_id: companyProductId,
-        transaction_type_id: selectedTransactionType?.id,
+        transaction_type_id: selectedTransactionType,
         transaction_date: transactionDate,
         offset: offset,
         limit: pageSize,
         requestedby_id: loginStatus.id,
       };
+      console.log(selectedTransactionType);
 
       await axiosClient
         .post(POST_API.GET_STOCK, postData, {

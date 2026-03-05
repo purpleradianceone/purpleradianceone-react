@@ -89,7 +89,6 @@ import WareHouseWiseStock from "../../components/views/stock-management/WareHous
 import StockLedgerManagement from "../../components/views/stock-management/StockLedgerManagement";
 import StockAgeingManagement from "../../components/views/stock-management/StockAgeingManagement";
 
-
 export const router = createBrowserRouter([
   {
     path: ROUTES_URL.NOT_FOUND,
@@ -866,10 +865,10 @@ export const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: 
-        // <AccountDetailsUpdated />
-        <AccountManagement/>
-        ,
+        element: (
+          // <AccountDetailsUpdated />
+          <AccountManagement />
+        ),
       },
       {
         path: "products/:productId",
