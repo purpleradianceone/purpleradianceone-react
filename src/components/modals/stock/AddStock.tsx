@@ -266,10 +266,15 @@ const AddStock = ({
     event: React.FormEvent<HTMLFormElement>,
   ) => {
     event.preventDefault();
+    if (product?.productTypeId === 3 || product?.productTypeId === 4) {
+      // toast.error("")
+      return;
+    }
     const isValid = validateForm();
     if (!isValid) {
       return;
     }
+
     if (isSaving) return;
     const postData = {
       company_id: loginStatus.companyId,
@@ -735,7 +740,12 @@ const AddStock = ({
                     Cancel
                   </div>
                 </Button>
-                <Button type="submit">
+                <Button
+                  type="submit"
+                  disabled={
+                    product?.productTypeId === 3 || product?.productTypeId === 4
+                  }
+                >
                   <div className="flex items-center gap-1">
                     <Save size={SIZE.SIXTEEN} />
                     Save
