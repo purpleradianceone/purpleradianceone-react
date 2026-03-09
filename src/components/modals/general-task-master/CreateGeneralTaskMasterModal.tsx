@@ -145,7 +145,8 @@ function CreateGeneralTaskMasterModal({
     if (!formData.description.trim())
       newErrors.description = "Description is required";
     if (!formData.startDate) newErrors.startDate = "Start date is required";
-    if (!formData.endDate) newErrors.endDate = "End date is required";
+    if (formData.frequency === 1 ? !formData.startDate : !formData.endDate)
+      newErrors.endDate = "End date is required";
     if (!formData.taskTime) newErrors.taskTime = "Task time is required";
 
     if (
@@ -192,7 +193,7 @@ function CreateGeneralTaskMasterModal({
       toast.error("Please fix validation errors");
       return;
     }
-    // setIsSubmitting(true);
+    setIsSubmitting(true);
 
     const postData = {
       company_id: loginStatus.companyId,
@@ -368,13 +369,18 @@ function CreateGeneralTaskMasterModal({
                   <div className="">
                     <CustomDropdown
                       logo={Timer}
-                      preselectedOption={formData.frequencyInterval}
+                      preselectedOption={
+                        formData.frequency === 1
+                          ? 1
+                          : formData.frequencyInterval
+                      }
                       requiredRedDot
                       labelName="Task Frequency Interval :"
                       options={intervalList!}
                       onSelect={(v) =>
                         handleDropdownChange("frequencyInterval", v)
                       }
+                      readOnly={formData.frequency === 1}
                     />
                     {errors.frequencyInterval && (
                       <span className="mt-1 ml-1 text-red-500 caption-custom-inactive">
@@ -426,7 +432,12 @@ function CreateGeneralTaskMasterModal({
 
                   <input
                     type="date"
-                    value={formData.endDate}
+                    value={
+                      formData.frequency === 1
+                        ? formData.startDate
+                        : formData.endDate
+                    }
+                    disabled={formData.frequency === 1}
                     min={formData.startDate} // 🔥 prevents selecting before start
                     onChange={(e) =>
                       handleInputChange("endDate", e.target.value)
@@ -479,7 +490,7 @@ function CreateGeneralTaskMasterModal({
                     select accordingly.
                   </p>
                 </div>
-                <div className="">
+                <div className="col-span-2">
                   <TextAreaInput
                     label="Description:"
                     logo={FileText}
@@ -492,7 +503,7 @@ function CreateGeneralTaskMasterModal({
                     }
                     required={true}
                     cols={0}
-                    rows={3}
+                    rows={5}
                     error={errors.description}
                   />
                 </div>
@@ -502,7 +513,7 @@ function CreateGeneralTaskMasterModal({
                     Attachment :
                   </label>
 
-                  <div className="border border-dashed rounded-md p-3">
+                  <div className="border-2 border-dashed rounded-md p-3">
                     <input
                       type="file"
                       onChange={handleFileChange}

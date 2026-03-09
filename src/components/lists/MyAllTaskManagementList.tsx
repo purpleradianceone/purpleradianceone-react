@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { ListChecks } from "lucide-react";
+import { ListTodo } from "lucide-react";
 import qs from "query-string";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
@@ -12,6 +12,7 @@ import { handleApiError } from "../../config/error/handleApiError";
 import { useUserAccessModules } from "../../config/hooks/useAccessModules";
 import { useComapanySpecificSearchDateRange } from "../../config/hooks/useCompanySpecificDateRange";
 import { useDateRangeIdChange } from "../../config/hooks/useDateRangeIdChange";
+import { customDateRangeId } from "../../config/hooks/usePaginationHandler";
 import useScreenSize from "../../config/hooks/useScreenSize";
 import RefreshToken from "../../config/validations/RefreshToken";
 import { STATUS_CODE } from "../../constants/AppConstants";
@@ -30,7 +31,6 @@ import DateRangeFilterDropdown from "../ui/DateRangeFilterDropdown";
 import DateRangePicker from "../ui/DateRangePicker";
 import SearchInput from "../ui/SearchInput";
 import { supportTicketDataUrlSearchParamKey } from "./SupportTicketManagementList";
-import { customDateRangeId } from "../../config/hooks/usePaginationHandler";
 
 export const MytaskQueryKey = "task";
 
@@ -282,7 +282,7 @@ function MyAllTaskManagementList({
             {isUsedInAllTasksModule && (
               <div className="flex gap-1 items-center w-fit">
                 {!isSmallScreen && (
-                  <ListChecks
+                  <ListTodo
                     className={`${
                       isCustomDateOptionSelected
                         ? "w-4 h-4 text-blue-600"
