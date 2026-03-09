@@ -3,6 +3,7 @@
 import {
   CalendarClock,
   ChevronRight,
+  Download,
   File,
   FileText,
   Flag,
@@ -50,6 +51,7 @@ import useTaskStage from "../../../config/hooks/useTaskStage";
 import { handleApiError } from "../../../config/error/handleApiError";
 import ConfirmationDialog from "../../dialogue-box/ConfirmationDialogue";
 import FormInput from "../../ui/FormInput";
+import MetaField from "../../ui/MetaField";
 
 interface TaskCardProps {
   task: any;
@@ -369,6 +371,7 @@ function MasterTaskUpdate() {
     if (!selectedFile) {
       return;
     }
+    setIsSubmitting(true);
     const data = {
       id: selectedSupportTicket?.id,
       company_id: loginStatus.companyId,
@@ -410,6 +413,7 @@ function MasterTaskUpdate() {
   };
 
   const downloadTaskDocument = async () => {
+    setIsSubmitting(true);
     try {
       const response = await axiosClient.post(
         POST_API.GET_GENERAL_TASK_MASTER_DOCUMENT,
@@ -448,6 +452,8 @@ function MasterTaskUpdate() {
     } catch (error) {
       console.error(error);
       toast.error("Failed to download document");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -484,49 +490,34 @@ function MasterTaskUpdate() {
                   <div className="flex-1 bg-white border rounded p-2 space-y-2">
                     {/* ROW 1 */}
                     <div className="grid grid-cols-8 gap-3 items-end text-sm">
-                      {/* TYPE */}
-
-                      <div>
-                        <label className="text-xs text-gray-500">
-                          Task Type
-                        </label>
-                        <p className="text-sm font-medium">
-                          {selectedSupportTicket?.generalTaskTypeName}
-                        </p>
-                      </div>
-                      {/* FREQUENCY */}
-                      <div>
-                        <label className="text-xs text-gray-500">
-                          Frequency
-                        </label>
-                        <p className="text-sm">
-                          {selectedSupportTicket?.frequencyName}
-                        </p>
-                      </div>
-                      <div>
-                        <label className="text-xs text-gray-500">Start</label>
-                        <p>{selectedSupportTicket?.startDate}</p>
-                      </div>
-                      <div>
-                        <label className="text-xs text-gray-500">End</label>
-                        <p>{selectedSupportTicket?.endDate}</p>
-                      </div>
-                      <div>
-                        <label className="text-xs text-gray-500">Time</label>
-                        <p>{selectedSupportTicket?.taskTime}</p>
-                      </div>
-                      <div>
-                        <label className="text-xs text-gray-500">
-                          Created By
-                        </label>
-                        <p>{selectedSupportTicket?.createdByName}</p>
-                      </div>
-                      <div>
-                        <label className="text-xs text-gray-500">
-                          Updated By
-                        </label>
-                        <p>{selectedSupportTicket?.updatedByName}</p>
-                      </div>
+                      <MetaField
+                        label=" Task Type"
+                        value={selectedSupportTicket.generalTaskTypeName}
+                      />
+                      <MetaField
+                        label="Frequency"
+                        value={selectedSupportTicket.frequencyName}
+                      />
+                      <MetaField
+                        label="Start"
+                        value={selectedSupportTicket.startDate}
+                      />
+                      <MetaField
+                        label="End"
+                        value={selectedSupportTicket.endDate}
+                      />
+                      <MetaField
+                        label="Time"
+                        value={selectedSupportTicket.taskTime}
+                      />
+                      <MetaField
+                        label="Created By"
+                        value={selectedSupportTicket.createdByName}
+                      />
+                      <MetaField
+                        label="Updated By"
+                        value={selectedSupportTicket.updatedByName}
+                      />
                       {/* STATUS */}
                       <div>
                         <label className="text-xs text-gray-500">Status</label>
@@ -608,7 +599,7 @@ function MasterTaskUpdate() {
                         </div>
                       </div>
                       {/* DESCRIPTION */}
-                      <div className="col-span-3">
+                      <div className="col-span-4">
                         <TextAreaInput
                           label="Description"
                           logo={FileText}
@@ -617,46 +608,42 @@ function MasterTaskUpdate() {
                             handleInputChange("description", e.target.value)
                           }
                           cols={3}
-                          rows={3}
+                          rows={4}
                         />
                       </div>
-                      <div className="flex justify-end items-end ">
-                        <div>
-                          <Button
-                            // className="text-xs bg-blue-500 text-white p-1 w-full rounded"
+
+                      <div className="flex flex-col items-end justify-end gap-1 ">
+                        <div className="mb-2 pr-2">
+                          <button
+                            title="Document Download"
+                            className="justify-end items-start"
                             onClick={(e) => {
-                              if (
-                                selectedSupportTicket.extension === null ||
-                                selectedSupportTicket.extension === ""
-                              ) {
-                                return;
-                              }
                               e.preventDefault();
                               downloadTaskDocument();
                             }}
                             disabled={
-                              selectedSupportTicket.extension === null ||
-                              selectedSupportTicket.extension === ""
+                              selectedSupportTicket?.extension === null ||
+                              selectedSupportTicket?.extension === ""
                             }
                           >
-                            Download
-                          </Button>
+                            <Download size={22} className="text-blue-500" />
+                          </button>
                         </div>
-                      </div>
-                      <div className="flex justify-end items-end pr-6">
-                        <div>
-                          <Button
-                            onClick={(e) => {
-                              e.preventDefault();
+                        <div className="flex justify-end items-end ">
+                          <div>
+                            <Button
+                              onClick={(e) => {
+                                e.preventDefault();
 
-                              updateTask();
-                            }}
-                          >
-                            <div className="flex gap-2 items-center">
-                              <Save size={15} />
-                              Save
-                            </div>
-                          </Button>
+                                updateTask();
+                              }}
+                            >
+                              <div className="flex gap-2 items-center">
+                                <Save size={15} />
+                                Save
+                              </div>
+                            </Button>
+                          </div>
                         </div>
                       </div>
                     </div>

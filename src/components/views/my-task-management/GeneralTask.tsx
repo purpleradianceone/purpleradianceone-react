@@ -1,12 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import {
-  ChevronRight,
-  ClipboardList,
-  FileText,
-  Flag,
-  Save,
-} from "lucide-react";
+import { ChevronRight, Download, FileText, Flag, Save } from "lucide-react";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { Link, useParams } from "react-router-dom";
@@ -22,6 +16,7 @@ import ROUTES_URL from "../../../constants/Routes";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
 import CustomDropdown from "../../modals/leads/CustomDropdown";
 import Button from "../../ui/Button";
+import MetaField from "../../ui/MetaField";
 import TaskPriorityChip from "../../ui/TaskPriorityChip";
 import TextAreaInput from "../../ui/TextAreaInput";
 import LoadingPopUpAnimation from "../card/LoadingPopUpAnimation";
@@ -221,6 +216,7 @@ function GeneralTask() {
     ) {
       return;
     }
+    setIsSubmitting(true);
     try {
       const response = await axiosClient.post(
         POST_API.GET_GENERAL_TASK_MASTER_DOCUMENT,
@@ -259,6 +255,8 @@ function GeneralTask() {
     } catch (error) {
       console.error(error);
       toast.error("Failed to download document");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -297,45 +295,21 @@ function GeneralTask() {
                     {/* ROW */}
 
                     <div className=" grid grid-cols-2 gap-3">
-                      <div className="">
-                        <label className="input-label-custom">
-                          <ClipboardList
-                            size={15}
-                            className="inline mr-1 text-blue-500"
-                          />
-                          Subject
-                        </label>
-
-                        <p className="input-label-custom pl-4">
-                          {formData.subject}
-                        </p>
-                      </div>
-                      <CustomDropdown
-                        logo={Flag}
-                        labelName="Task Stage"
-                        options={taskStage}
-                        preselectedOption={formData.taskStageId}
-                        onSelect={(v) => {
-                          handleDropdownChange("taskStageId", v);
-                        }}
+                      <MetaField
+                        label="Subject"
+                        value={formData.subject}
+                        className="col-span-2"
                       />
-                      <div className="">
-                        <TextAreaInput
-                          label="Remark"
-                          logo={FileText}
-                          value={formData.remark}
-                          onChange={(e: any) => {
-                            handleInputChange("remark", e.target.value);
-                          }}
-                          // onBlur={autoSave}
-                          cols={4}
-                          rows={3}
+                      <div className="col-span-2 flex items-start gap-6">
+                        <MetaField
+                          className="flex-1"
+                          label="Description"
+                          value={selectedGeneralTask?.description}
                         />
-                      </div>
-                      <div className="flex justify-end items-end ">
-                        <div>
-                          <Button
-                            // className="text-xs bg-blue-500 text-white p-1 w-full rounded"
+                        {generalMasterTask?.extension && (
+                          <button
+                            title="Document Download"
+                            className="justify-end items-start "
                             onClick={(e) => {
                               e.preventDefault();
                               downloadTaskDocument();
@@ -345,9 +319,35 @@ function GeneralTask() {
                               generalMasterTask?.extension === ""
                             }
                           >
-                            Download
-                          </Button>
-                        </div>
+                            <Download size={22} className="text-blue-500" />
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                    <div className="flex flex-1 gap-2">
+                      <div className="w-[65%] justify-end">
+                        <TextAreaInput
+                          label="Remark"
+                          logo={FileText}
+                          value={formData.remark}
+                          onChange={(e: any) => {
+                            handleInputChange("remark", e.target.value);
+                          }}
+                          // onBlur={autoSave}
+                          cols={5}
+                          rows={4}
+                        />
+                      </div>
+                      <div className="flex-1">
+                        <CustomDropdown
+                          logo={Flag}
+                          labelName="Task Stage"
+                          options={taskStage}
+                          preselectedOption={formData.taskStageId}
+                          onSelect={(v) => {
+                            handleDropdownChange("taskStageId", v);
+                          }}
+                        />
                       </div>
                     </div>
                     <div className="flex justify-end items-end border-t pt-2">
@@ -374,20 +374,19 @@ function GeneralTask() {
               ) : (
                 <div className=" bg-white border rounded-lg p-4 space-y-4 ">
                   <div className="grid grid-cols-2 gap-4 input-label-custom">
-                    <div>
-                      <label className="caption-custom">Task Type</label>
-                      <p>{selectedGeneralTask?.general_task_type_name}</p>
-                    </div>
-                    <div>
-                      <label className="caption-custom">Due Date Time</label>
-                      <p>{selectedGeneralTask?.due_date_time}</p>
-                    </div>
-                    <div>
-                      <label className="caption-custom">Completed Date</label>
-                      <p>
-                        {selectedGeneralTask?.completed_at_date_time || "-"}
-                      </p>
-                    </div>
+                    <MetaField
+                      label="Task Type"
+                      value={selectedGeneralTask?.general_task_type_name}
+                    />
+                    <MetaField
+                      label="Due Date Time"
+                      value={selectedGeneralTask?.due_date_time}
+                    />
+                    <MetaField
+                      label="Completed Date"
+                      value={selectedGeneralTask?.completed_at_date_time}
+                    />
+
                     <div>
                       <label className="caption-custom flex">Priority</label>
                       <TaskPriorityChip
@@ -396,26 +395,22 @@ function GeneralTask() {
                         }
                       />
                     </div>
-                    <div>
-                      <label className="caption-custom">Created By</label>
-                      <p>{selectedGeneralTask?.createdby}</p>
-                    </div>
-                    <div>
-                      <label className="caption-custom">Updated By</label>
-                      <p>{selectedGeneralTask?.updatedby}</p>
-                    </div>
-                    <div>
-                      <label className="caption-custom">Created On</label>
-                      <p>{selectedGeneralTask?.createdon}</p>
-                    </div>
-                    <div>
-                      <label className="caption-custom">Updated On</label>
-                      <p>{selectedGeneralTask?.updatedon}</p>
-                    </div>
-                    <div className="col-span-2">
-                      <label className="caption-custom">Description</label>
-                      <p>{selectedGeneralTask?.description}</p>
-                    </div>
+                    <MetaField
+                      label="Created By"
+                      value={selectedGeneralTask?.createdby}
+                    />
+                    <MetaField
+                      label="Updated By"
+                      value={selectedGeneralTask?.updatedby}
+                    />
+                    <MetaField
+                      label="Created On"
+                      value={selectedGeneralTask?.createdon}
+                    />
+                    <MetaField
+                      label="Updated On"
+                      value={selectedGeneralTask?.updatedon}
+                    />
                   </div>
                 </div>
               )}
