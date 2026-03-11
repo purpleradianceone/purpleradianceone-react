@@ -179,6 +179,7 @@ const UserPreference = () => {
     fullName?: string;
     mobileNumber?: string;
     email?: string;
+    pan?: string;
   }>({});
   const prevTimezoneId = useRef<number>(userPreference.timezoneId);
 
@@ -196,7 +197,7 @@ const UserPreference = () => {
   // const [totalCount, setTotalCount] = useState<number | null>(null);
 
   const handleTimezonePreferenceChange = async () => {
-    if(loginStatus.companyId === 0)return;
+    if (loginStatus.companyId === 0) return;
     //getting the id as per value
     const selectedMasterRowInGrid = rowsInGridDropdownOptions.find(
       (option) => parseInt(option.rowsInGrid) === selectedRowsPerPage,
@@ -245,6 +246,7 @@ const UserPreference = () => {
             countryId: selectedCountry?.id || userPreference.countryId,
           });
           setShowTimeZoneData(false);
+          setEditingSection(null);
         }
       }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -320,6 +322,14 @@ const UserPreference = () => {
       }
     }
 
+    if (name === "pan") {
+      if (value.trim().length !== 0 && !REGEX.PAN.test(value.trim())) {
+        errorMsg = "Invalid PAN format (valid PAN: ABCDE1234F)";
+      } else {
+        errorMsg = "";
+      }
+    }
+
     setFormErrors((prev) => ({
       ...prev,
       [name]: errorMsg,
@@ -344,7 +354,7 @@ const UserPreference = () => {
   };
 
   const updateUserProfile = async () => {
-    if(loginStatus.companyId === 0)return;
+    if (loginStatus.companyId === 0) return;
     try {
       const postData = {
         company_id: loginStatus.companyId,
@@ -401,7 +411,7 @@ const UserPreference = () => {
     searchTextToUse = "",
     customLimit?: number,
   ) => {
-    if(loginStatus.companyId === 0)return;
+    if (loginStatus.companyId === 0) return;
     const effectiveLimit = customLimit !== undefined ? customLimit : limit;
 
     const postData = {
@@ -505,14 +515,16 @@ const UserPreference = () => {
   //For company details
 
   const [logoFile, setLogoFile] = useState<File | null>(null);
-  const [logoPreviousPreview, setPreviousLogoPreview] = useState<string | null>(null);
+  const [logoPreviousPreview, setPreviousLogoPreview] = useState<string | null>(
+    null,
+  );
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
 
   const [stateData, setStateData] = useState<State[]>([]);
   const [districts, setDistrict] = useState<District[]>([]);
 
   const getCompanyDetail = () => {
-    if(loginStatus.companyId === 0)return;
+    if (loginStatus.companyId === 0) return;
     try {
       axiosClient
         .post(POST_API.GET_COMPANY_DETAIL, {
@@ -546,7 +558,7 @@ const UserPreference = () => {
   };
 
   const handleCompanyLogoUpload = async () => {
-    if(loginStatus.companyId === 0)return;
+    if (loginStatus.companyId === 0) return;
     if (logoFile) {
       try {
         const formData = new FormData();
@@ -605,7 +617,7 @@ const UserPreference = () => {
   ] = useState<boolean>(false);
 
   const updateCompanyDetail = () => {
-        if(loginStatus.companyId === 0)return;
+    if (loginStatus.companyId === 0) return;
 
     if (!isCompanyDetailEqual(previousCompanyDetail, companyDetail)) {
       setIsLoadingForCompanyDetailsUpdate(true);
@@ -668,9 +680,9 @@ const UserPreference = () => {
     getCompanyDetail();
   }, [loginStatus.companyId]);
 
-  const getCompanyLogo =()=>{
-    if(loginStatus.companyId === 0)return;
-     axios
+  const getCompanyLogo = () => {
+    if (loginStatus.companyId === 0) return;
+    axios
       .post(
         POST_API.GET_COMPANY_LOGO,
         {
@@ -681,7 +693,7 @@ const UserPreference = () => {
         },
         {
           responseType: "arraybuffer",
-          withCredentials: true
+          withCredentials: true,
         },
       )
       .then((response) => {
@@ -692,19 +704,21 @@ const UserPreference = () => {
         const imageUrl = URL.createObjectURL(blob);
         setLogoPreview(imageUrl);
         setPreviousLogoPreview(imageUrl);
-        console.log("inside get logo")
-
-      }).catch((e)=>{
-        console.log("inside get company logo catch"+e)
+        console.log("inside get logo");
+      })
+      .catch((e) => {
+        console.log("inside get company logo catch" + e);
       });
-  }
+  };
 
-  useEffect(()=>{
-    if(companyDetail.logo_file_extension && companyDetail.logo_file_extension!==""){
+  useEffect(() => {
+    if (
+      companyDetail.logo_file_extension &&
+      companyDetail.logo_file_extension !== ""
+    ) {
       getCompanyLogo();
     }
-
-  },[companyDetail.logo_file_extension])
+  }, [companyDetail.logo_file_extension]);
 
   const [isLogoChange, setIsLogoChange] = useState<boolean>(false);
 
@@ -715,35 +729,44 @@ const UserPreference = () => {
     setLogoFile(file);
     console.log(logoFile);
 
-
     // preview
     const previewUrl = URL.createObjectURL(file);
     setLogoPreview(previewUrl);
   };
 
-  useEffect(()=>{
-
-    if(logoPreview !== logoPreviousPreview){
-       setIsLogoChange(true);
+  useEffect(() => {
+    if (logoPreview !== logoPreviousPreview) {
+      setIsLogoChange(true);
     } else {
       setIsLogoChange(false);
     }
-
-  },[logoPreview])
+  }, [logoPreview]);
 
   const [editingSection, setEditingSection] = useState<string | null>(null);
 
   const handleEditableSectionSave = () => {
+    if(!formErrors.pan){
     updateCompanyDetail();
+    }else{
+      toast.error("please enter valid pan");
+    }
   };
 
+  const handleEditableSectionEdit = (key: string) => {
+     setFormErrors((prev) => ({
+      ...prev,
+      pan: "",
+    }));
+    setCompanyDetail(previousCompanyDetail);
+    setEditingSection(key);
+  };
   const handleEditableSectionCancel = () => {
     setCompanyDetail(previousCompanyDetail);
     setEditingSection(null);
   };
 
   const getAllState = async (countryId: number | null) => {
-    if(loginStatus.companyId === 0)return;
+    if (loginStatus.companyId === 0) return;
 
     if (!countryId) return;
     const PostDataForState: State = {
@@ -797,7 +820,7 @@ const UserPreference = () => {
   }, [companyDetail.state_id]);
 
   const getAllDistrict = async (stateId: number | null) => {
-    if(loginStatus.companyId === 0)return;
+    if (loginStatus.companyId === 0) return;
     if (!stateId) return;
     const PostDataForDistrict: District = {
       id: null,
@@ -864,7 +887,7 @@ const UserPreference = () => {
               title=""
               hasAccess={userHasAccessToUpdateUser}
               onEdit={() => {
-                setEditingSection("user detail");
+                handleEditableSectionEdit("user detail");
               }}
               isEditing={editingSection === "user detail"}
               onCancel={handleEditableSectionCancel}
@@ -1030,20 +1053,20 @@ const UserPreference = () => {
                 ) : (
                   <div className="w-55 flex justify-center mt-2 gap-2">
                     <div>
-                     <Button
-                     type="button"
-                      onClick={()=>setLogoPreview(logoPreviousPreview)}
-                    >
-                      Cancel
-                    </Button>
+                      <Button
+                        type="button"
+                        onClick={() => setLogoPreview(logoPreviousPreview)}
+                      >
+                        Cancel
+                      </Button>
                     </div>
                     <div>
-                    <Button
-                      className="cursor-pointer px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-                      onClick={handleCompanyLogoUpload}
-                    >
-                      Save Logo
-                    </Button>
+                      <Button
+                        className="cursor-pointer px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                        onClick={handleCompanyLogoUpload}
+                      >
+                        Save Logo
+                      </Button>
                     </div>
                   </div>
                 ))}
@@ -1057,7 +1080,7 @@ const UserPreference = () => {
               <EditableSection
                 title={loginStatus?.companyName ?? "Company Name"}
                 hasAccess={userHasAccessToUpdateCompanyDetail}
-                onEdit={() => setEditingSection("company")}
+                onEdit={() => handleEditableSectionEdit("company")}
                 isEditing={editingSection === "company"}
                 onCancel={handleEditableSectionCancel}
                 sectionKey="company"
@@ -1076,16 +1099,19 @@ const UserPreference = () => {
                     placeholder="eg. www.abc.com"
                   />
                 ) : (
-                  <div className="table-header-custom">
-                    Website:
-                    <a
-                      href={companyDetail?.website}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="caption-custom-blue ml-1"
-                    >
-                      {companyDetail?.website ?? ""}
-                    </a>
+                  <div className="grid grid-cols-2 items-start border-b pb-1">
+                    <div className="flex gap-4">
+                      <div className="input-label-custom py-1">Website:</div>
+
+                      <a
+                        href={companyDetail?.website}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="caption-custom-blue py-1.5 break-all"
+                      >
+                        {companyDetail?.website ?? ""}
+                      </a>
+                    </div>
                   </div>
                 )}
               </EditableSection>
@@ -1097,7 +1123,7 @@ const UserPreference = () => {
                 title="Business Information"
                 sectionKey="business"
                 hasAccess={userHasAccessToUpdateCompanyDetail}
-                onEdit={() => setEditingSection("business")}
+                onEdit={() => handleEditableSectionEdit("business")}
                 isEditing={editingSection === "business"}
                 onCancel={handleEditableSectionCancel}
                 onSave={() => {
@@ -1137,17 +1163,21 @@ const UserPreference = () => {
                     />
                   </div>
                 ) : (
-                  <div className="grid grid-cols-2">
-                    <div className="table-header-custom">
-                      Business Type:{"  "}
-                      <span className="table-data-custom">
+                  <div className="grid grid-cols-2 items-start border-b pb-1">
+                    <div className="flex gap-3">
+                      <div className="input-label-custom py-1">
+                        Business Type:
+                      </div>
+                      <span className="caption-custom text-blue-600 py-1.5">
                         {companyDetail?.business_type_name ?? "-"}
                       </span>
                     </div>
-                    <div className="table-header-custom">
-                      Industry Type:{"  "}
-                      <span className="table-data-custom">
-                        {"  "}
+
+                    <div className="flex gap-3">
+                      <div className="input-label-custom py-1">
+                        Industry Type:
+                      </div>
+                      <span className="caption-custom text-blue-600 py-1.5">
                         {companyDetail?.industry_type_name ?? "-"}
                       </span>
                     </div>
@@ -1162,7 +1192,7 @@ const UserPreference = () => {
                 title="Location Information"
                 sectionKey="location"
                 hasAccess={userHasAccessToUpdateCompanyDetail}
-                onEdit={() => setEditingSection("location")}
+                onEdit={() => handleEditableSectionEdit("location")}
                 isEditing={editingSection === "location"}
                 onCancel={handleEditableSectionCancel}
                 onSave={() => {
@@ -1224,16 +1254,17 @@ const UserPreference = () => {
                     />
                   </div>
                 ) : (
-                  <div className="grid grid-cols-2">
-                    <div className="table-header-custom">
-                      State:{"  "}
-                      <span className="table-data-custom">
+                  <div className="grid grid-cols-2 items-start border-b pb-1">
+                    <div className="flex gap-4">
+                      <div className="input-label-custom py-1">State:</div>
+                      <span className="caption-custom text-blue-600 py-1.5">
                         {companyDetail?.state_name ?? "-"}
                       </span>
                     </div>
-                    <div className="table-header-custom">
-                      District:{"  "}
-                      <span className="table-data-custom">
+
+                    <div className="flex gap-4">
+                      <div className="input-label-custom py-1">District:</div>
+                      <span className="caption-custom text-blue-600 py-1.5">
                         {companyDetail?.district_name ?? "-"}
                       </span>
                     </div>
@@ -1247,7 +1278,7 @@ const UserPreference = () => {
               <EditableSection
                 title="Tax Information"
                 hasAccess={userHasAccessToUpdateCompanyDetail}
-                onEdit={() => setEditingSection("tax")}
+                onEdit={() => handleEditableSectionEdit("tax")}
                 isEditing={editingSection === "tax"}
                 onCancel={handleEditableSectionCancel}
                 sectionKey="tax"
@@ -1262,7 +1293,10 @@ const UserPreference = () => {
                       label="PAN: "
                       name="pan"
                       value={companyDetail?.pan ?? ""}
+                      pattern="[A-Z]{5}[0-9]{4}[A-Z]{1}"
+                      onBlur={handleBlur}
                       onChange={handleCompanyDetailsChange}
+                      error={formErrors.pan}
                     />
 
                     <FormInput
@@ -1294,36 +1328,48 @@ const UserPreference = () => {
                     />
                   </div>
                 ) : (
-                  <div className="grid grid-cols-2 gap-y-1">
-                    <div className="table-header-custom">
-                      PAN:{" "}
-                      <span className="table-data-custom">
-                        {companyDetail?.pan ?? ""}
-                      </span>
+                  <div className="space-y-1">
+                    <div className="grid grid-cols-2 items-start border-b pb-1">
+                      <div className="flex gap-4">
+                        <div className="input-label-custom py-1">PAN:</div>
+                        <span className="caption-custom text-blue-600 py-1.5">
+                          {companyDetail?.pan ?? ""}
+                        </span>
+                      </div>
+
+                      <div className="flex gap-4">
+                        <div className="input-label-custom py-1">GST:</div>
+                        <span className="caption-custom text-blue-600 py-1.5">
+                          {companyDetail?.gst ?? ""}
+                        </span>
+                      </div>
                     </div>
-                    <div className="table-header-custom">
-                      GST:{" "}
-                      <span className="table-data-custom">
-                        {companyDetail?.gst ?? ""}
-                      </span>
+
+                    <div className="grid grid-cols-2 items-start border-b pb-1">
+                      <div className="flex gap-4">
+                        <div className="input-label-custom py-1">TAN:</div>
+                        <span className="caption-custom text-blue-600 py-1.5">
+                          {companyDetail?.tan ?? ""}
+                        </span>
+                      </div>
+
+                      <div className="flex gap-4">
+                        <div className="input-label-custom py-1">CIN:</div>
+                        <span className="caption-custom text-blue-600 py-1.5">
+                          {companyDetail?.cin ?? ""}
+                        </span>
+                      </div>
                     </div>
-                    <div className="table-header-custom">
-                      TAN:{" "}
-                      <span className="table-data-custom">
-                        {companyDetail?.tan ?? ""}
-                      </span>
-                    </div>
-                    <div className="table-header-custom">
-                      CIN:{" "}
-                      <span className="table-data-custom">
-                        {companyDetail?.cin ?? ""}
-                      </span>
-                    </div>
-                    <div className="col-span-2 table-header-custom">
-                      Business Reg No:
-                      <span className="table-data-custom">
-                        {companyDetail?.business_registration_number ?? ""}
-                      </span>
+
+                    <div className="grid grid-cols-2 items-start border-b pb-1">
+                      <div className="flex gap-4">
+                        <div className="input-label-custom py-1">
+                          Business Reg No:
+                        </div>
+                        <span className="caption-custom text-blue-600 py-1.5">
+                          {companyDetail?.business_registration_number ?? ""}
+                        </span>
+                      </div>
                     </div>
                   </div>
                 )}
@@ -1336,7 +1382,7 @@ const UserPreference = () => {
                 title="Address Information"
                 sectionKey="address"
                 hasAccess={userHasAccessToUpdateCompanyDetail}
-                onEdit={() => setEditingSection("address")}
+                onEdit={() => handleEditableSectionEdit("address")}
                 isEditing={editingSection === "address"}
                 onCancel={handleEditableSectionCancel}
                 onSave={() => {
@@ -1351,7 +1397,7 @@ const UserPreference = () => {
                       name="registered_office_address"
                       value={companyDetail?.registered_office_address ?? ""}
                       onChange={handleCompanyDetailsChange}
-                      rows={1}
+                      rows={3}
                       cols={0}
                     />
 
@@ -1360,7 +1406,7 @@ const UserPreference = () => {
                       name="billing_address"
                       value={companyDetail?.billing_address ?? ""}
                       onChange={handleCompanyDetailsChange}
-                      rows={1}
+                      rows={3}
                       cols={0}
                     />
 
@@ -1369,27 +1415,35 @@ const UserPreference = () => {
                       value={companyDetail?.shipping_address ?? ""}
                       name="shipping_address"
                       onChange={handleCompanyDetailsChange}
-                      rows={1}
+                      rows={3}
                       cols={0}
                     />
                   </div>
                 ) : (
                   <div className="space-y-1">
-                    <div className="table-header-custom mb-2">
-                      Registered:{"  "}
-                      <span className="table-data-custom">
+                    <div className="grid grid-cols-[185px_1fr] items-start border-b pb-1">
+                      <div className="input-label-custom py-1">
+                        Registered Office Address:
+                      </div>
+                      <span className="caption-custom text-blue-600 hover:text-blue-700 rounded-md py-1.5 whitespace-pre-wrap">
                         {companyDetail?.registered_office_address ?? ""}
                       </span>
                     </div>
-                    <div className="table-header-custom mb-2">
-                      Billing:{"  "}
-                      <span className="table-data-custom">
+
+                    <div className="grid grid-cols-[185px_1fr] items-start border-b pb-1">
+                      <div className="input-label-custom py-1">
+                        Billing Address:
+                      </div>
+                      <span className="caption-custom text-blue-600 hover:text-blue-700 rounded-md py-1.5 whitespace-pre-wrap">
                         {companyDetail?.billing_address ?? ""}
                       </span>
                     </div>
-                    <div className="table-header-custom">
-                      Shipping:{"  "}
-                      <span className="table-data-custom">
+
+                    <div className="grid grid-cols-[185px_1fr] items-start border-b pb-1">
+                      <div className="input-label-custom py-1">
+                        Shipping Address:
+                      </div>
+                      <span className="caption-custom text-blue-600 hover:text-blue-700 rounded-md py-1.5 whitespace-pre-wrap">
                         {companyDetail?.shipping_address ?? ""}
                       </span>
                     </div>
@@ -1404,198 +1458,218 @@ const UserPreference = () => {
         <div
           className={` ${
             !userHasAccessToViewSettingGeneral ? "hidden" : ""
-          }   bg-white rounded-2xl shadow-lg px-8 py-6 space-y-2`}
+          }   bg-white rounded-2xl shadow-lg px-8 py-6 space-y-2 `}
         >
-          {/* button */}
           <div className="flex items-center justify-between">
             <h3 className="section-header-custom">
               Preferences{" "}
-              <span className="caption-custom">(Click to change)</span>
+              <span className="caption-custom">(Click Edit to change)</span>
             </h3>
-            {(prevTimezoneId.current !== selectedTimezoneId ||
-              userPreference.rowsInGrid != selectedRowsPerPage ||
-              userPreference.countryId !== selectedCountry?.id) && (
-              <button
-                onClick={() => {
-                  if (userHasAccessToUpdateSettingGeneral) {
-                    if (prevTimezoneId.current !== selectedTimezoneId) {
-                      handleTimezonePreferenceChange();
-                      prevTimezoneId.current = selectedTimezoneId;
-                    } else if (
-                      userPreference.rowsInGrid !== selectedRowsPerPage
-                    ) {
-                      handleTimezonePreferenceChange();
-                    } else if (
-                      userPreference.countryId !== selectedCountry?.id
-                    ) {
-                      handleTimezonePreferenceChange();
-                    }
-                  } else {
-                    toast.error(
-                      MESSAGE.MODULE_ACCESS.GENERAL_SETTING
-                        .DENIED_UPDATE_ACCESS,
-                    );
-                  }
-                }}
-                className="px-4 py-2 bg-blue-600 action-btn-custom rounded-md hover:bg-blue-700 transition"
-              >
-                Save
-              </button>
-            )}
           </div>
-          {/* time zone */}
-          <div className="flex items-center space-x-4 border-b pb-1">
-            {/* Label for the Time Zone setting */}
-            <h4 className="input-label-custom whitespace-nowrap">Time Zone:</h4>
-
-            {/* Conditional rendering for either the display text or the dropdown */}
-            {showTimeZoneData ? (
-              // When the dropdown should be visible (showTimeZoneData is true)
-              <div className="relative z-10 w-auto">
-                {" "}
-                {/* Add relative and z-index for dropdown positioning */}
-                <CustomTimezoneDropdown
-                  setShowTimeZoneData={setShowTimeZoneData}
-                  timezoneData={timezoneList}
-                  hasMore={hasMore}
-                  loadMore={loadMore}
-                  onSearchChange={handleSearchChange}
-                  onSelect={(zone) => {
-                    setSelectedTimeZoneData(zone);
-                    setSelectedTimezoneId(zone.id);
-                    // setShowTimeZoneData(false); // Often desirable to close after selection
-                  }}
-                />
-              </div>
-            ) : (
-              // When the display text should be visible (showTimeZoneData is false)
-              <p
-                onClick={() => {
-                  if (userHasAccessToUpdateSettingGeneral) {
-                    setShowTimeZoneData(!showTimeZoneData); // Toggle to show the dropdown
+          <div className="border-t pt-4">
+            <EditableSection
+              hasAccess={userHasAccessToUpdateSettingGeneral}
+              title=""
+              sectionKey="preferences"
+              onEdit={() => handleEditableSectionEdit("preferences")}
+              isEditing={editingSection === "preferences"}
+              onCancel={handleEditableSectionCancel}
+              onSave={() => {
+                if (userHasAccessToUpdateSettingGeneral) {
+                  if (prevTimezoneId.current !== selectedTimezoneId) {
+                    handleTimezonePreferenceChange();
+                    prevTimezoneId.current = selectedTimezoneId;
+                  } else if (
+                    userPreference.rowsInGrid !== selectedRowsPerPage
+                  ) {
+                    handleTimezonePreferenceChange();
+                  } else if (userPreference.countryId !== selectedCountry?.id) {
+                    handleTimezonePreferenceChange();
                   } else {
-                    toast.error(
-                      MESSAGE.MODULE_ACCESS.GENERAL_SETTING
-                        .DENIED_UPDATE_ACCESS,
-                    );
+                    handleEditableSectionCancel();
                   }
-                }}
-                className="caption-custom text-blue-600 cursor-pointer hover:text-blue-700
-                 rounded-md py-1.5 px-3  // Adds padding to match select height
-                 focus:outline-none focus:ring-2 focus:ring-indigo-500" // Focus styles for clickability
-                tabIndex={0} // Makes the paragraph focusable for keyboard navigation
-                role="button" // Indicates it's a clickable element
-                aria-label="Click to change time zone"
-              >
-                {userPreference.timezone}
-              </p>
-            )}
-          </div>
-          {/* rows in grid  */}
-          <div className="flex items-center space-x-4 border-b pb-2">
-            {/* Label for accessibility and clear identification */}
-            <label
-              htmlFor="records-per-page-select"
-              className="input-label-custom whitespace-nowrap"
-            >
-              Records Per Page:
-            </label>
-
-            {/* Display current preference, visually distinct */}
-            <div className="flex items-center space-x-1">
-              <span className="caption-custom">Current:</span>
-              <span className="caption-custom-blue">
-                {userPreference.rowsInGrid}
-              </span>
-            </div>
-
-            {/* The styled select dropdown */}
-            <select
-              // disabled={!userHasAccessToUpdateSettingGeneral}
-              onClick={() => {
-                if (!userHasAccessToUpdateSettingGeneral) {
+                } else {
                   toast.error(
                     MESSAGE.MODULE_ACCESS.GENERAL_SETTING.DENIED_UPDATE_ACCESS,
                   );
-                  return;
                 }
               }}
-              onChange={(e) => {
-                if (userHasAccessToUpdateSettingGeneral) {
-                  handleSelectRowInGridOptionChange(e);
-                }
-              }}
-              value={selectedRowsPerPage}
-              id="records-per-page-select" // Link with label's htmlFor
-              className="block caption-custom w-36 max-w-fit border rounded border-gray-300 shadow-sm
-               focus:border-indigo-500 focus:ring-indigo-500
-               sm:pl-1 pr-1 // Added padding for better appearance
-               text-gray-900" // Default text color
-              aria-label="Select number of records per page" // Good for accessibility
-              // You'd add value={selectedValue} and onChange={handleChange} props here in your React component
+              isLoading={isLoadingForCompanyDetailsUpdate}
             >
-              <option className="caption-custom" value="">
-                Select
-              </option>
-              {rowsInGridDropdownOptions &&
-                rowsInGridDropdownOptions.map((data) => (
-                  <option key={data.id} value={data.rowsInGrid}>
-                    {data.rowsInGrid}
-                  </option>
-                ))}
-            </select>
-          </div>
-          <div className="flex input-label-custom gap-2">
-            {/* Country Id :{userPreference.countryId} */}
-            Country :{/* Display current preference, visually distinct */}
-            <div className="flex items-center space-x-1">
-              <span className="caption-custom">Current:</span>
-              <span className="caption-custom-blue">
-                {
-                  countries.find(
-                    (country: Country) =>
-                      country.id === userPreference.countryId,
-                  )?.name
-                }
-              </span>
-            </div>
-            {/* The styled select dropdown */}
-            <select
-              // disabled={!userHasAccessToUpdateSettingGeneral}
-              onClick={() => {
-                if (!userHasAccessToUpdateSettingGeneral) {
-                  toast.error(
-                    MESSAGE.MODULE_ACCESS.GENERAL_SETTING.DENIED_UPDATE_ACCESS,
-                  );
-                  return;
-                }
-              }}
-              onChange={(e) => {
-                if (userHasAccessToUpdateSettingGeneral) {
-                  handleSelectCountryOptionChange(e);
-                }
-              }}
-              value={selectedCountry?.id?.toString() ?? ""}
-              id="records-per-page-select" // Link with label's htmlFor
-              className="block caption-custom w-36 max-w-fit border rounded border-gray-300 shadow-sm
-               focus:border-indigo-500 focus:ring-indigo-500
-               sm:pl-1 pr-1 // Added padding for better appearance
-               text-gray-900" // Default text color
-              aria-label="Select number of records per page" // Good for accessibility
-              // You'd add value={selectedValue} and onChange={handleChange} props here in your React component
-            >
-              <option className="caption-custom" value="">
-                Select {}
-              </option>
-              {countries &&
-                countries.map((data) => (
-                  <option key={data.id} value={data.id!}>
-                    {data.name}
-                  </option>
-                ))}
-            </select>
+              {editingSection === "preferences" ? (
+                <div className="space-y-1">
+                  {/* Time Zone */}
+                  <div className="grid grid-cols-[140px_1fr] items-start border-b pb-2">
+                    <div className="input-label-custom py-1">Time Zone:</div>
+
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="caption-custom">Current:</span>
+
+                      <span className="caption-custom-blue">
+                        {userPreference.timezone}
+                      </span>
+
+                      <div className="relative z-10 w-auto">
+                        <CustomTimezoneDropdown
+                          setShowTimeZoneData={setShowTimeZoneData}
+                          timezoneData={timezoneList}
+                          hasMore={hasMore}
+                          loadMore={loadMore}
+                          onSearchChange={handleSearchChange}
+                          onSelect={(zone) => {
+                            setSelectedTimeZoneData(zone);
+                            setSelectedTimezoneId(zone.id);
+                          }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Records Per Page */}
+                  <div className="grid grid-cols-[140px_1fr] items-start border-b pb-2">
+                    <label
+                      htmlFor="records-per-page-select"
+                      className="input-label-custom py-1"
+                    >
+                      Records Per Page:
+                    </label>
+
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="caption-custom">Current:</span>
+
+                      <span className="caption-custom-blue">
+                        {userPreference.rowsInGrid}
+                      </span>
+
+                      <select
+                        onClick={() => {
+                          if (!userHasAccessToUpdateSettingGeneral) {
+                            toast.error(
+                              MESSAGE.MODULE_ACCESS.GENERAL_SETTING
+                                .DENIED_UPDATE_ACCESS,
+                            );
+                            return;
+                          }
+                        }}
+                        onChange={(e) => {
+                          if (userHasAccessToUpdateSettingGeneral) {
+                            handleSelectRowInGridOptionChange(e);
+                          }
+                        }}
+                        value={selectedRowsPerPage}
+                        id="records-per-page-select"
+                        className="block caption-custom w-36 border rounded border-gray-300 shadow-sm
+        focus:border-indigo-500 focus:ring-indigo-500
+        text-gray-900 py-1"
+                        aria-label="Select number of records per page"
+                      >
+                        <option value="">Select</option>
+
+                        {rowsInGridDropdownOptions &&
+                          rowsInGridDropdownOptions.map((data) => (
+                            <option key={data.id} value={data.rowsInGrid}>
+                              {data.rowsInGrid}
+                            </option>
+                          ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  {/* Country */}
+                  <div className="grid grid-cols-[140px_1fr] items-start border-b pb-2">
+                    <div className="input-label-custom py-1">Country:</div>
+
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="caption-custom">Current:</span>
+
+                      <span className="caption-custom-blue">
+                        {
+                          countries.find(
+                            (country: Country) =>
+                              country.id === userPreference.countryId,
+                          )?.name
+                        }
+                      </span>
+
+                      <select
+                        onClick={() => {
+                          if (!userHasAccessToUpdateSettingGeneral) {
+                            toast.error(
+                              MESSAGE.MODULE_ACCESS.GENERAL_SETTING
+                                .DENIED_UPDATE_ACCESS,
+                            );
+                            return;
+                          }
+                        }}
+                        onChange={(e) => {
+                          if (userHasAccessToUpdateSettingGeneral) {
+                            handleSelectCountryOptionChange(e);
+                          }
+                        }}
+                        value={selectedCountry?.id?.toString() ?? ""}
+                        className="block caption-custom w-36 border rounded border-gray-300 shadow-sm
+        focus:border-indigo-500 focus:ring-indigo-500
+        text-gray-900 py-1"
+                      >
+                        <option value="">Select</option>
+
+                        {countries &&
+                          countries.map((data) => (
+                            <option key={data.id} value={data.id!}>
+                              {data.name}
+                            </option>
+                          ))}
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-1">
+                  {/* Time Zone */}
+                  <div className="grid grid-cols-[140px_1fr] items-start border-b pb-1">
+                    <div className="input-label-custom py-1">Time Zone:</div>
+                    <p
+                      className="caption-custom text-blue-600 hover:text-blue-700 py-1.5"
+                      aria-label="Click Edit change time zone"
+                    >
+                      {userPreference.timezone}
+                    </p>
+                  </div>
+
+                  {/* Records Per Page */}
+                  <div className="grid grid-cols-[140px_1fr] items-start border-b pb-1">
+                    <div className="input-label-custom py-1">
+                      Records Per Page:
+                    </div>
+                    <p
+                      className="caption-custom text-blue-600 hover:text-blue-700 py-1.5"
+                      aria-label="Click Edit change rows per page"
+                    >
+                      {userPreference.rowsInGrid}
+                    </p>
+                  </div>
+
+                  {/* Country */}
+                  <div className="grid grid-cols-[140px_1fr] items-start border-b pb-1">
+                    <div className="input-label-custom py-1">Country:</div>
+                    <p
+                      className="caption-custom text-blue-600 hover:text-blue-700 py-1.5"
+                      aria-label="Click Edit change country"
+                    >
+                      {
+                        countries.find(
+                          (country: Country) =>
+                            country.id === userPreference.countryId,
+                        )?.name
+                      }
+                    </p>
+                  </div>
+                </div>
+              )}
+            </EditableSection>
           </div>
         </div>
+
         {/* Subscription Card */}
         <div className="  bg-white rounded-2xl shadow-lg p-8 space-y-4">
           <div className="flex items-center justify-between">
