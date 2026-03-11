@@ -180,6 +180,7 @@ const UserPreference = () => {
     mobileNumber?: string;
     email?: string;
     pan?: string;
+    gst?: string;
   }>({});
   const prevTimezoneId = useRef<number>(userPreference.timezoneId);
 
@@ -327,6 +328,19 @@ const UserPreference = () => {
         errorMsg = "Invalid PAN format (valid PAN: ABCDE1234F)";
       } else {
         errorMsg = "";
+      }
+    }
+
+    if (name === "gst") {
+      if (value.trim().length !== 0 && !REGEX.GST.test(value.trim())) {
+        errorMsg = "Invalid GST format (valid GST: 27ABCDE1234F1Z5)";
+      } else {
+        const result = value.substring(2, 12);
+        if (value.trim().length !== 0 && result !== companyDetail.pan) {
+          errorMsg = "Given PAN number must be include in GST.";
+        } else {
+          errorMsg = "";
+        }
       }
     }
 
@@ -745,17 +759,21 @@ const UserPreference = () => {
   const [editingSection, setEditingSection] = useState<string | null>(null);
 
   const handleEditableSectionSave = () => {
-    if(!formErrors.pan){
-    updateCompanyDetail();
-    }else{
-      toast.error("please enter valid pan");
+    if (!formErrors.pan && !formErrors.gst) {
+      updateCompanyDetail();
+    } else {
+      if(formErrors.pan)
+      toast.error("Please enter valid pan");
+      if(formErrors.gst)
+      toast.error("Please enter valid gst");
     }
   };
 
   const handleEditableSectionEdit = (key: string) => {
-     setFormErrors((prev) => ({
+    setFormErrors((prev) => ({
       ...prev,
       pan: "",
+      gst: "",
     }));
     setCompanyDetail(previousCompanyDetail);
     setEditingSection(key);
@@ -1304,6 +1322,8 @@ const UserPreference = () => {
                       name="gst"
                       value={companyDetail?.gst ?? ""}
                       onChange={handleCompanyDetailsChange}
+                      onBlur={handleBlur}
+                      error={formErrors.gst}
                     />
 
                     <FormInput
