@@ -30,13 +30,16 @@ import {
 import { handleApiError } from "../../config/error/handleApiError";
 import FormInput from "../ui/FormInput";
 import TextAreaInput from "../ui/TextAreaInput";
-import State from "../../@types/general/State";
-import District from "../../@types/general/District";
 import CustomDropdown from "../modals/leads/CustomDropdown";
 import EditableSection from "./EditableSection";
 import { usebusinessType } from "../../config/hooks/useBusinessType";
 import { useIndustryType } from "../../config/hooks/useIndustryType";
 import Button from "../ui/Button";
+import { CheckCircle, XCircle } from "lucide-react";
+import { useStates } from "../../config/hooks/useStates";
+import { useDistricts } from "../../config/hooks/useDisctricts";
+import { toSelectOptions } from "../../utils/toSelectOption";
+import CustomSelect from "../ui/CustomSelect";
 
 const UserPreference = () => {
   const { countries } = useCountries();
@@ -52,12 +55,17 @@ const UserPreference = () => {
     userHasAccessToViewSettingGeneral,
     userHasAccessToViewCompanyDetail,
     userHasAccessToUpdateCompanyDetail,
+    userHasAccessToUpdateSubscription,
   } = useUserAccessModules();
 
   const [selectedRowsPerPage, setSelectedRowsPerPage] = useState<number>(
     userPreference.rowsInGrid,
   );
   const [selectedCountry, setSelectedCountry] = useState<Country | null>(null);
+
+  const [showCompanyLogoPreview, setShowCompanyLogoPreview] = useState(false);
+
+  const [showUserLogoPreview, setShowUserLogoPreview] = useState(false);
 
   const [companyDetail, setCompanyDetail] = useState<CompanyDetail>({
     id: 0,
@@ -145,6 +153,11 @@ const UserPreference = () => {
       updatedon: "",
     });
 
+  const { states } = useStates(userPreference.countryId);
+  const { districts } = useDistricts(companyDetail.state_id);
+  const stateTypeOption = toSelectOptions(states, "id", "name");
+  const districtTypeOption = toSelectOptions(districts, "id", "name");
+
   useEffect(() => {
     if (userPreference.countryId && countries.length > 0) {
       const found = countries.find(
@@ -181,6 +194,9 @@ const UserPreference = () => {
     email?: string;
     pan?: string;
     gst?: string;
+    tan?: string;
+    cin?: string;
+    business_registration_number?: string;
   }>({});
   const prevTimezoneId = useRef<number>(userPreference.timezoneId);
 
@@ -304,7 +320,6 @@ const UserPreference = () => {
     const { name, value } = e.target;
     let errorMsg = "";
 
-    // Check empty input for all fields
     if (!value.trim()) {
       errorMsg = `${name.charAt(0).toUpperCase() + name.slice(1)} is required`;
     } else {
@@ -335,12 +350,40 @@ const UserPreference = () => {
       if (value.trim().length !== 0 && !REGEX.GST.test(value.trim())) {
         errorMsg = "Invalid GST format (valid GST: 27ABCDE1234F1Z5)";
       } else {
-        const result = value.substring(2, 12);
-        if (value.trim().length !== 0 && result !== companyDetail.pan) {
-          errorMsg = "Given PAN number must be include in GST.";
+        if (companyDetail.state_id) {
+          const result = value.substring(2, 12);
+          if (value.trim().length !== 0 && result !== companyDetail.pan) {
+            errorMsg = "Given PAN number must be include in GST.";
+          } else {
+            errorMsg = "";
+          }
         } else {
-          errorMsg = "";
+          errorMsg = "First select the location information (ex: state)";
         }
+      }
+    }
+
+    if (name === "tan") {
+      if (value.trim().length !== 0 && !REGEX.TAN.test(value.trim())) {
+        errorMsg = "Invalid TAN format (valid TAN: MUMA12345B)";
+      } else {
+        errorMsg = "";
+      }
+    }
+
+    if (name === "cin") {
+      if (value.trim().length !== 0 && !REGEX.CIN.test(value.trim())) {
+        errorMsg = "Invalid CIN format (valid CIN: L12345MH2020PLC123456)";
+      } else {
+        errorMsg = "";
+      }
+    }
+
+    if (name === "business_registration_number") {
+      if (value.trim().length !== 0 && !REGEX.BRN.test(value.trim())) {
+        errorMsg = "Invalid Business Registration Number";
+      } else {
+        errorMsg = "";
       }
     }
 
@@ -359,9 +402,7 @@ const UserPreference = () => {
       ...formErrors,
       [name]: errorMsg,
     };
-    // if (!hasChanged) {
-    //   toast.error("No new changes to save.");
-    // }
+
     const hasErrors = Object.values(currentErrors).some((e) => e !== "");
 
     setIsSaveEnabled(hasChanged && !hasErrors);
@@ -384,10 +425,6 @@ const UserPreference = () => {
       });
       const res = response.data;
       if (response.status === STATUS_CODE.OK) {
-        // showMessageSnackbar({
-        //   message: response.data.message,
-        //   type: "success",
-        // });
         if (res.status) {
           setEditingSection(null);
           toast.success(response.data.message);
@@ -410,7 +447,6 @@ const UserPreference = () => {
           callFunction: updateUserProfile,
         });
 
-        // setIsDialogueOpen(!refreshTokenStatus);
         if (refreshTokenStatus) {
           updateUserProfile();
         }
@@ -445,11 +481,10 @@ const UserPreference = () => {
 
       if (newOffset === 0) {
         setTimezoneList(newTimezones);
-        // setTotalCount(count); // Update total count on initial load
         if (searchTextToUse) {
-          setLimit(limitForGrid); // If searching, set limit to total count initially
+          setLimit(limitForGrid);
         } else {
-          setLimit(limitForGrid); // If not searching, keep default limit for initial load
+          setLimit(limitForGrid);
         }
       } else {
         setTimezoneList((prev) => [...prev, ...newTimezones]);
@@ -483,22 +518,18 @@ const UserPreference = () => {
     setSelectedCountry(selected);
   };
 
-  // Initial load (now triggered by showing the dropdown)
   useEffect(() => {
     if (showTimeZoneData) {
       setOffset(0);
       setLimit(limitForGrid);
-      setSearchText(""); // Clear search text when dropdown is shown
-      // setTotalCount(null);
+      setSearchText("");
       setHasMore(true);
       loadTimezones(0);
     } else {
-      // Reset state when dropdown is closed
       setTimezoneList([]);
       setOffset(0);
       setLimit(limitForGrid);
       setSearchText("");
-      // setTotalCount(null);
       setHasMore(true);
     }
   }, [showTimeZoneData]);
@@ -507,10 +538,9 @@ const UserPreference = () => {
   const handleSearchChange = (text: string) => {
     setSearchText(text);
     setOffset(0);
-    // setTotalCount(null);
-    setLimit(limitForGrid); // Reset limit for new search
+    setLimit(limitForGrid);
     setHasMore(true);
-    loadTimezones(0, text, limitForGrid); // Initial search load with limit 25
+    loadTimezones(0, text, limitForGrid);
   };
 
   const loadMore = () => {
@@ -527,15 +557,11 @@ const UserPreference = () => {
   };
 
   //For company details
-
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [logoPreviousPreview, setPreviousLogoPreview] = useState<string | null>(
     null,
   );
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
-
-  const [stateData, setStateData] = useState<State[]>([]);
-  const [districts, setDistrict] = useState<District[]>([]);
 
   const getCompanyDetail = () => {
     if (loginStatus.companyId === 0) return;
@@ -641,8 +667,12 @@ const UserPreference = () => {
             company_id: loginStatus.companyId,
             industry_type_id: companyDetail.industry_type_id,
             business_type_id: companyDetail.business_type_id,
-            state_id: companyDetail.state_id,
-            district_id: companyDetail.district_id,
+            state_id:
+              companyDetail.state_id != 0 ? companyDetail.state_id : null,
+            district_id:
+              companyDetail.district_id !== 0
+                ? companyDetail.district_id
+                : null,
             pan: companyDetail.pan,
             gst: companyDetail.gst,
             tan: companyDetail.tan,
@@ -759,122 +789,52 @@ const UserPreference = () => {
   const [editingSection, setEditingSection] = useState<string | null>(null);
 
   const handleEditableSectionSave = () => {
-    if (!formErrors.pan && !formErrors.gst) {
+    if (
+      !formErrors.pan &&
+      !formErrors.gst &&
+      !formErrors.tan &&
+      !formErrors.cin &&
+      !formErrors.business_registration_number
+    ) {
       updateCompanyDetail();
     } else {
-      if(formErrors.pan)
-      toast.error("Please enter valid pan");
-      if(formErrors.gst)
-      toast.error("Please enter valid gst");
+      if (formErrors.pan) toast.error("Please enter valid PAN");
+      if (formErrors.gst) toast.error("Please enter valid GST");
+      if (formErrors.tan) toast.error("Please enter valid TAN");
+      if (formErrors.cin) toast.error("Please enter valid CIN");
+      if (formErrors.business_registration_number)
+        toast.error("Please enter valid BRN");
     }
   };
 
   const handleEditableSectionEdit = (key: string) => {
     setFormErrors((prev) => ({
       ...prev,
+      fullName: "",
+      mobileNumber: "",
       pan: "",
       gst: "",
+      tan: "",
+      cin: "",
+      brn: "",
     }));
     setCompanyDetail(previousCompanyDetail);
     setEditingSection(key);
   };
   const handleEditableSectionCancel = () => {
     setCompanyDetail(previousCompanyDetail);
+    setFormData(initialData);
     setEditingSection(null);
-  };
-
-  const getAllState = async (countryId: number | null) => {
-    if (loginStatus.companyId === 0) return;
-
-    if (!countryId) return;
-    const PostDataForState: State = {
-      id: null,
-      country_id: countryId,
-      name: null,
-      description: null,
-      isactive: true,
-    };
-    try {
-      const response = await axiosClient.post(
-        POST_API.GET_STATE,
-        PostDataForState,
-        {
-          withCredentials: true,
-          headers: {
-            "Content-Type": "application/json",
-          },
-        },
-      );
-      if (response.status === STATUS_CODE.OK) {
-        setStateData(response.data);
-      } else {
-        throw new Error("Failed to fetch states");
-      }
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      if (error.status === STATUS_CODE.UNATHORISED) {
-        const refreshTokenStatus = await RefreshToken({
-          callFunctionWithParamsNotEvent: getAllState,
-        });
-        if (refreshTokenStatus) {
-          getAllState(countryId);
-        }
-      }
-      handleApiError(error);
-    }
   };
 
   const { businessType } = usebusinessType();
   const { industryTypeData } = useIndustryType();
 
-  useEffect(() => {
-    getAllState(userPreference.countryId);
-  }, [userPreference.countryId]);
+  // useEffect(()=>{
 
-  useEffect(() => {
-    if (companyDetail.state_id) {
-      getAllDistrict(companyDetail.state_id);
-    }
-  }, [companyDetail.state_id]);
+  //   console.log("state id:"+companyDetail.state_id + ", district id:"+companyDetail.district_id);
 
-  const getAllDistrict = async (stateId: number | null) => {
-    if (loginStatus.companyId === 0) return;
-    if (!stateId) return;
-    const PostDataForDistrict: District = {
-      id: null,
-      state_id: stateId,
-      name: null,
-      description: null,
-      isactive: true,
-    };
-
-    try {
-      const response = await axiosClient.post(
-        POST_API.GET_DISTRICT,
-        PostDataForDistrict,
-        {
-          withCredentials: true,
-          headers: {
-            "Content-Type": "application/json",
-          },
-        },
-      );
-
-      if (response.status === STATUS_CODE.OK) {
-        setDistrict(response.data);
-      }
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      if (error.status === STATUS_CODE.UNATHORISED) {
-        const refreshTokenStatus = await RefreshToken({
-          callFunctionWithParamsNotEvent: getAllDistrict,
-        });
-        if (refreshTokenStatus) {
-          getAllDistrict(stateId);
-        }
-      }
-    }
-  };
+  // },[companyDetail.state_id,companyDetail.district_id]);
 
   return (
     <div className="w-full mx-24 min-h-screen bg-gray-100 py-8 px-2 space-y-10">
@@ -894,9 +854,22 @@ const UserPreference = () => {
           <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
             <div
               className={`relative w-32 h-32 rounded-full flex items-center justify-center text-white text-6xl font-semibold  border-4 border-white shadow-xl ring-2 ring-gray-200  transition-all duration-300 hover:scale-105 hover:shadow-2xl ${getColor(loginStatus.email)}`}
+              onDoubleClick={() => setShowUserLogoPreview(true)}
             >
               {loginStatus.fullName?.charAt(0)?.toUpperCase()}
             </div>
+            {showUserLogoPreview && (
+              <div
+                className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50"
+                onClick={() => setShowUserLogoPreview(false)}
+              >
+                <div
+                  className={`w-72 h-72 rounded-full flex items-center justify-center text-white text-9xl font-semibold shadow-2xl ${getColor(loginStatus.email)}`}
+                >
+                  {loginStatus.fullName?.charAt(0)?.toUpperCase()}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Basic Info Grid */}
@@ -913,8 +886,8 @@ const UserPreference = () => {
               onSave={handleUserDetailSave}
             >
               {editingSection === "user detail" ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                  <div className="">
+                <div className="grid grid-cols-2 sm:grid-cols-2 gap-4">
+                  <div className="w-96">
                     <h4 className="table-header-custom">Name</h4>
                     <FormInput
                       type="text"
@@ -925,12 +898,8 @@ const UserPreference = () => {
                       maxLength={VALIDATIONS.MAX_NAME_LENGTH}
                       minLength={VALIDATIONS.MIN_NAME_LENGTH}
                       className="w-full p-2 border rounded"
+                      error={formErrors.fullName}
                     />
-                    {formErrors.fullName && (
-                      <p className="text-red-500 text-sm mt-1">
-                        {formErrors.fullName}
-                      </p>
-                    )}
                   </div>
 
                   <div>
@@ -940,12 +909,7 @@ const UserPreference = () => {
                     </p>
                   </div>
 
-                  {/* <div>
-            <h4 className="table-header-custom">Company</h4>
-            <p className={classnameForParagragh}>{loginStatus.companyName}</p>
-            </div> */}
-
-                  <div>
+                  <div className="w-96">
                     <h4 className="table-header-custom">Contact Number</h4>
                     <FormInput
                       type="text"
@@ -956,58 +920,78 @@ const UserPreference = () => {
                       maxLength={VALIDATIONS.MOBILE_NUMBER_LENGTH}
                       minLength={VALIDATIONS.MOBILE_NUMBER_LENGTH}
                       className="w-full p-2 border rounded"
+                      error={formErrors.mobileNumber}
                     />
-                    {formErrors.mobileNumber && (
-                      <p className="text-red-500 text-sm mt-1">
-                        {formErrors.mobileNumber}
-                      </p>
-                    )}
                   </div>
 
-                  <div className="mt-1 justify-center items-center">
-                    <h4 className="table-header-custom">Profile Status</h4>
-                    <p className={classnameForParagragh}>
-                      {loginStatus.status === true ? "Active" : "Inactive"}
-                    </p>
+                  <div className="justify-center items-center">
+                    <h4 className="table-header-custom mb-1">Profile Status</h4>
+
+                    <span
+                      className={`flex items-center gap-1 px-3 py-0.5 rounded-full text-xs font-semibold w-fit ${
+                        loginStatus.status
+                          ? "bg-green-100 text-green-700 border border-green-300"
+                          : "bg-red-100 text-red-700 border border-red-300"
+                      }`}
+                    >
+                      {loginStatus.status ? (
+                        <CheckCircle size={14} />
+                      ) : (
+                        <XCircle size={14} />
+                      )}
+
+                      {loginStatus.status ? "Active" : "Inactive"}
+                    </span>
                   </div>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                  <div className="">
-                    <h4 className="table-header-custom">Name</h4>
-                    <p
-                      title={formData.fullName ?? "Not Provided"}
-                      className="table-data-custom block truncate w-full "
-                    >
-                      {formData.fullName || "Not Provided"}
-                    </p>
+                <div className="grid grid-cols-1 sm:grid-cols-1 gap-6 ">
+                  <div className="grid grid-cols-2 border-b pb-1">
+                    <div className="">
+                      <h4 className="table-header-custom">Name</h4>
+                      <p
+                        title={formData.fullName ?? "Not Provided"}
+                        className="table-data-custom block truncate w-full "
+                      >
+                        {formData.fullName || "Not Provided"}
+                      </p>
+                    </div>
+
+                    <div>
+                      <h4 className="table-header-custom">Email</h4>
+                      <p className={classnameForParagragh}>
+                        {formData.email || "Not Provided"}
+                      </p>
+                    </div>
                   </div>
+                  <div className="grid grid-cols-2 border-b pb-1">
+                    <div>
+                      <h4 className="table-header-custom">Contact Number</h4>
 
-                  <div>
-                    <h4 className="table-header-custom">Email</h4>
-                    <p className={classnameForParagragh}>
-                      {formData.email || "Not Provided"}
-                    </p>
-                  </div>
+                      <p className={classnameForParagragh}>
+                        {formData.mobileNumber || "Not Provided"}
+                      </p>
+                    </div>
 
-                  {/* <div>
-            <h4 className="table-header-custom">Company</h4>
-            <p className={classnameForParagragh}>{loginStatus.companyName}</p>
-            </div> */}
+                    <div className="justify-center items-center">
+                      <h4 className="table-header-custom ">Profile Status</h4>
 
-                  <div>
-                    <h4 className="table-header-custom">Contact Number</h4>
+                      <span
+                        className={`flex items-center gap-1 px-3 py-0.5 rounded-full text-xs font-semibold w-fit ${
+                          loginStatus.status
+                            ? "bg-green-100 text-green-700 border border-green-300"
+                            : "bg-red-100 text-red-700 border border-red-300"
+                        }`}
+                      >
+                        {loginStatus.status ? (
+                          <CheckCircle size={14} />
+                        ) : (
+                          <XCircle size={14} />
+                        )}
 
-                    <p className={classnameForParagragh}>
-                      {formData.mobileNumber || "Not Provided"}
-                    </p>
-                  </div>
-
-                  <div className="mt-1 justify-center items-center">
-                    <h4 className="table-header-custom">Profile Status</h4>
-                    <p className={classnameForParagragh}>
-                      {loginStatus.status === true ? "Active" : "Inactive"}
-                    </p>
+                        {loginStatus.status ? "Active" : "Inactive"}
+                      </span>
+                    </div>
                   </div>
                 </div>
               )}
@@ -1034,8 +1018,6 @@ const UserPreference = () => {
 
           {/** Company Logo */}
           <div className="border-t pt-4">
-            {/* <h4 className="input-label-custom mb-2">Company Logo:</h4> */}
-
             {/* Left aligned container */}
             <div className="flex flex-col items-start">
               {/* Image */}
@@ -1045,9 +1027,22 @@ const UserPreference = () => {
                     src={logoPreview ?? companyDetail?.logo_cdn_url}
                     alt="Company Logo"
                     className="w-full h-full object-contain"
+                    onDoubleClick={() => setShowCompanyLogoPreview(true)}
                   />
                 ) : (
                   <span className="caption-custom">No Logo</span>
+                )}
+                {showCompanyLogoPreview && (
+                  <div
+                    className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50"
+                    onClick={() => setShowCompanyLogoPreview(false)}
+                  >
+                    <img
+                      src={logoPreview ?? companyDetail?.logo_cdn_url}
+                      alt="Company Logo"
+                      className="max-w-[80%] max-h-[80%] object-contain rounded-lg shadow-lg"
+                    />
+                  </div>
                 )}
               </div>
 
@@ -1217,59 +1212,80 @@ const UserPreference = () => {
                   if (companyDetail.state_id && companyDetail.district_id) {
                     handleEditableSectionSave();
                   } else {
-                    // toast.error("Please select both state and district.");
-                    toast("Please select both state and district.", {
-                      icon: "⚠️",
-                      style: {
-                        border: "1px solid #facc15",
-                        background: "#fffbeb",
-                        color: "#92400e",
-                      },
-                    });
+                    if (
+                      companyDetail.state_id === 0 &&
+                      companyDetail.district_id === 0
+                    ) {
+                      handleEditableSectionSave();
+                    } else {
+                      // toast.error("Please select both state and district.");
+                      toast("Please select both state and district.", {
+                        icon: "⚠️",
+                        style: {
+                          border: "1px solid #facc15",
+                          background: "#fffbeb",
+                          color: "#92400e",
+                        },
+                      });
+                    }
                   }
                 }}
                 isLoading={isLoadingForCompanyDetailsUpdate}
               >
                 {editingSection === "location" ? (
                   <div className="grid grid-cols-2 gap-2">
-                    <CustomDropdown
-                      labelName="State: "
-                      preselectedOption={companyDetail.state_id}
-                      selectedValue={companyDetail.state_id}
-                      options={stateData}
-                      onSelect={(e) => {
-                        setCompanyDetail((prev) => {
-                          return {
-                            ...prev,
-                            state_id: e ?? 0,
-                          };
-                        });
-                        if (previousCompanyDetail.state_id !== e) {
+                    <div className="">
+                      <CustomSelect
+                        label="State:"
+                        value={companyDetail.state_id}
+                        options={stateTypeOption}
+                        onChange={(id) => {
                           setCompanyDetail((prev) => {
                             return {
                               ...prev,
-                              district_id: 0,
+                              state_id: id ?? 0,
                             };
                           });
-                        }
-                      }}
-                    />
-                    <CustomDropdown
-                      labelName="District: "
-                      readOnly={!companyDetail.state_id}
-                      preselectedOption={companyDetail.district_id}
-                      selectedValue={companyDetail.district_id}
-                      options={districts}
-                      onSelect={(e) => {
-                        setCompanyDetail((prev) => {
-                          return {
-                            ...prev,
-                            district_id: e ?? 0,
-                          };
-                        });
-                      }}
-                      errorMessage="Please select state first!"
-                    />
+
+                          if (previousCompanyDetail.state_id !== id) {
+                            setCompanyDetail((prev) => {
+                              return {
+                                ...prev,
+                                district_id: 0,
+                              };
+                            });
+                          }
+                          if (id === undefined) {
+                            setCompanyDetail((prev) => {
+                              return {
+                                ...prev,
+                                district_id: 0,
+                              };
+                            });
+                          }
+                        }}
+                        // label="State"
+                        isClearable={false}
+                      />
+                    </div>
+                    <div className="">
+                      <CustomSelect
+                        label="District: "
+                        isDisabled={!companyDetail.state_id}
+                        value={companyDetail.district_id}
+                        options={districtTypeOption}
+                        onChange={(id) => {
+                          setCompanyDetail((prev) => {
+                            return {
+                              ...prev,
+                              district_id: id ?? 0,
+                            };
+                          });
+                        }}
+                        // label="District"
+                        isClearable={false}
+                      />
+                    </div>
                   </div>
                 ) : (
                   <div className="grid grid-cols-2 items-start border-b pb-1">
@@ -1331,6 +1347,8 @@ const UserPreference = () => {
                       name="tan"
                       value={companyDetail?.tan ?? ""}
                       onChange={handleCompanyDetailsChange}
+                      onBlur={handleBlur}
+                      error={formErrors.tan}
                     />
 
                     <FormInput
@@ -1338,6 +1356,8 @@ const UserPreference = () => {
                       name="cin"
                       value={companyDetail?.cin ?? ""}
                       onChange={handleCompanyDetailsChange}
+                      onBlur={handleBlur}
+                      error={formErrors.cin}
                     />
 
                     <FormInput
@@ -1345,6 +1365,8 @@ const UserPreference = () => {
                       name="business_registration_number"
                       value={companyDetail?.business_registration_number ?? ""}
                       onChange={handleCompanyDetailsChange}
+                      onBlur={handleBlur}
+                      error={formErrors.business_registration_number}
                     />
                   </div>
                 ) : (
@@ -1691,31 +1713,43 @@ const UserPreference = () => {
         </div>
 
         {/* Subscription Card */}
-        <div className="  bg-white rounded-2xl shadow-lg p-8 space-y-4">
+        <div className="bg-white rounded-2xl shadow-lg p-8 space-y-2">
           <div className="flex items-center justify-between">
-            <h3 className="section-header-custom">Subscription</h3>
-            <button
-              onClick={() => {
+            <h3 className="section-header-custom">
+              Current Subscription <span className="caption-custom"></span>
+            </h3>
+          </div>
+          <div className="border-t pt-4">
+            <EditableSection
+              title=""
+              sectionKey="subscription"
+              onEdit={() => {
                 navigate(ROUTES_URL.GET_SUBSCRIPTION);
               }}
-              className="px-4 py-2 bg-blue-600 action-btn-custom rounded-md hover:bg-blue-700 transition"
+              hasAccess={userHasAccessToUpdateSubscription}
+              isEditing={false}
+              onCancel={() => {}}
+              onSave={() => {}}
+              editButtonText="Update Subscription"
+              isLoading={false}
+              key={"subscription"}
             >
-              Update Subscription
-            </button>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            <div>
-              <h4 className="table-header-custom">Started On</h4>
-              <p className={classnameForParagragh}>
-                {loginStatus.startDateSubscription || "-"}
-              </p>
-            </div>
-            <div>
-              <h4 className="table-header-custom">Ending On</h4>
-              <p className={classnameForParagragh}>
-                {loginStatus.endDateSubscription || "Not Provided"}
-              </p>
-            </div>
+              <div className="grid grid-cols-2 items-start border-b pb-1">
+                <div className="flex gap-4">
+                  <div className="input-label-custom py-1">Started On:</div>
+                  <span className="caption-custom text-blue-600 py-1.5">
+                    {loginStatus.startDateSubscription || "-"}
+                  </span>
+                </div>
+
+                <div className="flex gap-4">
+                  <div className="input-label-custom py-1">Ending On:</div>
+                  <span className="caption-custom text-blue-600 py-1.5">
+                    {loginStatus.endDateSubscription || "Not Provided"}
+                  </span>
+                </div>
+              </div>
+            </EditableSection>
           </div>
         </div>
         <AppVersionViewCard />

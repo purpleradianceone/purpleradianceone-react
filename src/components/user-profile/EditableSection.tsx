@@ -1,8 +1,9 @@
 import Button from "../ui/Button";
 
 interface EditableSectionProps {
-  title?: string;
   sectionKey: string;
+  title?: string;
+  editButtonText?: string;
   isEditing: boolean;
   onEdit: () => void;
   onCancel: () => void;
@@ -14,6 +15,7 @@ interface EditableSectionProps {
 
 const EditableSection = ({
   title,
+  editButtonText,
   isEditing,
   onEdit,
   onCancel,
@@ -39,7 +41,7 @@ const EditableSection = ({
               onClick={onEdit}
               className="text-blue-600 caption-custom hover:underline"
             >
-              Edit
+              {editButtonText?editButtonText:"Edit"}
             </button>
           )
         ) : (
