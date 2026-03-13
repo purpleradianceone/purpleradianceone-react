@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 import React, { useEffect } from "react";
 
 import AccountCompanyType from "./AccountCompanyType";
@@ -11,6 +9,8 @@ import { parseInt } from "lodash";
 import AccountDetailsUpdated from "./AccountDetailsUpdated";
 import AccountContact from "./account-contact-temp/AccountContact";
 import AccountLead from "./account-lead/AccountLead";
+import AccountService from "./account-service/AccountService";
+import AccountSubscription from "./account-subscription/AccountSubscription";
 
 const AccountManagement: React.FC = () => {
   const { accountId } = useParams();
@@ -52,7 +52,7 @@ const AccountManagement: React.FC = () => {
       {/* Main Content Grid */}
       <div className="grid sm:grid-cols-1 md:grid-cols-2    gap-1">
         <div className="bg-white rounded-md border p-1 border-slate-200">
-          <AccountDetailsUpdated/>
+          <AccountDetailsUpdated />
         </div>
 
         {/* Right Card - Empty for future use */}
@@ -89,6 +89,22 @@ const AccountManagement: React.FC = () => {
             Product Details
           </h3>
           <AccountCompanyProduct
+            accountId={company!.id}
+            // handleShowCompanyProductData={handleShowCompanyProductData}
+          />
+        </div>
+
+        <div className="bg-white col-span-2 rounded-md border p-1 border-slate-200">
+          <h3 className="bg-gray-100 table-header-custom rounded-t-md px-2">
+            Account Service
+          </h3>
+          <AccountService accountId={company.id} />
+        </div>
+        <div className="bg-white col-span-2 rounded-md border p-1 border-slate-200">
+          <h3 className="bg-gray-100 table-header-custom rounded-t-md px-2">
+            Account Subscription
+          </h3>
+          <AccountSubscription
             accountId={company!.id}
             // handleShowCompanyProductData={handleShowCompanyProductData}
           />

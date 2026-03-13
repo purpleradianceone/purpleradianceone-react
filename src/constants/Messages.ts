@@ -154,6 +154,16 @@ const MESSAGE = {
             DENIED_ADD_ACCESS: "You do not have permission to add account contact.",
             DENIED_UPDATE_ACCESS: "You do not have permission to update account contact",
         },
+        ACCOUNT_SERVICE: {
+            DENIED_VIEW_ACCESS: "You do not have permission to view account service.",
+            DENIED_ADD_ACCESS: "You do not have permission to add account service.",
+            DENIED_UPDATE_ACCESS: "You do not have permission to update account service",
+        },
+        ACCOUNT_SUBSCRIPTION: {
+            DENIED_VIEW_ACCESS: "You do not have permission to view account subscription.",
+            DENIED_ADD_ACCESS: "You do not have permission to add account subscription.",
+            DENIED_UPDATE_ACCESS: "You do not have permission to update account subscription",
+        },
         LEADS_SETTINGS: {
             DENIED_VIEW_ACCESS: "You do not have permission to view lead settings.",
             DENIED_ADD_ACCESS: "You do not have permission to add.",

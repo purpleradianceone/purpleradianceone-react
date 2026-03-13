@@ -19,14 +19,16 @@ import axiosClient from "../../../../axios-client/AxiosClient";
 import { handleApiError } from "../../../../config/error/handleApiError";
 import AccessDeniedMessagePage from "../../../views/not-found/AccessDeniedMessagePage";
 
-const AccountCompanyProduct = (
-  { 
-    accountId,
-    // handleShowCompanyProductData
-   }: AccountCompanyProductType) => {
+const AccountCompanyProduct = ({
+  accountId,
+  // handleShowCompanyProductData
+}: AccountCompanyProductType) => {
   const navigate = useNavigate();
   const { loginStatus } = useLoggedInUserContext();
-  const { userHasAccessToAddAccountProducts, userHasAccessToViewAccountProducts } = useUserAccessModules();
+  const {
+    userHasAccessToAddAccountProducts,
+    userHasAccessToViewAccountProducts,
+  } = useUserAccessModules();
   const [isLoadingAccountCompanyProduct, setIsLoadingAccountCompanyProduct] =
     useState<boolean>(true);
   const [showCreateAccountCompanyProduct, setShowCreateAccountCompanyProduct] =
@@ -46,41 +48,39 @@ const AccountCompanyProduct = (
   //   // }
   //   navigate(`${ROUTES_URL.ACCOUNT_COMPANY_PRODUCT_DETAILS}/${data.id}`)
   //   handleShowCompanyProductData(data);
-    
+
   // };
   const handleRowSelectAccountProduct = (data: AccountProduct) => {
-    if(!userHasAccessToViewAccountProducts) return ;
+    if (!userHasAccessToViewAccountProducts) return;
 
-  navigate(
-    // `products/${data.id}`,
+    navigate(
+      // `products/${data.id}`,
       `${ROUTES_URL.ACCOUNT_DETAILS}/${accountId}/products/${data.id}`,
 
-    {
-      state: {
-        productName: data.companyProductName,
-        // accountName : data.accountName
+      {
+        state: {
+          productName: data.companyProductName,
+          // accountName : data.accountName
+        },
       },
-    }
-  );
-};
+    );
+  };
 
-
-  function handleRowClick(event :any){
-        if(!userHasAccessToViewAccountProducts) return ;
+  function handleRowClick(event: any) {
+    if (!userHasAccessToViewAccountProducts) return;
     const data = event.data;
     navigate(
-    // `products/${data.id}`,
+      // `products/${data.id}`,
       `${ROUTES_URL.ACCOUNT_DETAILS}/${accountId}/products/${data.id}`,
 
-    {
-      state: {
-        productName: data.companyProductName,
-        // accountName : data.accountName
+      {
+        state: {
+          productName: data.companyProductName,
+          // accountName : data.accountName
+        },
       },
-    }
-  );
+    );
   }
- 
 
   // const getAccountCompanyProduct = async () => {
   //   const postData = {
@@ -141,7 +141,7 @@ const AccountCompanyProduct = (
   //     })
   //     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   //     .catch(async (error: ApiError | any) => {
-        
+
   //        handleApiError(error)
   //     })
   //     .finally(() => {
@@ -149,82 +149,86 @@ const AccountCompanyProduct = (
   //     });
   // };
 
-
-      const [hasError, setHasError] = useState(false);
+  const [hasError, setHasError] = useState(false);
 
   const getAccountCompanyProduct = async () => {
-  setIsLoadingAccountCompanyProduct(true);
-  setHasError(false);
+    setIsLoadingAccountCompanyProduct(true);
+    setHasError(false);
 
-  const postData = {
-    company_id: loginStatus.companyId,
-    account_id: accountId,
-    id: null,
-    company_product_id: null,
-    requestedby: loginStatus.id,
+    const postData = {
+      company_id: loginStatus.companyId,
+      account_id: accountId,
+      id: null,
+      company_product_id: null,
+      requestedby: loginStatus.id,
+    };
+
+    try {
+      const response = await axiosClient.post(
+        POST_API.GET_ACCOUNT_COMPANY_PRODUCT,
+        postData,
+        { withCredentials: true },
+      );
+
+      const formattedData: AccountProduct[] = response.data.map(
+        (item: any) => ({
+          id: item.id,
+          accountId: item.account_id,
+          accountName: item.account_name,
+          companyProductId: item.company_product_id,
+          companyProductName: item.company_product_name,
+          quantity: item.quantity,
+          quantityReturn: item.quantity_return,
+          barcode: item.barcode,
+          serialNumber: item.serial_number,
+          unitName: item.unit_name,
+          unitNameInStock: item.unit_name_in_stock,
+          purchaseDate: item.purchase_date,
+          deliveryDate: item.delivery_date,
+          deliveryAddress: item.delivery_address,
+          billingAddress: item.billing_address,
+          installationDate: item.installation_date,
+          installedByName: item.installed_by_name,
+          installedBy: item.installed_by,
+          updatedBy: item.updatedby,
+          createdOn: item.createdon,
+          updatedOn: item.updatedon,
+          createdBy: item.createdby,
+        }),
+      );
+
+      setAccountCompanyProduct(formattedData);
+      // setRefreshKey((prev) => prev + 1);
+    } catch (error) {
+      setHasError(true); //  distinguish error vs empty
+      handleApiError(error);
+    } finally {
+      setIsLoadingAccountCompanyProduct(false); //  always runs
+    }
   };
 
-  try {
-    const response = await axiosClient.post(
-      POST_API.GET_ACCOUNT_COMPANY_PRODUCT,
-      postData,
-      { withCredentials: true }
-    );
-
-    const formattedData: AccountProduct[] = response.data.map((item: any) => ({
-      id: item.id,
-      accountId: item.account_id,
-      accountName: item.account_name,
-      companyProductId: item.company_product_id,
-      companyProductName: item.company_product_name,
-      quantity: item.quantity,
-      quantityReturn: item.quantity_return,
-      barcode: item.barcode,
-      serialNumber: item.serial_number,
-      unitName: item.unit_name,
-      unitNameInStock: item.unit_name_in_stock,
-      purchaseDate: item.purchase_date,
-      deliveryDate: item.delivery_date,
-      deliveryAddress: item.delivery_address,
-      billingAddress: item.billing_address,
-      installationDate: item.installation_date,
-      installedByName: item.installed_by_name,
-      installedBy: item.installed_by,
-      updatedBy: item.updatedby,
-      createdOn: item.createdon,
-      updatedOn: item.updatedon,
-      createdBy: item.createdby,
-    }));
-
-    setAccountCompanyProduct(formattedData);
-    // setRefreshKey((prev) => prev + 1);
-
-  } catch (error) {
-    setHasError(true);          //  distinguish error vs empty
-    handleApiError(error);
-
-  } finally {
-    setIsLoadingAccountCompanyProduct(false); //  always runs
-  }
-};
-
-
   useEffect(() => {
-    if(userHasAccessToViewAccountProducts){
+    if (userHasAccessToViewAccountProducts) {
       getAccountCompanyProduct();
     }
   }, [userHasAccessToViewAccountProducts]);
 
-  if(hasError){
-    return(
+  if (hasError) {
+    return (
       <div className="text-center caption-custom">
-
-      <h1>Someting went wrong!</h1>
-      </ div>
-    )
+        <h1>Someting went wrong!</h1>
+      </div>
+    );
   }
 
-  if(!userHasAccessToViewAccountProducts) return <AccessDeniedMessagePage message={MESSAGE.MODULE_ACCESS.ACCOUNT_COMPANY_PRODUCT.DENIED_VIEW_ACCESS}/>
+  if (!userHasAccessToViewAccountProducts)
+    return (
+      <AccessDeniedMessagePage
+        message={
+          MESSAGE.MODULE_ACCESS.ACCOUNT_COMPANY_PRODUCT.DENIED_VIEW_ACCESS
+        }
+      />
+    );
   return (
     <div className="h-full w-full min-h-14">
       {/* Main Content */}
@@ -234,23 +238,25 @@ const AccountCompanyProduct = (
           <LoadingSpinner />
         </div>
       ) : accountCompanyProduct.length === 0 &&
-        !isLoadingAccountCompanyProduct && !hasError ? (
+        !isLoadingAccountCompanyProduct &&
+        !hasError ? (
         <div className="flex items-center justify-center w-full   h-full">
           <div className="flex gap-1 w-full text-xs  h-16 bg-green-0 py-3 items-center justify-center">
             <Link
-            to={ROUTES_URL.ACCOUNT_MULTIPLE_COMPANY_PRODUCT}
-            state={{
-              assignProducts: true,
-            }}
-            // to={`${ROUTES_URL.ACCOUNT_MULTIPLE_COMPANY_PRODUCT}/${accountId}`}
-          //  state={{
-          //     assignProducts: true,
-          //   }}
+              to={ROUTES_URL.ACCOUNT_MULTIPLE_COMPANY_PRODUCT}
+              state={{
+                assignProducts: true,
+              }}
+              // to={`${ROUTES_URL.ACCOUNT_MULTIPLE_COMPANY_PRODUCT}/${accountId}`}
+              //  state={{
+              //     assignProducts: true,
+              //   }}
               onClick={(e) => {
                 if (!userHasAccessToAddAccountProducts) {
                   e.preventDefault();
                   toast.error(
-                    MESSAGE.MODULE_ACCESS.ACCOUNT_COMPANY_PRODUCT.DENIED_ADD_ACCESS
+                    MESSAGE.MODULE_ACCESS.ACCOUNT_COMPANY_PRODUCT
+                      .DENIED_ADD_ACCESS,
                   );
                 }
               }}
@@ -283,20 +289,20 @@ const AccountCompanyProduct = (
           </div>
         </div>
       ) : (
-        
         <div className="grid grid-cols-2 gap-1 w-full">
           <div className="col-span-2 flex justify-end p-0.5">
             <Link
-            to={ROUTES_URL.ACCOUNT_MULTIPLE_COMPANY_PRODUCT}
-            state={{
-              assignProducts: true,
-            }}
+              to={ROUTES_URL.ACCOUNT_MULTIPLE_COMPANY_PRODUCT}
+              state={{
+                assignProducts: true,
+              }}
               // to={`${ROUTES_URL.ACCOUNT_MULTIPLE_COMPANY_PRODUCT}/${accountId}`}
               onClick={(e) => {
                 if (!userHasAccessToAddAccountProducts) {
                   e.preventDefault();
                   toast.error(
-                    MESSAGE.MODULE_ACCESS.ACCOUNT_COMPANY_PRODUCT.DENIED_ADD_ACCESS
+                    MESSAGE.MODULE_ACCESS.ACCOUNT_COMPANY_PRODUCT
+                      .DENIED_ADD_ACCESS,
                   );
                 }
               }}
@@ -310,8 +316,7 @@ const AccountCompanyProduct = (
                 disabled={!userHasAccessToAddAccountProducts}
                 // onClick={() => {
                 //   if (userHasAccessToUpdateAccountProducts) {
-                    
-                  
+
                 //     toast.error(
                 //       MESSAGE.MODULE_ACCESS.ACCOUNT_ACCESS.DENIED_UPDATE_ACCESS
                 //     );
@@ -350,13 +355,13 @@ const AccountCompanyProduct = (
           <CreateAccountCompanyProduct
             onClose={() => {
               setShowCreateAccountCompanyProduct(
-                !showCreateAccountCompanyProduct
+                !showCreateAccountCompanyProduct,
               );
             }}
             accountId={accountId}
             getAccountCompanyProduct={getAccountCompanyProduct}
           />,
-          document.body
+          document.body,
         )}
     </div>
   );

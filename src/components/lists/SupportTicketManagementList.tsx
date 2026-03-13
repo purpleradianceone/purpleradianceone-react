@@ -188,8 +188,9 @@ function SupportTicketManagementList({
 
     return (
       <div
-        className={`w-full ${position === "left" && isUsedInSupportTicketModule ? "pl-5" : "pl-1"
-          } pr-1 gap-1`}
+        className={`w-full ${
+          position === "left" && isUsedInSupportTicketModule ? "pl-5" : "pl-1"
+        } pr-1 gap-1`}
       >
         {/* sticky */}
         {
@@ -203,19 +204,21 @@ function SupportTicketManagementList({
               <div className="flex gap-1 items-center w-fit">
                 {!isSmallScreen && (
                   <Headset
-                    className={`${isCustomDateOptionSelected
+                    className={`${
+                      isCustomDateOptionSelected
                         ? "w-4 h-4 text-blue-600"
                         : COLORS.GRID_HEADER_ICONS_COLOR_AND_SIZE
-                      } `}
+                    } `}
                   />
                 )}
 
                 {(isMediumScreen || isLargeScreen) && (
                   <span
-                    className={`${isCustomDateOptionSelected
+                    className={`${
+                      isCustomDateOptionSelected
                         ? "text-xs"
                         : "section-header-custom"
-                      } `}
+                    } `}
                   >
                     Support
                   </span>
@@ -226,8 +229,9 @@ function SupportTicketManagementList({
             <div className="flex flex-wrap items-center gap-2 w-fit">
               {/* Search Box */}
               <div
-                className={`relative flex items-start ${isCustomDateOptionSelected ? "w-44 " : "w-44"
-                  }`}
+                className={`relative flex items-start ${
+                  isCustomDateOptionSelected ? "w-44 " : "w-44"
+                }`}
               >
                 <SearchInput
                   value={handleSearchOption.searchParameter}
@@ -329,7 +333,7 @@ function SupportTicketManagementList({
                               <span onClick={handleCompanyUserPopUp}>
                                 {selectedAssignTo.fullname.length > 14
                                   ? selectedAssignTo.fullname.slice(0, 14) +
-                                  "..."
+                                    "..."
                                   : selectedAssignTo.fullname}
                               </span>
 
@@ -370,7 +374,7 @@ function SupportTicketManagementList({
                               <span onClick={handleResolvedByPopUp}>
                                 {selectedResolvedBy.fullname.length > 14
                                   ? selectedResolvedBy.fullname.slice(0, 14) +
-                                  "..."
+                                    "..."
                                   : selectedResolvedBy.fullname}
                               </span>
 
@@ -411,7 +415,7 @@ function SupportTicketManagementList({
                               <span onClick={handleCompanyProductPopUp}>
                                 {selectedCompanyProduct.name.length > 14
                                   ? selectedCompanyProduct.name.slice(0, 14) +
-                                  "..."
+                                    "..."
                                   : selectedCompanyProduct.name}
                               </span>
 

@@ -1,0 +1,309 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { Layers, ShoppingBag, TicketPlus, X } from "lucide-react";
+import useScreenSize from "../../config/hooks/useScreenSize";
+import { JSX_CHILDREN_NAME, SIZE } from "../../constants/AppConstants";
+import Button from "../ui/Button";
+import { useUserAccessModules } from "../../config/hooks/useAccessModules";
+import { useEffect, useState } from "react";
+import SearchInput from "../ui/SearchInput";
+import DateRangePicker from "../ui/DateRangePicker";
+import { useComapanySpecificSearchDateRange } from "../../config/hooks/useCompanySpecificDateRange";
+import { useDateRangeIdChange } from "../../config/hooks/useDateRangeIdChange";
+import DateRangeFilterDropdown from "../ui/DateRangeFilterDropdown";
+import { useNavigate } from "react-router-dom";
+import ROUTES_URL from "../../constants/Routes";
+import { usePanel } from "../../context/panel/usePanel";
+import toast from "react-hot-toast";
+import MESSAGE from "../../constants/Messages";
+import { useUserPreference } from "../../context/user/UserPreference";
+import COLORS from "../../constants/Colors";
+import LookupCompanyProductSelection from "../views/lookups/lookup-company-product/LookupCompanyProductSelection";
+import PaginationWithoutCount from "../ag-grid/PaginationWithoutCount";
+import { customDateRangeId } from "../../config/hooks/usePaginationHandler";
+import AccountSubscriptionManagementListProps from "../../@types/List/AccountSubscriptionManagementListProps";
+import AccountSubscriptionProps from "../../@types/account/AccountSubscriptionProps";
+import AccountSubscriptionManagementAgGrid from "../ag-grid/AccountSubscriptionManagementAgGrid";
+import CreateAccountSubscription from "../modals/Account/account-subscription/CreateAccountSubscription";
+
+export const accountSubscriptionDataUrlSearchParamKey: string = "accountSubscriptionData";
+
+function AccountSubscriptionManagementList({
+  handleSearchOption,
+  onStartDateChange,
+  onEndDateChange,
+  handleAddAccountSubscritption,
+  paginationData,
+  handleSelectedCompanyProductCheckBoxChange,
+  accountSubscriptionData,
+
+  selectedCompanyProduct,
+  handleRowSelectedForShowAccountSubscription,
+
+  accountId,
+}: AccountSubscriptionManagementListProps) {
+
+  const navigate = useNavigate();
+  const { position } = usePanel();
+  const { userPreference } = useUserPreference();
+  const { isLargeScreen, isMediumScreen, isSmallScreen } = useScreenSize();
+
+  const {
+    userHasAccessToViewAccountSubscription,
+    userHasAccessToAddAccountSubscription,
+  } = useUserAccessModules();
+
+  const [isCreateAccountSubscriptionModalOpen, setIsCreateAccountSubscriptionModalOpen] =
+    useState<boolean>(false);
+
+
+  const [selectedAccountSubscriptionForEdit, setSelectedAccountSubscriptionForEdit] =
+    useState<AccountSubscriptionProps>({
+      id: 0,
+      companyId: 0,
+      accountSubscriptionCode: 0,
+      accountId: 0,
+      accountName: "",
+      companyProductId: 0,
+      companyProductName: "",
+      startDate: "",
+      endDate: "",
+      packageDetail: "",
+      isRenewal: false,
+      isActive: false,
+      createdBy: "",
+      createdOn: "",
+    });
+
+  const handleAccountSubscriptionDataFormChange = (data: AccountSubscriptionProps) => {
+    setSelectedAccountSubscriptionForEdit(data);
+    console.log(data);
+    console.log(selectedAccountSubscriptionForEdit);
+  };
+
+  const [openPopUpOfCompanyProductModal, setOpenPopUpOfCompanyProductModal] =
+    useState(false);
+
+  const handleCompanyProductPopUp = () => {
+    setOpenPopUpOfCompanyProductModal(true);
+  };
+
+  const { dateRangeDropdownOptions } = useComapanySpecificSearchDateRange();
+
+  const {
+    handleDateRangeIdChange,
+    isCustomDateOptionSelected,
+    setIsCustomDateOptionSelected,
+  } = useDateRangeIdChange({ dateRangeDropdownOptions, handleSearchOption });
+
+  const handleRowClicked = (event: any) => {
+    const rowData: AccountSubscriptionProps = event.data;
+
+    navigate(
+      `${ROUTES_URL.ACCOUNT_DETAILS}/${accountId}/account-subscription-details/${rowData.id}`,
+    );
+  };
+
+  const handleRowSelected = (rowData: AccountSubscriptionProps | any) => {
+    handleRowSelectedForShowAccountSubscription!(rowData);
+  };
+
+  if (userHasAccessToViewAccountSubscription) {
+    const handleCreateAccountSubscriptionModalClose = () => {
+      setIsCreateAccountSubscriptionModalOpen(false);
+    };
+
+    const selectedDateName =
+      dateRangeDropdownOptions.find(
+        (o) => o.search_date_range_id === handleSearchOption.dateRangeId,
+      )?.date_range || "Date Filter";
+
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    useEffect(() => {
+      if (handleSearchOption.dateRangeId === customDateRangeId) {
+        setIsCustomDateOptionSelected(true);
+      }
+    }, [
+      handleSearchOption.searchParameter,
+      handleSearchOption.dateRangeId,
+      setIsCustomDateOptionSelected,
+    ]);
+
+    return (
+      <div className={`w-full ${position === "left"} pr-1 gap-1`}>
+
+        <div
+          className={`z-10 top-12 mt-1 p-1 flex flex-wrap items-center justify-between gap-3 text-sm 
+          ${COLORS.GRID_HEADER_SECTION_BG_COLOR} rounded-lg shadow-sm mb-1.5 w-full`}
+        >
+
+          <div className="flex gap-1 items-center w-fit">
+            {!isSmallScreen && (
+              <Layers
+                className={`${isCustomDateOptionSelected
+                  ? "w-4 h-4 text-blue-600"
+                  : COLORS.GRID_HEADER_ICONS_COLOR_AND_SIZE
+                  }`}
+              />
+            )}
+
+            {(isMediumScreen || isLargeScreen) && (
+              <span
+                className={`${isCustomDateOptionSelected ? "text-xs" : "section-header-custom"
+                  }`}
+              >
+                Account Subscription
+              </span>
+            )}
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2 w-fit">
+
+            <div className="relative flex items-start w-44">
+              <SearchInput
+                value={handleSearchOption.searchParameter}
+                onChange={(e) => {
+                  handleSearchOption.handleSearchParameterChange(e.target.value);
+                }}
+              />
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2 w-fit">
+
+              <DateRangeFilterDropdown
+                dropdownOptions={dateRangeDropdownOptions}
+                handleDateIdChange={handleDateRangeIdChange}
+                selectedOption={selectedDateName}
+              />
+
+              {isCustomDateOptionSelected && (
+                <DateRangePicker
+                  onStartDateChange={onStartDateChange}
+                  onEndDateChange={onEndDateChange}
+                  initialStartDate={handleSearchOption.startDate}
+                  initialEndDate={handleSearchOption.endDate}
+                />
+              )}
+
+
+
+              <div className="relative flex items-center justify-center">
+                {selectedCompanyProduct.id === 0 ? (
+                  <Button
+                    type="button"
+                    onClick={handleCompanyProductPopUp}
+                    className="flex items-center gap-2 px-2 py-1 caption-custom border border-gray-300 rounded-md bg-white hover:bg-gray-50 shadow-sm"
+                  >
+                    <ShoppingBag size={14} />
+                    <span>Product</span>
+                  </Button>
+                ) : (
+                  <div className="border rounded-md border-gray-400 p-0.5 max-w-[150px]">
+                    <div
+                      title={selectedCompanyProduct.name}
+                      className="relative rounded flex justify-between gap-x-0.5 bg-blue-600 caption-custom white-text p-0.5"
+                    >
+                      <span onClick={handleCompanyProductPopUp}>
+                        {selectedCompanyProduct.name.length > 14
+                          ? selectedCompanyProduct.name.slice(0, 14) + "..."
+                          : selectedCompanyProduct.name}
+                      </span>
+
+                      <button
+                        title="Clear"
+                        onClick={() =>
+                          handleSelectedCompanyProductCheckBoxChange(null)
+                        }
+                      >
+                        <X size={14} />
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <Button
+                type="submit"
+                disabled={!userHasAccessToAddAccountSubscription}
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (!userHasAccessToAddAccountSubscription) {
+                    toast.error(
+                      MESSAGE.MODULE_ACCESS.ACCOUNT_SUBSCRIPTION.DENIED_ADD_ACCESS,
+                    );
+                    return;
+                  }
+                  setIsCreateAccountSubscriptionModalOpen(true);
+                }}
+              >
+                <span className="flex items-center gap-1">
+                  {!isSmallScreen && <TicketPlus size={SIZE.SIXTEEN} />}
+                  {isSmallScreen && <TicketPlus size={SIZE.EIGHT} />}
+                  {isLargeScreen && JSX_CHILDREN_NAME.CREATE_SUPPORT_TICKET}
+                </span>
+              </Button>
+            </div>
+          </div>
+
+        </div>
+
+        <div className="bg-white overflow-y-auto rounded-lg shadow-sm">
+
+          <div
+            className={
+              userPreference.isLeftMenu
+                ? `ag-theme-balham w-full h-[calc(50vh-120px)]`
+                : "ag-theme-balham w-full h-[calc(50vh-122px)]"
+            }
+          >
+            <AccountSubscriptionManagementAgGrid
+              handleRowClick={handleRowClicked}
+              handleAccountSubscriptionDataFormChange={
+                handleAccountSubscriptionDataFormChange
+              }
+              onRowSelect={handleRowSelected}
+              accountSubscriptions={accountSubscriptionData}
+              isUsedInAccountSubscriptionModule={false}
+            />
+          </div>
+
+          <CreateAccountSubscription
+            isOpen={isCreateAccountSubscriptionModalOpen}
+            onClose={handleCreateAccountSubscriptionModalClose}
+            accountId={Number(accountId)}
+            handleAddAccountSubscritption={handleAddAccountSubscritption}
+          />
+        </div>
+
+        <div className="flex items-center justify-end col-span-1">
+          <PaginationWithoutCount
+            pageSize={paginationData.pageSize}
+            currentPage={paginationData.currentPage}
+            currentPageData={paginationData.currentPageData}
+            onPageSizeChange={paginationData.onPageSizeChange}
+            onPageChange={paginationData.onPageChange}
+          />
+        </div>
+
+        {openPopUpOfCompanyProductModal && (
+          <LookupCompanyProductSelection
+            isOpen={openPopUpOfCompanyProductModal}
+            onClose={() => setOpenPopUpOfCompanyProductModal(false)}
+            preText="Select Company Product"
+            description="Select company product to view its subscriptions"
+            selectedProductId={
+              selectedCompanyProduct && selectedCompanyProduct.id !== 0
+                ? selectedCompanyProduct.id
+                : null
+            }
+            handleSelectedCompanyProductChange={(params) => {
+              handleSelectedCompanyProductCheckBoxChange(params);
+              setOpenPopUpOfCompanyProductModal(false);
+            }}
+          />
+        )}
+      </div>
+    );
+  }
+}
+
+export default AccountSubscriptionManagementList;

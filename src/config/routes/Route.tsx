@@ -88,6 +88,7 @@ import StockManagement from "../../components/views/stock-management/StockManage
 import WareHouseWiseStock from "../../components/views/stock-management/WareHouseWiseStock";
 import StockLedgerManagement from "../../components/views/stock-management/StockLedgerManagement";
 import StockAgeingManagement from "../../components/views/stock-management/StockAgeingManagement";
+import AccountServiceDetails from "../../components/modals/Account/account-service/AccountServiceDetails";
 
 export const router = createBrowserRouter([
   {
@@ -878,6 +879,10 @@ export const router = createBrowserRouter([
         path: ROUTES_URL.ACCOUNT_MULTIPLE_COMPANY_PRODUCT,
         element: <CreateMultipleAccountCompanyProduct />,
       },
+      {
+        path: "account-service-details/:accountServiceId",
+        element: <AccountServiceDetails></AccountServiceDetails>
+      }
     ],
   },
   {
