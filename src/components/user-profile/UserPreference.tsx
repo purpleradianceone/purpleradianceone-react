@@ -40,6 +40,7 @@ import { useStates } from "../../config/hooks/useStates";
 import { useDistricts } from "../../config/hooks/useDisctricts";
 import { toSelectOptions } from "../../utils/toSelectOption";
 import CustomSelect from "../ui/CustomSelect";
+import CustomDocumentPreviewComponent from "../custom-document-preview-component/CustomDocumentPreviewComponent";
 
 const UserPreference = () => {
   const { countries } = useCountries();
@@ -563,6 +564,10 @@ const UserPreference = () => {
   );
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
 
+  useEffect(() => {
+    console.log("Company logo file: " + logoPreview?.toString());
+  }, [logoPreview]);
+
   const getCompanyDetail = () => {
     if (loginStatus.companyId === 0) return;
     try {
@@ -1037,10 +1042,16 @@ const UserPreference = () => {
                     className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50"
                     onClick={() => setShowCompanyLogoPreview(false)}
                   >
-                    <img
+                    {/* <img
                       src={logoPreview ?? companyDetail?.logo_cdn_url}
                       alt="Company Logo"
                       className="max-w-[80%] max-h-[80%] object-contain rounded-lg shadow-lg"
+                    /> */}
+                    <CustomDocumentPreviewComponent
+                      fileUrl={logoPreview ?? companyDetail?.logo_cdn_url}
+                      fileExtension={companyDetail.logo_file_extension}
+                      width={"50%"}
+                      enableDownload={true}
                     />
                   </div>
                 )}
