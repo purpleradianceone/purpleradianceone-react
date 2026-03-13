@@ -35,6 +35,8 @@ import axiosClient from "../../../../axios-client/AxiosClient";
 import CompanyUser from "../../../../@types/company-users/CompanyUser";
 import AccountServiceDetailProps from "../../../../@types/account/AccountServiceDetailProps";
 import ShimmerEffect from "./ShimerEffect";
+import ToggleButton from "../../../ui/ToggleButton";
+import MetaField from "../../../ui/MetaField";
 
 interface CustomField {
   id: string;
@@ -69,14 +71,12 @@ const AccountServiceDetails = () => {
   });
 
   const [fields, setFields] = useState<CustomField[]>([]);
-  const [error, setError] = useState({
-    service_booking_date_error: "",
-    service_booking_time_error: "",
-    productId: false,
-  });
+
   const [showErrorAtServiceStatus, setShowErrorAtServiceStatus] = useState(false);
   const [showErrorAtServiceBookingSource, setShowErrorAtServiceBookingSource] = useState(false);
   const [showErrorAtServiceLocationType, setShowErrorAtServiceLocationType] = useState(false);
+  const [showErrorAtServiceBookingDateError, setShowErrorAtServiceBookingDateError] = useState(false);
+  const [showErrorAtServiceBookingTimeError, setShowErrorAtServiceBookingTimeError] = useState(false);
 
   const { serviceStatus, isLoading: isLoadingForServiceStatus } = useServiceStatus();
   const { serviceLocationType, isLoading: isLoadingForServiceLocationType } = useServiceLocationType();
@@ -92,6 +92,7 @@ const AccountServiceDetails = () => {
     cancellation_reason: "",
     customer_feedback: "",
     next_service_due_date: "",
+    is_active: false,
   };
 
   const [formData, setFormData] = useState(intialFormData);
@@ -165,9 +166,9 @@ const AccountServiceDetails = () => {
           customer_feedback: data.customer_feedback,
           next_service_due_date: data.next_service_due_date,
           is_follow_up_required: data.is_follow_up_required,
-          isactive: data.isactive,
-          createdBy: data.createdBy,
-          createdOn: data.createdOn,
+          is_active: data.isactive,
+          createdBy: data.createdby,
+          createdOn: data.createdon,
         };
 
         setAccountServiceDetail(formattedData);
@@ -180,6 +181,7 @@ const AccountServiceDetails = () => {
           cancellation_reason: data.cancellation_reason,
           customer_feedback: data.customer_feedback,
           next_service_due_date: data.next_service_due_date,
+          is_active: data.isactive,
         });
 
         setSelectedServiceStatus(data.service_status_id);
@@ -220,16 +222,20 @@ const AccountServiceDetails = () => {
     let flag = true;
 
     if (!formData.service_booking_date) {
-      setError((prev) => ({ ...prev, service_booking_date_error: "Please select Service Booking Date" }));
-      toast.error("Please select Service Booking Date");
+      setShowErrorAtServiceBookingDateError(true);
       flag = false;
-    } else setError((prev) => ({ ...prev, service_booking_date_error: "" }));
+    }
+    else {
+      setShowErrorAtServiceBookingDateError(false);
+    }
+
 
     if (!formData.service_booking_time) {
-      setError((prev) => ({ ...prev, service_booking_time_error: "Please select Service Booking Time" }));
-      toast.error("Please select Service Booking Time");
+      setShowErrorAtServiceBookingTimeError(true);
       flag = false;
-    } else setError((prev) => ({ ...prev, service_booking_time_error: "" }));
+    } else {
+      setShowErrorAtServiceBookingTimeError(false);
+    }
 
     if (!selectedServiceStatus) {
       setShowErrorAtServiceStatus(true);
@@ -317,104 +323,142 @@ const AccountServiceDetails = () => {
     <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-6 w-full">
 
       {/* Header */}
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex justify-between items-center mb-3">
         <h2 className="table-header-custom">
           Account Service Details
         </h2>
       </div>
 
       {/* Top Details */}
-      <div className="grid grid-cols-4 gap-6 mb-2 text-sm">
+      <div className="grid grid-cols-5 gap-3 mb-2 text-sm">
+
+        <MetaField
+          label="Service Booking Source"
+          value={accountServiceDetail?.service_booking_source || "-"}
+        />
+
+        <MetaField
+          label="Account Service Code"
+          value={accountServiceDetail?.account_service_code || "-"}
+        />
+
+        <MetaField
+          label="Account Name"
+          value={accountServiceDetail?.account_name || "-"}
+        />
+        <MetaField
+          label="Company Product Name"
+          value={accountServiceDetail?.company_product_name || "-"}
+        />
+
+        <MetaField
+          label="Service Date Time"
+          value={accountServiceDetail?.service_date_time || "-"}
+        />
+
+        <MetaField
+          label="Service Status"
+          value={accountServiceDetail?.service_status || "-"}
+        />
+
+        <MetaField
+          label="Service Booking Source"
+          value={accountServiceDetail?.service_booking_source || "-"}
+        />
+
+        <MetaField
+          label="Service Location Type"
+          value={accountServiceDetail?.service_location_type || "-"}
+        />
+
+        <MetaField
+          label="Location Address"
+          value={accountServiceDetail?.location_address || "-"}
+        />
+
+        <MetaField
+          label="Location Address"
+          value={accountServiceDetail?.location_address || "-"}
+        />
+
+        <MetaField
+          label="Assigned To"
+          value={accountServiceDetail?.assignedto_name || "-"}
+        />
+
+        <MetaField
+          label="Service Notes"
+          value={accountServiceDetail?.service_notes || "-"}
+        />
+
+        <MetaField
+          label="Cancellation Reason"
+          value={accountServiceDetail?.cancellation_reason || "-"}
+        />
+
+        <MetaField
+          label="Customer Rating"
+          value={accountServiceDetail?.customer_rating || "-"}
+        />
+
+        <MetaField
+          label="Customer Feedback"
+          value={accountServiceDetail?.customer_feedback || "-"}
+        />
+
+        <MetaField
+          label="Next Service Due Date"
+          value={accountServiceDetail?.next_service_due_date || "-"}
+        />
+
+        <MetaField
+          label="Follow Up Required"
+          value={accountServiceDetail?.is_follow_up_required ? "Yes" : "No"}
+        />
+        <MetaField
+          label="Createdby"
+          value={accountServiceDetail?.createdBy || "-"}
+        />
+
+        <MetaField
+          label="Createdon"
+          value={accountServiceDetail?.createdOn || "-"}
+        />
 
         <div>
-          <p className="text-gray-500">Service Booking Source</p>
-          <p className="font-medium">
-            {accountServiceDetail?.service_booking_source || "-"}
-          </p>
-        </div>
+          <label className="text-xs text-gray-500">Status</label>
+          <div className="flex gap-2 items-center">
+            <ToggleButton
+              checked={formData.is_active}
+              name="is_active"
+              onToggle={(e) => {
+                const checked = e.target.checked;
 
-        <div>
-          <p className="text-gray-500">Service Location Type</p>
-          <p className="font-medium">
-            {accountServiceDetail?.service_location_type || "-"}
-          </p>
-        </div>
+                setFormData((prev) => ({
+                  ...prev,
+                  is_active: checked,
+                }));
 
-        <div>
-          <p className="text-gray-500">Service Status</p>
-          <p className="font-medium">
-            {accountServiceDetail?.service_status || "-"}
-          </p>
+                handleUpdate();
+              }}
+            />
+            <span
+              className={`text-sm ${formData.is_active
+                ? "text-green-600"
+                : "text-red-600"
+                }`}
+            >
+              {formData.is_active ? "Active" : "Inactive"}
+            </span>
+          </div>
         </div>
-
-        <div>
-          <p className="text-gray-500">Assigned To</p>
-          <p className="font-medium">
-            {accountServiceDetail?.assignedto_name || "-"}
-          </p>
-        </div>
-
       </div>
 
-      {/* Booking Section */}
-      <div className="grid grid-cols-4 gap-6 mb-6 text-sm">
-
-        <div>
-          <p className="text-gray-500">Service Booking Date</p>
-          <p className="font-medium">
-            {accountServiceDetail?.service_date_time || "-"}
-          </p>
-        </div>
-
-        <div>
-          <p className="text-gray-500">Next Service Due Date</p>
-          <p className="font-medium">
-            {accountServiceDetail?.next_service_due_date || "-"}
-          </p>
-        </div>
-
-        <div>
-          <p className="text-gray-500">Customer Rating</p>
-          <p className="font-medium">
-            {customerRating || "-"}
-          </p>
-        </div>
-
-      </div>
-
-      {/* Address */}
-      <div className="mb-6 text-sm">
-        <p className="text-gray-500 mb-1">Location Address</p>
-        <p className="font-medium">
-          {accountServiceDetail?.location_address || "-"}
-        </p>
-      </div>
-
-      {/* Notes */}
-      <div className="grid grid-cols-2 gap-6 text-sm">
-
-        <div>
-          <p className="text-gray-500 mb-1">Service Notes</p>
-          <p className="font-medium">
-            {accountServiceDetail?.service_notes || "-"}
-          </p>
-        </div>
-
-        <div>
-          <p className="text-gray-500 mb-1">Cancellation Reason</p>
-          <p className="font-medium">
-            {accountServiceDetail?.cancellation_reason || "-"}
-          </p>
-        </div>
-
-      </div>
-
-      {/* Feedback */}
-      <div className="mt-6 text-sm">
-        <p className="text-gray-500 mb-1">Customer Feedback</p>
-        <p className="font-medium">
-          {accountServiceDetail?.customer_feedback || "-"}
-        </p>
+      <hr></hr>
+      <div className="flex justify-between items-center mb-3 mt-3">
+        <h2 className="table-header-custom">
+          Update Account Service Details
+        </h2>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
@@ -460,15 +504,20 @@ const AccountServiceDetails = () => {
           <div className="text-red-500 text-xs">Please select Service Status</div>
         )}
 
-        <DatePickerInput
-          label="Service Booking Date"
-          name="service_booking_date"
-          onChange={handleChange}
-          logo={Calendar}
-          error={error.service_booking_date_error}
-          required
-          value={formData.service_booking_date}
-        />
+        <div>
+          <DatePickerInput
+            label="Service Booking Date"
+            name="service_booking_date"
+            onChange={handleChange}
+            logo={Calendar}
+            required
+            value={formData.service_booking_date}
+          />
+          {showErrorAtServiceBookingDateError && (
+            <div className="text-red-500 text-xs">Please select Service Booking Date</div>
+          )}
+        </div>
+
 
         <div className=" col-span-1">
           <label htmlFor="service_booking_time" className="block input-label-custom">
@@ -489,10 +538,11 @@ const AccountServiceDetails = () => {
               <option key={option} value={option}>{option}</option>
             ))}
           </select>
-          {error.service_booking_time_error && (
-            <div className="caption-custom-inactive">{error.service_booking_time_error}</div>
+          {showErrorAtServiceBookingTimeError && (
+            <div className="text-red-500 text-xs">Please select Service Booking Time</div>
           )}
         </div>
+
 
         <TextAreaInput
           logo={MapPin}
@@ -573,7 +623,7 @@ const AccountServiceDetails = () => {
         <div><Button onClick={(e) => {
           e.preventDefault();
           handleUpdate();
-        }} type="submit">Save</Button></div>
+        }} type="button">Save</Button></div>
       </div>
 
 
