@@ -64,24 +64,22 @@ export const CanvasWrapperQuotation = ({ data }: { data: string }) => {
 
   //preventing default browser behavior
   useEffect(() => {
-  const handleKeyDown = (e: KeyboardEvent) => {
-    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "s") {
-      e.preventDefault(); 
-      console.log("Ctrl + S blocked");
-
-    }
-  };
-  window.addEventListener("keydown", handleKeyDown);
-  return () => {
-    window.removeEventListener("keydown", handleKeyDown);
-  };
-}, []);
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "s") {
+        e.preventDefault();
+        console.log("Ctrl + S blocked");
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
 
   return (
     <div style={{ position: "relative" }} className="table-data-custom">
       {/* Redo Undo */}
-      <div className="fixed top-28 right-9 "
-      style={{zIndex: 51}}>
+      <div className="fixed top-28 right-9 " style={{ zIndex: 51 }}>
         <div
           className="flex items-center gap-2 px-2 py-1 
                   bg-white/80 backdrop-blur-lg 
