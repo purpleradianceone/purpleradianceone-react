@@ -73,6 +73,7 @@ const ROUTES_URL = {
   ACCOUNT_COMPANY_PRODUCT_AMC_DETAILS:
     "/home/manage-accounts/accounts/prod-details-amc/:accountCompanyProductId",
   ACCOUNT_MULTIPLE_COMPANY_PRODUCT: "assign-products",
+  ACCOUNT_SERVICE_DETAILS: "account-service-details",
 
   // Stock
   STOCK_MANAGEMENT: "/home/manage-stock/stock",
