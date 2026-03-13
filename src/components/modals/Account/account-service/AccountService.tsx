@@ -47,7 +47,7 @@ function AccountService({
   // Read filters from LocalStorage (before hook initializes)
   const savedFilters = JSON.parse(
     localStorage.getItem(LocalStorageKeys.SUPPORT_TICKET_MANAGEMENT_FILTERS) ||
-      "{}",
+    "{}",
   );
 
   const {

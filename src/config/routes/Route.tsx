@@ -89,6 +89,7 @@ import WareHouseWiseStock from "../../components/views/stock-management/WareHous
 import StockLedgerManagement from "../../components/views/stock-management/StockLedgerManagement";
 import StockAgeingManagement from "../../components/views/stock-management/StockAgeingManagement";
 import AccountServiceDetails from "../../components/modals/Account/account-service/AccountServiceDetails";
+import AccountSubscriptionDetails from "../../components/modals/Account/account-subscription/AccountSubscriptionDetails";
 
 export const router = createBrowserRouter([
   {
@@ -525,7 +526,7 @@ export const router = createBrowserRouter([
           <div>
             <AuthLayout
               title="Activate Subscription!"
-              // subtitle="Enter the number of users and subscription duration to proceed"
+            // subtitle="Enter the number of users and subscription duration to proceed"
             >
               <CreateSubscription
                 isOpen={true}
@@ -810,7 +811,7 @@ export const router = createBrowserRouter([
                 onClose={() => {
                   window.history.back();
                 }}
-                handleProductChangeOnAdd={() => {}}
+                handleProductChangeOnAdd={() => { }}
               ></AddProductModal>
             </Navbar>
           </div>
@@ -830,7 +831,7 @@ export const router = createBrowserRouter([
                 onClose={() => {
                   window.history.back();
                 }}
-                handleCompanyTeamChangeOnAdd={() => {}}
+                handleCompanyTeamChangeOnAdd={() => { }}
               ></AddTeamModal>
             </Navbar>
           </div>
@@ -882,6 +883,10 @@ export const router = createBrowserRouter([
       {
         path: "account-service-details/:accountServiceId",
         element: <AccountServiceDetails></AccountServiceDetails>
+      },
+      {
+        path: "account-subscription-details/:accountSubscriptionId",
+        element: <AccountSubscriptionDetails></AccountSubscriptionDetails>
       }
     ],
   },
