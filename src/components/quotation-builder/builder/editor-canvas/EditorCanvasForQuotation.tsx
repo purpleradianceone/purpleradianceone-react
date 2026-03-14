@@ -96,79 +96,8 @@ export const EditorCanvasForQuotation: React.FC = () => {
     }
   };
 
-  // const placeholderDatafromApi = [
-  //   {
-  //     isactive: true,
-  //     name: "{{quotation_number}}",
-  //     id: 1,
-  //     email_type_id: 1
-  //   },
-  //   {
-  //     isactive: true,
-  //     name: "{{quotation_date}}",
-  //     id: 2,
-  //     email_type_id: 1
-
-  //   },
-  //   {
-  //     isactive: true,
-  //     name: "{{quotation_valid_till}}",
-  //     id: 3,
-  //     email_type_id: 1
-
-  //   },
-  //   {
-  //     isactive: true,
-  //     name: "{{client_name}}",
-  //     id: 4,
-  //     email_type_id: 1
-
-  //   },
-  //   {
-  //     isactive: true,
-  //     name: "{{client_company}}",
-  //     id: 5,
-  //     email_type_id: 1
-
-  //   },
-  //   {
-  //     isactive: true,
-  //     name: "{{client_address}}",
-  //     id: 6,
-  //     email_type_id: 1
-
-  //   },
-  //   {
-  //     isactive: true,
-  //     name: "{{company_name}}",
-  //     id: 7,
-  //     email_type_id: 1
-
-  //   },
-  //   {
-  //     isactive: true,
-  //     name: "{{company_address}}",
-  //     id: 8,
-  //     email_type_id: 1
-  //   },
-  //   {
-  //     isactive: true,
-  //     name: "{{authorized_name}}",
-  //     id: 9,
-  //     email_type_id: 1
-  //   },
-  //   {
-  //     isactive: true,
-  //     name: "{{authorized_designation}}",
-  //     id: 10,
-  //     email_type_id: 1
-  //   },
-  // ];
-
   useEffect(() => {
-    // setPlaceHolderData(placeholderDatafromApi);
     getPlaceholderForQuotation();
-    // parsedFields = convertPlaceholdersToFields(placeHolderData);
   }, []);
 
   return (

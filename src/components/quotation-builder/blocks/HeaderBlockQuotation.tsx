@@ -28,7 +28,7 @@ export const HeaderBlockQuotation: React.FC = () => {
   const { loginStatus } = useLoggedInUserContext();
   const [isConfirmationPopupOpen, setIsConfirmationPopupOpen] =
     useState<boolean>(false);
-    //for syncking headers on every page end
+  //for syncking headers on every page end
   /* ===== Local State ===== */
   const [hovered, setHovered] = useState(false);
   const [editing, setEditing] = useState(false);
@@ -44,71 +44,18 @@ export const HeaderBlockQuotation: React.FC = () => {
       p.padding = tempPadding;
       p.backgroundColor = tempBg;
     });
-    saveHeaderToStorage(); // Save header
     setEditing(false);
   };
-
-  const handleSaveHeaderLayout = () => {
-    setProp((p: any) => {
-      p.height = tempHeight;
-      p.padding = tempPadding;
-      p.backgroundColor = tempBg;
-    });
-
-    localStorage.setItem(
-      HEADER_LAYOUT_KEY + loginStatus.id,
-      JSON.stringify(props),
-    );
-    handleSave(); // Save 
-    setEditing(false);
-    setIsConfirmationPopupOpen(false);
-    window.location.reload();
-  };
-
-  useEffect(() => {
-    const stored = localStorage.getItem(HEADER_LAYOUT_KEY + loginStatus.id);
-    if (!stored) return;
-
-    try {
-      const parsed = JSON.parse(stored);
-      setProp((p: any) => {
-        p.padding = parsed.padding;
-        p.backgroundColor = parsed.backgroundColor;
-        p.height = parsed.height;
-      });
-    } catch (err) {
-      console.log("Error loading header props:", err);
-    }
-  }, [id]);
-
-
-  useEffect(() => {
-    const stored = localStorage.getItem(HEADER_STORAGE_KEY + loginStatus.id);
-    if (!stored) return;
-
-    try {
-      const parsed = JSON.parse(stored);
-
-      const editorState = query.getState();
-      const canvasId = editorState.nodes[id].data.linkedNodes[`${id}-canvas`];
-
-      if (!canvasId) return;
-
-      const node = query.parseSerializedNode(parsed).toNode();
-
-      // VERY IMPORTANT: Inject only if empty
-      const canvasNode = editorState.nodes[canvasId];
-      if (canvasNode.data.nodes.length > 0) return;
-
-      actions.add(node, canvasId);
-    } catch (err) {
-      console.log("Error loading header:", err);
-    }
-  }, [id]);
 
   const saveHeaderToStorage = () => {
     try {
       const editorState = query.getState();
+
+      setProp((p: any) => {
+        p.height = tempHeight;
+        p.padding = tempPadding;
+        p.backgroundColor = tempBg;
+      });
 
       // This is the linked canvas id created by Craft
       const canvasId = editorState.nodes[id].data.linkedNodes[`${id}-canvas`];
@@ -125,16 +72,77 @@ export const HeaderBlockQuotation: React.FC = () => {
       // Serialize that node
       const serializedNode = query.node(firstNodeId).toSerializedNode();
 
+      const localStorageData = {
+        data: serializedNode,
+        props: {
+          height: tempHeight,
+          padding: tempPadding,
+          backgroundColor: tempBg,
+        },
+      };
+
       localStorage.setItem(
         HEADER_STORAGE_KEY + loginStatus.id,
-        JSON.stringify(serializedNode),
+        JSON.stringify(localStorageData),
       );
     } catch (err) {
       console.log("Error storing header:", err);
     }
   };
 
-  
+  const handleSaveHeaderLayout = () => {
+    setProp((p: any) => {
+      p.height = tempHeight;
+      p.padding = tempPadding;
+      p.backgroundColor = tempBg;
+    });
+
+    saveHeaderToStorage(); // Save header
+    handleSave(); // Save
+    setEditing(false);
+    setIsConfirmationPopupOpen(false);
+    window.location.reload();
+  };
+
+  useEffect(() => {
+    const stored = localStorage.getItem(HEADER_LAYOUT_KEY + loginStatus.id);
+    if (!stored) return;
+
+    try {
+      const parsed = JSON.parse(stored);
+      setProp((p: any) => {
+        p.padding = parsed.props.padding;
+        p.backgroundColor = parsed.props.backgroundColor;
+        p.height = parsed.props.height;
+      });
+    } catch (err) {
+      console.log("Error loading header props:", err);
+    }
+  }, [id]);
+
+  useEffect(() => {
+    const stored = localStorage.getItem(HEADER_STORAGE_KEY + loginStatus.id);
+    if (!stored) return;
+
+    try {
+      const parsed = JSON.parse(stored);
+
+      const editorState = query.getState();
+      const canvasId = editorState.nodes[id].data.linkedNodes[`${id}-canvas`];
+
+      if (!canvasId) return;
+
+      const node = query.parseSerializedNode(parsed.data).toNode();
+
+      // VERY IMPORTANT: Inject only if empty
+      const canvasNode = editorState.nodes[canvasId];
+      if (canvasNode.data.nodes.length > 0) return;
+
+      actions.add(node, canvasId);
+    } catch (err) {
+      console.log("Error loading header:", err);
+    }
+  }, [id]);
 
   //For Ctrl+s
   useEffect(() => {
@@ -159,7 +167,7 @@ export const HeaderBlockQuotation: React.FC = () => {
         borderBottom: "1px dashed #ddd",
         position: "relative",
         boxSizing: "border-box",
-        flexShrink: 0, // 🔥 KEY
+        flexShrink: 0,
       }}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
@@ -218,7 +226,7 @@ export const HeaderBlockQuotation: React.FC = () => {
           </div>
           <div className="flex justify-center items-center mt-2">
             <Button onClick={() => setIsConfirmationPopupOpen(true)}>
-              <Save size={SIZE.SIXTEEN} /> Save Header layout
+              <Save size={SIZE.SIXTEEN} /> Save Header Layout
             </Button>
           </div>
 
@@ -233,10 +241,10 @@ export const HeaderBlockQuotation: React.FC = () => {
               icon={Save}
               onCancel={() => setIsConfirmationPopupOpen(false)}
               onConfirm={handleSaveHeaderLayout}
-              title="Set this header layout as the default for new pages?"
-              description="Newly created pages will automatically follow this header layout structure."
+              title="Set this header as the default for new pages?"
+              description="Newly created pages will automatically follow this header structure."
               message="This will apply the same layout settings — including padding, alignment, background styling, and spacing — to all future pages."
-              messageDescription="Note: Header and footer content must be configured separately."
+              messageDescription="Note: Header and footer content Visibility must be configured separately in page setting."
               cancelButtonText="Cancel"
               confirmButtonText="Save Header Layout"
             />

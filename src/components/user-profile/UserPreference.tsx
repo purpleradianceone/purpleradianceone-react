@@ -351,15 +351,29 @@ const UserPreference = () => {
       if (value.trim().length !== 0 && !REGEX.GST.test(value.trim())) {
         errorMsg = "Invalid GST format (valid GST: 27ABCDE1234F1Z5)";
       } else {
-        if (companyDetail.state_id) {
-          const result = value.substring(2, 12);
-          if (value.trim().length !== 0 && result !== companyDetail.pan) {
-            errorMsg = "Given PAN number must be include in GST.";
+        if (value.trim().length !== 0) {
+          if (companyDetail.state_id) {
+            const stateGstCodeFromGstString = value.trim().substring(0, 2);
+            const result = value.substring(2, 12);
+            const selectedStateGstCode = states.find(
+              (result) => result.id == companyDetail.state_id,
+            );
+
+            if (stateGstCodeFromGstString === selectedStateGstCode?.gst_code) {
+              if (result !== companyDetail.pan) {
+                errorMsg =
+                  "The GST number does not correspond to the provided PAN.";
+              } else {
+                errorMsg = "";
+              }
+            } else {
+              errorMsg = "GST state code does not match the company's state.";
+            }
           } else {
-            errorMsg = "";
+            errorMsg = "First select the location information (ex: State)";
           }
         } else {
-          errorMsg = "First select the location information (ex: state)";
+          errorMsg = "";
         }
       }
     }
@@ -1478,7 +1492,7 @@ const UserPreference = () => {
                       <div className="input-label-custom py-1">
                         Registered Office Address:
                       </div>
-                      <span className="caption-custom text-blue-600 hover:text-blue-700 rounded-md py-1.5 whitespace-pre-wrap">
+                      <span className="caption-custom text-blue-600 rounded-md py-1.5 whitespace-pre-wrap">
                         {companyDetail?.registered_office_address ?? ""}
                       </span>
                     </div>
@@ -1487,7 +1501,7 @@ const UserPreference = () => {
                       <div className="input-label-custom py-1">
                         Billing Address:
                       </div>
-                      <span className="caption-custom text-blue-600 hover:text-blue-700 rounded-md py-1.5 whitespace-pre-wrap">
+                      <span className="caption-custom text-blue-600 rounded-md py-1.5 whitespace-pre-wrap">
                         {companyDetail?.billing_address ?? ""}
                       </span>
                     </div>
@@ -1496,7 +1510,7 @@ const UserPreference = () => {
                       <div className="input-label-custom py-1">
                         Shipping Address:
                       </div>
-                      <span className="caption-custom text-blue-600 hover:text-blue-700 rounded-md py-1.5 whitespace-pre-wrap">
+                      <span className="caption-custom text-blue-600 rounded-md py-1.5 whitespace-pre-wrap">
                         {companyDetail?.shipping_address ?? ""}
                       </span>
                     </div>
