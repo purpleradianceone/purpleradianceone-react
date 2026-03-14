@@ -14,8 +14,8 @@ const FormLayout = ({
     widthPercent?: number
   }) => {
   return createPortal(
-    <div className="fixed  inset-0 z-50 bg-black/40 backdrop-blur-[1px] flex items-center justify-center  overflow-y-auto">
-      <div className={`bg-white rounded-lg shadow-xl w-full max-w-${width}xl relative animate-fadeIn p-${padding} min-h-fit max-h-[90vh] overflow-y-auto`}
+    <div className="fixed   inset-0 z-50 bg-black/40 backdrop-blur-[1px] flex items-center justify-center  overflow-y-auto">
+      <div className={`bg-white rounded-lg shadow-xl w-full max-w-${width}xl relative animate-fadeIn p-${padding} min-h-56 max-h-[90vh] overflow-y-auto`}
         style={{
           maxWidth: widthPercent ? `${widthPercent}%` : undefined
         }}
