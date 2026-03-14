@@ -18,6 +18,7 @@ import axiosClient from "../../axios-client/AxiosClient";
       country_id: countryId,
       name: null,
       description: null,
+      gst_code: null,
       isactive: true,
     };
 
