@@ -22,7 +22,7 @@ export const useServiceStatus = () => {
       name: null,
       isactive: null,
       company_id: loginStatus.companyId,
-      requestedby: loginStatus.id,
+      requestedby_id: loginStatus.id,
     };
 
     await axiosClient

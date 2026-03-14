@@ -6,7 +6,9 @@ type AccountServiceDetailProps = {
   account_name: string;
   company_product_id: number;
   company_product_name: string;
+  service_booking_date: string;
   service_date_time: string;
+  service_booking_time: string;
   service_status_id: number;
   service_status: string;
   service_booking_source_id: number;
