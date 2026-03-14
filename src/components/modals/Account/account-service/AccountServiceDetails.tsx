@@ -149,7 +149,9 @@ const AccountServiceDetails = () => {
           account_name: data.account_name,
           company_product_id: data.company_product_id,
           company_product_name: data.company_product_name,
+          service_booking_date: data.service_booking_date,
           service_date_time: data.service_date_time,
+          service_booking_time: data.service_booking_time,
           service_status_id: data.service_status_id,
           service_status: data.service_status,
           service_booking_source_id: data.service_booking_source_id,
@@ -353,7 +355,7 @@ const AccountServiceDetails = () => {
 
         <MetaField
           label="Service Date Time"
-          value={accountServiceDetail?.service_date_time || "-"}
+          value={`${accountServiceDetail?.service_booking_date} ${accountServiceDetail?.service_booking_time}`}
         />
 
         <MetaField
@@ -546,7 +548,7 @@ const AccountServiceDetails = () => {
 
         <TextAreaInput
           logo={MapPin}
-          rows={3}
+          rows={1}
           cols={4}
           label="Location Address: "
           name="location_address"
@@ -557,8 +559,8 @@ const AccountServiceDetails = () => {
         />
         <TextAreaInput
           logo={ShieldCheck}
-          rows={3}
-          cols={4}
+          rows={1}
+          cols={1}
           label="Service Note: "
           name="service_notes"
           placeholder="Enter Service Note"
@@ -567,8 +569,8 @@ const AccountServiceDetails = () => {
         />
         <TextAreaInput
           logo={Ban}
+          rows={1}
           cols={4}
-          rows={3}
           label="Cancellation Reason: "
           name="cancellation_reason"
           placeholder="Enter Cancellation Reason"
@@ -578,8 +580,8 @@ const AccountServiceDetails = () => {
         />
         <TextAreaInput
           logo={MessageSquare}
+          rows={1}
           cols={4}
-          rows={3}
           label="Customer Feedback: "
           name="customer_feedback"
           placeholder="Enter Customer Feedback"
@@ -587,6 +589,7 @@ const AccountServiceDetails = () => {
           maxLength={VALIDATIONS.MAX_DESCRIPTION_LENGTH}
           onChange={handleChange}
         />
+        <FormCheckbox label="Is Follow Up Required" name="is_follow_up_required" onChange={handleFollowUpChange} checked={isFollowUpRequired} />
 
         {/* Custom fields */}
         <div className="p-6 bg-white border rounded-lg shadow-sm max-w-4xl">
@@ -606,7 +609,6 @@ const AccountServiceDetails = () => {
           </div>
         </div>
 
-        <FormCheckbox label="Is Follow Up Required" name="is_follow_up_required" onChange={handleFollowUpChange} checked={isFollowUpRequired} />
         <DatePickerInput label="Next Service Due Date" name="next_service_due_date" onChange={handleChange} logo={Calendar} value={formData.next_service_due_date} />
 
         <CompanyUserSearchFieldInput logo={User} label="Assign To:" defaultValue={accountServiceDetail?.assignedto_name} onUserSelected={setAssignedTo} />
@@ -617,13 +619,13 @@ const AccountServiceDetails = () => {
 
       <div className="flex  tems-center justify-end gap-2">
 
-        <div>
+        {/* <div>
           <Button onClick={() => { }} type="button">Cancel</Button>
-        </div>
+        </div> */}
         <div><Button onClick={(e) => {
           e.preventDefault();
           handleUpdate();
-        }} type="button">Save</Button></div>
+        }} >Save</Button></div>
       </div>
 
 

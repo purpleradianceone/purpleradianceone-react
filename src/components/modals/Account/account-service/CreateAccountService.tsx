@@ -279,11 +279,9 @@ const AddStock = ({
     }
 
     if (isSaving) return;
-
-    // const customizationsForBackend = fields.map((field) => ({
-    //   key: field.key,
-    //   value: field.value,
-    // }));
+    const customizationsForBackend = Object.fromEntries(
+      fields.map(field => [field.key, field.value])
+    );
 
     const postData = {
       company_id: loginStatus.companyId,
@@ -299,13 +297,13 @@ const AddStock = ({
       // assignedto: null,
       service_notes: addCreateServiceDetailFormData.service_notes,
       // customizations: JSON.stringify(fields),
-      customizations: null,
+      customizations: JSON.stringify(customizationsForBackend),
       cancellation_reason: addCreateServiceDetailFormData.cancellation_reason,
       customer_rating: customerRating,
       customer_feedback: addCreateServiceDetailFormData.customer_feedback,
       is_follow_up_required: isFollowUpRequired,
       next_service_due_date:
-        addCreateServiceDetailFormData.next_service_due_date,
+        addCreateServiceDetailFormData.next_service_due_date || null,
       createdby_id: loginStatus.id,
     };
     console.log("--------------");
@@ -671,7 +669,7 @@ const AddStock = ({
                 value={addCreateServiceDetailFormData.location_address}
                 maxLength={VALIDATIONS.MAX_DESCRIPTION_LENGTH}
                 onChange={handleCreateServiceDetailFormChange}
-                // className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
+              // className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
               />
               <TextAreaInput
                 logo={ShieldCheck}
@@ -693,7 +691,7 @@ const AddStock = ({
                 value={addCreateServiceDetailFormData.cancellation_reason}
                 maxLength={VALIDATIONS.MAX_DESCRIPTION_LENGTH}
                 onChange={handleCreateServiceDetailFormChange}
-                // className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
+              // className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
               />
 
               <TextAreaInput
@@ -706,7 +704,7 @@ const AddStock = ({
                 value={addCreateServiceDetailFormData.customer_feedback}
                 maxLength={VALIDATIONS.MAX_DESCRIPTION_LENGTH}
                 onChange={handleCreateServiceDetailFormChange}
-                // className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
+              // className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
               />
 
               <div className="p-6 bg-white border rounded-lg shadow-sm max-w-4xl">

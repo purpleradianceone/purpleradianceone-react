@@ -22,6 +22,7 @@ import axiosClient from "../../../../axios-client/AxiosClient";
 
 import AccountSubscriptionProps from "../../../../@types/account/AccountSubscriptionProps";
 import ShimmerEffect from "../account-service/ShimerEffect";
+import MetaField from "../../../ui/MetaField";
 
 const AccountSubscriptionDetails = () => {
 
@@ -62,10 +63,6 @@ const AccountSubscriptionDetails = () => {
         }));
 
     };
-
-    // -----------------------
-    // Fetch Account Subscription Detail
-    // -----------------------
 
     const getAccountSubscriptionDetail = async () => {
 
@@ -138,9 +135,7 @@ const AccountSubscriptionDetails = () => {
 
     }, [accountSubscriptionId]);
 
-    // -----------------------
-    // Validation
-    // -----------------------
+
 
     const validateForm = () => {
 
@@ -168,40 +163,36 @@ const AccountSubscriptionDetails = () => {
     // Update Account Subscription
     // -----------------------
 
-    const handleUpdate = async () => {
+    const handleUpdate = async (activeValue?: boolean) => {
 
         if (!validateForm()) return;
 
         if (isSaving) return;
 
-        let packageJSON = null;
+        // let packageJSON = null;
 
-        try {
+        // try {
 
-            packageJSON = formData.package_detail
-                ? JSON.parse(formData.package_detail)
-                : null;
+        //     packageJSON = formData.package_detail
+        //         ? JSON.parse(formData.package_detail)
+        //         : null;
 
-        } catch {
+        // } catch {
 
-            toast.error("Invalid package detail JSON");
-            return;
+        //     toast.error("Invalid package detail JSON");
+        //     return;
 
-        }
+        // }
 
         const postData = {
 
             company_id: loginStatus.companyId,
             id: Number(accountSubscriptionId),
-
-            start_date_string: formData.start_date,
-            end_date_string: formData.end_date,
-
-            packagedetail: packageJSON,
-
-            isactive: formData.is_active,
-
-            updatedby: loginStatus.id
+            start_date: formData.start_date,
+            end_date: formData.end_date,
+            package_detail: null,
+            isactive: activeValue ?? formData.is_active,
+            updatedby_id: loginStatus.id
 
         };
 
@@ -277,28 +268,47 @@ const AccountSubscriptionDetails = () => {
 
             {/* Top Details */}
 
-            <div className="grid grid-cols-3 gap-6 mb-6 text-sm">
+            <div className="grid grid-cols-4 gap-6 mb-3 text-sm">
 
-                <div>
-                    <p className="text-gray-500">Account Name</p>
-                    <p className="font-medium">
-                        {accountSubscriptionDetail?.accountName || "-"}
-                    </p>
-                </div>
+                <MetaField
+                    label="Account Subscription Field"
+                    value={accountSubscriptionDetail?.accountSubscriptionCode || "-"}
+                ></MetaField>
 
-                <div>
-                    <p className="text-gray-500">Product</p>
-                    <p className="font-medium">
-                        {accountSubscriptionDetail?.companyProductName || "-"}
-                    </p>
-                </div>
+                <MetaField
+                    label="Account Name"
+                    value={accountSubscriptionDetail?.accountName || "-"}
+                ></MetaField>
 
-                <div>
-                    <p className="text-gray-500">Subscription Code</p>
-                    <p className="font-medium">
-                        {accountSubscriptionDetail?.accountSubscriptionCode || "-"}
-                    </p>
-                </div>
+                <MetaField
+                    label="Company Product Name"
+                    value={accountSubscriptionDetail?.companyProductName || "-"}
+                ></MetaField>
+
+                <MetaField
+                    label="Start Date"
+                    value={accountSubscriptionDetail?.startDate || "-"}
+                ></MetaField>
+
+                <MetaField
+                    label="End Date"
+                    value={accountSubscriptionDetail?.endDate || "-"}
+                ></MetaField>
+
+                <MetaField
+                    label="Is Renewal"
+                    value={accountSubscriptionDetail?.isRenewal ? "Yes" : "No"}
+                ></MetaField>
+
+                <MetaField
+                    label="Createdby"
+                    value={accountSubscriptionDetail?.createdBy || "-"}
+                ></MetaField>
+
+                <MetaField
+                    label="Createdon"
+                    value={accountSubscriptionDetail?.createdOn || "-"}
+                ></MetaField>
 
             </div>
 
@@ -360,7 +370,7 @@ const AccountSubscriptionDetails = () => {
                                 is_active: checked
                             }));
 
-                            handleUpdate();
+                            handleUpdate(checked);
 
                         }}
                     />
