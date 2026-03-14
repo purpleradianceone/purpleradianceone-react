@@ -3,6 +3,8 @@ import { useInView } from "react-intersection-observer";
 import { motion } from "framer-motion";
 import { PageLayout } from "../../../ui/PageLayout";
 import { Outlet } from "react-router-dom";
+import { ComponentHeaderAndLogo } from "../../../ui/ComponentHeaderAndLogo";
+import { Settings } from "lucide-react";
 
 function SettingsPage() {
   const [ref, inView] = useInView({ fallbackInView: true, threshold: 0.1 });
@@ -17,11 +19,10 @@ function SettingsPage() {
           transition={{ duration: 0.4, ease: "easeOut" }}
         >
           <div className="sticky top-0 z-50  py-1  flex items-center justify-between  bg-gray-50 rounded-sm shadow-sm   w-full">
-            <div className="flex w-full gap-2 justify-start pl-1">
-              <div className="flex">
-                <span className="section-header-custom">Settings</span>
-              </div>
-            </div>
+            <ComponentHeaderAndLogo
+              headerText="Settings"
+              logo={Settings}
+            />
           </div>
           <div className="sticky top-8 left-0 z-20">
             <SettingsTabs />

@@ -36,7 +36,8 @@ const MESSAGE = {
         SELECT_DIFFERENT_USER: "Select different user.",
 
         MODULE_ACCESS_UPDATE: "You do not have permission to update details.",
-        SAME_PRODUCT_SELECTED : "Same product selected."
+        SAME_PRODUCT_SELECTED : "Same product selected.",
+        DENIED_FACEBOOK_INTEGRATION_MESSAGE:"Facebook account is already connected. you can integrate pages."
     },
     SUCCESS: {
         LOGGED_IN: "Logged In",

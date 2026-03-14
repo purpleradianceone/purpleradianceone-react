@@ -1,4 +1,5 @@
 const ROUTES_URL = {
+
   NOT_FOUND: "*",
   LANDING_PAGE: "/",
   SIGN_IN: "/signin",
@@ -108,5 +109,11 @@ const ROUTES_URL = {
   MY_TASKS: "my-tasks",
   GENERAL_TASK: "/home/manage-tasks/general-task/:taskId/:masterId",
   MASTER_TASK_DETAILS: "/home/master-task/details/:taskId",
+    
+     //META APP INTEGRATIONS
+   SETTING_META_APP_INTEGRATION_FACEBOOK: "/settings/facebook",
+   SETTING_META_APP_INTEGRATION_FACEBOOK_PAGE_ADDITION : "integrate-meta-app",
+
+      SETTING_META_APP_INTEGRATION_WHATSAPP: "/settings/integrate-whatsapp",
 };
 export default ROUTES_URL;
