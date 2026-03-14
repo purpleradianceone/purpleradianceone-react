@@ -5,10 +5,12 @@ import { SIZE, STRING_VALUES } from "../../constants/AppConstants";
 import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
 import { useNavigate } from "react-router-dom";
 import ROUTES_URL from "../../constants/Routes";
+import POST_API from "../../constants/PostApi";
 
 function FacebookOAuthConsent() {
   const { loginStatus } = useLoggedInUserContext();
   const navigate = useNavigate();
+
 
   const handleClose = (isFlowCompleted: boolean) => {
     if (isFlowCompleted) {
@@ -21,76 +23,20 @@ function FacebookOAuthConsent() {
     // window.history.back();
   };
 
+  // http://localhost:8080/api/main/purple-crm-api/main/facebook
+  // "http://localhost:8080/api/main/purple-crm-api/main/facebook";
   const handleConfirm = () => {
-    const baseUrl =
-      "https://cdranalysis.com/api/main/purple-crm-api/main/facebook";
+    console.log("Button clicked");
+    
+    const baseUrl = POST_API.OAUTH_CONSENT_FACEBOOK_ACCOUNT
+    console.log(baseUrl);
+    
     const params = new URLSearchParams();
     params.append("company_id", loginStatus.companyId.toString());
     params.append("company_user_id", loginStatus.id.toString());
     window.location.href = `${baseUrl}?${params}`;
   };
 
-  // useEffect(() => {
-  //   const urlFragment = window.location.hash;
-  //   if (urlFragment) {
-  //     const fragmentString = urlFragment.substring(1);
-  //     const params = new URLSearchParams(fragmentString);
-
-  //     const accessToken = params.get("access_token");
-  //     // const expiresIn = params.get('expires_in');
-  //     const longLivedToken = params.get("long_lived_token");
-
-  //     // console.log("redirected from facebook");
-  //     // console.log("Token : " + accessToken);
-  //     // console.log("expires in : " + expiresIn);
-  //     // console.log("Long Lived Token : " + longLivedToken);
-  //     // console.log("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-  //     handleFacebookCallback(accessToken, longLivedToken);
-  //   }
-
-  //   window.history.pushState(null, document.title, window.location.href);
-
-  //   const handleBackButton = (event: PopStateEvent) => {
-  //     event.preventDefault();
-  //     navigate(ROUTES_URL.INTEGRATIONS_SETTINGS + "/" + ROUTES_URL.SETTING_META_APP,);
-  //     // navigate(ROUTES_URL.INTEGRATIONS_SETTINGS, { replace: true });
-  //   };
-
-  //   window.addEventListener("popstate", handleBackButton);
-  //   return () => {
-  //     window.removeEventListener("popstate", handleBackButton);
-  //   };
-  // }, []);
-
-  // const handleFacebookCallback = (
-  //   accessToken: string | null,
-  //   longLivedToken: string | null,
-  // ) => {
-  //   if (accessToken) {
-  //     const postDataFacebookCallback = {
-  //       company_id: loginStatus.companyId,
-  //       company_user_id: loginStatus.id,
-  //       short_lived_access_token: accessToken,
-  //       long_lived_access_token: longLivedToken,
-  //     };
-  //     axios
-  //       .post(POST_API.FACEBOOK_CALLBACK, postDataFacebookCallback, {
-  //         withCredentials: true,
-  //       })
-  //       .then((response) => {
-  //         if (response.status === STATUS_CODE.OK) {
-  //           if (response.data.status) {
-  //             toast.success(response.data.message);
-  //           } else {
-  //             toast.error(response.data.message);
-  //           }
-  //           // setTimeout(()=>{
-  //           //   navigate(ROUTES_URL.COMPANY_SETTING);
-  //           // },3000)
-  //         }
-  //       });
-  //   }
-  // };
 
   return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center">
