@@ -140,7 +140,9 @@ const AccountServiceDetails = () => {
       );
       if (response.status === 200 && response.data) {
         const data = response.data[0];
-
+        console.log("--------------");
+        console.log(data);
+        console.log("--------------");
         const formattedData: AccountServiceDetailProps = {
           id: data.id,
           company_id: data.company_id,
@@ -192,6 +194,22 @@ const AccountServiceDetails = () => {
         setIsFollowUpRequired(data.is_follow_up_required);
         setCustomerRating(data.customer_rating);
 
+        const customObj =
+          typeof data.customizations === "string"
+            ? JSON.parse(data.customizations)
+            : data.customizations || {};
+
+        const fieldsArray: CustomField[] = Object.entries(customObj).map(
+          ([key, value], index) => ({
+            id: index.toString(),
+            key,
+            value: String(value)
+          })
+        );
+
+        setFields(fieldsArray);
+
+        console.log(data.customizations);
         setAssignedTo(
           data.assignedto
             ? data.assignedto
@@ -265,6 +283,12 @@ const AccountServiceDetails = () => {
 
     if (isSaving) return;
 
+    const customizationsForBackend = Object.fromEntries(
+      fields.map(field => [field.key, field.value])
+    );
+
+    console.log("FOr backennd data");
+    console.log(customizationsForBackend);
     const postData = {
       company_id: loginStatus.companyId,
       id: Number(accountServiceId),
@@ -277,8 +301,9 @@ const AccountServiceDetails = () => {
       // assignedto: assignedTo?.id || null,
       assignedto: assignedTo?.id === 0 ? accountServiceDetail?.assignedto : assignedTo?.id,
       service_notes: formData.service_notes,
-      // customizations: fields.length ? JSON.stringify(fields) : null,
-      customizations: null,
+      customizations: Object.keys(customizationsForBackend).length
+        ? JSON.stringify(customizationsForBackend) : null,
+      // customizations: null,
       cancellation_reason: formData.cancellation_reason,
       customer_rating: customerRating,
       customer_feedback: formData.customer_feedback,
@@ -315,6 +340,29 @@ const AccountServiceDetails = () => {
     } finally {
       setIsSaving(false);
     }
+  };
+
+  const addField = () => {
+    setFields((prev) => [
+      ...prev,
+      { id: crypto.randomUUID(), key: "", value: "" }
+    ]);
+  };
+
+  const updateField = (
+    id: string,
+    fieldName: "key" | "value",
+    value: string
+  ) => {
+    setFields((prev) =>
+      prev.map((f) =>
+        f.id === id ? { ...f, [fieldName]: value } : f
+      )
+    );
+  };
+
+  const removeField = (id: string) => {
+    setFields((prev) => prev.filter((f) => f.id !== id));
   };
 
   if (loading) {
@@ -426,6 +474,13 @@ const AccountServiceDetails = () => {
           label="Createdon"
           value={accountServiceDetail?.createdOn || "-"}
         />
+
+        <div>
+          <h2>Customizations</h2>
+          <h1>
+            {fields?.map((field) => `${field.key}:${field.value}`).join(", ")}
+          </h1>
+        </div>
 
         <div>
           <label className="text-xs text-gray-500">Status</label>
@@ -591,21 +646,62 @@ const AccountServiceDetails = () => {
         />
         <FormCheckbox label="Is Follow Up Required" name="is_follow_up_required" onChange={handleFollowUpChange} checked={isFollowUpRequired} />
 
-        {/* Custom fields */}
         <div className="p-6 bg-white border rounded-lg shadow-sm max-w-4xl">
           <div className="flex justify-between items-center mb-6">
-            <h3 className="text-lg font-semibold text-gray-800">Customization Fields</h3>
-            <button type="button" onClick={() => setFields([...fields, { id: crypto.randomUUID(), key: "", value: "" }])} className="px-2 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700">+ Add</button>
+            <h3 className="text-lg font-semibold text-gray-800">
+              Customization
+            </h3>
+
+            <button
+              type="button"
+              onClick={addField}
+              className="px-2 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+            >
+              + Add
+            </button>
           </div>
+
           <div className="space-y-4">
-            {fields.map((field) => (
-              <div key={field.id} className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                <input type="text" placeholder="Key" value={field.key} onChange={(e) => setFields(prev => prev.map(f => f.id === field.id ? { ...f, key: e.target.value } : f))} className="flex-1 px-3 py-2 border border-gray-300 rounded-md" />
-                <input type="text" placeholder="Value" value={field.value} onChange={(e) => setFields(prev => prev.map(f => f.id === field.id ? { ...f, value: e.target.value } : f))} className="flex-1 px-3 py-2 border border-gray-300 rounded-md" />
-                <button type="button" onClick={() => setFields(prev => prev.filter(f => f.id !== field.id))} className="px-2 py-1 bg-red-500 text-white rounded-md hover:bg-red-600">Remove</button>
+            {fields?.map((field) => (
+              <div
+                key={field.id}
+                className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg border border-gray-200"
+              >
+                <input
+                  type="text"
+                  placeholder="Key"
+                  value={field.key}
+                  onChange={(e) =>
+                    updateField(field.id, "key", e.target.value)
+                  }
+                  className="flex-1 px-3 py-2 border border-gray-300 rounded-md"
+                />
+
+                <input
+                  type="text"
+                  placeholder="Value"
+                  value={field.value}
+                  onChange={(e) =>
+                    updateField(field.id, "value", e.target.value)
+                  }
+                  className="flex-1 px-3 py-2 border border-gray-300 rounded-md"
+                />
+
+                <button
+                  type="button"
+                  onClick={() => removeField(field.id)}
+                  className="px-2 py-1 bg-red-500 text-white rounded-md hover:bg-red-600"
+                >
+                  Remove
+                </button>
               </div>
             ))}
-            {fields.length === 0 && <p className="text-center text-gray-400 py-4 italic">No customization fields added yet.</p>}
+
+            {fields?.length === 0 && (
+              <p className="text-center text-gray-400 py-4 italic">
+                No customization fields added yet.
+              </p>
+            )}
           </div>
         </div>
 
