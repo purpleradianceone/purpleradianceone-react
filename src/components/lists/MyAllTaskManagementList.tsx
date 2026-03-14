@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Calendar, ListChecks } from "lucide-react";
+import { ListTodo } from "lucide-react";
 import qs from "query-string";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
@@ -12,6 +12,7 @@ import { handleApiError } from "../../config/error/handleApiError";
 import { useUserAccessModules } from "../../config/hooks/useAccessModules";
 import { useComapanySpecificSearchDateRange } from "../../config/hooks/useCompanySpecificDateRange";
 import { useDateRangeIdChange } from "../../config/hooks/useDateRangeIdChange";
+import { customDateRangeId } from "../../config/hooks/usePaginationHandler";
 import useScreenSize from "../../config/hooks/useScreenSize";
 import RefreshToken from "../../config/validations/RefreshToken";
 import { STATUS_CODE } from "../../constants/AppConstants";
@@ -30,7 +31,6 @@ import DateRangeFilterDropdown from "../ui/DateRangeFilterDropdown";
 import DateRangePicker from "../ui/DateRangePicker";
 import SearchInput from "../ui/SearchInput";
 import { supportTicketDataUrlSearchParamKey } from "./SupportTicketManagementList";
-import { customDateRangeId } from "../../config/hooks/usePaginationHandler";
 
 export const MytaskQueryKey = "task";
 
@@ -222,16 +222,18 @@ function MyAllTaskManagementList({
       if (isUsedInAllTasksModule) {
         const rowData: MyAllTaskProps = event.data;
         if (!rowData.isActive) {
-          toast.error("Not accessable.");
+          toast.error("This record is inactive and cannot be accessed.");
           return;
         }
         console.log(rowData);
         switch (rowData?.source?.split(" ")[0]) {
           case source[0].name: {
-            const queryParams = qs.stringify({
-              [MytaskQueryKey]: JSON.stringify(rowData),
-            });
-            navigate(ROUTES_URL.GENERAL_TASK + `?${queryParams}`);
+            const path = ROUTES_URL.GENERAL_TASK.replace(
+              ":taskId",
+              String(rowData.id),
+            ).replace(":masterId", String(rowData.masterId));
+
+            navigate(path);
 
             break;
           }
@@ -244,11 +246,6 @@ function MyAllTaskManagementList({
             break;
           }
         }
-
-        // const queryParams = qs.stringify({
-        //     ["task"]: JSON.stringify(rowData),
-        // });
-        // navigate(ROUTES_URL.SUPPORT_TICKET_DETAILS + `?${queryParams}`);
       }
     };
 
@@ -266,9 +263,6 @@ function MyAllTaskManagementList({
     //note : this is new
     const handleAllTaskDataFormChange = (data: MyAllTaskProps) => {
       console.log(data);
-
-      // setSelectedSupportTicketForEdit(data);
-      // console.log(selectedSupportTicketForEdit);
     };
 
     return (
@@ -288,7 +282,7 @@ function MyAllTaskManagementList({
             {isUsedInAllTasksModule && (
               <div className="flex gap-1 items-center w-fit">
                 {!isSmallScreen && (
-                  <ListChecks
+                  <ListTodo
                     className={`${
                       isCustomDateOptionSelected
                         ? "w-4 h-4 text-blue-600"
@@ -326,33 +320,34 @@ function MyAllTaskManagementList({
                   </div>
                   <div className="flex gap-2">
                     <div>
-                      <div className="grid grid-cols-1 justify-center gap-1 w-full">
-                        {/* Shared width wrapper */}
-                        <div className="relative w-fit flex justify-center gap-1">
-                          <div className="flex col-span-2 w-fit">
-                            <div className="flex input-label-custom items-center size-4 justify-center mt-2 mr-2 gap-2">
-                              <Calendar className="input-label-custom" />
+                      {dateRangeDropdownOptions ? (
+                        <div className="grid grid-cols-1 justify-center gap-1 w-full">
+                          {/* Shared width wrapper */}
+                          <div className="relative w-fit flex justify-center gap-1">
+                            <div className="flex col-span-2 w-fit">
+                              <DateRangeFilterDropdown
+                                dropdownOptions={dateRangeDropdownOptions}
+                                handleDateIdChange={handleDateRangeIdChange}
+                                selectedOption={selectedDateName}
+                              />
+                              {isCustomDateOptionSelected && (
+                                <div className="mt-1 w-fit">
+                                  <DateRangePicker
+                                    onStartDateChange={onStartDateChange}
+                                    onEndDateChange={onEndDateChange}
+                                    initialStartDate={
+                                      handleSearchOption.startDate
+                                    }
+                                    initialEndDate={handleSearchOption.endDate}
+                                  />
+                                </div>
+                              )}
                             </div>
-                            <DateRangeFilterDropdown
-                              dropdownOptions={dateRangeDropdownOptions}
-                              handleDateIdChange={handleDateRangeIdChange}
-                              selectedOption={selectedDateName}
-                            />
-                            {isCustomDateOptionSelected && (
-                              <div className="mt-1 w-fit">
-                                <DateRangePicker
-                                  onStartDateChange={onStartDateChange}
-                                  onEndDateChange={onEndDateChange}
-                                  initialStartDate={
-                                    handleSearchOption.startDate
-                                  }
-                                  initialEndDate={handleSearchOption.endDate}
-                                />
-                              </div>
-                            )}
                           </div>
                         </div>
-                      </div>
+                      ) : (
+                        <div className="h-4 w-34 bg-gray-200 rounded" />
+                      )}
                     </div>
 
                     {/* All Task FILTERS */}
@@ -374,11 +369,9 @@ function MyAllTaskManagementList({
                           />
                         </div>
                         {/* priority */}
-
                         <div className="min-w-[150px]">
                           <CustomDropdown
                             preselectedOption={
-                              // savedFilters.selectedtaskType || null
                               handleSearchOption.selectedPriority
                             }
                             labelName="priority"
@@ -388,11 +381,9 @@ function MyAllTaskManagementList({
                         </div>
 
                         {/* Category */}
-
                         <div className="min-w-[150px]">
                           <CustomDropdown
                             preselectedOption={
-                              // savedFilters.selectedtaskType || null
                               handleSearchOption.selectedTaskStage
                             }
                             labelName="stage"
@@ -406,39 +397,6 @@ function MyAllTaskManagementList({
                 </div>
               </div>
             )}
-
-            <div className="flex flex-wrap items-center gap-2 w-fit">
-              {/* DATE FILTERS */}
-              <div className="flex flex-wrap items-center gap-2 w-fit">
-                {/* RIGHT SECTION - Create Button */}
-                {/* {isUsedInAllTasksModule && (
-                                    <div className="flex gap-1 justify-end w-fit">
-                                        <Button
-                                            type="submit"
-                                            disabled={!userHasAccessToAddAllTasks}
-                                            onClick={(e) => {
-                                                e.preventDefault();
-                                                if (!userHasAccessToAddAllTasks) {
-                                                    toast.error(
-                                                        MESSAGE.MODULE_ACCESS.MY_TASK.MY_TASK
-                                                            .DENIED_ADD_ACCESS,
-                                                    );
-                                                    return;
-                                                }
-                                                setIsCreateTaskMasterModalOpen(true);
-                                            }}
-                                        >
-                                            <span className="flex items-center gap-1">
-                                                {!isSmallScreen && <BookCheck size={SIZE.SIXTEEN} />}
-                                                {isSmallScreen && <BookCheck size={SIZE.EIGHT} />}
-                                                {isLargeScreen &&
-                                                    JSX_CHILDREN_NAME.ADD_GENERAL_TASK}
-                                            </span>
-                                        </Button>
-                                    </div>
-                                )} */}
-              </div>
-            </div>
           </div>
         }
 

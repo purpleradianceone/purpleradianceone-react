@@ -6,6 +6,7 @@ import { Outlet } from "react-router-dom";
 import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
 import AccessDeniedPopup from "../not-found/AccessDeniedPage";
 import { useState } from "react";
+import { Layers } from "lucide-react";
 
 function StockPage() {
   const [ref, inView] = useInView({ fallbackInView: true, threshold: 0.1 });
@@ -26,7 +27,8 @@ function StockPage() {
           >
             <div className="sticky top-0 z-50  py-1  flex items-center justify-between bg-gray-50 rounded-sm shadow-sm   w-full">
               <div className="flex w-full gap-2 justify-start pl-1">
-                <div className="flex">
+                <div className="flex items-center gap-1">
+                  <Layers className="w-5 h-5 text-blue-600" />
                   <span className="section-header-custom">Stock</span>
                 </div>
               </div>

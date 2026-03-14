@@ -29,6 +29,7 @@ const StockLedgerList = ({
   setCompanyProductId: (id: number | null) => void;
 }) => {
   const { userPreference } = useUserPreference();
+  // console.log(stockLedger);
 
   return (
     <div

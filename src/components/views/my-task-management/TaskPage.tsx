@@ -1,11 +1,12 @@
-import { useInView } from "react-intersection-observer";
-import { PageLayout } from "../../ui/PageLayout";
 import { motion } from "framer-motion";
-import { Outlet } from "react-router-dom";
-import TaskTab from "../../tabs/TaskTab";
-import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
-import AccessDeniedPopup from "../not-found/AccessDeniedPage";
+import { ListChecks } from "lucide-react";
 import { useState } from "react";
+import { useInView } from "react-intersection-observer";
+import { Outlet } from "react-router-dom";
+import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
+import TaskTab from "../../tabs/TaskTab";
+import { PageLayout } from "../../ui/PageLayout";
+import AccessDeniedPopup from "../not-found/AccessDeniedPage";
 
 function TaskPage() {
   const [ref, inView] = useInView({ fallbackInView: true, threshold: 0.1 });
@@ -26,7 +27,8 @@ function TaskPage() {
           >
             <div className="sticky top-0 z-50  py-1  flex items-center justify-between bg-gray-50 rounded-sm shadow-sm   w-full">
               <div className="flex w-full gap-2 justify-start pl-1">
-                <div className="flex">
+                <div className="flex items-center gap-1">
+                  <ListChecks className="w-5 h-5 text-blue-600" />
                   <span className="section-header-custom">Tasks</span>
                 </div>
               </div>

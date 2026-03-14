@@ -259,6 +259,7 @@ const LeadDetails = ({
       country_id: countryId,
       name: null,
       description: null,
+      gst_code: null,
       isactive: true,
     };
     try {

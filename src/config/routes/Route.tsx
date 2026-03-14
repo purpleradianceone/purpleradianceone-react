@@ -92,6 +92,8 @@ import { MetaAppsIntegrationTabsBreadcrumb } from "../../components/views/settin
 import { FacebookBreadCrumb } from "../../components/views/settings/social-media-integration/meta-app-facebook/FacebookBreadcrumb";
 import MetaAppWhatsappIntegration from "../../components/views/settings/social-media-integration/meta-app-whatsapp/MetaAppWhatsappIntegration";
 import { PageIdIntegrationManagement } from "../../components/views/settings/social-media-integration/meta-app-facebook/PageIdIntegrationManagement";
+import AccountServiceDetails from "../../components/modals/Account/account-service/AccountServiceDetails";
+import AccountSubscriptionDetails from "../../components/modals/Account/account-subscription/AccountSubscriptionDetails";
 
 export const router = createBrowserRouter([
   {
@@ -513,7 +515,7 @@ export const router = createBrowserRouter([
           <div>
             <AuthLayout
               title="Activate Subscription!"
-              // subtitle="Enter the number of users and subscription duration to proceed"
+            // subtitle="Enter the number of users and subscription duration to proceed"
             >
               <CreateSubscription
                 isOpen={true}
@@ -798,7 +800,7 @@ export const router = createBrowserRouter([
                 onClose={() => {
                   window.history.back();
                 }}
-                handleProductChangeOnAdd={() => {}}
+                handleProductChangeOnAdd={() => { }}
               ></AddProductModal>
             </Navbar>
           </div>
@@ -818,7 +820,7 @@ export const router = createBrowserRouter([
                 onClose={() => {
                   window.history.back();
                 }}
-                handleCompanyTeamChangeOnAdd={() => {}}
+                handleCompanyTeamChangeOnAdd={() => { }}
               ></AddTeamModal>
             </Navbar>
           </div>
@@ -867,6 +869,14 @@ export const router = createBrowserRouter([
         path: ROUTES_URL.ACCOUNT_MULTIPLE_COMPANY_PRODUCT,
         element: <CreateMultipleAccountCompanyProduct />,
       },
+      {
+        path: "account-service-details/:accountServiceId",
+        element: <AccountServiceDetails></AccountServiceDetails>
+      },
+      {
+        path: "account-subscription-details/:accountSubscriptionId",
+        element: <AccountSubscriptionDetails></AccountSubscriptionDetails>
+      }
     ],
   },
   {
