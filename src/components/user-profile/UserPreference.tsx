@@ -879,11 +879,11 @@ const UserPreference = () => {
             </div>
             {showUserLogoPreview && (
               <div
-                className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50"
+                className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 select-none"
                 onClick={() => setShowUserLogoPreview(false)}
               >
                 <div
-                  className={`w-72 h-72 rounded-full flex items-center justify-center text-white text-9xl font-semibold shadow-2xl ${getColor(loginStatus.email)}`}
+                  className={`w-72 h-72 rounded-full flex items-center justify-center text-white text-9xl font-semibold shadow-2xl select-none ${getColor(loginStatus.email)}`}
                 >
                   {loginStatus.fullName?.charAt(0)?.toUpperCase()}
                 </div>
