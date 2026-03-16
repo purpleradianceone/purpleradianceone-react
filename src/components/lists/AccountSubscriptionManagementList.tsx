@@ -132,7 +132,7 @@ function AccountSubscriptionManagementList({
       <div className={`w-full ${position === "left"} pr-1 gap-1`}>
 
         <div
-          className={`z-10 top-12 mt-1 p-1 flex flex-wrap items-center justify-between gap-3 text-sm 
+          className={`z-10 top-12 mt-1 p-1 flex items-center justify-between gap-3 text-sm 
           ${COLORS.GRID_HEADER_SECTION_BG_COLOR} rounded-lg shadow-sm mb-1.5 w-full`}
         >
 
@@ -156,7 +156,7 @@ function AccountSubscriptionManagementList({
             )}
           </div>
 
-          <div className="flex flex-wrap items-center gap-2 w-fit">
+          <div className="flex items-center gap-2 w-fit">
 
             <div className="relative flex items-start w-44">
               <SearchInput
@@ -167,7 +167,7 @@ function AccountSubscriptionManagementList({
               />
             </div>
 
-            <div className="flex flex-wrap items-center gap-2 w-fit">
+            <div className="flex items-center gap-2 w-fit">
 
               <DateRangeFilterDropdown
                 dropdownOptions={dateRangeDropdownOptions}

@@ -24,6 +24,18 @@ import AccountSubscriptionProps from "../../../../@types/account/AccountSubscrip
 import ShimmerEffect from "../account-service/ShimerEffect";
 import MetaField from "../../../ui/MetaField";
 
+interface CustomField {
+    id: string;
+    key: string;
+    value: string;
+}
+
+interface PackageDetail {
+    id: string;
+    packageName: string;
+    field: CustomField[];
+}
+
 const AccountSubscriptionDetails = () => {
 
     const { accountSubscriptionId } = useParams<{ accountSubscriptionId: string }>();
@@ -31,6 +43,8 @@ const AccountSubscriptionDetails = () => {
 
     const [loading, setLoading] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
+
+    const [packages, setPackages] = useState<PackageDetail[]>([]);
 
     const [accountSubscriptionDetail, setAccountSubscriptionDetail] =
         useState<AccountSubscriptionProps | null>(null);
@@ -86,6 +100,10 @@ const AccountSubscriptionDetails = () => {
 
                 const data = response.data[0];
 
+                console.log("Data of account subscription");
+                console.log(data);
+                console.log("Data of account subscription");
+
                 const formattedData: AccountSubscriptionProps = {
 
                     id: data.id,
@@ -103,6 +121,25 @@ const AccountSubscriptionDetails = () => {
                     createdBy: data.createdby,
                     createdOn: data.createdon
                 };
+
+                const packageObj =
+                    typeof data.package_detail === "string"
+                        ? JSON.parse(data.package_detail)
+                        : data.packagedetail || {};
+
+                const packagesArray: PackageDetail[] = Object.entries(packageObj).map(
+                    ([packageName, values]: any) => ({
+                        id: crypto.randomUUID(),
+                        packageName,
+                        field: Object.entries(values).map(([key, value]) => ({
+                            id: crypto.randomUUID(),
+                            key,
+                            value: String(value)
+                        }))
+                    })
+                );
+
+                setPackages(packagesArray);
 
                 setAccountSubscriptionDetail(formattedData);
 
@@ -159,51 +196,28 @@ const AccountSubscriptionDetails = () => {
 
     };
 
-    // -----------------------
-    // Update Account Subscription
-    // -----------------------
-
     const handleUpdate = async (activeValue?: boolean) => {
 
         if (!validateForm()) return;
 
         if (isSaving) return;
 
-        // let packageJSON = null;
-
-        // try {
-
-        //     packageJSON = formData.package_detail
-        //         ? JSON.parse(formData.package_detail)
-        //         : null;
-
-        // } catch {
-
-        //     toast.error("Invalid package detail JSON");
-        //     return;
-
-        // }
+        const packageJSON = buildPackageJson();
 
         const postData = {
-
             company_id: loginStatus.companyId,
             id: Number(accountSubscriptionId),
             start_date: formData.start_date,
             end_date: formData.end_date,
-            package_detail: null,
+            package_detail: JSON.stringify(packageJSON),
             isactive: activeValue ?? formData.is_active,
             updatedby_id: loginStatus.id
 
         };
 
-        console.log("-----------");
-        alert(JSON.stringify(postData, null, 2));
-        console.log("-----------");
-
         setIsSaving(true);
 
         try {
-
             const response = await axiosClient.post(
                 POST_API.UPDATE_ACCOUNT_SUBSCRIPTION,
                 postData,
@@ -246,6 +260,92 @@ const AccountSubscriptionDetails = () => {
 
         }
 
+    };
+
+    const addPackage = () => {
+
+        setPackages((prev) => [
+            ...prev,
+            {
+                id: crypto.randomUUID(),
+                packageName: "",
+                field: [
+                    {
+                        id: crypto.randomUUID(),
+                        key: "Allowed",
+                        value: "",
+                    },
+                    {
+                        id: crypto.randomUUID(),
+                        key: "Completed",
+                        value: "0",
+                    }
+                ],
+            },
+        ]);
+
+    };
+
+    const removePackage = (packageId: string) => {
+
+        setPackages((prev) =>
+            prev.filter((pkg) => pkg.id !== packageId)
+        );
+
+    };
+
+    const updatePackageName = (packageId: string, name: string) => {
+
+        setPackages((prev) =>
+            prev.map((pkg) =>
+                pkg.id === packageId
+                    ? { ...pkg, packageName: name }
+                    : pkg
+            )
+        );
+
+    };
+
+    const handlePackageChange = (
+        packageId: string,
+        fieldId: string,
+        val: string
+    ) => {
+
+        setPackages((prev) =>
+            prev.map((pkg) =>
+                pkg.id === packageId
+                    ? {
+                        ...pkg,
+                        field: pkg.field.map((f) =>
+                            f.id === fieldId ? { ...f, value: val } : f
+                        ),
+                    }
+                    : pkg
+            )
+        );
+
+    };
+
+    const buildPackageJson = () => {
+
+        const result: any = {};
+
+        packages.forEach((pkg) => {
+
+            if (pkg.packageName) {
+
+                result[pkg.packageName] = {};
+
+                pkg.field.forEach((f) => {
+                    result[pkg.packageName][f.key] = f.value;
+                });
+
+            }
+        });
+
+        console.log(result);
+        return result;
     };
 
     if (loading) {
@@ -386,6 +486,89 @@ const AccountSubscriptionDetails = () => {
 
                     </span>
 
+                </div>
+
+                <div>
+                    <div className="mt-6">
+
+                        {/* Header */}
+
+                        <div className="flex justify-between items-center mb-3">
+
+                            <h3 className="font-semibold">Package Details</h3>
+
+                            <button
+                                type="button"
+                                onClick={addPackage}
+                                className="px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                            >
+                                + Add Package
+                            </button>
+
+                        </div>
+
+                        {/* Packages */}
+
+                        {packages.map((pkg) => (
+
+                            <div key={pkg.id} className="border p-4 rounded-md mb-3 bg-gray-50">
+
+                                {/* Package Name + Remove */}
+
+                                <div className="flex items-center gap-2 mb-3">
+
+                                    <input
+                                        value={pkg.packageName}
+                                        placeholder="Package Name"
+                                        onChange={(e) =>
+                                            updatePackageName(pkg.id, e.target.value)
+                                        }
+                                        className="border px-2 py-1 rounded w-full"
+                                    />
+
+                                    <button
+                                        type="button"
+                                        onClick={() => removePackage(pkg.id)}
+                                        className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
+                                    >
+                                        Remove
+                                    </button>
+
+                                </div>
+
+                                {/* Package Fields */}
+
+                                {pkg.field.map((f) => (
+
+                                    <div key={f.id} className="flex gap-2 mb-2">
+
+                                        {/* Key */}
+
+                                        <input
+                                            value={f.key}
+                                            readOnly
+                                            className="border px-2 py-1 rounded bg-gray-100 w-40"
+                                        />
+
+                                        {/* Value */}
+
+                                        <input
+                                            value={f.value}
+                                            onChange={(e) =>
+                                                handlePackageChange(pkg.id, f.id, e.target.value)
+                                            }
+                                            className="border px-2 py-1 rounded flex-1"
+                                        />
+
+                                    </div>
+
+                                ))}
+
+                            </div>
+
+                        ))}
+
+                    </div>
                 </div>
 
             </div>
