@@ -544,7 +544,7 @@ const AddStock = ({
                     logo={Share2}
                     preselectedOption={selectedServiceBookingSource}
                     requiredRedDot
-                    labelName="Service Booking Source :"
+                    labelName="Source"
                     options={serviceBookingSource!}
                     onSelect={handleSelectedServiceBookingSource}
                   />
@@ -570,7 +570,7 @@ const AddStock = ({
                     logo={MapPin}
                     preselectedOption={selectedServiceLocationType}
                     requiredRedDot
-                    labelName="Service LocationType :"
+                    labelName="Location"
                     options={serviceLocationType!}
                     onSelect={handleSelectedServiceLocationType}
                   />
@@ -596,7 +596,7 @@ const AddStock = ({
                     logo={Activity}
                     preselectedOption={selectedServiceStatus}
                     requiredRedDot
-                    labelName="Service Status :"
+                    labelName="Status"
                     options={serviceStatus!}
                     onSelect={handleSelectedServiceStatus}
                   />
@@ -617,7 +617,7 @@ const AddStock = ({
               )}
 
               <DatePickerInput
-                label="Service Booking Date"
+                label="Booking Date"
                 name="service_booking_date"
                 onChange={handleCreateServiceDetailFormChange}
                 logo={Calendar}
@@ -635,7 +635,7 @@ const AddStock = ({
                       size={13}
                       className="text-blue-600  justify-center "
                     />
-                    <span>Service Booking Time:</span>
+                    <span>Booking Time</span>
                   </div>
                 </label>
                 <select
@@ -661,9 +661,9 @@ const AddStock = ({
               </div>
               <TextAreaInput
                 logo={MapPin}
-                rows={3}
+                rows={1}
                 cols={4}
-                label="Location Address: "
+                label="Location Address"
                 name="location_address"
                 placeholder="Enter Location address"
                 value={addCreateServiceDetailFormData.location_address}
@@ -673,9 +673,9 @@ const AddStock = ({
               />
               <TextAreaInput
                 logo={ShieldCheck}
-                rows={3}
+                rows={1}
                 cols={4}
-                label="Service Note: "
+                label="Note"
                 name="service_notes"
                 value={addCreateServiceDetailFormData.service_notes}
                 onChange={handleCreateServiceDetailFormChange}
@@ -684,8 +684,8 @@ const AddStock = ({
               <TextAreaInput
                 logo={Ban}
                 cols={4}
-                rows={3}
-                label="Cancellation Reason: "
+                rows={1}
+                label="Cancellation Reason"
                 name="cancellation_reason"
                 placeholder="Enter Cancellation Reason"
                 value={addCreateServiceDetailFormData.cancellation_reason}
@@ -697,8 +697,8 @@ const AddStock = ({
               <TextAreaInput
                 logo={MessageSquare}
                 cols={4}
-                rows={3}
-                label="Customer Feedback: "
+                rows={1}
+                label="Customer Feedback"
                 name="customer_feedback"
                 placeholder="Enter Customer Feedback"
                 value={addCreateServiceDetailFormData.customer_feedback}
@@ -710,7 +710,7 @@ const AddStock = ({
               <div className="p-6 bg-white border rounded-lg shadow-sm max-w-4xl">
                 <div className="flex justify-between items-center mb-6">
                   <h3 className="text-lg font-semibold text-gray-800">
-                    Customization Fields
+                    Customizations
                   </h3>
                   <button
                     type="button"
@@ -730,7 +730,7 @@ const AddStock = ({
                       <div className="flex-1">
                         <input
                           type="text"
-                          placeholder="Key"
+                          placeholder="Customization name"
                           value={field.key}
                           onChange={(e) =>
                             handleChange(field.id, "key", e.target.value)
@@ -742,7 +742,7 @@ const AddStock = ({
                       <div className="flex-1">
                         <input
                           type="text"
-                          placeholder="Value"
+                          placeholder="Enter Value"
                           value={field.value}
                           onChange={(e) =>
                             handleChange(field.id, "value", e.target.value)
@@ -790,7 +790,7 @@ const AddStock = ({
                   <div className="grid grid-cols-1">
                     <CompanyUserSearchFieldInput
                       logo={User}
-                      label="Assign To:"
+                      label="Assign To"
                       // defaultValue={supportTicketData?.assignedToName}
                       onUserSelected={(user) => {
                         if (user && user?.id) {
