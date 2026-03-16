@@ -510,22 +510,16 @@ const AccountSubscriptionDetails = () => {
                         {/* Packages */}
 
                         {packages.map((pkg) => (
-
                             <div key={pkg.id} className="border p-4 rounded-md mb-3 bg-gray-50">
 
                                 {/* Package Name + Remove */}
-
                                 <div className="flex items-center gap-2 mb-3">
-
                                     <input
                                         value={pkg.packageName}
                                         placeholder="Package Name"
-                                        onChange={(e) =>
-                                            updatePackageName(pkg.id, e.target.value)
-                                        }
+                                        onChange={(e) => updatePackageName(pkg.id, e.target.value)}
                                         className="border px-2 py-1 rounded w-full"
                                     />
-
                                     <button
                                         type="button"
                                         onClick={() => removePackage(pkg.id)}
@@ -533,17 +527,13 @@ const AccountSubscriptionDetails = () => {
                                     >
                                         Remove
                                     </button>
-
                                 </div>
 
                                 {/* Package Fields */}
-
                                 {pkg.field.map((f) => (
-
-                                    <div key={f.id} className="flex gap-2 mb-2">
+                                    <div key={f.id} className="flex gap-2 mb-2 items-center">
 
                                         {/* Key */}
-
                                         <input
                                             value={f.key}
                                             readOnly
@@ -551,21 +541,36 @@ const AccountSubscriptionDetails = () => {
                                         />
 
                                         {/* Value */}
-
-                                        <input
-                                            value={f.value}
-                                            onChange={(e) =>
-                                                handlePackageChange(pkg.id, f.id, e.target.value)
-                                            }
-                                            className="border px-2 py-1 rounded flex-1"
-                                        />
-
+                                        {f.key === "IsActive" ? (
+                                            <>
+                                                <ToggleButton
+                                                    checked={f.value === "true"}
+                                                    onToggle={(e) => {
+                                                        handlePackageChange(
+                                                            pkg.id,
+                                                            f.id,
+                                                            e.target.checked ? "true" : "false"
+                                                        );
+                                                    }} name={""} />
+                                                <span
+                                                    className={`text-sm ${f.value === "true" ? "text-green-600" : "text-red-600"
+                                                        }`}
+                                                >
+                                                    {f.value === "true" ? "Active" : "Inactive"}
+                                                </span>
+                                            </>
+                                        ) : (
+                                            <input
+                                                value={f.value}
+                                                onChange={(e) =>
+                                                    handlePackageChange(pkg.id, f.id, e.target.value)
+                                                }
+                                                className="border px-2 py-1 rounded flex-1"
+                                            />
+                                        )}
                                     </div>
-
                                 ))}
-
                             </div>
-
                         ))}
 
                     </div>
