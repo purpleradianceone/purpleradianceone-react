@@ -63,7 +63,7 @@ const MetaIntegration: React.FC<MetaIntegrationProps> = ({
 
     // Note : check if the user has add access for the integration module.
     if(!userHasAccessToAddIntegrationSetting){
-      toast.success(MESSAGE.MODULE_ACCESS.SETTING.INTEGRATION.DENIED_ADD_ACCESS);
+      toast.error(MESSAGE.MODULE_ACCESS.SETTING.INTEGRATION.DENIED_ADD_ACCESS);
       return;
     }
     navigate(ROUTES_URL.FACEBOOK_OAUTH);
