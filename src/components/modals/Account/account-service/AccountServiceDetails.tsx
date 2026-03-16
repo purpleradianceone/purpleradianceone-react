@@ -383,7 +383,7 @@ const AccountServiceDetails = () => {
       <div className="grid grid-cols-5 gap-3 mb-2 text-sm">
 
         <MetaField
-          label="Service Booking Source"
+          label="Source"
           value={accountServiceDetail?.service_booking_source || "-"}
         />
 
@@ -393,11 +393,11 @@ const AccountServiceDetails = () => {
         />
 
         <MetaField
-          label="Account Name"
+          label="Account"
           value={accountServiceDetail?.account_name || "-"}
         />
         <MetaField
-          label="Company Product Name"
+          label="Product"
           value={accountServiceDetail?.company_product_name || "-"}
         />
 
@@ -407,17 +407,12 @@ const AccountServiceDetails = () => {
         />
 
         <MetaField
-          label="Service Status"
+          label="Status"
           value={accountServiceDetail?.service_status || "-"}
         />
 
         <MetaField
-          label="Service Booking Source"
-          value={accountServiceDetail?.service_booking_source || "-"}
-        />
-
-        <MetaField
-          label="Service Location Type"
+          label="Location"
           value={accountServiceDetail?.service_location_type || "-"}
         />
 
@@ -426,10 +421,6 @@ const AccountServiceDetails = () => {
           value={accountServiceDetail?.location_address || "-"}
         />
 
-        <MetaField
-          label="Location Address"
-          value={accountServiceDetail?.location_address || "-"}
-        />
 
         <MetaField
           label="Assigned To"
@@ -437,7 +428,7 @@ const AccountServiceDetails = () => {
         />
 
         <MetaField
-          label="Service Notes"
+          label="Note"
           value={accountServiceDetail?.service_notes || "-"}
         />
 
@@ -524,7 +515,7 @@ const AccountServiceDetails = () => {
             logo={Share2}
             preselectedOption={selectedServiceBookingSource}
             requiredRedDot
-            labelName="Service Booking Source :"
+            labelName="Source"
             options={serviceBookingSource!}
             onSelect={setSelectedServiceBookingSource}
           />
@@ -538,7 +529,7 @@ const AccountServiceDetails = () => {
             logo={MapPin}
             preselectedOption={selectedServiceLocationType}
             requiredRedDot
-            labelName="Service Location Type :"
+            labelName="Location"
             options={serviceLocationType!}
             onSelect={setSelectedServiceLocationType}
           />
@@ -552,7 +543,7 @@ const AccountServiceDetails = () => {
             logo={Activity}
             preselectedOption={selectedServiceStatus}
             requiredRedDot
-            labelName="Service Status :"
+            labelName="Status"
             options={serviceStatus!}
             onSelect={setSelectedServiceStatus}
           />
@@ -563,7 +554,7 @@ const AccountServiceDetails = () => {
 
         <div>
           <DatePickerInput
-            label="Service Booking Date"
+            label="Booking Date"
             name="service_booking_date"
             onChange={handleChange}
             logo={Calendar}
@@ -580,7 +571,7 @@ const AccountServiceDetails = () => {
           <label htmlFor="service_booking_time" className="block input-label-custom">
             <div className="flex gap-1 items-center">
               <Clock size={13} className="text-blue-600" />
-              <span>Service Booking Time:</span>
+              <span>Booking Time</span>
             </div>
           </label>
           <select
@@ -605,7 +596,7 @@ const AccountServiceDetails = () => {
           logo={MapPin}
           rows={1}
           cols={4}
-          label="Location Address: "
+          label="Location Address"
           name="location_address"
           placeholder="Enter Location address"
           value={formData.location_address}
@@ -616,7 +607,7 @@ const AccountServiceDetails = () => {
           logo={ShieldCheck}
           rows={1}
           cols={1}
-          label="Service Note: "
+          label="Note"
           name="service_notes"
           placeholder="Enter Service Note"
           value={formData.service_notes}
@@ -626,7 +617,7 @@ const AccountServiceDetails = () => {
           logo={Ban}
           rows={1}
           cols={4}
-          label="Cancellation Reason: "
+          label="Cancellation Reason"
           name="cancellation_reason"
           placeholder="Enter Cancellation Reason"
           value={formData.cancellation_reason}
@@ -637,7 +628,7 @@ const AccountServiceDetails = () => {
           logo={MessageSquare}
           rows={1}
           cols={4}
-          label="Customer Feedback: "
+          label="Customer Feedback"
           name="customer_feedback"
           placeholder="Enter Customer Feedback"
           value={formData.customer_feedback}
@@ -723,11 +714,7 @@ const AccountServiceDetails = () => {
           handleUpdate();
         }} >Save</Button></div>
       </div>
-
-
     </div>
-
-
   );
 };
 
