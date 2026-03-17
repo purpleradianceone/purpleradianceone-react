@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Layers, ShoppingBag, TicketPlus, X } from "lucide-react";
+import { Layers, TicketPlus, } from "lucide-react";
 import useScreenSize from "../../config/hooks/useScreenSize";
 import { JSX_CHILDREN_NAME, SIZE } from "../../constants/AppConstants";
 import Button from "../ui/Button";
@@ -83,9 +83,6 @@ function AccountSubscriptionManagementList({
   const [openPopUpOfCompanyProductModal, setOpenPopUpOfCompanyProductModal] =
     useState(false);
 
-  const handleCompanyProductPopUp = () => {
-    setOpenPopUpOfCompanyProductModal(true);
-  };
 
   const { dateRangeDropdownOptions } = useComapanySpecificSearchDateRange();
 
@@ -184,42 +181,6 @@ function AccountSubscriptionManagementList({
                 />
               )}
 
-
-
-              <div className="relative flex items-center justify-center">
-                {selectedCompanyProduct.id === 0 ? (
-                  <Button
-                    type="button"
-                    onClick={handleCompanyProductPopUp}
-                    className="flex items-center gap-2 px-2 py-1 caption-custom border border-gray-300 rounded-md bg-white hover:bg-gray-50 shadow-sm"
-                  >
-                    <ShoppingBag size={14} />
-                    <span>Product</span>
-                  </Button>
-                ) : (
-                  <div className="border rounded-md border-gray-400 p-0.5 max-w-[150px]">
-                    <div
-                      title={selectedCompanyProduct.name}
-                      className="relative rounded flex justify-between gap-x-0.5 bg-blue-600 caption-custom white-text p-0.5"
-                    >
-                      <span onClick={handleCompanyProductPopUp}>
-                        {selectedCompanyProduct.name.length > 14
-                          ? selectedCompanyProduct.name.slice(0, 14) + "..."
-                          : selectedCompanyProduct.name}
-                      </span>
-
-                      <button
-                        title="Clear"
-                        onClick={() =>
-                          handleSelectedCompanyProductCheckBoxChange(null)
-                        }
-                      >
-                        <X size={14} />
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
 
               <Button
                 type="submit"

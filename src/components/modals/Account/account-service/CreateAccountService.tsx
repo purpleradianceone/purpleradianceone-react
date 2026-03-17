@@ -152,6 +152,7 @@ const AddStock = ({
   const {
     handleChange: handleCreateServiceDetailFormChange,
     formData: addCreateServiceDetailFormData,
+    resetForm: resetCreateAccountForm,
   } = useFormChange(intialCreateServiceDetailFormData);
 
   const [isFollowUpRequired, setIsFollowUpRequired] = useState<boolean>(false);
@@ -180,21 +181,17 @@ const AddStock = ({
     generate_password: "",
   });
 
-  // const {
-  //   handleChange: handleAddStockFormDataChange,
-  //   formData: addStockFormData,
-  //   resetForm: resetStockCreateForm,
-  // } = useFormChange(intialAddStockFormData);
 
   // Note : on close Clear the states
   const handleCloseForm = () => {
-    // resetStockCreateForm();
+    resetCreateAccountForm();
 
     setProductSelected(null);
     setSelectedServiceBookingSource(undefined);
     setSelectedServiceLocationType(undefined);
     setselectedServiceStatus(undefined);
     setCustomerRating(0);
+    setIsFollowUpRequired(false);
 
     setError({
       productId: false,
@@ -295,17 +292,15 @@ const AddStock = ({
       service_booking_source_id: selectedServiceBookingSource,
       service_location_type_id: selectedServiceLocationType,
       location_address: addCreateServiceDetailFormData.location_address,
-      assignedto: assignedTo.id ?? null,
-      // assignedto: null,
+      assignedto: assignedTo.id === 0 ? null : assignedTo.id,
       service_notes: addCreateServiceDetailFormData.service_notes,
-      // customizations: JSON.stringify(fields),
       customizations: JSON.stringify(customizationsForBackend),
       cancellation_reason: addCreateServiceDetailFormData.cancellation_reason,
       customer_rating: customerRating,
       customer_feedback: addCreateServiceDetailFormData.customer_feedback,
       is_follow_up_required: isFollowUpRequired,
       next_service_due_date:
-        addCreateServiceDetailFormData.next_service_due_date || null,
+        addCreateServiceDetailFormData.next_service_due_date === "" ? null : addCreateServiceDetailFormData.next_service_due_date,
       createdby_id: loginStatus.id,
     };
     console.log("--------------");
@@ -782,10 +777,7 @@ const AddStock = ({
                       // defaultValue={supportTicketData?.assignedToName}
                       onUserSelected={(user) => {
                         if (user && user?.id) {
-                          //
-                          console.log("--------------");
-                          console.log(user);
-                          console.log("--------------");
+
                           setAssignedTo(user);
                         }
                         if (user === null || user === undefined) {
@@ -801,8 +793,6 @@ const AddStock = ({
                             generate_password: "",
                           });
                         }
-                        console.log("selected user:");
-                        console.log(user);
                       }}
                       // isDisabled={!userHasAccessToViewUser}
                       disabledMessage={
