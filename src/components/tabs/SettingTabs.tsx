@@ -1,8 +1,4 @@
-import {
-  Tabs,
-  TabsHeader,
-  Tab,
-} from "@material-tailwind/react";
+import { Tabs, TabsHeader, Tab } from "@material-tailwind/react";
 import { useLocation, useNavigate } from "react-router-dom";
 import ROUTES_URL from "../../constants/Routes";
 
@@ -189,11 +185,20 @@ function SettingsTabs() {
     { label: "Lead", value: "lead", path: "" }, // index route
     { label: "Email", value: "email-setting", path: ROUTES_URL.SETTING_EMAIL },
     { label: "Meetings", value: "meeting", path: ROUTES_URL.SETTING_MEETINGS },
-    { label: "Account Type", value: "accounttype", path: ROUTES_URL.SETTING_ACCOUNT_TYPE },
+    {
+      label: "Account Type",
+      value: "accounttype",
+      path: ROUTES_URL.SETTING_ACCOUNT_TYPE,
+    },
     {
       label: "Notifications",
       value: "companyPreference",
       path: ROUTES_URL.SETTING_NOTIFICATIONS,
+    },
+    {
+      label: "Reminder",
+      value: "Reminder",
+      path: ROUTES_URL.SETTING_REMINDER,
     },
     { label: "General", value: "general", path: ROUTES_URL.SETTING_GENERAL },
     {
@@ -201,7 +206,11 @@ function SettingsTabs() {
       value: "support-ticket-category",
       path: ROUTES_URL.SETTING_SUPPORT_TICKET_CATEGORY,
     },
-    { label: "Company Warehouse", value: "warehouse", path: ROUTES_URL.SETTING_COMPANY_WAREHOUSE },
+    {
+      label: "Company Warehouse",
+      value: "warehouse",
+      path: ROUTES_URL.SETTING_COMPANY_WAREHOUSE,
+    },
   ];
 
   const location = useLocation();
@@ -213,7 +222,7 @@ function SettingsTabs() {
     TABS.find((tab) =>
       tab.path
         ? location.pathname.includes(tab.path)
-        : location.pathname === basePath
+        : location.pathname === basePath,
     )?.value || "lead";
 
   return (
@@ -227,7 +236,8 @@ function SettingsTabs() {
             onPointerEnterCapture={undefined}
             onPointerLeaveCapture={undefined}
             indicatorProps={{
-              className: "main-nav-custom-setting active-header-setting shadow-none",
+              className:
+                "main-nav-custom-setting active-header-setting shadow-none",
             }}
             className="shadow-none"
           >

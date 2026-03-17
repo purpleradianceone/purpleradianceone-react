@@ -88,6 +88,7 @@ import StockManagement from "../../components/views/stock-management/StockManage
 import WareHouseWiseStock from "../../components/views/stock-management/WareHouseWiseStock";
 import StockLedgerManagement from "../../components/views/stock-management/StockLedgerManagement";
 import StockAgeingManagement from "../../components/views/stock-management/StockAgeingManagement";
+import ReminderSetting from "../../components/views/settings/reminder/ReminderSetting";
 
 export const router = createBrowserRouter([
   {
@@ -440,6 +441,20 @@ export const router = createBrowserRouter([
             }
           >
             <CompanyPreferenceSetting />,
+          </ModuleGuard>
+        ),
+      },
+      {
+        path: ROUTES_URL.SETTING_REMINDER,
+        element: (
+          <ModuleGuard
+            permissionKey="userHasAccessToViewCompanyPreferences"
+            deniedMessage={
+              MESSAGE.MODULE_ACCESS.SETTING.COMPANY_PREFERENCE_SETTING
+                .DENIED_VIEW_ACCESS
+            }
+          >
+            <ReminderSetting />
           </ModuleGuard>
         ),
       },
