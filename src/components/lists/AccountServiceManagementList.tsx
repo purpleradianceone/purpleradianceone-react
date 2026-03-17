@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Headset, ShoppingBag, TicketPlus, X } from "lucide-react";
+import { Headset, TicketPlus, } from "lucide-react";
 import useScreenSize from "../../config/hooks/useScreenSize";
 import { JSX_CHILDREN_NAME, SIZE } from "../../constants/AppConstants";
 import Button from "../ui/Button";
@@ -20,7 +20,6 @@ import MESSAGE from "../../constants/Messages";
 import { useUserPreference } from "../../context/user/UserPreference";
 import COLORS from "../../constants/Colors";
 // import SupportTicketProps from "../../@types/support-ticket-management/SupportTicketProps";
-import LookupCompanyProductSelection from "../views/lookups/lookup-company-product/LookupCompanyProductSelection";
 import PaginationWithoutCount from "../ag-grid/PaginationWithoutCount";
 import { customDateRangeId } from "../../config/hooks/usePaginationHandler";
 import AccountServiceManagementListProps from "../../@types/List/AccountServiceManagementListProps";
@@ -29,6 +28,7 @@ import AccountServiceProps from "../../@types/account/AccountServiceProps";
 import { useServiceStatus } from "../../config/hooks/useServiceStatus";
 import AccountServiceManagementAgGrid from "../ag-grid/AccountServiceManagementAgGrid";
 import CreateAccountService from "../modals/Account/account-service/CreateAccountService";
+import LookupCompanyProductDropdown from "../ui/LookupCompanyProductDropdown";
 
 export const supportTicketDataUrlSearchParamKey: string = "supportTicketData";
 
@@ -38,10 +38,9 @@ function AccountServiceManagementList({
   onEndDateChange,
   handleAddAccountService,
   paginationData,
-  handleSelectedCompanyProductCheckBoxChange,
+  handleSelectedCompanyProductChange,
   accountServiceData,
   handleServiceStatusId,
-  selectedCompanyProduct,
   handleRowSelectedForShowAccountService,
   accountId,
 }: AccountServiceManagementListProps) {
@@ -85,12 +84,6 @@ function AccountServiceManagementList({
     console.log(selectedSupportTicketForEdit);
   };
 
-  const [openPopUpOfCompanyProductModal, setOpenPopUpOfCompanyProductModal] =
-    useState(false);
-
-  const handleCompanyProductPopUp = () => {
-    setOpenPopUpOfCompanyProductModal(true);
-  };
 
   const { dateRangeDropdownOptions } = useComapanySpecificSearchDateRange();
 
@@ -191,6 +184,20 @@ function AccountServiceManagementList({
                   }}
                 ></SearchInput>
               </div>
+
+              <div className="min-w-[250px]">
+                <LookupCompanyProductDropdown
+                  onProductSelected={(product) => {
+                    console.log(product);
+                    if (product) {
+                      handleSelectedCompanyProductChange(product);
+                    } else {
+                      handleSelectedCompanyProductChange({ id: 0, name: "" });
+                    }
+                  }}
+                />
+              </div>
+
               {/* DATE FILTERS */}
               <div className="flex flex-wrap items-center gap-2 w-fit">
                 <div>
@@ -234,46 +241,7 @@ function AccountServiceManagementList({
                     )}
                   </div>
 
-                  {/* Product */}
-                  <div className="relative flex items-center justify-center">
-                    <div className="grid">
-                      {selectedCompanyProduct.id === 0 ? (
-                        <Button
-                          type="button"
-                          onClick={handleCompanyProductPopUp}
-                          className="flex items-center gap-2 px-2 py-1 caption-custom border border-gray-300 
-                  rounded-md bg-white hover:bg-gray-50 shadow-sm"
-                        >
-                          <ShoppingBag size={14} />
-                          <span>Product</span>
-                        </Button>
-                      ) : (
-                        <div className="border rounded-md border-gray-400 p-0.5 max-w-[150px]">
-                          <div
-                            title={selectedCompanyProduct.name}
-                            className="relative rounded flex justify-between gap-x-0.5 bg-blue-600 caption-custom white-text p-0.5"
-                          >
-                            <span onClick={handleCompanyProductPopUp}>
-                              {selectedCompanyProduct.name.length > 14
-                                ? selectedCompanyProduct.name.slice(0, 14) +
-                                "..."
-                                : selectedCompanyProduct.name}
-                            </span>
 
-                            <button
-                              title="Clear"
-                              onClick={() =>
-                                handleSelectedCompanyProductCheckBoxChange(null)
-                              }
-                              className="border-transparent"
-                            >
-                              <X size={14} className="self-center" />
-                            </button>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </div>
                 </div>
 
                 <div className="flex gap-1 justify-end w-fit">
@@ -359,23 +327,7 @@ function AccountServiceManagementList({
           />
         </div>
 
-        {openPopUpOfCompanyProductModal && (
-          <LookupCompanyProductSelection
-            isOpen={openPopUpOfCompanyProductModal}
-            onClose={() => setOpenPopUpOfCompanyProductModal(false)}
-            preText="Select Company Product"
-            description="Select company product to view its support tickets"
-            selectedProductId={
-              selectedCompanyProduct && selectedCompanyProduct.id !== 0
-                ? selectedCompanyProduct.id!
-                : null
-            }
-            handleSelectedCompanyProductChange={(params) => {
-              handleSelectedCompanyProductCheckBoxChange(params);
-              setOpenPopUpOfCompanyProductModal(false);
-            }}
-          />
-        )}
+
       </div>
     );
   }

@@ -15,11 +15,11 @@ type AccountSubscriptionManagementListProps = {
 
   paginationData: PaginationDataWithoutCountProps;
 
-  handleSelectedCompanyProductCheckBoxChange: (
+  handleSelectedCompanyProductChange: (
     params: LookupCompanyProduct | null,
   ) => void;
   
-  selectedCompanyProduct: LookupCompanyProduct;
+  selectedCompanyProduct?: LookupCompanyProduct;
 
   
   handleRowSelectedForShowAccountSubscription?: (

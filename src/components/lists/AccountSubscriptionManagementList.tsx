@@ -17,7 +17,6 @@ import toast from "react-hot-toast";
 import MESSAGE from "../../constants/Messages";
 import { useUserPreference } from "../../context/user/UserPreference";
 import COLORS from "../../constants/Colors";
-import LookupCompanyProductSelection from "../views/lookups/lookup-company-product/LookupCompanyProductSelection";
 import PaginationWithoutCount from "../ag-grid/PaginationWithoutCount";
 import { customDateRangeId } from "../../config/hooks/usePaginationHandler";
 import AccountSubscriptionManagementListProps from "../../@types/List/AccountSubscriptionManagementListProps";
@@ -34,10 +33,9 @@ function AccountSubscriptionManagementList({
   onEndDateChange,
   handleAddAccountSubscritption,
   paginationData,
-  handleSelectedCompanyProductCheckBoxChange,
+  handleSelectedCompanyProductChange,
   accountSubscriptionData,
 
-  selectedCompanyProduct,
   handleRowSelectedForShowAccountSubscription,
 
   accountId,
@@ -81,8 +79,7 @@ function AccountSubscriptionManagementList({
     console.log(selectedAccountSubscriptionForEdit);
   };
 
-  const [openPopUpOfCompanyProductModal, setOpenPopUpOfCompanyProductModal] =
-    useState(false);
+
 
 
   const { dateRangeDropdownOptions } = useComapanySpecificSearchDateRange();
@@ -169,7 +166,7 @@ function AccountSubscriptionManagementList({
               <LookupCompanyProductDropdown
                 onProductSelected={(product) => {
                   console.log(product);
-                  // setCompanyProductId(product?.id ?? null);
+                  handleSelectedCompanyProductChange(product);
                 }}
               />
             </div>
@@ -234,6 +231,7 @@ function AccountSubscriptionManagementList({
               onRowSelect={handleRowSelected}
               accountSubscriptions={accountSubscriptionData}
               isUsedInAccountSubscriptionModule={false}
+
             />
           </div>
 
@@ -255,23 +253,7 @@ function AccountSubscriptionManagementList({
           />
         </div>
 
-        {openPopUpOfCompanyProductModal && (
-          <LookupCompanyProductSelection
-            isOpen={openPopUpOfCompanyProductModal}
-            onClose={() => setOpenPopUpOfCompanyProductModal(false)}
-            preText="Select Company Product"
-            description="Select company product to view its subscriptions"
-            selectedProductId={
-              selectedCompanyProduct && selectedCompanyProduct.id !== 0
-                ? selectedCompanyProduct.id
-                : null
-            }
-            handleSelectedCompanyProductChange={(params) => {
-              handleSelectedCompanyProductCheckBoxChange(params);
-              setOpenPopUpOfCompanyProductModal(false);
-            }}
-          />
-        )}
+
       </div>
     );
   }
