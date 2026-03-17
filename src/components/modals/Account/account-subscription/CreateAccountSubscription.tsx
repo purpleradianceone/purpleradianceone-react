@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import FormHeader from "../../../ui/FormHeader";
 
-import { BoxIcon, Plus, Save, X, Calendar } from "lucide-react";
+import { BoxIcon, Plus, Save, X, Calendar, Trash } from "lucide-react";
 import FormLayout from "../../../ui/FormLayout";
 import React, { useEffect, useState } from "react";
 import Button from "../../../ui/Button";
@@ -36,6 +36,7 @@ import DatePickerInput from "../../../ui/DatePickerInput";
 // import CompanyUserSearchFieldInput from "../../../ui/CompanyUserSearchFieldInput";
 import AddAccountSubscriptionModalProps from "../../../../@types/modal/AddAccountSubscriptionModalProps";
 import CreateAccountSubscriptionProps from "../../../../@types/account/CreateAccountSubscriptionProps";
+import COLORS from "../../../../constants/Colors";
 
 interface CustomField {
   id: string;
@@ -544,9 +545,8 @@ const CreateAccountSubscription = ({
 
                         <button
                           onClick={() => removePackage(pkg.id)}
-                          className="px-2 py-1 bg-red-500 text-white rounded-md hover:bg-red-600"
                         >
-                          Remove Package
+                          <Trash size={SIZE.ICON_DELETE_BUTTON_SIZE} className={COLORS.ICON_DELETE_BUTTON}></Trash>
                         </button>
 
                       </div>

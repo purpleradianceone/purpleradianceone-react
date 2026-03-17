@@ -15,10 +15,11 @@ type AccountServiceManagementListProps = {
 
   paginationData: PaginationDataWithoutCountProps;
 
-  handleSelectedCompanyProductCheckBoxChange: (
+  handleSelectedCompanyProductChange: (
     params: LookupCompanyProduct | null,
   ) => void;
-  selectedCompanyProduct: LookupCompanyProduct;
+  
+  selectedCompanyProduct?: LookupCompanyProduct;
 
   serviceStatusId: ServiceStatus[];
   handleServiceStatusId: (selectedValue: number | undefined) => void;
