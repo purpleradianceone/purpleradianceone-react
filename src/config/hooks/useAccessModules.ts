@@ -684,6 +684,18 @@ export const useUserAccessModules = () => {
   const userHasAccessToUpdateStockAgeing = accessModules.some(
     (accessModule) => accessModule.crm_module_id === 53 && accessModule.update,
   );
+  // setting - reminder
+  const userHasAccessToAddSettingReminder = accessModules.some(
+    (accessModules) => accessModules.crm_module_id === 56 && accessModules.add,
+  );
+
+  const userHasAccessToViewSettingReminder = accessModules.some(
+    (accessModule) => accessModule.crm_module_id === 56 && accessModule.view,
+  );
+
+  const userHasAccessToUpdateSettingReminder = accessModules.some(
+    (accessModule) => accessModule.crm_module_id === 56 && accessModule.update,
+  );
 
   //Account Service
   const userHasAccessToAddAccountService = accessModules.some(
@@ -922,6 +934,10 @@ export const useUserAccessModules = () => {
     userHasAccessToAddTasks,
     userHasAccessToUpdateTasks,
 
+    userHasAccessToViewSettingReminder,
+    userHasAccessToAddSettingReminder,
+    userHasAccessToUpdateSettingReminder,
+
     userHasAccessToAddAccountService,
     userHasAccessToViewAccountService,
     userHasAccessToUpdateAccountService,
@@ -929,5 +945,6 @@ export const useUserAccessModules = () => {
     userHasAccessToAddAccountSubscription,
     userHasAccessToViewAccountSubscription,
     userHasAccessToUpdateAccountSubscription,
+
   };
 };

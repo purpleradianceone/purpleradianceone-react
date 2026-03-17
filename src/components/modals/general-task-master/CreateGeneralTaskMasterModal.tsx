@@ -201,12 +201,13 @@ function CreateGeneralTaskMasterModal({
       general_task_type_id: formData.taskType,
       general_task_priority_id: formData.taskPriority,
       frequency_id: formData.frequency,
-      frequency_interval: formData.frequencyInterval,
+      frequency_interval: formData.frequency === 1 ? 1 :formData.frequencyInterval,
       description: formData.description,
       assignedto:
         selectedCompanyUser.id === 0 ? loginStatus.id : selectedCompanyUser.id,
       start_date: formData.startDate,
-      end_date: formData.endDate,
+      end_date:
+        formData.frequency === 1 ? formData.startDate : formData.endDate,
       task_time: formData.taskTime,
       createdby_id: loginStatus.id,
     };

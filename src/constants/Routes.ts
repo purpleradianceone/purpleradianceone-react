@@ -94,6 +94,7 @@ const ROUTES_URL = {
   SETTING_MEETINGS: "meetings",
   SETTING_ACCOUNT_TYPE: "account-type",
   SETTING_NOTIFICATIONS: "notification",
+  SETTING_REMINDER: "reminder",
   SETTING_GENERAL: "general",
   SETTING_SUPPORT_TICKET_CATEGORY: "support-ticket-category",
   SETTING_COMPANY_WAREHOUSE: "company-warehouse",
