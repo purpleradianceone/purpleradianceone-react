@@ -24,6 +24,7 @@ import AccountSubscriptionManagementListProps from "../../@types/List/AccountSub
 import AccountSubscriptionProps from "../../@types/account/AccountSubscriptionProps";
 import AccountSubscriptionManagementAgGrid from "../ag-grid/AccountSubscriptionManagementAgGrid";
 import CreateAccountSubscription from "../modals/Account/account-subscription/CreateAccountSubscription";
+import LookupCompanyProductDropdown from "../ui/LookupCompanyProductDropdown";
 
 export const accountSubscriptionDataUrlSearchParamKey: string = "accountSubscriptionData";
 
@@ -160,6 +161,15 @@ function AccountSubscriptionManagementList({
                 value={handleSearchOption.searchParameter}
                 onChange={(e) => {
                   handleSearchOption.handleSearchParameterChange(e.target.value);
+                }}
+              />
+            </div>
+
+            <div className="min-w-[250px]">
+              <LookupCompanyProductDropdown
+                onProductSelected={(product) => {
+                  console.log(product);
+                  // setCompanyProductId(product?.id ?? null);
                 }}
               />
             </div>

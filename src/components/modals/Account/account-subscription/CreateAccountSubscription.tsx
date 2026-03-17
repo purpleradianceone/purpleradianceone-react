@@ -426,67 +426,66 @@ const CreateAccountSubscription = ({
           </div>
 
           <form onSubmit={handleCreateAccountService} className="space-y-2 p-1">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-              {/* select the product when used from the stock creation button from stock module */}
-              <div className="flex flex-col gap-2">
-                {
-                  <div className="">
-                    <CustomSelectForAccountService
-                      icon={BoxIcon}
-                      label="Product"
-                      // onChange={(value) => {
-                      //   if (!value) return;
-                      //   setProductSelected(value);
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+              {
+                <div >
+                  <CustomSelectForAccountService
+                    icon={BoxIcon}
+                    label="Product"
+                    // onChange={(value) => {
+                    //   if (!value) return;
+                    //   setProductSelected(value);
 
-                      //   setError((prev) => ({
-                      //     ...prev,
-                      //     productId: false,
-                      //   }));
-                      // }}
+                    //   setError((prev) => ({
+                    //     ...prev,
+                    //     productId: false,
+                    //   }));
+                    // }}
 
-                      onChange={(
-                        option: number | SelectOption | undefined | null,
-                      ) => {
-                        if (!option) return;
+                    onChange={(
+                      option: number | SelectOption | undefined | null,
+                    ) => {
+                      if (!option) return;
 
-                        if (typeof option === "number") {
-                          console.log("Selected ID:", option);
-                          return;
-                        }
-                        console.log("------option-----------");
-                        console.log(option);
-                        console.log("-----------------");
-                        // set the full option as selected
-                        setProductSelected(option);
+                      if (typeof option === "number") {
+                        console.log("Selected ID:", option);
+                        return;
+                      }
+                      console.log("------option-----------");
+                      console.log(option);
+                      console.log("-----------------");
+                      // set the full option as selected
+                      setProductSelected(option);
 
-                        // clear any validation error
-                        setError((prev) => ({
-                          ...prev,
-                          productId: false,
-                        }));
+                      // clear any validation error
+                      setError((prev) => ({
+                        ...prev,
+                        productId: false,
+                      }));
 
-                        // // now you can access details directly:
-                        console.log("Selected ID:", option.value);
-                        console.log("Selected Name:", option.label);
-                      }}
-                      options={productOptions}
-                      isRequired={true}
-                      placeholder="Select Product"
-                      value={productSelected || 0}
-                      onMenuOpen={handleMenuOpen}
-                      onMenuScrollToBottom={handleMenuScrollToBottom}
-                      onInputChange={handleInputChange}
-                      isLoading={isLoading}
-                      isClearable={false}
-                    />
-                    {error.productId && (
-                      <div className="caption-custom-inactive">
-                        Product is required
-                      </div>
-                    )}
-                  </div>
-                }
+                      // // now you can access details directly:
+                      console.log("Selected ID:", option.value);
+                      console.log("Selected Name:", option.label);
+                    }}
+                    options={productOptions}
+                    isRequired={true}
+                    placeholder="Select Product"
+                    value={productSelected || 0}
+                    onMenuOpen={handleMenuOpen}
+                    onMenuScrollToBottom={handleMenuScrollToBottom}
+                    onInputChange={handleInputChange}
+                    isLoading={isLoading}
+                    isClearable={false}
+                  />
+                  {error.productId && (
+                    <div className="caption-custom-inactive">
+                      Product is required
+                    </div>
+                  )}
+                </div>
+              }
 
+              <div>
                 <DatePickerInput
                   label="Start Date"
                   name="start_date"
@@ -495,7 +494,8 @@ const CreateAccountSubscription = ({
                   error={error.start_date_error}
                   required
                 />
-
+              </div>
+              <div>
                 <DatePickerInput
                   label="End Date"
                   name="end_date"
@@ -506,7 +506,7 @@ const CreateAccountSubscription = ({
                 />
               </div>
 
-              <div className="p-6 bg-white border rounded-lg shadow-sm max-w-4xl">
+              <div className="p-6 bg-white border rounded-lg shadow-sm col-span-3">
 
                 {/* Header */}
                 <div className="flex justify-between items-center mb-6">
@@ -522,7 +522,7 @@ const CreateAccountSubscription = ({
                 </div>
 
                 {/* Package List */}
-                <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
 
                   {packages.map((pkg) => (
                     <div
@@ -539,7 +539,7 @@ const CreateAccountSubscription = ({
                           onChange={(e) =>
                             updatePackageName(pkg.id, e.target.value)
                           }
-                          className="border px-3 py-2 rounded-md"
+                          className="border px-3 py-1 rounded-md"
                         />
 
                         <button
@@ -561,7 +561,7 @@ const CreateAccountSubscription = ({
                             handleChange(pkg.id, "key", e.target.value)
                           }
                           readOnly
-                          className="border px-3 py-2 rounded-md"
+                          className="border px-3 py-1 rounded-md"
                         />
 
                         <input
@@ -570,7 +570,7 @@ const CreateAccountSubscription = ({
                           onChange={(e) =>
                             handleChange(pkg.id, "value", e.target.value)
                           }
-                          className="border px-3 py-2 rounded-md"
+                          className="border px-3 py-1 rounded-md"
                         />
 
                       </div>
@@ -582,7 +582,7 @@ const CreateAccountSubscription = ({
 
               </div>
 
-              <div className="flex items-center justify-end bg-pink-00 col-span-2">
+              <div className="sticky bottom-0 flex items-center justify-end bg-pink-00 col-span-3">
                 <div className="flex gap-1">
                   <Button onClick={handleCloseForm} type="button">
                     <div className="flex items-center gap-0.5">
