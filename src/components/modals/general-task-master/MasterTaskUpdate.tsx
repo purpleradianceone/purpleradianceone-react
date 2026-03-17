@@ -52,6 +52,7 @@ import { handleApiError } from "../../../config/error/handleApiError";
 import ConfirmationDialog from "../../dialogue-box/ConfirmationDialogue";
 import FormInput from "../../ui/FormInput";
 import MetaField from "../../ui/MetaField";
+import CustomDocumentPreviewComponent from "../../custom-document-preview-component/CustomDocumentPreviewComponent";
 
 interface TaskCardProps {
   task: any;
@@ -71,6 +72,8 @@ function MasterTaskUpdate() {
   const [generalTaskUpdate, setGeneralTaskUpdate] = useState<number>(0);
   const [taskList, setTaskList] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
+  const [logoPreview, setLogoPreview] = useState<string | null>(null);
+  const [showCompanyLogoPreview, setShowCompanyLogoPreview] = useState(false);
   const [selectedSupportTicket, setSelectedSupportTicket] =
     useState<MasterTaskProps | null>(null);
   const [selectedTaskStage, setselectedTaskStage] = useState<
@@ -178,6 +181,7 @@ function MasterTaskUpdate() {
           updatedOn: item.updatedon,
           generalTaskTypeId: 0,
           frequencyId: 0,
+          cdnUrl: item.document_cdn_url,
         };
         setSelectedSupportTicket(formattedData);
 
@@ -428,27 +432,37 @@ function MasterTaskUpdate() {
         },
       );
 
+      const blob = new Blob([response.data], {
+        type: selectedSupportTicket?.extension,
+      });
+
+      console.log(response.data);
+
+      const imageUrl = URL.createObjectURL(blob);
+      setLogoPreview(imageUrl);
+      setShowCompanyLogoPreview(true);
+
       // Create download link
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement("a");
-      link.href = url;
+      // const url = window.URL.createObjectURL(new Blob([response.data]));
+      // const link = document.createElement("a");
+      // link.href = url;
 
-      const contentDisposition = response.headers["content-disposition"];
+      // const contentDisposition = response.headers["content-disposition"];
 
-      let fileName = `${selectedSupportTicket?.id}.${selectedSupportTicket?.extension}`;
+      // let fileName = `${selectedSupportTicket?.id}.${selectedSupportTicket?.extension}`;
 
-      // If backend sends filename → override
-      if (contentDisposition) {
-        const fileNameMatch = contentDisposition.match(/filename="?(.+)"?/);
-        if (fileNameMatch?.length === 2) {
-          fileName = fileNameMatch[1];
-        }
-      }
+      // // If backend sends filename → override
+      // if (contentDisposition) {
+      //   const fileNameMatch = contentDisposition.match(/filename="?(.+)"?/);
+      //   if (fileNameMatch?.length === 2) {
+      //     fileName = fileNameMatch[1];
+      //   }
+      // }
 
-      link.setAttribute("download", fileName);
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
+      // link.setAttribute("download", fileName);
+      // document.body.appendChild(link);
+      // link.click();
+      // link.remove();
     } catch (error) {
       console.error(error);
       toast.error("Failed to download document");
@@ -536,10 +550,11 @@ function MasterTaskUpdate() {
                             }}
                           />
                           <span
-                            className={`text-sm ${formData.isActive
+                            className={`text-sm ${
+                              formData.isActive
                                 ? "text-green-600"
                                 : "text-red-600"
-                              }`}
+                            }`}
                           >
                             {formData.isActive ? "Active" : "Inactive"}
                           </span>
@@ -627,6 +642,23 @@ function MasterTaskUpdate() {
                           >
                             <Download size={22} className="text-blue-500" />
                           </button>
+                          {showCompanyLogoPreview && (
+                            <div
+                              className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50"
+                              onClick={() => setShowCompanyLogoPreview(false)}
+                            >
+                              <CustomDocumentPreviewComponent
+                                fileUrl={
+                                  logoPreview ??
+                                  selectedSupportTicket?.cdnUrl ??
+                                  ""
+                                }
+                                fileExtension={selectedSupportTicket?.extension}
+                                width={"50%"}
+                                enableDownload={true}
+                              />
+                            </div>
+                          )}
                         </div>
                         <div className="flex justify-end items-end ">
                           <div>
@@ -826,9 +858,9 @@ export const TaskCard = ({ task, setTaskList }: TaskCardProps) => {
       prev.map((t: any) =>
         t.id === taskId
           ? {
-            ...t,
-            isactive: checked,
-          }
+              ...t,
+              isactive: checked,
+            }
           : t,
       ),
     );
@@ -853,9 +885,9 @@ export const TaskCard = ({ task, setTaskList }: TaskCardProps) => {
           prev.map((t: any) =>
             t.id === taskId
               ? {
-                ...t,
-                isactive: previousValue,
-              }
+                  ...t,
+                  isactive: previousValue,
+                }
               : t,
           ),
         );
@@ -866,9 +898,9 @@ export const TaskCard = ({ task, setTaskList }: TaskCardProps) => {
         prev.map((t: any) =>
           t.id === taskId
             ? {
-              ...t,
-              isactive: previousValue,
-            }
+                ...t,
+                isactive: previousValue,
+              }
             : t,
         ),
       );

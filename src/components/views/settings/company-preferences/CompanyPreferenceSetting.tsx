@@ -198,9 +198,9 @@ function CompanyPreferenceSetting() {
         preText="Manage your company's default settings and services."
         description="Choose how you want to receive notifications. You can enable or disable different channels based on your preference. Notifications will be sent through Email, Mobile, or directly in your Web browser.
 "
-        onClose={() => {
-          // setCompanyUserModalOpen(false);
-        }}
+        // onClose={() => {
+        //   // setCompanyUserModalOpen(false);
+        // }}
         icon={Bell}
         isModal={false}
         wantBorderBottom={false}

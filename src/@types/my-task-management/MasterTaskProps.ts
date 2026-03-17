@@ -27,6 +27,7 @@ type MasterTaskProps = {
 
   createdOn: string;
   updatedOn: string;
+  cdnUrl: string;
 };
 
 export default MasterTaskProps;

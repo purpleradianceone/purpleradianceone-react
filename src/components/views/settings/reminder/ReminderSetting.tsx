@@ -193,7 +193,7 @@ function ReminderSetting() {
       <FormHeader
         preText="Manage your company's default settings and services."
         description="Choose how you want to receive Reminders. You can enable or disable different channels based on your preference. Reminders will be sent through Mobile, or directly in your Web browser."
-        onClose={() => {}}
+        // onClose={() => {}}
         icon={Bell}
         isModal={false}
         wantBorderBottom={false}
