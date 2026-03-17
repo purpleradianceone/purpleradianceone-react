@@ -235,7 +235,7 @@ function AccountServiceManagementList({
                           // savedFilters.selectedSupportTicketCategory || null
                           handleSearchOption.selectedSupportTicketCategory
                         }
-                        labelName="category"
+                        labelName="status"
                         options={serviceStatus!}
                         onSelect={handleServiceStatusId}
                       />
