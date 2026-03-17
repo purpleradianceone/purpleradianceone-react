@@ -314,7 +314,7 @@ const AccountServiceDetails = () => {
       updatedby_id: loginStatus.id,
     };
     console.log('----------------------');
-    alert(JSON.stringify(postData, null, 2));
+    // alert(JSON.stringify(postData, null, 2));
     console.log('----------------------');
     setIsSaving(true);
     try {
@@ -653,11 +653,11 @@ const AccountServiceDetails = () => {
             </Button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 ">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 ">
             {fields?.map((field) => (
               <div
                 key={field.id}
-                className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg border border-gray-200"
+                className="flex items-center gap-4 p-2 bg-gray-50 rounded-lg border border-gray-200"
               >
                 <input
                   type="text"
@@ -666,7 +666,7 @@ const AccountServiceDetails = () => {
                   onChange={(e) =>
                     updateField(field.id, "key", e.target.value)
                   }
-                  className="flex-1 px-3 py-1 border border-gray-300 rounded-md"
+                  className="flex-1 px-1 py-1 border border-gray-300 rounded-md"
                 />
 
                 <input
@@ -676,7 +676,7 @@ const AccountServiceDetails = () => {
                   onChange={(e) =>
                     updateField(field.id, "value", e.target.value)
                   }
-                  className="flex-1 px-3 py-1 border border-gray-300 rounded-md"
+                  className="flex-1 px-1 py-1 border border-gray-300 rounded-md"
                 />
 
                 <button
