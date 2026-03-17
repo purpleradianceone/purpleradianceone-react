@@ -39,6 +39,7 @@ import ShimmerEffect from "./ShimerEffect";
 import ToggleButton from "../../../ui/ToggleButton";
 import MetaField from "../../../ui/MetaField";
 import COLORS from "../../../../constants/Colors";
+import { useUserAccessModules } from "../../../../config/hooks/useAccessModules";
 
 interface CustomField {
   id: string;
@@ -50,6 +51,8 @@ const AccountServiceDetails = () => {
 
   const { accountServiceId } = useParams<{ accountServiceId: string }>();
   const { loginStatus } = useLoggedInUserContext();
+  const { userHasAccessToUpdateAccountService } = useUserAccessModules();
+
 
   const [isSaving, setIsSaving] = useState(false);
 
@@ -281,6 +284,12 @@ const AccountServiceDetails = () => {
   // Update account service
   const handleUpdate = async (activeValue?: boolean) => {
     // e.preventDefault();
+
+    if (!userHasAccessToUpdateAccountService) {
+      toast.error('You are not authorized user')
+      return;
+    }
+
     if (!validateForm()) return;
 
 
@@ -706,10 +715,13 @@ const AccountServiceDetails = () => {
 
       <div className="flex  tems-center justify-end gap-2">
 
-        <div><Button onClick={(e) => {
-          e.preventDefault();
-          handleUpdate();
-        }} >Save</Button></div>
+        <div>
+          <Button
+            disabled={!userHasAccessToUpdateAccountService}
+            onClick={(e) => {
+              e.preventDefault();
+              handleUpdate();
+            }} >Save</Button></div>
       </div>
     </div>
   );

@@ -24,6 +24,7 @@ import AccountSubscriptionProps from "../../../../@types/account/AccountSubscrip
 import ShimmerEffect from "../account-service/ShimerEffect";
 import MetaField from "../../../ui/MetaField";
 import COLORS from "../../../../constants/Colors";
+import { useUserAccessModules } from "../../../../config/hooks/useAccessModules";
 
 interface CustomField {
     id: string;
@@ -63,6 +64,7 @@ const AccountSubscriptionDetails = () => {
     const [showStartDateError, setShowStartDateError] = useState(false);
     const [showEndDateError, setShowEndDateError] = useState(false);
 
+    const { userHasAccessToUpdateAccountSubscription } = useUserAccessModules();
     // -----------------------
     // Handle Input Change
     // -----------------------
@@ -196,6 +198,11 @@ const AccountSubscriptionDetails = () => {
     };
 
     const handleUpdate = async (activeValue?: boolean) => {
+
+        if (!userHasAccessToUpdateAccountSubscription) {
+            toast.error('You are not authorized user')
+            return;
+        }
 
         if (!validateForm()) return;
 
@@ -643,6 +650,7 @@ const AccountSubscriptionDetails = () => {
                 <div>
 
                     <Button
+                        disabled={!userHasAccessToUpdateAccountSubscription}
                         onClick={(e) => {
                             e.preventDefault();
                             handleUpdate();
