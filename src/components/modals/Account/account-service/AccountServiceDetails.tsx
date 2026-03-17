@@ -176,6 +176,7 @@ const AccountServiceDetails = () => {
           createdBy: data.createdby,
           createdOn: data.createdon,
         };
+        console.log("isactive from API:", data.isactive, typeof data.isactive);
 
         setAccountServiceDetail(formattedData);
 
@@ -278,7 +279,7 @@ const AccountServiceDetails = () => {
   };
 
   // Update account service
-  const handleUpdate = async () => {
+  const handleUpdate = async (activeValue?: boolean) => {
     // e.preventDefault();
     if (!validateForm()) return;
 
@@ -309,7 +310,7 @@ const AccountServiceDetails = () => {
       customer_feedback: formData.customer_feedback,
       next_service_due_date: formData.next_service_due_date,
       is_follow_up_required: isFollowUpRequired,
-      isactive: true,
+      isactive: activeValue ?? formData.is_active,
       updatedby_id: loginStatus.id,
     };
     console.log('----------------------');
@@ -487,7 +488,7 @@ const AccountServiceDetails = () => {
                   is_active: checked,
                 }));
 
-                handleUpdate();
+                handleUpdate(checked);
               }}
             />
             <span
@@ -705,9 +706,6 @@ const AccountServiceDetails = () => {
 
       <div className="flex  tems-center justify-end gap-2">
 
-        {/* <div>
-          <Button onClick={() => { }} type="button">Cancel</Button>
-        </div> */}
         <div><Button onClick={(e) => {
           e.preventDefault();
           handleUpdate();

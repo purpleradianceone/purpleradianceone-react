@@ -74,14 +74,14 @@ const AddStock = ({
   const [isSaving, setIsSaving] = useState<boolean>(false);
 
   const [selectedServiceBookingSource, setSelectedServiceBookingSource] =
-    useState<number | undefined>(undefined);
+    useState<number | undefined>(1);
 
   const [selectedServiceLocationType, setSelectedServiceLocationType] =
-    useState<number | undefined>(undefined);
+    useState<number | undefined>(3);
 
   const [selectedServiceStatus, setselectedServiceStatus] = useState<
     number | undefined
-  >(undefined);
+  >(1);
 
   const { serviceBookingSource, isLoading: isLoadingForServiceBookingSource } =
     useServiceBookingSource();
@@ -187,9 +187,9 @@ const AddStock = ({
     resetCreateAccountForm();
 
     setProductSelected(null);
-    setSelectedServiceBookingSource(undefined);
-    setSelectedServiceLocationType(undefined);
-    setselectedServiceStatus(undefined);
+    setSelectedServiceBookingSource(1);
+    setSelectedServiceLocationType(3);
+    setselectedServiceStatus(1);
     setCustomerRating(0);
     setIsFollowUpRequired(false);
 
