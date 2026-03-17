@@ -1,4 +1,5 @@
 const ROUTES_URL = {
+
   NOT_FOUND: "*",
   LANDING_PAGE: "/",
   SIGN_IN: "/signin",
@@ -73,7 +74,8 @@ const ROUTES_URL = {
   ACCOUNT_COMPANY_PRODUCT_AMC_DETAILS:
     "/home/manage-accounts/accounts/prod-details-amc/:accountCompanyProductId",
   ACCOUNT_MULTIPLE_COMPANY_PRODUCT: "assign-products",
-
+  ACCOUNT_SERVICE_DETAILS: "account-service-details",
+  ACCOUNT_SUBSCRIPTION_DETAILS: "account-subscription-details",
   // Stock
   STOCK_MANAGEMENT: "/home/manage-stock/stock",
   STOCK_LIVE_FOR_COMPANY_PRODUCT:
@@ -108,5 +110,11 @@ const ROUTES_URL = {
   MY_TASKS: "my-tasks",
   GENERAL_TASK: "/home/manage-tasks/general-task/:taskId/:masterId",
   MASTER_TASK_DETAILS: "/home/master-task/details/:taskId",
+    
+     //META APP INTEGRATIONS
+   SETTING_META_APP_INTEGRATION_FACEBOOK: "/settings/facebook",
+   SETTING_META_APP_INTEGRATION_FACEBOOK_PAGE_ADDITION : "integrate-meta-app",
+
+      SETTING_META_APP_INTEGRATION_WHATSAPP: "/settings/integrate-whatsapp",
 };
 export default ROUTES_URL;

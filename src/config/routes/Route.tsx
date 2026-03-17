@@ -89,6 +89,12 @@ import WareHouseWiseStock from "../../components/views/stock-management/WareHous
 import StockLedgerManagement from "../../components/views/stock-management/StockLedgerManagement";
 import StockAgeingManagement from "../../components/views/stock-management/StockAgeingManagement";
 import ReminderSetting from "../../components/views/settings/reminder/ReminderSetting";
+import { MetaAppsIntegrationTabsBreadcrumb } from "../../components/views/settings/social-media-integration/MetaAppsIntergrationTabsBreadcrumb";
+import { FacebookBreadCrumb } from "../../components/views/settings/social-media-integration/meta-app-facebook/FacebookBreadcrumb";
+import MetaAppWhatsappIntegration from "../../components/views/settings/social-media-integration/meta-app-whatsapp/MetaAppWhatsappIntegration";
+import { PageIdIntegrationManagement } from "../../components/views/settings/social-media-integration/meta-app-facebook/PageIdIntegrationManagement";
+import AccountServiceDetails from "../../components/modals/Account/account-service/AccountServiceDetails";
+import AccountSubscriptionDetails from "../../components/modals/Account/account-subscription/AccountSubscriptionDetails";
 
 export const router = createBrowserRouter([
   {
@@ -361,21 +367,6 @@ export const router = createBrowserRouter([
       },
     ],
   },
-  // {
-  //   path: ROUTES_URL.COMPANY_SETTING,
-  //   element: (
-  //     <MobileRedirectWrapper>
-  //       <PrivateRoute>
-  //         <div>
-  //           <Navbar>
-  //             <SettingsPage />
-  //           </Navbar>
-  //         </div>
-  //       </PrivateRoute>
-  //     </MobileRedirectWrapper>
-  //   ),
-  // },
-
   {
     path: ROUTES_URL.COMPANY_SETTING,
     element: (
@@ -539,7 +530,7 @@ export const router = createBrowserRouter([
           <div>
             <AuthLayout
               title="Activate Subscription!"
-              // subtitle="Enter the number of users and subscription duration to proceed"
+            // subtitle="Enter the number of users and subscription duration to proceed"
             >
               <CreateSubscription
                 isOpen={true}
@@ -824,7 +815,7 @@ export const router = createBrowserRouter([
                 onClose={() => {
                   window.history.back();
                 }}
-                handleProductChangeOnAdd={() => {}}
+                handleProductChangeOnAdd={() => { }}
               ></AddProductModal>
             </Navbar>
           </div>
@@ -844,7 +835,7 @@ export const router = createBrowserRouter([
                 onClose={() => {
                   window.history.back();
                 }}
-                handleCompanyTeamChangeOnAdd={() => {}}
+                handleCompanyTeamChangeOnAdd={() => { }}
               ></AddTeamModal>
             </Navbar>
           </div>
@@ -893,6 +884,14 @@ export const router = createBrowserRouter([
         path: ROUTES_URL.ACCOUNT_MULTIPLE_COMPANY_PRODUCT,
         element: <CreateMultipleAccountCompanyProduct />,
       },
+      {
+        path: "account-service-details/:accountServiceId",
+        element: <AccountServiceDetails></AccountServiceDetails>
+      },
+      {
+        path: "account-subscription-details/:accountSubscriptionId",
+        element: <AccountSubscriptionDetails></AccountSubscriptionDetails>
+      }
     ],
   },
   {
@@ -941,9 +940,25 @@ export const router = createBrowserRouter([
               MESSAGE.MODULE_ACCESS.SETTING.INTEGRATION.DENIED_VIEW_ACCESS
             }
           >
-            <MetaAppsIntegration />
+            <MetaAppsIntegrationTabsBreadcrumb />
+            {/* <MetaAppsIntegration /> */}
           </ModuleGuard>
         ),
+        // children: [
+        //   {
+        //     index: true,
+        //     element: (
+        //       <ModuleGuard
+        //         permissionKey="userHasAccessToViewIntegrationSetting"
+        //         deniedMessage={
+        //           MESSAGE.MODULE_ACCESS.SETTING.INTEGRATION.DENIED_VIEW_ACCESS
+        //         }
+        //       >
+        //         <MetaAppsIntegration />
+        //       </ModuleGuard>
+        //     ),
+        //   },
+        // ],
       },
       {
         path: ROUTES_URL.SETTING_INDIAMART,
@@ -986,20 +1001,63 @@ export const router = createBrowserRouter([
       },
     ],
   },
-  // {
-  //   path: ROUTES_URL.STOCK_MANAGEMENT,
-  //   element: (
-  //     <MobileRedirectWrapper>
-  //       <PrivateRoute>
-  //         <div>
-  //           <Navbar>
-  //             <StockManagement />
-  //           </Navbar>
-  //         </div>
-  //       </PrivateRoute>
-  //     </MobileRedirectWrapper>
-  //   ),
-  // },
+   {
+    path: ROUTES_URL.SETTING_META_APP_INTEGRATION_WHATSAPP,
+    element: (
+      <MobileRedirectWrapper>
+        <PrivateRoute>
+          <div>
+            <Navbar>
+              <MetaAppWhatsappIntegration/>
+            </Navbar>
+          </div>
+        </PrivateRoute>
+      </MobileRedirectWrapper>
+    ),
+  },
+  {
+    path: ROUTES_URL.SETTING_META_APP_INTEGRATION_FACEBOOK,
+    element: (
+      <MobileRedirectWrapper>
+        <PrivateRoute>
+          <div>
+            <Navbar>
+              <FacebookBreadCrumb />
+              {/* <MetaAppsIntegration /> */}
+            </Navbar>
+          </div>
+        </PrivateRoute>
+      </MobileRedirectWrapper>
+    ),
+    children: [
+      {
+        index: true,
+        element: (
+          <ModuleGuard
+            permissionKey="userHasAccessToViewIntegrationSetting"
+            deniedMessage={
+              MESSAGE.MODULE_ACCESS.SETTING.INTEGRATION.DENIED_VIEW_ACCESS
+            }
+          >
+            <MetaAppsIntegration />
+          </ModuleGuard>
+        ),
+      },
+      {
+        path: ROUTES_URL.SETTING_META_APP_INTEGRATION_FACEBOOK_PAGE_ADDITION,
+        element: (
+          <ModuleGuard
+            permissionKey="userHasAccessToViewIntegrationSetting"
+            deniedMessage={
+              MESSAGE.MODULE_ACCESS.SETTING.INTEGRATION.DENIED_VIEW_ACCESS
+            }
+          >
+            <PageIdIntegrationManagement />
+          </ModuleGuard>
+        ),
+      },
+    ],
+  },
 
   // stock management routes
   {

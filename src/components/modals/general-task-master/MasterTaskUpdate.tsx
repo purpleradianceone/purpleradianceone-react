@@ -536,11 +536,10 @@ function MasterTaskUpdate() {
                             }}
                           />
                           <span
-                            className={`text-sm ${
-                              formData.isActive
+                            className={`text-sm ${formData.isActive
                                 ? "text-green-600"
                                 : "text-red-600"
-                            }`}
+                              }`}
                           >
                             {formData.isActive ? "Active" : "Inactive"}
                           </span>
@@ -827,9 +826,9 @@ export const TaskCard = ({ task, setTaskList }: TaskCardProps) => {
       prev.map((t: any) =>
         t.id === taskId
           ? {
-              ...t,
-              isactive: checked,
-            }
+            ...t,
+            isactive: checked,
+          }
           : t,
       ),
     );
@@ -854,9 +853,9 @@ export const TaskCard = ({ task, setTaskList }: TaskCardProps) => {
           prev.map((t: any) =>
             t.id === taskId
               ? {
-                  ...t,
-                  isactive: previousValue,
-                }
+                ...t,
+                isactive: previousValue,
+              }
               : t,
           ),
         );
@@ -867,9 +866,9 @@ export const TaskCard = ({ task, setTaskList }: TaskCardProps) => {
         prev.map((t: any) =>
           t.id === taskId
             ? {
-                ...t,
-                isactive: previousValue,
-              }
+              ...t,
+              isactive: previousValue,
+            }
             : t,
         ),
       );

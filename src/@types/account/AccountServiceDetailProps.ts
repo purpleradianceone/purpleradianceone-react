@@ -1,0 +1,33 @@
+type AccountServiceDetailProps = {
+  id: number;
+  company_id: number;
+  account_service_code: string;
+  account_id: number;
+  account_name: string;
+  company_product_id: number;
+  company_product_name: string;
+  service_booking_date: string;
+  service_date_time: string;
+  service_booking_time: string;
+  service_status_id: number;
+  service_status: string;
+  service_booking_source_id: number;
+  service_booking_source:string;
+  service_location_type_id: number;
+  service_location_type: string;
+  location_address: string;
+  assignedto: number;
+  assignedto_name: string;
+  service_notes: string;
+  customizations: string;
+  cancellation_reason: string; 
+  customer_rating: number;
+  customer_feedback: string;
+  next_service_due_date: string;
+  is_follow_up_required: boolean;
+  is_active: boolean;
+  createdBy: string;
+  createdOn: string;
+};
+
+export default AccountServiceDetailProps;

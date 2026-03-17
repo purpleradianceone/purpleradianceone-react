@@ -697,6 +697,32 @@ export const useUserAccessModules = () => {
     (accessModule) => accessModule.crm_module_id === 56 && accessModule.update,
   );
 
+  //Account Service
+  const userHasAccessToAddAccountService = accessModules.some(
+    (accessModules) => accessModules.crm_module_id === 54 && accessModules.add,
+  );
+
+  const userHasAccessToViewAccountService = accessModules.some(
+    (accessModule) => accessModule.crm_module_id === 54 && accessModule.view,
+  );
+
+  const userHasAccessToUpdateAccountService = accessModules.some(
+    (accessModule) => accessModule.crm_module_id === 54 && accessModule.update,
+  );
+
+  //Account Subscription
+  const userHasAccessToAddAccountSubscription = accessModules.some(
+    (accessModules) => accessModules.crm_module_id === 55 && accessModules.add,
+  );
+
+  const userHasAccessToViewAccountSubscription = accessModules.some(
+    (accessModule) => accessModule.crm_module_id === 55 && accessModule.view,
+  );
+
+  const userHasAccessToUpdateAccountSubscription = accessModules.some(
+    (accessModule) => accessModule.crm_module_id === 55 && accessModule.update,
+  );
+
   return {
     userHasAccessToAddUser,
     userHasAccessToViewUser,
@@ -911,5 +937,14 @@ export const useUserAccessModules = () => {
     userHasAccessToViewSettingReminder,
     userHasAccessToAddSettingReminder,
     userHasAccessToUpdateSettingReminder,
+
+    userHasAccessToAddAccountService,
+    userHasAccessToViewAccountService,
+    userHasAccessToUpdateAccountService,
+
+    userHasAccessToAddAccountSubscription,
+    userHasAccessToViewAccountSubscription,
+    userHasAccessToUpdateAccountSubscription,
+
   };
 };

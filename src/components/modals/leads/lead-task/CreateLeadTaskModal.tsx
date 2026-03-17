@@ -12,7 +12,7 @@ import {
   TargetIcon,
   Text,
   User,
-  
+
   Users,
   X,
 } from "lucide-react";
@@ -29,7 +29,7 @@ import LeadTaskStageType from "../../../../@types/lead-management/LeadTaskStageT
 import React, { useEffect, useState } from "react";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
 import Lead from "../../../../@types/lead-management/LeadManagementProps";
-import {  STATUS_CODE } from "../../../../constants/AppConstants";
+import { STATUS_CODE } from "../../../../constants/AppConstants";
 import CompanyUsersSearchProps from "../../../../@types/company-users/CompanyUserProps";
 import POST_API from "../../../../constants/PostApi";
 import RefreshToken from "../../../../config/validations/RefreshToken";
@@ -385,35 +385,35 @@ function CreateLeadTaskModal({
               //   </div>
               // </div>
               // Select lead contact
-            <div className="flex items-center  justify-start gap-2   mb-0">
-              <label
-                // htmlFor="phoneCallBtn"
-                className="block input-label-custom"
-              >
-                <div className="flex gap-1">
-                  <Contact2 className="text-blue-600 mt-0.5" size={16} />
-                  <span>Lead Contact:</span>
-                </div>
-              </label>
-              <div 
-              // id="phoneCallBtn" 
-              className="mb-1   ">
-                <Button
-                  className="bg-white text-blue-800 "
-                  type="submit"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setIsAddCompanyLeadContactModalOpen(true);
-                  }}
+              <div className="flex items-center  justify-start gap-2   mb-0">
+                <label
+                  // htmlFor="phoneCallBtn"
+                  className="block input-label-custom"
                 >
-                  <span className="text-xs text-blue-500  text-nowrap underline ">
-                   {leadContactDataSelectedArray.length ===0 ?  "Select" : "Select/Change"} 
-                    {/* <Contact size={14}></Contact> */}
-                    {/* <span>lead contact</span> */}
-                  </span>
-                </Button>
+                  <div className="flex gap-1">
+                    <Contact2 className="text-blue-600 mt-0.5" size={16} />
+                    <span>Lead Contact:</span>
+                  </div>
+                </label>
+                <div
+                  // id="phoneCallBtn" 
+                  className="mb-1   ">
+                  <Button
+                    className="bg-white text-blue-800 "
+                    type="submit"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setIsAddCompanyLeadContactModalOpen(true);
+                    }}
+                  >
+                    <span className="text-xs text-blue-500  text-nowrap underline ">
+                      {leadContactDataSelectedArray.length === 0 ? "Select" : "Select/Change"}
+                      {/* <Contact size={14}></Contact> */}
+                      {/* <span>lead contact</span> */}
+                    </span>
+                  </Button>
+                </div>
               </div>
-            </div>
             )}
           {leadActivityId === 3 && (
             <div className="col-span-3">
@@ -434,41 +434,41 @@ function CreateLeadTaskModal({
         )} */}
         {leadContactDataSelectedArray.length != 0 && (
           <div className="border  rounded-md">
-          <div className=" p-1 table-header-custom">
-            Selected Contacts :
-          </div>
-          <div className=" grid grid-cols-3 p-1  max-h-36 gap-0.5 overflow-y-auto">
-            {leadContactDataSelectedArray.map((contact) => (
-              <div
-              key={contact.id}
-              className="grid col-span-1 py-0.5 border border-r-2 px-0.5 hover:bg-gray-100 rounded-lg"
-              >
-                <div className="flex justify-between">
-                  <span className="flex items-center gap-2">
-                    <Users className="h-3 w-3 caption-custom rounded-full bg-white" />
-                    <span className="caption-custom">
-                      {contact.name || contact.email || "Unnamed contact"}
-                    </span>
-                  </span>
-                  <Button
-                    size="sm"
-                    onClick={() => {
-                      setAddCompanyLeadContactIdArray((prev) =>
-                        prev.filter((id) => id !== contact.id)
-                    );
-                    setLeadContactDataSelectedArray((prev) =>
-                      prev.filter((item) => item.id !== contact.id)
-                  );
-                }}
-                className="caption-custom hover:text-red-500"
+            <div className=" p-1 table-header-custom">
+              Selected Contacts :
+            </div>
+            <div className=" grid grid-cols-3 p-1  max-h-36 gap-0.5 overflow-y-auto">
+              {leadContactDataSelectedArray.map((contact) => (
+                <div
+                  key={contact.id}
+                  className="grid col-span-1 py-0.5 border border-r-2 px-0.5 hover:bg-gray-100 rounded-lg"
                 >
-                    <X className="h-3 w-3" />
-                  </Button>
+                  <div className="flex justify-between">
+                    <span className="flex items-center gap-2">
+                      <Users className="h-3 w-3 caption-custom rounded-full bg-white" />
+                      <span className="caption-custom">
+                        {contact.name || contact.email || "Unnamed contact"}
+                      </span>
+                    </span>
+                    <Button
+                      size="sm"
+                      onClick={() => {
+                        setAddCompanyLeadContactIdArray((prev) =>
+                          prev.filter((id) => id !== contact.id)
+                        );
+                        setLeadContactDataSelectedArray((prev) =>
+                          prev.filter((item) => item.id !== contact.id)
+                        );
+                      }}
+                      className="caption-custom hover:text-red-500"
+                    >
+                      <X className="h-3 w-3" />
+                    </Button>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-                    </div>
         )}
 
         <div className="grid grid-cols-2 gap-2">
@@ -599,7 +599,7 @@ function CreateLeadTaskModal({
                   </Button> */}
             <Button
               type="submit"
-               className="bg-white text-blue-800 "
+              className="bg-white text-blue-800 "
               onClick={(e) => {
                 e.preventDefault();
                 setIsAssignUsersModalOpen(true);
@@ -612,13 +612,13 @@ function CreateLeadTaskModal({
                 <span className="flex gap-0.5 justify-center">
                   <UserPlus size={12} className="mt-0.5"></UserPlus>
                   {/* <span>Assign Users</span> */}
-                {/* </span> */}
-              {/* </span> */} 
+              {/* </span> */}
+              {/* </span> */}
               <span className="text-xs text-blue-500  text-nowrap underline ">
-                   {selectedCompanyUsers.length ===0 ?  "Select" : "Select/Change"} 
-                    {/* <Contact size={14}></Contact> */}
-                    {/* <span>lead contact</span> */}
-                  </span>
+                {selectedCompanyUsers.length === 0 ? "Select" : "Select/Change"}
+                {/* <Contact size={14}></Contact> */}
+                {/* <span>lead contact</span> */}
+              </span>
             </Button>
           </div>
         </div>
