@@ -195,6 +195,7 @@ function AccountServiceManagementList({
                       handleSelectedCompanyProductChange({ id: 0, name: "" });
                     }
                   }}
+                  productTypeId={3}
                 />
               </div>
 

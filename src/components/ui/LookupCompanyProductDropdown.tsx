@@ -9,9 +9,11 @@ import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
 
 export default function LookupCompanyProductDropdown({
   onProductSelected,
+  productTypeId,
   placeholder = "Search Product...",
 }: {
   onProductSelected: (product: any | null) => void;
+  productTypeId?: number
   placeholder?: string;
 }) {
   const { loginStatus } = useLoggedInUserContext();
@@ -45,8 +47,12 @@ export default function LookupCompanyProductDropdown({
     try {
       setLoading(true);
 
+      const apiUrl =
+        (productTypeId && POST_API.GET_LOOKUP_COMPANY_PRODUCT_BY_PRODUCT_TYPE) ||
+        POST_API.GET_LOOKUP_COMPANY_PRODUCT;
+
       const response = await axiosClient.post(
-        POST_API.GET_LOOKUP_COMPANY_PRODUCT,
+        apiUrl,
         {
           company_id: loginStatus.companyId,
           requestedby: loginStatus.id,
@@ -54,12 +60,15 @@ export default function LookupCompanyProductDropdown({
           offset: nextOffset,
           search_parameter: searchText,
           isactive: true,
+          product_type_id: productTypeId ?? null,
         },
         {
           withCredentials: true,
           signal: abortController.signal,
         },
       );
+
+
 
       const newData = response.data || [];
 
