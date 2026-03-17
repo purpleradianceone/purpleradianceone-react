@@ -306,7 +306,7 @@ const AddStock = ({
     console.log("--------------");
     console.log(JSON.stringify(postData, null, 2));
     console.log("--------------");
-    alert(JSON.stringify(postData, null, 2));
+    // alert(JSON.stringify(postData, null, 2));
     setIsSaving(true);
     await axios
       .post(POST_API.CREATE_ACCOUNT_SERVICE, postData, {

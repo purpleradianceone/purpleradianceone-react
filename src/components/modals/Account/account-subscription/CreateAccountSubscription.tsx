@@ -81,6 +81,7 @@ const CreateAccountSubscription = ({
   const {
     handleChange: handleCreateServiceDetailFormChange,
     formData: addCreateAccountSubscriptionFormData,
+    resetForm: resetAddAccountSubscriptionForm,
   } = useFormChange(intialCreateAccountSubscriptionFormData);
 
   //   const [isRenewal, setisRenewal] = useState<boolean>(false);
@@ -99,7 +100,7 @@ const CreateAccountSubscription = ({
 
   // Note : on close Clear the states
   const handleCloseForm = () => {
-    // resetStockCreateForm();
+    resetAddAccountSubscriptionForm();
 
     // here we are setting dropdown
     setProductSelected(null);
