@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Calendar, } from "lucide-react";
+import { Calendar, Trash, } from "lucide-react";
 
 import Button from "../../../ui/Button";
 import DatePickerInput from "../../../ui/DatePickerInput";
@@ -14,7 +14,7 @@ import toast from "react-hot-toast";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
 import RefreshToken from "../../../../config/validations/RefreshToken";
 
-import { STATUS_CODE } from "../../../../constants/AppConstants";
+import { SIZE, STATUS_CODE } from "../../../../constants/AppConstants";
 import { handleApiError } from "../../../../config/error/handleApiError";
 
 import axiosClient from "../../../../axios-client/AxiosClient";
@@ -23,6 +23,7 @@ import axiosClient from "../../../../axios-client/AxiosClient";
 import AccountSubscriptionProps from "../../../../@types/account/AccountSubscriptionProps";
 import ShimmerEffect from "../account-service/ShimerEffect";
 import MetaField from "../../../ui/MetaField";
+import COLORS from "../../../../constants/Colors";
 
 interface CustomField {
     id: string;
@@ -34,6 +35,7 @@ interface PackageDetail {
     id: string;
     packageName: string;
     field: CustomField[];
+    isNew?: boolean;
 }
 
 const AccountSubscriptionDetails = () => {
@@ -131,6 +133,7 @@ const AccountSubscriptionDetails = () => {
                     ([packageName, values]: any) => ({
                         id: crypto.randomUUID(),
                         packageName,
+                        isNew: false,
                         field: Object.entries(values).map(([key, value]) => ({
                             id: crypto.randomUUID(),
                             key,
@@ -269,6 +272,7 @@ const AccountSubscriptionDetails = () => {
             {
                 id: crypto.randomUUID(),
                 packageName: "",
+                isNew: true,
                 field: [
                     {
                         id: crypto.randomUUID(),
@@ -279,7 +283,7 @@ const AccountSubscriptionDetails = () => {
                         id: crypto.randomUUID(),
                         key: "Completed",
                         value: "0",
-                    }
+                    },
                 ],
             },
         ]);
@@ -340,6 +344,10 @@ const AccountSubscriptionDetails = () => {
                 pkg.field.forEach((f) => {
                     result[pkg.packageName][f.key] = f.value;
                 });
+
+                if (pkg.isNew) {
+                    result[pkg.packageName]["IsActive"] = "true";
+                }
 
             }
         });
@@ -518,15 +526,15 @@ const AccountSubscriptionDetails = () => {
                                         value={pkg.packageName}
                                         placeholder="Package Name"
                                         onChange={(e) => updatePackageName(pkg.id, e.target.value)}
-                                        className="border px-2 py-1 rounded w-full"
+                                        className="border px-2 py-1 rounded w-64"
                                     />
-                                    <button
+                                    {pkg.isNew && <button
                                         type="button"
                                         onClick={() => removePackage(pkg.id)}
-                                        className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
                                     >
-                                        Remove
+                                        <Trash size={SIZE.ICON_DELETE_BUTTON_SIZE} className={COLORS.ICON_DELETE_BUTTON}></Trash>
                                     </button>
+                                    }
                                 </div>
 
                                 {/* Package Fields */}
