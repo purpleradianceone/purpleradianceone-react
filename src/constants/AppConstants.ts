@@ -151,11 +151,12 @@ export const SIZE = {
     SIXTEEN : 16,
     SAVE_BUTTON_LOGO_SIZE : 16,
     CANCEL_BUTTON_LOGO_SIZE : 16,
+    ICON_DELETE_BUTTON_SIZE: 16,
     LUCIDE_LOGO_INPUT_LABEL_SIZE: 14,
     NAVBAR : {
       TOP_HEIGHT_USER_PREF_LEFT : 'h-11',
       TOP_HEIGHT_USER_PREF_RIGHT : 'h-12'
-    }
+    },
 }
 
 export const INNERHTML = {
