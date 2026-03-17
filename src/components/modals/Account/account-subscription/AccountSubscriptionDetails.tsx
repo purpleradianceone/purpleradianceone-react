@@ -371,7 +371,7 @@ const AccountSubscriptionDetails = () => {
             <div className="grid grid-cols-4 gap-6 mb-3 text-sm">
 
                 <MetaField
-                    label="Account Subscription Field"
+                    label="Account Subscription Code"
                     value={accountSubscriptionDetail?.accountSubscriptionCode || "-"}
                 ></MetaField>
 
@@ -581,13 +581,6 @@ const AccountSubscriptionDetails = () => {
             {/* Buttons */}
 
             <div className="flex items-center justify-end gap-2 mt-6">
-
-                <div>
-                    <Button onClick={() => { }} type="button">
-                        Cancel
-                    </Button>
-                </div>
-
                 <div>
 
                     <Button
@@ -595,7 +588,6 @@ const AccountSubscriptionDetails = () => {
                             e.preventDefault();
                             handleUpdate();
                         }}
-                        type="button"
                     >
                         Save
                     </Button>
