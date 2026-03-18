@@ -401,7 +401,7 @@ function SupportTicketManagementList({
                             type="button"
                             onClick={handleCompanyProductPopUp}
                             className="flex items-center gap-2 px-2 py-1 caption-custom border border-gray-300 
-                  rounded-md bg-white hover:bg-gray-50 shadow-sm"
+                              rounded-md bg-white hover:bg-gray-50 shadow-sm"
                           >
                             <ShoppingBag size={14} />
                             <span>Product</span>
@@ -433,6 +433,10 @@ function SupportTicketManagementList({
                             </div>
                           </div>
                         )}
+                        {/* <LookupCompanyProductDropdown
+                        placeholder="Product"
+                        onProductSelected={handleSelectedCompanyProductCheckBoxChange}
+                        /> */}
                       </div>
                     </div>
                   </div>

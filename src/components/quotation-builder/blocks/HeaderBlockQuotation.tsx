@@ -10,8 +10,6 @@ import ConfirmationDialog from "../../dialogue-box/ConfirmationDialogue";
 
 export const HEADER_STORAGE_KEY = "quotation_header_data=";
 
-export const HEADER_LAYOUT_KEY = "header_layout_key=";
-
 export const HeaderBlockQuotation: React.FC = () => {
   const {
     id,
@@ -105,7 +103,7 @@ export const HeaderBlockQuotation: React.FC = () => {
   };
 
   useEffect(() => {
-    const stored = localStorage.getItem(HEADER_LAYOUT_KEY + loginStatus.id);
+    const stored = localStorage.getItem(HEADER_STORAGE_KEY + loginStatus.id);
     if (!stored) return;
 
     try {
