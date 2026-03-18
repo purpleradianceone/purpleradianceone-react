@@ -30,9 +30,8 @@ import {
 import { SectionBlockQuotation } from "../../blocks/SectionBlockQuotation";
 import { SidebarQuotation } from "../../sidebar/SidebarQuotation";
 import { useUserPreference } from "../../../../context/user/UserPreference";
-import Button from "../../../ui/Button";
-import { QuoteIcon, Save } from "lucide-react";
-import { SIZE, STATUS_CODE } from "../../../../constants/AppConstants";
+import { QuoteIcon,  } from "lucide-react";
+import {  STATUS_CODE } from "../../../../constants/AppConstants";
 import COLORS from "../../../../constants/Colors";
 import { ImageBlockQuotation } from "../../blocks/ImageBlockQuotation";
 import { DocumentCanvasQuotation } from "../../blocks/DocumentCanvasQuotation";
@@ -54,6 +53,7 @@ import { handleApiError } from "../../../../config/error/handleApiError";
 import axiosClient from "../../../../axios-client/AxiosClient";
 import POST_API from "../../../../constants/PostApi";
 import AutoScrollWrapper from "../../utils/AutoScrollWrapper";
+import { QuotationTemplateSettingsPanelCreate } from "../../template-panel/QuotationTemplateSettingsPanelCreate";
 
 export const EditorCanvasForQuotation: React.FC = () => {
   const canvasBgColor = "#f9f9f9";
@@ -121,20 +121,7 @@ export const EditorCanvasForQuotation: React.FC = () => {
             </div>
           </div>
 
-          <div className="flex max-w-60 min-h-7 h-8">
-            <Button
-              type="submit"
-              // disabled={!userHasAccessToAddEmailTemplateSetting}
-              onClick={(e) => {
-                e.preventDefault();
-              }}
-            >
-              <div className="flex items-center justify-center gap-1">
-                <Save size={SIZE.SIXTEEN} />
-                <span>Save</span>
-              </div>
-            </Button>
-          </div>
+       
         </div>
         <Editor
           resolver={{
@@ -169,6 +156,7 @@ export const EditorCanvasForQuotation: React.FC = () => {
               </main>
             </AutoScrollWrapper>
           </div>
+                <QuotationTemplateSettingsPanelCreate/>
         </Editor>
       </DynamicFieldsContext.Provider>
     </div>
