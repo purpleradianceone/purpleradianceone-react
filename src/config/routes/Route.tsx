@@ -95,6 +95,7 @@ import MetaAppWhatsappIntegration from "../../components/views/settings/social-m
 import { PageIdIntegrationManagement } from "../../components/views/settings/social-media-integration/meta-app-facebook/PageIdIntegrationManagement";
 import AccountServiceDetails from "../../components/modals/Account/account-service/AccountServiceDetails";
 import AccountSubscriptionDetails from "../../components/modals/Account/account-subscription/AccountSubscriptionDetails";
+import { EditorCanvasForQuotationEdit } from "../../components/quotation-builder/builder/editor-canvas/EditorCanvasForQuotationEdit";
 
 export const router = createBrowserRouter([
   {
@@ -655,13 +656,27 @@ export const router = createBrowserRouter([
     ),
   },
   {
-    path: ROUTES_URL.QUOTATION_SETTINGS_CREATE_Template,
+    path: ROUTES_URL.QUOTATION_SETTINGS_CREATE_TEMPLATE,
     element: (
       <MobileRedirectWrapper>
         <PrivateRoute>
           <div>
             <Navbar>
               <EditorCanvasForQuotation />
+            </Navbar>
+          </div>
+        </PrivateRoute>
+      </MobileRedirectWrapper>
+    ),
+  },
+  {
+    path: ROUTES_URL.QUOTATION_SETTINGS_UPDATE_TEMPLATE,
+    element: (
+      <MobileRedirectWrapper>
+        <PrivateRoute>
+          <div>
+            <Navbar>
+              <EditorCanvasForQuotationEdit />
             </Navbar>
           </div>
         </PrivateRoute>

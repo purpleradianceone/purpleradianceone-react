@@ -1,4 +1,4 @@
-import React, {  useState } from "react";
+import React, { useState } from "react";
 import { useEditor } from "@craftjs/core";
 import { useNavigate } from "react-router-dom";
 
@@ -16,40 +16,56 @@ import axiosClient from "../../../axios-client/AxiosClient";
 import { handleApiError } from "../../../config/error/handleApiError";
 import TextAreaInput from "../../ui/TextAreaInput";
 import {
-  FOOTER_STORAGE_KEY_CREATE,
-  HEADER_STORAGE_KEY_CREATE,
-  PAGE_BLOCK_LAYOUT_Create,
+  FOOTER_STORAGE_KEY_UPDATE,
+  HEADER_STORAGE_KEY_UPDATE,
+  PAGE_BLOCK_LAYOUT_UPDATE,
 } from "../local-storage/LocalStorageKeys";
 import { JsonFileData } from "../quotation-template-types/JsonFileData";
+import QuotationTemplate from "../quotation-template-types/QuotationTemplate";
 import LoadingPopUpAnimation from "../../views/card/LoadingPopUpAnimation";
 
-type QuotationTemplateSettingsPanelCreateProps = {
-  quotationTemplateNamePlaceholder?: string;
+type QuotationTemplateSettingsPanelUpdateProps = {
+  editQuotationTemplateJson?: QuotationTemplate;
 };
 
-export const QuotationTemplateSettingsPanelCreate: React.FC<
-  QuotationTemplateSettingsPanelCreateProps
-> = ({ quotationTemplateNamePlaceholder }) => {
+export const QuotationTemplateSettingsPanelUpdate: React.FC<
+  QuotationTemplateSettingsPanelUpdateProps
+> = ({ editQuotationTemplateJson }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [templateName, setTemplateName] = useState("");
-  const [templateDescription, setTemplateDescription] = useState("");
+  const [isLoadingForQuotationUpdate, setIsLoadingForQuotationUpdate] =
+    useState<boolean>(false);
+
+  const [quotationTemplate, setQuotationTemplate] = useState<QuotationTemplate>(
+    editQuotationTemplateJson ?? {
+      company_id: 0,
+      createdby: "",
+      createdon: "",
+      description: "",
+      id: 0,
+      isactive: false,
+      json_cdn_url: "",
+      json_file_extension: "application/json",
+      json_origin_url: "",
+      name: "",
+      updatedby: "",
+      updatedon: "",
+    },
+  );
 
   const navigate = useNavigate();
   const { query } = useEditor();
   const { loginStatus } = useLoggedInUserContext();
-   const [isLoadingForQuotationUpdate, setIsLoadingForQuotationUpdate] =
-      useState<boolean>(false);
 
   function getCraftJson(): string {
     setIsLoadingForQuotationUpdate(true);
     const storedDefaultHeader = localStorage.getItem(
-      HEADER_STORAGE_KEY_CREATE + loginStatus.id,
+      HEADER_STORAGE_KEY_UPDATE + loginStatus.id,
     );
     const storedDefaultFooter = localStorage.getItem(
-      FOOTER_STORAGE_KEY_CREATE + loginStatus.id,
+      FOOTER_STORAGE_KEY_UPDATE + loginStatus.id,
     );
     const storedDefaultPageLayout = localStorage.getItem(
-      PAGE_BLOCK_LAYOUT_Create + loginStatus.id,
+      PAGE_BLOCK_LAYOUT_UPDATE + loginStatus.id,
     );
     const jsonFileData: JsonFileData = {
       defaultHeader: storedDefaultHeader,
@@ -61,7 +77,7 @@ export const QuotationTemplateSettingsPanelCreate: React.FC<
     return JSON.stringify(jsonFileData);
   }
 
-  const createQuotationTemplate = (resultJson: string) => {
+  const updateQuotationTemplate = (resultJson: string) => {
     try {
       const blob = new Blob([resultJson], { type: "application/json" });
       const file = new File([blob], `quotationTemplate.json`, {
@@ -71,12 +87,14 @@ export const QuotationTemplateSettingsPanelCreate: React.FC<
       const formData = new FormData();
       formData.append("file", file);
       formData.append("company_id", `${loginStatus.companyId}`);
-      formData.append("createdby_id", `${loginStatus.id}`);
-      formData.append("name", templateName);
-      formData.append("description", templateDescription);
+      formData.append("id", `${quotationTemplate.id}`);
+      formData.append("name", quotationTemplate.name);
+      formData.append("description", quotationTemplate.description);
+      formData.append("isactive", "true");
+      formData.append("updatedby_id", `${loginStatus.id}`);
 
       axiosClient
-        .post(POST_API.CREATE_QUOTATION_TEMPLATE, formData, {
+        .post(POST_API.UPDATE_QUOTATION_TEMPLATE, formData, {
           withCredentials: true,
           headers: {
             "Content-Type": "multipart/form-data",
@@ -98,15 +116,14 @@ export const QuotationTemplateSettingsPanelCreate: React.FC<
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .catch((error: ApiError | any) => {
           handleApiError(error);
-        }).finally(()=>{
+        })
+        .finally(() => {
           setIsLoadingForQuotationUpdate(false);
         });
     } catch (error) {
       console.error("Upload failed:", error);
     }
   };
-
-
 
   return (
     <>
@@ -167,7 +184,7 @@ export const QuotationTemplateSettingsPanelCreate: React.FC<
             onSubmit={(e) => {
               e.preventDefault();
               const resultJson = getCraftJson();
-              createQuotationTemplate(resultJson);
+              updateQuotationTemplate(resultJson);
             }}
           >
             <FormHeader
@@ -183,18 +200,32 @@ export const QuotationTemplateSettingsPanelCreate: React.FC<
                 label="Name"
                 type="text"
                 required
-                value={templateName}
-                onChange={(e) => setTemplateName(e.target.value)}
+                value={quotationTemplate.name}
+                onChange={(e) =>
+                  setQuotationTemplate((prev) => {
+                    return {
+                      ...prev,
+                      name: e.target.value,
+                    };
+                  })
+                }
                 placeholder={
-                  quotationTemplateNamePlaceholder ?? "Enter template name"
+                  editQuotationTemplateJson?.name ?? "Enter template name"
                 }
               />
 
               {/* Description */}
               <TextAreaInput
                 label="Description"
-                value={templateDescription}
-                onChange={(e) => setTemplateDescription(e.target.value)}
+                value={quotationTemplate.description}
+                onChange={(e) =>
+                  setQuotationTemplate((prev) => {
+                    return {
+                      ...prev,
+                      description: e.target.value,
+                    };
+                  })
+                }
                 placeholder="Enter description"
                 rows={3}
                 cols={0}
@@ -227,7 +258,7 @@ export const QuotationTemplateSettingsPanelCreate: React.FC<
       {isLoadingForQuotationUpdate && (
         <LoadingPopUpAnimation
           show={isLoadingForQuotationUpdate}
-          text="Creating quotation template..."
+          text="Updating template..."
         />
       )}
     </>
