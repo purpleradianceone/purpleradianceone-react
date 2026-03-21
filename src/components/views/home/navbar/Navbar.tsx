@@ -17,7 +17,6 @@ import {
   Menu,
   MessageCircle,
   Network,
-  Quote,
   Settings,
   SettingsIcon,
   Store,
@@ -54,6 +53,7 @@ import { cancelAllRequests } from "../../../../axios-client/AxiosClient";
 import { LocalStorageKeys } from "../../../../enums/LocalStorageKeys";
 import { AppVersionViewCard } from "../../card/AppVersionViewCard";
 import { useUserPreference } from "../../../../context/user/UserPreference";
+import QuotationIconSvg from "../../../quotation-builder/svg/QuotationIconSvg";
 
 function Navbar({ children }: { children: React.ReactNode }) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -593,7 +593,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
                               label: "Integrations",
                             },
                             {
-                              icon: <Quote size={SIZE.TWENTY} />,
+                              icon: <QuotationIconSvg strokeWidth={2} size={26} className="text-blue-600" showCurrency={true}/>,
                               to: ROUTES_URL.QUOTATION_SETTINGS,
                               label: "Quotation",
                             },
@@ -697,7 +697,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
                           />
                           <NavItem
                             to={ROUTES_URL.QUOTATION_SETTINGS}
-                            icon={<Quote size={SIZE.TWENTY} />}
+                            icon={<QuotationIconSvg strokeWidth={2} size={26} className="text-blue-600" showCurrency={true}/>}
                             onClick={() => setIsDropdownOpen(false)}
                             label=""
                           />

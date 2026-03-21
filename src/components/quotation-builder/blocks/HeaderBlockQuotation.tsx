@@ -7,8 +7,12 @@ import FormInput from "../../ui/FormInput";
 import { SIZE } from "../../../constants/AppConstants";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
 import ConfirmationDialog from "../../dialogue-box/ConfirmationDialogue";
-
-export const HEADER_STORAGE_KEY = "quotation_header_data=";
+import { useSearchParams } from "react-router-dom";
+import {
+  HEADER_STORAGE_KEY_CREATE,
+  HEADER_STORAGE_KEY_UPDATE,
+  searchParamKey,
+} from "../local-storage/LocalStorageKeys";
 
 export const HeaderBlockQuotation: React.FC = () => {
   const {
@@ -34,6 +38,8 @@ export const HeaderBlockQuotation: React.FC = () => {
   const [tempHeight, setTempHeight] = useState(props.height);
   const [tempPadding, setTempPadding] = useState(props.padding);
   const [tempBg, setTempBg] = useState(props.backgroundColor);
+  const [searchParams] = useSearchParams();
+  const quotationTemplateId = searchParams.get(searchParamKey);
 
   /* ===== Save ===== */
   const handleSave = () => {
@@ -46,6 +52,10 @@ export const HeaderBlockQuotation: React.FC = () => {
   };
 
   const saveHeaderToStorage = () => {
+    const pageBlockLayoutKey = quotationTemplateId
+      ? HEADER_STORAGE_KEY_UPDATE
+      : HEADER_STORAGE_KEY_CREATE;
+
     try {
       const editorState = query.getState();
 
@@ -80,7 +90,7 @@ export const HeaderBlockQuotation: React.FC = () => {
       };
 
       localStorage.setItem(
-        HEADER_STORAGE_KEY + loginStatus.id,
+        pageBlockLayoutKey + loginStatus.id,
         JSON.stringify(localStorageData),
       );
     } catch (err) {
@@ -103,7 +113,11 @@ export const HeaderBlockQuotation: React.FC = () => {
   };
 
   useEffect(() => {
-    const stored = localStorage.getItem(HEADER_STORAGE_KEY + loginStatus.id);
+    const pageBlockLayoutKey = quotationTemplateId
+      ? HEADER_STORAGE_KEY_UPDATE
+      : HEADER_STORAGE_KEY_CREATE;
+
+    const stored = localStorage.getItem(pageBlockLayoutKey + loginStatus.id);
     if (!stored) return;
 
     try {
@@ -119,7 +133,11 @@ export const HeaderBlockQuotation: React.FC = () => {
   }, [id]);
 
   useEffect(() => {
-    const stored = localStorage.getItem(HEADER_STORAGE_KEY + loginStatus.id);
+    const pageBlockLayoutKey = quotationTemplateId
+      ? HEADER_STORAGE_KEY_UPDATE
+      : HEADER_STORAGE_KEY_CREATE;
+
+    const stored = localStorage.getItem(pageBlockLayoutKey + loginStatus.id);
     if (!stored) return;
 
     try {

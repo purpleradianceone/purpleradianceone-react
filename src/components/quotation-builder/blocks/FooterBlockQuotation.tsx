@@ -7,8 +7,12 @@ import FormInput from "../../ui/FormInput";
 import { SIZE } from "../../../constants/AppConstants";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
 import ConfirmationDialog from "../../dialogue-box/ConfirmationDialogue";
-
-export const FOOTER_STORAGE_KEY = "quotation_footer_data=";
+import { useSearchParams } from "react-router-dom";
+import {
+  FOOTER_STORAGE_KEY_CREATE,
+  FOOTER_STORAGE_KEY_UPDATE,
+  searchParamKey,
+} from "../local-storage/LocalStorageKeys";
 
 export const FooterBlockQuotation: React.FC = () => {
   const {
@@ -39,6 +43,9 @@ export const FooterBlockQuotation: React.FC = () => {
   const [tempPadding, setTempPadding] = useState(props.padding);
   const [tempBg, setTempBg] = useState(props.backgroundColor);
 
+  const [searchParams] = useSearchParams();
+  const quotationTemplateId = searchParams.get(searchParamKey);
+
   /* ===== Save ===== */
   const handleSave = () => {
     setProp((p: any) => {
@@ -51,6 +58,9 @@ export const FooterBlockQuotation: React.FC = () => {
   };
 
   const saveFooterToStorage = () => {
+    const footerStorageKey = quotationTemplateId
+      ? FOOTER_STORAGE_KEY_UPDATE
+      : FOOTER_STORAGE_KEY_CREATE;
     try {
       const editorState = query.getState();
 
@@ -87,7 +97,7 @@ export const FooterBlockQuotation: React.FC = () => {
       console.log(localStorageData);
 
       localStorage.setItem(
-        FOOTER_STORAGE_KEY + loginStatus.id,
+        footerStorageKey + loginStatus.id,
         JSON.stringify(localStorageData),
       );
       setIsConfirmationPopupOpen(false);
@@ -103,7 +113,11 @@ export const FooterBlockQuotation: React.FC = () => {
   };
 
   useEffect(() => {
-    const stored = localStorage.getItem(FOOTER_STORAGE_KEY + loginStatus.id);
+    const footerStorageKey = quotationTemplateId
+      ? FOOTER_STORAGE_KEY_UPDATE
+      : FOOTER_STORAGE_KEY_CREATE;
+
+    const stored = localStorage.getItem(footerStorageKey + loginStatus.id);
     if (!stored) return;
 
     try {
@@ -119,7 +133,11 @@ export const FooterBlockQuotation: React.FC = () => {
   }, [id]);
 
   useEffect(() => {
-    const stored = localStorage.getItem(FOOTER_STORAGE_KEY + loginStatus.id);
+    const footerStorageKey = quotationTemplateId
+      ? FOOTER_STORAGE_KEY_UPDATE
+      : FOOTER_STORAGE_KEY_CREATE;
+
+    const stored = localStorage.getItem(footerStorageKey + loginStatus.id);
     if (!stored) return;
 
     try {

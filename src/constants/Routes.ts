@@ -63,7 +63,8 @@ const ROUTES_URL = {
 
   // Quotation module
   QUOTATION_SETTINGS: "/settings/quotations",
-  QUOTATION_SETTINGS_CREATE_Template: "/settings/quotations/create",
+  QUOTATION_SETTINGS_CREATE_TEMPLATE: "/settings/quotations/create",
+  QUOTATION_SETTINGS_UPDATE_TEMPLATE: "/settings/quotations/update",
 
   // Account module
   ACCOUNT_MANAGEMENT: "/home/manage-accounts/accounts",

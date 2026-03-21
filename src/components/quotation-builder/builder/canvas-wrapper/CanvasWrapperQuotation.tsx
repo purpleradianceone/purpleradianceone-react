@@ -4,7 +4,12 @@ import { useEffect, useState } from "react";
 import { DocumentCanvasQuotation } from "../../blocks/DocumentCanvasQuotation";
 import { LucideClipboardPaste, Redo, Undo } from "lucide-react";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
-export const STORAGE_KEY = "quotation_editor_json_user_id=";
+import {
+  searchParamKey,
+  STORAGE_KEY_CREATE,
+  STORAGE_KEY_UPDATE,
+} from "../../local-storage/LocalStorageKeys";
+import { useSearchParams } from "react-router-dom";
 
 export const CanvasWrapperQuotation = ({ data }: { data: string }) => {
   const { canUndo, canRedo, actions, query, store } = useEditor(
@@ -14,6 +19,9 @@ export const CanvasWrapperQuotation = ({ data }: { data: string }) => {
       canRedo: query.history.canRedo(),
     }),
   );
+  const [searchParams] = useSearchParams();
+  const quotationTemplateId = searchParams.get(searchParamKey);
+
   const [isEmpty, setIsEmpty] = useState(true);
   const { loginStatus } = useLoggedInUserContext();
 
@@ -39,8 +47,11 @@ export const CanvasWrapperQuotation = ({ data }: { data: string }) => {
         const data = JSON.parse(serialized);
         const result = isCanvasTrulyEmpty(data, "ROOT");
         // console.log(`Craft Json: ${serialized}`);
+        const storageKey = !quotationTemplateId
+          ? STORAGE_KEY_CREATE
+          : STORAGE_KEY_UPDATE;
         if (!result)
-          localStorage.setItem(STORAGE_KEY + loginStatus.id, serialized);
+          localStorage.setItem(storageKey + loginStatus.id, serialized);
       },
     );
 
