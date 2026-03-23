@@ -245,7 +245,7 @@ function CreateLeadModal({
     if (name === "email" && !VALIDATIONS.EMAIL.test(value) && value !== "") {
       setError((prev) => ({
         ...prev,
-        email: "please enter invalid email address.",
+        email: "please enter valid email address.",
       }));
     } else {
       setError((prev) => ({

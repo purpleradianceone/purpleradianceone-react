@@ -81,21 +81,7 @@ function MetaAppsIntegration() {
         <div
           className={`w-full border ${facebookStatus.isActive ? "bg-green-100 border-green-300 text-green-700" : "bg-red-100 border-red-300 text-red-700"}    px-4 py-3 rounded-md flex items-center justify-center gap-2`}
         >
-          <AlertCircle size={18} />
-          {/* <span className="font-medium">
-            {facebookStatus.message}!
-          </span> */}
-          {/* {
-            facebookStatus.status && (
-              <PageLayout>
-
-              <FormLayout width={2} >
-                <FacebookLeadAccessSetupPage/>
-              </FormLayout>
-              </PageLayout>
-            )
-          } */}
-          
+          <AlertCircle size={18} />          
           {facebookStatus.isActive ? (
             <span className="font-medium ">
             Facebook page is connected, integrate pages on another tab.
@@ -105,7 +91,6 @@ function MetaAppsIntegration() {
             </span>}
         </div>
       }
-
       <MetaIntegration faceBookConnectionStatus={facebookStatus} getFacebookStatus={getFacebookStatus} />
     </div>
   );

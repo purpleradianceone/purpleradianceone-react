@@ -91,11 +91,13 @@ import StockAgeingManagement from "../../components/views/stock-management/Stock
 import ReminderSetting from "../../components/views/settings/reminder/ReminderSetting";
 import { MetaAppsIntegrationTabsBreadcrumb } from "../../components/views/settings/social-media-integration/MetaAppsIntergrationTabsBreadcrumb";
 import { FacebookBreadCrumb } from "../../components/views/settings/social-media-integration/meta-app-facebook/FacebookBreadcrumb";
-import MetaAppWhatsappIntegration from "../../components/views/settings/social-media-integration/meta-app-whatsapp/MetaAppWhatsappIntegration";
 import { PageIdIntegrationManagement } from "../../components/views/settings/social-media-integration/meta-app-facebook/PageIdIntegrationManagement";
 import AccountServiceDetails from "../../components/modals/Account/account-service/AccountServiceDetails";
 import AccountSubscriptionDetails from "../../components/modals/Account/account-subscription/AccountSubscriptionDetails";
+import WhatsappOAuthConsent from "../../components/dialogue-box/WhatsappOAuthConsent";
+import { WhatsappPhoneNumberIntegrationManagement } from "../../components/views/settings/social-media-integration/meta-app-whatsapp/WhatsappPhoneNumberIntegrationManagement";
 import { EditorCanvasForQuotationEdit } from "../../components/quotation-builder/builder/editor-canvas/EditorCanvasForQuotationEdit";
+
 
 export const router = createBrowserRouter([
   {
@@ -910,6 +912,17 @@ export const router = createBrowserRouter([
     ],
   },
   {
+    path: ROUTES_URL.WHATSAPP_OAUTH,
+    element: (
+      <MobileRedirectWrapper>
+        <PrivateRoute>
+          <WhatsappOAuthConsent/>
+          {/* <FacebookOAuthConsent /> */}
+        </PrivateRoute>
+      </MobileRedirectWrapper>
+    ),
+  },
+   {
     path: ROUTES_URL.FACEBOOK_OAUTH,
     element: (
       <MobileRedirectWrapper>
@@ -1023,12 +1036,44 @@ export const router = createBrowserRouter([
         <PrivateRoute>
           <div>
             <Navbar>
-              <MetaAppWhatsappIntegration/>
+              <WhatsappPhoneNumberIntegrationManagement/>
+              {/* <WhatsappPhoneNumberAddition /> */}
+              {/* <WhatsappBreadCrumb/> */}
             </Navbar>
           </div>
         </PrivateRoute>
       </MobileRedirectWrapper>
     ),
+    // children : [
+    //   {
+    //     index: true,
+    //     element: (
+    //       <ModuleGuard
+    //         permissionKey="userHasAccessToViewIntegrationSetting"
+    //         deniedMessage={
+    //           MESSAGE.MODULE_ACCESS.SETTING.INTEGRATION.DENIED_VIEW_ACCESS
+    //         }
+    //       >
+    //         <WhatsappOAuthIntegration/>
+    //         {/* <MetaAppsIntegration /> */}
+    //       </ModuleGuard>
+    //     ),
+    //   },
+    //   {
+    //     path: ROUTES_URL.SETTING_META_APP_INTEGRATION_WHATSAPP_PHONE_NUMBER_ADDITION,
+    //     element: (
+    //       <ModuleGuard
+    //         permissionKey="userHasAccessToViewIntegrationSetting"
+    //         deniedMessage={
+    //           MESSAGE.MODULE_ACCESS.SETTING.INTEGRATION.DENIED_VIEW_ACCESS
+    //         }
+    //       >
+    //         <WhatsappPhoneNumberAddition/>
+    //         {/* <PageIdIntegrationManagement /> */}
+    //       </ModuleGuard>
+    //     ),
+    //   },
+    // ]
   },
   {
     path: ROUTES_URL.SETTING_META_APP_INTEGRATION_FACEBOOK,

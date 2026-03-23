@@ -7,7 +7,7 @@ export interface BlockCardProps {
   id: number;
   name: string;
   description: string;
-  logo: LucideIcon | IconType; // image URL
+  logo: LucideIcon | IconType | string; // image URL
   onClick?: (id: number) => void;
 }
 
@@ -25,6 +25,7 @@ const BlockCard: React.FC<BlockCardProps> = ({
     >
       <div className={style.blockLogoWrapper}>
         <Logo size={20} className={style.logoColor}/>
+        {/* <img src={image}></img> */}
         {/* <img src={logo} alt={name} className="block-logo" /> */}
       </div>
 
