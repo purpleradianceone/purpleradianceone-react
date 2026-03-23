@@ -22,7 +22,7 @@ function AccountSubscriptionManagementAgGrid({
       {
         hide: false,
         field: "accountSubscriptionCode",
-        headerName: "Account Subscription Code",
+        headerName: "Code",
         minWidth: 130,
       },
 
@@ -46,13 +46,13 @@ function AccountSubscriptionManagementAgGrid({
         filter: true,
       },
 
-{
+      {
         field: "endDate",
         headerName: "End Date",
         sortable: true,
         filter: true,
       },
-    
+
       {
         field: "isRenewal",
         headerName: "Is Renewal",
@@ -125,7 +125,7 @@ function AccountSubscriptionManagementAgGrid({
                   params.context.handleRowSelect(params.data);
                 }}
               >
-                {isUsedInSupportTicketModule ? "Details" : "Select"}
+                {isUsedInSupportTicketModule ? "Select" : "Details"}
               </span>
             </div>
           );

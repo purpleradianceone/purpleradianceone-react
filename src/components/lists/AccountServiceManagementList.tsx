@@ -1,7 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Headset, TicketPlus, } from "lucide-react";
-import useScreenSize from "../../config/hooks/useScreenSize";
-import { JSX_CHILDREN_NAME, SIZE } from "../../constants/AppConstants";
+
 import Button from "../ui/Button";
 import { useUserAccessModules } from "../../config/hooks/useAccessModules";
 import { useEffect, useState } from "react";
@@ -49,7 +47,7 @@ function AccountServiceManagementList({
   const navigate = useNavigate();
   const { position } = usePanel();
   const { userPreference } = useUserPreference();
-  const { isLargeScreen, isMediumScreen, isSmallScreen } = useScreenSize();
+
   const {
     userHasAccessToViewAccountService,
     userHasAccessToAddAccountService,
@@ -145,28 +143,12 @@ function AccountServiceManagementList({
                       w-full
                     `}
           >
-            {/* LEFT SECTION - Support Label */}
+            {/* LEFT SECTION - Account Service Label */}
 
             <div className="flex gap-1 items-center w-fit">
-              {!isSmallScreen && (
-                <Headset
-                  className={`${isCustomDateOptionSelected
-                    ? "w-4 h-4 text-blue-600"
-                    : COLORS.GRID_HEADER_ICONS_COLOR_AND_SIZE
-                    } `}
-                />
-              )}
-
-              {(isMediumScreen || isLargeScreen) && (
-                <span
-                  className={`${isCustomDateOptionSelected
-                    ? "text-xs"
-                    : "section-header-custom"
-                    } `}
-                >
-                  Account Service
-                </span>
-              )}
+              <h3 className="table-header-custom rounded-t-md px-1">
+                Account Service
+              </h3>
             </div>
 
             <div className="flex flex-wrap items-center gap-2 w-fit">
@@ -241,19 +223,13 @@ function AccountServiceManagementList({
                       />
                     )}
                   </div>
-
-
                 </div>
 
                 <div className="flex gap-1 justify-end w-fit">
                   <Button
-                    type="submit"
+                    type="button"
                     disabled={!userHasAccessToAddAccountService}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      console.log('------------------');
-                      console.log(userHasAccessToAddAccountService);
-                      console.log('------------------');
+                    onClick={() => {
                       if (!userHasAccessToAddAccountService) {
                         toast.error(
                           MESSAGE.MODULE_ACCESS.ACCOUNT_SERVICE
@@ -263,12 +239,9 @@ function AccountServiceManagementList({
                       }
                       setIsCreateAccountServiceModalOpen(true);
                     }}
+                    className={COLORS.ADD_BUTTON}
                   >
-                    <span className="flex items-center gap-1">
-                      {!isSmallScreen && <TicketPlus size={SIZE.SIXTEEN} />}
-                      {isSmallScreen && <TicketPlus size={SIZE.EIGHT} />}
-                      {isLargeScreen && JSX_CHILDREN_NAME.CREATE_SUPPORT_TICKET}
-                    </span>
+                    +Add
                   </Button>
                 </div>
               </div>

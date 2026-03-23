@@ -1,7 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Layers, TicketPlus, } from "lucide-react";
-import useScreenSize from "../../config/hooks/useScreenSize";
-import { JSX_CHILDREN_NAME, SIZE } from "../../constants/AppConstants";
+
 import Button from "../ui/Button";
 import { useUserAccessModules } from "../../config/hooks/useAccessModules";
 import { useEffect, useState } from "react";
@@ -44,7 +42,7 @@ function AccountSubscriptionManagementList({
   const navigate = useNavigate();
   const { position } = usePanel();
   const { userPreference } = useUserPreference();
-  const { isLargeScreen, isMediumScreen, isSmallScreen } = useScreenSize();
+
 
   const {
     userHasAccessToViewAccountSubscription,
@@ -130,25 +128,10 @@ function AccountSubscriptionManagementList({
           className={`z-10 top-12 mt-1 p-1 flex items-center justify-between gap-3 text-sm 
           ${COLORS.GRID_HEADER_SECTION_BG_COLOR} rounded-lg shadow-sm mb-1.5 w-full`}
         >
-
           <div className="flex gap-1 items-center w-fit">
-            {!isSmallScreen && (
-              <Layers
-                className={`${isCustomDateOptionSelected
-                  ? "w-4 h-4 text-blue-600"
-                  : COLORS.GRID_HEADER_ICONS_COLOR_AND_SIZE
-                  }`}
-              />
-            )}
-
-            {(isMediumScreen || isLargeScreen) && (
-              <span
-                className={`${isCustomDateOptionSelected ? "text-xs" : "section-header-custom"
-                  }`}
-              >
-                Account Subscription
-              </span>
-            )}
+            <h3 className="table-header-custom rounded-t-md px-1 ">
+              Account Subscription
+            </h3>
           </div>
 
           <div className="flex items-center gap-2 w-fit">
@@ -190,26 +173,25 @@ function AccountSubscriptionManagementList({
               )}
 
 
-              <Button
-                type="submit"
-                disabled={!userHasAccessToAddAccountSubscription}
-                onClick={(e) => {
-                  e.preventDefault();
-                  if (!userHasAccessToAddAccountSubscription) {
-                    toast.error(
-                      MESSAGE.MODULE_ACCESS.ACCOUNT_SUBSCRIPTION.DENIED_ADD_ACCESS,
-                    );
-                    return;
-                  }
-                  setIsCreateAccountSubscriptionModalOpen(true);
-                }}
-              >
-                <span className="flex items-center gap-1">
-                  {!isSmallScreen && <TicketPlus size={SIZE.SIXTEEN} />}
-                  {isSmallScreen && <TicketPlus size={SIZE.EIGHT} />}
-                  {isLargeScreen && JSX_CHILDREN_NAME.CREATE_SUPPORT_TICKET}
-                </span>
-              </Button>
+              <div className="flex gap-1 justify-end w-fit">
+                <Button
+                  type="button"
+                  disabled={!userHasAccessToAddAccountSubscription}
+                  onClick={() => {
+                    if (!userHasAccessToAddAccountSubscription) {
+                      toast.error(
+                        MESSAGE.MODULE_ACCESS.ACCOUNT_SUBSCRIPTION.DENIED_ADD_ACCESS,
+                      );
+                      return;
+                    }
+                    setIsCreateAccountSubscriptionModalOpen(true);
+                  }}
+                  className={COLORS.ADD_BUTTON}
+                >
+                  +Add
+                </Button>
+              </div>
+
             </div>
           </div>
 
