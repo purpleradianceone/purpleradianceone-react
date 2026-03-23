@@ -58,6 +58,9 @@ export const PageBlockQuotation: React.FC = () => {
   const [isFooterRequired, setIsFooterRequired] = useState<boolean>(hasFooter);
 
   const handleSave = () => {
+    const pageBlockLayoutKey = quotationTemplateId
+      ? PAGE_BLOCK_LAYOUT_UPDATE
+      : PAGE_BLOCK_LAYOUT_Create;
     if (isHeaderRequired) {
       if (!hasHeader) {
         addHeader();
@@ -81,6 +84,10 @@ export const PageBlockQuotation: React.FC = () => {
       p.isHeader = isHeaderRequired;
       p.isFooter = isFooterRequired;
     });
+    const result = localStorage.getItem(pageBlockLayoutKey+loginStatus.id);
+    if(!result){
+      handleSavePageLayout();
+    }
     setEditing(false);
   };
 
