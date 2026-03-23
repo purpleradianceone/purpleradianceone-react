@@ -49,10 +49,17 @@ export const HeaderBlockQuotation: React.FC = () => {
       p.backgroundColor = tempBg;
     });
     setEditing(false);
+    const headerBlockStorageKey = quotationTemplateId
+      ? HEADER_STORAGE_KEY_UPDATE
+      : HEADER_STORAGE_KEY_CREATE;
+    const result = localStorage.getItem(headerBlockStorageKey+loginStatus.id);
+    if(!result){
+      saveHeaderToStorage();
+    }
   };
 
   const saveHeaderToStorage = () => {
-    const pageBlockLayoutKey = quotationTemplateId
+    const headerBlockStorageKey = quotationTemplateId
       ? HEADER_STORAGE_KEY_UPDATE
       : HEADER_STORAGE_KEY_CREATE;
 
@@ -90,7 +97,7 @@ export const HeaderBlockQuotation: React.FC = () => {
       };
 
       localStorage.setItem(
-        pageBlockLayoutKey + loginStatus.id,
+        headerBlockStorageKey + loginStatus.id,
         JSON.stringify(localStorageData),
       );
     } catch (err) {
@@ -113,11 +120,11 @@ export const HeaderBlockQuotation: React.FC = () => {
   };
 
   useEffect(() => {
-    const pageBlockLayoutKey = quotationTemplateId
+    const headerBlockStorageKey = quotationTemplateId
       ? HEADER_STORAGE_KEY_UPDATE
       : HEADER_STORAGE_KEY_CREATE;
 
-    const stored = localStorage.getItem(pageBlockLayoutKey + loginStatus.id);
+    const stored = localStorage.getItem(headerBlockStorageKey + loginStatus.id);
     if (!stored) return;
 
     try {
@@ -133,11 +140,11 @@ export const HeaderBlockQuotation: React.FC = () => {
   }, [id]);
 
   useEffect(() => {
-    const pageBlockLayoutKey = quotationTemplateId
+    const headerBlockStorageKey = quotationTemplateId
       ? HEADER_STORAGE_KEY_UPDATE
       : HEADER_STORAGE_KEY_CREATE;
 
-    const stored = localStorage.getItem(pageBlockLayoutKey + loginStatus.id);
+    const stored = localStorage.getItem(headerBlockStorageKey + loginStatus.id);
     if (!stored) return;
 
     try {

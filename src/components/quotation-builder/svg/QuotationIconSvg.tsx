@@ -63,7 +63,7 @@ const QuotationIconSvg: React.FC<QuotationIconProps> = ({
   strokeWidth = 2,
   className = "text-blue-600",
   showCurrency = false,
-  currency = "₹",
+  currency,
 }) => {
 
     const{userPreference}= useUserPreference();

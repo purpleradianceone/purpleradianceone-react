@@ -4,7 +4,7 @@ import axiosClient from "../../axios-client/AxiosClient";
 import { handleApiError } from "../../config/error/handleApiError";
 import { useUserPreference } from "../../context/user/UserPreference";
 import { useNavigate } from "react-router-dom";
-import {  STATUS_CODE } from "../../constants/AppConstants";
+import { STATUS_CODE } from "../../constants/AppConstants";
 import MESSAGE from "../../constants/Messages";
 import toast from "react-hot-toast";
 import COLORS from "../../constants/Colors";
@@ -27,7 +27,12 @@ import QuotationTemplate from "./quotation-template-types/QuotationTemplate";
 import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
 import RefreshToken from "../../config/validations/RefreshToken";
 import QuotationIconSvg from "./svg/QuotationIconSvg";
-import { FOOTER_STORAGE_KEY_UPDATE, HEADER_STORAGE_KEY_UPDATE, PAGE_BLOCK_LAYOUT_UPDATE, STORAGE_KEY_UPDATE } from "./local-storage/LocalStorageKeys";
+import {
+  FOOTER_STORAGE_KEY_UPDATE,
+  HEADER_STORAGE_KEY_UPDATE,
+  PAGE_BLOCK_LAYOUT_UPDATE,
+  STORAGE_KEY_UPDATE,
+} from "./local-storage/LocalStorageKeys";
 
 export const QuotationPage: React.FC = () => {
   const { userPreference } = useUserPreference();
@@ -99,18 +104,17 @@ export const QuotationPage: React.FC = () => {
       setOffset(0);
       setHasMoreTemplates(true);
       getTemplatesOfCompany({ reset: true });
-
     }
   }, [dateRangeId, concatDate, searchParameter]);
 
-  useEffect(()=>{
-      localStorage.removeItem(STORAGE_KEY_UPDATE+loginStatus.id);
-      localStorage.removeItem(PAGE_BLOCK_LAYOUT_UPDATE+loginStatus.id);
-      localStorage.removeItem(HEADER_STORAGE_KEY_UPDATE+loginStatus.id);
-      localStorage.removeItem(FOOTER_STORAGE_KEY_UPDATE+loginStatus.id);
-  },[]);
+  useEffect(() => {
+    localStorage.removeItem(STORAGE_KEY_UPDATE + loginStatus.id);
+    localStorage.removeItem(PAGE_BLOCK_LAYOUT_UPDATE + loginStatus.id);
+    localStorage.removeItem(HEADER_STORAGE_KEY_UPDATE + loginStatus.id);
+    localStorage.removeItem(FOOTER_STORAGE_KEY_UPDATE + loginStatus.id);
+  }, []);
 
-  // const handleQuotationPdf = async () => {
+  // const handleDemoQuotationPdf = async () => {
   //   try {
   //     const payload = {
   //       quotationId: "QT-2026-0001",
@@ -122,6 +126,7 @@ export const QuotationPage: React.FC = () => {
   //           includeHeader: true,
   //           includeFooter: false,
   //           headerTemplate: "base_template_quotation/headers/quotation-header",
+  //           // headerTemplate: "<div> <div>Demo header </div> <hr/></div>",
   //           footerTemplate: "base_template_quotation/footers/quotation-footer",
   //           contentHtml: sanitizeToXhtml(
   //             "<div>" +
@@ -206,6 +211,108 @@ export const QuotationPage: React.FC = () => {
 
   //     const response = await axiosClient.post(
   //       POST_API.DEMO_QUOTATION_PDF,
+  //       payload,
+  //       {
+  //         responseType: "blob",
+  //         headers: { "Content-Type": "application/json" },
+  //         withCredentials: true,
+  //       },
+  //     );
+
+  //     const pdfBlob = new Blob([response.data], {
+  //       type: "application/pdf",
+  //     });
+
+  //     const url = window.URL.createObjectURL(pdfBlob);
+  //     window.open(url);
+
+  //     const a = document.createElement("a");
+  //     a.href = url;
+  //     a.download = `${payload.quotationId}.pdf`;
+  //     document.body.appendChild(a);
+  //     a.click();
+  //     document.body.removeChild(a);
+  //   } catch (error) {
+  //     console.error("Failed to generate quotation PDF", error);
+  //     handleApiError(error);
+  //   }
+  // };
+
+
+
+  // const handleQuotationPdfGeneration = async () => {
+  //   try {
+  //     const payload = {
+  //       quotationId: "QT-2026-0001",
+  //       quotation_template_id: 3,
+  //       company_id: loginStatus.companyId,
+  //       generatedby_id: loginStatus.id,
+  //       quotation_account: {
+  //         id: 101,
+  //         company_id: 1,
+  //         name: "TechNova Solutions Pvt Ltd",
+  //         email: "contact@technova.com",
+  //         mobilenumber: "9876543210",
+  //         industry_type_id: 3,
+  //         industry_type_name: "Information Technology",
+  //         business_type_id: 2,
+  //         business_type_name: "Private Limited",
+  //         country_id: 101,
+  //         state_id: 27,
+  //         district_id: 501,
+  //         country_name: "India",
+  //         state_name: "Maharashtra",
+  //         district_name: "Pune",
+  //         pan: "ABCDE1234F",
+  //         gst: "27ABCDE1234F1Z5",
+  //         tan: "PNEA12345B",
+  //         billing_address: "Office No. 12, Hinjewadi Phase 1, Pune - 411057",
+  //         shipping_address: "Warehouse 5, MIDC, Pune - 411018",
+  //         registered_office_address: "TechNova HQ, Baner Road, Pune - 411045",
+  //         business_registration_number: "U12345MH2020PTC123456",
+  //         website: "https://www.technova.com",
+  //         isactive: true,
+  //         createdby: "admin@technova.com",
+  //         createdon: "2026-03-23T10:30:00",
+  //         requestedby: 45,
+  //         lead_id: 789,
+  //         company_account_type_id_array: [1, 2, 4],
+  //         createdby_id: 10,
+  //         updatedby_id: 12,
+  //       },
+  //       quotation_items: [
+  //         {
+  //           productName: "Laptop Dell Inspiron 15",
+  //           quantity: 2,
+  //           unitPrice: 55000.0,
+  //           discountPercent: 10.0,
+  //           gstPercent: 18.0,
+  //           cgstPercent: 9.0,
+  //           lineSubTotal: 99000.0,
+  //         },
+  //         {
+  //           productName: "Wireless Mouse Logitech M235",
+  //           quantity: 5,
+  //           unitPrice: 800.0,
+  //           discountPercent: 5.0,
+  //           gstPercent: 18.0,
+  //           cgstPercent: 9.0,
+  //           lineSubTotal: 3800.0,
+  //         },
+  //         {
+  //           productName: "Office Chair Ergonomic",
+  //           quantity: 3,
+  //           unitPrice: 7000.0,
+  //           discountPercent: 15.0,
+  //           gstPercent: 18.0,
+  //           cgstPercent: 9.0,
+  //           lineSubTotal: 17850.0,
+  //         },
+  //       ],
+  //     };
+
+  //     const response = await axiosClient.post(
+  //       POST_API.QUOTATION_PDF_GENERATION,
   //       payload,
   //       {
   //         responseType: "blob",
@@ -335,7 +442,12 @@ export const QuotationPage: React.FC = () => {
         <div className="flex justify-start items-center w-fit gap-5">
           <div className="flex justify-center items-center gap-1">
             {/* <Quote className={COLORS.GRID_HEADER_ICONS_COLOR_AND_SIZE} /> */}
-            <QuotationIconSvg strokeWidth={2} size={24} className="text-blue-600" showCurrency={true}/>
+            <QuotationIconSvg
+              strokeWidth={2}
+              size={24}
+              className="text-blue-600"
+              showCurrency={true}
+            />
             <span className="section-header-custom">Quotation Template</span>
           </div>
 
@@ -383,25 +495,42 @@ export const QuotationPage: React.FC = () => {
           </div>
         </div>
 
-        <div className="flex max-w-60 min-h-7 h-8">
-          <Button
-            type="submit"
-            disabled={!userHasAccessToAddQuotationTemplate}
-            onClick={(e) => {
-              e.preventDefault();
-              if (userHasAccessToAddQuotationTemplate) {
-                navigate(ROUTES_URL.QUOTATION_SETTINGS_CREATE_TEMPLATE);
-              } else {
-                toast.error(MESSAGE.ERROR.NOT_ATHORISED);
-              }
-            }}
-          >
-            <div className="flex items-center justify-center gap-1">
-              {/* <Quote size={SIZE.SIXTEEN} /> */}
-              <QuotationIconSvg strokeWidth={2} size={16} className="text-white" showCurrency={true}/>
-              <span>Create Quotation Template</span>
-            </div>
-          </Button>
+        <div className="flex max-w-fit min-h-7 h-8">
+          <div>
+            <Button
+              type="submit"
+              disabled={!userHasAccessToAddQuotationTemplate}
+              onClick={(e) => {
+                e.preventDefault();
+                if (userHasAccessToAddQuotationTemplate) {
+                  navigate(ROUTES_URL.QUOTATION_SETTINGS_CREATE_TEMPLATE);
+                } else {
+                  toast.error(MESSAGE.ERROR.NOT_ATHORISED);
+                }
+              }}
+            >
+              <div className="flex items-center justify-center gap-1">
+                {/* <Quote size={SIZE.SIXTEEN} /> */}
+                <QuotationIconSvg
+                  strokeWidth={2}
+                  size={16}
+                  className="text-white"
+                  showCurrency={true}
+                />
+                <span>Create Quotation Template</span>
+              </div>
+            </Button>
+          </div>
+          {/* <div>
+            <Button type="button" onClick={handleDemoQuotationPdf}>
+              Demo Quotation Preview
+            </Button>
+          </div> */}
+          {/* <div>
+            <Button type="button" onClick={handleQuotationPdfGeneration}>
+              Quotation Generation
+            </Button>
+          </div> */}
         </div>
       </div>
 

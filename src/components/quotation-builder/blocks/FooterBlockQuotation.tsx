@@ -55,10 +55,18 @@ export const FooterBlockQuotation: React.FC = () => {
     });
     setEditing(false);
     // saveFooterToStorage();
+    const footerBlockStorageKey = quotationTemplateId
+      ? FOOTER_STORAGE_KEY_UPDATE
+      : FOOTER_STORAGE_KEY_CREATE;
+
+      const result = localStorage.getItem(footerBlockStorageKey+loginStatus.id);
+      if(!result){
+        saveFooterToStorage();
+      }
   };
 
   const saveFooterToStorage = () => {
-    const footerStorageKey = quotationTemplateId
+    const footerBlockStorageKey = quotationTemplateId
       ? FOOTER_STORAGE_KEY_UPDATE
       : FOOTER_STORAGE_KEY_CREATE;
     try {
@@ -97,7 +105,7 @@ export const FooterBlockQuotation: React.FC = () => {
       console.log(localStorageData);
 
       localStorage.setItem(
-        footerStorageKey + loginStatus.id,
+        footerBlockStorageKey + loginStatus.id,
         JSON.stringify(localStorageData),
       );
       setIsConfirmationPopupOpen(false);
@@ -113,11 +121,11 @@ export const FooterBlockQuotation: React.FC = () => {
   };
 
   useEffect(() => {
-    const footerStorageKey = quotationTemplateId
+    const footerBlockStorageKey = quotationTemplateId
       ? FOOTER_STORAGE_KEY_UPDATE
       : FOOTER_STORAGE_KEY_CREATE;
 
-    const stored = localStorage.getItem(footerStorageKey + loginStatus.id);
+    const stored = localStorage.getItem(footerBlockStorageKey + loginStatus.id);
     if (!stored) return;
 
     try {
@@ -133,11 +141,11 @@ export const FooterBlockQuotation: React.FC = () => {
   }, [id]);
 
   useEffect(() => {
-    const footerStorageKey = quotationTemplateId
+    const footerBlockStorageKey = quotationTemplateId
       ? FOOTER_STORAGE_KEY_UPDATE
       : FOOTER_STORAGE_KEY_CREATE;
 
-    const stored = localStorage.getItem(footerStorageKey + loginStatus.id);
+    const stored = localStorage.getItem(footerBlockStorageKey + loginStatus.id);
     if (!stored) return;
 
     try {
