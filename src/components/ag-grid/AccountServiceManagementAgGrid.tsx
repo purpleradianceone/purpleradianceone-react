@@ -22,7 +22,7 @@ function AccountServiceManagementAgGrid({
       {
         hide: false,
         field: "accountServiceCode",
-        headerName: "Account Service Code",
+        headerName: "Code",
         minWidth: 130,
       },
 
@@ -41,7 +41,7 @@ function AccountServiceManagementAgGrid({
 
       {
         field: "serviceDateTime",
-        headerName: "Service Date Time",
+        headerName: "Date Time",
         sortable: true,
         filter: true,
       },
@@ -111,7 +111,7 @@ function AccountServiceManagementAgGrid({
                   params.context.handleRowSelect(params.data);
                 }}
               >
-                {isUsedInSupportTicketModule ? "Details" : "Select"}
+                {isUsedInSupportTicketModule ? "Select" : "Details"}
               </span>
             </div>
           );
