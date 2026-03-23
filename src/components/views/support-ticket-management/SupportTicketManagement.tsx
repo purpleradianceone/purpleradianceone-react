@@ -243,7 +243,7 @@ function SupportTicketManagement({
     }
   };
 
-  const handleSelectedAssignToCheckBoxChange = (
+  const handleSelectedAssignToChange = (
     params: LookupCompanyUser | null,
   ) => {
     if (params) {
@@ -264,7 +264,7 @@ function SupportTicketManagement({
     }
   };
 
-  const handleSelectedCompanyProductCheckBoxChange = (
+  const handleSelectedCompanyProductChange = (
     params: LookupCompanyProduct | null,
   ) => {
     if (params) {
@@ -280,7 +280,7 @@ function SupportTicketManagement({
     }
   };
 
-  const handleSelectedResolvedByCheckBoxChange = (
+  const handleSelectedResolvedByChange = (
     params: LookupCompanyUser | null,
   ) => {
     if (params) {
@@ -423,20 +423,16 @@ function SupportTicketManagement({
             }}
             selectedAssignTo={selectedAssignTo}
             handleSelectedAssignToCheckBoxChange={
-              handleSelectedAssignToCheckBoxChange
+              handleSelectedAssignToChange
             }
-            // persistedSelectedUserId={
-            //   selectedAssignTo.id !== 0 ? selectedAssignTo.id : null
-            // }
+          
             selectedResolvedBy={selectedResolvedBy}
             handleSelectedResolvedByCheckBoxChange={
-              handleSelectedResolvedByCheckBoxChange
+              handleSelectedResolvedByChange
             }
-            // persistedSelectedResolvedById={
-            //   selectedResolvedBy.id !== 0 ? selectedResolvedBy.id : null
-            // }
+          
             handleSelectedCompanyProductCheckBoxChange={
-              handleSelectedCompanyProductCheckBoxChange
+              handleSelectedCompanyProductChange
             }
             selectedCompanyProduct={selectedCompanyProduct}
             supportTicketCategory={supportTicketCategory!}

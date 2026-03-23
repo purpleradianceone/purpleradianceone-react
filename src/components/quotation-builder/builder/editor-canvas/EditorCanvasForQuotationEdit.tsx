@@ -1,26 +1,4 @@
-// quotation-builder/
-//  ├── builder/
-//  │   ├── EditorCanvas.tsx
-//  │   ├── Toolbox.tsx
-//  │   ├── SettingsPanel.tsx
-//  |   |── canvas-wrapper
-//  |         |──CanvasWrapperQuotation
-//  |
-//  ├── blocks/
-//  │        PageBlock (A4)
-//  │            ├── SectionBlock  --optional
-//  │            │    ├── ContentBlock
-//  │            │    ├── TableBlock
-//  │            │    ├── HeaderBlock
-//  │            │    └── FooterBlock
-//  │
-//  ├── state/
-//  │   ├── templateAtoms.ts
-//  ├── pages/
-//  │   ├── QuotationTemplateBuilder.tsx
-//  ├── services/
-//  │   ├── templateApi.ts
-
+/* eslint-disable react-hooks/exhaustive-deps */
 import { Editor } from "@craftjs/core";
 import { PageBlockQuotation } from "../../blocks/PageBlockQuotation";
 import { CanvasWrapperQuotation } from "../canvas-wrapper/CanvasWrapperQuotation";
@@ -49,15 +27,27 @@ import { handleApiError } from "../../../../config/error/handleApiError";
 import axiosClient from "../../../../axios-client/AxiosClient";
 import POST_API from "../../../../constants/PostApi";
 import AutoScrollWrapper from "../../utils/AutoScrollWrapper";
-import { QuotationTemplateSettingsPanelCreate } from "../../template-panel/QuotationTemplateSettingsPanelCreate";
 import QuotationIconSvg from "../../svg/QuotationIconSvg";
-import { STORAGE_KEY_CREATE } from "../../local-storage/LocalStorageKeys";
+import {
+  FOOTER_STORAGE_KEY_UPDATE,
+  HEADER_STORAGE_KEY_UPDATE,
+  PAGE_BLOCK_LAYOUT_UPDATE,
+  searchParamKey,
+  STORAGE_KEY_UPDATE,
+} from "../../local-storage/LocalStorageKeys";
+import { useSearchParams } from "react-router-dom";
+import QuotationTemplate from "../../quotation-template-types/QuotationTemplate";
+import { JsonFileData } from "../../quotation-template-types/JsonFileData";
 import { QuotationEditorSkeleton } from "../../utils/QuotationEditorSkeleton";
+import { QuotationTemplateSettingsPanelUpdate } from "../../template-panel/QuotationTemplateSettingsPanelUpdate";
 
-export const EditorCanvasForQuotation: React.FC = () => {
+export const EditorCanvasForQuotationEdit: React.FC = () => {
   const canvasBgColor = "#f9f9f9";
   const { userPreference } = useUserPreference();
   const { loginStatus } = useLoggedInUserContext();
+  const [searchParams] = useSearchParams();
+  const quotationTemplateId = searchParams.get(searchParamKey);
+  const [jsonFileData, setJsonFileData] = useState<JsonFileData>();
 
   const [placeHolderData, setPlaceHolderData] = useState<PlaceholderItem[]>([]);
   const parsedFields: DynamicFieldOption[] =
@@ -65,25 +55,111 @@ export const EditorCanvasForQuotation: React.FC = () => {
 
   const [editorStateData, setEditorStateData] = useState(() => {
     const jsonEditorState = localStorage.getItem(
-      STORAGE_KEY_CREATE + loginStatus.id,
+      STORAGE_KEY_UPDATE + loginStatus.id,
     );
     return jsonEditorState;
   });
 
+  const [quotationTemplate, setQuotationTemplate] =
+    useState<QuotationTemplate>();
   const [isLoadingForData, setIsLogingForData] = useState<boolean>(true);
 
   useEffect(() => {
-    const jsonEditorState = localStorage.getItem(STORAGE_KEY_CREATE);
-    if (jsonEditorState) {
-      setEditorStateData(jsonEditorState);
-      console.log("stored Local storage editor json state:");
-      console.log(jsonEditorState);
+    if (jsonFileData) {
+      setEditorStateData(jsonFileData.quotationTemplateData);
+      //   console.log("stored editor json state:");
+      //   console.log(jsonFileData.quotationTemplateData);
+      setIsLogingForData(false);
     }
-  }, []);
+  }, [jsonFileData]);
+
+  const getQuotationTemplate = () => {
+    try {
+      const postData = {
+        company_id: loginStatus.companyId,
+        requestedby_id: loginStatus.id,
+        id: quotationTemplateId,
+      };
+      axiosClient
+        .post(POST_API.GET_QUOTATION_TEMPLATE, postData)
+        .then((response) => {
+          if (response.status) {
+            setQuotationTemplate(response.data[0]);
+          }
+        })
+        .catch((e) => {
+          handleApiError(e);
+        })
+        .finally(() => {});
+    } catch (e) {
+      handleApiError(e);
+    }
+  };
+
+  const getQuotationTemplateFile = () => {
+    try {
+      const postData = {
+        company_id: loginStatus.companyId,
+        requestedby_id: loginStatus.id,
+        id: quotationTemplateId,
+      };
+      axiosClient
+        .post(POST_API.GET_QUOTATION_TEMPLATE_FILE, postData)
+        .then((response) => {
+          if (response.status) {
+            const responseData = response.data;
+            setJsonFileData(responseData);
+            // const jsonFileResponse = convertByteArrayToJson(responseData);
+            // setJsonFileData(jsonFileResponse);
+          }
+        })
+        .catch((e) => {
+          handleApiError(e);
+        });
+    } catch (e) {
+      handleApiError(e);
+    }
+  };
+
+  useEffect(() => {
+    const response = localStorage.getItem(STORAGE_KEY_UPDATE + loginStatus.id);
+    if (quotationTemplate?.id) {
+      if (!response) {
+        getQuotationTemplateFile();
+      }else{
+        setIsLogingForData(false);
+      }
+    }
+  }, [quotationTemplate]);
+
+  useEffect(() => {
+    if (jsonFileData) {
+      console.log("json file data:= ");
+      console.log(jsonFileData);
+      localStorage.setItem(
+        STORAGE_KEY_UPDATE + loginStatus.id,
+        jsonFileData.quotationTemplateData,
+      );
+      localStorage.setItem(
+        FOOTER_STORAGE_KEY_UPDATE + loginStatus.id,
+        jsonFileData.defaultFooter,
+      );
+
+      localStorage.setItem(
+        HEADER_STORAGE_KEY_UPDATE + loginStatus.id,
+        jsonFileData.defaultHeader,
+      );
+
+      localStorage.setItem(
+        PAGE_BLOCK_LAYOUT_UPDATE + loginStatus.id,
+        jsonFileData.defaultPageLayout,
+      );
+    }
+  }, [jsonFileData]);
 
   const getPlaceholderForQuotation = () => {
+    setIsLogingForData(true);
     try {
-      setIsLogingForData(true);
       axiosClient
         .post(POST_API.GET_QUOTATION_PLACEHOLDER, {
           company_id: loginStatus.companyId,
@@ -94,9 +170,6 @@ export const EditorCanvasForQuotation: React.FC = () => {
           if (response.status === STATUS_CODE.OK) {
             setPlaceHolderData(response.data);
           }
-        })
-        .finally(() => {
-          setIsLogingForData(false);
         });
     } catch (e) {
       handleApiError(e);
@@ -105,7 +178,7 @@ export const EditorCanvasForQuotation: React.FC = () => {
 
   useEffect(() => {
     getPlaceholderForQuotation();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    getQuotationTemplate();
   }, []);
 
   return isLoadingForData ? (
@@ -124,15 +197,24 @@ export const EditorCanvasForQuotation: React.FC = () => {
         >
           <div className="flex justify-start items-center w-fit gap-5">
             <div className="flex justify-center items-center gap-1">
-              {/* <QuoteIcon className={COLORS.GRID_HEADER_ICONS_COLOR_AND_SIZE} /> */}
               <QuotationIconSvg
                 strokeWidth={2}
                 size={26}
                 className="text-blue-600"
                 showCurrency={true}
               />
-              <span className="section-header-custom">
-                Quotation Template Builder
+              <span className="flex items-center gap-2 section-header-custom">
+                <span>Quotation Template Builder</span>
+
+                {quotationTemplate?.name && (
+                  <span className="caption-custom text-gray-500">
+                    (Editing:{" "}
+                    <span className="font-medium text-gray-700">
+                      {quotationTemplate.name}
+                    </span>
+                    )
+                  </span>
+                )}
               </span>
             </div>
           </div>
@@ -170,7 +252,9 @@ export const EditorCanvasForQuotation: React.FC = () => {
               </main>
             </AutoScrollWrapper>
           </div>
-          <QuotationTemplateSettingsPanelCreate quotationTemplateNamePlaceholder="Enter quotation name. (ex: Quotation 1)"/>
+          <QuotationTemplateSettingsPanelUpdate
+            editQuotationTemplateJson={quotationTemplate}
+          />
         </Editor>
       </DynamicFieldsContext.Provider>
     </div>

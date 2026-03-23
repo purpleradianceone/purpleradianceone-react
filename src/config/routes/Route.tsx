@@ -88,6 +88,7 @@ import StockManagement from "../../components/views/stock-management/StockManage
 import WareHouseWiseStock from "../../components/views/stock-management/WareHouseWiseStock";
 import StockLedgerManagement from "../../components/views/stock-management/StockLedgerManagement";
 import StockAgeingManagement from "../../components/views/stock-management/StockAgeingManagement";
+import ReminderSetting from "../../components/views/settings/reminder/ReminderSetting";
 import { MetaAppsIntegrationTabsBreadcrumb } from "../../components/views/settings/social-media-integration/MetaAppsIntergrationTabsBreadcrumb";
 import { FacebookBreadCrumb } from "../../components/views/settings/social-media-integration/meta-app-facebook/FacebookBreadcrumb";
 import { PageIdIntegrationManagement } from "../../components/views/settings/social-media-integration/meta-app-facebook/PageIdIntegrationManagement";
@@ -95,6 +96,8 @@ import AccountServiceDetails from "../../components/modals/Account/account-servi
 import AccountSubscriptionDetails from "../../components/modals/Account/account-subscription/AccountSubscriptionDetails";
 import WhatsappOAuthConsent from "../../components/dialogue-box/WhatsappOAuthConsent";
 import { WhatsappPhoneNumberIntegrationManagement } from "../../components/views/settings/social-media-integration/meta-app-whatsapp/WhatsappPhoneNumberIntegrationManagement";
+import { EditorCanvasForQuotationEdit } from "../../components/quotation-builder/builder/editor-canvas/EditorCanvasForQuotationEdit";
+
 
 export const router = createBrowserRouter([
   {
@@ -436,6 +439,20 @@ export const router = createBrowserRouter([
         ),
       },
       {
+        path: ROUTES_URL.SETTING_REMINDER,
+        element: (
+          <ModuleGuard
+            permissionKey="userHasAccessToViewCompanyPreferences"
+            deniedMessage={
+              MESSAGE.MODULE_ACCESS.SETTING.COMPANY_PREFERENCE_SETTING
+                .DENIED_VIEW_ACCESS
+            }
+          >
+            <ReminderSetting />
+          </ModuleGuard>
+        ),
+      },
+      {
         path: ROUTES_URL.SETTING_GENERAL,
         element: (
           <ModuleGuard
@@ -641,13 +658,27 @@ export const router = createBrowserRouter([
     ),
   },
   {
-    path: ROUTES_URL.QUOTATION_SETTINGS_CREATE_Template,
+    path: ROUTES_URL.QUOTATION_SETTINGS_CREATE_TEMPLATE,
     element: (
       <MobileRedirectWrapper>
         <PrivateRoute>
           <div>
             <Navbar>
               <EditorCanvasForQuotation />
+            </Navbar>
+          </div>
+        </PrivateRoute>
+      </MobileRedirectWrapper>
+    ),
+  },
+  {
+    path: ROUTES_URL.QUOTATION_SETTINGS_UPDATE_TEMPLATE,
+    element: (
+      <MobileRedirectWrapper>
+        <PrivateRoute>
+          <div>
+            <Navbar>
+              <EditorCanvasForQuotationEdit />
             </Navbar>
           </div>
         </PrivateRoute>

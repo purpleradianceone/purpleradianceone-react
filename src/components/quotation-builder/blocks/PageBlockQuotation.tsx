@@ -9,11 +9,15 @@ import { HeaderBlockQuotation } from "./HeaderBlockQuotation";
 import { FooterBlockQuotation } from "./FooterBlockQuotation";
 import ConfirmationDialog from "../../dialogue-box/ConfirmationDialogue";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
+import { useSearchParams } from "react-router-dom";
+import {
+  PAGE_BLOCK_LAYOUT_Create,
+  PAGE_BLOCK_LAYOUT_UPDATE,
+  searchParamKey,
+} from "../local-storage/LocalStorageKeys";
 
 const A4_WIDTH = 794;
 const A4_HEIGHT = 1123;
-
-export const PageBlockLayoutKey = "page_block_layout_key=";
 
 export const PageBlockQuotation: React.FC = () => {
   const {
@@ -35,6 +39,8 @@ export const PageBlockQuotation: React.FC = () => {
   const [tempBackground, setTempBackground] = useState(props.backgroundColor);
   const [tempAlign, setTempAlign] = useState(props.align);
   const { loginStatus } = useLoggedInUserContext();
+  const [searchParams] = useSearchParams();
+  const quotationTemplateId = searchParams.get(searchParamKey);
 
   /* ---------- Detect Header / Footer ---------- */
   const childNodes = node.data.nodes || [];
@@ -52,6 +58,9 @@ export const PageBlockQuotation: React.FC = () => {
   const [isFooterRequired, setIsFooterRequired] = useState<boolean>(hasFooter);
 
   const handleSave = () => {
+    const pageBlockLayoutKey = quotationTemplateId
+      ? PAGE_BLOCK_LAYOUT_UPDATE
+      : PAGE_BLOCK_LAYOUT_Create;
     if (isHeaderRequired) {
       if (!hasHeader) {
         addHeader();
@@ -75,10 +84,18 @@ export const PageBlockQuotation: React.FC = () => {
       p.isHeader = isHeaderRequired;
       p.isFooter = isFooterRequired;
     });
+    const result = localStorage.getItem(pageBlockLayoutKey+loginStatus.id);
+    if(!result){
+      handleSavePageLayout();
+    }
     setEditing(false);
   };
 
   const handleSavePageLayout = () => {
+    const pageBlockLayoutKey = quotationTemplateId
+      ? PAGE_BLOCK_LAYOUT_UPDATE
+      : PAGE_BLOCK_LAYOUT_Create;
+
     setProp((p: any) => {
       p.padding = tempPadding;
       p.backgroundColor = tempBackground;
@@ -88,17 +105,19 @@ export const PageBlockQuotation: React.FC = () => {
     });
     console.log(JSON.stringify(props));
     localStorage.setItem(
-      PageBlockLayoutKey + loginStatus.id,
+      pageBlockLayoutKey + loginStatus.id,
       JSON.stringify(props),
     );
     setEditing(false);
     setIsConfirmationPopupOpen(false);
     window.location.reload();
-
   };
 
   useEffect(() => {
-    const stored = localStorage.getItem(PageBlockLayoutKey + loginStatus.id);
+    const pageBlockLayoutKey = quotationTemplateId
+      ? PAGE_BLOCK_LAYOUT_UPDATE
+      : PAGE_BLOCK_LAYOUT_Create;
+    const stored = localStorage.getItem(pageBlockLayoutKey + loginStatus.id);
     if (!stored) return;
 
     try {

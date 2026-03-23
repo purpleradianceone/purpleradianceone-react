@@ -21,6 +21,7 @@ import TaskPriorityChip from "../../ui/TaskPriorityChip";
 import TextAreaInput from "../../ui/TextAreaInput";
 import LoadingPopUpAnimation from "../card/LoadingPopUpAnimation";
 import AccessDeniedPopup from "../not-found/AccessDeniedPage";
+import CustomDocumentPreviewComponent from "../../custom-document-preview-component/CustomDocumentPreviewComponent";
 
 function GeneralTask() {
   const { loginStatus } = useLoggedInUserContext();
@@ -33,6 +34,8 @@ function GeneralTask() {
   const [selectedGeneralTask, setSelectedGeneralTask] = useState<any>(null);
   const [generalMasterTask, setGeneralMasterTask] = useState<MasterTaskProps>();
   const [isLoadingTask, setIsLoadingTask] = useState<boolean>(false);
+  const [logoPreview, setLogoPreview] = useState<string | null>(null);
+  const [showCompanyLogoPreview, setShowCompanyLogoPreview] = useState(false);
 
   useEffect(() => {
     if (!userHasAccessToUpdateAllTasks) {
@@ -201,6 +204,7 @@ function GeneralTask() {
           updatedOn: item.updatedon,
           generalTaskTypeId: 0,
           frequencyId: 0,
+          cdnUrl: item.document_cdn_url,
         };
         setGeneralMasterTask(formattedData);
       }
@@ -231,27 +235,36 @@ function GeneralTask() {
         },
       );
 
+      const blob = new Blob([response.data], {
+        type: generalMasterTask?.extension,
+      });
+
+      console.log(response.data);
+
+      const imageUrl = URL.createObjectURL(blob);
+      setLogoPreview(imageUrl);
+      setShowCompanyLogoPreview(true);
       // Create download link
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement("a");
-      link.href = url;
+      // const url = window.URL.createObjectURL(new Blob([response.data]));
+      // const link = document.createElement("a");
+      // link.href = url;
 
-      const contentDisposition = response.headers["content-disposition"];
+      // const contentDisposition = response.headers["content-disposition"];
 
-      let fileName = `${generalMasterTask?.id}.${generalMasterTask?.extension}`;
+      // let fileName = `${generalMasterTask?.id}.${generalMasterTask?.extension}`;
 
-      // If backend sends filename → override
-      if (contentDisposition) {
-        const fileNameMatch = contentDisposition.match(/filename="?(.+)"?/);
-        if (fileNameMatch?.length === 2) {
-          fileName = fileNameMatch[1];
-        }
-      }
+      // // If backend sends filename → override
+      // if (contentDisposition) {
+      //   const fileNameMatch = contentDisposition.match(/filename="?(.+)"?/);
+      //   if (fileNameMatch?.length === 2) {
+      //     fileName = fileNameMatch[1];
+      //   }
+      // }
 
-      link.setAttribute("download", fileName);
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
+      // link.setAttribute("download", fileName);
+      // document.body.appendChild(link);
+      // link.click();
+      // link.remove();
     } catch (error) {
       console.error(error);
       toast.error("Failed to download document");
@@ -321,6 +334,21 @@ function GeneralTask() {
                           >
                             <Download size={22} className="text-blue-500" />
                           </button>
+                        )}
+                        {showCompanyLogoPreview && (
+                          <div
+                            className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50"
+                            onClick={() => setShowCompanyLogoPreview(false)}
+                          >
+                            <CustomDocumentPreviewComponent
+                              fileUrl={
+                                logoPreview ?? generalMasterTask?.cdnUrl ?? ""
+                              }
+                              fileExtension={generalMasterTask?.extension}
+                              width={"50%"}
+                              enableDownload={true}
+                            />
+                          </div>
                         )}
                       </div>
                     </div>

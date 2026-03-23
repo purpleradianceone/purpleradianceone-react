@@ -12,6 +12,7 @@ import {
   ThumbsUp,
   User,
   ShieldCheck,
+  Trash,
 } from "lucide-react";
 import Button from "../../../ui/Button";
 import TextAreaInput from "../../../ui/TextAreaInput";
@@ -26,7 +27,7 @@ import POST_API from "../../../../constants/PostApi";
 import toast from "react-hot-toast";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
 import RefreshToken from "../../../../config/validations/RefreshToken";
-import { STATUS_CODE, VALIDATIONS } from "../../../../constants/AppConstants";
+import { SIZE, STATUS_CODE, VALIDATIONS } from "../../../../constants/AppConstants";
 import { handleApiError } from "../../../../config/error/handleApiError";
 import { useServiceStatus } from "../../../../config/hooks/useServiceStatus";
 import { useServiceLocationType } from "../../../../config/hooks/useServiceLocationType";
@@ -37,6 +38,8 @@ import AccountServiceDetailProps from "../../../../@types/account/AccountService
 import ShimmerEffect from "./ShimerEffect";
 import ToggleButton from "../../../ui/ToggleButton";
 import MetaField from "../../../ui/MetaField";
+import COLORS from "../../../../constants/Colors";
+import { useUserAccessModules } from "../../../../config/hooks/useAccessModules";
 
 interface CustomField {
   id: string;
@@ -48,6 +51,8 @@ const AccountServiceDetails = () => {
 
   const { accountServiceId } = useParams<{ accountServiceId: string }>();
   const { loginStatus } = useLoggedInUserContext();
+  const { userHasAccessToUpdateAccountService } = useUserAccessModules();
+
 
   const [isSaving, setIsSaving] = useState(false);
 
@@ -174,6 +179,7 @@ const AccountServiceDetails = () => {
           createdBy: data.createdby,
           createdOn: data.createdon,
         };
+        console.log("isactive from API:", data.isactive, typeof data.isactive);
 
         setAccountServiceDetail(formattedData);
 
@@ -276,8 +282,14 @@ const AccountServiceDetails = () => {
   };
 
   // Update account service
-  const handleUpdate = async () => {
+  const handleUpdate = async (activeValue?: boolean) => {
     // e.preventDefault();
+
+    if (!userHasAccessToUpdateAccountService) {
+      toast.error('You are not authorized user')
+      return;
+    }
+
     if (!validateForm()) return;
 
 
@@ -298,22 +310,20 @@ const AccountServiceDetails = () => {
       service_booking_source_id: selectedServiceBookingSource,
       service_location_type_id: selectedServiceLocationType,
       location_address: formData.location_address,
-      // assignedto: assignedTo?.id || null,
       assignedto: assignedTo?.id === 0 ? accountServiceDetail?.assignedto : assignedTo?.id,
       service_notes: formData.service_notes,
       customizations: Object.keys(customizationsForBackend).length
         ? JSON.stringify(customizationsForBackend) : null,
-      // customizations: null,
       cancellation_reason: formData.cancellation_reason,
       customer_rating: customerRating,
       customer_feedback: formData.customer_feedback,
       next_service_due_date: formData.next_service_due_date,
       is_follow_up_required: isFollowUpRequired,
-      isactive: true,
+      isactive: activeValue ?? formData.is_active,
       updatedby_id: loginStatus.id,
     };
     console.log('----------------------');
-    alert(JSON.stringify(postData, null, 2));
+    // alert(JSON.stringify(postData, null, 2));
     console.log('----------------------');
     setIsSaving(true);
     try {
@@ -487,7 +497,7 @@ const AccountServiceDetails = () => {
                   is_active: checked,
                 }));
 
-                handleUpdate();
+                handleUpdate(checked);
               }}
             />
             <span
@@ -637,53 +647,52 @@ const AccountServiceDetails = () => {
         />
         <FormCheckbox label="Is Follow Up Required" name="is_follow_up_required" onChange={handleFollowUpChange} checked={isFollowUpRequired} />
 
-        <div className="p-6 bg-white border rounded-lg shadow-sm max-w-4xl">
+        <div className="p-6 bg-white border rounded-lg shadow-sm col-span-2">
           <div className="flex justify-between items-center mb-6">
             <h3 className="text-lg font-semibold text-gray-800">
-              Customization
+              Customizations
             </h3>
 
-            <button
+            <Button
               type="button"
               onClick={addField}
-              className="px-2 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+              className={COLORS.ADD_BUTTON}
             >
               + Add
-            </button>
+            </Button>
           </div>
 
-          <div className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 ">
             {fields?.map((field) => (
               <div
                 key={field.id}
-                className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg border border-gray-200"
+                className="flex items-center gap-4 p-2 bg-gray-50 rounded-lg border border-gray-200"
               >
                 <input
                   type="text"
-                  placeholder="Key"
+                  placeholder="Customization name"
                   value={field.key}
                   onChange={(e) =>
                     updateField(field.id, "key", e.target.value)
                   }
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded-md"
+                  className="flex-1 px-1 py-1 border border-gray-300 rounded-md"
                 />
 
                 <input
                   type="text"
-                  placeholder="Value"
+                  placeholder="Enter Value"
                   value={field.value}
                   onChange={(e) =>
                     updateField(field.id, "value", e.target.value)
                   }
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded-md"
+                  className="flex-1 px-1 py-1 border border-gray-300 rounded-md"
                 />
 
                 <button
                   type="button"
                   onClick={() => removeField(field.id)}
-                  className="px-2 py-1 bg-red-500 text-white rounded-md hover:bg-red-600"
                 >
-                  Remove
+                  <Trash size={SIZE.ICON_DELETE_BUTTON_SIZE} className={COLORS.ICON_DELETE_BUTTON}></Trash>
                 </button>
               </div>
             ))}
@@ -706,13 +715,13 @@ const AccountServiceDetails = () => {
 
       <div className="flex  tems-center justify-end gap-2">
 
-        {/* <div>
-          <Button onClick={() => { }} type="button">Cancel</Button>
-        </div> */}
-        <div><Button onClick={(e) => {
-          e.preventDefault();
-          handleUpdate();
-        }} >Save</Button></div>
+        <div>
+          <Button
+            disabled={!userHasAccessToUpdateAccountService}
+            onClick={(e) => {
+              e.preventDefault();
+              handleUpdate();
+            }} >Save</Button></div>
       </div>
     </div>
   );

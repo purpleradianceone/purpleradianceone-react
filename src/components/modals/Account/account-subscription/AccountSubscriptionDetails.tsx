@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Calendar, } from "lucide-react";
+import { Calendar, Trash, } from "lucide-react";
 
 import Button from "../../../ui/Button";
 import DatePickerInput from "../../../ui/DatePickerInput";
@@ -14,7 +14,7 @@ import toast from "react-hot-toast";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
 import RefreshToken from "../../../../config/validations/RefreshToken";
 
-import { STATUS_CODE } from "../../../../constants/AppConstants";
+import { SIZE, STATUS_CODE } from "../../../../constants/AppConstants";
 import { handleApiError } from "../../../../config/error/handleApiError";
 
 import axiosClient from "../../../../axios-client/AxiosClient";
@@ -23,6 +23,21 @@ import axiosClient from "../../../../axios-client/AxiosClient";
 import AccountSubscriptionProps from "../../../../@types/account/AccountSubscriptionProps";
 import ShimmerEffect from "../account-service/ShimerEffect";
 import MetaField from "../../../ui/MetaField";
+import COLORS from "../../../../constants/Colors";
+import { useUserAccessModules } from "../../../../config/hooks/useAccessModules";
+
+interface CustomField {
+    id: string;
+    key: string;
+    value: string;
+}
+
+interface PackageDetail {
+    id: string;
+    packageName: string;
+    field: CustomField[];
+    isNew?: boolean;
+}
 
 const AccountSubscriptionDetails = () => {
 
@@ -31,6 +46,8 @@ const AccountSubscriptionDetails = () => {
 
     const [loading, setLoading] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
+
+    const [packages, setPackages] = useState<PackageDetail[]>([]);
 
     const [accountSubscriptionDetail, setAccountSubscriptionDetail] =
         useState<AccountSubscriptionProps | null>(null);
@@ -47,6 +64,7 @@ const AccountSubscriptionDetails = () => {
     const [showStartDateError, setShowStartDateError] = useState(false);
     const [showEndDateError, setShowEndDateError] = useState(false);
 
+    const { userHasAccessToUpdateAccountSubscription } = useUserAccessModules();
     // -----------------------
     // Handle Input Change
     // -----------------------
@@ -104,6 +122,26 @@ const AccountSubscriptionDetails = () => {
                     createdOn: data.createdon
                 };
 
+                const packageObj =
+                    typeof data.package_detail === "string"
+                        ? JSON.parse(data.package_detail)
+                        : data.packagedetail || {};
+
+                const packagesArray: PackageDetail[] = Object.entries(packageObj).map(
+                    ([packageName, values]: any) => ({
+                        id: crypto.randomUUID(),
+                        packageName,
+                        isNew: false,
+                        field: Object.entries(values).map(([key, value]) => ({
+                            id: crypto.randomUUID(),
+                            key,
+                            value: String(value)
+                        }))
+                    })
+                );
+
+                setPackages(packagesArray);
+
                 setAccountSubscriptionDetail(formattedData);
 
                 setFormData({
@@ -159,51 +197,34 @@ const AccountSubscriptionDetails = () => {
 
     };
 
-    // -----------------------
-    // Update Account Subscription
-    // -----------------------
-
     const handleUpdate = async (activeValue?: boolean) => {
+
+        if (!userHasAccessToUpdateAccountSubscription) {
+            toast.error('You are not authorized user')
+            return;
+        }
 
         if (!validateForm()) return;
 
+        if (!validatePackages()) return;
         if (isSaving) return;
 
-        // let packageJSON = null;
-
-        // try {
-
-        //     packageJSON = formData.package_detail
-        //         ? JSON.parse(formData.package_detail)
-        //         : null;
-
-        // } catch {
-
-        //     toast.error("Invalid package detail JSON");
-        //     return;
-
-        // }
+        const packageJSON = buildPackageJson();
 
         const postData = {
-
             company_id: loginStatus.companyId,
             id: Number(accountSubscriptionId),
             start_date: formData.start_date,
             end_date: formData.end_date,
-            package_detail: null,
+            package_detail: JSON.stringify(packageJSON),
             isactive: activeValue ?? formData.is_active,
             updatedby_id: loginStatus.id
 
         };
 
-        console.log("-----------");
-        alert(JSON.stringify(postData, null, 2));
-        console.log("-----------");
-
         setIsSaving(true);
 
         try {
-
             const response = await axiosClient.post(
                 POST_API.UPDATE_ACCOUNT_SUBSCRIPTION,
                 postData,
@@ -248,6 +269,154 @@ const AccountSubscriptionDetails = () => {
 
     };
 
+    const addPackage = () => {
+
+        setPackages((prev) => [
+            ...prev,
+            {
+                id: crypto.randomUUID(),
+                packageName: "",
+                isNew: true,
+                field: [
+                    {
+                        id: crypto.randomUUID(),
+                        key: "Allowed",
+                        value: "",
+                    },
+                    {
+                        id: crypto.randomUUID(),
+                        key: "Completed",
+                        value: "0",
+                    },
+                ],
+            },
+        ]);
+
+    };
+
+    const removePackage = (packageId: string) => {
+
+        setPackages((prev) =>
+            prev.filter((pkg) => pkg.id !== packageId)
+        );
+
+    };
+
+    const updatePackageName = (packageId: string, name: string) => {
+
+        setPackages((prev) =>
+            prev.map((pkg) =>
+                pkg.id === packageId
+                    ? { ...pkg, packageName: name }
+                    : pkg
+            )
+        );
+
+    };
+
+    const handlePackageChange = (
+        packageId: string,
+        fieldId: string,
+        val: string
+    ) => {
+
+        setPackages((prev) =>
+            prev.map((pkg) =>
+                pkg.id === packageId
+                    ? {
+                        ...pkg,
+                        field: pkg.field.map((f) =>
+                            f.id === fieldId ? { ...f, value: val } : f
+                        ),
+                    }
+                    : pkg
+            )
+        );
+
+    };
+
+    const buildPackageJson = () => {
+
+        const result: any = {};
+
+        packages.forEach((pkg) => {
+
+            if (pkg.packageName) {
+
+                result[pkg.packageName] = {};
+
+                pkg.field.forEach((f) => {
+                    result[pkg.packageName][f.key] = f.value;
+                });
+
+                if (pkg.isNew) {
+                    result[pkg.packageName]["IsActive"] = "true";
+                }
+
+            }
+        });
+
+        console.log(result);
+        return result;
+    };
+
+    const validatePackages = () => {
+        const packageNames = new Set();
+
+        for (const pkg of packages) {
+
+            // ✅ Strict Package Name Validation
+            if (
+                pkg.packageName == null || // handles null & undefined
+                pkg.packageName.trim() === "" ||
+                pkg.packageName.trim().toLowerCase() === "null" ||
+                pkg.packageName.trim().toLowerCase() === "undefined"
+            ) {
+                toast.error("Package name must not be empty");
+                return false;
+            }
+
+            const normalizedName = pkg.packageName.trim().toLowerCase();
+
+            // ✅ Duplicate check
+            if (packageNames.has(normalizedName)) {
+                toast.error(`Duplicate package name: ${pkg.packageName}`);
+                return false;
+            }
+            packageNames.add(normalizedName);
+
+            let allowed = 0;
+            let completed = 0;
+
+            for (const f of pkg.field) {
+                if (f.key === "Allowed") {
+                    if (!f.value || isNaN(Number(f.value))) {
+                        toast.error(`Allowed must be a valid number in ${pkg.packageName}`);
+                        return false;
+                    }
+                    allowed = Number(f.value);
+                }
+
+                if (f.key === "Completed") {
+                    if (!f.value || isNaN(Number(f.value))) {
+                        toast.error(`Completed must be a valid number in ${pkg.packageName}`);
+                        return false;
+                    }
+                    completed = Number(f.value);
+                }
+            }
+
+            if (completed > allowed) {
+                toast.error(
+                    `Package : ${pkg.packageName}\nCompleted cannot be greater than Allowed`
+                );
+                return false;
+            }
+        }
+
+        return true;
+    };
+
     if (loading) {
         return <ShimmerEffect />;
     }
@@ -271,7 +440,7 @@ const AccountSubscriptionDetails = () => {
             <div className="grid grid-cols-4 gap-6 mb-3 text-sm">
 
                 <MetaField
-                    label="Account Subscription Field"
+                    label="Account Subscription Code"
                     value={accountSubscriptionDetail?.accountSubscriptionCode || "-"}
                 ></MetaField>
 
@@ -281,7 +450,7 @@ const AccountSubscriptionDetails = () => {
                 ></MetaField>
 
                 <MetaField
-                    label="Company Product Name"
+                    label="Company Product"
                     value={accountSubscriptionDetail?.companyProductName || "-"}
                 ></MetaField>
 
@@ -289,6 +458,8 @@ const AccountSubscriptionDetails = () => {
                     label="Start Date"
                     value={accountSubscriptionDetail?.startDate || "-"}
                 ></MetaField>
+
+
 
                 <MetaField
                     label="End Date"
@@ -312,12 +483,17 @@ const AccountSubscriptionDetails = () => {
 
             </div>
 
+            <div className="flex justify-between items-center mb-3 border-t-2  mt-3 p-2">
+                <h2 className="table-header-custom">
+                    Update Account Subscription Details
+                </h2>
+            </div>
+
             {/* Form Section */}
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-4 mb-4 gap-4 ">
 
-                <div>
-
+                <div >
                     <DatePickerInput
                         label="Start Date"
                         name="start_date"
@@ -332,11 +508,9 @@ const AccountSubscriptionDetails = () => {
                             Please select Start Date
                         </div>
                     )}
-
                 </div>
 
                 <div>
-
                     <DatePickerInput
                         label="End Date"
                         name="end_date"
@@ -345,16 +519,12 @@ const AccountSubscriptionDetails = () => {
                         required
                         value={formData.end_date}
                     />
-
                     {showEndDateError && (
                         <div className="text-red-500 text-xs">
                             Please select End Date
                         </div>
                     )}
-
                 </div>
-
-
 
                 <div className="flex gap-2 items-center">
 
@@ -390,24 +560,101 @@ const AccountSubscriptionDetails = () => {
 
             </div>
 
+
+            <div className="p-6 bg-white border   rounded-lg shadow-sm col-span-2">
+                <div className=" justify-between flex items-center mb-3">
+
+                    <h3 className="font-semibold">Package Details</h3>
+
+                    <button
+                        type="button"
+                        onClick={addPackage}
+                        className="px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                    >
+                        + Add Package
+                    </button>
+
+                </div>
+
+                {/* Packages */}
+                <div className="grid grid-cols-3 gap-4">
+                    {packages.map((pkg) => (
+                        <div key={pkg.id} className="border p-4 rounded-md mb-3  bg-gray-50">
+
+                            {/* Package Name + Remove */}
+                            <div className="flex items-center gap-2 mb-3">
+                                <input
+                                    value={pkg.packageName}
+                                    placeholder="Package Name"
+                                    onChange={(e) => updatePackageName(pkg.id, e.target.value)}
+                                    className="border px-2 py-1 rounded w-64"
+                                />
+                                {pkg.isNew && <button
+                                    type="button"
+                                    onClick={() => removePackage(pkg.id)}
+                                >
+                                    <Trash size={SIZE.ICON_DELETE_BUTTON_SIZE} className={COLORS.ICON_DELETE_BUTTON}></Trash>
+                                </button>
+                                }
+                            </div>
+
+                            {/* Package Fields */}
+                            {pkg.field.map((f) => (
+                                <div key={f.id} className="flex gap-2 mb-2 items-center">
+
+                                    {/* Key */}
+                                    <input
+                                        value={f.key}
+                                        readOnly
+                                        className="border px-2 py-1 rounded bg-gray-100 w-40"
+                                    />
+
+                                    {/* Value */}
+                                    {f.key === "IsActive" ? (
+                                        <>
+                                            <ToggleButton
+                                                checked={f.value === "true"}
+                                                onToggle={(e) => {
+                                                    handlePackageChange(
+                                                        pkg.id,
+                                                        f.id,
+                                                        e.target.checked ? "true" : "false"
+                                                    );
+                                                }} name={""} />
+                                            <span
+                                                className={`text-sm ${f.value === "true" ? "text-green-600" : "text-red-600"
+                                                    }`}
+                                            >
+                                                {f.value === "true" ? "Active" : "Inactive"}
+                                            </span>
+                                        </>
+                                    ) : (
+                                        <input
+                                            value={f.value}
+                                            onChange={(e) =>
+                                                handlePackageChange(pkg.id, f.id, e.target.value)
+                                            }
+                                            className="border px-2 py-1 rounded flex-1"
+                                        />
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    ))}
+                </div>
+            </div>
+
             {/* Buttons */}
 
             <div className="flex items-center justify-end gap-2 mt-6">
-
-                <div>
-                    <Button onClick={() => { }} type="button">
-                        Cancel
-                    </Button>
-                </div>
-
                 <div>
 
                     <Button
+                        disabled={!userHasAccessToUpdateAccountSubscription}
                         onClick={(e) => {
                             e.preventDefault();
                             handleUpdate();
                         }}
-                        type="button"
                     >
                         Save
                     </Button>

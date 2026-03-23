@@ -90,23 +90,23 @@ const AccountManagement: React.FC = () => {
           </h3>
           <AccountCompanyProduct
             accountId={company!.id}
-            // handleShowCompanyProductData={handleShowCompanyProductData}
+          // handleShowCompanyProductData={handleShowCompanyProductData}
           />
         </div>
 
         <div className="bg-white col-span-2 rounded-md border p-1 border-slate-200">
-          <h3 className="bg-gray-100 table-header-custom rounded-t-md px-2">
+          {/* <h3 className="bg-gray-100 table-header-custom rounded-t-md px-2">
             Account Service
-          </h3>
+          </h3> */}
           <AccountService accountId={company.id} />
         </div>
         <div className="bg-white col-span-2 rounded-md border p-1 border-slate-200">
-          <h3 className="bg-gray-100 table-header-custom rounded-t-md px-2">
+          {/* <h3 className="bg-gray-100 table-header-custom rounded-t-md px-2">
             Account Subscription
-          </h3>
+          </h3> */}
           <AccountSubscription
             accountId={company!.id}
-            // handleShowCompanyProductData={handleShowCompanyProductData}
+          // handleShowCompanyProductData={handleShowCompanyProductData}
           />
         </div>
       </div>

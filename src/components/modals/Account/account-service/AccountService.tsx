@@ -292,10 +292,10 @@ function AccountService({
             //   selectedAssignTo.id !== 0 ? selectedAssignTo.id : null
             // }
 
-            handleSelectedCompanyProductCheckBoxChange={
+            handleSelectedCompanyProductChange={
               handleSelectedCompanyProductCheckBoxChange
             }
-            selectedCompanyProduct={{ id: 1, name: "" }}
+            selectedCompanyProduct={selectedCompanyProduct}
             serviceStatusId={serviceStatus!}
             handleServiceStatusId={handleAccocuntServiceStatus}
             accountId={accountId}

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import FormHeader from "../../../ui/FormHeader";
 
-import { BoxIcon, Plus, Save, X, Calendar } from "lucide-react";
+import { BoxIcon, Plus, Save, X, Calendar, Trash } from "lucide-react";
 import FormLayout from "../../../ui/FormLayout";
 import React, { useEffect, useState } from "react";
 import Button from "../../../ui/Button";
@@ -36,12 +36,20 @@ import DatePickerInput from "../../../ui/DatePickerInput";
 // import CompanyUserSearchFieldInput from "../../../ui/CompanyUserSearchFieldInput";
 import AddAccountSubscriptionModalProps from "../../../../@types/modal/AddAccountSubscriptionModalProps";
 import CreateAccountSubscriptionProps from "../../../../@types/account/CreateAccountSubscriptionProps";
+import COLORS from "../../../../constants/Colors";
 
 interface CustomField {
   id: string;
   key: string;
   value: string;
 }
+
+interface PackageDetail {
+  id: string;
+  packageName: string;
+  field: CustomField;
+}
+
 const CreateAccountSubscription = ({
   // isUsedInProductModal = false,
   isOpen,
@@ -49,7 +57,7 @@ const CreateAccountSubscription = ({
   // product,
   accountId,
   handleAddAccountSubscritption
-  
+
 }: AddAccountSubscriptionModalProps) => {
   const { loginStatus } = useLoggedInUserContext();
   const [isSaving, setIsSaving] = useState<boolean>(false);
@@ -65,14 +73,15 @@ const CreateAccountSubscription = ({
   });
 
   const intialCreateAccountSubscriptionFormData: CreateAccountSubscriptionProps =
-    {
-      start_date: "",
-      end_date: "",
-    };
+  {
+    start_date: "",
+    end_date: "",
+  };
 
   const {
     handleChange: handleCreateServiceDetailFormChange,
     formData: addCreateAccountSubscriptionFormData,
+    resetForm: resetAddAccountSubscriptionForm,
   } = useFormChange(intialCreateAccountSubscriptionFormData);
 
   //   const [isRenewal, setisRenewal] = useState<boolean>(false);
@@ -91,7 +100,7 @@ const CreateAccountSubscription = ({
 
   // Note : on close Clear the states
   const handleCloseForm = () => {
-    // resetStockCreateForm();
+    resetAddAccountSubscriptionForm();
 
     // here we are setting dropdown
     setProductSelected(null);
@@ -153,7 +162,7 @@ const CreateAccountSubscription = ({
       addCreateAccountSubscriptionFormData.start_date &&
       addCreateAccountSubscriptionFormData.end_date &&
       addCreateAccountSubscriptionFormData.start_date >
-        addCreateAccountSubscriptionFormData.end_date
+      addCreateAccountSubscriptionFormData.end_date
     ) {
       setError((prev) => ({
         ...prev,
@@ -182,6 +191,8 @@ const CreateAccountSubscription = ({
       return;
     }
 
+    const packageDetailJson = buildPackageJson();
+    console.log("Package JSON:", packageDetailJson);
     if (isSaving) return;
 
     // const customizationsForBackend = fields.map((field) => ({
@@ -195,15 +206,13 @@ const CreateAccountSubscription = ({
       company_product_id: productSelected?.value,
       start_date: addCreateAccountSubscriptionFormData.start_date,
       end_date: addCreateAccountSubscriptionFormData.end_date,
-      packagedetail: null,
+      package_detail: JSON.stringify(packageDetailJson),
       is_renewal: false,
       renewal_account_subscription_id: null,
       createdby_id: loginStatus.id,
     };
-    console.log("--------------");
-    console.log(JSON.stringify(postData, null, 2));
-    console.log("--------------");
-    alert(JSON.stringify(postData, null, 2));
+
+    // alert(JSON.stringify(postData, null, 2));
     setIsSaving(true);
     await axios
       .post(POST_API.CREATE_ACCOUNT_SUBSCRIPTION, postData, {
@@ -322,32 +331,78 @@ const CreateAccountSubscription = ({
     console.log(productSelected);
   }, [productSelected]);
 
-  const [fields, setFields] = useState<CustomField[]>([]);
 
-  // 2. Add a new field with a unique ID
-  const addField = () => {
-    const newField: CustomField = {
-      id: crypto.randomUUID(), // Standard way to get unique IDs
-      key: "",
-      value: "",
-    };
-    setFields((prev) => [...prev, newField]);
+  const [packages, setPackages] = useState<PackageDetail[]>([]);
+
+  // Add new package
+  const addPackage = () => {
+    setPackages((prev) => [
+      ...prev,
+      {
+        id: crypto.randomUUID(),
+        packageName: "",
+        field: {
+          id: crypto.randomUUID(),
+          key: "Allowed",
+          value: "",
+        },
+      },
+    ]);
   };
 
-  // 3. Remove a field by ID
-  const removeField = (idToRemove: string) => {
-    // Functional update ensures we are filtering the latest state
-    setFields((prev) => prev.filter((field) => field.id !== idToRemove));
+  // Remove package
+  const removePackage = (packageId: string) => {
+    setPackages((prev) => prev.filter((pkg) => pkg.id !== packageId));
   };
 
-  // 4. Update specific field values
-  const handleChange = (id: string, name: "key" | "value", val: string) => {
-    setFields((prev) =>
-      prev.map((field) =>
-        field.id === id ? { ...field, [name]: val } : field,
-      ),
+  // Update package name
+  const updatePackageName = (packageId: string, name: string) => {
+    setPackages((prev) =>
+      prev.map((pkg) =>
+        pkg.id === packageId ? { ...pkg, packageName: name } : pkg
+      )
     );
   };
+
+  // Update key/value
+  const handleChange = (
+    packageId: string,
+    name: "key" | "value",
+    val: string
+  ) => {
+    setPackages((prev) =>
+      prev.map((pkg) =>
+        pkg.id === packageId
+          ? {
+            ...pkg,
+            field: {
+              ...pkg.field,
+              [name]: val,
+            },
+          }
+          : pkg
+      )
+    );
+  };
+
+  // Build JSON (completed added automatically)
+  const buildPackageJson = () => {
+    const result: any = {};
+
+    packages.forEach((pkg) => {
+      if (pkg.packageName && pkg.field.key) {
+        result[pkg.packageName] = {
+          [pkg.field.key]: pkg.field.value,
+          Completed: "0",
+          IsActive: "true"
+        };
+      }
+    });
+    console.log(result);
+
+    return result;
+  };
+
 
   // const productOptions = toSelectOptions(productList, 'id', 'name');
   // if isOpen is false then return null
@@ -373,67 +428,66 @@ const CreateAccountSubscription = ({
           </div>
 
           <form onSubmit={handleCreateAccountService} className="space-y-2 p-1">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-              {/* select the product when used from the stock creation button from stock module */}
-              <div className="flex flex-col gap-2">
-                {
-                  <div className="">
-                    <CustomSelectForAccountService
-                      icon={BoxIcon}
-                      label="Product"
-                      // onChange={(value) => {
-                      //   if (!value) return;
-                      //   setProductSelected(value);
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+              {
+                <div >
+                  <CustomSelectForAccountService
+                    icon={BoxIcon}
+                    label="Product"
+                    // onChange={(value) => {
+                    //   if (!value) return;
+                    //   setProductSelected(value);
 
-                      //   setError((prev) => ({
-                      //     ...prev,
-                      //     productId: false,
-                      //   }));
-                      // }}
+                    //   setError((prev) => ({
+                    //     ...prev,
+                    //     productId: false,
+                    //   }));
+                    // }}
 
-                      onChange={(
-                        option: number | SelectOption | undefined | null,
-                      ) => {
-                        if (!option) return;
+                    onChange={(
+                      option: number | SelectOption | undefined | null,
+                    ) => {
+                      if (!option) return;
 
-                        if (typeof option === "number") {
-                          console.log("Selected ID:", option);
-                          return;
-                        }
-                        console.log("------option-----------");
-                        console.log(option);
-                        console.log("-----------------");
-                        // set the full option as selected
-                        setProductSelected(option);
+                      if (typeof option === "number") {
+                        console.log("Selected ID:", option);
+                        return;
+                      }
+                      console.log("------option-----------");
+                      console.log(option);
+                      console.log("-----------------");
+                      // set the full option as selected
+                      setProductSelected(option);
 
-                        // clear any validation error
-                        setError((prev) => ({
-                          ...prev,
-                          productId: false,
-                        }));
+                      // clear any validation error
+                      setError((prev) => ({
+                        ...prev,
+                        productId: false,
+                      }));
 
-                        // // now you can access details directly:
-                        console.log("Selected ID:", option.value);
-                        console.log("Selected Name:", option.label);
-                      }}
-                      options={productOptions}
-                      isRequired={true}
-                      placeholder="Select Product"
-                      value={productSelected || 0}
-                      onMenuOpen={handleMenuOpen}
-                      onMenuScrollToBottom={handleMenuScrollToBottom}
-                      onInputChange={handleInputChange}
-                      isLoading={isLoading}
-                      isClearable={false}
-                    />
-                    {error.productId && (
-                      <div className="caption-custom-inactive">
-                        Product is required
-                      </div>
-                    )}
-                  </div>
-                }
+                      // // now you can access details directly:
+                      console.log("Selected ID:", option.value);
+                      console.log("Selected Name:", option.label);
+                    }}
+                    options={productOptions}
+                    isRequired={true}
+                    placeholder="Select Product"
+                    value={productSelected || 0}
+                    onMenuOpen={handleMenuOpen}
+                    onMenuScrollToBottom={handleMenuScrollToBottom}
+                    onInputChange={handleInputChange}
+                    isLoading={isLoading}
+                    isClearable={false}
+                  />
+                  {error.productId && (
+                    <div className="caption-custom-inactive">
+                      Product is required
+                    </div>
+                  )}
+                </div>
+              }
 
+              <div>
                 <DatePickerInput
                   label="Start Date"
                   name="start_date"
@@ -442,7 +496,8 @@ const CreateAccountSubscription = ({
                   error={error.start_date_error}
                   required
                 />
-
+              </div>
+              <div>
                 <DatePickerInput
                   label="End Date"
                   name="end_date"
@@ -453,82 +508,96 @@ const CreateAccountSubscription = ({
                 />
               </div>
 
-              <div className="p-6 bg-white border rounded-lg shadow-sm max-w-4xl">
+              <div className="p-6 bg-white border rounded-lg shadow-sm col-span-3">
+
+                {/* Header */}
                 <div className="flex justify-between items-center mb-6">
-                  <h3 className="text-lg font-semibold text-gray-800">
-                    Package Details
-                  </h3>
+                  <h2 className="text-lg font-semibold">Package Details</h2>
+
                   <button
                     type="button"
-                    onClick={addField}
-                    className="px-2 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition font-medium"
+                    onClick={addPackage}
+                    className="px-2 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700"
                   >
-                    + Add
+                    + Add Package
                   </button>
                 </div>
 
-                <div className="space-y-4">
-                  {fields.map((field) => (
+                {/* Package List */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+
+                  {packages.map((pkg) => (
                     <div
-                      key={field.id}
-                      className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg border border-gray-200"
+                      key={pkg.id}
+                      className="border border-gray-200 p-4 rounded-md bg-gray-50"
                     >
-                      <div className="flex-1">
+
+                      {/* Package Header */}
+                      <div className="flex gap-3 mb-3">
+
                         <input
-                          type="text"
+                          placeholder="Package Name"
+                          value={pkg.packageName}
+                          onChange={(e) =>
+                            updatePackageName(pkg.id, e.target.value)
+                          }
+                          className="border px-3 py-1 rounded-md"
+                        />
+
+                        <button
+                          onClick={() => removePackage(pkg.id)}
+                        >
+                          <Trash size={SIZE.ICON_DELETE_BUTTON_SIZE} className={COLORS.ICON_DELETE_BUTTON}></Trash>
+                        </button>
+
+                      </div>
+
+                      {/* Key Value Field */}
+                      <div className="flex gap-3">
+
+                        <input
                           placeholder="Key"
-                          value={field.key}
+                          value={pkg.field.key}
                           onChange={(e) =>
-                            handleChange(field.id, "key", e.target.value)
+                            handleChange(pkg.id, "key", e.target.value)
                           }
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 outline-none"
+                          readOnly
+                          className="border px-3 py-1 rounded-md"
                         />
-                      </div>
 
-                      <div className="flex-1">
                         <input
-                          type="text"
                           placeholder="Value"
-                          value={field.value}
+                          value={pkg.field.value}
                           onChange={(e) =>
-                            handleChange(field.id, "value", e.target.value)
+                            handleChange(pkg.id, "value", e.target.value)
                           }
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 outline-none"
+                          className="border px-3 py-1 rounded-md"
                         />
+
                       </div>
 
-                      <button
-                        type="button"
-                        onClick={() => removeField(field.id)}
-                        className="px-2 py-1 bg-red-500 text-white rounded-md hover:bg-red-600 transition"
-                      >
-                        Remove
-                      </button>
                     </div>
                   ))}
 
-                  {fields.length === 0 && (
-                    <p className="text-center text-gray-400 py-4 italic">
-                      No customization fields added yet.
-                    </p>
-                  )}
                 </div>
+
               </div>
-            </div>
-            <div className="flex items-center justify-end bg-pink-00 col-span-2">
-              <div className="flex gap-1">
-                <Button onClick={handleCloseForm} type="button">
-                  <div className="flex items-center gap-0.5">
-                    <X size={SIZE.SIXTEEN} />
-                    Cancel
-                  </div>
-                </Button>
-                <Button type="submit">
-                  <div className="flex items-center gap-1">
-                    <Save size={SIZE.SIXTEEN} />
-                    Save
-                  </div>
-                </Button>
+
+              <div className="sticky bottom-0 flex items-center justify-end bg-pink-00 col-span-3">
+                <div className="flex gap-1">
+                  <Button onClick={handleCloseForm} type="button">
+                    <div className="flex items-center gap-0.5">
+                      <X size={SIZE.SIXTEEN} />
+                      Cancel
+                    </div>
+                  </Button>
+                  <Button type="submit">
+                    <div className="flex items-center gap-1">
+                      <Save size={SIZE.SIXTEEN} />
+                      Save
+                    </div>
+                  </Button>
+                </div>
               </div>
             </div>
           </form>

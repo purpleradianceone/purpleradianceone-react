@@ -1,62 +1,3 @@
-// /* eslint-disable @typescript-eslint/no-explicit-any */
-
-// // import toast from "react-hot-toast";
-// // import MESSAGE from "../../../../constants/Messages";
-
-// import Button from "../../../ui/Button";
-
-// import COLORS from "../../../../constants/Colors";
-// import { useState } from "react";
-// import CreateAccountSubscription from "./CreateAccountSubscription";
-// // import CreateAccountService from "./CreateAccountService";
-
-// type AccountServiceTypeComponent = {
-//   accountId: number;
-// };
-
-// const AccountSubscription = ({ accountId }: AccountServiceTypeComponent) => {
-//   console.log(accountId);
-
-//   const [createAccountSubscriptionShow, setCreateAccountSubscriptionShow] =
-//     useState<boolean>(false);
-
-//   function test(): void {
-//     setCreateAccountSubscriptionShow(false);
-//   }
-
-//   return (
-//     <div className="h-full w-full min-h-14">
-//       <h1>Inside the Account Subscription Component</h1>
-//       <Button
-//         disabled={false}
-//         onClick={() => {
-//           // if (userHasAccessToAddAccountContacts) {
-//           //   setIsOpenAddAccountContactForm(!isOpenAddAccountContactForm);
-//           // } else {
-//           //   toast.error(
-//           //     MESSAGE.MODULE_ACCESS.ACCOUNT_ACCESS.DENIED_UPDATE_ACCESS,
-//           //   );
-//           // }
-
-//           setCreateAccountSubscriptionShow(!createAccountSubscriptionShow);
-//         }}
-//         className={COLORS.ADD_BUTTON}
-//       >
-//         +Add
-//       </Button>
-
-//       <CreateAccountSubscription
-//         isOpen={createAccountSubscriptionShow}
-//         onClose={test}
-//         accountId={accountId}
-//       ></CreateAccountSubscription>
-//     </div>
-//   );
-// };
-
-// export default AccountSubscription;
-
-
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from "react";
@@ -90,7 +31,7 @@ function AccountSubscription({
   // ) => void;
 }) {
   const { userHasAccessToViewAccountSubscription } = useUserAccessModules();
-  
+
   const [accessDeniedPopUpOpen, setAccessDeniedPopUpOpen] = useState(false);
 
   const [accountSubscriptionData, setAccountSubscriptionData] = useState<
@@ -100,13 +41,13 @@ function AccountSubscription({
 
   const { loginStatus } = useLoggedInUserContext();
 
-  const [ accountSubscriptionUpdateCount,  setAccountSubscriptionUpdateCount] =
+  const [accountSubscriptionUpdateCount, setAccountSubscriptionUpdateCount] =
     useState<number>(0);
 
   // Read filters from LocalStorage (before hook initializes)
   const savedFilters = JSON.parse(
     localStorage.getItem(LocalStorageKeys.SUPPORT_TICKET_MANAGEMENT_FILTERS) ||
-      "{}",
+    "{}",
   );
 
   const {
@@ -139,7 +80,7 @@ function AccountSubscription({
 
   const [ref, inView] = useInView({ fallbackInView: true, threshold: 0.1 });
 
-  
+
 
   const getAccountSubscription = async (signal: AbortSignal) => {
     if (dateRangeId === customDateRangeId && concatDate.trim() === "") return;
@@ -150,9 +91,8 @@ function AccountSubscription({
       company_id: loginStatus.companyId,
       id: null,
       account_id: accountId,
-      company_product_id:
-        selectedCompanyProduct.id === 0 ? null : selectedCompanyProduct.id,
-     
+      company_product_id: selectedCompanyProduct.id === 0 ? null : selectedCompanyProduct.id,
+
       search_company_specific_date_range_id:
         effectiveDateRangeId === 0 ? null : effectiveDateRangeId,
       limit: pageSize,
@@ -217,7 +157,7 @@ function AccountSubscription({
     }
   };
 
-  const handleSelectedCompanyProductCheckBoxChange = (
+  const handleSelectedCompanyProductChange = (
     params: LookupCompanyProduct | null,
   ) => {
     if (params) {
@@ -233,9 +173,8 @@ function AccountSubscription({
     }
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const   handleAddAccountSubscription = () => {
-     setAccountSubscriptionUpdateCount( accountSubscriptionUpdateCount + 1);
+  const handleAddAccountSubscription = () => {
+    setAccountSubscriptionUpdateCount(accountSubscriptionUpdateCount + 1);
   };
 
   useEffect(() => {
@@ -248,14 +187,13 @@ function AccountSubscription({
       controller.abort();
     };
   }, [
-     accountSubscriptionUpdateCount,
+    accountSubscriptionUpdateCount,
     pageSize,
     currentPage,
     dateRangeId,
     searchParameter,
     concatDate,
     selectedCompanyProduct,
-   
   ]);
 
   useEffect(() => {
@@ -339,8 +277,8 @@ function AccountSubscription({
             //   selectedAssignTo.id !== 0 ? selectedAssignTo.id : null
             // }
 
-            handleSelectedCompanyProductCheckBoxChange={
-              handleSelectedCompanyProductCheckBoxChange
+            handleSelectedCompanyProductChange={
+              handleSelectedCompanyProductChange
             }
             selectedCompanyProduct={{ id: 1, name: "" }}
             serviceStatusId={serviceStatus!}
@@ -373,7 +311,7 @@ function AccountSubscription({
               endDate,
               searchParameter,
             }}
-           
+
             accountSubscriptionData={accountSubscriptionData}
             onEndDateChange={handleEndDateChange}
             onStartDateChange={handleStartDateChange}
@@ -388,11 +326,11 @@ function AccountSubscription({
             //   selectedAssignTo.id !== 0 ? selectedAssignTo.id : null
             // }
 
-            handleSelectedCompanyProductCheckBoxChange={
-              handleSelectedCompanyProductCheckBoxChange
+            handleSelectedCompanyProductChange={
+              handleSelectedCompanyProductChange
             }
-            selectedCompanyProduct={{ id: 1, name: "" }}
-           
+            selectedCompanyProduct={selectedCompanyProduct}
+
             accountId={accountId}
           ></AccountSubscriptionManagementList>
         ) : (

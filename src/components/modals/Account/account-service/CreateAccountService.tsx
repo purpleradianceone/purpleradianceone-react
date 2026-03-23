@@ -16,6 +16,7 @@ import {
   MessageSquare,
   ThumbsUp,
   User,
+  Trash,
 } from "lucide-react";
 import FormLayout from "../../../ui/FormLayout";
 import React, { useEffect, useState, useMemo } from "react";
@@ -54,6 +55,7 @@ import CompanyUser from "../../../../@types/company-users/CompanyUser";
 import MESSAGE from "../../../../constants/Messages";
 import CompanyUserSearchFieldInput from "../../../ui/CompanyUserSearchFieldInput";
 import AddAccountServiceModalProps from "../../../../@types/modal/AddAccountServiceModalProps";
+import COLORS from "../../../../constants/Colors";
 
 interface CustomField {
   id: string;
@@ -72,14 +74,14 @@ const AddStock = ({
   const [isSaving, setIsSaving] = useState<boolean>(false);
 
   const [selectedServiceBookingSource, setSelectedServiceBookingSource] =
-    useState<number | undefined>(undefined);
+    useState<number | undefined>(1);
 
   const [selectedServiceLocationType, setSelectedServiceLocationType] =
-    useState<number | undefined>(undefined);
+    useState<number | undefined>(3);
 
   const [selectedServiceStatus, setselectedServiceStatus] = useState<
     number | undefined
-  >(undefined);
+  >(1);
 
   const { serviceBookingSource, isLoading: isLoadingForServiceBookingSource } =
     useServiceBookingSource();
@@ -150,6 +152,7 @@ const AddStock = ({
   const {
     handleChange: handleCreateServiceDetailFormChange,
     formData: addCreateServiceDetailFormData,
+    resetForm: resetCreateAccountForm,
   } = useFormChange(intialCreateServiceDetailFormData);
 
   const [isFollowUpRequired, setIsFollowUpRequired] = useState<boolean>(false);
@@ -178,21 +181,17 @@ const AddStock = ({
     generate_password: "",
   });
 
-  // const {
-  //   handleChange: handleAddStockFormDataChange,
-  //   formData: addStockFormData,
-  //   resetForm: resetStockCreateForm,
-  // } = useFormChange(intialAddStockFormData);
 
   // Note : on close Clear the states
   const handleCloseForm = () => {
-    // resetStockCreateForm();
+    resetCreateAccountForm();
 
     setProductSelected(null);
-    setSelectedServiceBookingSource(undefined);
-    setSelectedServiceLocationType(undefined);
-    setselectedServiceStatus(undefined);
+    setSelectedServiceBookingSource(1);
+    setSelectedServiceLocationType(3);
+    setselectedServiceStatus(1);
     setCustomerRating(0);
+    setIsFollowUpRequired(false);
 
     setError({
       productId: false,
@@ -293,23 +292,21 @@ const AddStock = ({
       service_booking_source_id: selectedServiceBookingSource,
       service_location_type_id: selectedServiceLocationType,
       location_address: addCreateServiceDetailFormData.location_address,
-      assignedto: assignedTo.id ?? null,
-      // assignedto: null,
+      assignedto: assignedTo.id === 0 ? null : assignedTo.id,
       service_notes: addCreateServiceDetailFormData.service_notes,
-      // customizations: JSON.stringify(fields),
       customizations: JSON.stringify(customizationsForBackend),
       cancellation_reason: addCreateServiceDetailFormData.cancellation_reason,
       customer_rating: customerRating,
       customer_feedback: addCreateServiceDetailFormData.customer_feedback,
       is_follow_up_required: isFollowUpRequired,
       next_service_due_date:
-        addCreateServiceDetailFormData.next_service_due_date || null,
+        addCreateServiceDetailFormData.next_service_due_date === "" ? null : addCreateServiceDetailFormData.next_service_due_date,
       createdby_id: loginStatus.id,
     };
     console.log("--------------");
     console.log(JSON.stringify(postData, null, 2));
     console.log("--------------");
-    alert(JSON.stringify(postData, null, 2));
+    // alert(JSON.stringify(postData, null, 2));
     setIsSaving(true);
     await axios
       .post(POST_API.CREATE_ACCOUNT_SERVICE, postData, {
@@ -707,21 +704,23 @@ const AddStock = ({
               // className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
               />
 
-              <div className="p-6 bg-white border rounded-lg shadow-sm max-w-4xl">
-                <div className="flex justify-between items-center mb-6">
+              <div className="p-2 bg-white border rounded-lg shadow-sm col-span-2">
+                <div className="flex justify-between items-center mb-4">
                   <h3 className="text-lg font-semibold text-gray-800">
                     Customizations
                   </h3>
-                  <button
+
+
+                  <Button
                     type="button"
                     onClick={addField}
-                    className="px-2 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition font-medium"
+                    className={COLORS.ADD_BUTTON}
                   >
                     + Add
-                  </button>
+                  </Button>
                 </div>
 
-                <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                   {fields.map((field) => (
                     <div
                       key={field.id}
@@ -735,7 +734,7 @@ const AddStock = ({
                           onChange={(e) =>
                             handleChange(field.id, "key", e.target.value)
                           }
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 outline-none"
+                          className="w-full px-3 py-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 outline-none"
                         />
                       </div>
 
@@ -747,16 +746,15 @@ const AddStock = ({
                           onChange={(e) =>
                             handleChange(field.id, "value", e.target.value)
                           }
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 outline-none"
+                          className="w-full px-3 py-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 outline-none"
                         />
                       </div>
 
                       <button
                         type="button"
                         onClick={() => removeField(field.id)}
-                        className="px-2 py-1 bg-red-500 text-white rounded-md hover:bg-red-600 transition"
                       >
-                        Remove
+                        <Trash size={SIZE.ICON_DELETE_BUTTON_SIZE} className={COLORS.ICON_DELETE_BUTTON}></Trash>
                       </button>
                     </div>
                   ))}
@@ -769,21 +767,6 @@ const AddStock = ({
                 </div>
               </div>
 
-              <div className="grid grid-cols-1">
-                <FormCheckbox
-                  label="Is Follow Up Required"
-                  name="is_follow_up_required"
-                  onChange={handleFollowUpRequiredChange}
-                  checked={isFollowUpRequired}
-                />
-              </div>
-
-              <DatePickerInput
-                label="Next Service Due Date"
-                name="next_service_due_date"
-                onChange={handleCreateServiceDetailFormChange}
-                logo={Calendar}
-              />
 
               <div className="grid grid-cols-1 items-center  gap-2  mb-0">
                 <div>
@@ -794,10 +777,7 @@ const AddStock = ({
                       // defaultValue={supportTicketData?.assignedToName}
                       onUserSelected={(user) => {
                         if (user && user?.id) {
-                          //
-                          console.log("--------------");
-                          console.log(user);
-                          console.log("--------------");
+
                           setAssignedTo(user);
                         }
                         if (user === null || user === undefined) {
@@ -813,8 +793,6 @@ const AddStock = ({
                             generate_password: "",
                           });
                         }
-                        console.log("selected user:");
-                        console.log(user);
                       }}
                       // isDisabled={!userHasAccessToViewUser}
                       disabledMessage={
@@ -824,7 +802,21 @@ const AddStock = ({
                   </div>
                 </div>
               </div>
+              <DatePickerInput
+                label="Next Service Due Date"
+                name="next_service_due_date"
+                onChange={handleCreateServiceDetailFormChange}
+                logo={Calendar}
+              />
 
+              <div className="grid grid-cols-1">
+                <FormCheckbox
+                  label="Is Follow Up Required"
+                  name="is_follow_up_required"
+                  onChange={handleFollowUpRequiredChange}
+                  checked={isFollowUpRequired}
+                />
+              </div>
               <CustomerRating
                 logo={ThumbsUp}
                 label="Customer Rating"

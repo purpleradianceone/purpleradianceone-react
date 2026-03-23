@@ -64,7 +64,8 @@ const ROUTES_URL = {
 
   // Quotation module
   QUOTATION_SETTINGS: "/settings/quotations",
-  QUOTATION_SETTINGS_CREATE_Template: "/settings/quotations/create",
+  QUOTATION_SETTINGS_CREATE_TEMPLATE: "/settings/quotations/create",
+  QUOTATION_SETTINGS_UPDATE_TEMPLATE: "/settings/quotations/update",
 
   // Account module
   ACCOUNT_MANAGEMENT: "/home/manage-accounts/accounts",
@@ -95,6 +96,7 @@ const ROUTES_URL = {
   SETTING_MEETINGS: "meetings",
   SETTING_ACCOUNT_TYPE: "account-type",
   SETTING_NOTIFICATIONS: "notification",
+  SETTING_REMINDER: "reminder",
   SETTING_GENERAL: "general",
   SETTING_SUPPORT_TICKET_CATEGORY: "support-ticket-category",
   SETTING_COMPANY_WAREHOUSE: "company-warehouse",

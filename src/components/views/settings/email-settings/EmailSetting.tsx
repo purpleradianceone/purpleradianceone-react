@@ -269,7 +269,7 @@ export default function EmailSettingsTabs() {
     setting: CompanyEmailSetting,
     index: number
   ) => (
-    <>
+    <div className="w-full h-full">
       <div className="flex justify-between">
         <div
           key={index}
@@ -336,18 +336,17 @@ export default function EmailSettingsTabs() {
                 {setting.email_security_type_id === 1
                   ? "SSL"
                   : setting.email_security_type_id === 2
-                  ? "TLS"
-                  : "Unknown"}
+                    ? "TLS"
+                    : "Unknown"}
               </span>
             </p>
           </div>
           <div className="flex items-center space-x-2 mb-2">
             <ShieldCheck
-              className={`w-5 h-5 ${
-                setting.authentication_required
-                  ? "text-emerald-600"
-                  : "text-gray-400"
-              }`}
+              className={`w-5 h-5 ${setting.authentication_required
+                ? "text-emerald-600"
+                : "text-gray-400"
+                }`}
             />
             <p className="text-gray-700 text-sm">
               <strong className="input-label-custom">
@@ -414,7 +413,7 @@ export default function EmailSettingsTabs() {
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 
   const renderUserEmailCard = (
@@ -492,18 +491,17 @@ export default function EmailSettingsTabs() {
                     {setting.email_security_type_id === 1
                       ? "SSL"
                       : setting.email_security_type_id === 2
-                      ? "TLS"
-                      : "Unknown"}
+                        ? "TLS"
+                        : "Unknown"}
                   </span>
                 </p>
               </div>
               <div className="flex items-center space-x-2 mb-2">
                 <ShieldCheck
-                  className={`w-5 h-5 ${
-                    setting.authentication_required
-                      ? "text-emerald-600"
-                      : "text-gray-400"
-                  }`}
+                  className={`w-5 h-5 ${setting.authentication_required
+                    ? "text-emerald-600"
+                    : "text-gray-400"
+                    }`}
                 />
                 <p className="text-gray-700 text-sm">
                   <strong className="input-label-custom">
@@ -583,38 +581,35 @@ export default function EmailSettingsTabs() {
       <div className="mb-2 flex border-b border-gray-300">
         <button
           onClick={() => setActiveTab("company")}
-          className={`px-4 py-2 text-sm font-medium border-b-2 transition ${
-            activeTab === "company"
-              ? "border-teal-600 table-header-custom active"
-              : "border-transparent table-header-custom"
-          }`}
+          className={`px-4 py-2 text-sm font-medium border-b-2 transition ${activeTab === "company"
+            ? "border-teal-600 table-header-custom active"
+            : "border-transparent table-header-custom"
+            }`}
         >
           Company Email Settings
         </button>
         <button
           onClick={() => setActiveTab("user")}
-          className={`ml-4 px-4 py-2 text-sm font-medium border-b-2 transition ${
-            activeTab === "user"
-              ? "border-teal-600 table-header-custom active"
-              : "border-transparent table-header-custom"
-          }`}
+          className={`ml-4 px-4 py-2 text-sm font-medium border-b-2 transition ${activeTab === "user"
+            ? "border-teal-600 table-header-custom active"
+            : "border-transparent table-header-custom"
+            }`}
         >
           Company User Email Settings
         </button>
         <button
           onClick={() => setActiveTab("email type")}
-          className={`ml-4 px-4 py-2 text-sm font-medium border-b-2 transition ${
-            activeTab === "email type"
-              ? "border-teal-600 table-header-custom active"
-              : "border-transparent table-header-custom"
-          }`}
+          className={`ml-4 px-4 py-2 text-sm font-medium border-b-2 transition ${activeTab === "email type"
+            ? "border-teal-600 table-header-custom active"
+            : "border-transparent table-header-custom"
+            }`}
         >
           Email Type
         </button>
       </div>
 
       {/* Content */}
-      <div>
+      <div className="h-[78vh]">
         {activeTab === "company" ? (
           <div className="w-full">
             {userHasAccessToViewEmailSettingCompany ? (
@@ -623,7 +618,7 @@ export default function EmailSettingsTabs() {
                   <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-600"></div>
                 </div>
               ) : (
-                <div>
+                <div className="w-full ">
                   {companySettings.length > 0 ? (
                     companySettings.map(renderCompanyEmailCard)
                   ) : (
