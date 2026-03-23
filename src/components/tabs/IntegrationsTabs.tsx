@@ -10,7 +10,7 @@ function IntegrationsTabs() {
    const TABS = [
     { label: "Web Form Integration", value: "webFormIntegration", path: "" }, // index route
     { label: "Meta Apps", value: "meta", path: ROUTES_URL.SETTING_META_APP },
-    { label: "IndiaMART", value: "indiaMART", path: ROUTES_URL.SETTING_INDIAMART },
+    // { label: "IndiaMART", value: "indiaMART", path: ROUTES_URL.SETTING_INDIAMART },
     { label: "LinkedIn", value: "linkedIn", path: ROUTES_URL.SETTING_LINKEDIN },
     {
       label: "Google Ads",

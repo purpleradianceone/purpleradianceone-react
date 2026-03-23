@@ -176,14 +176,6 @@ const MetaIntegration: React.FC<MetaIntegrationProps> = ({
       </div>
       {showDisconnectPopUp && (
         <FormLayout widthPercent={35} padding={1}>
-          {/* <FormHeader
-            icon={AlertTriangle}
-            onClose={() => {
-              setShowDisconnectPopUp(false);
-            }}
-            preText="Disconnect Facebook Account"
-            description="Please confirm before performing this action because action cannot be undone."
-          ></FormHeader> */}
           <div className="bg-pink-00 p-2 h-full">
             <div className="max-w-md rounded-xl space-y-5">
               {/* Header */}
@@ -231,30 +223,6 @@ const MetaIntegration: React.FC<MetaIntegrationProps> = ({
                 </button>
               </div>
             </div>
-            {/* <div className="flex items-center justify-end w-full ">
-              <div className="flex gap-2">
-                <Button
-                  type="button"
-                  onClick={() => {
-                    setShowDisconnectPopUp(false);
-                  }}
-                >
-                  <div className="flex items-center gap-0.5">
-                    <X className="" size={SIZE.CANCEL_BUTTON_LOGO_SIZE} />
-                    <span>Cancel</span>
-                  </div>
-                </Button>
-                <Button
-                  type="submit"
-                  onClick={handelConfirmFacebookAccountRemove}
-                >
-                  <div className="flex items-center gap-0.5">
-                    <Save className="" size={SIZE.SAVE_BUTTON_LOGO_SIZE} />
-                    <span>Confirm</span>
-                  </div>
-                </Button>
-              </div>
-            </div> */}
           </div>
         </FormLayout>
       )}

@@ -13,9 +13,25 @@ export const getFacebookPageDetails  = async (payload: object
     return response;
 }
 
+/**
+ * 
+ * @param payload  - object contains post data
+ * @returns response or error
+ */
 export const createConnectFacebookPage  = async (payload: object
 ) => {
     const response = await axiosClient.post(POST_API.CREATE_CONNECT_FACEBOOK_PAGE, payload, { withCredentials: true })
+    return response;
+}
+
+/**
+ * CREATE CONNECT WHATSAPP ACCOUNT API
+ * @param payload - object contains post data
+ * @returns response or error
+ */
+export const createConnectWhatsappAccount  = async (payload: object
+) => {
+    const response = await axiosClient.post(POST_API.CREATE_CONNECT_WHATSAPP_ACCOUNT, payload, { withCredentials: true })
     return response;
 }
 
