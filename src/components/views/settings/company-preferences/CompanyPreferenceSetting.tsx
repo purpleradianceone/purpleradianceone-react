@@ -5,7 +5,10 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
 import POST_API from "../../../../constants/PostApi";
-import { notificationsDesription, STATUS_CODE } from "../../../../constants/AppConstants";
+import {
+  notificationsDesription,
+  STATUS_CODE,
+} from "../../../../constants/AppConstants";
 import ApiError from "../../../../@types/error/ApiError";
 import RefreshToken from "../../../../config/validations/RefreshToken";
 import CompanyPreferencesType from "../../../../@types/settings/CompanyPreferences";
@@ -21,7 +24,7 @@ interface PreferenceCardProps {
   label: string;
   name: string;
   checked: boolean;
-  description? : string;
+  description?: string;
   onToggle: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
@@ -30,17 +33,17 @@ const PreferenceCard: React.FC<PreferenceCardProps> = ({
   name,
   checked,
   onToggle,
-  description
+  description,
 }) => {
   return (
-    <div className={`relative rounded-lg p-4 bg-white shadow-sm border border-gray-100 flex flex-col justify-between ${description ? "h-36 gap-0" : "h-28"}`}>
+    <div
+      className={`relative rounded-lg p-4 bg-white shadow-sm border border-gray-100 flex flex-col justify-between ${description ? "h-36 gap-0" : "h-28"}`}
+    >
       <div>
-        <h3 className="table-data-custom">
-          {label}
-        </h3>
+        <h3 className="table-data-custom">{label}</h3>
       </div>
-<p className="caption-custom m-0 p-0">{description}</p>
-      <label className="inline-flex items-center cursor-pointer relative self-end"> 
+      <p className="caption-custom m-0 p-0">{description}</p>
+      <label className="inline-flex items-center cursor-pointer relative self-end">
         <input
           type="checkbox"
           className="sr-only peer"
@@ -67,7 +70,7 @@ function CompanyPreferenceSetting() {
     useState<CompanyPreferencesType | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const {userHasAccessToUpdateCompanyPreferences} = useUserAccessModules();
+  const { userHasAccessToUpdateCompanyPreferences } = useUserAccessModules();
   const getCompanyPreferences = async () => {
     setIsLoading(true);
     const getCompanyPreferencesPostData = {
@@ -78,7 +81,7 @@ function CompanyPreferenceSetting() {
       const response = await axios.post(
         POST_API.GET_COMPANY_PREFERENCES,
         getCompanyPreferencesPostData,
-        { withCredentials: true }
+        { withCredentials: true },
       );
 
       if (response.status === STATUS_CODE.OK) {
@@ -112,10 +115,13 @@ function CompanyPreferenceSetting() {
   };
 
   const handleCompanyPreferenceCheckboxChange = async (
-    event: React.ChangeEvent<HTMLInputElement>
+    event: React.ChangeEvent<HTMLInputElement>,
   ) => {
-    if(!userHasAccessToUpdateCompanyPreferences) {
-      toast.error(MESSAGE.MODULE_ACCESS.SETTING.COMPANY_PREFERENCE_SETTING.DENIED_UPDATE_ACCESS)
+    if (!userHasAccessToUpdateCompanyPreferences) {
+      toast.error(
+        MESSAGE.MODULE_ACCESS.SETTING.COMPANY_PREFERENCE_SETTING
+          .DENIED_UPDATE_ACCESS,
+      );
       return;
     }
     const { name, checked } = event.target;
@@ -139,7 +145,7 @@ function CompanyPreferenceSetting() {
       const response = await axios.post(
         POST_API.UPDATE_COMPANY_PREFERENCES,
         updateCompanyPreferencesPostData,
-        { withCredentials: true }
+        { withCredentials: true },
       );
 
       if (response.status === STATUS_CODE.OK) {
@@ -153,7 +159,7 @@ function CompanyPreferenceSetting() {
     } catch (error: ApiError | any) {
       if (error.status === STATUS_CODE.UNATHORISED) {
         const refreshTokenStatus = await RefreshToken({
-          callFunctionWithEvent: handleCompanyPreferenceCheckboxChange
+          callFunctionWithEvent: handleCompanyPreferenceCheckboxChange,
         });
         if (refreshTokenStatus) {
           handleCompanyPreferenceCheckboxChange(event);
@@ -166,40 +172,43 @@ function CompanyPreferenceSetting() {
     getCompanyPreferences();
   }, []);
 
- 
-  const getDescription = (preferenceId : number,isActive : boolean) => {
-    if(preferenceId === 1){
-      return isActive ? notificationsDesription.active.emailNotifications : notificationsDesription.inactive.emailNotifications;
+  const getDescription = (preferenceId: number, isActive: boolean) => {
+    if (preferenceId === 1) {
+      return isActive
+        ? notificationsDesription.active.emailNotifications
+        : notificationsDesription.inactive.emailNotifications;
+    } else if (preferenceId === 2) {
+      return isActive
+        ? notificationsDesription.active.mobileAppNotifications
+        : notificationsDesription.inactive.mobileAppNotifications;
+    } else if (preferenceId === 3) {
+      return isActive
+        ? notificationsDesription.active.webAppNotifications
+        : notificationsDesription.inactive.webAppNotifications;
     }
-    else if(preferenceId === 2){
-      return isActive ? notificationsDesription.active.mobileAppNotifications : notificationsDesription.inactive.mobileAppNotifications;
-    }
-    else if(preferenceId === 3){
-      return isActive ? notificationsDesription.active.webAppNotifications : notificationsDesription.inactive.webAppNotifications;
-    }
-  }
+  };
 
   return (
     <div className="w-full min-h-screen  lg:p-2">
       {/* <div className="text-center mb-3"> */}
-        {/* <p className="table-data-custom mt-2">
+      {/* <p className="table-data-custom mt-2">
           Choose how you want to receive notifications. You can enable or disable different channels based on your preference. Notifications will be sent through Email, Mobile, or directly in your Web browser.
         </p> */}
-        <FormHeader
-          preText="Manage your company's default settings and services."
-          description="Choose how you want to receive notifications. You can enable or disable different channels based on your preference. Notifications will be sent through Email, Mobile, or directly in your Web browser.
+      <FormHeader
+        preText="Manage your company's default settings and services."
+        description="Choose how you want to receive notifications. You can enable or disable different channels based on your preference. Notifications will be sent through Email, Mobile, or directly in your Web browser.
 "
-          onClose={() => {
-            // setCompanyUserModalOpen(false);
-          }}
-          icon={Bell}
-          isModal={false}
-          wantBorderBottom={false}
-        />
+        // onClose={() => {
+        //   // setCompanyUserModalOpen(false);
+        // }}
+        icon={Bell}
+        isModal={false}
+        wantBorderBottom={false}
+      />
       {/* </div> */}
       {isLoading ? (
         <>
-        <LoadingSpinner />
+          <LoadingSpinner />
         </>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-1">
@@ -210,21 +219,30 @@ function CompanyPreferenceSetting() {
                 name="isEmailServiceOn"
                 checked={companyPreferences.isEmailServiceOn}
                 onToggle={handleCompanyPreferenceCheckboxChange}
-                description={getDescription(1,companyPreferences.isEmailServiceOn)}
+                description={getDescription(
+                  1,
+                  companyPreferences.isEmailServiceOn,
+                )}
               />
               <PreferenceCard
                 label="Mobile App Notifications"
                 name="isNotificationServiceMobileOn"
                 checked={companyPreferences.isNotificationServiceMobileOn}
                 onToggle={handleCompanyPreferenceCheckboxChange}
-                description={getDescription(2,companyPreferences.isNotificationServiceMobileOn)}
+                description={getDescription(
+                  2,
+                  companyPreferences.isNotificationServiceMobileOn,
+                )}
               />
               <PreferenceCard
                 label="Web App Notifications"
                 name="isNotificatonServiceWebOn"
                 checked={companyPreferences.isNotificatonServiceWebOn}
                 onToggle={handleCompanyPreferenceCheckboxChange}
-                description={getDescription(3,companyPreferences.isNotificatonServiceWebOn)}
+                description={getDescription(
+                  3,
+                  companyPreferences.isNotificatonServiceWebOn,
+                )}
               />
             </>
           )}

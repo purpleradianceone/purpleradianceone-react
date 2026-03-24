@@ -1,12 +1,12 @@
 type MasterTaskProps = {
   id: number;
-
+  subject: string;
   generalTaskTypeId: number;
   generalTaskTypeName: string;
 
   generalTaskPriorityId: number;
   generalTaskPriorityName: string;
-
+  extension: string;
   frequencyId: number;
   frequencyName: string;
   frequencyInterval: number;
@@ -27,6 +27,7 @@ type MasterTaskProps = {
 
   createdOn: string;
   updatedOn: string;
+  cdnUrl: string;
 };
 
 export default MasterTaskProps;

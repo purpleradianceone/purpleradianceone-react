@@ -7,6 +7,7 @@ import {
 } from "../../constants/AppConstants";
 import LiveStockForCompanyProduct from "../../@types/stock/LiveStockForCompanyProduct";
 import { useMemo, useRef } from "react";
+import { useUserAccessModules } from "../../config/hooks/useAccessModules";
 
 const StockLiveForCompanyProductAgGrid = ({
   data,
@@ -18,7 +19,7 @@ const StockLiveForCompanyProductAgGrid = ({
   onRowSelect?: (data: LiveStockForCompanyProduct | any) => void;
 }) => {
   const gridRef = useRef<AgGridReact>(null); // Ref to the AgGridReact component
-
+  const { userHasAccessToAddStock } = useUserAccessModules();
   const columnDefs = useMemo<ColDef[]>(
     () => [
       {
@@ -98,26 +99,35 @@ const StockLiveForCompanyProductAgGrid = ({
       },
       {
         headerName: "Actions",
-        field: "view",
+        field: "",
         pinned: "right",
         maxWidth: 80,
         cellRenderer: (params: LiveStockForCompanyProduct | any) => {
           return (
             <div className="flex items-center justify-center">
-              <span
-                className="lead-details"
+              <button
+                type="button"
+                disabled={!userHasAccessToAddStock}
+                className={`px-2 py-1 rounded text-sm
+            ${
+              userHasAccessToAddStock
+                ? "bg-blue-500 text-white hover:bg-blue-600"
+                : "bg-gray-200 text-gray-400 cursor-not-allowed opacity-60"
+            }`}
                 onClick={() => {
+                  if (!userHasAccessToAddStock) return;
+
                   params.context.handleRowSelect(params.data);
                 }}
               >
                 {"Add Stock"}
-              </span>
+              </button>
             </div>
           );
         },
       },
     ],
-    [],
+    [userHasAccessToAddStock],
   );
 
   const defaultColDef = useMemo(

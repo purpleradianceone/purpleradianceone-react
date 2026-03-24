@@ -23,16 +23,11 @@
 
 import { Editor } from "@craftjs/core";
 import { PageBlockQuotation } from "../../blocks/PageBlockQuotation";
-import {
-  CanvasWrapperQuotation,
-  STORAGE_KEY,
-} from "../canvas-wrapper/CanvasWrapperQuotation";
+import { CanvasWrapperQuotation } from "../canvas-wrapper/CanvasWrapperQuotation";
 import { SectionBlockQuotation } from "../../blocks/SectionBlockQuotation";
 import { SidebarQuotation } from "../../sidebar/SidebarQuotation";
 import { useUserPreference } from "../../../../context/user/UserPreference";
-import Button from "../../../ui/Button";
-import { QuoteIcon, Save } from "lucide-react";
-import { SIZE } from "../../../../constants/AppConstants";
+import { STATUS_CODE } from "../../../../constants/AppConstants";
 import COLORS from "../../../../constants/Colors";
 import { ImageBlockQuotation } from "../../blocks/ImageBlockQuotation";
 import { DocumentCanvasQuotation } from "../../blocks/DocumentCanvasQuotation";
@@ -50,6 +45,14 @@ import {
   DynamicFieldOption,
   DynamicFieldsContext,
 } from "../../../email-template/DynamicFieldsContext";
+import { handleApiError } from "../../../../config/error/handleApiError";
+import axiosClient from "../../../../axios-client/AxiosClient";
+import POST_API from "../../../../constants/PostApi";
+import AutoScrollWrapper from "../../utils/AutoScrollWrapper";
+import { QuotationTemplateSettingsPanelCreate } from "../../template-panel/QuotationTemplateSettingsPanelCreate";
+import QuotationIconSvg from "../../svg/QuotationIconSvg";
+import { STORAGE_KEY_CREATE } from "../../local-storage/LocalStorageKeys";
+import { QuotationEditorSkeleton } from "../../utils/QuotationEditorSkeleton";
 
 export const EditorCanvasForQuotation: React.FC = () => {
   const canvasBgColor = "#f9f9f9";
@@ -61,12 +64,16 @@ export const EditorCanvasForQuotation: React.FC = () => {
     convertPlaceholdersToFields(placeHolderData);
 
   const [editorStateData, setEditorStateData] = useState(() => {
-    const jsonEditorState = localStorage.getItem(STORAGE_KEY + loginStatus.id);
+    const jsonEditorState = localStorage.getItem(
+      STORAGE_KEY_CREATE + loginStatus.id,
+    );
     return jsonEditorState;
   });
 
+  const [isLoadingForData, setIsLogingForData] = useState<boolean>(true);
+
   useEffect(() => {
-    const jsonEditorState = localStorage.getItem(STORAGE_KEY);
+    const jsonEditorState = localStorage.getItem(STORAGE_KEY_CREATE);
     if (jsonEditorState) {
       setEditorStateData(jsonEditorState);
       console.log("stored Local storage editor json state:");
@@ -74,82 +81,36 @@ export const EditorCanvasForQuotation: React.FC = () => {
     }
   }, []);
 
-const placeholderDatafromApi = [
-  {
-    isactive: true,
-    name: "{{quotation_number}}",
-    id: 1,
-    email_type_id: 1
-  },
-  {
-    isactive: true,
-    name: "{{quotation_date}}",
-    id: 2,
-    email_type_id: 1
-
-  },
-  {
-    isactive: true,
-    name: "{{quotation_valid_till}}",
-    id: 3,
-    email_type_id: 1
-
-  },
-  {
-    isactive: true,
-    name: "{{client_name}}",
-    id: 4,
-    email_type_id: 1
-
-  },
-  {
-    isactive: true,
-    name: "{{client_company}}",
-    id: 5,
-    email_type_id: 1
-
-  },
-  {
-    isactive: true,
-    name: "{{client_address}}",
-    id: 6,
-    email_type_id: 1
-
-  },
-  {
-    isactive: true,
-    name: "{{company_name}}",
-    id: 7,
-    email_type_id: 1
-
-  },
-  {
-    isactive: true,
-    name: "{{company_address}}",
-    id: 8,
-    email_type_id: 1
-  },
-  {
-    isactive: true,
-    name: "{{authorized_name}}",
-    id: 9,
-    email_type_id: 1
-  },
-  {
-    isactive: true,
-    name: "{{authorized_designation}}",
-    id: 10,
-    email_type_id: 1
-  },
-];
-
+  const getPlaceholderForQuotation = () => {
+    try {
+      setIsLogingForData(true);
+      axiosClient
+        .post(POST_API.GET_QUOTATION_PLACEHOLDER, {
+          company_id: loginStatus.companyId,
+          isactive: true,
+          requestedby: loginStatus.id,
+        })
+        .then((response) => {
+          if (response.status === STATUS_CODE.OK) {
+            setPlaceHolderData(response.data);
+          }
+        })
+        .finally(() => {
+          setIsLogingForData(false);
+        });
+    } catch (e) {
+      handleApiError(e);
+    }
+  };
 
   useEffect(() => {
-    setPlaceHolderData(placeholderDatafromApi);
-    // parsedFields = convertPlaceholdersToFields(placeHolderData);
+    getPlaceholderForQuotation();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return (
+  return isLoadingForData ? (
+    <QuotationEditorSkeleton />
+  ) : (
     <div
       className={`w-full pt-0.5 ${
         userPreference.isLeftMenu ? "pl-5" : "px-1"
@@ -163,24 +124,17 @@ const placeholderDatafromApi = [
         >
           <div className="flex justify-start items-center w-fit gap-5">
             <div className="flex justify-center items-center gap-1">
-              <QuoteIcon className={COLORS.GRID_HEADER_ICONS_COLOR_AND_SIZE} />
-              <span className="section-header-custom">Quotation Template Builder</span>
+              {/* <QuoteIcon className={COLORS.GRID_HEADER_ICONS_COLOR_AND_SIZE} /> */}
+              <QuotationIconSvg
+                strokeWidth={2}
+                size={26}
+                className="text-blue-600"
+                showCurrency={true}
+              />
+              <span className="section-header-custom">
+                Quotation Template Builder
+              </span>
             </div>
-          </div>
-
-          <div className="flex max-w-60 min-h-7 h-8">
-            <Button
-              type="submit"
-              // disabled={!userHasAccessToAddEmailTemplateSetting}
-              onClick={(e) => {
-                e.preventDefault();
-              }}
-            >
-              <div className="flex items-center justify-center gap-1">
-                <Save size={SIZE.SIXTEEN} />
-                <span>Save</span>
-              </div>
-            </Button>
           </div>
         </div>
         <Editor
@@ -204,17 +158,19 @@ const placeholderDatafromApi = [
             >
               <SidebarQuotation />
             </aside>
-
-            {/* MAIN CANVAS (SCROLLABLE) */}
-            <main
-              className="flex-1 relative overflow-auto p-[20px]"
-              style={{ backgroundColor: canvasBgColor }}
-            >
-              <div id="CANVAS" className=" w-full">
-                <CanvasWrapperQuotation data={editorStateData ?? ""} />
-              </div>
-            </main>
+            <AutoScrollWrapper threshold={200} scrollSpeed={25}>
+              {/* MAIN CANVAS (SCROLLABLE) */}
+              <main
+                className="flex-1 relative overflow-auto p-[40px]"
+                style={{ backgroundColor: canvasBgColor }}
+              >
+                <div id="CANVAS" className=" w-full">
+                  <CanvasWrapperQuotation data={editorStateData ?? ""} />
+                </div>
+              </main>
+            </AutoScrollWrapper>
           </div>
+          <QuotationTemplateSettingsPanelCreate quotationTemplateNamePlaceholder="Enter quotation name. (ex: Quotation 1)"/>
         </Editor>
       </DynamicFieldsContext.Provider>
     </div>

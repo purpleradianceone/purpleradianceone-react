@@ -37,7 +37,7 @@ function MeetingSettings() {
   ];
 
   return (
-    <div className="w-full max-w-2xl min-h-96 mx-auto p-6 space-y-4">
+    <div className="w-full max-w-2xl min-h-[81vh] mx-auto p-6 space-y-4">
       {meetingSettings.map((platform) => (
         <div
           key={platform.id}

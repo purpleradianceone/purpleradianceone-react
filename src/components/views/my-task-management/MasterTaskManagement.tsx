@@ -7,7 +7,10 @@ import { useEffect, useState } from "react";
 import useTaskPriority from "../../../config/hooks/useTaskPriority";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
 import { LocalStorageKeys } from "../../../enums/LocalStorageKeys";
-import { customDateRangeId, useSearchFilterPaginationDateHandlers } from "../../../config/hooks/usePaginationHandler";
+import {
+  customDateRangeId,
+  useSearchFilterPaginationDateHandlers,
+} from "../../../config/hooks/usePaginationHandler";
 import POST_API from "../../../constants/PostApi";
 import axiosClient from "../../../axios-client/AxiosClient";
 import { STATUS_CODE } from "../../../constants/AppConstants";
@@ -18,6 +21,7 @@ import PostDataToGetMasterTask from "../../../@types/my-task-management/PostData
 import useTaskType from "../../../config/hooks/useTaskType";
 import useTaskFrequency from "../../../config/hooks/useTaskFrequency";
 import CompanyUser from "../../../@types/company-users/CompanyUser";
+import toast from "react-hot-toast";
 
 function MasterTaskManagement({
   isUsedInAllTasksModule,
@@ -138,6 +142,8 @@ function MasterTaskManagement({
         const formattedData: MasterTaskProps[] = responseData.map(
           (item: any) => ({
             id: item.id,
+            subject: item.subject,
+            extension: item.document_file_extension,
             generalTaskTypeName: item.general_task_type_name,
             generalTaskPriorityId: item.general_task_priority_id,
             generalTaskPriorityName: item.general_task_priority_name,
@@ -170,6 +176,49 @@ function MasterTaskManagement({
           getMasterTaskData(signal);
         }
       }
+    }
+  };
+
+  const downloadTaskDocument = async (event: any) => {
+    try {
+      const data = event.data;
+      const response = await axiosClient.post(
+        POST_API.GET_GENERAL_TASK_MASTER_DOCUMENT,
+        {
+          id: data.id,
+          company_id: loginStatus.companyId,
+          requestedby_id: loginStatus.id,
+        },
+        {
+          responseType: "blob", // VERY IMPORTANT
+          withCredentials: true,
+        },
+      );
+
+      // Create download link
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
+
+      const contentDisposition = response.headers["content-disposition"];
+
+      let fileName = `task_document.${data?.extension}`;
+
+      // If backend sends filename → override
+      if (contentDisposition) {
+        const fileNameMatch = contentDisposition.match(/filename="?(.+)"?/);
+        if (fileNameMatch?.length === 2) {
+          fileName = fileNameMatch[1];
+        }
+      }
+
+      link.setAttribute("download", fileName);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to download document");
     }
   };
 
@@ -294,6 +343,7 @@ function MasterTaskManagement({
             handleSelectedCompanyUser={setSelectedCompanyUser}
             isActive={isActive}
             setIsActive={setIsActive}
+            downloadTaskDocument={downloadTaskDocument}
           />
         ) : (
           <div className="flex-none mx-96 mt-14">

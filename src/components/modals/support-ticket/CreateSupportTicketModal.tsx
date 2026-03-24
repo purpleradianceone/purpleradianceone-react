@@ -217,7 +217,7 @@ function CreateSupportTicketModal({
     } else {
       setCompanyProductSla([]);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedAccount]);
 
   useEffect(() => {

@@ -1,0 +1,55 @@
+.blockCard {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  gap: 16px;
+  cursor: pointer;
+}
+
+/* .grid {
+  display: flex;
+  width: 100%;
+  padding: 20px;
+  gap: 20px;
+} */
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  width: 100%;
+  padding: 20px;
+}
+.blockLogoWrapper {
+  width: 50px;
+  height: 50px;
+}
+.blockCard {
+  width: 100%;
+}
+
+.blockLogoWrapper {
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.blockContent {
+  flex: 1;
+}
+.blockTitle {
+  font-size: 16px;
+  font-weight: 600;
+     color: rgb(57, 57, 252);
+}
+.logoColor{
+    color: rgb(57, 57, 252);
+}
+
+.blockDescription {
+  font-size: 14px;
+  color: gray;
+}

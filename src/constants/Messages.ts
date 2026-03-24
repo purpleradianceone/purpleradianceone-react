@@ -36,7 +36,8 @@ const MESSAGE = {
         SELECT_DIFFERENT_USER: "Select different user.",
 
         MODULE_ACCESS_UPDATE: "You do not have permission to update details.",
-        SAME_PRODUCT_SELECTED : "Same product selected."
+        SAME_PRODUCT_SELECTED : "Same product selected.",
+        DENIED_FACEBOOK_INTEGRATION_MESSAGE:"Facebook account is already connected. you can integrate pages."
     },
     SUCCESS: {
         LOGGED_IN: "Logged In",
@@ -153,6 +154,16 @@ const MESSAGE = {
             DENIED_VIEW_ACCESS: "You do not have permission to view account contacts.",
             DENIED_ADD_ACCESS: "You do not have permission to add account contact.",
             DENIED_UPDATE_ACCESS: "You do not have permission to update account contact",
+        },
+        ACCOUNT_SERVICE: {
+            DENIED_VIEW_ACCESS: "You do not have permission to view account service.",
+            DENIED_ADD_ACCESS: "You do not have permission to add account service.",
+            DENIED_UPDATE_ACCESS: "You do not have permission to update account service",
+        },
+        ACCOUNT_SUBSCRIPTION: {
+            DENIED_VIEW_ACCESS: "You do not have permission to view account subscription.",
+            DENIED_ADD_ACCESS: "You do not have permission to add account subscription.",
+            DENIED_UPDATE_ACCESS: "You do not have permission to update account subscription",
         },
         LEADS_SETTINGS: {
             DENIED_VIEW_ACCESS: "You do not have permission to view lead settings.",

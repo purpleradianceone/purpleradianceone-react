@@ -1,7 +1,8 @@
-
 import { useState } from "react";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
-import axiosClient from "../../../../axios-client/AxiosClient";
+import {
+  createConnectFacebookPage,
+} from "../../../../config/apis/IntegrationApis";
 
 type ConnectionStatus = "idle" | "loading" | "success" | "error";
 
@@ -10,54 +11,93 @@ interface ConnectedPage {
   pageName: string;
 }
 
-export default function PageIdIntegration(
-    
- ) {
-
-    const {loginStatus}= useLoggedInUserContext();
+export default function PageIdIntegration({
+  handleRefreshApiCall,
+}:{
+  handleRefreshApiCall : ()=> void;
+}) {
+  const { loginStatus } = useLoggedInUserContext();
   const [pageId, setPageId] = useState("");
   const [status, setStatus] = useState<ConnectionStatus>("idle");
   const [message, setMessage] = useState("");
-  const [connectedPage, setConnectedPage] = useState<ConnectedPage | null>(null);
+  const [connectedPage, setConnectedPage] = useState<ConnectedPage | null>(
+    null,
+  );
 
- const handleSubmit = async () => {
-  if (!pageId.trim()) {
-    setStatus("error");
-    setMessage("Please enter a Page ID.");
-    return;
-  }
+  // NEED TO WORK HERE NOTE BELOW
+  // Note : do the service orchestration , instead of multiple calls.
+  // do the handling in the backend.
+  const handleSubmit = async () => {
+    if (!pageId.trim()) {
+      setStatus("error");
+      setMessage("Please enter a Page ID.");
+      return;
+    }
 
-  setStatus("loading");
-  setMessage("");
+    setStatus("loading");
+    setMessage("");
 
-  try {
-    const res = await axiosClient.post(
-      `https://cdranalysis.com/api/main/purple-crm-api/facebook/connect-page?companyId=${loginStatus.companyId}&pageId=${pageId.trim()}`
-    );
+    // const postDataForFacebookCompanyStatus = {
+    //   company_id: loginStatus.companyId,
+    //   requestedby: loginStatus.id,
+    // };
 
-    // backend returns plain string on success e.g. "Page 'Crm test page' connected successfully!"
-    const responseText = typeof res.data === "string" ? res.data : res.data?.message ?? "Connected";
+    // let facebookPageTokenId = null;
+    // const response = await getFacebookComapnyStatus(
+    //   postDataForFacebookCompanyStatus,
+    // );
 
-    const page: ConnectedPage = {
-      pageId: pageId.trim(),
-      pageName: responseText,
-    };
-    setConnectedPage(page);
-    setStatus("success");
-    setMessage(responseText);
+    // if (response.status === STATUS_CODE.OK) {
+    //   if (response.data.status) {
+    //     facebookPageTokenId = response.data.id;
+    //   }
+    // }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } catch (error: any) {
-    setStatus("error");
-    // Spring error object comes in error.response.data
-    const data = error?.response?.data;
-    const errMsg =
-      typeof data === "string"
-        ? data
-        : data?.message ?? "Failed to connect page."; //  extract message field
-    setMessage(errMsg);
-  }
-};
+    // Note : need to make changes for the facebook company token id
+    try {
+      const postData = {
+        company_id: loginStatus.companyId,
+        page_id: pageId.trim(),
+        company_user_id: loginStatus.id,
+        // facebook_company_token_id: facebookPageTokenId,
+        createdby_id: loginStatus.id,
+      };
+
+      const res = await createConnectFacebookPage(postData);
+
+      // backend returns plain string on success e.g. "Page 'Crm test page' connected successfully!"
+      const responseText =
+        typeof res.data === "string"
+          ? res.data
+          : (res.data?.message ?? "Connected");
+
+      const page: ConnectedPage = {
+        pageId: pageId.trim(),
+        pageName: responseText,
+      };
+      if (res.data.status) {
+        setStatus("success");
+      } else {
+        setStatus("error");
+      }
+      setConnectedPage(page);
+      setMessage(responseText);
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      setStatus("error");
+      // Spring error object comes in error.response.data
+      const data = error?.response?.data;
+      const errMsg =
+        typeof data === "string"
+          ? data
+          : (data?.message ?? "Failed to connect page."); //  extract message field
+      setMessage(errMsg);
+    }finally{
+      // Note : to refresh the page list perform the refresh api call
+      handleRefreshApiCall()
+    }
+  };
 
   const handleReset = () => {
     setPageId("");
@@ -67,130 +107,141 @@ export default function PageIdIntegration(
   };
 
   return (
-    <div style={styles.wrapper}>
-      {/* Header */}
-      <div style={styles.header}>
-        <div style={styles.fbIcon}>
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="white">
-            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
-          </svg>
-        </div>
-        <div>
-          <h2 style={styles.title}>Connect Facebook Page</h2>
-          <p style={styles.subtitle}>Link your page to receive leads in your CRM</p>
-        </div>
-      </div>
-
-      {/* Success State */}
-      {status === "success" && connectedPage ? (
-        <div style={styles.successCard}>
-          <div style={styles.successIcon}>✓</div>
+    <div className="w-full flex items-center  justify-center">
+      <div style={styles.wrapper}>
+        {/* Header */}
+        <div style={styles.header}>
+          <div style={styles.fbIcon}>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="white">
+              <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+            </svg>
+          </div>
           <div>
-            <p style={styles.successTitle}>Page Connected!</p>
-            <p style={styles.successSub}>
-              <strong>{connectedPage.pageName}</strong> is now sending leads to your CRM.
+            <h2 style={styles.title}>Connect Facebook Page</h2>
+            <p style={styles.subtitle}>
+              Link your page to receive leads in your CRM
             </p>
-            <p style={styles.pageIdBadge}>Page ID: {connectedPage.pageId}</p>
           </div>
-          <button style={styles.resetBtn} onClick={handleReset}>
-            Connect another page
-          </button>
         </div>
-      ) : (
-        <>
-          {/* Input Section */}
-          <div style={styles.inputSection}>
-            <label style={styles.label}>Facebook Page ID</label>
-            <div style={styles.inputRow}>
-              <input
-                style={{
-                  ...styles.input,
-                  borderColor: status === "error" ? "#ef4444" : "#e2e8f0",
-                  boxShadow: status === "error" ? "0 0 0 3px rgba(239,68,68,0.1)" : "none",
-                }}
-                type="text"
-                placeholder="e.g. 1012524338613313"
-                value={pageId}
-                onChange={(e) => {
-                  setPageId(e.target.value);
-                  if (status === "error") setStatus("idle");
-                }}
-                onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
-                disabled={status === "loading"}
-              />
-              <button
-                style={{
-                  ...styles.connectBtn,
-                  opacity: status === "loading" ? 0.7 : 1,
-                  cursor: status === "loading" ? "not-allowed" : "pointer",
-                }}
-                onClick={handleSubmit}
-                disabled={status === "loading"}
+
+        {/* Success State */}
+        {status === "success" && connectedPage ? (
+          <div style={styles.successCard}>
+            <div style={styles.successIcon}>✓</div>
+            <div>
+              <p style={styles.successTitle}>Page Connected!</p>
+              <p style={styles.successSub}>
+                <strong>{connectedPage.pageName}</strong> is now sending leads
+                to your CRM.
+              </p>
+              <p style={styles.pageIdBadge}>Page ID: {connectedPage.pageId}</p>
+            </div>
+            <button style={styles.resetBtn} onClick={handleReset}>
+              Connect another page
+            </button>
+          </div>
+        ) : (
+          <>
+            {/* Input Section */}
+            <div style={styles.inputSection}>
+              <label style={styles.label}>Facebook Page ID</label>
+              <div style={styles.inputRow}>
+                <input
+                  style={{
+                    ...styles.input,
+                    borderColor: status === "error" ? "#ef4444" : "#e2e8f0",
+                    boxShadow:
+                      status === "error"
+                        ? "0 0 0 3px rgba(239,68,68,0.1)"
+                        : "none",
+                  }}
+                  type="text"
+                  placeholder="e.g. 10************13"
+                  value={pageId}
+                  onChange={(e) => {
+                    setPageId(e.target.value);
+                    if (status === "error") setStatus("idle");
+                  }}
+                  onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
+                  disabled={status === "loading"}
+                />
+                <button
+                  style={{
+                    ...styles.connectBtn,
+                    opacity: status === "loading" ? 0.7 : 1,
+                    cursor: status === "loading" ? "not-allowed" : "pointer",
+                  }}
+                  onClick={handleSubmit}
+                  disabled={status === "loading"}
+                >
+                  {status === "loading" ? (
+                    <span style={styles.spinner} />
+                  ) : (
+                    "Connect"
+                  )}
+                </button>
+              </div>
+
+              {/* Error message */}
+              {status === "error" && <p style={styles.errorMsg}>⚠ {message}</p>}
+            </div>
+
+            {/* How to find Page ID */}
+            <div style={styles.helpBox}>
+              <p style={styles.helpTitle}>📍 How to find your Page ID</p>
+              <ol style={styles.helpList}>
+                <li>Go to your Facebook Page</li>
+                <li>
+                  Click <strong>About</strong> in the left menu
+                </li>
+                <li>
+                  Scroll down to find <strong>Page ID</strong>
+                </li>
+              </ol>
+              <a
+                href="https://www.facebook.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={styles.helpLink}
               >
-                {status === "loading" ? (
-                  <span style={styles.spinner} />
-                ) : (
-                  "Connect"
-                )}
-              </button>
+                Open Facebook →
+              </a>
             </div>
 
-            {/* Error message */}
-            {status === "error" && (
-              <p style={styles.errorMsg}>⚠ {message}</p>
-            )}
-          </div>
-
-          {/* How to find Page ID */}
-          <div style={styles.helpBox}>
-            <p style={styles.helpTitle}>📍 How to find your Page ID</p>
-            <ol style={styles.helpList}>
-              <li>Go to your Facebook Page</li>
-              <li>Click <strong>About</strong> in the left menu</li>
-              <li>Scroll down to find <strong>Page ID</strong></li>
-            </ol>
-            <a
-              href="https://www.facebook.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              style={styles.helpLink}
-            >
-              Open Facebook →
-            </a>
-          </div>
-
-          {/* Requirements */}
-          <div style={styles.requirementsList}>
-            <p style={styles.reqTitle}>Requirements</p>
-            <div style={styles.reqItem}>
-              <span style={styles.reqDot} />
-              You must be an <strong>Admin</strong> of the page
+            {/* Requirements */}
+            <div style={styles.requirementsList}>
+              <p style={styles.reqTitle}>Requirements</p>
+              <div style={styles.reqItem}>
+                <span style={styles.reqDot} />
+                You must be an <strong>Admin</strong> of the page
+              </div>
+              <div style={styles.reqItem}>
+                <span style={styles.reqDot} />
+                Page must have an active <strong>Lead Ad form</strong>
+              </div>
+              <div style={styles.reqItem}>
+                <span style={styles.reqDot} />
+                Facebook OAuth must be <strong>completed</strong> first
+              </div>
             </div>
-            <div style={styles.reqItem}>
-              <span style={styles.reqDot} />
-              Page must have an active <strong>Lead Ad form</strong>
-            </div>
-            <div style={styles.reqItem}>
-              <span style={styles.reqDot} />
-              Facebook OAuth must be <strong>completed</strong> first
-            </div>
-          </div>
-        </>
-      )}
+          </>
+        )}
+      </div>
     </div>
   );
 }
 
 const styles: Record<string, React.CSSProperties> = {
   wrapper: {
+    // margin: "5px",
     fontFamily: "'DM Sans', sans-serif",
     background: "#ffffff",
-    border: "1px solid #e2e8f0",
-    borderRadius: "16px",
-    padding: "32px",
-    maxWidth: "480px",
+    // border: "1px solid #e2e8f0",
+    // borderRadius: "16px",
+    padding: "15px",
+    // maxWidth: "680px",
     width: "100%",
-    boxShadow: "0 4px 24px rgba(0,0,0,0.06)",
+    // boxShadow: "0 4px 24px rgba(0,0,0,0.06)",
   },
   header: {
     display: "flex",

@@ -1,14 +1,18 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useEffect, useState } from "react";
 import { Element, useEditor, useNode } from "@craftjs/core";
-import {  Edit, Save, X } from "lucide-react";
+import { Edit, Save, X } from "lucide-react";
 import Button from "../../ui/Button";
 import FormInput from "../../ui/FormInput";
 import { SIZE } from "../../../constants/AppConstants";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
-
-export const FOOTER_STORAGE_KEY = "quotation_footer_data=";
-
+import ConfirmationDialog from "../../dialogue-box/ConfirmationDialogue";
+import { useSearchParams } from "react-router-dom";
+import {
+  FOOTER_STORAGE_KEY_CREATE,
+  FOOTER_STORAGE_KEY_UPDATE,
+  searchParamKey,
+} from "../local-storage/LocalStorageKeys";
 
 export const FooterBlockQuotation: React.FC = () => {
   const {
@@ -20,40 +24,59 @@ export const FooterBlockQuotation: React.FC = () => {
     props: node.data.props,
   }));
 
-//const { actions } = useEditor();
+  //const { actions } = useEditor();
 
-//for syncing headers on every page
+  //for syncing headers on every page
   const { query, actions } = useEditor();
 
   const { loginStatus } = useLoggedInUserContext();
 
-  useEffect(() => {
-    const stored = localStorage.getItem(FOOTER_STORAGE_KEY + loginStatus.id);
-    if (!stored) return;
+  //for syncking headers on every page end
 
-    try {
-      const parsed = JSON.parse(stored);
+  /* ===== Local State ===== */
+  const [hovered, setHovered] = useState(false);
+  const [editing, setEditing] = useState(false);
+  const [isConfirmationPopupOpen, setIsConfirmationPopupOpen] =
+    useState<boolean>(false);
 
-      const editorState = query.getState();
-      const canvasId = editorState.nodes[id].data.linkedNodes[`${id}-canvas`];
+  const [tempHeight, setTempHeight] = useState(props.height);
+  const [tempPadding, setTempPadding] = useState(props.padding);
+  const [tempBg, setTempBg] = useState(props.backgroundColor);
 
-      if (!canvasId) return;
+  const [searchParams] = useSearchParams();
+  const quotationTemplateId = searchParams.get(searchParamKey);
 
-      const node = query.parseSerializedNode(parsed).toNode();
+  /* ===== Save ===== */
+  const handleSave = () => {
+    setProp((p: any) => {
+      p.height = tempHeight;
+      p.padding = tempPadding;
+      p.backgroundColor = tempBg;
+    });
+    setEditing(false);
+    // saveFooterToStorage();
+    const footerBlockStorageKey = quotationTemplateId
+      ? FOOTER_STORAGE_KEY_UPDATE
+      : FOOTER_STORAGE_KEY_CREATE;
 
-      // VERY IMPORTANT: Inject only if empty
-      const canvasNode = editorState.nodes[canvasId];
-      if (canvasNode.data.nodes.length > 0) return;
-
-      actions.add(node, canvasId);
-    } catch (err) {
-      console.log("Error loading header:", err);
-    }
-  }, [id]);
+      const result = localStorage.getItem(footerBlockStorageKey+loginStatus.id);
+      if(!result){
+        saveFooterToStorage();
+      }
+  };
 
   const saveFooterToStorage = () => {
+    const footerBlockStorageKey = quotationTemplateId
+      ? FOOTER_STORAGE_KEY_UPDATE
+      : FOOTER_STORAGE_KEY_CREATE;
     try {
       const editorState = query.getState();
+
+      setProp((p: any) => {
+        p.height = tempHeight;
+        p.padding = tempPadding;
+        p.backgroundColor = tempBg;
+      });
 
       // This is the linked canvas id created by Craft
       const canvasId = editorState.nodes[id].data.linkedNodes[`${id}-canvas`];
@@ -70,47 +93,92 @@ export const FooterBlockQuotation: React.FC = () => {
       // Serialize that node
       const serializedNode = query.node(firstNodeId).toSerializedNode();
 
+      const localStorageData = {
+        data: serializedNode,
+        props: {
+          height: tempHeight,
+          padding: tempPadding,
+          backgroundColor: tempBg,
+        },
+      };
+
+      console.log(localStorageData);
+
       localStorage.setItem(
-        FOOTER_STORAGE_KEY + loginStatus.id,
-        JSON.stringify(serializedNode),
+        footerBlockStorageKey + loginStatus.id,
+        JSON.stringify(localStorageData),
       );
+      setIsConfirmationPopupOpen(false);
     } catch (err) {
       console.log("Error storing header:", err);
     }
   };
 
-  //for syncking headers on every page end
-
-  /* ===== Local State ===== */
-  const [hovered, setHovered] = useState(false);
-  const [editing, setEditing] = useState(false);
-
-  const [tempHeight, setTempHeight] = useState(props.height);
-  const [tempPadding, setTempPadding] = useState(props.padding);
-  const [tempBg, setTempBg] = useState(props.backgroundColor);
-
-  /* ===== Save ===== */
-  const handleSave = () => {
-    setProp((p: any) => {
-      p.height = tempHeight;
-      p.padding = tempPadding;
-      p.backgroundColor = tempBg;
-    });
-    setEditing(false);
+  const handleSaveFooterLayout = () => {
+    handleSave();
     saveFooterToStorage();
+    window.location.reload();
   };
 
-    //For Ctrl+s
-    useEffect(() => {
-      const handleKeyDown = (e: KeyboardEvent) => {
-        if (e.ctrlKey && e.key === "s") {
-          handleSave();
-        }
-      };
-  
-      window.addEventListener("keydown", handleKeyDown);
-      return () => window.removeEventListener("keydown", handleKeyDown);
-    }, [actions]);
+  useEffect(() => {
+    const footerBlockStorageKey = quotationTemplateId
+      ? FOOTER_STORAGE_KEY_UPDATE
+      : FOOTER_STORAGE_KEY_CREATE;
+
+    const stored = localStorage.getItem(footerBlockStorageKey + loginStatus.id);
+    if (!stored) return;
+
+    try {
+      const parsed = JSON.parse(stored);
+      setProp((p: any) => {
+        p.padding = parsed.props.padding;
+        p.backgroundColor = parsed.props.backgroundColor;
+        p.height = parsed.props.height;
+      });
+    } catch (err) {
+      console.log("Error loading header props:", err);
+    }
+  }, [id]);
+
+  useEffect(() => {
+    const footerBlockStorageKey = quotationTemplateId
+      ? FOOTER_STORAGE_KEY_UPDATE
+      : FOOTER_STORAGE_KEY_CREATE;
+
+    const stored = localStorage.getItem(footerBlockStorageKey + loginStatus.id);
+    if (!stored) return;
+
+    try {
+      const parsed = JSON.parse(stored);
+
+      const editorState = query.getState();
+      const canvasId = editorState.nodes[id].data.linkedNodes[`${id}-canvas`];
+
+      if (!canvasId) return;
+
+      const node = query.parseSerializedNode(parsed.data).toNode();
+
+      // VERY IMPORTANT: Inject only if empty
+      const canvasNode = editorState.nodes[canvasId];
+      if (canvasNode.data.nodes.length > 0) return;
+
+      actions.add(node, canvasId);
+    } catch (err) {
+      console.log("Error loading footer:", err);
+    }
+  }, [id]);
+
+  //For Ctrl+s
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.ctrlKey && e.key === "s") {
+        handleSave();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [actions]);
 
   return (
     <div
@@ -119,8 +187,8 @@ export const FooterBlockQuotation: React.FC = () => {
         height: props.height,
         padding: props.padding,
         width: "100%",
-        // flexShrink: 0,     
-        marginTop: "auto", 
+        // flexShrink: 0,
+        marginTop: "auto",
         backgroundColor: props.backgroundColor,
         borderTop: "1px dashed #ddd",
         position: "relative",
@@ -133,22 +201,18 @@ export const FooterBlockQuotation: React.FC = () => {
       {(hovered || editing) && (
         <div className="group absolute right-1/2 translate-x-1/2 top-2 flex gap-1 z-50">
           <div className="scale-75 group-hover:scale-100 transition-transform duration-200">
-          <Button onClick={() => setEditing(true)}>
-            <Edit size={SIZE.SIXTEEN} />
-            Edit Footer
-          </Button>
-
+            <Button onClick={() => setEditing(true)}>
+              <Edit size={SIZE.SIXTEEN} />
+              Edit Footer
+            </Button>
           </div>
-
-          {/* <Button onClick={() => actions.delete(id)}>
-            <Trash2 size={SIZE.SIXTEEN} />
-          </Button> */}
         </div>
       )}
 
       {/* ===== Settings Panel ===== */}
       {editing && (
-        <div className="absolute right-1/2 translate-x-1/2 top-2 p-3 w-[220px] z-50 bg-white/80 backdrop-blur-lg 
+        <div
+          className="absolute right-1/2 translate-x-1/2 -top-2 p-3 w-[220px] z-50 bg-white/80 backdrop-blur-lg 
                   shadow-xl rounded-xl border border-gray-200"
         >
           <FormInput
@@ -181,6 +245,31 @@ export const FooterBlockQuotation: React.FC = () => {
             <Button onClick={handleSave}>
               <Save size={SIZE.SIXTEEN} /> Save
             </Button>
+          </div>
+          <div className="mt-2">
+            <Button onClick={() => setIsConfirmationPopupOpen(true)}>
+              <Save size={SIZE.SIXTEEN} /> Save Footer Layout
+            </Button>
+          </div>
+
+          <div
+            className=""
+            style={{
+              zIndex: 1000,
+            }}
+          >
+            <ConfirmationDialog
+              open={isConfirmationPopupOpen}
+              icon={Save}
+              onCancel={() => setIsConfirmationPopupOpen(false)}
+              onConfirm={handleSaveFooterLayout}
+              title="Set this footer as the default for new pages?"
+              description="Newly created pages will automatically follow this footer structure."
+              message="This will apply the same layout settings — including padding, alignment, background styling, and spacing — to all future pages."
+              messageDescription="Note: Header and footer content Visibility must be configured separately in page setting."
+              cancelButtonText="Cancel"
+              confirmButtonText="Save Footer Layout"
+            />
           </div>
         </div>
       )}

@@ -3,6 +3,8 @@ import { motion } from "framer-motion";
 import { PageLayout } from "../../ui/PageLayout";
 import { Outlet } from "react-router-dom";
 import IntegrationsTabs from "../../tabs/IntegrationsTabs";
+import { Settings } from "lucide-react";
+import { ComponentHeaderAndLogo } from "../../ui/ComponentHeaderAndLogo";
 
 function IntegrationsPage() {
   const [ref, inView] = useInView({ fallbackInView: true, threshold: 0.1 });
@@ -18,9 +20,10 @@ function IntegrationsPage() {
         >
           <div className="sticky top-0 z-50  py-1  flex items-center justify-between  bg-gray-50 rounded-sm shadow-sm   w-full">
             <div className="flex w-full gap-2 justify-start pl-1">
-              <div className="flex">
-                <span className="section-header-custom">Setting - Integration</span>
-              </div>
+             <ComponentHeaderAndLogo
+              headerText="Settings- Integration"
+              logo={Settings}
+             />
             </div>
           </div>
           <div className="sticky top-8 left-0 z-20">

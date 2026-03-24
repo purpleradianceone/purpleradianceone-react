@@ -30,13 +30,17 @@ import {
 import { handleApiError } from "../../config/error/handleApiError";
 import FormInput from "../ui/FormInput";
 import TextAreaInput from "../ui/TextAreaInput";
-import State from "../../@types/general/State";
-import District from "../../@types/general/District";
 import CustomDropdown from "../modals/leads/CustomDropdown";
 import EditableSection from "./EditableSection";
 import { usebusinessType } from "../../config/hooks/useBusinessType";
 import { useIndustryType } from "../../config/hooks/useIndustryType";
 import Button from "../ui/Button";
+import { CheckCircle, XCircle } from "lucide-react";
+import { useStates } from "../../config/hooks/useStates";
+import { useDistricts } from "../../config/hooks/useDisctricts";
+import { toSelectOptions } from "../../utils/toSelectOption";
+import CustomSelect from "../ui/CustomSelect";
+import CustomDocumentPreviewComponent from "../custom-document-preview-component/CustomDocumentPreviewComponent";
 
 const UserPreference = () => {
   const { countries } = useCountries();
@@ -52,12 +56,17 @@ const UserPreference = () => {
     userHasAccessToViewSettingGeneral,
     userHasAccessToViewCompanyDetail,
     userHasAccessToUpdateCompanyDetail,
+    userHasAccessToUpdateSubscription,
   } = useUserAccessModules();
 
   const [selectedRowsPerPage, setSelectedRowsPerPage] = useState<number>(
     userPreference.rowsInGrid,
   );
   const [selectedCountry, setSelectedCountry] = useState<Country | null>(null);
+
+  const [showCompanyLogoPreview, setShowCompanyLogoPreview] = useState(false);
+
+  const [showUserLogoPreview, setShowUserLogoPreview] = useState(false);
 
   const [companyDetail, setCompanyDetail] = useState<CompanyDetail>({
     id: 0,
@@ -145,6 +154,11 @@ const UserPreference = () => {
       updatedon: "",
     });
 
+  const { states } = useStates(userPreference.countryId);
+  const { districts } = useDistricts(companyDetail.state_id);
+  const stateTypeOption = toSelectOptions(states, "id", "name");
+  const districtTypeOption = toSelectOptions(districts, "id", "name");
+
   useEffect(() => {
     if (userPreference.countryId && countries.length > 0) {
       const found = countries.find(
@@ -179,6 +193,11 @@ const UserPreference = () => {
     fullName?: string;
     mobileNumber?: string;
     email?: string;
+    pan?: string;
+    gst?: string;
+    tan?: string;
+    cin?: string;
+    business_registration_number?: string;
   }>({});
   const prevTimezoneId = useRef<number>(userPreference.timezoneId);
 
@@ -196,7 +215,7 @@ const UserPreference = () => {
   // const [totalCount, setTotalCount] = useState<number | null>(null);
 
   const handleTimezonePreferenceChange = async () => {
-    if(loginStatus.companyId === 0)return;
+    if (loginStatus.companyId === 0) return;
     //getting the id as per value
     const selectedMasterRowInGrid = rowsInGridDropdownOptions.find(
       (option) => parseInt(option.rowsInGrid) === selectedRowsPerPage,
@@ -245,6 +264,7 @@ const UserPreference = () => {
             countryId: selectedCountry?.id || userPreference.countryId,
           });
           setShowTimeZoneData(false);
+          setEditingSection(null);
         }
       }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -301,7 +321,6 @@ const UserPreference = () => {
     const { name, value } = e.target;
     let errorMsg = "";
 
-    // Check empty input for all fields
     if (!value.trim()) {
       errorMsg = `${name.charAt(0).toUpperCase() + name.slice(1)} is required`;
     } else {
@@ -320,6 +339,69 @@ const UserPreference = () => {
       }
     }
 
+    if (name === "pan") {
+      if (value.trim().length !== 0 && !REGEX.PAN.test(value.trim())) {
+        errorMsg = "Invalid PAN format (valid PAN: ABCDE1234F)";
+      } else {
+        errorMsg = "";
+      }
+    }
+
+    if (name === "gst") {
+      if (value.trim().length !== 0 && !REGEX.GST.test(value.trim())) {
+        errorMsg = "Invalid GST format (valid GST: 27ABCDE1234F1Z5)";
+      } else {
+        if (value.trim().length !== 0) {
+          if (companyDetail.state_id) {
+            const stateGstCodeFromGstString = value.trim().substring(0, 2);
+            const result = value.substring(2, 12);
+            const selectedStateGstCode = states.find(
+              (result) => result.id == companyDetail.state_id,
+            );
+
+            if (stateGstCodeFromGstString === selectedStateGstCode?.gst_code) {
+              if (result !== companyDetail.pan) {
+                errorMsg =
+                  "The GST number does not correspond to the provided PAN.";
+              } else {
+                errorMsg = "";
+              }
+            } else {
+              errorMsg = "GST state code does not match the company's state.";
+            }
+          } else {
+            errorMsg = "First select the location information (ex: State)";
+          }
+        } else {
+          errorMsg = "";
+        }
+      }
+    }
+
+    if (name === "tan") {
+      if (value.trim().length !== 0 && !REGEX.TAN.test(value.trim())) {
+        errorMsg = "Invalid TAN format (valid TAN: MUMA12345B)";
+      } else {
+        errorMsg = "";
+      }
+    }
+
+    if (name === "cin") {
+      if (value.trim().length !== 0 && !REGEX.CIN.test(value.trim())) {
+        errorMsg = "Invalid CIN format (valid CIN: L12345MH2020PLC123456)";
+      } else {
+        errorMsg = "";
+      }
+    }
+
+    if (name === "business_registration_number") {
+      if (value.trim().length !== 0 && !REGEX.BRN.test(value.trim())) {
+        errorMsg = "Invalid Business Registration Number";
+      } else {
+        errorMsg = "";
+      }
+    }
+
     setFormErrors((prev) => ({
       ...prev,
       [name]: errorMsg,
@@ -335,16 +417,14 @@ const UserPreference = () => {
       ...formErrors,
       [name]: errorMsg,
     };
-    // if (!hasChanged) {
-    //   toast.error("No new changes to save.");
-    // }
+
     const hasErrors = Object.values(currentErrors).some((e) => e !== "");
 
     setIsSaveEnabled(hasChanged && !hasErrors);
   };
 
   const updateUserProfile = async () => {
-    if(loginStatus.companyId === 0)return;
+    if (loginStatus.companyId === 0) return;
     try {
       const postData = {
         company_id: loginStatus.companyId,
@@ -360,10 +440,6 @@ const UserPreference = () => {
       });
       const res = response.data;
       if (response.status === STATUS_CODE.OK) {
-        // showMessageSnackbar({
-        //   message: response.data.message,
-        //   type: "success",
-        // });
         if (res.status) {
           setEditingSection(null);
           toast.success(response.data.message);
@@ -386,7 +462,6 @@ const UserPreference = () => {
           callFunction: updateUserProfile,
         });
 
-        // setIsDialogueOpen(!refreshTokenStatus);
         if (refreshTokenStatus) {
           updateUserProfile();
         }
@@ -401,7 +476,7 @@ const UserPreference = () => {
     searchTextToUse = "",
     customLimit?: number,
   ) => {
-    if(loginStatus.companyId === 0)return;
+    if (loginStatus.companyId === 0) return;
     const effectiveLimit = customLimit !== undefined ? customLimit : limit;
 
     const postData = {
@@ -421,11 +496,10 @@ const UserPreference = () => {
 
       if (newOffset === 0) {
         setTimezoneList(newTimezones);
-        // setTotalCount(count); // Update total count on initial load
         if (searchTextToUse) {
-          setLimit(limitForGrid); // If searching, set limit to total count initially
+          setLimit(limitForGrid);
         } else {
-          setLimit(limitForGrid); // If not searching, keep default limit for initial load
+          setLimit(limitForGrid);
         }
       } else {
         setTimezoneList((prev) => [...prev, ...newTimezones]);
@@ -459,22 +533,18 @@ const UserPreference = () => {
     setSelectedCountry(selected);
   };
 
-  // Initial load (now triggered by showing the dropdown)
   useEffect(() => {
     if (showTimeZoneData) {
       setOffset(0);
       setLimit(limitForGrid);
-      setSearchText(""); // Clear search text when dropdown is shown
-      // setTotalCount(null);
+      setSearchText("");
       setHasMore(true);
       loadTimezones(0);
     } else {
-      // Reset state when dropdown is closed
       setTimezoneList([]);
       setOffset(0);
       setLimit(limitForGrid);
       setSearchText("");
-      // setTotalCount(null);
       setHasMore(true);
     }
   }, [showTimeZoneData]);
@@ -483,10 +553,9 @@ const UserPreference = () => {
   const handleSearchChange = (text: string) => {
     setSearchText(text);
     setOffset(0);
-    // setTotalCount(null);
-    setLimit(limitForGrid); // Reset limit for new search
+    setLimit(limitForGrid);
     setHasMore(true);
-    loadTimezones(0, text, limitForGrid); // Initial search load with limit 25
+    loadTimezones(0, text, limitForGrid);
   };
 
   const loadMore = () => {
@@ -503,16 +572,18 @@ const UserPreference = () => {
   };
 
   //For company details
-
   const [logoFile, setLogoFile] = useState<File | null>(null);
-  const [logoPreviousPreview, setPreviousLogoPreview] = useState<string | null>(null);
+  const [logoPreviousPreview, setPreviousLogoPreview] = useState<string | null>(
+    null,
+  );
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
 
-  const [stateData, setStateData] = useState<State[]>([]);
-  const [districts, setDistrict] = useState<District[]>([]);
+  useEffect(() => {
+    console.log("Company logo file: " + logoPreview?.toString());
+  }, [logoPreview]);
 
   const getCompanyDetail = () => {
-    if(loginStatus.companyId === 0)return;
+    if (loginStatus.companyId === 0) return;
     try {
       axiosClient
         .post(POST_API.GET_COMPANY_DETAIL, {
@@ -546,7 +617,7 @@ const UserPreference = () => {
   };
 
   const handleCompanyLogoUpload = async () => {
-    if(loginStatus.companyId === 0)return;
+    if (loginStatus.companyId === 0) return;
     if (logoFile) {
       try {
         const formData = new FormData();
@@ -605,7 +676,7 @@ const UserPreference = () => {
   ] = useState<boolean>(false);
 
   const updateCompanyDetail = () => {
-        if(loginStatus.companyId === 0)return;
+    if (loginStatus.companyId === 0) return;
 
     if (!isCompanyDetailEqual(previousCompanyDetail, companyDetail)) {
       setIsLoadingForCompanyDetailsUpdate(true);
@@ -615,8 +686,12 @@ const UserPreference = () => {
             company_id: loginStatus.companyId,
             industry_type_id: companyDetail.industry_type_id,
             business_type_id: companyDetail.business_type_id,
-            state_id: companyDetail.state_id,
-            district_id: companyDetail.district_id,
+            state_id:
+              companyDetail.state_id != 0 ? companyDetail.state_id : null,
+            district_id:
+              companyDetail.district_id !== 0
+                ? companyDetail.district_id
+                : null,
             pan: companyDetail.pan,
             gst: companyDetail.gst,
             tan: companyDetail.tan,
@@ -668,9 +743,9 @@ const UserPreference = () => {
     getCompanyDetail();
   }, [loginStatus.companyId]);
 
-  const getCompanyLogo =()=>{
-    if(loginStatus.companyId === 0)return;
-     axios
+  const getCompanyLogo = () => {
+    if (loginStatus.companyId === 0) return;
+    axios
       .post(
         POST_API.GET_COMPANY_LOGO,
         {
@@ -681,7 +756,7 @@ const UserPreference = () => {
         },
         {
           responseType: "arraybuffer",
-          withCredentials: true
+          withCredentials: true,
         },
       )
       .then((response) => {
@@ -692,19 +767,21 @@ const UserPreference = () => {
         const imageUrl = URL.createObjectURL(blob);
         setLogoPreview(imageUrl);
         setPreviousLogoPreview(imageUrl);
-        console.log("inside get logo")
-
-      }).catch((e)=>{
-        console.log("inside get company logo catch"+e)
+        console.log("inside get logo");
+      })
+      .catch((e) => {
+        console.log("inside get company logo catch" + e);
       });
-  }
+  };
 
-  useEffect(()=>{
-    if(companyDetail.logo_file_extension && companyDetail.logo_file_extension!==""){
+  useEffect(() => {
+    if (
+      companyDetail.logo_file_extension &&
+      companyDetail.logo_file_extension !== ""
+    ) {
       getCompanyLogo();
     }
-
-  },[companyDetail.logo_file_extension])
+  }, [companyDetail.logo_file_extension]);
 
   const [isLogoChange, setIsLogoChange] = useState<boolean>(false);
 
@@ -715,125 +792,68 @@ const UserPreference = () => {
     setLogoFile(file);
     console.log(logoFile);
 
-
     // preview
     const previewUrl = URL.createObjectURL(file);
     setLogoPreview(previewUrl);
   };
 
-  useEffect(()=>{
-
-    if(logoPreview !== logoPreviousPreview){
-       setIsLogoChange(true);
+  useEffect(() => {
+    if (logoPreview !== logoPreviousPreview) {
+      setIsLogoChange(true);
     } else {
       setIsLogoChange(false);
     }
-
-  },[logoPreview])
+  }, [logoPreview]);
 
   const [editingSection, setEditingSection] = useState<string | null>(null);
 
   const handleEditableSectionSave = () => {
-    updateCompanyDetail();
+    if (
+      !formErrors.pan &&
+      !formErrors.gst &&
+      !formErrors.tan &&
+      !formErrors.cin &&
+      !formErrors.business_registration_number
+    ) {
+      updateCompanyDetail();
+    } else {
+      if (formErrors.pan) toast.error("Please enter valid PAN");
+      if (formErrors.gst) toast.error("Please enter valid GST");
+      if (formErrors.tan) toast.error("Please enter valid TAN");
+      if (formErrors.cin) toast.error("Please enter valid CIN");
+      if (formErrors.business_registration_number)
+        toast.error("Please enter valid BRN");
+    }
   };
 
+  const handleEditableSectionEdit = (key: string) => {
+    setFormErrors((prev) => ({
+      ...prev,
+      fullName: "",
+      mobileNumber: "",
+      pan: "",
+      gst: "",
+      tan: "",
+      cin: "",
+      brn: "",
+    }));
+    setCompanyDetail(previousCompanyDetail);
+    setEditingSection(key);
+  };
   const handleEditableSectionCancel = () => {
     setCompanyDetail(previousCompanyDetail);
+    setFormData(initialData);
     setEditingSection(null);
-  };
-
-  const getAllState = async (countryId: number | null) => {
-    if(loginStatus.companyId === 0)return;
-
-    if (!countryId) return;
-    const PostDataForState: State = {
-      id: null,
-      country_id: countryId,
-      name: null,
-      description: null,
-      isactive: true,
-    };
-    try {
-      const response = await axiosClient.post(
-        POST_API.GET_STATE,
-        PostDataForState,
-        {
-          withCredentials: true,
-          headers: {
-            "Content-Type": "application/json",
-          },
-        },
-      );
-      if (response.status === STATUS_CODE.OK) {
-        setStateData(response.data);
-      } else {
-        throw new Error("Failed to fetch states");
-      }
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      if (error.status === STATUS_CODE.UNATHORISED) {
-        const refreshTokenStatus = await RefreshToken({
-          callFunctionWithParamsNotEvent: getAllState,
-        });
-        if (refreshTokenStatus) {
-          getAllState(countryId);
-        }
-      }
-      handleApiError(error);
-    }
   };
 
   const { businessType } = usebusinessType();
   const { industryTypeData } = useIndustryType();
 
-  useEffect(() => {
-    getAllState(userPreference.countryId);
-  }, [userPreference.countryId]);
+  // useEffect(()=>{
 
-  useEffect(() => {
-    if (companyDetail.state_id) {
-      getAllDistrict(companyDetail.state_id);
-    }
-  }, [companyDetail.state_id]);
+  //   console.log("state id:"+companyDetail.state_id + ", district id:"+companyDetail.district_id);
 
-  const getAllDistrict = async (stateId: number | null) => {
-    if(loginStatus.companyId === 0)return;
-    if (!stateId) return;
-    const PostDataForDistrict: District = {
-      id: null,
-      state_id: stateId,
-      name: null,
-      description: null,
-      isactive: true,
-    };
-
-    try {
-      const response = await axiosClient.post(
-        POST_API.GET_DISTRICT,
-        PostDataForDistrict,
-        {
-          withCredentials: true,
-          headers: {
-            "Content-Type": "application/json",
-          },
-        },
-      );
-
-      if (response.status === STATUS_CODE.OK) {
-        setDistrict(response.data);
-      }
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      if (error.status === STATUS_CODE.UNATHORISED) {
-        const refreshTokenStatus = await RefreshToken({
-          callFunctionWithParamsNotEvent: getAllDistrict,
-        });
-        if (refreshTokenStatus) {
-          getAllDistrict(stateId);
-        }
-      }
-    }
-  };
+  // },[companyDetail.state_id,companyDetail.district_id]);
 
   return (
     <div className="w-full mx-24 min-h-screen bg-gray-100 py-8 px-2 space-y-10">
@@ -853,9 +873,22 @@ const UserPreference = () => {
           <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
             <div
               className={`relative w-32 h-32 rounded-full flex items-center justify-center text-white text-6xl font-semibold  border-4 border-white shadow-xl ring-2 ring-gray-200  transition-all duration-300 hover:scale-105 hover:shadow-2xl ${getColor(loginStatus.email)}`}
+              onDoubleClick={() => setShowUserLogoPreview(true)}
             >
               {loginStatus.fullName?.charAt(0)?.toUpperCase()}
             </div>
+            {showUserLogoPreview && (
+              <div
+                className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 select-none"
+                onClick={() => setShowUserLogoPreview(false)}
+              >
+                <div
+                  className={`w-72 h-72 rounded-full flex items-center justify-center text-white text-9xl font-semibold shadow-2xl select-none ${getColor(loginStatus.email)}`}
+                >
+                  {loginStatus.fullName?.charAt(0)?.toUpperCase()}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Basic Info Grid */}
@@ -864,7 +897,7 @@ const UserPreference = () => {
               title=""
               hasAccess={userHasAccessToUpdateUser}
               onEdit={() => {
-                setEditingSection("user detail");
+                handleEditableSectionEdit("user detail");
               }}
               isEditing={editingSection === "user detail"}
               onCancel={handleEditableSectionCancel}
@@ -872,8 +905,8 @@ const UserPreference = () => {
               onSave={handleUserDetailSave}
             >
               {editingSection === "user detail" ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                  <div className="">
+                <div className="grid grid-cols-2 sm:grid-cols-2 gap-4">
+                  <div className="w-96">
                     <h4 className="table-header-custom">Name</h4>
                     <FormInput
                       type="text"
@@ -884,12 +917,8 @@ const UserPreference = () => {
                       maxLength={VALIDATIONS.MAX_NAME_LENGTH}
                       minLength={VALIDATIONS.MIN_NAME_LENGTH}
                       className="w-full p-2 border rounded"
+                      error={formErrors.fullName}
                     />
-                    {formErrors.fullName && (
-                      <p className="text-red-500 text-sm mt-1">
-                        {formErrors.fullName}
-                      </p>
-                    )}
                   </div>
 
                   <div>
@@ -899,12 +928,7 @@ const UserPreference = () => {
                     </p>
                   </div>
 
-                  {/* <div>
-            <h4 className="table-header-custom">Company</h4>
-            <p className={classnameForParagragh}>{loginStatus.companyName}</p>
-            </div> */}
-
-                  <div>
+                  <div className="w-96">
                     <h4 className="table-header-custom">Contact Number</h4>
                     <FormInput
                       type="text"
@@ -915,58 +939,78 @@ const UserPreference = () => {
                       maxLength={VALIDATIONS.MOBILE_NUMBER_LENGTH}
                       minLength={VALIDATIONS.MOBILE_NUMBER_LENGTH}
                       className="w-full p-2 border rounded"
+                      error={formErrors.mobileNumber}
                     />
-                    {formErrors.mobileNumber && (
-                      <p className="text-red-500 text-sm mt-1">
-                        {formErrors.mobileNumber}
-                      </p>
-                    )}
                   </div>
 
-                  <div className="mt-1 justify-center items-center">
-                    <h4 className="table-header-custom">Profile Status</h4>
-                    <p className={classnameForParagragh}>
-                      {loginStatus.status === true ? "Active" : "Inactive"}
-                    </p>
+                  <div className="justify-center items-center">
+                    <h4 className="table-header-custom mb-1">Profile Status</h4>
+
+                    <span
+                      className={`flex items-center gap-1 px-3 py-0.5 rounded-full text-xs font-semibold w-fit ${
+                        loginStatus.status
+                          ? "bg-green-100 text-green-700 border border-green-300"
+                          : "bg-red-100 text-red-700 border border-red-300"
+                      }`}
+                    >
+                      {loginStatus.status ? (
+                        <CheckCircle size={14} />
+                      ) : (
+                        <XCircle size={14} />
+                      )}
+
+                      {loginStatus.status ? "Active" : "Inactive"}
+                    </span>
                   </div>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                  <div className="">
-                    <h4 className="table-header-custom">Name</h4>
-                    <p
-                      title={formData.fullName ?? "Not Provided"}
-                      className="table-data-custom block truncate w-full "
-                    >
-                      {formData.fullName || "Not Provided"}
-                    </p>
+                <div className="grid grid-cols-1 sm:grid-cols-1 gap-6 ">
+                  <div className="grid grid-cols-2 border-b pb-1">
+                    <div className="">
+                      <h4 className="table-header-custom">Name</h4>
+                      <p
+                        title={formData.fullName ?? "Not Provided"}
+                        className="table-data-custom block truncate w-full "
+                      >
+                        {formData.fullName || "Not Provided"}
+                      </p>
+                    </div>
+
+                    <div>
+                      <h4 className="table-header-custom">Email</h4>
+                      <p className={classnameForParagragh}>
+                        {formData.email || "Not Provided"}
+                      </p>
+                    </div>
                   </div>
+                  <div className="grid grid-cols-2 border-b pb-1">
+                    <div>
+                      <h4 className="table-header-custom">Contact Number</h4>
 
-                  <div>
-                    <h4 className="table-header-custom">Email</h4>
-                    <p className={classnameForParagragh}>
-                      {formData.email || "Not Provided"}
-                    </p>
-                  </div>
+                      <p className={classnameForParagragh}>
+                        {formData.mobileNumber || "Not Provided"}
+                      </p>
+                    </div>
 
-                  {/* <div>
-            <h4 className="table-header-custom">Company</h4>
-            <p className={classnameForParagragh}>{loginStatus.companyName}</p>
-            </div> */}
+                    <div className="justify-center items-center">
+                      <h4 className="table-header-custom ">Profile Status</h4>
 
-                  <div>
-                    <h4 className="table-header-custom">Contact Number</h4>
+                      <span
+                        className={`flex items-center gap-1 px-3 py-0.5 rounded-full text-xs font-semibold w-fit ${
+                          loginStatus.status
+                            ? "bg-green-100 text-green-700 border border-green-300"
+                            : "bg-red-100 text-red-700 border border-red-300"
+                        }`}
+                      >
+                        {loginStatus.status ? (
+                          <CheckCircle size={14} />
+                        ) : (
+                          <XCircle size={14} />
+                        )}
 
-                    <p className={classnameForParagragh}>
-                      {formData.mobileNumber || "Not Provided"}
-                    </p>
-                  </div>
-
-                  <div className="mt-1 justify-center items-center">
-                    <h4 className="table-header-custom">Profile Status</h4>
-                    <p className={classnameForParagragh}>
-                      {loginStatus.status === true ? "Active" : "Inactive"}
-                    </p>
+                        {loginStatus.status ? "Active" : "Inactive"}
+                      </span>
+                    </div>
                   </div>
                 </div>
               )}
@@ -993,8 +1037,6 @@ const UserPreference = () => {
 
           {/** Company Logo */}
           <div className="border-t pt-4">
-            {/* <h4 className="input-label-custom mb-2">Company Logo:</h4> */}
-
             {/* Left aligned container */}
             <div className="flex flex-col items-start">
               {/* Image */}
@@ -1004,9 +1046,28 @@ const UserPreference = () => {
                     src={logoPreview ?? companyDetail?.logo_cdn_url}
                     alt="Company Logo"
                     className="w-full h-full object-contain"
+                    onDoubleClick={() => setShowCompanyLogoPreview(true)}
                   />
                 ) : (
                   <span className="caption-custom">No Logo</span>
+                )}
+                {showCompanyLogoPreview && (
+                  <div
+                    className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50"
+                    onClick={() => setShowCompanyLogoPreview(false)}
+                  >
+                    {/* <img
+                      src={logoPreview ?? companyDetail?.logo_cdn_url}
+                      alt="Company Logo"
+                      className="max-w-[80%] max-h-[80%] object-contain rounded-lg shadow-lg"
+                    /> */}
+                    <CustomDocumentPreviewComponent
+                      fileUrl={logoPreview ?? companyDetail?.logo_cdn_url}
+                      fileExtension={companyDetail.logo_file_extension}
+                      width={"50%"}
+                      enableDownload={true}
+                    />
+                  </div>
                 )}
               </div>
 
@@ -1030,20 +1091,20 @@ const UserPreference = () => {
                 ) : (
                   <div className="w-55 flex justify-center mt-2 gap-2">
                     <div>
-                     <Button
-                     type="button"
-                      onClick={()=>setLogoPreview(logoPreviousPreview)}
-                    >
-                      Cancel
-                    </Button>
+                      <Button
+                        type="button"
+                        onClick={() => setLogoPreview(logoPreviousPreview)}
+                      >
+                        Cancel
+                      </Button>
                     </div>
                     <div>
-                    <Button
-                      className="cursor-pointer px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-                      onClick={handleCompanyLogoUpload}
-                    >
-                      Save Logo
-                    </Button>
+                      <Button
+                        className="cursor-pointer px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                        onClick={handleCompanyLogoUpload}
+                      >
+                        Save Logo
+                      </Button>
                     </div>
                   </div>
                 ))}
@@ -1057,7 +1118,7 @@ const UserPreference = () => {
               <EditableSection
                 title={loginStatus?.companyName ?? "Company Name"}
                 hasAccess={userHasAccessToUpdateCompanyDetail}
-                onEdit={() => setEditingSection("company")}
+                onEdit={() => handleEditableSectionEdit("company")}
                 isEditing={editingSection === "company"}
                 onCancel={handleEditableSectionCancel}
                 sectionKey="company"
@@ -1076,16 +1137,19 @@ const UserPreference = () => {
                     placeholder="eg. www.abc.com"
                   />
                 ) : (
-                  <div className="table-header-custom">
-                    Website:
-                    <a
-                      href={companyDetail?.website}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="caption-custom-blue ml-1"
-                    >
-                      {companyDetail?.website ?? ""}
-                    </a>
+                  <div className="grid grid-cols-2 items-start border-b pb-1">
+                    <div className="flex gap-4">
+                      <div className="input-label-custom py-1">Website:</div>
+
+                      <a
+                        href={companyDetail?.website}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="caption-custom-blue py-1.5 break-all"
+                      >
+                        {companyDetail?.website ?? ""}
+                      </a>
+                    </div>
                   </div>
                 )}
               </EditableSection>
@@ -1097,7 +1161,7 @@ const UserPreference = () => {
                 title="Business Information"
                 sectionKey="business"
                 hasAccess={userHasAccessToUpdateCompanyDetail}
-                onEdit={() => setEditingSection("business")}
+                onEdit={() => handleEditableSectionEdit("business")}
                 isEditing={editingSection === "business"}
                 onCancel={handleEditableSectionCancel}
                 onSave={() => {
@@ -1137,17 +1201,21 @@ const UserPreference = () => {
                     />
                   </div>
                 ) : (
-                  <div className="grid grid-cols-2">
-                    <div className="table-header-custom">
-                      Business Type:{"  "}
-                      <span className="table-data-custom">
+                  <div className="grid grid-cols-2 items-start border-b pb-1">
+                    <div className="flex gap-3">
+                      <div className="input-label-custom py-1">
+                        Business Type:
+                      </div>
+                      <span className="caption-custom text-blue-600 py-1.5">
                         {companyDetail?.business_type_name ?? "-"}
                       </span>
                     </div>
-                    <div className="table-header-custom">
-                      Industry Type:{"  "}
-                      <span className="table-data-custom">
-                        {"  "}
+
+                    <div className="flex gap-3">
+                      <div className="input-label-custom py-1">
+                        Industry Type:
+                      </div>
+                      <span className="caption-custom text-blue-600 py-1.5">
                         {companyDetail?.industry_type_name ?? "-"}
                       </span>
                     </div>
@@ -1162,78 +1230,100 @@ const UserPreference = () => {
                 title="Location Information"
                 sectionKey="location"
                 hasAccess={userHasAccessToUpdateCompanyDetail}
-                onEdit={() => setEditingSection("location")}
+                onEdit={() => handleEditableSectionEdit("location")}
                 isEditing={editingSection === "location"}
                 onCancel={handleEditableSectionCancel}
                 onSave={() => {
                   if (companyDetail.state_id && companyDetail.district_id) {
                     handleEditableSectionSave();
                   } else {
-                    // toast.error("Please select both state and district.");
-                    toast("Please select both state and district.", {
-                      icon: "⚠️",
-                      style: {
-                        border: "1px solid #facc15",
-                        background: "#fffbeb",
-                        color: "#92400e",
-                      },
-                    });
+                    if (
+                      companyDetail.state_id === 0 &&
+                      companyDetail.district_id === 0
+                    ) {
+                      handleEditableSectionSave();
+                    } else {
+                      // toast.error("Please select both state and district.");
+                      toast("Please select both state and district.", {
+                        icon: "⚠️",
+                        style: {
+                          border: "1px solid #facc15",
+                          background: "#fffbeb",
+                          color: "#92400e",
+                        },
+                      });
+                    }
                   }
                 }}
                 isLoading={isLoadingForCompanyDetailsUpdate}
               >
                 {editingSection === "location" ? (
                   <div className="grid grid-cols-2 gap-2">
-                    <CustomDropdown
-                      labelName="State: "
-                      preselectedOption={companyDetail.state_id}
-                      selectedValue={companyDetail.state_id}
-                      options={stateData}
-                      onSelect={(e) => {
-                        setCompanyDetail((prev) => {
-                          return {
-                            ...prev,
-                            state_id: e ?? 0,
-                          };
-                        });
-                        if (previousCompanyDetail.state_id !== e) {
+                    <div className="">
+                      <CustomSelect
+                        label="State:"
+                        value={companyDetail.state_id}
+                        options={stateTypeOption}
+                        onChange={(id) => {
                           setCompanyDetail((prev) => {
                             return {
                               ...prev,
-                              district_id: 0,
+                              state_id: id ?? 0,
                             };
                           });
-                        }
-                      }}
-                    />
-                    <CustomDropdown
-                      labelName="District: "
-                      readOnly={!companyDetail.state_id}
-                      preselectedOption={companyDetail.district_id}
-                      selectedValue={companyDetail.district_id}
-                      options={districts}
-                      onSelect={(e) => {
-                        setCompanyDetail((prev) => {
-                          return {
-                            ...prev,
-                            district_id: e ?? 0,
-                          };
-                        });
-                      }}
-                      errorMessage="Please select state first!"
-                    />
+
+                          if (previousCompanyDetail.state_id !== id) {
+                            setCompanyDetail((prev) => {
+                              return {
+                                ...prev,
+                                district_id: 0,
+                              };
+                            });
+                          }
+                          if (id === undefined) {
+                            setCompanyDetail((prev) => {
+                              return {
+                                ...prev,
+                                district_id: 0,
+                              };
+                            });
+                          }
+                        }}
+                        // label="State"
+                        isClearable={false}
+                      />
+                    </div>
+                    <div className="">
+                      <CustomSelect
+                        label="District: "
+                        isDisabled={!companyDetail.state_id}
+                        value={companyDetail.district_id}
+                        options={districtTypeOption}
+                        onChange={(id) => {
+                          setCompanyDetail((prev) => {
+                            return {
+                              ...prev,
+                              district_id: id ?? 0,
+                            };
+                          });
+                        }}
+                        // label="District"
+                        isClearable={false}
+                      />
+                    </div>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-2">
-                    <div className="table-header-custom">
-                      State:{"  "}
-                      <span className="table-data-custom">
+                  <div className="grid grid-cols-2 items-start border-b pb-1">
+                    <div className="flex gap-4">
+                      <div className="input-label-custom py-1">State:</div>
+                      <span className="caption-custom text-blue-600 py-1.5">
                         {companyDetail?.state_name ?? "-"}
                       </span>
                     </div>
-                    <div className="table-header-custom">
-                      District:{"  "}
-                      <span className="table-data-custom">
+
+                    <div className="flex gap-4">
+                      <div className="input-label-custom py-1">District:</div>
+                      <span className="caption-custom text-blue-600 py-1.5">
                         {companyDetail?.district_name ?? "-"}
                       </span>
                     </div>
@@ -1247,7 +1337,7 @@ const UserPreference = () => {
               <EditableSection
                 title="Tax Information"
                 hasAccess={userHasAccessToUpdateCompanyDetail}
-                onEdit={() => setEditingSection("tax")}
+                onEdit={() => handleEditableSectionEdit("tax")}
                 isEditing={editingSection === "tax"}
                 onCancel={handleEditableSectionCancel}
                 sectionKey="tax"
@@ -1262,7 +1352,10 @@ const UserPreference = () => {
                       label="PAN: "
                       name="pan"
                       value={companyDetail?.pan ?? ""}
+                      pattern="[A-Z]{5}[0-9]{4}[A-Z]{1}"
+                      onBlur={handleBlur}
                       onChange={handleCompanyDetailsChange}
+                      error={formErrors.pan}
                     />
 
                     <FormInput
@@ -1270,6 +1363,8 @@ const UserPreference = () => {
                       name="gst"
                       value={companyDetail?.gst ?? ""}
                       onChange={handleCompanyDetailsChange}
+                      onBlur={handleBlur}
+                      error={formErrors.gst}
                     />
 
                     <FormInput
@@ -1277,6 +1372,8 @@ const UserPreference = () => {
                       name="tan"
                       value={companyDetail?.tan ?? ""}
                       onChange={handleCompanyDetailsChange}
+                      onBlur={handleBlur}
+                      error={formErrors.tan}
                     />
 
                     <FormInput
@@ -1284,6 +1381,8 @@ const UserPreference = () => {
                       name="cin"
                       value={companyDetail?.cin ?? ""}
                       onChange={handleCompanyDetailsChange}
+                      onBlur={handleBlur}
+                      error={formErrors.cin}
                     />
 
                     <FormInput
@@ -1291,39 +1390,53 @@ const UserPreference = () => {
                       name="business_registration_number"
                       value={companyDetail?.business_registration_number ?? ""}
                       onChange={handleCompanyDetailsChange}
+                      onBlur={handleBlur}
+                      error={formErrors.business_registration_number}
                     />
                   </div>
                 ) : (
-                  <div className="grid grid-cols-2 gap-y-1">
-                    <div className="table-header-custom">
-                      PAN:{" "}
-                      <span className="table-data-custom">
-                        {companyDetail?.pan ?? ""}
-                      </span>
+                  <div className="space-y-1">
+                    <div className="grid grid-cols-2 items-start border-b pb-1">
+                      <div className="flex gap-4">
+                        <div className="input-label-custom py-1">PAN:</div>
+                        <span className="caption-custom text-blue-600 py-1.5">
+                          {companyDetail?.pan ?? ""}
+                        </span>
+                      </div>
+
+                      <div className="flex gap-4">
+                        <div className="input-label-custom py-1">GST:</div>
+                        <span className="caption-custom text-blue-600 py-1.5">
+                          {companyDetail?.gst ?? ""}
+                        </span>
+                      </div>
                     </div>
-                    <div className="table-header-custom">
-                      GST:{" "}
-                      <span className="table-data-custom">
-                        {companyDetail?.gst ?? ""}
-                      </span>
+
+                    <div className="grid grid-cols-2 items-start border-b pb-1">
+                      <div className="flex gap-4">
+                        <div className="input-label-custom py-1">TAN:</div>
+                        <span className="caption-custom text-blue-600 py-1.5">
+                          {companyDetail?.tan ?? ""}
+                        </span>
+                      </div>
+
+                      <div className="flex gap-4">
+                        <div className="input-label-custom py-1">CIN:</div>
+                        <span className="caption-custom text-blue-600 py-1.5">
+                          {companyDetail?.cin ?? ""}
+                        </span>
+                      </div>
                     </div>
-                    <div className="table-header-custom">
-                      TAN:{" "}
-                      <span className="table-data-custom">
-                        {companyDetail?.tan ?? ""}
-                      </span>
-                    </div>
-                    <div className="table-header-custom">
-                      CIN:{" "}
-                      <span className="table-data-custom">
-                        {companyDetail?.cin ?? ""}
-                      </span>
-                    </div>
-                    <div className="col-span-2 table-header-custom">
-                      Business Reg No:
-                      <span className="table-data-custom">
-                        {companyDetail?.business_registration_number ?? ""}
-                      </span>
+
+                    <div className="grid grid-cols-2 items-start border-b pb-1">
+                      <div className="flex gap-4">
+                        <div className="input-label-custom py-1">
+                          Business Reg No:
+                        </div>
+                        <span className="caption-custom text-blue-600 py-1.5">
+                          {companyDetail?.business_registration_number ?? ""}
+                        </span>
+                      </div>
                     </div>
                   </div>
                 )}
@@ -1336,7 +1449,7 @@ const UserPreference = () => {
                 title="Address Information"
                 sectionKey="address"
                 hasAccess={userHasAccessToUpdateCompanyDetail}
-                onEdit={() => setEditingSection("address")}
+                onEdit={() => handleEditableSectionEdit("address")}
                 isEditing={editingSection === "address"}
                 onCancel={handleEditableSectionCancel}
                 onSave={() => {
@@ -1351,7 +1464,7 @@ const UserPreference = () => {
                       name="registered_office_address"
                       value={companyDetail?.registered_office_address ?? ""}
                       onChange={handleCompanyDetailsChange}
-                      rows={1}
+                      rows={3}
                       cols={0}
                     />
 
@@ -1360,7 +1473,7 @@ const UserPreference = () => {
                       name="billing_address"
                       value={companyDetail?.billing_address ?? ""}
                       onChange={handleCompanyDetailsChange}
-                      rows={1}
+                      rows={3}
                       cols={0}
                     />
 
@@ -1369,27 +1482,35 @@ const UserPreference = () => {
                       value={companyDetail?.shipping_address ?? ""}
                       name="shipping_address"
                       onChange={handleCompanyDetailsChange}
-                      rows={1}
+                      rows={3}
                       cols={0}
                     />
                   </div>
                 ) : (
                   <div className="space-y-1">
-                    <div className="table-header-custom mb-2">
-                      Registered:{"  "}
-                      <span className="table-data-custom">
+                    <div className="grid grid-cols-[185px_1fr] items-start border-b pb-1">
+                      <div className="input-label-custom py-1">
+                        Registered Office Address:
+                      </div>
+                      <span className="caption-custom text-blue-600 rounded-md py-1.5 whitespace-pre-wrap">
                         {companyDetail?.registered_office_address ?? ""}
                       </span>
                     </div>
-                    <div className="table-header-custom mb-2">
-                      Billing:{"  "}
-                      <span className="table-data-custom">
+
+                    <div className="grid grid-cols-[185px_1fr] items-start border-b pb-1">
+                      <div className="input-label-custom py-1">
+                        Billing Address:
+                      </div>
+                      <span className="caption-custom text-blue-600 rounded-md py-1.5 whitespace-pre-wrap">
                         {companyDetail?.billing_address ?? ""}
                       </span>
                     </div>
-                    <div className="table-header-custom">
-                      Shipping:{"  "}
-                      <span className="table-data-custom">
+
+                    <div className="grid grid-cols-[185px_1fr] items-start border-b pb-1">
+                      <div className="input-label-custom py-1">
+                        Shipping Address:
+                      </div>
+                      <span className="caption-custom text-blue-600 rounded-md py-1.5 whitespace-pre-wrap">
                         {companyDetail?.shipping_address ?? ""}
                       </span>
                     </div>
@@ -1404,224 +1525,256 @@ const UserPreference = () => {
         <div
           className={` ${
             !userHasAccessToViewSettingGeneral ? "hidden" : ""
-          }   bg-white rounded-2xl shadow-lg px-8 py-6 space-y-2`}
+          }   bg-white rounded-2xl shadow-lg px-8 py-6 space-y-2 `}
         >
-          {/* button */}
           <div className="flex items-center justify-between">
             <h3 className="section-header-custom">
               Preferences{" "}
-              <span className="caption-custom">(Click to change)</span>
+              <span className="caption-custom">(Click Edit to change)</span>
             </h3>
-            {(prevTimezoneId.current !== selectedTimezoneId ||
-              userPreference.rowsInGrid != selectedRowsPerPage ||
-              userPreference.countryId !== selectedCountry?.id) && (
-              <button
-                onClick={() => {
-                  if (userHasAccessToUpdateSettingGeneral) {
-                    if (prevTimezoneId.current !== selectedTimezoneId) {
-                      handleTimezonePreferenceChange();
-                      prevTimezoneId.current = selectedTimezoneId;
-                    } else if (
-                      userPreference.rowsInGrid !== selectedRowsPerPage
-                    ) {
-                      handleTimezonePreferenceChange();
-                    } else if (
-                      userPreference.countryId !== selectedCountry?.id
-                    ) {
-                      handleTimezonePreferenceChange();
-                    }
-                  } else {
-                    toast.error(
-                      MESSAGE.MODULE_ACCESS.GENERAL_SETTING
-                        .DENIED_UPDATE_ACCESS,
-                    );
-                  }
-                }}
-                className="px-4 py-2 bg-blue-600 action-btn-custom rounded-md hover:bg-blue-700 transition"
-              >
-                Save
-              </button>
-            )}
           </div>
-          {/* time zone */}
-          <div className="flex items-center space-x-4 border-b pb-1">
-            {/* Label for the Time Zone setting */}
-            <h4 className="input-label-custom whitespace-nowrap">Time Zone:</h4>
-
-            {/* Conditional rendering for either the display text or the dropdown */}
-            {showTimeZoneData ? (
-              // When the dropdown should be visible (showTimeZoneData is true)
-              <div className="relative z-10 w-auto">
-                {" "}
-                {/* Add relative and z-index for dropdown positioning */}
-                <CustomTimezoneDropdown
-                  setShowTimeZoneData={setShowTimeZoneData}
-                  timezoneData={timezoneList}
-                  hasMore={hasMore}
-                  loadMore={loadMore}
-                  onSearchChange={handleSearchChange}
-                  onSelect={(zone) => {
-                    setSelectedTimeZoneData(zone);
-                    setSelectedTimezoneId(zone.id);
-                    // setShowTimeZoneData(false); // Often desirable to close after selection
-                  }}
-                />
-              </div>
-            ) : (
-              // When the display text should be visible (showTimeZoneData is false)
-              <p
-                onClick={() => {
-                  if (userHasAccessToUpdateSettingGeneral) {
-                    setShowTimeZoneData(!showTimeZoneData); // Toggle to show the dropdown
+          <div className="border-t pt-4">
+            <EditableSection
+              hasAccess={userHasAccessToUpdateSettingGeneral}
+              title=""
+              sectionKey="preferences"
+              onEdit={() => handleEditableSectionEdit("preferences")}
+              isEditing={editingSection === "preferences"}
+              onCancel={handleEditableSectionCancel}
+              onSave={() => {
+                if (userHasAccessToUpdateSettingGeneral) {
+                  if (prevTimezoneId.current !== selectedTimezoneId) {
+                    handleTimezonePreferenceChange();
+                    prevTimezoneId.current = selectedTimezoneId;
+                  } else if (
+                    userPreference.rowsInGrid !== selectedRowsPerPage
+                  ) {
+                    handleTimezonePreferenceChange();
+                  } else if (userPreference.countryId !== selectedCountry?.id) {
+                    handleTimezonePreferenceChange();
                   } else {
-                    toast.error(
-                      MESSAGE.MODULE_ACCESS.GENERAL_SETTING
-                        .DENIED_UPDATE_ACCESS,
-                    );
+                    handleEditableSectionCancel();
                   }
-                }}
-                className="caption-custom text-blue-600 cursor-pointer hover:text-blue-700
-                 rounded-md py-1.5 px-3  // Adds padding to match select height
-                 focus:outline-none focus:ring-2 focus:ring-indigo-500" // Focus styles for clickability
-                tabIndex={0} // Makes the paragraph focusable for keyboard navigation
-                role="button" // Indicates it's a clickable element
-                aria-label="Click to change time zone"
-              >
-                {userPreference.timezone}
-              </p>
-            )}
-          </div>
-          {/* rows in grid  */}
-          <div className="flex items-center space-x-4 border-b pb-2">
-            {/* Label for accessibility and clear identification */}
-            <label
-              htmlFor="records-per-page-select"
-              className="input-label-custom whitespace-nowrap"
-            >
-              Records Per Page:
-            </label>
-
-            {/* Display current preference, visually distinct */}
-            <div className="flex items-center space-x-1">
-              <span className="caption-custom">Current:</span>
-              <span className="caption-custom-blue">
-                {userPreference.rowsInGrid}
-              </span>
-            </div>
-
-            {/* The styled select dropdown */}
-            <select
-              // disabled={!userHasAccessToUpdateSettingGeneral}
-              onClick={() => {
-                if (!userHasAccessToUpdateSettingGeneral) {
+                } else {
                   toast.error(
                     MESSAGE.MODULE_ACCESS.GENERAL_SETTING.DENIED_UPDATE_ACCESS,
                   );
-                  return;
                 }
               }}
-              onChange={(e) => {
-                if (userHasAccessToUpdateSettingGeneral) {
-                  handleSelectRowInGridOptionChange(e);
-                }
-              }}
-              value={selectedRowsPerPage}
-              id="records-per-page-select" // Link with label's htmlFor
-              className="block caption-custom w-36 max-w-fit border rounded border-gray-300 shadow-sm
-               focus:border-indigo-500 focus:ring-indigo-500
-               sm:pl-1 pr-1 // Added padding for better appearance
-               text-gray-900" // Default text color
-              aria-label="Select number of records per page" // Good for accessibility
-              // You'd add value={selectedValue} and onChange={handleChange} props here in your React component
+              isLoading={isLoadingForCompanyDetailsUpdate}
             >
-              <option className="caption-custom" value="">
-                Select
-              </option>
-              {rowsInGridDropdownOptions &&
-                rowsInGridDropdownOptions.map((data) => (
-                  <option key={data.id} value={data.rowsInGrid}>
-                    {data.rowsInGrid}
-                  </option>
-                ))}
-            </select>
-          </div>
-          <div className="flex input-label-custom gap-2">
-            {/* Country Id :{userPreference.countryId} */}
-            Country :{/* Display current preference, visually distinct */}
-            <div className="flex items-center space-x-1">
-              <span className="caption-custom">Current:</span>
-              <span className="caption-custom-blue">
-                {
-                  countries.find(
-                    (country: Country) =>
-                      country.id === userPreference.countryId,
-                  )?.name
-                }
-              </span>
-            </div>
-            {/* The styled select dropdown */}
-            <select
-              // disabled={!userHasAccessToUpdateSettingGeneral}
-              onClick={() => {
-                if (!userHasAccessToUpdateSettingGeneral) {
-                  toast.error(
-                    MESSAGE.MODULE_ACCESS.GENERAL_SETTING.DENIED_UPDATE_ACCESS,
-                  );
-                  return;
-                }
-              }}
-              onChange={(e) => {
-                if (userHasAccessToUpdateSettingGeneral) {
-                  handleSelectCountryOptionChange(e);
-                }
-              }}
-              value={selectedCountry?.id?.toString() ?? ""}
-              id="records-per-page-select" // Link with label's htmlFor
-              className="block caption-custom w-36 max-w-fit border rounded border-gray-300 shadow-sm
-               focus:border-indigo-500 focus:ring-indigo-500
-               sm:pl-1 pr-1 // Added padding for better appearance
-               text-gray-900" // Default text color
-              aria-label="Select number of records per page" // Good for accessibility
-              // You'd add value={selectedValue} and onChange={handleChange} props here in your React component
-            >
-              <option className="caption-custom" value="">
-                Select {}
-              </option>
-              {countries &&
-                countries.map((data) => (
-                  <option key={data.id} value={data.id!}>
-                    {data.name}
-                  </option>
-                ))}
-            </select>
+              {editingSection === "preferences" ? (
+                <div className="space-y-1">
+                  {/* Time Zone */}
+                  <div className="grid grid-cols-[140px_1fr] items-start border-b pb-2">
+                    <div className="input-label-custom py-1">Time Zone:</div>
+
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="caption-custom">Current:</span>
+
+                      <span className="caption-custom-blue">
+                        {userPreference.timezone}
+                      </span>
+
+                      <div className="relative z-10 w-auto">
+                        <CustomTimezoneDropdown
+                          setShowTimeZoneData={setShowTimeZoneData}
+                          timezoneData={timezoneList}
+                          hasMore={hasMore}
+                          loadMore={loadMore}
+                          onSearchChange={handleSearchChange}
+                          onSelect={(zone) => {
+                            setSelectedTimeZoneData(zone);
+                            setSelectedTimezoneId(zone.id);
+                          }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Records Per Page */}
+                  <div className="grid grid-cols-[140px_1fr] items-start border-b pb-2">
+                    <label
+                      htmlFor="records-per-page-select"
+                      className="input-label-custom py-1"
+                    >
+                      Records Per Page:
+                    </label>
+
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="caption-custom">Current:</span>
+
+                      <span className="caption-custom-blue">
+                        {userPreference.rowsInGrid}
+                      </span>
+
+                      <select
+                        onClick={() => {
+                          if (!userHasAccessToUpdateSettingGeneral) {
+                            toast.error(
+                              MESSAGE.MODULE_ACCESS.GENERAL_SETTING
+                                .DENIED_UPDATE_ACCESS,
+                            );
+                            return;
+                          }
+                        }}
+                        onChange={(e) => {
+                          if (userHasAccessToUpdateSettingGeneral) {
+                            handleSelectRowInGridOptionChange(e);
+                          }
+                        }}
+                        value={selectedRowsPerPage}
+                        id="records-per-page-select"
+                        className="block caption-custom w-36 border rounded border-gray-300 shadow-sm
+        focus:border-indigo-500 focus:ring-indigo-500
+        text-gray-900 py-1"
+                        aria-label="Select number of records per page"
+                      >
+                        <option value="">Select</option>
+
+                        {rowsInGridDropdownOptions &&
+                          rowsInGridDropdownOptions.map((data) => (
+                            <option key={data.id} value={data.rowsInGrid}>
+                              {data.rowsInGrid}
+                            </option>
+                          ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  {/* Country */}
+                  <div className="grid grid-cols-[140px_1fr] items-start border-b pb-2">
+                    <div className="input-label-custom py-1">Country:</div>
+
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="caption-custom">Current:</span>
+
+                      <span className="caption-custom-blue">
+                        {
+                          countries.find(
+                            (country: Country) =>
+                              country.id === userPreference.countryId,
+                          )?.name
+                        }
+                      </span>
+
+                      <select
+                        onClick={() => {
+                          if (!userHasAccessToUpdateSettingGeneral) {
+                            toast.error(
+                              MESSAGE.MODULE_ACCESS.GENERAL_SETTING
+                                .DENIED_UPDATE_ACCESS,
+                            );
+                            return;
+                          }
+                        }}
+                        onChange={(e) => {
+                          if (userHasAccessToUpdateSettingGeneral) {
+                            handleSelectCountryOptionChange(e);
+                          }
+                        }}
+                        value={selectedCountry?.id?.toString() ?? ""}
+                        className="block caption-custom w-36 border rounded border-gray-300 shadow-sm
+        focus:border-indigo-500 focus:ring-indigo-500
+        text-gray-900 py-1"
+                      >
+                        <option value="">Select</option>
+
+                        {countries &&
+                          countries.map((data) => (
+                            <option key={data.id} value={data.id!}>
+                              {data.name}
+                            </option>
+                          ))}
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-1">
+                  {/* Time Zone */}
+                  <div className="grid grid-cols-[140px_1fr] items-start border-b pb-1">
+                    <div className="input-label-custom py-1">Time Zone:</div>
+                    <p
+                      className="caption-custom text-blue-600 hover:text-blue-700 py-1.5"
+                      aria-label="Click Edit change time zone"
+                    >
+                      {userPreference.timezone}
+                    </p>
+                  </div>
+
+                  {/* Records Per Page */}
+                  <div className="grid grid-cols-[140px_1fr] items-start border-b pb-1">
+                    <div className="input-label-custom py-1">
+                      Records Per Page:
+                    </div>
+                    <p
+                      className="caption-custom text-blue-600 hover:text-blue-700 py-1.5"
+                      aria-label="Click Edit change rows per page"
+                    >
+                      {userPreference.rowsInGrid}
+                    </p>
+                  </div>
+
+                  {/* Country */}
+                  <div className="grid grid-cols-[140px_1fr] items-start border-b pb-1">
+                    <div className="input-label-custom py-1">Country:</div>
+                    <p
+                      className="caption-custom text-blue-600 hover:text-blue-700 py-1.5"
+                      aria-label="Click Edit change country"
+                    >
+                      {
+                        countries.find(
+                          (country: Country) =>
+                            country.id === userPreference.countryId,
+                        )?.name
+                      }
+                    </p>
+                  </div>
+                </div>
+              )}
+            </EditableSection>
           </div>
         </div>
+
         {/* Subscription Card */}
-        <div className="  bg-white rounded-2xl shadow-lg p-8 space-y-4">
+        <div className="bg-white rounded-2xl shadow-lg p-8 space-y-2">
           <div className="flex items-center justify-between">
-            <h3 className="section-header-custom">Subscription</h3>
-            <button
-              onClick={() => {
+            <h3 className="section-header-custom">
+              Current Subscription <span className="caption-custom"></span>
+            </h3>
+          </div>
+          <div className="border-t pt-4">
+            <EditableSection
+              title=""
+              sectionKey="subscription"
+              onEdit={() => {
                 navigate(ROUTES_URL.GET_SUBSCRIPTION);
               }}
-              className="px-4 py-2 bg-blue-600 action-btn-custom rounded-md hover:bg-blue-700 transition"
+              hasAccess={userHasAccessToUpdateSubscription}
+              isEditing={false}
+              onCancel={() => {}}
+              onSave={() => {}}
+              editButtonText="Update Subscription"
+              isLoading={false}
+              key={"subscription"}
             >
-              Update Subscription
-            </button>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            <div>
-              <h4 className="table-header-custom">Started On</h4>
-              <p className={classnameForParagragh}>
-                {loginStatus.startDateSubscription || "-"}
-              </p>
-            </div>
-            <div>
-              <h4 className="table-header-custom">Ending On</h4>
-              <p className={classnameForParagragh}>
-                {loginStatus.endDateSubscription || "Not Provided"}
-              </p>
-            </div>
+              <div className="grid grid-cols-2 items-start border-b pb-1">
+                <div className="flex gap-4">
+                  <div className="input-label-custom py-1">Started On:</div>
+                  <span className="caption-custom text-blue-600 py-1.5">
+                    {loginStatus.startDateSubscription || "-"}
+                  </span>
+                </div>
+
+                <div className="flex gap-4">
+                  <div className="input-label-custom py-1">Ending On:</div>
+                  <span className="caption-custom text-blue-600 py-1.5">
+                    {loginStatus.endDateSubscription || "Not Provided"}
+                  </span>
+                </div>
+              </div>
+            </EditableSection>
           </div>
         </div>
         <AppVersionViewCard />

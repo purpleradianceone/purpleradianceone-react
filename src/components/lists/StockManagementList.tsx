@@ -26,25 +26,19 @@ const StockManagementList = ({
   handleSearchParameterChange,
 }: StockManagementListProps) => {
   const { userPreference } = useUserPreference();
-  const { userHasAccessToAddProductWiseStock } = useUserAccessModules();
+  const { userHasAccessToAddStock } = useUserAccessModules();
   const [isAddStockModalOpen, setIsAddStockModalOpen] =
     useState<boolean>(false);
   const [isAddStockModalOpenFromStock, setIsAddStockModalOpenFromStock] =
     useState<boolean>(false);
-  // const [openAllTransactionPage, setOpenAllTransactionPage] =
-  //   useState<boolean>(false);
   const [activeStockView, setActiveStockview] = useState<StockView>(null);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-  // const [isCreateStockLoading, setIsCreateStockLoading] = useState(false);
-
   const { loginStatus } = useLoggedInUserContext();
-
   const [isCreateStockLoading, setIsCreateStockLoading] = useState(false);
-
   function handleSelectedStockLiveForCompanyProduct(
     data: LiveStockForCompanyProduct,
   ) {
-    if (userHasAccessToAddProductWiseStock) {
+    if (userHasAccessToAddStock) {
       handleCreateStock(data);
     } else {
       toast.error(MESSAGE.MODULE_ACCESS.STOCK.STOCK.DENIED_ADD_ACCESS);
@@ -151,32 +145,6 @@ const StockManagementList = ({
             </div>
           </div>
         </div>
-        {/* <div
-          id="company-users-module-add-button"
-          className="flex gap-1 items-center"
-        >
-          <Button
-            type="submit"
-            disabled={!userHasAccessToAddProductWiseStock}
-            onClick={(e) => {
-              e.preventDefault();
-              if (!userHasAccessToAddProductWiseStock) {
-                toast.error(
-                  MESSAGE.MODULE_ACCESS.STOCK.PRODUCT_WISE_STOCK
-                    .DENIED_ADD_ACCESS,
-                );
-                return;
-              } else {
-                setIsAddStockModalOpen(true);
-              }
-            }}
-          >
-            <div className="flex items-center gap-1">
-              <Plus size={SIZE.SIXTEEN} />
-              <span className="hidden md:inline">Add</span>
-            </div>
-          </Button>
-        </div> */}
       </div>
       <div className="bg-white  overflow-y-auto rounded-lg shadow-sm ">
         <div
@@ -225,29 +193,6 @@ const StockManagementList = ({
             }}
           />
         )}
-      {/* {activeStockView === ActionTypeForStockMOdule.DETAILS && (
-        <StockLiveForCompanyProduct
-          companyStockLive={selectedStock!}
-          handleClose={() => {
-            setActiveStockview(null);
-          }}
-        />
-      )}
-      {activeStockView === ActionTypeForStockMOdule.TRANSACTIONS && (
-        <StockTransactions
-          companyProductId={selectedStock!.companyProductId}
-          onClose={() => {
-            setActiveStockview(null);
-          }}
-        />
-      )}
-      {openAllTransactionPage && (
-        <StockTransactions
-          onClose={() => {
-            setOpenAllTransactionPage(false);
-          }}
-        />
-      )} */}
     </div>
   );
 };

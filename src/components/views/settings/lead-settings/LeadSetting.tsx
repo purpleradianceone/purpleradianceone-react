@@ -203,9 +203,9 @@ const LeadSetting: React.FC = () => {
         <FormHeader
           preText="Manage your company's lead-related configurations."
           description="Select and assign a user to whom lead will be visible."
-          onClose={() => {
-            // setCompanyUserModalOpen(false);
-          }}
+          // onClose={() => {
+          //   // setCompanyUserModalOpen(false);
+          // }}
           icon={Handshake}
           isModal={false}
           wantBorderBottom={false}
@@ -235,9 +235,9 @@ const LeadSetting: React.FC = () => {
         <FormHeader
           preText="Assign Users to whom all leads should be visible"
           description="Select and assign a user to whom all the lead's will be visible."
-          onClose={() => {
-            // setCompanyUserModalOpen(false);
-          }}
+          // onClose={() => {
+          //   // setCompanyUserModalOpen(false);
+          // }}
           icon={User2}
           isModal={false}
           wantBorderBottom={false}

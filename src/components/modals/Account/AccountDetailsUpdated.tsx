@@ -30,7 +30,6 @@ import ToggleButton from "../../ui/ToggleButton";
 import { useCountries } from "../../../config/hooks/useCountries";
 import { useStates } from "../../../config/hooks/useStates";
 import { useDistricts } from "../../../config/hooks/useDisctricts";
-
 import { useAccountDetails } from "../../../config/hooks/useGetAccountDetails";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { parseInt } from "lodash";
@@ -53,21 +52,6 @@ const AccountDetailsUpdated: React.FC = () => {
     refresh: accountDetailsRefreshCall,
   } = useAccountDetails(parseInt(accountId!));
   const navigate = useNavigate();
-
-  //   const parsedAccountId = Number(accountId);
-
-  //   useEffect(() => {
-  //     if (!accountId || Number.isNaN(parsedAccountId)) {
-  //       navigate(ROUTES_URL.ACCOUNT_MANAGEMENT);
-  //     }
-  //   }, [accountId, parsedAccountId, navigate]);
-
-  //   useEffect(() => {
-  //     if (!accountDetailsLoading && company === undefined) {
-  //       navigate(ROUTES_URL.ACCOUNT_MANAGEMENT);
-  //       return;
-  //     }
-  //   }, [accountDetailsLoading, company, navigate]);
 
   const initialState = {
     count: 0,
@@ -133,10 +117,7 @@ const AccountDetailsUpdated: React.FC = () => {
   const districtTypeOption = toSelectOptions(districts, "id", "name");
   const businessTypeOption = toSelectOptions(businessType, "id", "name");
 
-  //   Note: this is not working
-  //   useEffect(()=>{
-  //     refreshDistrictCall()
-  //   },[formData.stateId, formData.countryId])
+
   const newErrors = {
     mobilenumber: "",
     gst: "",
@@ -155,59 +136,16 @@ const AccountDetailsUpdated: React.FC = () => {
     email: string;
     registrationNumber: string;
   }>(newErrors);
-  //   const validateField = (
-  //     fieldName: keyof Account,
-  //     value: string | number,
-  //   ): string => {
-  //     const str = String(value);
-  //     switch (fieldName) {
-  //       case "name":
-  //         if (!str.trim()) return "Account name is required";
-  //         if (str.length > 40) return "Account name cannot exceed 40 characters";
-  //         return "";
-  //       case "email":
-  //         if (!str.trim()) return "Email is required";
-  //         if (str.length > 50) return "Email cannot exceed 50 characters";
-  //         if (!REGEX.EMAIL.test(str)) return "Please enter a valid email";
-  //         return "";
-  //       case "mobileNumber":
-  //         if (!str.trim()) return "Mobile number is required";
-  //         if (!/^\d+$/.test(str)) return "Mobile number can only contain digits";
-  //         if (!MOBILE_NUMBER_VALIDATION.MOBILE_NUMBER_PATTERN_INDIAN.test(str))
-  //           return "Please enter a valid 10-digit mobile number";
-  //         return "";
-  //       case "pan":
-  //         if (!/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(str))
-  //           return "Please enter the valid pan.";
-  //         return "";
-  //       case "tan":
-  //         if (!/^[A-Z]{4}[0-9]{5}[A-Z]{1}$/.test(str))
-  //           return "Please enter the valid tan.";
-  //         return "";
-  //       case "gst":
-  //         if (
-  //           !/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/.test(str)
-  //         )
-  //           return "Please enter the valid gst.";
-  //         return "";
-  //       case "businessResgistrationNumber":
-  //         if (str.length > 100) {
-  //           return "registration number length is greater that 100.";
-  //         }
-  //         return "";
-  //       default:
-  //         return "";
-  //     }
-  //   };
+  
 
   //Note : Validation before the api submit call
   const validateData = () => {
-    const name = formData.name.trim();
-    const email = formData.email.trim();
-    const mobile = formData.mobileNumber.trim();
-    const pan = formData.pan.trim();
-    const tan = formData.tan.trim();
-    const gst = formData.gst.trim();
+    const name = (formData.name ?? "").trim();
+    const email = (formData.email ?? "").trim();
+    const mobile = (formData.mobileNumber ?? "").trim();
+    const pan = (formData.pan ?? "").trim();
+    const tan = (formData.tan ?? "").trim();
+    const gst = (formData.gst ?? "").trim();
 
     // Name
     if (name.length === 0) {
@@ -221,18 +159,19 @@ const AccountDetailsUpdated: React.FC = () => {
       return false;
     }
 
-    if (email.length > 50) {
+    if (email && email.length > 50) {
       toast.error("Email cannot exceed 50 characters");
       return false;
     }
 
-    if (!VALIDATIONS.EMAIL.test(email)) {
+    if (email && !VALIDATIONS.EMAIL.test(email)) {
       toast.error("Please enter a valid email");
       return false;
     }
 
     // Mobile
     if (
+      mobile &&
       mobile.length === 0 ||
       !MOBILE_NUMBER_VALIDATION.MOBILE_NUMBER_PATTERN_INDIAN.test(mobile)
     ) {
@@ -269,68 +208,6 @@ const AccountDetailsUpdated: React.FC = () => {
 
     return true;
   };
-
-  //   const validateData = () => {
-  //     if (formData.name.length == 0) {
-  //       toast.error("name is req");
-  //       return false;
-  //     }
-
-  //     if (formData.email.trim().length == 0) {
-  //       toast.error("Email is required");
-  //       return false;
-  //     }
-  //     if (formData.email.length > 50) {
-  //       toast.error("Email cannot exceed 50 characters");
-  //       return false;
-  //     }
-  //     if (!VALIDATIONS.EMAIL.test(formData.email)) {
-  //       toast.error("Please enter a valid email");
-  //       return false;
-  //     }
-  //     const mobile = formData.mobileNumber.trim();
-
-  //     if (
-  //       mobile.length === 0 ||
-  //       !MOBILE_NUMBER_VALIDATION.MOBILE_NUMBER_PATTERN_INDIAN.test(mobile)
-  //     ) {
-  //       toast.error("Please enter a valid Mobile Number.");
-  //       return false;
-  //     }
-
-  //     if (
-  //       formData.pan.trim() &&
-  //       !/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(formData.pan.trim())
-  //     ) {
-  //       toast.error("Please enter the valid pan.");
-  //       return false;
-  //     }
-
-  //     if (
-  //       formData.tan.trim() &&
-  //       !/^[A-Z]{4}[0-9]{5}[A-Z]{1}$/.test(formData.tan)
-  //     ) {
-  //       toast.error("Please enter the valid tan.");
-  //       return false;
-  //     }
-
-  //     if (
-  //       formData.gst.trim() &&
-  //       !/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/.test(
-  //         formData.gst.trim(),
-  //       )
-  //     ) {
-  //       toast.error("Please enter valid gst.");
-  //       return false;
-  //     }
-
-  //     if (formData.gst.trim().length > 100) {
-  //       toast.error("registration number length is greater that 100.");
-  //       return false;
-  //     }
-
-  //     return true;
-  //   };
 
   //Note : handle api sublit logic here
   const handleSaveAccountDetails = async () => {
@@ -460,12 +337,6 @@ const AccountDetailsUpdated: React.FC = () => {
     await axiosClient
       .post(POST_API.UPDATE_ACCOUNT, postData, { withCredentials: true })
       .then((response) => {
-        // if (response.data.status) {
-        //   toast.success(response.data.message);
-        // //   setFormData((prev) => ({ ...prev, isActive: checked }));
-        // } else {
-        //   toast.error(response.data.message);
-        // }
 
         if (response.data.status) {
           toast.success(response.data.message);
@@ -520,7 +391,7 @@ const AccountDetailsUpdated: React.FC = () => {
     console.log(name + "value  : " + value);
 
     if (name === "name") {
-      if (!value.trim()) {
+      if ( value && !value.trim()) {
         setErrors((prev) => ({ ...prev, name: "Name is required" }));
       } else {
         setErrors((prev) => ({ ...prev, name: "" }));
@@ -528,12 +399,12 @@ const AccountDetailsUpdated: React.FC = () => {
     }
 
     if (name === "email") {
-      if (!value.trim()) {
+      if (value && !value.trim()) {
         setErrors((prev) => ({
           ...prev,
           email: "Email is required",
         }));
-      } else if (!VALIDATIONS.EMAIL.test(value) && value !== "") {
+      } else if (value !== "" && !VALIDATIONS.EMAIL.test(value)  ) {
         setErrors((prev) => ({
           ...prev,
           email: "Please enter valid email address.",
@@ -544,12 +415,13 @@ const AccountDetailsUpdated: React.FC = () => {
     }
 
     if (name === "mobileNumber") {
-      if (!value.trim()) {
+      if (value && !value.trim()) {
         setErrors((prev) => ({
           ...prev,
           mobilenumber: "Mobile Number is required",
         }));
       } else if (
+        value &&
         !MOBILE_NUMBER_VALIDATION.MOBILE_NUMBER_PATTERN_INDIAN.test(value) &&
         value.length !== 0
       ) {
@@ -557,7 +429,7 @@ const AccountDetailsUpdated: React.FC = () => {
           ...prev,
           mobilenumber: "Please enter a valid Mobile Number.",
         }));
-      } else if (value.length > 10) {
+      } else if (value && value.length > 10) {
         setErrors((prev) => ({
           ...prev,
           mobilenumber: "Please enter a valid Mobile Number.",
@@ -567,7 +439,7 @@ const AccountDetailsUpdated: React.FC = () => {
       }
     }
     if (name === "pan") {
-      if (value.trim() && !/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(value)) {
+      if ( value && value.trim() && !/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(value)) {
         setErrors((prev) => ({
           ...prev,
           pan: "Please enter the valid pan.",
@@ -580,7 +452,7 @@ const AccountDetailsUpdated: React.FC = () => {
       }
     }
     if (name === "tan") {
-      if (value.trim() && !/^[A-Z]{4}[0-9]{5}[A-Z]{1}$/.test(value)) {
+      if (value && value.trim() && !/^[A-Z]{4}[0-9]{5}[A-Z]{1}$/.test(value)) {
         setErrors((prev) => ({
           ...prev,
           tan: "Please enter the valid tan.",
@@ -594,7 +466,7 @@ const AccountDetailsUpdated: React.FC = () => {
     }
     if (name === "gst") {
       if (
-        value.trim() &&
+       value && value.trim() &&
         !/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/.test(value)
       ) {
         setErrors((prev) => ({
@@ -609,7 +481,7 @@ const AccountDetailsUpdated: React.FC = () => {
       }
     }
     if (name === "businessResgistrationNumber") {
-      if (value.trim().length > 100) {
+      if (value && value.trim().length > 100) {
         setErrors((prev) => ({
           ...prev,
           registrationNumber: "registration number length is greater that 100.",
@@ -1401,12 +1273,6 @@ const AccountDetailsUpdated: React.FC = () => {
                   <Building2 className="h-6 w-6 text-white" />
                 </div>
                 <div className="w-full bg-pink-00">
-                  {/* <h1 className=" "> */}
-                  {/* {renderEditableField(
-                  "name",
-                  formData.name,
-                  "Enter company name",
-                )} */}
                   {isEditing ? (
                     <div className="w-full">
                       <FormInput
@@ -1476,25 +1342,6 @@ const AccountDetailsUpdated: React.FC = () => {
 
               {/* Right side */}
               {/* Note : metadata */}
-              {/* <div className="grid gap-2 font-semibold text-gray-700">
-                  <div className="flex items-center justify-between gap-4">
-                    <span className="grid">
-                      <span className="caption-custom truncate">
-                      <span className="cap">Created By</span>
-                        {formData.createdBy}
-                      </span>
-                    </span>
-                    <span className="caption-custom">
-                      <span className=" ">
-                      <span className="">Created On</span>
-                      <span>
-
-                        {formData.createdOn}
-                      </span>
-                      </span>
-                    </span>
-                  </div>
-                </div> */}
             </div>
           </div>
           {/* Tab Navigation */}
@@ -1548,141 +1395,11 @@ const AccountDetailsUpdated: React.FC = () => {
           {/* Tab Content */}
           {renderTabContent()}
         </div>
-
-        {/* Right Card - Empty for future use */}
-
-        {/* <div className="bg-white rounded-xl border p-1 border-slate-200">
-          <h3 className="bg-gray-100 table-header-custom rounded-t-md px-2">
-            Account Contacts
-          </h3>
-          <AccountContact accountId={company!.id} />
-        </div> */}
-
-        {/* Account Lead */}
-
-        {/* <div className="bg-white rounded-xl border p-1 border-slate-200">
-          <div className="bg-gray-100 table-header-custom rounded-t-md px-2 ">
-            <span>Account related leads</span>
-          </div>
-          <AccountLead account={company!} />
-        </div> */}
-
-        {/* Account company type */}
-
-        {/* <div className="bg-white rounded-xl border p-1 border-slate-200">
-          <div className="bg-gray-100 table-header-custom rounded-t-md px-2 ">
-            <span>Company Account Type</span>
-          </div>
-          <AccountCompanyType accountId={company!.id} />
-        </div> */}
-
-        {/* Account company product */}
-        {/* <div className="bg-white col-span-2 rounded-xl border p-1 border-slate-200">
-          <h3 className="bg-gray-100 table-header-custom rounded-t-md px-2">
-            Product Details
-          </h3>
-          <AccountCompanyProduct
-            accountId={company!.id}
-          />
-        </div> */}
       </div>
     </div>
   );
 };
 
-// Note : this is the form skeleton
-// const Skeleton: React.FC = () => {
-//   return (
-//     <div className="    bg-white animate-pulse">
-//       {/* Header Section */}
-//       <div className="flex items-center space-x-4 mb-6">
-//         <div className="w-16 h-16 bg-gray-200 rounded-lg"></div>
-//         <div className="flex flex-col space-y-2 flex-1">
-//           <div className="h-4 bg-gray-200 rounded w-48"></div>
-//           <div className="h-3 bg-gray-200 rounded w-32"></div>
-//         </div>
-//         <div className="flex flex-col items-end space-y-2">
-//           <div className="h-3 bg-gray-200 rounded w-24"></div>
-//           <div className="h-3 bg-gray-200 rounded w-24"></div>
-//         </div>
-//       </div>
-
-//       {/* Tab and Content Section */}
-//       <div className="flex space-x-4 mb-6">
-//         <div className="w-24 h-6 bg-gray-200 rounded-md"></div>
-//         <div className="w-24 h-6 bg-gray-200 rounded-md"></div>
-//         <div className="w-24 h-6 bg-gray-200 rounded-md"></div>
-//       </div>
-//       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-//         {/* Left Side (Contact, Mobile, Website) */}
-//         <div className="flex flex-col space-y-4">
-//           <div className="p-4 bg-white rounded-md border border-gray-200">
-//             <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-//             <div className="h-3 bg-gray-200 rounded w-full"></div>
-//           </div>
-//           <div className="p-4 bg-white rounded-md border border-gray-200">
-//             <div className="h-4 bg-gray-200 rounded w-1/2 mb-2"></div>
-//             <div className="h-3 bg-gray-200 rounded w-full"></div>
-//           </div>
-//           <div className="p-4 bg-white rounded-md border border-gray-200">
-//             <div className="h-4 bg-gray-200 rounded w-2/3 mb-2"></div>
-//             <div className="h-3 bg-gray-200 rounded w-full"></div>
-//           </div>
-//         </div>
-
-//         {/* Right Side (Account Contact) */}
-//         <div className="p-4 bg-white rounded-md border border-gray-200">
-//           <div className="flex items-center justify-between mb-4">
-//             <div className="h-4 bg-gray-200 rounded w-32"></div>
-//             <div className="w-16 h-8 bg-gray-200 rounded"></div>
-//           </div>
-//           <div className="flex items-center space-x-4">
-//             <div className="w-12 h-12 bg-gray-200 rounded-full"></div>
-//             <div className="flex-1">
-//               <div className="h-4 bg-gray-200 rounded w-24 mb-2"></div>
-//               <div className="h-3 bg-gray-200 rounded w-48"></div>
-//             </div>
-//             <div className="h-8 w-16 bg-gray-200 rounded-full"></div>
-//           </div>
-//         </div>
-//       </div>
-//       <br />
-//       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-//         {/* Left Side (Contact, Mobile, Website) */}
-//         <div className="flex flex-col space-y-4">
-//           <div className="p-4 bg-white rounded-md border border-gray-200">
-//             <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-//             <div className="h-3 bg-gray-200 rounded w-full"></div>
-//           </div>
-//           <div className="p-4 bg-white rounded-md border border-gray-200">
-//             <div className="h-4 bg-gray-200 rounded w-1/2 mb-2"></div>
-//             <div className="h-3 bg-gray-200 rounded w-full"></div>
-//           </div>
-//           <div className="p-4 bg-white rounded-md border border-gray-200">
-//             <div className="h-4 bg-gray-200 rounded w-2/3 mb-2"></div>
-//             <div className="h-3 bg-gray-200 rounded w-full"></div>
-//           </div>
-//         </div>
-
-//         {/* Right Side (Account Contact) */}
-//         <div className="p-4 bg-white rounded-md border border-gray-200">
-//           <div className="flex items-center justify-between mb-4">
-//             <div className="h-4 bg-gray-200 rounded w-32"></div>
-//             <div className="w-16 h-8 bg-gray-200 rounded"></div>
-//           </div>
-//           <div className="flex items-center space-x-4">
-//             <div className="w-12 h-12 bg-gray-200 rounded-full"></div>
-//             <div className="flex-1">
-//               <div className="h-4 bg-gray-200 rounded w-24 mb-2"></div>
-//               <div className="h-3 bg-gray-200 rounded w-48"></div>
-//             </div>
-//             <div className="h-8 w-16 bg-gray-200 rounded-full"></div>
-//           </div>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
 
 const AccountDetailsSkeleton = () => {
   return (
@@ -1733,5 +1450,4 @@ const SkeletonField = () => {
   )
 };
 
-// export default AccountDetailsSkeleton;
 export default AccountDetailsUpdated;

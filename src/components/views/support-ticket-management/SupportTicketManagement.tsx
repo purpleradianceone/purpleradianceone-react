@@ -7,7 +7,10 @@ import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContex
 import POST_API from "../../../constants/PostApi";
 import { STATUS_CODE } from "../../../constants/AppConstants";
 import RefreshToken from "../../../config/validations/RefreshToken";
-import { customDateRangeId, useSearchFilterPaginationDateHandlers } from "../../../config/hooks/usePaginationHandler";
+import {
+  customDateRangeId,
+  useSearchFilterPaginationDateHandlers,
+} from "../../../config/hooks/usePaginationHandler";
 import { useInView } from "react-intersection-observer";
 import { motion } from "framer-motion";
 import SupportTicketManagementList from "../../lists/SupportTicketManagementList";
@@ -27,7 +30,7 @@ function SupportTicketManagement({
 }: {
   isUsedInSupportTicketModule: boolean;
   handleRowSelectedForShowSupportTicket?: (
-    rowData: SupportTicketProps | any
+    rowData: SupportTicketProps | any,
   ) => void;
 }) {
   const { userHasAccessToViewSupportTicket } = useUserAccessModules();
@@ -48,7 +51,7 @@ function SupportTicketManagement({
   // Read filters from LocalStorage (before hook initializes)
   const savedFilters = JSON.parse(
     localStorage.getItem(LocalStorageKeys.SUPPORT_TICKET_MANAGEMENT_FILTERS) ||
-      "{}"
+      "{}",
   );
 
   const {
@@ -74,7 +77,7 @@ function SupportTicketManagement({
 
   const [selectedSupportTicketLifecycle, setSelectedSupportTicketLifecycle] =
     useState<number | null>(
-      savedFilters.selectedSupportTicketLifecycle || null
+      savedFilters.selectedSupportTicketLifecycle || null,
     );
 
   const [selectedSupportTicketSource, setSelectedSupportTicketSource] =
@@ -86,31 +89,31 @@ function SupportTicketManagement({
       fullname: "",
       email: "",
       mobilenumber: "",
-    }
+    },
   );
 
-  const [selectedResolvedBy, setSelectedResolvedBy] = useState<LookupCompanyUser>(
-    savedFilters.selectedResolvedBy || {
-      id: 0,
-      fullname: "",
-      email: "",
-      mobilenumber: "",
-    }
-  );
+  const [selectedResolvedBy, setSelectedResolvedBy] =
+    useState<LookupCompanyUser>(
+      savedFilters.selectedResolvedBy || {
+        id: 0,
+        fullname: "",
+        email: "",
+        mobilenumber: "",
+      },
+    );
 
-  const [selectedCompanyProduct, setSelectedCompanyProduct] = useState<LookupCompanyProduct>(
-    savedFilters.selectedCompanyProduct || {
-      id: 0,
-      name: "",
-      
-    }
-  );
-
+  const [selectedCompanyProduct, setSelectedCompanyProduct] =
+    useState<LookupCompanyProduct>(
+      savedFilters.selectedCompanyProduct || {
+        id: 0,
+        name: "",
+      },
+    );
 
   const [ref, inView] = useInView({ fallbackInView: true, threshold: 0.1 });
 
   const handleSupportSelectedCategory = (
-    selectedSupportTicketCategory: number | undefined
+    selectedSupportTicketCategory: number | undefined,
   ) => {
     if (selectedSupportTicketCategory) {
       setSelectedSupportTicketCategory(selectedSupportTicketCategory);
@@ -120,7 +123,7 @@ function SupportTicketManagement({
   };
 
   const handleSupportSelectedLifecycle = (
-    selectedSupportTicketLifecycle: number | undefined
+    selectedSupportTicketLifecycle: number | undefined,
   ) => {
     if (selectedSupportTicketLifecycle) {
       setSelectedSupportTicketLifecycle(selectedSupportTicketLifecycle);
@@ -130,7 +133,7 @@ function SupportTicketManagement({
   };
 
   const handleSupportTicketSelectedSource = (
-    selectedSupportTicketSource: number | undefined
+    selectedSupportTicketSource: number | undefined,
   ) => {
     if (selectedSupportTicketSource) {
       setSelectedSupportTicketSource(selectedSupportTicketSource);
@@ -170,7 +173,7 @@ function SupportTicketManagement({
         {
           signal,
           withCredentials: true,
-        }
+        },
       );
       if (response.status === STATUS_CODE.OK) {
         const responseData = response.data;
@@ -178,7 +181,10 @@ function SupportTicketManagement({
         //   setTotalPages(Math.ceil(response.data[0].count / pageSize));
         // }
         // setCurrentPageDataLength(currentPage, response.data.length);
-        setCurrentPageData({currentPage:currentPage,pageDataLength:response.data.length});
+        setCurrentPageData({
+          currentPage: currentPage,
+          pageDataLength: response.data.length,
+        });
         const formattedData: SupportTicketProps[] = responseData.map(
           (item: any) => ({
             count: item.count,
@@ -218,7 +224,7 @@ function SupportTicketManagement({
             createdOn: item.createdon,
             updatedBy: item.updatedby,
             updatedOn: item.updatedon,
-          })
+          }),
         );
         setSupportTicketData(formattedData);
       }
@@ -237,14 +243,15 @@ function SupportTicketManagement({
     }
   };
 
-  const handleSelectedAssignToCheckBoxChange = (params: LookupCompanyUser | null) => {
+  const handleSelectedAssignToChange = (
+    params: LookupCompanyUser | null,
+  ) => {
     if (params) {
       setSelectedAssignTo({
         id: params.id,
         fullname: params.fullname,
         email: params.email,
         mobilenumber: params.mobilenumber,
-       
       });
     } else {
       // Reset selectedCompanyUser to its initial state when null is received
@@ -253,30 +260,28 @@ function SupportTicketManagement({
         fullname: "",
         email: "",
         mobilenumber: "",
-        
       });
     }
   };
 
-  const handleSelectedCompanyProductCheckBoxChange = (
-    params: LookupCompanyProduct | null
+  const handleSelectedCompanyProductChange = (
+    params: LookupCompanyProduct | null,
   ) => {
     if (params) {
       setSelectedCompanyProduct({
         id: params.id,
         name: params.name,
-       
       });
     } else {
       setSelectedCompanyProduct({
         id: 0,
-        name: "", 
+        name: "",
       });
     }
   };
 
-  const handleSelectedResolvedByCheckBoxChange = (
-    params: LookupCompanyUser | null
+  const handleSelectedResolvedByChange = (
+    params: LookupCompanyUser | null,
   ) => {
     if (params) {
       setSelectedResolvedBy({
@@ -284,7 +289,6 @@ function SupportTicketManagement({
         fullname: params.fullname,
         email: params.email,
         mobilenumber: params.mobilenumber,
-       
       });
     } else {
       setSelectedResolvedBy({
@@ -292,7 +296,6 @@ function SupportTicketManagement({
         fullname: "",
         email: "",
         mobilenumber: "",
-        
       });
     }
   };
@@ -350,7 +353,7 @@ function SupportTicketManagement({
 
     localStorage.setItem(
       LocalStorageKeys.SUPPORT_TICKET_MANAGEMENT_FILTERS,
-      JSON.stringify(filters)
+      JSON.stringify(filters),
     );
   }, [
     currentPage,
@@ -372,7 +375,7 @@ function SupportTicketManagement({
     window.addEventListener("beforeunload", clearSupportTicketFilters);
     function clearSupportTicketFilters() {
       localStorage.removeItem(
-        LocalStorageKeys.SUPPORT_TICKET_MANAGEMENT_FILTERS
+        LocalStorageKeys.SUPPORT_TICKET_MANAGEMENT_FILTERS,
       );
     }
     return () =>
@@ -412,7 +415,7 @@ function SupportTicketManagement({
             onEndDateChange={handleEndDateChange}
             onStartDateChange={handleStartDateChange}
             paginationData={{
-              pageSize:pageSize,
+              pageSize: pageSize,
               currentPage,
               currentPageData,
               onPageChange: handlePageChange,
@@ -420,20 +423,16 @@ function SupportTicketManagement({
             }}
             selectedAssignTo={selectedAssignTo}
             handleSelectedAssignToCheckBoxChange={
-              handleSelectedAssignToCheckBoxChange
+              handleSelectedAssignToChange
             }
-            // persistedSelectedUserId={
-            //   selectedAssignTo.id !== 0 ? selectedAssignTo.id : null
-            // }
+          
             selectedResolvedBy={selectedResolvedBy}
             handleSelectedResolvedByCheckBoxChange={
-              handleSelectedResolvedByCheckBoxChange
+              handleSelectedResolvedByChange
             }
-            // persistedSelectedResolvedById={
-            //   selectedResolvedBy.id !== 0 ? selectedResolvedBy.id : null
-            // }
+          
             handleSelectedCompanyProductCheckBoxChange={
-              handleSelectedCompanyProductCheckBoxChange
+              handleSelectedCompanyProductChange
             }
             selectedCompanyProduct={selectedCompanyProduct}
             supportTicketCategory={supportTicketCategory!}

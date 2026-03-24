@@ -20,12 +20,17 @@ function MyTaskManagementAgGrid({
   const columnDefs = useMemo<ColDef[]>(
     () => [
       {
+        field: "subject",
+        headerName: "subject",
+        sortable: true,
+        filter: true,
+      },
+      {
         hide: false,
         field: "source",
         headerName: "Source",
         minWidth: 130,
       },
-
       {
         field: "taskType",
         headerName: "Task Type",

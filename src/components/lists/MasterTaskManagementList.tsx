@@ -10,6 +10,7 @@ import MyAllTaskProps from "../../@types/my-task-management/MyAlltaskProps";
 import { useUserAccessModules } from "../../config/hooks/useAccessModules";
 import { useComapanySpecificSearchDateRange } from "../../config/hooks/useCompanySpecificDateRange";
 import { useDateRangeIdChange } from "../../config/hooks/useDateRangeIdChange";
+import { customDateRangeId } from "../../config/hooks/usePaginationHandler";
 import useScreenSize from "../../config/hooks/useScreenSize";
 import { JSX_CHILDREN_NAME, SIZE } from "../../constants/AppConstants";
 import COLORS from "../../constants/Colors";
@@ -26,8 +27,6 @@ import CompanyUserSearchFieldInput from "../ui/CompanyUserSearchFieldInput";
 import DateRangeFilterDropdown from "../ui/DateRangeFilterDropdown";
 import DateRangePicker from "../ui/DateRangePicker";
 import SearchInput from "../ui/SearchInput";
-import BooleanDropdown from "../ui/BooleanDropdown";
-import { customDateRangeId } from "../../config/hooks/usePaginationHandler";
 
 function MasterTaskManagementList({
   isUsedInAllTasksModule,
@@ -46,8 +45,9 @@ function MasterTaskManagementList({
   handleSelectedFrequency,
   selectedCompanyUser,
   handleSelectedCompanyUser,
-  isActive,
-  setIsActive,
+  downloadTaskDocument,
+  // isActive,
+  // setIsActive,
 }: MasterTaskManagementProps) {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -55,7 +55,7 @@ function MasterTaskManagementList({
   const { isLargeScreen, isMediumScreen, isSmallScreen } = useScreenSize();
   const { dateRangeDropdownOptions } = useComapanySpecificSearchDateRange();
   const { userPreference } = useUserPreference();
-  const { userHasAccessToViewAllTasks, userHasAccessToAddAllTasks } =
+  const { userHasAccessToViewAllTasks, userHasAccessToAddMasterTasks } =
     useUserAccessModules();
   const {
     handleDateRangeIdChange,
@@ -90,12 +90,6 @@ function MasterTaskManagementList({
       if (isUsedInAllTasksModule) {
         const rowData: MasterTaskProps = event.data;
         console.log(rowData);
-        // setSelectedRowData(rowData);
-        // setUpdateModal(true);
-        // const queryParams = qs.stringify({
-        //     ["task"]: JSON.stringify(rowData),
-        // });
-        // navigate(ROUTES_URL.MASTER_TASK_DETAILS + `?${queryParams}`);
         navigate(
           ROUTES_URL.MASTER_TASK_DETAILS.replace(
             ":taskId",
@@ -165,7 +159,7 @@ function MasterTaskManagementList({
                 <div className="flex items-start justify-start gap-2">
                   <div
                     className={`relative flex items-start ${
-                      isCustomDateOptionSelected ? "w-40" : "w-40"
+                      isCustomDateOptionSelected ? "w-40" : "w-52"
                     }`}
                   >
                     <SearchInput
@@ -223,9 +217,9 @@ function MasterTaskManagementList({
                           />
                         </div>
 
-                        {/* Category */}
+                        {/* Type */}
 
-                        <div className="min-w-[110px]">
+                        <div className="min-w-[120px]">
                           <CustomDropdown
                             preselectedOption={
                               // savedFilters.selectedtaskType || null
@@ -249,7 +243,9 @@ function MasterTaskManagementList({
                             onSelect={handleSelectedFrequency}
                           />
                         </div>
-                        <div className="min-w-[100px]">
+                        <div
+                          className={`${isCustomDateOptionSelected ? "min-w-[80px]" : "min-w-[100px]"}`}
+                        >
                           <CompanyUserSearchFieldInput
                             label=""
                             required={false}
@@ -291,13 +287,13 @@ function MasterTaskManagementList({
                             }}
                           />
                         </div>
-                        <div className="min-w-[100px]">
+                        {/* <div className="min-w-[100px]">
                           <BooleanDropdown
                             // labelName="Active"
                             value={isActive}
                             onChange={(val: any) => setIsActive(val)}
                           />
-                        </div>
+                        </div> */}
                       </div>
                     )}
                   </div>
@@ -317,10 +313,10 @@ function MasterTaskManagementList({
                   <div className="flex gap-1 justify-end w-fit">
                     <Button
                       type="submit"
-                      disabled={!userHasAccessToAddAllTasks}
+                      disabled={!userHasAccessToAddMasterTasks}
                       onClick={(e) => {
                         e.preventDefault();
-                        if (!userHasAccessToAddAllTasks) {
+                        if (!userHasAccessToAddMasterTasks) {
                           toast.error(
                             MESSAGE.MODULE_ACCESS.MY_TASK.MASTER_TASK
                               .DENIED_ADD_ACCESS,
@@ -357,6 +353,7 @@ function MasterTaskManagementList({
               onRowSelect={handleRowSelected}
               handleAllTaskDataFormChange={handleAllTaskDataFormChange}
               MasterTaskData={MasterTaskData}
+              downloadTaskDocument={downloadTaskDocument}
             />
           </div>
           <CreateGeneralTaskMasterModal
