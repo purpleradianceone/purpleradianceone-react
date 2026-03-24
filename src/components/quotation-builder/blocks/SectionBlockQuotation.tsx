@@ -45,7 +45,7 @@ export const SectionBlockQuotation: React.FC = () => {
    //For Ctrl+s
     useEffect(() => {
       const handleKeyDown = (e: KeyboardEvent) => {
-        if (e.ctrlKey && e.key === "s") {
+        if (e.ctrlKey && e.key.toLowerCase() === "s") {
           handleSave();
         }
       };

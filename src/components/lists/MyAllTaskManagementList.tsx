@@ -49,6 +49,7 @@ function MyAllTaskManagementList({
   handleSelectedSource,
   taskPriority,
   handleSelectedPriority,
+  gridLoading,
 }: MyTaskManagementListProps) {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -414,6 +415,7 @@ function MyAllTaskManagementList({
               onRowSelect={handleRowSelected}
               handleAllTaskDataFormChange={handleAllTaskDataFormChange}
               allTaskData={allTaskData}
+              gridLoading={gridLoading}
             />
           </div>
           <CreateGeneralTaskMasterModal

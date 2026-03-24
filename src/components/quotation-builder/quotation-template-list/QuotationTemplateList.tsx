@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Eye, Edit, CheckCircle, XCircle, Loader2, X } from "lucide-react";
+import { Eye, Edit, CheckCircle, XCircle, Loader2 } from "lucide-react";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
@@ -11,11 +11,12 @@ import POST_API from "../../../constants/PostApi";
 import ROUTES_URL from "../../../constants/Routes";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
 import Button from "../../ui/Button";
-import FormHeader from "../../ui/FormHeader";
 import ToggleButton from "../../ui/ToggleButton";
 import QuotationTemplate from "../quotation-template-types/QuotationTemplate";
 import axiosClient from "../../../axios-client/AxiosClient";
 import { handleApiError } from "../../../config/error/handleApiError";
+import CustomDocumentPreviewComponent from "../../custom-document-preview-component/CustomDocumentPreviewComponent";
+import LoadingPopUpAnimation from "../../views/card/LoadingPopUpAnimation";
 
 export type QuotationTemplateListProps = {
   templates: QuotationTemplate[];
@@ -30,7 +31,8 @@ export const QuotationTemplateList: React.FC<QuotationTemplateListProps> = ({
   hasmore,
   reset,
 }) => {
-  const [previewTemplate, setPreviewTemplate] = useState<QuotationTemplate | null>(null);
+  const [previewTemplate, setPreviewTemplate] =
+    useState<QuotationTemplate | null>(null);
 
   const { userHasAccessToUpdateQuotationTemplate } = useUserAccessModules();
   const navigate = useNavigate();
@@ -41,6 +43,10 @@ export const QuotationTemplateList: React.FC<QuotationTemplateListProps> = ({
     );
   };
   const { loginStatus } = useLoggedInUserContext();
+
+  const [pdfPreviewUrl, setPdfPreviewUrl] = useState<string | null>(null);
+  const [isLoadingForGenerateTemplate, setisLoadingForGenerateTemplate] =
+    useState<boolean>(true);
 
   const handleDefaultToggle = async (template: QuotationTemplate) => {
     if (!userHasAccessToUpdateQuotationTemplate) {
@@ -88,6 +94,110 @@ export const QuotationTemplateList: React.FC<QuotationTemplateListProps> = ({
     }
   };
 
+  const handleQuotationPdfGeneration = async (templateId: number) => {
+    try {
+      setisLoadingForGenerateTemplate(true);
+      const payload = {
+        quotationId: "QT-2026-0001",
+        quotation_template_id: templateId,
+        company_id: loginStatus.companyId,
+        generatedby_id: loginStatus.id,
+        quotation_account: {
+          id: 101,
+          company_id: 1,
+          name: "TechNova Solutions Pvt Ltd",
+          email: "contact@technova.com",
+          mobilenumber: "9876543210",
+          industry_type_id: 3,
+          industry_type_name: "Information Technology",
+          business_type_id: 2,
+          business_type_name: "Private Limited",
+          country_id: 101,
+          state_id: 27,
+          district_id: 501,
+          country_name: "India",
+          state_name: "Maharashtra",
+          district_name: "Pune",
+          pan: "ABCDE1234F",
+          gst: "27ABCDE1234F1Z5",
+          tan: "PNEA12345B",
+          billing_address: "Office No. 12, Hinjewadi Phase 1, Pune - 411057",
+          shipping_address: "Warehouse 5, MIDC, Pune - 411018",
+          registered_office_address: "TechNova HQ, Baner Road, Pune - 411045",
+          business_registration_number: "U12345MH2020PTC123456",
+          website: "https://www.technova.com",
+          isactive: true,
+          createdby: "admin@technova.com",
+          createdon: "2026-03-23T10:30:00",
+          requestedby: 45,
+          lead_id: 789,
+          company_account_type_id_array: [1, 2, 4],
+          createdby_id: 10,
+          updatedby_id: 12,
+        },
+        quotation_items: [
+          {
+            productName: "Laptop Dell Inspiron 15",
+            quantity: 2,
+            unitPrice: 55000.0,
+            discountPercent: 10.0,
+            gstPercent: 18.0,
+            cgstPercent: 9.0,
+            lineSubTotal: 99000.0,
+          },
+          {
+            productName: "Wireless Mouse Logitech M235",
+            quantity: 5,
+            unitPrice: 800.0,
+            discountPercent: 5.0,
+            gstPercent: 18.0,
+            cgstPercent: 9.0,
+            lineSubTotal: 3800.0,
+          },
+          {
+            productName: "Office Chair Ergonomic",
+            quantity: 3,
+            unitPrice: 7000.0,
+            discountPercent: 15.0,
+            gstPercent: 18.0,
+            cgstPercent: 9.0,
+            lineSubTotal: 17850.0,
+          },
+        ],
+      };
+
+      const response = await axiosClient.post(
+        POST_API.QUOTATION_PDF_GENERATION,
+        payload,
+        {
+          responseType: "blob",
+          headers: { "Content-Type": "application/json" },
+          withCredentials: true,
+        },
+      );
+
+      const pdfBlob = new Blob([response.data], {
+        type: "application/pdf",
+      });
+
+      const url = window.URL.createObjectURL(pdfBlob);
+      // window.open(url);
+      setPdfPreviewUrl(url);
+      setisLoadingForGenerateTemplate(false);
+
+      // const a = document.createElement("a");
+      // a.href = url;
+      // a.download = `${payload.quotationId}.pdf`;
+      // document.body.appendChild(a);
+      // a.click();
+      // document.body.removeChild(a);
+    } catch (error) {
+      console.error("Failed to generate quotation PDF", error);
+      handleApiError(error);
+      setisLoadingForGenerateTemplate(false);
+    }
+  };
+
   return (
     <>
       {templates.length === 0 && !loading && !hasmore && (
@@ -123,6 +233,7 @@ export const QuotationTemplateList: React.FC<QuotationTemplateListProps> = ({
                   onClick={(e) => {
                     e.preventDefault();
                     setPreviewTemplate(template);
+                    handleQuotationPdfGeneration(template.id);
                   }}
                   aria-label={`Preview ${template.name}`}
                 >
@@ -230,32 +341,25 @@ export const QuotationTemplateList: React.FC<QuotationTemplateListProps> = ({
       )}
 
       {previewTemplate && (
-        <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4">
-          <div className="bg-white p-6 rounded-lg shadow-lg max-w-2xl w-full max-h-[90vh] flex flex-col">
-            <FormHeader
-              icon={Eye}
-              preText={"Preview:"}
-              userName={previewTemplate.name}
-              description={`This is the preview of ${previewTemplate.name} template.`}
-              onClose={() => setPreviewTemplate(null)}
+        <div
+          className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50"
+          onClick={() => setPreviewTemplate(null)}
+        >
+          {" "}
+          {isLoadingForGenerateTemplate ? (
+            <LoadingPopUpAnimation
+              show={isLoadingForGenerateTemplate}
+              text="Loading preview..."
             />
-            {/* <div
-              className="overflow-y-auto flex-1 border rounded p-4 text-sm text-gray-800 bg-gray-50"
-              dangerouslySetInnerHTML={{
-                __html: previewTemplate.email_body_html,
-              }}
-            /> */}
-            <div className="relative text-right justify-items-end justify-end items-end w-full">
-              <div className="w-fit">
-                <Button type="button" onClick={() => setPreviewTemplate(null)}>
-                  <div className="flex items-center justify-center gap-0.5">
-                    <X size={SIZE.SIXTEEN} />
-                    Close
-                  </div>
-                </Button>
-              </div>
-            </div>
-          </div>
+          ) : (
+            <CustomDocumentPreviewComponent
+              fileUrl={pdfPreviewUrl ?? ""}
+              fileExtension="pdf"
+              enableDownload={true}
+              width={"60%"}
+              height={"90%"}
+            />
+          )}
         </div>
       )}
     </>

@@ -61,10 +61,10 @@ export const CanvasWrapperQuotation = ({ data }: { data: string }) => {
   //For undo and redo handler
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.ctrlKey && e.key === "z") {
+      if (e.ctrlKey && e.key.toLowerCase() === "z") {
         actions.history.undo();
       }
-      if (e.ctrlKey && e.key === "y") {
+      if (e.ctrlKey && e.key.toLowerCase() === "y") {
         actions.history.redo();
       }
     };
