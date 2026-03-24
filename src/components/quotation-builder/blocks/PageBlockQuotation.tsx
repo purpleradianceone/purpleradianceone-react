@@ -84,12 +84,22 @@ export const PageBlockQuotation: React.FC = () => {
       p.isHeader = isHeaderRequired;
       p.isFooter = isFooterRequired;
     });
-    const result = localStorage.getItem(pageBlockLayoutKey+loginStatus.id);
-    if(!result){
+    const result = localStorage.getItem(pageBlockLayoutKey + loginStatus.id);
+    if (!result) {
       handleSavePageLayout();
     }
     setEditing(false);
   };
+
+  useEffect(() => {
+    const pageBlockLayoutKey = quotationTemplateId
+      ? PAGE_BLOCK_LAYOUT_UPDATE
+      : PAGE_BLOCK_LAYOUT_Create;
+    const result = localStorage.getItem(pageBlockLayoutKey + loginStatus.id);
+    if (!result) {
+      handleSavePageLayout();
+    }
+  }, []);
 
   const handleSavePageLayout = () => {
     const pageBlockLayoutKey = quotationTemplateId

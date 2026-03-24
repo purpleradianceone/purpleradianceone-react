@@ -85,7 +85,7 @@ export const TableBlockQuotation: React.FC = () => {
   //For Ctrl+s
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.ctrlKey && e.key === "s") {
+      if (e.ctrlKey && e.key.toLowerCase() === "s") {
         setEditing(false);
       }
     };
