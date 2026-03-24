@@ -2,7 +2,11 @@
 import { useMemo, useRef } from "react";
 import MyTaskManagementAgGridProps from "../../@types/ag-grid/MyTaskManagementAgGridProps";
 import { AgGridReact } from "ag-grid-react";
-import { INNERHTML, JSX_CHILDREN_NAME } from "../../constants/AppConstants";
+import {
+  GRIDSKELETON,
+  INNERHTML,
+  JSX_CHILDREN_NAME,
+} from "../../constants/AppConstants";
 import { AllCommunityModule, ColDef, themeBalham } from "ag-grid-community";
 import MyAllTaskProps from "../../@types/my-task-management/MyAlltaskProps";
 import { Flag } from "lucide-react";
@@ -15,6 +19,7 @@ function MyTaskManagementAgGrid({
   onRowSelect,
   handleRowClick,
   isUsedInAllTasksModule,
+  gridLoading,
 }: MyTaskManagementAgGridProps) {
   const gridRef = useRef<AgGridReact>(null); // Ref to the AgGridReact component
   const columnDefs = useMemo<ColDef[]>(
@@ -177,7 +182,9 @@ function MyTaskManagementAgGrid({
         defaultColDef={defaultColDef}
         modules={[AllCommunityModule]}
         theme={themeBalham}
-        overlayNoRowsTemplate={INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
+        loading={gridLoading}
+        overlayLoadingTemplate={GRIDSKELETON.MY_TASK_GRID}
+        overlayNoRowsTemplate={INNERHTML.GRID_NO_DATE_FOUND}
         context={{ handleRowSelect: onRowSelect }}
         onRowClicked={handleRowClick}
       />

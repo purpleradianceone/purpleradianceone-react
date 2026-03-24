@@ -283,3 +283,39 @@
   background: #cbd5e0;
   border-radius: 6px;
 }
+
+.ag-skeleton-overlay {
+  padding-top: 25px;
+  width: 100%;
+}
+
+.ag-skeleton-row {
+  height: 16px;
+  margin-bottom: 12px;
+  border-radius: 6px;
+  background: #e5e7eb;
+  position: relative;
+  overflow: hidden;
+}
+
+.ag-skeleton-row::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -150%;
+  width: 150%;
+  height: 100%;
+  background: linear-gradient(
+    120deg,
+    transparent 20%,
+    rgba(255, 255, 255, 0.6) 50%,
+    transparent 80%
+  );
+  animation: wave-diagonal 1.6s ease-in-out infinite;
+}
+
+@keyframes wave-diagonal {
+  100% {
+    transform: translateX(100%);
+  }
+}
