@@ -13,12 +13,12 @@ import {
   useSearchFilterPaginationDateHandlers,
 } from "../../../config/hooks/usePaginationHandler";
 import { STATUS_CODE } from "../../../constants/AppConstants";
-import RefreshToken from "../../../config/validations/RefreshToken";
 import POST_API from "../../../constants/PostApi";
 import axiosClient from "../../../axios-client/AxiosClient";
 import useTaskPriority from "../../../config/hooks/useTaskPriority";
 import useTaskStage from "../../../config/hooks/useTaskStage";
 import PostDataToGetAllTask from "../../../@types/my-task-management/PostDataToGetAllTask";
+import { handleApiError } from "../../../config/error/handleApiError";
 
 export type souceType = { id: number; name: string; isactive: boolean };
 
@@ -33,7 +33,7 @@ function MyTaskManagement({
   const { userHasAccessToViewAllTasks } = useUserAccessModules();
   const [accessDeniedPopUpOpen, setAccessDeniedPopUpOpen] = useState(false);
   const [allTaskData, setAllTaskData] = useState<MyAllTaskProps[]>([]);
-
+  const [gridLoading, setGridLoading] = useState(true);
   const { taskStage } = useTaskStage();
   const { taskPriority } = useTaskPriority();
 
@@ -69,7 +69,7 @@ function MyTaskManagement({
     number | undefined
   >(savedFilters.selectedTaskStage);
   const [selectedPriority, setselectedPriority] = useState<number | undefined>(
-    savedFilters.selectedPrioritytype,
+    savedFilters.selectedPriority,
   );
   const source: souceType[] = [
     // { id: 1, name: "all", isactive: true },
@@ -90,7 +90,12 @@ function MyTaskManagement({
   };
 
   const getAllTaskData = async (signal: AbortSignal) => {
-    if (dateRangeId === customDateRangeId && concatDate.trim() === "") return;
+    setGridLoading(true);
+    setAllTaskData([]);
+    if (dateRangeId === customDateRangeId && concatDate.trim() === "") {
+      setGridLoading(false);
+      return;
+    }
     const offset = (currentPage - 1) * pageSize;
     const effectiveDateRangeId = dateRangeId;
     const PostDataToGetAllTask: PostDataToGetAllTask = {
@@ -108,7 +113,10 @@ function MyTaskManagement({
       source: selectedSource?.name.toLocaleLowerCase() ?? "all",
     };
     try {
-      if (PostDataToGetAllTask.company_id === 0 || pageSize === 10) return;
+      if (PostDataToGetAllTask.company_id === 0 || pageSize === 10) {
+        setGridLoading(false);
+        return;
+      }
       const response = await axiosClient.post(
         POST_API.GET_ALL_MY_TASK,
         PostDataToGetAllTask,
@@ -117,6 +125,7 @@ function MyTaskManagement({
           withCredentials: true,
         },
       );
+
       if (response.status === STATUS_CODE.OK) {
         const responseData = response.data;
         setCurrentPageData({
@@ -145,19 +154,11 @@ function MyTaskManagement({
           }),
         );
         setAllTaskData(formattedData);
+        setGridLoading(false);
       }
     } catch (error: any) {
       //NOTE : NEED TO ADD REFRESH TOKEN HANDLING HERE
-      if (error.status === STATUS_CODE.UNATHORISED) {
-        const refreshTokenStatus = await RefreshToken({
-          callFunctionWithEvent: getAllTaskData,
-        });
-
-        // setIsDialogueOpen(!refreshTokenStatus);
-        if (refreshTokenStatus) {
-          getAllTaskData(signal);
-        }
-      }
+      handleApiError(error);
     }
   };
   console.log(allTaskData);
@@ -204,7 +205,7 @@ function MyTaskManagement({
       concatDate,
       customStartDate: startDate,
       customEndDate: endDate,
-      selectedtaskStage: selectedTaskStage,
+      selectedTaskStage: selectedTaskStage,
       selectedSource: selectedSource,
       selectedPriority: selectedPriority,
     };
@@ -258,6 +259,7 @@ function MyTaskManagement({
               searchParameter,
               selectedTaskStage: selectedTaskStage,
               selectedSource: selectedSource,
+              selectedPriority: selectedPriority,
             }}
             allTaskData={allTaskData}
             onEndDateChange={handleEndDateChange}
@@ -275,6 +277,7 @@ function MyTaskManagement({
             taskPriority={taskPriority!}
             handleSelectedSource={setselectedSource}
             handleSelectedPriority={handleSelectedPriority}
+            gridLoading={gridLoading}
           />
         ) : (
           <div className="flex-none mx-96 mt-14">
