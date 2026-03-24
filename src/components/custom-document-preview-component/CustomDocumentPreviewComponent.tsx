@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Download } from "lucide-react";
-import { Document, Page, pdfjs } from "react-pdf";
+import { pdfjs } from "react-pdf";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
@@ -20,7 +20,6 @@ const CustomDocumentPreviewComponent: React.FC<Props> = ({
   enableDownload = false,
 }) => {
   const [loading, setLoading] = useState(true);
-  const [numPages, setNumPages] = useState<number>();
 
   if (!fileUrl) return null;
 
@@ -139,17 +138,24 @@ const CustomDocumentPreviewComponent: React.FC<Props> = ({
 
         {/* PDF */}
         {isPdf && (
-          <Document
-            file={fileUrl}
-            onLoadSuccess={({ numPages }) => {
-              setNumPages(numPages);
-              setLoading(false);
-            }}
-          >
-            {Array.from(new Array(numPages), (_, index) => (
-              <Page key={index} pageNumber={index + 1} width={800} />
-            ))}
-          </Document>
+          // <Document
+          //   file={fileUrl}
+          //   onLoadSuccess={({ numPages }) => {
+          //     setNumPages(numPages);
+          //     setLoading(false);
+          //   }}
+          // >
+          //   {Array.from(new Array(numPages), (_, index) => (
+          //     <Page key={index} pageNumber={index + 1} width={800} />
+          //   ))}
+          // </Document>
+          <iframe
+            src={`${fileUrl}#toolbar=0`}
+            title="PDF Preview"
+            className="w-full h-full"
+            onLoad={() => setLoading(false)}
+
+          />
         )}
 
         {/* OTHER FILES */}
@@ -159,7 +165,7 @@ const CustomDocumentPreviewComponent: React.FC<Props> = ({
               isLocal
                 ? fileUrl
                 : `https://docs.google.com/gview?url=${encodeURIComponent(
-                    fileUrl
+                    fileUrl,
                   )}&embedded=true`
             }
             width="100%"

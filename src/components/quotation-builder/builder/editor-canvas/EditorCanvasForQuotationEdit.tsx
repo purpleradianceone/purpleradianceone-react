@@ -109,6 +109,9 @@ export const EditorCanvasForQuotationEdit: React.FC = () => {
           if (response.status) {
             const responseData = response.data;
             setJsonFileData(responseData);
+            // console.error("--------------------------------------------------------------");
+            // console.log(responseData);
+            // console.error("--------------------------------------------------------------");
             // const jsonFileResponse = convertByteArrayToJson(responseData);
             // setJsonFileData(jsonFileResponse);
           }
