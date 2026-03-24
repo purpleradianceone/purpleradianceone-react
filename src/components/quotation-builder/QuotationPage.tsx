@@ -495,7 +495,7 @@ export const QuotationPage: React.FC = () => {
           </div>
         </div>
 
-        <div className="flex max-w-fit min-h-7 h-8">
+        <div className="flex max-w-fit min-h-7 h-8 gap-2">
           <div>
             <Button
               type="submit"
