@@ -147,7 +147,7 @@ function AccountServiceManagementList({
 
             <div className="flex gap-1 items-center w-fit">
               <h3 className="table-header-custom rounded-t-md px-1">
-                Account Service
+                Services
               </h3>
             </div>
 
