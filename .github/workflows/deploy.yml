@@ -5,7 +5,7 @@ on:
   push:
     branches:
       - development
-   #   - production
+      - production
     # - main
 
 jobs:
