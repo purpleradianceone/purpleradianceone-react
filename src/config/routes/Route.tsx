@@ -1116,6 +1116,19 @@ export const router = createBrowserRouter([
           </ModuleGuard>
         ),
       },
+       {
+        path: ROUTES_URL.SETTING_META_APP_INTEGRATION_WHATSAPP,
+        element: (
+          <ModuleGuard
+            permissionKey="userHasAccessToViewIntegrationSetting"
+            deniedMessage={
+              MESSAGE.MODULE_ACCESS.SETTING.INTEGRATION.DENIED_VIEW_ACCESS
+            }
+          >
+              <WhatsappPhoneNumberIntegrationManagement/>
+          </ModuleGuard>
+        ),
+      },
     ],
   },
 

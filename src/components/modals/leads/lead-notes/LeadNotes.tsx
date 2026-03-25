@@ -282,76 +282,7 @@ export const LeadNotes = ({
     if (leadNotes.length === 0) {
       return (
         <>
-          {/* <div className="flex items-endn justify-end">
-            <Popover
-              onTriggerClick={() => handleShowDeletedLeadNote()}
-              trigger={
-                <button
-                  type="button"
-                  className=" caption-custom hover:text-gray-600 flex items-center "
-                >
-                  <History size={12} />
-                  Deleted
-                </button>
-              }
-              align="right"
-              width={400}
-              padding={3}
-              onClose={() => {
-                getLeadNote(true, setLeadNotes);
-              }}
-            >
-              {(handleCloseButton) => (
-                <>
-                  <div className="caption-custom flex items-center justify-between sticky top-0  bg-gray-50 w-full ">
-                    <span className="flex items-center px-2">
-                      <span className="table-data-custom ">Note : </span>
-                      Following notes have been deleted. Click “
-                      <Undo2 className="text-green-500" size={12} />” to undo
-                      action.
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        handleCloseButton();
-                      }}
-                    >
-                      <X size={14} className="hover:text-gray-600" />
-                    </button>
-                  </div>
-                  {isLoading.inactiveLeadNote && (
-                    <div className="w-full h-full flex justify-center items-center">
-                      <LoadingSpinner />
-                    </div>
-                  )}
-                  {!isLoading.inactiveLeadNote && (
-                    <div className=" ">
-                      <div className="min-h-20 max-h-[400px] overflow-y-auto">
-                        {leadNotesInactive &&
-                          leadNotesInactive.length === 0 && (
-                            <div className="flex items-center  min-h-20 justify-center h-full w-full ">
-                              <div className="text-center caption-custom       ">
-                                No data found.
-                              </div>
-                            </div>
-                          )}
-                        {leadNotesInactive &&
-                          leadNotesInactive.map((note) => (
-                            <AccordionItem
-                              key={note.id}
-                              note={note}
-                              onUpdate={handleLeadNoteInactiveUpdateCall}
-                              isUsedInDelete={true}
-                            >
-                            </AccordionItem>
-                          ))}
-                      </div>
-                    </div>
-                  )}
-                </>
-              )}
-            </Popover>
-          </div> */}
+          
 
           <div className=" w-full h-full flex items-center justify-center">
             <Popover
