@@ -1,4 +1,4 @@
-import React, {  useState } from "react";
+import React, { useState } from "react";
 import { useEditor } from "@craftjs/core";
 import { useNavigate } from "react-router-dom";
 
@@ -9,7 +9,7 @@ import ROUTES_URL from "../../../constants/Routes";
 import toast from "react-hot-toast";
 import ApiError from "../../../@types/error/ApiError";
 import Button from "../../ui/Button";
-import { Quote, Save, X } from "lucide-react";
+import { Eye, Quote, Save, X } from "lucide-react";
 import FormInput from "../../ui/FormInput";
 import FormHeader from "../../ui/FormHeader";
 import axiosClient from "../../../axios-client/AxiosClient";
@@ -22,6 +22,7 @@ import {
 } from "../local-storage/LocalStorageKeys";
 import { JsonFileData } from "../quotation-template-types/JsonFileData";
 import LoadingPopUpAnimation from "../../views/card/LoadingPopUpAnimation";
+import CustomDocumentPreviewComponent from "../../custom-document-preview-component/CustomDocumentPreviewComponent";
 
 type QuotationTemplateSettingsPanelCreateProps = {
   quotationTemplateNamePlaceholder?: string;
@@ -37,11 +38,12 @@ export const QuotationTemplateSettingsPanelCreate: React.FC<
   const navigate = useNavigate();
   const { query } = useEditor();
   const { loginStatus } = useLoggedInUserContext();
-   const [isLoadingForQuotationUpdate, setIsLoadingForQuotationUpdate] =
-      useState<boolean>(false);
+  const [isLoadingForQuotationCreate, setIsLoadingForQuotationCreate] =
+    useState<boolean>(false);
+  const [pdfPreviewUrl, setPdfPreviewUrl] = useState<string | null>(null);
+  const [isLoadingForPreviewTemplate, setisLoadingForPreviewTemplate] = useState<boolean>(false);
 
   function getCraftJson(): string {
-    setIsLoadingForQuotationUpdate(true);
     const storedDefaultHeader = localStorage.getItem(
       HEADER_STORAGE_KEY_CREATE + loginStatus.id,
     );
@@ -62,6 +64,7 @@ export const QuotationTemplateSettingsPanelCreate: React.FC<
   }
 
   const createQuotationTemplate = (resultJson: string) => {
+    setIsLoadingForQuotationCreate(true);
     try {
       const blob = new Blob([resultJson], { type: "application/json" });
       const file = new File([blob], `quotationTemplate.json`, {
@@ -98,39 +101,103 @@ export const QuotationTemplateSettingsPanelCreate: React.FC<
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .catch((error: ApiError | any) => {
           handleApiError(error);
-        }).finally(()=>{
-          setIsLoadingForQuotationUpdate(false);
+        })
+        .finally(() => {
+          setIsLoadingForQuotationCreate(false);
         });
     } catch (error) {
       console.error("Upload failed:", error);
     }
   };
 
+  const previewQuotationTemplateWhileCreating = () => {
+    try {
+      setisLoadingForPreviewTemplate(true);
 
+      const resultJson = getCraftJson();
+      const blob = new Blob([resultJson], { type: "application/json" });
+      const file = new File([blob], `quotationTemplate.json`, {
+        type: "application/json",
+      });
+
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("preview_template_json", resultJson);
+      formData.append("company_id", `${loginStatus.companyId}`);
+      formData.append("generatedby_id", `${loginStatus.id}`);
+
+      axiosClient
+        .post(POST_API.PREVIEW_QUOTATION_TEMPLATE_WHILE_CREATING, formData, {
+          withCredentials: true,
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        })
+        .then((response) => {
+          if (response.status === STATUS_CODE.OK) {
+            //
+            const pdfBlob = new Blob([response.data], {
+        type: "application/pdf",
+      });
+
+      const url = window.URL.createObjectURL(pdfBlob);
+      setPdfPreviewUrl(url);
+      setisLoadingForPreviewTemplate(false);
+      
+      // window.open(url);
+      // const a = document.createElement("a");
+      // a.href = url;
+      // a.download = `${loginStatus.id}.pdf`;
+      // document.body.appendChild(a);
+      // a.click();
+      // document.body.removeChild(a);
+          } else {
+            toast.error("error");
+          }
+        })
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .catch((error: ApiError | any) => {
+          handleApiError(error);
+        })
+        .finally(() => {
+          setisLoadingForPreviewTemplate(false);
+        });
+    } catch (error) {
+      console.error("Upload failed:", error);
+    }
+  };
 
   return (
     <>
       {/* Save Button */}
       {/* Fixed Save Button */}
-      <div
-        style={{
-          position: "fixed",
-          top: "50px",
-          right: "20px",
-          zIndex: 10,
-        }}
-      >
-        <Button
-          onClick={(e) => {
-            e.preventDefault();
-            setIsOpen(true);
-          }}
-        >
-          <div className="flex items-center justify-center gap-1">
-            <Save size={SIZE.SIXTEEN} />
-            Save Template
-          </div>
-        </Button>
+      <div className="fixed flex  gap-2 top-12 right-4 z-10">
+        <div>
+          <Button
+            onClick={(e) => {
+              e.preventDefault();
+              previewQuotationTemplateWhileCreating();
+            }}
+          >
+            <div className="flex items-center justify-center gap-1">
+              <Eye size={SIZE.SIXTEEN} />
+              Preview Template
+            </div>
+          </Button>
+        </div>
+        <div>
+          <Button
+            onClick={(e) => {
+              e.preventDefault();
+              setIsOpen(true);
+            }}
+          >
+            <div className="flex items-center justify-center gap-1">
+              <Save size={SIZE.SIXTEEN} />
+              Save Template
+            </div>
+          </Button>
+        </div>
       </div>
 
       {/* Overlay */}
@@ -224,11 +291,35 @@ export const QuotationTemplateSettingsPanelCreate: React.FC<
           </form>
         </div>
       )}
-      {isLoadingForQuotationUpdate && (
+
+      {isLoadingForQuotationCreate && (
         <LoadingPopUpAnimation
-          show={isLoadingForQuotationUpdate}
+          show={isLoadingForQuotationCreate}
           text="Creating quotation template..."
         />
+      )}
+
+      {isLoadingForPreviewTemplate || pdfPreviewUrl && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50"
+          onClick={() => setPdfPreviewUrl(null)}
+        >
+          {" "}
+          {isLoadingForPreviewTemplate ? (
+            <LoadingPopUpAnimation
+              show={isLoadingForPreviewTemplate}
+              text="Loading preview..."
+            />
+          ) : (
+            <CustomDocumentPreviewComponent
+              fileUrl={pdfPreviewUrl ?? ""}
+              fileExtension="pdf"
+              enableDownload={true}
+              width={"60%"}
+              height={"90%"}
+            />
+          )}
+        </div>
       )}
     </>
   );
