@@ -394,7 +394,7 @@ const CreateAccountSubscription = ({
         result[pkg.packageName] = {
           [pkg.field.key]: pkg.field.value,
           Completed: "0",
-          IsActive: "true"
+          Active: "true"
         };
       }
     });

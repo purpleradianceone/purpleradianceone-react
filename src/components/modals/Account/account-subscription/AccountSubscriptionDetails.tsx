@@ -350,7 +350,7 @@ const AccountSubscriptionDetails = () => {
                 });
 
                 if (pkg.isNew) {
-                    result[pkg.packageName]["IsActive"] = "true";
+                    result[pkg.packageName]["Active"] = "true";
                 }
 
             }
@@ -610,7 +610,7 @@ const AccountSubscriptionDetails = () => {
                                     />
 
                                     {/* Value */}
-                                    {f.key === "IsActive" ? (
+                                    {f.key === "Active" ? (
                                         <>
                                             <ToggleButton
                                                 checked={f.value === "true"}
@@ -621,12 +621,6 @@ const AccountSubscriptionDetails = () => {
                                                         e.target.checked ? "true" : "false"
                                                     );
                                                 }} name={""} />
-                                            <span
-                                                className={`text-sm ${f.value === "true" ? "text-green-600" : "text-red-600"
-                                                    }`}
-                                            >
-                                                {f.value === "true" ? "Active" : "Inactive"}
-                                            </span>
                                         </>
                                     ) : (
                                         <input
