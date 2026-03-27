@@ -42,7 +42,7 @@ import { toSelectOptions } from "../../utils/toSelectOption";
 import CustomSelect from "../ui/CustomSelect";
 import CustomDocumentPreviewComponent from "../custom-document-preview-component/CustomDocumentPreviewComponent";
 
-const UserPreference = () => {
+const UserAndCompanyProfile = () => {
   const { countries } = useCountries();
   const classnameForParagragh = "table-data-custom  block truncate w-full";
   const { userPreference, setUserPreference } = useUserPreference();
@@ -740,7 +740,9 @@ const UserPreference = () => {
   };
 
   useEffect(() => {
-    getCompanyDetail();
+    if (userHasAccessToViewCompanyDetail) {
+      getCompanyDetail();
+    }
   }, [loginStatus.companyId]);
 
   const getCompanyLogo = () => {
@@ -1783,4 +1785,4 @@ const UserPreference = () => {
   );
 };
 
-export default UserPreference;
+export default UserAndCompanyProfile;

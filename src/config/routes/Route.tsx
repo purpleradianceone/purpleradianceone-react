@@ -27,7 +27,6 @@ import ViewLeadManagement from "../../components/modals/leads/ViewLeadManagement
 import MeetingScheduler from "../../components/modals/meetings/MeetingScheduler";
 import { EditorCanvas } from "../../components/email-template/template-editors/EditorCanvas";
 import { TemplatesPage } from "../../components/email-template/TemplatesPage";
-import UserPrerefenceManagement from "../../components/user-profile/UserPreferenceManagement";
 import GoogleOAuthConsent from "../../components/dialogue-box/GoogleOAuthConsent";
 import ZoomMeetingsOAuthConsent from "../../components/dialogue-box/ZoomOAuthConsent";
 import GoogleOAuthConsentAndroid from "../../components/android-page/GoogleOAuthConsentAndroid";
@@ -97,6 +96,7 @@ import AccountSubscriptionDetails from "../../components/modals/Account/account-
 import WhatsappOAuthConsent from "../../components/dialogue-box/WhatsappOAuthConsent";
 import { WhatsappPhoneNumberIntegrationManagement } from "../../components/views/settings/social-media-integration/meta-app-whatsapp/WhatsappPhoneNumberIntegrationManagement";
 import { EditorCanvasForQuotationEdit } from "../../components/quotation-builder/builder/editor-canvas/EditorCanvasForQuotationEdit";
+import UserAndCompanyProfileManagement from "../../components/user-profile/UserPreferenceManagement";
 
 
 export const router = createBrowserRouter([
@@ -462,7 +462,7 @@ export const router = createBrowserRouter([
                 .DENIED_VIEW_ACCESS
             }
           >
-            <UserPrerefenceManagement />,
+            <UserAndCompanyProfileManagement />,
           </ModuleGuard>
         ),
       },
@@ -706,7 +706,7 @@ export const router = createBrowserRouter([
         <PrivateRoute>
           <div>
             <Navbar>
-              <UserPrerefenceManagement />
+              <UserAndCompanyProfileManagement />
             </Navbar>
           </div>
         </PrivateRoute>

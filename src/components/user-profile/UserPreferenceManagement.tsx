@@ -1,8 +1,8 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 
-import UserPreference from "./UserPreference";
+import UserAndCompanyProfile from "./UserAndCompanyProfile";
 
-const UserPrerefenceManagement = () => {
+
+const UserAndCompanyProfileManagement = () => {
   // const { userHasAccessToViewUser } = useUserAccessModules();
 
 
@@ -20,7 +20,7 @@ const UserPrerefenceManagement = () => {
       {/* {userHasAccessToViewUser ? ( */}
         {/* <> */}
           <div className="min-h-screen min-w-full bg-gray-100 flex items-center justify-center">
-            <UserPreference
+            <UserAndCompanyProfile
             />
           </div>
         {/* </> */}
@@ -38,4 +38,4 @@ const UserPrerefenceManagement = () => {
     </div>
   );
 };
-export default UserPrerefenceManagement;
+export default UserAndCompanyProfileManagement;

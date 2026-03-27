@@ -1,9 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from "react";
-import AccessDeniedPopup from "../../../views/not-found/AccessDeniedPage";
 import { STATUS_CODE } from "../../../../constants/AppConstants";
 import RefreshToken from "../../../../config/validations/RefreshToken";
-
 import POST_API from "../../../../constants/PostApi";
 import CompanyUser from "../../../../@types/company-users/CompanyUser";
 import { useSearchFilterPaginationDateHandlers } from "../../../../config/hooks/usePaginationHandler";
@@ -13,6 +11,8 @@ import { useUserAccessModules } from "../../../../config/hooks/useAccessModules"
 import GetCompanyUserListForLeadAssignment from "./GetCompanyUserListForLeadAssignment";
 import axiosClient from "../../../../axios-client/AxiosClient";
 import axios from "axios";
+import AccessDeniedMessagePage from "../../../views/not-found/AccessDeniedMessagePage";
+import MESSAGE from "../../../../constants/Messages";
 // import ApiError from "../../../../@types/error/ApiError";
 
 function GetCompanyUsersForLead({
@@ -32,7 +32,7 @@ function GetCompanyUsersForLead({
   const { loginStatus } = useLoggedInUserContext();
   const [accessDeniedPopUpOpen, setAccessDeniedPopUpOpen] = useState(false);
 
-  const { userHasAccessToViewUser } = useUserAccessModules();
+  const {  userHasAccessToViewLeadSettings } = useUserAccessModules();
   const [userUpdateCount, setUserUpdateCount] = useState(0);
 
   const {
@@ -135,14 +135,20 @@ function GetCompanyUsersForLead({
   ]);
 
   useEffect(() => {
-    if (!userHasAccessToViewUser && isUsedForSettings) {
-      setAccessDeniedPopUpOpen(true);
+    if (isUsedForSettings) {
+      if (!userHasAccessToViewLeadSettings) {
+        setAccessDeniedPopUpOpen(true);
+      } else {
+        setAccessDeniedPopUpOpen(false);
+      }
+    } else {
+      setAccessDeniedPopUpOpen(false);
     }
-  }, [userHasAccessToViewUser]);
+  }, [userHasAccessToViewLeadSettings]);
 
   return (
     <div className="w-full">
-      {userHasAccessToViewUser || !isUsedForSettings ? (
+      { !accessDeniedPopUpOpen ? (
         <>
           <div>
             <GetCompanyUserListForLeadAssignment
@@ -171,14 +177,10 @@ function GetCompanyUsersForLead({
           </div>
         </>
       ) : (
-        <div className="flex-none mx-96 mt-14">
-          <AccessDeniedPopup
-            isOpen={accessDeniedPopUpOpen}
-            onClose={() => {
-              setAccessDeniedPopUpOpen(false);
-              window.history.back();
-            }}
-          />
+        <div className="flex-none mx-96 mt-14 h-[40vh] justify-center items-center">
+            <AccessDeniedMessagePage
+            message={MESSAGE.MODULE_ACCESS.LEADS_SETTINGS.DENIED_VIEW_ACCESS}
+            ></AccessDeniedMessagePage>
         </div>
       )}
     </div>
