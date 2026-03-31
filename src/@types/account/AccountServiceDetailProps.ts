@@ -25,6 +25,7 @@ type AccountServiceDetailProps = {
   customer_feedback: string;
   next_service_due_date: string;
   is_follow_up_required: boolean;
+  total_cost: number | string;
   is_active: boolean;
   createdBy: string;
   createdOn: string;

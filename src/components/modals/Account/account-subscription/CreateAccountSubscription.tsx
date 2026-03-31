@@ -1,16 +1,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import FormHeader from "../../../ui/FormHeader";
 
-import { BoxIcon, Plus, Save, X, Calendar, Trash } from "lucide-react";
+import { BoxIcon, Plus, Save, X, Calendar, Trash, IndianRupee } from "lucide-react";
 import FormLayout from "../../../ui/FormLayout";
 import React, { useEffect, useState } from "react";
 import Button from "../../../ui/Button";
 import {
   SIZE,
   STATUS_CODE,
+  VALIDATIONS,
   //   VALIDATIONS,
 } from "../../../../constants/AppConstants";
-// import FormInput from "../../../ui/FormInput";
 import { useFormChange } from "../../../../config/hooks/useFormChange";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
 
@@ -30,13 +30,12 @@ import { handleApiError } from "../../../../config/error/handleApiError";
 
 // import TextAreaInput from "../../../ui/TextAreaInput";
 import DatePickerInput from "../../../ui/DatePickerInput";
-// import FormCheckbox from "../../../ui/FormCheckbox";
 
 // import MESSAGE from "../../../../constants/Messages";
-// import CompanyUserSearchFieldInput from "../../../ui/CompanyUserSearchFieldInput";
 import AddAccountSubscriptionModalProps from "../../../../@types/modal/AddAccountSubscriptionModalProps";
 import CreateAccountSubscriptionProps from "../../../../@types/account/CreateAccountSubscriptionProps";
 import COLORS from "../../../../constants/Colors";
+import FormInput from "../../../ui/FormInput";
 
 interface CustomField {
   id: string;
@@ -62,6 +61,11 @@ const CreateAccountSubscription = ({
   const { loginStatus } = useLoggedInUserContext();
   const [isSaving, setIsSaving] = useState<boolean>(false);
 
+  const [totalCost, setTotalCost] = useState<number | "">("");
+  const [totalCostError, setTotalCostError] = useState<string>("");
+
+
+
   const [error, setError] = useState<{
     productId: boolean;
     start_date_error: string;
@@ -84,19 +88,20 @@ const CreateAccountSubscription = ({
     resetForm: resetAddAccountSubscriptionForm,
   } = useFormChange(intialCreateAccountSubscriptionFormData);
 
-  //   const [isRenewal, setisRenewal] = useState<boolean>(false);
+  const handleCostChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
 
-  //   function handleIsRenewalRequiredChange(
-  //     event: React.ChangeEvent<HTMLInputElement>,
-  //   ) {
-  //     setisRenewal(event.target.checked);
-  //   }
+    if (value === "") {
+      setTotalCost("");
+      return;
+    }
 
-  // const {
-  //   handleChange: handleAddStockFormDataChange,
-  //   formData: addStockFormData,
-  //   resetForm: resetStockCreateForm,
-  // } = useFormChange(intialAddStockFormData);
+    if (!VALIDATIONS.NUMBER_WITH_DECIMAL.test(value)) {
+      return;
+    }
+
+    setTotalCost(Number(value));
+  };
 
   // Note : on close Clear the states
   const handleCloseForm = () => {
@@ -104,8 +109,8 @@ const CreateAccountSubscription = ({
 
     // here we are setting dropdown
     setProductSelected(null);
-
-    // setCustomerRating(0);
+    setPackages([]);
+    setTotalCost("");
 
     setError({
       productId: false,
@@ -179,6 +184,13 @@ const CreateAccountSubscription = ({
       }));
     }
 
+    if (totalCost === "" || totalCost < 0) {
+      setTotalCostError("Total Cost is required");
+      flagVariable = false;
+    } else {
+      setTotalCostError("");
+    }
+
     return flagVariable;
   };
 
@@ -209,10 +221,11 @@ const CreateAccountSubscription = ({
       package_detail: JSON.stringify(packageDetailJson),
       is_renewal: false,
       renewal_account_subscription_id: null,
+      total_cost: totalCost || 0,
       createdby_id: loginStatus.id,
     };
 
-    // alert(JSON.stringify(postData, null, 2));
+
     setIsSaving(true);
     await axios
       .post(POST_API.CREATE_ACCOUNT_SUBSCRIPTION, postData, {
@@ -506,6 +519,20 @@ const CreateAccountSubscription = ({
                   error={error.end_date_error}
                   required
                 />
+              </div>
+              <div className="flex flex-col gap-1">
+                <FormInput
+                  required
+                  type="number"
+                  label="Total Cost"
+                  placeholder="Enter total cost"
+                  logo={IndianRupee}
+                  value={totalCost === "" ? "" : totalCost}
+                  onChange={handleCostChange}
+                />
+                {totalCostError && (
+                  <p className="text-xs  text-red-600 ">{totalCostError}</p>
+                )}
               </div>
 
               <div className="p-6 bg-white border rounded-lg shadow-sm col-span-3">
