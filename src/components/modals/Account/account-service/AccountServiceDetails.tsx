@@ -13,6 +13,7 @@ import {
   User,
   ShieldCheck,
   Trash,
+  IndianRupee,
 } from "lucide-react";
 import Button from "../../../ui/Button";
 import TextAreaInput from "../../../ui/TextAreaInput";
@@ -40,6 +41,7 @@ import ToggleButton from "../../../ui/ToggleButton";
 import MetaField from "../../../ui/MetaField";
 import COLORS from "../../../../constants/Colors";
 import { useUserAccessModules } from "../../../../config/hooks/useAccessModules";
+import FormInput from "../../../ui/FormInput";
 
 interface CustomField {
   id: string;
@@ -63,6 +65,7 @@ const AccountServiceDetails = () => {
   const [selectedServiceLocationType, setSelectedServiceLocationType] = useState<number | undefined>(undefined);
   const [isFollowUpRequired, setIsFollowUpRequired] = useState(false);
   const [customerRating, setCustomerRating] = useState(0);
+  const [totalCost, setTotalCost] = useState<number | "">("");
   const [assignedTo, setAssignedTo] = useState<CompanyUser | null>({
     id: 0,
     company_id: 0,
@@ -82,6 +85,7 @@ const AccountServiceDetails = () => {
   const [showErrorAtServiceLocationType, setShowErrorAtServiceLocationType] = useState(false);
   const [showErrorAtServiceBookingDateError, setShowErrorAtServiceBookingDateError] = useState(false);
   const [showErrorAtServiceBookingTimeError, setShowErrorAtServiceBookingTimeError] = useState(false);
+  const [totalCostError, setTotalCostError] = useState<string>("");
 
   const { serviceStatus, isLoading: isLoadingForServiceStatus } = useServiceStatus();
   const { serviceLocationType, isLoading: isLoadingForServiceLocationType } = useServiceLocationType();
@@ -128,6 +132,20 @@ const AccountServiceDetails = () => {
     setCustomerRating(value);
   };
 
+  const handleCostChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+
+    if (value === "") {
+      setTotalCost("");
+      return;
+    }
+
+    if (!VALIDATIONS.NUMBER_WITH_DECIMAL.test(value)) {
+      return;
+    }
+
+    setTotalCost(Number(value));
+  };
   // Fetch existing account service details
   const getAccountServiceDetail = async () => {
     try {
@@ -145,9 +163,7 @@ const AccountServiceDetails = () => {
       );
       if (response.status === 200 && response.data) {
         const data = response.data[0];
-        console.log("--------------");
-        console.log(data);
-        console.log("--------------");
+
         const formattedData: AccountServiceDetailProps = {
           id: data.id,
           company_id: data.company_id,
@@ -175,6 +191,7 @@ const AccountServiceDetails = () => {
           customer_feedback: data.customer_feedback,
           next_service_due_date: data.next_service_due_date,
           is_follow_up_required: data.is_follow_up_required,
+          total_cost: data.total_cost,
           is_active: data.isactive,
           createdBy: data.createdby,
           createdOn: data.createdon,
@@ -198,6 +215,7 @@ const AccountServiceDetails = () => {
         setSelectedServiceBookingSource(data.service_booking_source_id);
         setSelectedServiceLocationType(data.service_location_type_id);
         setIsFollowUpRequired(data.is_follow_up_required);
+        setTotalCost(data.total_cost);
         setCustomerRating(data.customer_rating);
 
         const customObj =
@@ -278,6 +296,12 @@ const AccountServiceDetails = () => {
       flag = false;
     } else setShowErrorAtServiceLocationType(false);
 
+    if (totalCost === "" || totalCost < 0) {
+      setTotalCostError("Total Cost is required");
+      flag = false;
+    } else {
+      setTotalCostError("");
+    }
     return flag;
   };
 
@@ -320,11 +344,10 @@ const AccountServiceDetails = () => {
       next_service_due_date: formData.next_service_due_date,
       is_follow_up_required: isFollowUpRequired,
       isactive: activeValue ?? formData.is_active,
+      total_cost: totalCost || 0,
       updatedby_id: loginStatus.id,
     };
-    console.log('----------------------');
-    // alert(JSON.stringify(postData, null, 2));
-    console.log('----------------------');
+
     setIsSaving(true);
     try {
       const response = await axiosClient.post(POST_API.UPDATE_ACCOUNT_SERVICE, postData, { withCredentials: true });
@@ -466,6 +489,12 @@ const AccountServiceDetails = () => {
           label="Follow Up Required"
           value={accountServiceDetail?.is_follow_up_required ? "Yes" : "No"}
         />
+
+        <MetaField
+          label="Total Cost"
+          value={accountServiceDetail?.total_cost || "-"}
+        >
+        </MetaField>
         <MetaField
           label="Createdby"
           value={accountServiceDetail?.createdBy || "-"}
@@ -709,6 +738,21 @@ const AccountServiceDetails = () => {
 
         <CompanyUserSearchFieldInput logo={User} label="Assign To:" defaultValue={accountServiceDetail?.assignedto_name} onUserSelected={setAssignedTo} />
 
+        <div className="flex flex-col gap-1">
+          <FormInput
+            required
+            type="number"
+            label="Total Cost"
+            placeholder="Enter total cost"
+            logo={IndianRupee}
+            defaultValue={totalCost}
+            value={totalCost === "" ? "" : totalCost}
+            onChange={handleCostChange}
+          />
+          {totalCostError && (
+            <p className="text-xs  text-red-600 ">{totalCostError}</p>
+          )}
+        </div>
         <CustomerRating logo={ThumbsUp} label="Customer Rating" onChange={handleCustomerRatingChange} value={customerRating} />
       </div>
 
