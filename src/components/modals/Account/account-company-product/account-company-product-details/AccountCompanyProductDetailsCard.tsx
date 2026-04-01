@@ -13,6 +13,7 @@ import {
   Barcode,
   Calendar,
   FileDigit,
+  IndianRupee,
   LucideIcon,
   MapPin,
   Pen,
@@ -79,6 +80,7 @@ export const AccountCompanyProductDetailsCard = ({
     purchaseDate: "purchase_date",
     deliveryDate: "delivery_date",
     installationDate: "installation_date",
+    totalCost: "total_cost"
     // add mappings only where API differs
   };
 
@@ -103,6 +105,10 @@ export const AccountCompanyProductDetailsCard = ({
       const postData = {
         id: productData.id,
         [apiField]: value,
+        total_cost:
+          field === "totalCost"
+            ? value
+            : productData.totalCost ?? originalProductData.totalCost,
         company_id: loginStatus.companyId,
         updatedby_id: loginStatus.id,
       };
@@ -170,7 +176,7 @@ export const AccountCompanyProductDetailsCard = ({
     }
 
     timeoutRefForProductSerialNumber.current = window.setTimeout(() => {
-      updateAccountCompanyProductSerialNumber(productData?.id , productSerialNumber);
+      updateAccountCompanyProductSerialNumber(productData?.id, productSerialNumber);
     }, 1000);
 
     return () => {
@@ -183,7 +189,7 @@ export const AccountCompanyProductDetailsCard = ({
   // Note : update api call for account-company-product-serial-number
   const updateAccountCompanyProductSerialNumber = async (
     id: number | undefined,
-    value : string | null
+    value: string | null
   ) => {
     if (!id) return;
     try {
@@ -250,6 +256,7 @@ export const AccountCompanyProductDetailsCard = ({
     "installationDate",
     "purchaseDate",
     "deliveryDate",
+    "totalCost"
     // add only backend fields here
   ];
 
@@ -334,8 +341,8 @@ export const AccountCompanyProductDetailsCard = ({
           value={
             productData?.quantity
               ? productData.quantity
-                  .toLocaleString()
-                  .concat(" " + productData!.unitNameInStock)
+                .toLocaleString()
+                .concat(" " + productData!.unitNameInStock)
               : ""
           }
           penLogo={false}
@@ -348,24 +355,24 @@ export const AccountCompanyProductDetailsCard = ({
             penLogo={false}
           />
         )}
-         {productData?.serialNumber && (
+        {productData?.serialNumber && (
 
-           <FormInput
-           logo={FileDigit}
-           label="Serial Number"
-           name="serialNumber"
-           placeholder="Enter serial number"
-           value={productSerialNumber ? productSerialNumber : ""}
-           onChange={handleSerialNumberChange}
-          inputMode="text"
-          type="text"
-          penLogo={Pen}
+          <FormInput
+            logo={FileDigit}
+            label="Serial Number"
+            name="serialNumber"
+            placeholder="Enter serial number"
+            value={productSerialNumber ? productSerialNumber : ""}
+            onChange={handleSerialNumberChange}
+            inputMode="text"
+            type="text"
+            penLogo={Pen}
           />
         )}
       </div>
 
       {/* Left Section */}
-      <div className="grid  grid-cols-2 md:grid-cols-4 gap-1   rounded p-0.5 ">
+      <div className="grid  grid-cols-2 md:grid-cols-5 gap-1   rounded p-0.5 ">
         <ControlledDatePicker
           label="Purchase Date"
           onCommit={(date) => {
@@ -410,6 +417,29 @@ export const AccountCompanyProductDetailsCard = ({
           logo={User}
           placeholder="Select User"
         />
+
+        <FormInput
+          required
+          logo={IndianRupee}
+          label="Total Cost"
+          name="totalCost"
+          placeholder="Enter Total Cost"
+          value={productData?.totalCost ?? ""}
+          onChange={(e) => {
+            const value = e.target.value;
+
+            setProductData((prev) => {
+              if (!prev) return prev;
+
+              return {
+                ...prev,
+                totalCost: value === "" ? "" : Number(value), // handle number
+              };
+            });
+          }}
+          type="number"
+          penLogo={Pen}
+        ></FormInput>
       </div>
 
       <div className=" grid grid-cols-2 gap-1 pb-1">
@@ -479,8 +509,8 @@ function DisplayComponent({
             {value.length > 30
               ? value.substring(0, 29).concat("...")
               : value || (
-                  <span className="text-gray-400 italic">Not provided</span>
-                )}
+                <span className="text-gray-400 italic">Not provided</span>
+              )}
           </p>
           {penLogo && <Pen className="text-blue-500 " size={14} />}
         </div>

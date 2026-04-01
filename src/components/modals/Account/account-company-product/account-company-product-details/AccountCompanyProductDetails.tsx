@@ -82,6 +82,7 @@ export const AccountCompanyProductDetails: React.FC = () => {
           installationDate: item.installation_date,
           installedByName: item.installed_by_name,
           installedBy: item.installed_by,
+          totalCost: item.total_cost,
           updatedBy: item.updatedby,
           createdOn: item.createdon,
           updatedOn: item.updatedon,
@@ -97,11 +98,11 @@ export const AccountCompanyProductDetails: React.FC = () => {
     fetchProductDetails();
   }, [loginStatus, parsedAccountId, parsedProductId]);
 
-  if(!accountCompanyProduct ) return (
-    <AccountProductDetailsSkeleton/>
+  if (!accountCompanyProduct) return (
+    <AccountProductDetailsSkeleton />
   );
   return (
-    <AccountCompanyProductDetailsCard 
+    <AccountCompanyProductDetailsCard
       selectedProductCard={accountCompanyProduct}
     />
   );
