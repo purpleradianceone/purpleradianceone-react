@@ -388,7 +388,7 @@ export const PageBlockQuotation: React.FC = () => {
 (PageBlockQuotation as any).craft = {
   displayName: "Page Block",
   props: {
-    padding: "40px",
+    padding: "30px",
     backgroundColor: "#ffffff",
     align: "center",
     isHeader: false,

@@ -16,8 +16,8 @@ interface ConnectedPage {
  * 
  * Displays pop up card to add phone number
  * 
- * @param {function} handleRefreshApiCall - method call to refresh to list of phone number 
- * @returns {TSX.Element}  Rendered Component - to add whatsapp phone number
+ * @param {function} handleRefreshApiCall - function call to refresh to list of records, whenever we add new record
+ * @returns  Rendered Component - to add whatsapp phone number
  */
 export default function WhatsappPhoneNumberAddition({
   handleRefreshApiCall,

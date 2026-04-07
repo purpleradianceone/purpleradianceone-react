@@ -21,6 +21,19 @@ interface PopoverProps {
    accessRight?: boolean;
 }
 
+/**
+ * POP OVER - REUSABLE COMPONENT
+ * 
+ * @param trigger - ReactNode, give jsx on action that pop up will show
+ * @param align - where to align popup - right , left
+ * @param width - give required width
+ * @param onOpen - function call if want any data / need to perform any action onOpen of the popup.
+ * @param onClose - function call if want any data / need to perform any action onClose of the popup.
+ * @param onTriggerClick - Same as above 2 functions, function call if want any data / need to perform any action ontriggerClick of the popup.
+ * @param padding - give required padding
+ * @param accessRight - give required access right , if want conditinal opening of popup.
+ * @returns JSX 
+ */
 export function Popover({
   trigger,
   children,
@@ -59,7 +72,7 @@ export function Popover({
 
     const rect = triggerRef.current.getBoundingClientRect();
 
-    const top = rect.bottom + window.scrollY + 8;
+    const top = rect.bottom + window.scrollY ;// +8
 
     const left =
       align === "right"
@@ -113,7 +126,7 @@ export function Popover({
       <div
         ref={triggerRef}
         onClick={open ? close : openPopover}
-        className="inline-block"
+        className="inline-block  "
       >
         {isValidElement(trigger)
           ? cloneElement(trigger as React.ReactElement)
@@ -130,9 +143,11 @@ export function Popover({
               left: position.left,
               width,
               zIndex: 9999,
-              padding: padding
+              padding: padding,
+              // marginBottom: 40
+
             }}
-            className="bg-white shadow-lg border rounded-lg "
+            className="bg-white shadow-lg border border-gray-300 rounded-lg"
           >
             {children(close)} {/*  Pass close function */}
           </div>,

@@ -27,7 +27,6 @@ import ViewLeadManagement from "../../components/modals/leads/ViewLeadManagement
 import MeetingScheduler from "../../components/modals/meetings/MeetingScheduler";
 import { EditorCanvas } from "../../components/email-template/template-editors/EditorCanvas";
 import { TemplatesPage } from "../../components/email-template/TemplatesPage";
-import UserPrerefenceManagement from "../../components/user-profile/UserPreferenceManagement";
 import GoogleOAuthConsent from "../../components/dialogue-box/GoogleOAuthConsent";
 import ZoomMeetingsOAuthConsent from "../../components/dialogue-box/ZoomOAuthConsent";
 import GoogleOAuthConsentAndroid from "../../components/android-page/GoogleOAuthConsentAndroid";
@@ -99,6 +98,9 @@ import { WhatsappPhoneNumberIntegrationManagement } from "../../components/views
 import { EditorCanvasForQuotationEdit } from "../../components/quotation-builder/builder/editor-canvas/EditorCanvasForQuotationEdit";
 import AccountInvoice from "../../components/modals/Account/account-invoice/AccountInvoice";
 import CompanyInvoiceDetails from "../../components/views/invoice/CompanyInvoiceDetails";
+import UserAndCompanyProfileManagement from "../../components/user-profile/UserPreferenceManagement";
+
+
 
 export const router = createBrowserRouter([
   {
@@ -491,7 +493,7 @@ export const router = createBrowserRouter([
                 .DENIED_VIEW_ACCESS
             }
           >
-            <UserPrerefenceManagement />,
+            <UserAndCompanyProfileManagement />,
           </ModuleGuard>
         ),
       },
@@ -735,7 +737,7 @@ export const router = createBrowserRouter([
         <PrivateRoute>
           <div>
             <Navbar>
-              <UserPrerefenceManagement />
+              <UserAndCompanyProfileManagement />
             </Navbar>
           </div>
         </PrivateRoute>
@@ -1142,6 +1144,19 @@ export const router = createBrowserRouter([
             }
           >
             <PageIdIntegrationManagement />
+          </ModuleGuard>
+        ),
+      },
+       {
+        path: ROUTES_URL.SETTING_META_APP_INTEGRATION_WHATSAPP,
+        element: (
+          <ModuleGuard
+            permissionKey="userHasAccessToViewIntegrationSetting"
+            deniedMessage={
+              MESSAGE.MODULE_ACCESS.SETTING.INTEGRATION.DENIED_VIEW_ACCESS
+            }
+          >
+              <WhatsappPhoneNumberIntegrationManagement/>
           </ModuleGuard>
         ),
       },

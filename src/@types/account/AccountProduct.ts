@@ -20,6 +20,7 @@ type AccountProduct ={
 	// amcCycle : number,
 	// amcCycleStartDate : string,
 	// amcCycleEndDate : string,
+	totalCost?: string | number,
 	unitName : string ,
 	unitNameInStock : string ,
 	id: number,

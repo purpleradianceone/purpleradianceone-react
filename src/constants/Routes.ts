@@ -116,7 +116,7 @@ const ROUTES_URL = {
   //META APP INTEGRATIONS
   SETTING_META_APP_INTEGRATION_FACEBOOK: "/settings/facebook",
   SETTING_META_APP_INTEGRATION_FACEBOOK_PAGE_ADDITION : "integrate-meta-app",
-  SETTING_META_APP_INTEGRATION_WHATSAPP: "/settings/integrate-whatsapp",
+  SETTING_META_APP_INTEGRATION_WHATSAPP: "integrate-whatsapp",
   SETTING_META_APP_INTEGRATION_WHATSAPP_PHONE_NUMBER_ADDITION : "integrate-whatsapp-phone-number",
 
   //invoice

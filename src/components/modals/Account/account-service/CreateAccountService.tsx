@@ -17,6 +17,7 @@ import {
   ThumbsUp,
   User,
   Trash,
+  IndianRupee,
 } from "lucide-react";
 import FormLayout from "../../../ui/FormLayout";
 import React, { useEffect, useState, useMemo } from "react";
@@ -56,6 +57,7 @@ import MESSAGE from "../../../../constants/Messages";
 import CompanyUserSearchFieldInput from "../../../ui/CompanyUserSearchFieldInput";
 import AddAccountServiceModalProps from "../../../../@types/modal/AddAccountServiceModalProps";
 import COLORS from "../../../../constants/Colors";
+import FormInput from "../../../ui/FormInput";
 
 interface CustomField {
   id: string;
@@ -113,6 +115,8 @@ const AddStock = ({
   const [showErrorAtServiceStatus, setShowErrorAtServiceStatus] =
     useState<boolean>(false);
 
+  const [totalCostError, setTotalCostError] = useState<string>("");
+
   const [error, setError] = useState<{
     productId: boolean;
     service_booking_date_error: string;
@@ -159,6 +163,8 @@ const AddStock = ({
 
   const [customerRating, setCustomerRating] = useState<number>(0);
 
+  const [totalCost, setTotalCost] = useState<number | "">("");
+
   function handleFollowUpRequiredChange(
     event: React.ChangeEvent<HTMLInputElement>,
   ) {
@@ -181,6 +187,20 @@ const AddStock = ({
     generate_password: "",
   });
 
+  const handleCostChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+
+    if (value === "") {
+      setTotalCost("");
+      return;
+    }
+
+    if (!VALIDATIONS.NUMBER_WITH_DECIMAL.test(value)) {
+      return;
+    }
+
+    setTotalCost(Number(value));
+  };
 
   // Note : on close Clear the states
   const handleCloseForm = () => {
@@ -191,6 +211,8 @@ const AddStock = ({
     setSelectedServiceLocationType(3);
     setselectedServiceStatus(1);
     setCustomerRating(0);
+    setTotalCost("");
+    setFields([]);
     setIsFollowUpRequired(false);
 
     setError({
@@ -265,6 +287,12 @@ const AddStock = ({
       setShowErrorAtServiceStatus(false);
     }
 
+    if (totalCost === "" || totalCost < 0) {
+      setTotalCostError("Total Cost is required");
+      flagVariable = false;
+    } else {
+      setTotalCostError("");
+    }
     return flagVariable;
   };
 
@@ -301,6 +329,7 @@ const AddStock = ({
       is_follow_up_required: isFollowUpRequired,
       next_service_due_date:
         addCreateServiceDetailFormData.next_service_due_date === "" ? null : addCreateServiceDetailFormData.next_service_due_date,
+      total_cost: totalCost ?? 0,
       createdby_id: loginStatus.id,
     };
     console.log("--------------");
@@ -801,6 +830,20 @@ const AddStock = ({
                     />
                   </div>
                 </div>
+              </div>
+              <div className="flex flex-col gap-1">
+                <FormInput
+                  required
+                  type="number"
+                  label="Total Cost"
+                  placeholder="Enter total cost"
+                  logo={IndianRupee}
+                  value={totalCost === "" ? "" : totalCost}
+                  onChange={handleCostChange}
+                />
+                {totalCostError && (
+                  <p className="text-xs  text-red-600 ">{totalCostError}</p>
+                )}
               </div>
               <DatePickerInput
                 label="Next Service Due Date"

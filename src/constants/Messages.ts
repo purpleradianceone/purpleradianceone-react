@@ -268,7 +268,13 @@ const MESSAGE = {
                DENIED_VIEW_ACCESS: "You do not have permission to view integration setting.",
                 DENIED_ADD_ACCESS: "You do not have permission to create integration setting.",
                 DENIED_UPDATE_ACCESS: "You do not have permission to update integration setting .",  
+            },
+            REMINDER : {
+                DENIED_VIEW_ACCESS: "You do not have permission to view reminder setting.",
+                DENIED_ADD_ACCESS: "You do not have permission to create reminder setting.",
+                DENIED_UPDATE_ACCESS: "You do not have permission to update reminder setting .",  
             }
+
         },
         MY_TASK : {
 

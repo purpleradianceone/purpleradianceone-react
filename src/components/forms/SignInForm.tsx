@@ -129,7 +129,7 @@ function SignInForm() {
     setNotificationCount(0);
   };
 
-  const handleLoginSubmit = (event: React.FormEvent) => {
+  const handleLoginSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     if (!loginUserCredentials.email || !loginUserCredentials.password) {
@@ -446,7 +446,7 @@ function SignInForm() {
             required={true}
             placeholder="Enter your email"
             value={loginUserCredentials.email}
-            defaultValue={loginUserCredentials.email}
+            // defaultValue={loginUserCredentials.email}
             minLength={VALIDATIONS.MIN_EMAIL_LENGTH}
             maxLength={VALIDATIONS.MAX_NAME_LENGTH}
             onChange={(e) => {
@@ -471,7 +471,7 @@ function SignInForm() {
             required={true}
             placeholder="Enter your password"
             value={loginUserCredentials.password}
-            defaultValue={loginUserCredentials.password}
+            // defaultValue={loginUserCredentials.password}
             onChange={(e) => {
               if (rememberMe) {
                 localStorage.setItem(

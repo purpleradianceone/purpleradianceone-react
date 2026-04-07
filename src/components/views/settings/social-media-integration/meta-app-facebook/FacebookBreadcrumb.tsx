@@ -13,9 +13,14 @@ export const FacebookBreadCrumb = () => {
       path: "",
     }, // index route
     {
-      label: "Connect Page",
+      label: "Facebook Page",
       value: "integratePage",
       path: ROUTES_URL.SETTING_META_APP_INTEGRATION_FACEBOOK_PAGE_ADDITION,
+    },
+     {
+      label: "Whatsapp Account",
+      value: "connectWhatsappAccount",
+      path: ROUTES_URL.SETTING_META_APP_INTEGRATION_WHATSAPP,
     },
   ];
 

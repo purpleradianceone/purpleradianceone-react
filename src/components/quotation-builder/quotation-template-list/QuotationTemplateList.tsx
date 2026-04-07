@@ -105,8 +105,8 @@ export const QuotationTemplateList: React.FC<QuotationTemplateListProps> = ({
         quotation_account: {
           id: 101,
           company_id: 1,
-          name: "TechNova Solutions Pvt Ltd",
-          email: "contact@technova.com",
+          name: "PurpleRadiance Pvt Ltd",
+          email: "contact@purpleradiance.com",
           mobilenumber: "9876543210",
           industry_type_id: 3,
           industry_type_name: "Information Technology",
@@ -121,23 +121,23 @@ export const QuotationTemplateList: React.FC<QuotationTemplateListProps> = ({
           pan: "ABCDE1234F",
           gst: "27ABCDE1234F1Z5",
           tan: "PNEA12345B",
-          billing_address: "Office No. 12, Hinjewadi Phase 1, Pune - 411057",
-          shipping_address: "Warehouse 5, MIDC, Pune - 411018",
-          registered_office_address: "TechNova HQ, Baner Road, Pune - 411045",
+          billing_address: "PurpleRadiance, Office No. 07, Chandhere Complex, Viman Nagar, Pune - 411057",
+          shipping_address: "Warehouse 5, Chandan Nagar, Pune - 411018",
+          registered_office_address: "PurpleRadiance, Office No. 07, Chandhere Complex, Viman Nagar, Pune - 411045",
           business_registration_number: "U12345MH2020PTC123456",
           website: "https://www.technova.com",
           isactive: true,
-          createdby: "admin@technova.com",
+          createdby: "admin@purpleradiance.com",
           createdon: "2026-03-23T10:30:00",
           requestedby: 45,
           lead_id: 789,
-          company_account_type_id_array: [1, 2, 4],
+          company_account_type_id_array: [1, 2, 3],
           createdby_id: 10,
           updatedby_id: 12,
         },
         quotation_items: [
           {
-            productName: "Laptop Dell Inspiron 15",
+            productName: "Laptop Dell Inspiron 15 : Laptop Dell Inspiron 15 Laptop Dell Inspiron 15 ",
             quantity: 2,
             unitPrice: 55000.0,
             discountPercent: 10.0,
@@ -181,10 +181,10 @@ export const QuotationTemplateList: React.FC<QuotationTemplateListProps> = ({
       });
 
       const url = window.URL.createObjectURL(pdfBlob);
-      // window.open(url);
       setPdfPreviewUrl(url);
       setisLoadingForGenerateTemplate(false);
-
+      
+      // window.open(url);
       // const a = document.createElement("a");
       // a.href = url;
       // a.download = `${payload.quotationId}.pdf`;
