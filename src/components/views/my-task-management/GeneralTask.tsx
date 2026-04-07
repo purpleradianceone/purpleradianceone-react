@@ -244,27 +244,6 @@ function GeneralTask() {
       const imageUrl = URL.createObjectURL(blob);
       setLogoPreview(imageUrl);
       setShowCompanyLogoPreview(true);
-      // Create download link
-      // const url = window.URL.createObjectURL(new Blob([response.data]));
-      // const link = document.createElement("a");
-      // link.href = url;
-
-      // const contentDisposition = response.headers["content-disposition"];
-
-      // let fileName = `${generalMasterTask?.id}.${generalMasterTask?.extension}`;
-
-      // // If backend sends filename → override
-      // if (contentDisposition) {
-      //   const fileNameMatch = contentDisposition.match(/filename="?(.+)"?/);
-      //   if (fileNameMatch?.length === 2) {
-      //     fileName = fileNameMatch[1];
-      //   }
-      // }
-
-      // link.setAttribute("download", fileName);
-      // document.body.appendChild(link);
-      // link.click();
-      // link.remove();
     } catch (error) {
       console.error(error);
       toast.error("Failed to download document");
@@ -278,6 +257,34 @@ function GeneralTask() {
     getTask();
     getMasterTaskData();
   }, [taskId, masterId]);
+
+  const previewInvoice = async () => {
+    setIsSubmitting(true);
+
+    try {
+      const response = await axiosClient.get(
+        "http://localhost:8080/api/main/purple-crm-api/pdf",
+        {
+          responseType: "blob",
+          withCredentials: true, // ✅ IMPORTANT
+        },
+      );
+      console.log(response.data);
+
+      const blob = new Blob([response.data], {
+        type: "application/pdf",
+      });
+
+      const url = window.URL.createObjectURL(blob);
+
+      window.open(url, "_blank");
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to preview invoice");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   /* ---------- UI ---------- */
   return (
@@ -390,6 +397,9 @@ function GeneralTask() {
                             {isSubmitting ? "Saving..." : "Save"}
                           </div>
                         </Button>
+                        <button onClick={previewInvoice}>
+                          Preview Invoice
+                        </button>
                       </div>
                     </div>
                   </div>

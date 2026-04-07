@@ -723,6 +723,71 @@ export const useUserAccessModules = () => {
     (accessModule) => accessModule.crm_module_id === 55 && accessModule.update,
   );
 
+  //Company invoice
+  const userHasAccessToAddCompanyInvoice = accessModules.some(
+    (accessModules) => accessModules.crm_module_id === 57 && accessModules.add,
+  );
+
+  const userHasAccessToViewCompanyInvoice = accessModules.some(
+    (accessModule) => accessModule.crm_module_id === 57 && accessModule.view,
+  );
+
+  const userHasAccessToUpdateCompanyInvoice = accessModules.some(
+    (accessModule) => accessModule.crm_module_id === 57 && accessModule.update,
+  );
+
+  //Invoice Company Product/Item
+  const userHasAccessToAddCompanyInvoiceItem = accessModules.some(
+    (accessModules) => accessModules.crm_module_id === 58 && accessModules.add,
+  );
+
+  const userHasAccessToViewCompanyInvoiceItem = accessModules.some(
+    (accessModule) => accessModule.crm_module_id === 58 && accessModule.view,
+  );
+
+  const userHasAccessToUpdateCompanyInvoiceItem = accessModules.some(
+    (accessModule) => accessModule.crm_module_id === 58 && accessModule.update,
+  );
+
+  //Invoice Draft
+  const userHasAccessToAddCompanyInvoiceDraft = accessModules.some(
+    (accessModules) => accessModules.crm_module_id === 59 && accessModules.add,
+  );
+
+  const userHasAccessToViewCompanyInvoiceDraft = accessModules.some(
+    (accessModule) => accessModule.crm_module_id === 59 && accessModule.view,
+  );
+
+  const userHasAccessToUpdateCompanyInvoiceDraft = accessModules.some(
+    (accessModule) => accessModule.crm_module_id === 59 && accessModule.update,
+  );
+
+  //Invoice Approval
+  const userHasAccessToAddCompanyInvoiceApproval = accessModules.some(
+    (accessModules) => accessModules.crm_module_id === 60 && accessModules.add,
+  );
+
+  const userHasAccessToViewCompanyInvoiceApproval = accessModules.some(
+    (accessModule) => accessModule.crm_module_id === 60 && accessModule.view,
+  );
+
+  const userHasAccessToUpdateCompanyInvoiceApproval = accessModules.some(
+    (accessModule) => accessModule.crm_module_id === 60 && accessModule.update,
+  );
+
+  //Invoice Cancel
+  const userHasAccessToAddCompanyInvoiceCancel = accessModules.some(
+    (accessModules) => accessModules.crm_module_id === 61 && accessModules.add,
+  );
+
+  const userHasAccessToViewCompanyInvoiceCancel = accessModules.some(
+    (accessModule) => accessModule.crm_module_id === 61 && accessModule.view,
+  );
+
+  const userHasAccessToUpdateCompanyInvoiceCancel = accessModules.some(
+    (accessModule) => accessModule.crm_module_id === 61 && accessModule.update,
+  );
+
   return {
     userHasAccessToAddUser,
     userHasAccessToViewUser,
@@ -945,6 +1010,21 @@ export const useUserAccessModules = () => {
     userHasAccessToAddAccountSubscription,
     userHasAccessToViewAccountSubscription,
     userHasAccessToUpdateAccountSubscription,
-
+    
+    userHasAccessToAddCompanyInvoice,
+    userHasAccessToViewCompanyInvoice,
+    userHasAccessToUpdateCompanyInvoice,
+    userHasAccessToAddCompanyInvoiceItem,
+    userHasAccessToViewCompanyInvoiceItem,
+    userHasAccessToUpdateCompanyInvoiceItem,
+    userHasAccessToAddCompanyInvoiceDraft,
+    userHasAccessToViewCompanyInvoiceDraft,
+    userHasAccessToUpdateCompanyInvoiceDraft,
+    userHasAccessToAddCompanyInvoiceApproval,
+    userHasAccessToViewCompanyInvoiceApproval,
+    userHasAccessToUpdateCompanyInvoiceApproval,
+    userHasAccessToAddCompanyInvoiceCancel,
+    userHasAccessToViewCompanyInvoiceCancel,
+    userHasAccessToUpdateCompanyInvoiceCancel,
   };
 };

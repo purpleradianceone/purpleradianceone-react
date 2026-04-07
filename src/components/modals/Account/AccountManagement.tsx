@@ -11,6 +11,7 @@ import AccountContact from "./account-contact-temp/AccountContact";
 import AccountLead from "./account-lead/AccountLead";
 import AccountService from "./account-service/AccountService";
 import AccountSubscription from "./account-subscription/AccountSubscription";
+import AccountInvoice from "./account-invoice/AccountInvoice";
 
 const AccountManagement: React.FC = () => {
   const { accountId } = useParams();
@@ -90,7 +91,7 @@ const AccountManagement: React.FC = () => {
           </h3>
           <AccountCompanyProduct
             accountId={company!.id}
-          // handleShowCompanyProductData={handleShowCompanyProductData}
+            // handleShowCompanyProductData={handleShowCompanyProductData}
           />
         </div>
 
@@ -106,7 +107,13 @@ const AccountManagement: React.FC = () => {
           </h3> */}
           <AccountSubscription
             accountId={company!.id}
-          // handleShowCompanyProductData={handleShowCompanyProductData}
+            // handleShowCompanyProductData={handleShowCompanyProductData}
+          />
+        </div>
+        <div className="bg-white col-span-2 rounded-md border p-1 border-slate-200">
+          <AccountInvoice
+            account={company}
+            // handleShowCompanyProductData={handleShowCompanyProductData}
           />
         </div>
       </div>
