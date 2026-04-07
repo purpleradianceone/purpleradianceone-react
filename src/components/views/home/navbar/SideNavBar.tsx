@@ -1,6 +1,7 @@
 import {
   Building2,
   Calendar,
+  File,
   Handshake,
   Headset,
   Home,
@@ -31,6 +32,7 @@ function SideNavBar({ isOpen, onToggle }: SideBarProps) {
     userHasAccessToViewStock,
     userHasAccessToViewSupportTicket,
     userHasAccessToViewTasks,
+    userHasAccessToViewCompanyInvoice,
   } = useUserAccessModules();
 
   return (
@@ -108,6 +110,17 @@ function SideNavBar({ isOpen, onToggle }: SideBarProps) {
               isOpen={isOpen}
               isActive={isActive}
               disabled={!userHasAccessToViewAccount}
+            />
+          )}
+        </NavLink>
+        <NavLink to={ROUTES_URL.INVOICE_MANAGEMENT}>
+          {({ isActive }) => (
+            <SideNavBarItem
+              icon={File}
+              label="Invoices"
+              isOpen={isOpen}
+              isActive={isActive}
+              disabled={!userHasAccessToViewCompanyInvoice}
             />
           )}
         </NavLink>

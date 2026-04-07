@@ -6,6 +6,7 @@ import {
   Building2,
   Calendar,
   CreditCard,
+  File,
   Handshake,
   Headset,
   Home,
@@ -74,6 +75,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
     userHasAccessToViewStock,
     userHasAccessToViewSupportTicket,
     userHasAccessToViewTasks,
+    userHasAccessToViewCompanyInvoice,
   } = useUserAccessModules();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [accessDeniedPopUpView, setAccessDeniedPopUpView] =
@@ -516,6 +518,12 @@ function Navbar({ children }: { children: React.ReactNode }) {
                           icon={<UserCogIcon size={SIZE.TWENTY} />}
                           label="Accounts"
                         />
+                        <NavItem
+                          disable={!userHasAccessToViewCompanyInvoice}
+                          to={ROUTES_URL.INVOICE_MANAGEMENT}
+                          icon={<File size={SIZE.TWENTY} />}
+                          label="Invoices"
+                        />
 
                         {/* )} */}
                         {/* {!userHasAccessToViewAccount && (
@@ -593,7 +601,14 @@ function Navbar({ children }: { children: React.ReactNode }) {
                               label: "Integrations",
                             },
                             {
-                              icon: <QuotationIconSvg strokeWidth={2} size={26} className="text-blue-600" showCurrency={true}/>,
+                              icon: (
+                                <QuotationIconSvg
+                                  strokeWidth={2}
+                                  size={26}
+                                  className="text-blue-600"
+                                  showCurrency={true}
+                                />
+                              ),
                               to: ROUTES_URL.QUOTATION_SETTINGS,
                               label: "Quotation",
                             },
@@ -697,7 +712,14 @@ function Navbar({ children }: { children: React.ReactNode }) {
                           />
                           <NavItem
                             to={ROUTES_URL.QUOTATION_SETTINGS}
-                            icon={<QuotationIconSvg strokeWidth={2} size={26} className="text-blue-600" showCurrency={true}/>}
+                            icon={
+                              <QuotationIconSvg
+                                strokeWidth={2}
+                                size={26}
+                                className="text-blue-600"
+                                showCurrency={true}
+                              />
+                            }
                             onClick={() => setIsDropdownOpen(false)}
                             label=""
                           />

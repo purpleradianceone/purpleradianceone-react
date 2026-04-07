@@ -119,6 +119,9 @@ const ROUTES_URL = {
   SETTING_META_APP_INTEGRATION_WHATSAPP: "integrate-whatsapp",
   SETTING_META_APP_INTEGRATION_WHATSAPP_PHONE_NUMBER_ADDITION : "integrate-whatsapp-phone-number",
 
+  //invoice
+  INVOICE_MANAGEMENT: "/home/manage-invoices/company-invoice",
+  INVOICE_DETAILS: "/home/manage-invoices/company-invoice/invoice-details/:invoiceId",
 
 };
 export default ROUTES_URL;

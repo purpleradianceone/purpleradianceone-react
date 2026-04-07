@@ -96,7 +96,10 @@ import AccountSubscriptionDetails from "../../components/modals/Account/account-
 import WhatsappOAuthConsent from "../../components/dialogue-box/WhatsappOAuthConsent";
 import { WhatsappPhoneNumberIntegrationManagement } from "../../components/views/settings/social-media-integration/meta-app-whatsapp/WhatsappPhoneNumberIntegrationManagement";
 import { EditorCanvasForQuotationEdit } from "../../components/quotation-builder/builder/editor-canvas/EditorCanvasForQuotationEdit";
+import AccountInvoice from "../../components/modals/Account/account-invoice/AccountInvoice";
+import CompanyInvoiceDetails from "../../components/views/invoice/CompanyInvoiceDetails";
 import UserAndCompanyProfileManagement from "../../components/user-profile/UserPreferenceManagement";
+
 
 
 export const router = createBrowserRouter([
@@ -307,6 +310,34 @@ export const router = createBrowserRouter([
           <div>
             <Navbar>
               <GeneralTask />
+            </Navbar>
+          </div>
+        </PrivateRoute>
+      </MobileRedirectWrapper>
+    ),
+  },
+  {
+    path: ROUTES_URL.INVOICE_MANAGEMENT,
+    element: (
+      <MobileRedirectWrapper>
+        <PrivateRoute>
+          <div>
+            <Navbar>
+              <AccountInvoice account={null} isUsedForSidebar={true} />
+            </Navbar>
+          </div>
+        </PrivateRoute>
+      </MobileRedirectWrapper>
+    ),
+  },
+  {
+    path: ROUTES_URL.INVOICE_DETAILS,
+    element: (
+      <MobileRedirectWrapper>
+        <PrivateRoute>
+          <div>
+            <Navbar>
+              <CompanyInvoiceDetails  />
             </Navbar>
           </div>
         </PrivateRoute>
@@ -533,7 +564,7 @@ export const router = createBrowserRouter([
           <div>
             <AuthLayout
               title="Activate Subscription!"
-            // subtitle="Enter the number of users and subscription duration to proceed"
+              // subtitle="Enter the number of users and subscription duration to proceed"
             >
               <CreateSubscription
                 isOpen={true}
@@ -832,7 +863,7 @@ export const router = createBrowserRouter([
                 onClose={() => {
                   window.history.back();
                 }}
-                handleProductChangeOnAdd={() => { }}
+                handleProductChangeOnAdd={() => {}}
               ></AddProductModal>
             </Navbar>
           </div>
@@ -852,7 +883,7 @@ export const router = createBrowserRouter([
                 onClose={() => {
                   window.history.back();
                 }}
-                handleCompanyTeamChangeOnAdd={() => { }}
+                handleCompanyTeamChangeOnAdd={() => {}}
               ></AddTeamModal>
             </Navbar>
           </div>
@@ -903,12 +934,12 @@ export const router = createBrowserRouter([
       },
       {
         path: "account-service-details/:accountServiceId",
-        element: <AccountServiceDetails></AccountServiceDetails>
+        element: <AccountServiceDetails></AccountServiceDetails>,
       },
       {
         path: "account-subscription-details/:accountSubscriptionId",
-        element: <AccountSubscriptionDetails></AccountSubscriptionDetails>
-      }
+        element: <AccountSubscriptionDetails></AccountSubscriptionDetails>,
+      },
     ],
   },
   {
@@ -916,13 +947,13 @@ export const router = createBrowserRouter([
     element: (
       <MobileRedirectWrapper>
         <PrivateRoute>
-          <WhatsappOAuthConsent/>
+          <WhatsappOAuthConsent />
           {/* <FacebookOAuthConsent /> */}
         </PrivateRoute>
       </MobileRedirectWrapper>
     ),
   },
-   {
+  {
     path: ROUTES_URL.FACEBOOK_OAUTH,
     element: (
       <MobileRedirectWrapper>
@@ -1029,14 +1060,14 @@ export const router = createBrowserRouter([
       },
     ],
   },
-   {
+  {
     path: ROUTES_URL.SETTING_META_APP_INTEGRATION_WHATSAPP,
     element: (
       <MobileRedirectWrapper>
         <PrivateRoute>
           <div>
             <Navbar>
-              <WhatsappPhoneNumberIntegrationManagement/>
+              <WhatsappPhoneNumberIntegrationManagement />
               {/* <WhatsappPhoneNumberAddition /> */}
               {/* <WhatsappBreadCrumb/> */}
             </Navbar>
