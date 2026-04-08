@@ -82,7 +82,8 @@ export function Popover({
     setPosition({ top, left });
   }, [open, align, width]);
 
-  //  Outside click
+  // WARNING : DO NOT UNCOMMENT THIS CODE  Outside click
+  // FOR LEAD STATUS CHANGE , IF YOU START THIS FUNCTIONALOTY STATUS CHANGING FUNCTIONALITY WILL BREAK!!!
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
       if (
@@ -120,6 +121,57 @@ export function Popover({
       document.removeEventListener("keydown", handleEsc);
     };
   }, [open]);
+
+  //  Calculate position with viewport collision detection
+useEffect(() => {
+  if (!open || !triggerRef.current || !popoverRef.current) return;
+
+  const triggerRect = triggerRef.current.getBoundingClientRect();
+  const popoverRect = popoverRef.current.getBoundingClientRect();
+
+  const viewportHeight = window.innerHeight;
+  const viewportWidth = window.innerWidth;
+
+  const spaceBelow = viewportHeight - triggerRect.bottom;
+  const spaceAbove = triggerRect.top;
+
+  let top: number;
+  let left: number;
+
+  //  Vertical positioning (flip if needed)
+  if (spaceBelow >= popoverRect.height) {
+    // Enough space below
+    top = triggerRect.bottom + window.scrollY;
+  } else if (spaceAbove >= popoverRect.height) {
+    // Flip above
+    top = triggerRect.top + window.scrollY - popoverRect.height;
+  } else {
+    // Not enough space either side → clamp
+    top = Math.max(
+      8,
+      viewportHeight - popoverRect.height - 8
+    ) + window.scrollY;
+  }
+
+  //  Horizontal positioning
+  if (align === "right") {
+    left = triggerRect.right + window.scrollX - width;
+  } else {
+    left = triggerRect.left + window.scrollX;
+  }
+
+  //  Prevent right overflow
+  if (left + popoverRect.width > viewportWidth) {
+    left = viewportWidth - popoverRect.width - 8;
+  }
+
+  //  Prevent left overflow
+  if (left < 8) {
+    left = 8;
+  }
+
+  setPosition({ top, left });
+}, [open, align, width]);
 
   return (
     <>

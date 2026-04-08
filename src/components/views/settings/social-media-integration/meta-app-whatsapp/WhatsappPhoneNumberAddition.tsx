@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useLoggedInUserContext } from "../../../../../context/user/LoggedInUserContext";
 import {  createConnectWhatsappAccount } from "../../../../../config/apis/IntegrationApis";
 import {  MessageCircleIcon } from "lucide-react";
+import { useUserAccessModules } from "../../../../../config/hooks/useAccessModules";
 
 
 type ConnectionStatus = "idle" | "loading" | "success" | "error";
@@ -24,6 +25,8 @@ export default function WhatsappPhoneNumberAddition({
 }:{
   handleRefreshApiCall : ()=> void;
 }) {
+
+  const {userHasAccessToAddIntegrationSetting} = useUserAccessModules();
   const { loginStatus } = useLoggedInUserContext();
   const [pageId, setPageId] = useState("");
   const [status, setStatus] = useState<ConnectionStatus>("idle");
@@ -33,8 +36,12 @@ export default function WhatsappPhoneNumberAddition({
   );
 
 
-  // api call to add
+  //Note : Add api call
   const handleSubmit = async () => {
+  //Note : if user dont have the access then return from here. 
+    if(!userHasAccessToAddIntegrationSetting){
+      return;
+    }
     if (!pageId.trim()) {
       setStatus("error");
       setMessage("Please enter a Page ID.");
