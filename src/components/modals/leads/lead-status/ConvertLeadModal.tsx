@@ -1,10 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import FormHeader from "../../../ui/FormHeader";
-import { Handshake, Save, X } from "lucide-react";
+import { Handshake, Save, Text, X } from "lucide-react";
 import RadioButtons from "../../../ui/RadioButton";
 import { useState } from "react";
 // import Lead from "../../../../@types/lead-management/LeadManagementProps";
-import ConfirmationDialog from "../../../dialogue-box/ConfirmationDialogue";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
 import POST_API from "../../../../constants/PostApi";
 import toast from "react-hot-toast";
@@ -14,11 +13,11 @@ import RefreshToken from "../../../../config/validations/RefreshToken";
 import Button from "../../../ui/Button";
 import TextAreaInput from "../../../ui/TextAreaInput";
 import LoadingPopUpAnimation from "../../../views/card/LoadingPopUpAnimation";
-import FormLayout from "../../../ui/FormLayout";
 import axiosClient from "../../../../axios-client/AxiosClient";
 import LeadDataProps from "../../../../@types/lead-management/LeadProps";
 import { LookupAccountManagement } from "../../../views/lookups/lookup-account/LookupAccountManagement";
 import { LookupAccount } from "../../../../@types/lookup/LookupAccount";
+import LeadUpdateConfirmationDialogue from "./LeadUpdateConfirmationDialogue";
 
 function ConvertLeadModal({
   isOpen,
@@ -99,8 +98,8 @@ function ConvertLeadModal({
 
   if (!isOpen) return null;
   return (
-    // <>
-    <FormLayout padding={2} width={accountTypeSelected==="noAccount" ? 4:7  }>
+    <>
+    {/* // <FormLayout padding={2} width={accountTypeSelected==="noAccount" ? 4:7  }> */}
 
    
       {/* <div className="fixed inset-0 z-50 p-5 overflow-hidden bg-black bg-opacity-5">
@@ -156,6 +155,7 @@ function ConvertLeadModal({
                   <div className="grid grid-cols-1">
                     <div>
                       <TextAreaInput
+                      logo={Text}
                       autoFocus
                         placeholder="Enter reason for status update"
                         value={reasonText}
@@ -196,8 +196,8 @@ function ConvertLeadModal({
                     </div>
                   </div>
                 )}
-
-                <ConfirmationDialog
+                
+                <LeadUpdateConfirmationDialogue
                   message="Please confirm the action to proceed."
                   messageDescription="We are about to map the selected lead to the designated account.
 Ensure all details are correct before finalizing the mapping"
@@ -214,11 +214,11 @@ Ensure all details are correct before finalizing the mapping"
                 />
               </form>
             </div>
-             </FormLayout>
-      //     // {/* </div>
+            {/* //  </FormLayout> */}
+       {/* </div>
       //   </div>
       // </div> */}
-    // {/* </>,
+    </>
     // document.body */}
   );
 }

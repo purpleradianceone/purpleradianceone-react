@@ -1,5 +1,13 @@
 import { LucideIcon } from "lucide-react"
 
+/**
+ * COMPONENT HEADER LOGO AND NAME 
+ * 
+ * @param logo - give lucide logo
+ * @param headerText - give component name
+ * 
+ * @returns REUSABLE COMPONENT
+ */
 export const ComponentHeaderAndLogo=({
     logo : Logo,
     headerText
