@@ -18,6 +18,7 @@ export type ErrorType = {
   description?: string;
   cost?: string;
   taxRate?: string;
+  cess?: string;
   validFrom?: string;
   hsn?: string;
   sac?: string;
@@ -183,6 +184,23 @@ export const useFormValidation = (formData: Record<string, string | number | boo
         }
         break;
 
+        case "cess":
+          if (formType === STRING_VALUES.REGISTRATION) {
+
+            const numericValue = parseFloat(value);
+
+            console.log(value);
+            console.log(typeof value);
+            if (value === "") {
+              setErrors((prev) => ({ ...prev, cess: "" }));
+            } else if (numericValue < 0) {
+              setErrors((prev) => ({ ...prev, cess: "Cess cannot be negative" }));
+            } else {
+              setErrors((prev) => ({ ...prev, cess: "" }));
+            }
+          }
+          break;
+          
       case "validFrom":
         if (formType === STRING_VALUES.REGISTRATION && value === "") {
           setErrors((prev) => ({ ...prev, validFrom: "mandatory if tax rate is given." }));

@@ -4,6 +4,7 @@ type ProductTax = {
     hsn : string,
     sac : string,
     taxRate : number,
+    cess?: number,
     validFrom : string,
     createdBy : string,
     updatedBy : number,

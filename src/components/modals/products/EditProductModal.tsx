@@ -285,31 +285,31 @@ function EditCompanyProductModal({
     ) {
       if (
         updateCompanyProductFormData.barcode !==
-          intialEditCompanyProductFormData.barcode ||
+        intialEditCompanyProductFormData.barcode ||
         updateCompanyProductFormData.name !==
-          intialEditCompanyProductFormData.name ||
+        intialEditCompanyProductFormData.name ||
         updateCompanyProductFormData.description !==
-          intialEditCompanyProductFormData.description ||
+        intialEditCompanyProductFormData.description ||
         updateCompanyProductFormData.cost !==
-          intialEditCompanyProductFormData.cost ||
+        intialEditCompanyProductFormData.cost ||
         selectedProductTypeId !==
-          intialEditCompanyProductFormData.product_type_id ||
+        intialEditCompanyProductFormData.product_type_id ||
         selectedWarrantyIntervalTypeId !==
-          intialEditCompanyProductFormData.default_warranty_interval_type_id ||
+        intialEditCompanyProductFormData.default_warranty_interval_type_id ||
         selectedDefaultWarranty !==
-          intialEditCompanyProductFormData.default_warranty ||
+        intialEditCompanyProductFormData.default_warranty ||
         selectedAmcIntervalTypeId !==
-          intialEditCompanyProductFormData.default_amc_cycle_interval_type_id ||
+        intialEditCompanyProductFormData.default_amc_cycle_interval_type_id ||
         selectedDefaultAmc !==
-          intialEditCompanyProductFormData.default_amc_cycle ||
+        intialEditCompanyProductFormData.default_amc_cycle ||
         updateCompanyProductFormData.version !==
-          intialEditCompanyProductFormData.version ||
+        intialEditCompanyProductFormData.version ||
         updateCompanyProductFormData.url !==
-          intialEditCompanyProductFormData.url ||
+        intialEditCompanyProductFormData.url ||
         updateCompanyProductFormData.isSerialNumber !== isSerialNumberChecked ||
         selectedUnitId !== intialEditCompanyProductFormData.unitId ||
         updateCompanyProductFormData.minimumStock !==
-          Number(intialEditCompanyProductFormData.minimumStock)
+        Number(intialEditCompanyProductFormData.minimumStock)
       ) {
         if (userHasAccessToUpdateProduct) {
           const updateProductPostData = {
@@ -379,7 +379,7 @@ function EditCompanyProductModal({
                 }
               }
             })
-            .finally(() => {});
+            .finally(() => { });
         } else {
           toast.error(
             MESSAGE.MODULE_ACCESS.PRODUCT_MANAGEMENT.DENIED_UPDATE_ACCESS,
@@ -418,6 +418,7 @@ function EditCompanyProductModal({
                   hsn: res.hsn,
                   sac: res.sac,
                   taxRate: res.tax_rate,
+                  cess: res.cess,
                   validFrom: res.valid_from,
                   createdBy: res.createdby,
                   createdOn: res.createdon,
