@@ -229,6 +229,21 @@ function ProductsManagementGrid({
         },
       },
       {
+        field: "cess",
+        headerName: "Cess",
+        sortable: true,
+        filter: true,
+        flex: 1,
+        hide: !userHasAccessToViewProductTax || isGridForAccountProduct,
+        valueFormatter: (params) => {
+          if (params.value === 0) {
+            return "";
+          }
+          return params.value;
+        },
+      },
+
+      {
         field: "validFrom",
         headerName: "Effective From",
         sortable: true,
