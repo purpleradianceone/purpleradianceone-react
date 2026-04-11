@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Calendar, Plus, UserRoundCogIcon } from "lucide-react";
-import useScreenSize from "../../config/hooks/useScreenSize";
 import { usePanel } from "../../context/panel/usePanel";
 import SearchInput from "../ui/SearchInput";
 import HandleSearchOptionProps from "../../@types/company-users/HandleSearchOptionProps";
@@ -23,6 +22,7 @@ import { SIZE } from "../../constants/AppConstants";
 import COLORS from "../../constants/Colors";
 import PaginationWithoutCount, { PaginationDataWithoutCountProps } from "../ag-grid/PaginationWithoutCount";
 import { customDateRangeId } from "../../config/hooks/usePaginationHandler";
+import { ComponentHeaderAndLogo } from "../ui/ComponentHeaderAndLogo";
 
 function AccountManagementList({
   accounts,
@@ -50,7 +50,7 @@ function AccountManagementList({
   const navigate = useNavigate();
   const { position } = usePanel();
   const { userPreference } = useUserPreference();
-  const { isLargeScreen, isMediumScreen, isSmallScreen } = useScreenSize();
+  // const { isLargeScreen, isMediumScreen, isSmallScreen } = useScreenSize();
 
   const [openCreateAccountForm, setOpenAccountForm] = useState<boolean>(false);
   const { dateRangeDropdownOptions } = useComapanySpecificSearchDateRange();
@@ -123,20 +123,12 @@ function AccountManagementList({
         className={`sticky z-10 top-10 mt-1 p-0.5  flex items-center justify-between text-sm ${COLORS.GRID_HEADER_SECTION_BG_COLOR} rounded-lg shadow-sm  mb-1.5 w-full`}
       >
         <div className="flex items-center justify-center gap-5">
-          <div className="flex gap-1">
-            {!isSmallScreen && (
-              <UserRoundCogIcon
-                className={COLORS.GRID_HEADER_ICONS_COLOR_AND_SIZE}
-              />
-            )}
+          
+          <ComponentHeaderAndLogo
+          headerText="Account"
+          logo={UserRoundCogIcon}
+          />
 
-            {(isMediumScreen || isLargeScreen) && (
-              <span className="section-header-custom mt-1">{" Accounts"} </span>
-            )}
-          </div>
-
-          {/* {isLargeScreen && ( */}
-          {/* <> */}
           <div className="flex gap-2  justify-center items-center">
             {/* search box flex div */}
             <div className="flex gap-1">

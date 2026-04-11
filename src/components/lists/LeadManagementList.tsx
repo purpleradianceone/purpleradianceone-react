@@ -35,6 +35,7 @@ import COLORS from "../../constants/Colors";
 import { createPortal } from "react-dom";
 import PaginationWithoutCount from "../ag-grid/PaginationWithoutCount";
 import { customDateRangeId } from "../../config/hooks/usePaginationHandler";
+import { ComponentHeaderAndLogo } from "../ui/ComponentHeaderAndLogo";
 function LeadManagementList({
   handleSearchOption,
   onStartDateChange,
@@ -55,7 +56,7 @@ function LeadManagementList({
   const navigate = useNavigate();
   const { position } = usePanel();
   const { userPreference } = useUserPreference();
-  const { isLargeScreen, isMediumScreen, isSmallScreen } = useScreenSize();
+  const { isLargeScreen, isSmallScreen } = useScreenSize();
   const { userHasAccessToViewLead, userHasAccessToAddLead } =
     useUserAccessModules();
   const [isCreateLeadModalOpen, setIsCreateLeadModalOpen] =
@@ -167,17 +168,21 @@ function LeadManagementList({
           className={`z-10 top-12 mt-1 p-0.5  flex items-center justify-between text-sm ${COLORS.GRID_HEADER_SECTION_BG_COLOR} rounded-lg shadow-sm  mb-1.5 w-full`}
         >
           {isUsedInLeadModule && (
-            <div className="flex gap-1">
-              {!isSmallScreen && (
-                <Handshake
-                  className={COLORS.GRID_HEADER_ICONS_COLOR_AND_SIZE}
-                />
-              )}
+            // <div className="flex gap-1">
+            //   {!isSmallScreen && (
+            //     <Handshake
+            //       className={COLORS.GRID_HEADER_ICONS_COLOR_AND_SIZE}
+            //     />
+            //   )}
 
-              {(isMediumScreen || isLargeScreen) && (
-                <span className="section-header-custom">{" Leads"} </span>
-              )}
-            </div>
+            //   {(isMediumScreen || isLargeScreen) && (
+            //     <span className="section-header-custom">{" Leads"} </span>
+            //   )}
+            // </div>
+            <ComponentHeaderAndLogo
+            headerText="Leads"
+            logo={Handshake}
+            />
           )}
 
           {/* {isLargeScreen && ( */}

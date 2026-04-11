@@ -1,6 +1,14 @@
 // import { LucideIcon } from "lucide-react";
 import { ElementType } from "react";
 
+/**
+ * COMPONENT HEADER LOGO AND NAME 
+ * 
+ * @param logo - give lucide logo
+ * @param headerText - give component name
+ * 
+ * @returns REUSABLE COMPONENT
+ */
 export const ComponentHeaderAndLogo = ({
   logo: Logo,
   headerText,
@@ -15,3 +23,6 @@ export const ComponentHeaderAndLogo = ({
     </div>
   );
 };
+
+
+
