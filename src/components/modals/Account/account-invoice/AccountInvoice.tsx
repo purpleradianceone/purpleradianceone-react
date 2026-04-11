@@ -121,6 +121,7 @@ function AccountInvoice({
             totalTax: item.total_tax,
             totalAmount: item.total_amount,
             status: item.invoice_status_name,
+            statusId: item.invoice_status_id,
             isActive: item.isactive,
             createdBy: item.createdby,
             createdOn: item.createdon,

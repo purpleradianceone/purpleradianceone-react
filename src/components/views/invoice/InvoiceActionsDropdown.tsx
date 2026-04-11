@@ -1,13 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { Eye, Trash2 } from "lucide-react";
+import { Download, Eye, Trash2 } from "lucide-react";
 import { JSX_CHILDREN_NAME } from "../../../constants/AppConstants";
 import ActionsDropdownButton from "../../ui/ActionsDropdownButton";
 
 const InvoiceActionsDropdown = ({ data, context }: any) => {
   console.log(data);
-
   const [open, setOpen] = useState(false);
   const [position, setPosition] = useState({
     top: 0,
@@ -15,12 +14,9 @@ const InvoiceActionsDropdown = ({ data, context }: any) => {
   });
 
   const dropdownRef = useRef<HTMLDivElement | null>(null);
-
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-
     const rect = (e.currentTarget as HTMLButtonElement).getBoundingClientRect();
-
     const dropdownHeight = 90;
     const spaceBelow = window.innerHeight - rect.bottom;
     const isUpward = spaceBelow < dropdownHeight;
@@ -49,8 +45,6 @@ const InvoiceActionsDropdown = ({ data, context }: any) => {
     return () => document.removeEventListener("mousedown", handleOutside);
   }, []);
 
-  
-
   return (
     <>
       {/* BUTTON */}
@@ -66,7 +60,7 @@ const InvoiceActionsDropdown = ({ data, context }: any) => {
         createPortal(
           <div
             ref={dropdownRef}
-            className="absolute bg-white border rounded-md shadow-lg w-24 ml-6 z-50"
+            className="absolute bg-white border rounded-md shadow-lg w-34 ml-4 z-50"
             style={{ top: position.top, left: position.left }}
             onClick={(e) => e.stopPropagation()}
           >
@@ -82,20 +76,34 @@ const InvoiceActionsDropdown = ({ data, context }: any) => {
               </div>
             </ActionsDropdownButton>
 
-            <ActionsDropdownButton
-              onClick={() => {
-                const confirmDelete = window.confirm("Delete this invoice?");
-                if (confirmDelete) {
-                  context.onDelete?.(data);
-                }
-                setOpen(false);
-              }}
-            >
-              <div className="flex items-center gap-2 text-red-600">
-                <Trash2 size={14} />
-                Delete
-              </div>
-            </ActionsDropdownButton>
+            {data.statusId === 2 && (
+              <ActionsDropdownButton
+                onClick={() => {
+                  context.onDownloadInvoice(data);
+                  setOpen(false);
+                }}
+              >
+                <div className="flex items-center gap-2">
+                  <Download size={14} />
+                  Download
+                </div>
+              </ActionsDropdownButton>
+            )}
+
+            {!context.userHasAccessToUpdateCompanyInvoiceDraft ||
+              (data.statusId === 1 && (
+                <ActionsDropdownButton
+                  onClick={() => {
+                    context.onDelete?.(data);
+                    setOpen(false);
+                  }}
+                >
+                  <div className="flex items-center gap-2 text-red-600">
+                    <Trash2 size={14} />
+                    Delete
+                  </div>
+                </ActionsDropdownButton>
+              ))}
           </div>,
           document.body,
         )}

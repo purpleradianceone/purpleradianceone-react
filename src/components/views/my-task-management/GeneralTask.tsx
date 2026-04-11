@@ -258,33 +258,7 @@ function GeneralTask() {
     getMasterTaskData();
   }, [taskId, masterId]);
 
-  const previewInvoice = async () => {
-    setIsSubmitting(true);
-
-    try {
-      const response = await axiosClient.get(
-        "http://localhost:8080/api/main/purple-crm-api/pdf",
-        {
-          responseType: "blob",
-          withCredentials: true, // ✅ IMPORTANT
-        },
-      );
-      console.log(response.data);
-
-      const blob = new Blob([response.data], {
-        type: "application/pdf",
-      });
-
-      const url = window.URL.createObjectURL(blob);
-
-      window.open(url, "_blank");
-    } catch (error) {
-      console.error(error);
-      toast.error("Failed to preview invoice");
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+ 
 
   /* ---------- UI ---------- */
   return (
@@ -397,9 +371,6 @@ function GeneralTask() {
                             {isSubmitting ? "Saving..." : "Save"}
                           </div>
                         </Button>
-                        <button onClick={previewInvoice}>
-                          Preview Invoice
-                        </button>
                       </div>
                     </div>
                   </div>

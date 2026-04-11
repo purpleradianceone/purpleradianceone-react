@@ -7,14 +7,17 @@ import { INNERHTML, JSX_CHILDREN_NAME } from "../../constants/AppConstants";
 import StatusIndicator from "../ui/StatusIndicator";
 import AccountInvoiceManagementGridProps from "../../@types/ag-grid/AccountInvoiceManagementGridProps";
 import InvoiceActionsDropdown from "../views/invoice/InvoiceActionsDropdown";
+import InvoiceStatusChip from "../ui/InvoiceStatusChip";
+import { useUserAccessModules } from "../../config/hooks/useAccessModules";
 
 function AccountInvoiceManagementAgGrid({
   invoices,
   onRowSelect,
   onDeleteInvoice,
+  onDownloadInvoice,
 }: AccountInvoiceManagementGridProps) {
   const gridRef = useRef<AgGridReact>(null);
-
+  const { userHasAccessToUpdateCompanyInvoiceDraft } = useUserAccessModules();
   const columnDefs = useMemo<ColDef[]>(
     () => [
       {
@@ -23,7 +26,7 @@ function AccountInvoiceManagementAgGrid({
         minWidth: 140,
         cellRenderer: (params: any) => {
           return (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center font-bold gap-2">
               <span>{params.value || "[Auto-generated]"}</span>
             </div>
           );
@@ -44,8 +47,21 @@ function AccountInvoiceManagementAgGrid({
         filter: true,
         cellRenderer: (params: any) => {
           return (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center font-bold gap-2">
               <span>{params.value || "[Auto-generated]"}</span>
+            </div>
+          );
+        },
+      },
+      {
+        field: "Status",
+        headerName: "Status",
+        sortable: true,
+        filter: true,
+        cellRenderer: (params: any) => {
+          return (
+            <div className="flex items-center gap-2">
+              <InvoiceStatusChip statusId={params.data.statusId} />
             </div>
           );
         },
@@ -70,7 +86,7 @@ function AccountInvoiceManagementAgGrid({
       },
 
       {
-        field: "basicAmount",
+        field: "basicValue",
         headerName: "Basic Amount",
         sortable: true,
         filter: true,
@@ -84,7 +100,7 @@ function AccountInvoiceManagementAgGrid({
       },
 
       {
-        field: "TaxableValue",
+        field: "taxableValue",
         headerName: "Taxable Value",
         sortable: true,
         filter: true,
@@ -195,6 +211,8 @@ function AccountInvoiceManagementAgGrid({
         context={{
           handleRowSelect: onRowSelect, // ✅ correct
           onDelete: onDeleteInvoice,
+          onDownloadInvoice,
+          userHasAccessToUpdateCompanyInvoiceDraft,
           gridRef, // ✅ correct
         }}
         // onRowClicked={handleRowClick}
