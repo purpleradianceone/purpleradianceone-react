@@ -18,6 +18,7 @@ function SideNavBarItem({
   const buttonRef = useRef<HTMLButtonElement>(null);
   const [hoveredItem, setHoveredItem] = useState(false);
 
+   const [openUpwards, setOpenUpwards] = useState<boolean>(false);
   const location = useLocation();
 
   const hasActiveChild = React.Children.toArray(children).some((child) => {
@@ -143,7 +144,24 @@ function SideNavBarItem({
               setIsTooltipVisible(true);
               updateTooltipPosition();
             }}
-            onClick={() => setHoveredItem(true)}
+
+            onClick={() => {
+        setHoveredItem(true);
+
+        if (buttonRef.current) {
+          const rect = buttonRef.current.getBoundingClientRect();
+          const spaceBelow = window.innerHeight - rect.bottom;
+          const dropdownHeight = 180;
+
+          if (spaceBelow < dropdownHeight) {
+            setOpenUpwards(true);
+          } else {
+            setOpenUpwards(false);
+          }
+        }
+      }}
+
+            // onClick={() => setHoveredItem(true)}
             onMouseLeave={() => {
               setIsTooltipVisible(false);
             }}
@@ -170,7 +188,9 @@ function SideNavBarItem({
               <div
                 onMouseLeave={() => setHoveredItem(false)}
                 onMouseEnter={() => setIsTooltipVisible(false)}
-                className="absolute left-full top-0 ml-2 bg-white rounded-lg shadow-lg py-2 min-w-36"
+                className={`absolute left-full ml-2 bg-white rounded-lg shadow-lg py-2 min-w-36
+  ${openUpwards ? "bottom-0" : "top-0"}`}
+                // className="absolute left-full top-0 ml-2 bg-white rounded-lg shadow-lg py-2 min-w-36"
               >
                 {React.Children.toArray(children).map((child, index) => (
                   <button
