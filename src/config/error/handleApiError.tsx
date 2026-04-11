@@ -30,7 +30,7 @@ export function handleApiError(error: unknown) {
 
   switch (status) {
     case 400:
-      toast.error("Bad request! Something went wrong.");
+      toast.error( message ? message : "Bad request! Something went wrong.");
       break;
 
     case 401:

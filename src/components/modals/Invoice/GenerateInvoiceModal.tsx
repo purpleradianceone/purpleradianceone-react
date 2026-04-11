@@ -19,7 +19,6 @@ import toast from "react-hot-toast";
 import Account from "../../../@types/account/Account";
 import axiosClient from "../../../axios-client/AxiosClient";
 import POST_API from "../../../constants/PostApi";
-import ApiError from "../../../@types/error/ApiError";
 import { handleApiError } from "../../../config/error/handleApiError";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
 import { LookupAccountDropdown } from "../../views/lookups/lookup-account-dropdown/LookupAccountDropdown";
@@ -108,7 +107,7 @@ function GenerateInvoiceModal({
           toast.error(response.data.message);
         }
       })
-      .catch(async (error: ApiError | any) => {
+      .catch(async (error) => {
         console.log(error);
         handleApiError(error);
       })
