@@ -39,7 +39,7 @@ function SideNavBar({ isOpen, onToggle }: SideBarProps) {
     <aside
       id="left-side-navbar"
       className={`fixed  top-0 left-0 h-full bg-white border-r transition-all duration-300 z-30
-          ${isOpen ? "w-64" : "w-12"}`}
+          ${isOpen ? "w-64 overflow-y-auto" : "w-12"}`}
     >
       <div
         className={`flex items-center border-b justify-center ${SIZE.NAVBAR.TOP_HEIGHT_USER_PREF_LEFT}`}
