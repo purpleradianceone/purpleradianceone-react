@@ -318,7 +318,8 @@ function CompanyInvoiceDetails() {
     if (!disabled) return;
     if (!userHasAccessToViewCompanyInvoice) return;
     setIsSubmitting(true);
-
+    console.log(POST_API.COMPANY_INVOICE_DOWNLOAD);
+    
     try {
       const response = await axiosClient.post(
         POST_API.COMPANY_INVOICE_DOWNLOAD,
