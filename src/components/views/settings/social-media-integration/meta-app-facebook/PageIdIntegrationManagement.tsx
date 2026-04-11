@@ -6,7 +6,6 @@ import FormLayout from "../../../../ui/FormLayout";
 import FormHeader from "../../../../ui/FormHeader";
 import { Plus } from "lucide-react";
 import { FiFacebook } from "react-icons/fi";
-import LeadAccessInstructions from "./LeadAccessInstructions";
 import MetaAppWhatsappIntegration from "../meta-app-whatsapp/MetaIntegrationDeniedMessage";
 import FormSkeleton from "../../../../modals/Account/FormSkeleton";
 import { handleApiError } from "../../../../../config/error/handleApiError";
@@ -95,7 +94,7 @@ export const PageIdIntegrationManagement = () => {
   return (
     <div className="min-h-56 my-5 h-auto w-full flex items-center justify-center">
       <div className="bg-white rounded-xl shadow-lg overflow-hidden max-w-4xl w-full mt-0 pt-0 md:p-3 border border-gray-200 transition-all duration-300 transform hover:scale-[1.01]">
-        <LeadAccessInstructions/>
+        {/* <LeadAccessInstructions/> */}
         <div className="mt-4">
 
         <FormHeader
