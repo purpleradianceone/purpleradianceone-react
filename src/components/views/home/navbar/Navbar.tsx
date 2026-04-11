@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState, useRef } from "react";
+import { LiaFileInvoiceSolid } from "react-icons/lia";
 import {
   Aperture,
   Bell,
   Building2,
   Calendar,
   CreditCard,
-  File,
   Handshake,
   Headset,
   Home,
@@ -521,7 +521,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
                         <NavItem
                           disable={!userHasAccessToViewCompanyInvoice}
                           to={ROUTES_URL.INVOICE_MANAGEMENT}
-                          icon={<File size={SIZE.TWENTY} />}
+                          icon={<LiaFileInvoiceSolid size={SIZE.TWENTY} />}
                           label="Invoices"
                         />
 

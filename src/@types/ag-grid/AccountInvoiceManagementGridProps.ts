@@ -6,7 +6,7 @@ type AccountInvoiceManagementGridProps = {
 
   onRowSelect?: (data: AccountInvoiceProps) => void;
   onDeleteInvoice?: (data: AccountInvoiceProps) => void;
-
+  onDownloadInvoice?: (data: AccountInvoiceProps) => void;
   handleRowClick?: (event: any) => void;
 
   isUsedInInvoiceModule?: boolean;

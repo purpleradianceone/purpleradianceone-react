@@ -47,7 +47,7 @@ function GenerateInvoiceModal({
   const hasAccount = !!account;
   const accountId = hasAccount ? account?.id : selectedAccount?.id;
   const { accountDetails } = useAccountDetails(accountId && Number(accountId));
-
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const handleAccountSelect = (account: any) => {
     setSelectedAccount(account);
   };
@@ -94,7 +94,7 @@ function GenerateInvoiceModal({
     };
     console.log(formPayload);
     console.log(selectedAccount);
-
+    setIsSubmitting(true);
     await axiosClient
       .post(POST_API.CREATE_COMPANY_INVOICE, formPayload, {
         withCredentials: true,
@@ -102,8 +102,9 @@ function GenerateInvoiceModal({
       .then((response) => {
         if (response.data.status) {
           toast.success(response.data.message);
-          // setIsSubmitting(false);
+
           handleAddInvoice();
+          onClose();
         } else {
           toast.error(response.data.message);
         }
@@ -113,7 +114,7 @@ function GenerateInvoiceModal({
         handleApiError(error);
       })
       .finally(() => {
-        // setIsSubmitting(false);
+        setIsSubmitting(false);
       });
   };
 
@@ -208,7 +209,7 @@ function GenerateInvoiceModal({
               </div>
             </Button>
 
-            <Button onClick={handleSaveHeader}>
+            <Button disabled={isSubmitting} onClick={handleSaveHeader}>
               <div className="flex items-center gap-1">
                 <Save size={16} />
                 <span>Save</span>

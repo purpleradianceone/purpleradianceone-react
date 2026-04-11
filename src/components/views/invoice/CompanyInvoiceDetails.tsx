@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Button from "../../ui/Button";
+import { FaFilePdf } from "react-icons/fa";
 import TextAreaInput from "../../ui/TextAreaInput";
 import SearchInput from "../../ui/SearchInput";
 import MetaField from "../../ui/MetaField";
@@ -16,8 +17,12 @@ import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContex
 import toast from "react-hot-toast";
 import FormInput from "../../ui/FormInput";
 import { formatRupee } from "../../../utils/helperMethods/formatFunctions";
-import { Pencil, Trash, X } from "lucide-react";
+import { Download, Pencil, Trash, X } from "lucide-react";
 import CompanyInvoiceItemProps from "../../../@types/invoice/CompanyInvoiceItemProps";
+import InvoiceStatusChip from "../../ui/InvoiceStatusChip";
+import CustomDocumentPreviewComponent from "../../custom-document-preview-component/CustomDocumentPreviewComponent";
+import LoadingPopUpAnimation from "../card/LoadingPopUpAnimation";
+import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
 
 function CompanyInvoiceDetails() {
   const { invoiceId } = useParams();
@@ -29,6 +34,16 @@ function CompanyInvoiceDetails() {
   const [editingItemId, setEditingItemId] = useState<number | null>(null);
   const [refreshCount, setRefreshCount] = useState<number>(0);
   const [tempItems, setTempItems] = useState<any[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [logoPreview, setLogoPreview] = useState<string | null>(null);
+  const [showCompanyLogoPreview, setShowCompanyLogoPreview] = useState(false);
+  const {
+    userHasAccessToViewCompanyInvoiceItem,
+    userHasAccessToUpdateCompanyInvoiceItem,
+    userHasAccessToUpdateCompanyInvoiceApproval,
+    userHasAccessToUpdateCompanyInvoice,
+    userHasAccessToViewCompanyInvoice,
+  } = useUserAccessModules();
   const getInvoices = async (signal: AbortSignal) => {
     const postData = {
       id: Number(invoiceId),
@@ -48,7 +63,6 @@ function CompanyInvoiceDetails() {
         const responseData = response.data;
 
         console.log(response.data);
-        setDisabled(responseData.invoice_status_name !== "Draft");
 
         // ✅ Handle both array & object safely
         const item = Array.isArray(responseData)
@@ -56,6 +70,8 @@ function CompanyInvoiceDetails() {
           : responseData;
 
         if (!item) return;
+
+        setDisabled(item.invoice_status_name?.trim().toUpperCase() !== "DRAFT");
 
         const formattedData: AccountInvoiceProps = {
           id: item.id,
@@ -75,6 +91,7 @@ function CompanyInvoiceDetails() {
           totalTax: item.total_tax,
           totalAmount: item.total_amount,
           status: item.invoice_status_name,
+          statusId: item.invoice_status_id,
           isActive: item.isactive,
           createdBy: item.createdby,
           updatedBy: item.updatedby,
@@ -89,6 +106,7 @@ function CompanyInvoiceDetails() {
       handleApiError(error);
     }
   };
+  console.log(disabled);
 
   const getInvoiceItems = async (signal: AbortSignal) => {
     const postData = {
@@ -180,10 +198,12 @@ function CompanyInvoiceDetails() {
 
   const SubmitInvoice = async () => {
     if (!invoice) return;
-    if (!disabled) {
+    if (disabled) {
       return;
     }
-
+    if (!userHasAccessToUpdateCompanyInvoiceApproval) {
+      return;
+    }
     const postData = {
       id: invoice.id,
       company_id: loginStatus.companyId,
@@ -192,7 +212,7 @@ function CompanyInvoiceDetails() {
       isactive: invoice.isActive,
     };
     console.log(postData);
-
+    setIsSubmitting(true);
     try {
       const res = await axiosClient.post(
         POST_API.UPDATE_COMPANY_INVOICE,
@@ -210,15 +230,54 @@ function CompanyInvoiceDetails() {
       }
     } catch (error) {
       handleApiError(error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const previewInvoice = async () => {
+    if (!userHasAccessToViewCompanyInvoice) return;
+    setIsSubmitting(true);
+
+    try {
+      const response = await axiosClient.post(
+        POST_API.PREVIEW_COMPANY_INVOICE,
+        {
+          company_id: loginStatus.companyId,
+          company_invoice_id: Number(invoiceId),
+          company_invoice_type_id: 1,
+          requestedby_id: loginStatus.id,
+        },
+        {
+          responseType: "blob",
+          withCredentials: true, // ✅ IMPORTANT
+        },
+      );
+      const blob = new Blob([response.data], {
+        type: "application/pdf", // fixed for invoice
+      });
+
+      console.log(response.data);
+
+      const fileUrl = URL.createObjectURL(blob);
+
+      // ✅ Same as your task document logic
+      setLogoPreview(fileUrl); // you can rename this later (e.g. setInvoicePreview)
+      setShowCompanyLogoPreview(true);
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to preview invoice");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const updateInvoice = async () => {
     if (!invoice) return;
-    if (!disabled) {
+    if (disabled) {
       return;
     }
-
+    if (!userHasAccessToUpdateCompanyInvoice) return;
     const postData = {
       id: invoice.id,
       company_id: loginStatus.companyId,
@@ -232,7 +291,7 @@ function CompanyInvoiceDetails() {
       isactive: invoice.isActive,
     };
     console.log(postData);
-
+    setIsSubmitting(true);
     try {
       const res = await axiosClient.post(
         POST_API.UPDATE_COMPANY_INVOICE,
@@ -250,6 +309,47 @@ function CompanyInvoiceDetails() {
       }
     } catch (error) {
       handleApiError(error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleInvoiceDownload = async () => {
+    if (!disabled) return;
+    if (!userHasAccessToViewCompanyInvoice) return;
+    setIsSubmitting(true);
+
+    try {
+      const response = await axiosClient.post(
+        POST_API.COMPANY_INVOICE_DOWNLOAD,
+        {
+          company_id: loginStatus.companyId,
+          company_invoice_id: Number(invoiceId),
+          company_invoice_type_id: 1,
+          requestedby_id: loginStatus.id,
+        },
+        {
+          responseType: "blob", // ✅ IMPORTANT
+          withCredentials: true,
+        },
+      );
+
+      const blob = new Blob([response.data], {
+        type: "application/pdf", // fixed for invoice
+      });
+
+      console.log(response.data);
+
+      const fileUrl = URL.createObjectURL(blob);
+
+      // ✅ Same as your task document logic
+      setLogoPreview(fileUrl); // you can rename this later (e.g. setInvoicePreview)
+      setShowCompanyLogoPreview(true);
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to download invoice");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -257,7 +357,7 @@ function CompanyInvoiceDetails() {
     console.log("Delete item with id:", item.id);
     console.log(disabled);
 
-    if (!disabled) {
+    if (disabled) {
       return;
     }
     // 👉 Replace with API call to delete item from backend
@@ -269,6 +369,7 @@ function CompanyInvoiceDetails() {
       updatedby_id: loginStatus.id,
     };
     console.log(postData);
+    setIsSubmitting(true);
     try {
       const res = await axiosClient.post(
         POST_API.UPDATE_COMPANY_INVOICE_ITEM,
@@ -286,6 +387,8 @@ function CompanyInvoiceDetails() {
       }
     } catch (error) {
       handleApiError(error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -336,6 +439,9 @@ function CompanyInvoiceDetails() {
   );
 
   const saveSingleItem = async (item: any) => {
+    if (!userHasAccessToUpdateCompanyInvoiceItem) {
+      return;
+    }
     const postData = {
       company_id: loginStatus.companyId,
       id: item.id,
@@ -344,6 +450,8 @@ function CompanyInvoiceDetails() {
       updatedby_id: loginStatus.id,
     };
     console.log(postData);
+
+    setIsSubmitting(true);
     try {
       const res = await axiosClient.post(
         POST_API.UPDATE_COMPANY_INVOICE_ITEM,
@@ -362,6 +470,8 @@ function CompanyInvoiceDetails() {
       }
     } catch (error) {
       handleApiError(error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -381,6 +491,7 @@ function CompanyInvoiceDetails() {
   return (
     <PageLayout>
       <div className="p-1 font-roboto">
+        {isSubmitting && <LoadingPopUpAnimation show={isSubmitting} />}
         {/* HEADER */}
         <div className="flex justify-between items-center mb-3">
           <div>
@@ -403,8 +514,11 @@ function CompanyInvoiceDetails() {
             label="Invoice Date"
             value={invoice.invoiceDate || "[Auto-generated]"}
           />
-          <MetaField label="Status" value={invoice.status} />
-          {!disabled ? (
+          <MetaField
+            label="Status"
+            value={<InvoiceStatusChip statusId={invoice.statusId} />}
+          />
+          {disabled ? (
             <MetaField label="Due Date" value={invoice.dueDate} />
           ) : (
             <FormInput
@@ -430,7 +544,7 @@ function CompanyInvoiceDetails() {
         <div className="grid grid-cols-2 gap-x-3 border rounded p-2 bg-gray-100">
           <TextAreaInput
             label="Billing Address"
-            disabled={!disabled}
+            disabled={disabled}
             value={invoice.billingAddress}
             onChange={(e: any) =>
               setInvoice((prev) => ({
@@ -444,7 +558,7 @@ function CompanyInvoiceDetails() {
 
           <TextAreaInput
             label="Shipping Address"
-            disabled={!disabled}
+            disabled={disabled}
             value={invoice.shippingAddress}
             onChange={(e: any) =>
               setInvoice((prev) => ({
@@ -458,7 +572,7 @@ function CompanyInvoiceDetails() {
 
           <TextAreaInput
             label="Terms & Conditions"
-            disabled={!disabled}
+            disabled={disabled}
             value={invoice.termAndConditions}
             onChange={(e: any) =>
               setInvoice((prev) => ({
@@ -471,7 +585,7 @@ function CompanyInvoiceDetails() {
           />
           <TextAreaInput
             label="Remarks"
-            disabled={!disabled}
+            disabled={disabled}
             value={invoice.remarks}
             onChange={(e: any) =>
               setInvoice((prev) => ({
@@ -485,139 +599,191 @@ function CompanyInvoiceDetails() {
         </div>
         <div className="flex items-center justify-end p-1">
           <div className="flex gap-2">
-            <Button disabled={!disabled} onClick={updateInvoice}>
+            <Button disabled={!disabled} onClick={handleInvoiceDownload}>
+              <div className="flex items-center gap-1">
+                <span>Download</span>
+                <Download size={14} />
+              </div>
+            </Button>
+            {showCompanyLogoPreview && (
+              <div
+                className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50"
+                onClick={() => setShowCompanyLogoPreview(false)}
+              >
+                <CustomDocumentPreviewComponent
+                  fileUrl={logoPreview!}
+                  fileExtension={"application/pdf"}
+                  width={"50%"}
+                  height={"85%"}
+                  enableDownload={true}
+                />
+              </div>
+            )}
+            <Button
+              disabled={!userHasAccessToViewCompanyInvoice}
+              onClick={previewInvoice}
+            >
+              <div className="flex items-center gap-1">
+                <span>Preview</span>
+                <FaFilePdf size={14} color="white" />
+              </div>
+            </Button>
+            <Button
+              disabled={!userHasAccessToUpdateCompanyInvoice || disabled}
+              onClick={updateInvoice}
+            >
               Update
             </Button>
-            <Button disabled={!disabled} onClick={SubmitInvoice}>
+            <Button
+              disabled={
+                !userHasAccessToUpdateCompanyInvoiceApproval || disabled
+              }
+              onClick={SubmitInvoice}
+            >
               Submit
             </Button>
           </div>
         </div>
 
         {/* ITEMS */}
-        <div className="bg-white border rounded p-2 mb-1">
-          <div className="flex justify-between py-1">
-            <h3 className="font-semibold">Products & Services</h3>
-            <SearchInput
-              value={searchTerm}
-              onChange={(e: any) => setSearchTerm(e.target.value)}
-              placeholder="Search product..."
-            />
-          </div>
+        {userHasAccessToViewCompanyInvoiceItem && (
+          <div className="bg-white border rounded p-2 mb-1">
+            <div className="flex justify-between py-1">
+              <h3 className="font-semibold">Products & Services</h3>
+              <SearchInput
+                value={searchTerm}
+                onChange={(e: any) => setSearchTerm(e.target.value)}
+                placeholder="Search product..."
+              />
+            </div>
 
-          <table className="w-full text-sm font-semibold">
-            <thead className="sticky top-0 bg-gray-50 z-10 border">
-              <tr className="bg-gray-100 border-b">
-                <th>#</th>
-                <th className="p-2 text-left">Product</th>
-                <th>Qty</th>
-                <th>Price</th>
-                <th>HSN/SAC</th>
-                <th>Amount</th>
-                <th>Discount(%)</th>
-                <th>Taxable Value</th>
-                <th>CGST (%)</th>
-                <th>SGST (%)</th>
-                <th>IGST (%)</th>
-                <th>Total Item Amount</th>
-                <th>Action</th>
-              </tr>
-            </thead>
+            <table className="w-full text-sm font-semibold">
+              <thead className="sticky top-0 bg-gray-50 z-10 border">
+                <tr className="bg-gray-100 border-b">
+                  <th>#</th>
+                  <th className="p-2 text-left">Product</th>
+                  <th>Qty</th>
+                  <th>Price</th>
+                  <th>HSN/SAC</th>
+                  <th>Amount</th>
+                  <th>Discount(%)</th>
+                  <th>Taxable Value</th>
+                  <th>CGST (%)</th>
+                  <th>SGST (%)</th>
+                  <th>IGST (%)</th>
+                  <th>Total Item Amount</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
 
-            <tbody>
-              {/* {filteredItems.map((item, i) => { */}
-              {tempItems
-                .filter((item) =>
-                  item?.companyProductName
-                    ?.toLowerCase()
-                    .includes(searchTerm.toLowerCase()),
-                )
-                .map((item, i) => {
-                  return (
-                    <tr
-                      key={item.id}
-                      className="border-t font-normal text-sm hover:bg-blue-100 text-center"
-                    >
-                      <td>{i + 1}</td>
-                      <td className="p-2 text-left">
-                        {item.companyProductName}
-                      </td>
-                      <td>{item.quantity}</td>
-                      <td>{item.rate}</td>
-                      <td>{item.hsn || item.sac}</td>
-                      <td>{item.basicValue}</td>
-                      <td>
-                        <input
-                          type="number"
-                          className="border rounded p-1 text-center w-16"
-                          value={item.discountPercent}
-                          disabled={!disabled || editingItemId !== item.id}
-                          onChange={(e) =>
-                            handleDiscountChange(
-                              item.id,
-                              Number(e.target.value),
-                            )
-                          }
-                        />
-                      </td>
-                      <td>{item.taxableValue}</td>
-                      <td>{item.cgstPercent}</td>
-                      <td>{item.sgstPercent}</td>
-                      <td>{item.igstPercent}</td>
-                      <td>{item.totalAmount}</td>
-
-                      {disabled && (
-                        <td>
-                          <div className="flex gap-2 justify-center">
-                            {editingItemId !== item.id ? (
-                              <button
-                                disabled={!disabled}
-                                onClick={() => handleDeleteItem(item)}
-                              >
-                                <Trash className="text-red-500" size={16} />
-                              </button>
-                            ) : null}
-                            {editingItemId === item.id ? (
-                              <div className="flex gap-1 justify-center">
-                                <button
-                                  className="text-green-600 text-xs border px-2 rounded hover:bg-blue-500 hover:text-white"
-                                  onClick={() => saveSingleItem(item)}
-                                >
-                                  Save
-                                </button>
-                                <button
-                                  className="text-gray-500 text-xs border px-2 rounded hover:bg-blue-500 hover:text-white"
-                                  onClick={cancelEdit}
-                                >
-                                  {/* Cancel */}
-                                  <X className="text-gray-600" size={14} />
-                                </button>
-                              </div>
-                            ) : (
-                              <button
-                                disabled={!disabled}
-                                onClick={() => setEditingItemId(item.id)}
-                                className="text-blue-600 text-xs px-2 "
-                              >
-                                {/* Edit */}
-                                <Pencil className="text-blue-600" size={14} />
-                              </button>
-                            )}
-                          </div>
+              <tbody>
+                {/* {filteredItems.map((item, i) => { */}
+                {tempItems
+                  .filter((item) =>
+                    item?.companyProductName
+                      ?.toLowerCase()
+                      .includes(searchTerm.toLowerCase()),
+                  )
+                  .map((item, i) => {
+                    return (
+                      <tr
+                        key={item.id}
+                        className="border-t font-normal text-sm hover:bg-blue-100 text-center"
+                      >
+                        <td>{i + 1}</td>
+                        <td className="p-2 text-left">
+                          {item.companyProductName}
                         </td>
-                      )}
-                    </tr>
-                  );
-                })}
-            </tbody>
-          </table>
+                        <td>{item.quantity}</td>
+                        <td>{item.rate}</td>
+                        <td>{item.hsn || item.sac}</td>
+                        <td>{item.basicValue}</td>
+                        <td>
+                          <input
+                            type="number"
+                            className={`${editingItemId !== item.id ? "" : "border"} rounded p-1 text-center w-16`}
+                            value={item.discountPercent}
+                            disabled={disabled || editingItemId !== item.id}
+                            onChange={(e) =>
+                              handleDiscountChange(
+                                item.id,
+                                Number(e.target.value),
+                              )
+                            }
+                          />
+                        </td>
+                        <td>{item.taxableValue}</td>
+                        <td>{item.cgstPercent}</td>
+                        <td>{item.sgstPercent}</td>
+                        <td>{item.igstPercent}</td>
+                        <td>{item.totalAmount}</td>
 
-          <div className="w-full items-center justify-center  flex-1">
-            <span className="text-xs flex items-center justify-center font-medium text-gray-500 border rounded-lg px-2 py-1  bg-blue-100">
-              You can add or modify invoice items while it's in draft state.
-            </span>
+                        {!disabled && (
+                          <td>
+                            <div className="flex gap-2 justify-center">
+                              {editingItemId !== item.id ? (
+                                <button
+                                  disabled={
+                                    !userHasAccessToUpdateCompanyInvoiceItem ||
+                                    disabled
+                                  }
+                                  onClick={() => handleDeleteItem(item)}
+                                >
+                                  <Trash className="text-red-500" size={16} />
+                                </button>
+                              ) : null}
+                              {editingItemId === item.id ? (
+                                <div className="flex gap-1 justify-center">
+                                  <button
+                                    className="text-green-600 text-xs border px-2 rounded hover:bg-blue-500 hover:text-white"
+                                    onClick={() => saveSingleItem(item)}
+                                  >
+                                    Save
+                                  </button>
+                                  <button
+                                    className="text-gray-500 text-xs border px-2 rounded hover:bg-blue-500 hover:text-white"
+                                    onClick={cancelEdit}
+                                  >
+                                    {/* Cancel */}
+                                    <X className="text-gray-600" size={14} />
+                                  </button>
+                                </div>
+                              ) : (
+                                <button
+                                  disabled={
+                                    !userHasAccessToUpdateCompanyInvoiceItem ||
+                                    disabled
+                                  }
+                                  onClick={() => {
+                                    if (
+                                      !userHasAccessToUpdateCompanyInvoiceItem
+                                    ) {
+                                      return;
+                                    }
+                                    setEditingItemId(item.id);
+                                  }}
+                                  className="text-blue-600 text-xs px-2 "
+                                >
+                                  {/* Edit */}
+                                  <Pencil className="text-blue-600" size={14} />
+                                </button>
+                              )}
+                            </div>
+                          </td>
+                        )}
+                      </tr>
+                    );
+                  })}
+              </tbody>
+            </table>
+
+            <div className="w-full items-center justify-center  flex-1">
+              <span className="text-xs flex items-center justify-center font-medium text-gray-500 border rounded-lg px-2 py-1  bg-blue-100">
+                You can add or modify invoice items while it's in draft state.
+              </span>
+            </div>
           </div>
-        </div>
+        )}
         {/* BOTTOM */}
         <div className="grid grid-cols-2 text-sm mb-2">
           {/* Left */}

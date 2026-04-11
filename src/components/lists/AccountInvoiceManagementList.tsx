@@ -27,6 +27,8 @@ import axiosClient from "../../axios-client/AxiosClient";
 import { handleApiError } from "../../config/error/handleApiError";
 import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
 import { ComponentHeaderAndLogo } from "../ui/ComponentHeaderAndLogo";
+import CustomDocumentPreviewComponent from "../custom-document-preview-component/CustomDocumentPreviewComponent";
+import LoadingPopUpAnimation from "../views/card/LoadingPopUpAnimation";
 
 export const accountInvoiceDataUrlSearchParamKey: string = "accountInvoiceData";
 
@@ -50,7 +52,9 @@ function AccountInvoiceManagementList({
     userHasAccessToAddCompanyInvoice,
   } = useUserAccessModules();
   const { loginStatus } = useLoggedInUserContext();
-
+  const [logoPreview, setLogoPreview] = useState<string | null>(null);
+  const [showCompanyLogoPreview, setShowCompanyLogoPreview] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   // for invoice modal open
   const [isCreateInvoiceModalOpen, setIsCreateInvoiceModalOpen] =
     useState<boolean>(false);
@@ -89,6 +93,7 @@ function AccountInvoiceManagementList({
       updatedby_id: loginStatus.id,
       isactive: false,
     };
+    setIsSubmitting(true);
     try {
       const res = await axiosClient.post(
         POST_API.UPDATE_COMPANY_INVOICE,
@@ -109,6 +114,45 @@ function AccountInvoiceManagementList({
       }
     } catch (error) {
       handleApiError(error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleInvoiceDownload = async (rowData: AccountInvoiceProps) => {
+    setIsSubmitting(true);
+
+    try {
+      const response = await axiosClient.post(
+        "http://localhost:8080/api/main/purple-crm-api/get/company-invoice/document",
+        {
+          company_id: loginStatus.companyId,
+          company_invoice_id: Number(rowData?.id),
+          company_invoice_type_id: 1,
+          requestedby_id: loginStatus.id,
+        },
+        {
+          responseType: "blob", // ✅ IMPORTANT
+          withCredentials: true,
+        },
+      );
+
+      const blob = new Blob([response.data], {
+        type: "application/pdf", // fixed for invoice
+      });
+
+      console.log(response.data);
+
+      const fileUrl = URL.createObjectURL(blob);
+
+      // ✅ Same as your task document logic
+      setLogoPreview(fileUrl); // you can rename this later (e.g. setInvoicePreview)
+      setShowCompanyLogoPreview(true);
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to download invoice");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -135,6 +179,7 @@ function AccountInvoiceManagementList({
       <div
         className={`w-full ${position === "left"} ${isUsedForSidebar ? "pl-5" : ""} gap-1`}
       >
+        {isSubmitting && <LoadingPopUpAnimation show={isSubmitting} />}
         {/* 🔹 Header */}
         {isUsedForSidebar ? (
           <div
@@ -278,6 +323,20 @@ function AccountInvoiceManagementList({
             </div>
           </div>
         )}
+        {showCompanyLogoPreview && (
+          <div
+            className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50"
+            onClick={() => setShowCompanyLogoPreview(false)}
+          >
+            <CustomDocumentPreviewComponent
+              fileUrl={logoPreview!}
+              fileExtension={"application/pdf"}
+              width={"50%"}
+              height={"85%"}
+              enableDownload={true}
+            />
+          </div>
+        )}
         {/* 🔹 Grid */}
         <div className="bg-white overflow-y-auto rounded-lg shadow-sm">
           <div
@@ -303,6 +362,7 @@ function AccountInvoiceManagementList({
               handleRowClick={handleRowClicked}
               onRowSelect={handleRowSelected}
               onDeleteInvoice={onDeleteInvoice}
+              onDownloadInvoice={handleInvoiceDownload}
               invoices={invoiceData}
               isUsedInInvoiceModule={false}
             />

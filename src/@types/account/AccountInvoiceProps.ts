@@ -9,6 +9,7 @@ type AccountInvoiceProps = {
   invoiceDate: string;
   dueDate: string;
   status: string; // PAID | PENDING | OVERDUE
+  statusId: number; // 1: DRAFT, 2: SUBMITTED, 3: CANCELLED
   billingAddress?: string;
   shippingAddress?: string;
   termAndConditions?: string;
