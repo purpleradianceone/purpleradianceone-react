@@ -76,10 +76,21 @@ export const ContentBlockQuotation: React.FC = () => {
       showXPathInStatusbar: false,
       // nl2brInPlainText: false,
       // addNewLine: false,
-      config: {
-        enter: "br",
-        enterBlock: "br",
+
+      // ✅ FIX START
+      // config: {
+      //   enter: "br",
+      //   enterBlock: "br",
+      // },
+      enter: "br",
+      enterBlock: "p",
+      defaultActionOnEnter: "insert_br",
+
+      cleanHTML: {
+        fillEmptyParagraph: false,
+        removeEmptyElements: false,
       },
+      // ✅ FIX END
 
       buttons: [
         "bold",
@@ -136,7 +147,7 @@ export const ContentBlockQuotation: React.FC = () => {
 
       disablePlugins: ["file", "video", "about", "clipboard"],
       placeholder: "Enter quotation text...",
-    }),
+    } as any),
     [],
   );
 
