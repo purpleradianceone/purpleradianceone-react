@@ -117,7 +117,6 @@ const AccountDetailsUpdated: React.FC = () => {
   const districtTypeOption = toSelectOptions(districts, "id", "name");
   const businessTypeOption = toSelectOptions(businessType, "id", "name");
 
-
   const newErrors = {
     mobilenumber: "",
     gst: "",
@@ -136,7 +135,6 @@ const AccountDetailsUpdated: React.FC = () => {
     email: string;
     registrationNumber: string;
   }>(newErrors);
-  
 
   //Note : Validation before the api submit call
   const validateData = () => {
@@ -171,8 +169,7 @@ const AccountDetailsUpdated: React.FC = () => {
 
     // Mobile
     if (
-      mobile &&
-      mobile.length === 0 ||
+      (mobile && mobile.length === 0) ||
       !MOBILE_NUMBER_VALIDATION.MOBILE_NUMBER_PATTERN_INDIAN.test(mobile)
     ) {
       toast.error("Please enter a valid Mobile Number.");
@@ -337,7 +334,6 @@ const AccountDetailsUpdated: React.FC = () => {
     await axiosClient
       .post(POST_API.UPDATE_ACCOUNT, postData, { withCredentials: true })
       .then((response) => {
-
         if (response.data.status) {
           toast.success(response.data.message);
 
@@ -391,7 +387,7 @@ const AccountDetailsUpdated: React.FC = () => {
     console.log(name + "value  : " + value);
 
     if (name === "name") {
-      if ( value && !value.trim()) {
+      if (value && !value.trim()) {
         setErrors((prev) => ({ ...prev, name: "Name is required" }));
       } else {
         setErrors((prev) => ({ ...prev, name: "" }));
@@ -404,7 +400,7 @@ const AccountDetailsUpdated: React.FC = () => {
           ...prev,
           email: "Email is required",
         }));
-      } else if (value !== "" && !VALIDATIONS.EMAIL.test(value)  ) {
+      } else if (value !== "" && !VALIDATIONS.EMAIL.test(value)) {
         setErrors((prev) => ({
           ...prev,
           email: "Please enter valid email address.",
@@ -439,7 +435,7 @@ const AccountDetailsUpdated: React.FC = () => {
       }
     }
     if (name === "pan") {
-      if ( value && value.trim() && !/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(value)) {
+      if (value && value.trim() && !/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(value)) {
         setErrors((prev) => ({
           ...prev,
           pan: "Please enter the valid pan.",
@@ -466,7 +462,8 @@ const AccountDetailsUpdated: React.FC = () => {
     }
     if (name === "gst") {
       if (
-       value && value.trim() &&
+        value &&
+        value.trim() &&
         !/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/.test(value)
       ) {
         setErrors((prev) => ({
@@ -1145,7 +1142,7 @@ const AccountDetailsUpdated: React.FC = () => {
                       formData.billingAddress
                     ) : (
                       <span className="caption-custom italic">
-                        No billing address 
+                        No billing address
                       </span>
                     )}
                   </span>
@@ -1180,7 +1177,7 @@ const AccountDetailsUpdated: React.FC = () => {
                       formData.shippingAddress
                     ) : (
                       <span className="caption-custom italic">
-                        No shilling address 
+                        No shilling address
                       </span>
                     )}
                   </span>
@@ -1309,11 +1306,13 @@ const AccountDetailsUpdated: React.FC = () => {
                     <div
                       className="cursor-pointer caption-custom-blue "
                       onClick={() => {
-                        if(userHasAccessToUpdateAccount){
-                            setIsEditing(true);
-                        }else{
-                            toast.error(MESSAGE.MODULE_ACCESS.ACCOUNT_ACCESS.DENIED_UPDATE_ACCESS)
-
+                        if (userHasAccessToUpdateAccount) {
+                          setIsEditing(true);
+                        } else {
+                          toast.error(
+                            MESSAGE.MODULE_ACCESS.ACCOUNT_ACCESS
+                              .DENIED_UPDATE_ACCESS,
+                          );
                         }
                       }}
                     >
@@ -1400,7 +1399,6 @@ const AccountDetailsUpdated: React.FC = () => {
   );
 };
 
-
 const AccountDetailsSkeleton = () => {
   return (
     <div className="w-full  bg-white rounded-xl shadow-sm border p-4 animate-pulse">
@@ -1447,7 +1445,7 @@ const SkeletonField = () => {
       {/* Input box */}
       <div className="h-5 w-full bg-gray-200 rounded-lg" />
     </div>
-  )
+  );
 };
 
 export default AccountDetailsUpdated;

@@ -293,6 +293,11 @@ const MESSAGE = {
                 DENIED_ADD_ACCESS: "You do not have permission to create master tasks.",
                 DENIED_UPDATE_ACCESS: "You do not have permission to update master tasks.",
             },
+        },
+        COMPANY_INVOICE: {
+            DENIED_VIEW_ACCESS: "You do not have permission to view invoices.",
+            DENIED_ADD_ACCESS: "You do not have permission to add invoice.",
+            DENIED_UPDATE_ACCESS: "You do not have permission to update invoice.",
         }
 
     }

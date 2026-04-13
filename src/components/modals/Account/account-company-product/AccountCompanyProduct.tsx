@@ -328,7 +328,7 @@ const AccountCompanyProduct = ({
               </Button>
             </Link>
           </div>
-          <div className="col-span-2  w-full h-96">
+          <div className="col-span-2  w-full h-56">
             <AccountCompanyProductAgGrid
               accountProductData={accountCompanyProduct}
               onRowSelect={handleRowSelectAccountProduct}

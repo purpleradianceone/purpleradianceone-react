@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Calendar, Trash, } from "lucide-react";
+import { Calendar, IndianRupee, Trash, } from "lucide-react";
 
 import Button from "../../../ui/Button";
 import DatePickerInput from "../../../ui/DatePickerInput";
@@ -14,7 +14,7 @@ import toast from "react-hot-toast";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
 import RefreshToken from "../../../../config/validations/RefreshToken";
 
-import { SIZE, STATUS_CODE } from "../../../../constants/AppConstants";
+import { SIZE, STATUS_CODE, VALIDATIONS } from "../../../../constants/AppConstants";
 import { handleApiError } from "../../../../config/error/handleApiError";
 
 import axiosClient from "../../../../axios-client/AxiosClient";
@@ -25,6 +25,7 @@ import ShimmerEffect from "../account-service/ShimerEffect";
 import MetaField from "../../../ui/MetaField";
 import COLORS from "../../../../constants/Colors";
 import { useUserAccessModules } from "../../../../config/hooks/useAccessModules";
+import FormInput from "../../../ui/FormInput";
 
 interface CustomField {
     id: string;
@@ -48,6 +49,9 @@ const AccountSubscriptionDetails = () => {
     const [isSaving, setIsSaving] = useState(false);
 
     const [packages, setPackages] = useState<PackageDetail[]>([]);
+
+    const [totalCost, setTotalCost] = useState<number | "">("");
+    const [totalCostError, setTotalCostError] = useState<string>("");
 
     const [accountSubscriptionDetail, setAccountSubscriptionDetail] =
         useState<AccountSubscriptionProps | null>(null);
@@ -80,6 +84,21 @@ const AccountSubscriptionDetails = () => {
             [name]: value
         }));
 
+    };
+
+    const handleCostChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value;
+
+        if (value === "") {
+            setTotalCost("");
+            return;
+        }
+
+        if (!VALIDATIONS.NUMBER_WITH_DECIMAL.test(value)) {
+            return;
+        }
+
+        setTotalCost(Number(value));
     };
 
     const getAccountSubscriptionDetail = async () => {
@@ -118,6 +137,7 @@ const AccountSubscriptionDetails = () => {
                     packageDetail: JSON.stringify(data.packagedetail, null, 2),
                     isRenewal: data.is_renewal,
                     isActive: data.isactive,
+                    totalCost: data.total_cost,
                     createdBy: data.createdby,
                     createdOn: data.createdon
                 };
@@ -141,6 +161,7 @@ const AccountSubscriptionDetails = () => {
                 );
 
                 setPackages(packagesArray);
+                setTotalCost(data.total_cost);
 
                 setAccountSubscriptionDetail(formattedData);
 
@@ -193,6 +214,13 @@ const AccountSubscriptionDetails = () => {
             setShowEndDateError(false);
         }
 
+        if (totalCost === "" || totalCost < 0) {
+            setTotalCostError("Total Cost is required");
+            flag = false;
+        } else {
+            setTotalCostError("");
+        }
+
         return flag;
 
     };
@@ -218,6 +246,7 @@ const AccountSubscriptionDetails = () => {
             end_date: formData.end_date,
             package_detail: JSON.stringify(packageJSON),
             isactive: activeValue ?? formData.is_active,
+            total_cost: totalCost || 0,
             updatedby_id: loginStatus.id
 
         };
@@ -458,9 +487,6 @@ const AccountSubscriptionDetails = () => {
                     label="Start Date"
                     value={accountSubscriptionDetail?.startDate || "-"}
                 ></MetaField>
-
-
-
                 <MetaField
                     label="End Date"
                     value={accountSubscriptionDetail?.endDate || "-"}
@@ -469,6 +495,11 @@ const AccountSubscriptionDetails = () => {
                 <MetaField
                     label="Is Renewal"
                     value={accountSubscriptionDetail?.isRenewal ? "Yes" : "No"}
+                ></MetaField>
+
+                <MetaField
+                    label="Total Cost"
+                    value={accountSubscriptionDetail?.totalCost || "-"}
                 ></MetaField>
 
                 <MetaField
@@ -526,6 +557,21 @@ const AccountSubscriptionDetails = () => {
                     )}
                 </div>
 
+                <div className="flex flex-col gap-1">
+                    <FormInput
+                        required
+                        type="number"
+                        label="Total Cost"
+                        placeholder="Enter total cost"
+                        logo={IndianRupee}
+                        defaultValue={totalCost}
+                        value={totalCost === "" ? "" : totalCost}
+                        onChange={handleCostChange}
+                    />
+                    {totalCostError && (
+                        <p className="text-xs  text-red-600 ">{totalCostError}</p>
+                    )}
+                </div>
                 <div className="flex gap-2 items-center">
 
                     <ToggleButton

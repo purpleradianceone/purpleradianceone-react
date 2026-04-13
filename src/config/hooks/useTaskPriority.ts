@@ -8,7 +8,7 @@ import PostDataTypeForTaskPriority from "../../@types/my-task-management/PostDat
 import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
 
 function useTaskPriority() {
-      const { loginStatus } = useLoggedInUserContext();
+  const { loginStatus } = useLoggedInUserContext();
   const [taskPriority, setTaskPriority] = useState<
     PostDataTypeForTaskPriority[]
   >([]);
@@ -32,7 +32,7 @@ function useTaskPriority() {
       .then((response) => {
         if (response.status === STATUS_CODE.OK) {
           console.log(response.data);
-          
+
           setTaskPriority(response.data);
           setIsLoading(false);
         }
@@ -54,7 +54,6 @@ function useTaskPriority() {
     isLoading,
     taskPriority,
   };
-
 }
 
 export default useTaskPriority;

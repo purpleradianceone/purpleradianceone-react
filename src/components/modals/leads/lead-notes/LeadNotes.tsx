@@ -490,7 +490,7 @@ export const LeadNotes = ({
                 <div className="flex gap-1 h-fit">
                   <Button
                     type="button"
-                    className="caption-custom white-text h-fit px-2 py-1 rounded-md  bg-gray-500 hover:bg-gray-600"
+                    className={`caption-custom white-text h-fit px-2 py-1 rounded-md  ${COLORS.BG_GRAY_500_COLOR} ${COLORS.HOVER_BG_GRAY_600_COLOR_HOVER}`}
                     onClick={close}
                   >
                     Cancel

@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { AllCommunityModule, ColDef, themeAlpine } from "ag-grid-community";
-import {  useMemo, } from "react";
-import {  INNERHTML, STATUS_CODE, } from "../../constants/AppConstants";
+import { useMemo, } from "react";
+import { INNERHTML, STATUS_CODE, } from "../../constants/AppConstants";
 import { Trash2 } from "lucide-react";
 import { CLASS_NAMES } from "../../constants/ClassNames";
 import { AgGridReact } from "ag-grid-react";
@@ -18,16 +18,16 @@ import toast from "react-hot-toast";
 
 
 function ProductTaxManagementAgGrid({
-    productTax,
-    handleCompanyProductTaxChange,
-} : ProductTaxManagementAgGridProps) {
+  productTax,
+  handleCompanyProductTaxChange,
+}: ProductTaxManagementAgGridProps) {
 
-  const {isSmallScreen} = useScreenSize();
+  const { isSmallScreen } = useScreenSize();
 
 
- 
-const {userHasAccessToUpdateProductTax} = useUserAccessModules();
-const {loginStatus} = useLoggedInUserContext();
+
+  const { userHasAccessToUpdateProductTax } = useUserAccessModules();
+  const { loginStatus } = useLoggedInUserContext();
 
 
   const columnDefs = useMemo<ColDef[]>(
@@ -37,8 +37,8 @@ const {loginStatus} = useLoggedInUserContext();
         headerName: "HSN",
         sortable: true,
         filter: true,
-        flex: isSmallScreen ? 1: 1.5,
-        
+        flex: isSmallScreen ? 1 : 1.5,
+
       },
       {
         field: "sac",
@@ -56,6 +56,14 @@ const {loginStatus} = useLoggedInUserContext();
 
       },
       {
+        field: "cess",
+        headerName: "Cess",
+        sortable: true,
+        filter: true,
+        flex: 1,
+        valueGetter: (params) => params.data?.cess ?? 0,
+      },
+      {
         field: "validFrom",
         headerName: "Effective From",
         sortable: true,
@@ -70,69 +78,69 @@ const {loginStatus} = useLoggedInUserContext();
         flex: 1.5,
       },
       {
-        headerName : "Delete",
-        maxWidth : isSmallScreen ? 50 : 100,
-        flex : 1,
-        pinned : "right",
-        filter : false,
-        
+        headerName: "Delete",
+        maxWidth: isSmallScreen ? 50 : 100,
+        flex: 1,
+        pinned: "right",
+        filter: false,
+
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        cellRenderer : (params : any) => {
+        cellRenderer: (params: any) => {
 
 
-            
-            const handleCompanyProductTaxDelete = async() => {
-                if(userHasAccessToUpdateProductTax){
-                    const deleteCompanyProductTaxPostData= {
-                        company_id : loginStatus.companyId,
-                        id : params.data.id,
-                        updatedby : loginStatus.id
+
+          const handleCompanyProductTaxDelete = async () => {
+            if (userHasAccessToUpdateProductTax) {
+              const deleteCompanyProductTaxPostData = {
+                company_id: loginStatus.companyId,
+                id: params.data.id,
+                updatedby: loginStatus.id
+              }
+              await axios.post(POST_API.DELETE_COMPANY_PRODUCT_TAX, deleteCompanyProductTaxPostData, {
+                withCredentials: true,
+              })
+                .then((response) => {
+                  if (response.data.status) {
+                    toast.success(response.data.message);
+                    handleCompanyProductTaxChange();
+
+                  }
+                  else if (!response.data.status) {
+                    toast.error(response.data.message);
+                  }
+
+                })
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                .catch(async (error: ApiError | any) => {
+                  if (error.status === STATUS_CODE.UNATHORISED) {
+                    const refreshTokenResponse = await RefreshToken({ callFunction: handleCompanyProductTaxDelete })
+                    if (refreshTokenResponse) {
+                      handleCompanyProductTaxDelete();
                     }
-                    await axios.post(POST_API.DELETE_COMPANY_PRODUCT_TAX,deleteCompanyProductTaxPostData,{
-                        withCredentials : true,
-                    })
-                    .then((response) => {
-                       if(response.data.status){
-                        toast.success(response.data.message);
-                        handleCompanyProductTaxChange();
 
-                       }
-                       else if(!response.data.status){
-                        toast.error(response.data.message);
-                       }
-                       
-                    })
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    .catch(async(error : ApiError | any) => {
-                        if(error.status === STATUS_CODE.UNATHORISED){
-                            const refreshTokenResponse = await RefreshToken({callFunction:handleCompanyProductTaxDelete})
-                            if(refreshTokenResponse){
-                              handleCompanyProductTaxDelete();
-                            }
-                          
-                            }
-                           
-                        
-                    })
-                }
-                else{
-                    toast.error(MESSAGE.ERROR.NOT_ATHORISED)
-                }
+                  }
+
+
+                })
             }
-        
-         return (
+            else {
+              toast.error(MESSAGE.ERROR.NOT_ATHORISED)
+            }
+          }
+
+          return (
             <div>
-                <div
+              <div
                 onClick={handleCompanyProductTaxDelete}
                 className="delete"
-                >
-                    <Trash2 className={isSmallScreen ? CLASS_NAMES.INLINE_ICON_SIZE_FOUR_SMALL_SCREEN  :CLASS_NAMES.INLINE_ICON_SIZE_FOUR }/>
-                </div>
+              >
+                <Trash2 className={isSmallScreen ? CLASS_NAMES.INLINE_ICON_SIZE_FOUR_SMALL_SCREEN : CLASS_NAMES.INLINE_ICON_SIZE_FOUR} />
+              </div>
             </div>
-         )
-      }
+          )
+        }
 
-    }
+      }
     ],
     []
   );
@@ -148,18 +156,18 @@ const {loginStatus} = useLoggedInUserContext();
 
   return (
     <div
-          className="ag-theme-balham w-full"
-          style={{ height: "440px", width: "100%" }}
-      >
-          <AgGridReact
-              rowData={productTax}
-              columnDefs={columnDefs}
-              defaultColDef={defaultColDef}
-              modules={[AllCommunityModule]} 
-              overlayNoRowsTemplate = {INNERHTML.OVERLAY_NO_ROWS_TEMPLATE_PRODUCT_TAX}
-              theme={themeAlpine}
-              />
-      </div>
+      className="ag-theme-balham w-full"
+      style={{ height: "440px", width: "100%" }}
+    >
+      <AgGridReact
+        rowData={productTax}
+        columnDefs={columnDefs}
+        defaultColDef={defaultColDef}
+        modules={[AllCommunityModule]}
+        overlayNoRowsTemplate={INNERHTML.OVERLAY_NO_ROWS_TEMPLATE_PRODUCT_TAX}
+        theme={themeAlpine}
+      />
+    </div>
   );
 
 

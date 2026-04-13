@@ -11,6 +11,7 @@ type AccountSubscriptionProps = {
   packageDetail: string;
   isRenewal: boolean;
   isActive: boolean;
+  totalCost?: number | string,
   createdBy: string;
   createdOn: string;
 };

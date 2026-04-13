@@ -117,6 +117,7 @@ function AddProductModal({
       hsn: "",
       sac: "",
       taxRate: 0,
+      cess: 0,
       validFrom: "",
       createdBy: "",
       createdOn: "",
@@ -258,6 +259,12 @@ function AddProductModal({
           if (addProductFormData.taxRate) {
             taxRateDecimal = parseFloat(addProductFormData.taxRate.toString());
           }
+
+          let cessDecimal: number = 0;
+          if (addProductFormData.cess) {
+            cessDecimal = parseFloat(addProductFormData.cess.toString());
+          }
+
           if (
             selectedProductTypeId !== 0 &&
             selectedProductTypeId !== undefined &&
@@ -303,6 +310,7 @@ function AddProductModal({
               hsn: selectedTaxCode === "hsn" ? addProductFormData.hsn : null,
               sac: selectedTaxCode === "sac" ? addProductFormData.sac : null,
               tax_rate: taxRateDecimal,
+              cess: cessDecimal || 0,
               valid_from_string: formattedDate,
               createdby_id: loginStatus.id,
             };
@@ -385,6 +393,7 @@ function AddProductModal({
       hsn: "",
       sac: "",
       taxRate: 0,
+      cess: 0,
       validFrom: "",
       createdBy: "",
       createdOn: "",
@@ -727,7 +736,7 @@ function AddProductModal({
                 )}
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-3 ">
+            <div className="grid grid-cols-3 gap-3 ">
               {/* tax rate */}
               <FormInput
                 label="Tax Rate"
@@ -739,6 +748,18 @@ function AddProductModal({
                 onChange={handleAddProductFormDataChange}
                 onBlur={handleBlur}
                 error={errors.taxRate}
+              />
+
+              <FormInput
+                label="Cess"
+                logo={LucidePercent}
+                type="text"
+                name="cess"
+                value={addProductFormData.cess?.toString()}
+                placeholder="Enter Cess"
+                onChange={handleAddProductFormDataChange}
+                onBlur={handleBlur}
+                error={errors.cess}
               />
               {/* valid from */}
               <DatePickerInput

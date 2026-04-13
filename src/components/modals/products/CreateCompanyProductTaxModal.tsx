@@ -32,30 +32,31 @@ function CreateCompanyProductTaxModal({
     sac: "",
     taxRate: 0,
     validFrom: "",
+    cess: 0,
   };
 
   const { loginStatus } = useLoggedInUserContext();
   const { userHasAccessToAddProductTax } = useUserAccessModules();
-  const [isSaving , setIsSaving] = useState<boolean>(false);
+  const [isSaving, setIsSaving] = useState<boolean>(false);
 
   const [selectedTaxCode, setSelectedTaxCode] = useState<"hsn" | "sac">("hsn");
   const ProductsRadioButtonOptions = [
-  {
-    label : "HSN",
-    value : "hsn",
-    id : "hsn",
-    name : "taxCode",
-    checked : selectedTaxCode === "hsn" ? true : false,
-  },
-  {
-    label : "SAC",
-    value : "sac",
-    id : "sac",
-    name : "taxCode",
-    checked : selectedTaxCode === "sac" ? true : false,
-  },
+    {
+      label: "HSN",
+      value: "hsn",
+      id: "hsn",
+      name: "taxCode",
+      checked: selectedTaxCode === "hsn" ? true : false,
+    },
+    {
+      label: "SAC",
+      value: "sac",
+      id: "sac",
+      name: "taxCode",
+      checked: selectedTaxCode === "sac" ? true : false,
+    },
 
-]
+  ]
 
   const {
     formData: createCompanyProductTaxFormData,
@@ -70,22 +71,22 @@ function CreateCompanyProductTaxModal({
   function handleTaxRadioButtonChange(
     event: React.ChangeEvent<HTMLInputElement>
   ) {
-    if(event.target.value === "hsn"){
-      
+    if (event.target.value === "hsn") {
+
       setSelectedTaxCode("hsn");
     }
-    else if(event.target.value === "sac") {
+    else if (event.target.value === "sac") {
 
-        setSelectedTaxCode("sac");
+      setSelectedTaxCode("sac");
     }
-    
+
   }
 
   const hanldeCreateProductTaxFormSubmit = async (
     event: React.FormEvent<HTMLFormElement>
   ) => {
     event.preventDefault();
-    if(isSaving) return;
+    if (isSaving) return;
     if (
       createCompanyProductTaxFormData.taxRate !== 0 &&
       createCompanyProductTaxFormData.validFrom !== "" &&
@@ -100,6 +101,7 @@ function CreateCompanyProductTaxModal({
           hsn: selectedTaxCode === "hsn" ? createCompanyProductTaxFormData.hsn : null,
           sac: selectedTaxCode === "sac" ? createCompanyProductTaxFormData.sac : null,
           tax_rate: createCompanyProductTaxFormData.taxRate,
+          cess: createCompanyProductTaxFormData.cess || 0,
           valid_from: createCompanyProductTaxFormData.validFrom,
           createdby: loginStatus.id,
         };
@@ -135,7 +137,7 @@ function CreateCompanyProductTaxModal({
                 hanldeCreateProductTaxFormSubmit(event);
               }
             }
-          }).finally(()=>{
+          }).finally(() => {
             setIsSaving(false)
           });
       }
@@ -150,6 +152,7 @@ function CreateCompanyProductTaxModal({
         hsn: "",
         sac: "",
         taxRate: "",
+        cess: "",
         validFrom: "",
       });
     }
@@ -160,7 +163,7 @@ function CreateCompanyProductTaxModal({
   return (
     <div
       className="fixed inset-0 z-50 p-10 overflow-hidden bg-black bg-opacity-5"
-      
+
     >
       <div className="flex min-h-screen mb-5 items-center justify-center">
         <div
@@ -169,14 +172,14 @@ function CreateCompanyProductTaxModal({
   [&::-webkit-scrollbar-thumb]:bg-gray-400
    [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full"
         >
-          <LoadingPopUpAnimation show={isSaving}/>
+          <LoadingPopUpAnimation show={isSaving} />
           <div className="p-6">
             <FormHeader
-            icon={EditIcon}
-            onClose={onClose}
-            preText="Create Tax For "
-            userName={product.name}
-            description="Easily manage your product taxation by adding all tax details in one place"
+              icon={EditIcon}
+              onClose={onClose}
+              preText="Create Tax For "
+              userName={product.name}
+              description="Easily manage your product taxation by adding all tax details in one place"
             />
 
             <form
@@ -226,6 +229,16 @@ function CreateCompanyProductTaxModal({
                 onBlur={handleBlur}
                 error={errors.taxRate}
               />
+              <FormInput
+                label="Cess"
+                type="number"
+                name="cess"
+                placeholder="Enter Cess"
+                value={createCompanyProductTaxFormData.cess?.toString()}
+                onChange={handleCreateCompanyProductTaxChange}
+                onBlur={handleBlur}
+                error={errors.cess}
+              />
 
               <DatePickerInput
                 label="Valid From"
@@ -240,23 +253,23 @@ function CreateCompanyProductTaxModal({
               <div className="flex justify-end gap-2">
                 <div >
                   <Button
-                  type="button"
-                  onClick={onClose}
+                    type="button"
+                    onClick={onClose}
                   >
-                  
-                  <div className="flex items-center justify-center gap-1">
-                    <X size={16} />
-                    Close
-                  </div>
+
+                    <div className="flex items-center justify-center gap-1">
+                      <X size={16} />
+                      Close
+                    </div>
                   </Button>
                 </div>
                 <div >
                   <Button type="submit">
-                    
-                  <div className="flex items-center justify-center gap-1">
-                    <Save size={16} />
-                    Save
-                  </div>
+
+                    <div className="flex items-center justify-center gap-1">
+                      <Save size={16} />
+                      Save
+                    </div>
                   </Button>
                 </div>
               </div>

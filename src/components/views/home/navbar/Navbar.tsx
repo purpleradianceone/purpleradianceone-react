@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState, useRef } from "react";
+import { LiaFileInvoiceSolid } from "react-icons/lia";
 import {
   Aperture,
   Bell,
@@ -74,6 +75,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
     userHasAccessToViewStock,
     userHasAccessToViewSupportTicket,
     userHasAccessToViewTasks,
+    userHasAccessToViewCompanyInvoice,
   } = useUserAccessModules();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [accessDeniedPopUpView, setAccessDeniedPopUpView] =
@@ -516,6 +518,12 @@ function Navbar({ children }: { children: React.ReactNode }) {
                           icon={<UserCogIcon size={SIZE.TWENTY} />}
                           label="Accounts"
                         />
+                        <NavItem
+                          disable={!userHasAccessToViewCompanyInvoice}
+                          to={ROUTES_URL.INVOICE_MANAGEMENT}
+                          icon={<LiaFileInvoiceSolid size={SIZE.TWENTY} />}
+                          label="Invoices"
+                        />
 
                         {/* )} */}
                         {/* {!userHasAccessToViewAccount && (
@@ -597,7 +605,6 @@ function Navbar({ children }: { children: React.ReactNode }) {
                               to: ROUTES_URL.INTEGRATIONS_SETTINGS,
                               label: "Integrations",
                             },
-                            
                           ]}
                         />
                       </div>
@@ -698,7 +705,14 @@ function Navbar({ children }: { children: React.ReactNode }) {
                           />
                           <NavItem
                             to={ROUTES_URL.QUOTATION_SETTINGS}
-                            icon={<QuotationIconSvg strokeWidth={2} size={26} className="text-blue-600" showCurrency={true}/>}
+                            icon={
+                              <QuotationIconSvg
+                                strokeWidth={2}
+                                size={26}
+                                className="text-blue-600"
+                                showCurrency={true}
+                              />
+                            }
                             onClick={() => setIsDropdownOpen(false)}
                             label=""
                           />

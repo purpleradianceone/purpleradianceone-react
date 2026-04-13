@@ -59,6 +59,7 @@ import FormLayout from "../../ui/FormLayout";
 import { LeadNotes } from "./lead-notes/LeadNotes";
 import { ModuleGuard } from "../../../config/guard/ModuleGuard";
 import QuotationDetails from "./QuotationDetails";
+import { Popover } from "../../ui/PopOver";
 
 const ViewLeadManagement = () => {
   const navigate = useNavigate();
@@ -95,7 +96,7 @@ const ViewLeadManagement = () => {
 
   //NOTE : THIS IS THE SELECTED LEAD
   const [selectedLeadData, setSelectedLeadData] = useState<LeadDataProps>(
-    JSON.parse(searchParams.get("leadData") || "{}")
+    JSON.parse(searchParams.get("leadData") || "{}"),
   );
 
   const [leadStatus, setLeadStatus] = useState<
@@ -127,7 +128,7 @@ const ViewLeadManagement = () => {
       const response = await axiosClient.post(
         POST_API.GET_LEAD_STATUS,
         postDataForLeadStatusData,
-        { withCredentials: true }
+        { withCredentials: true },
       );
       if (response.status === STATUS_CODE.OK) {
         const data = response.data;
@@ -168,12 +169,12 @@ const ViewLeadManagement = () => {
       const response = await axiosClient.post(
         POST_API.UPDATE_LEAD_STATUS,
         postDataForLeadStatusUpdate,
-        { withCredentials: true }
+        { withCredentials: true },
       );
       if (response?.status == STATUS_CODE.OK) {
         if (response.data.status) {
           const updatedStatusName = leadStatus?.find(
-            (item) => item.id === selectedStatusId
+            (item) => item.id === selectedStatusId,
           )?.name;
 
           const parsedQuery = JSON.parse(searchParams.get("leadData") || "{}");
@@ -290,7 +291,7 @@ const ViewLeadManagement = () => {
       const response = await axiosClient.post(
         POST_API.UPDATE_LEAD_OWNER,
         PostDataLeadOwnerChange,
-        { withCredentials: true }
+        { withCredentials: true },
       );
 
       if (response.status === STATUS_CODE.OK) {
@@ -382,7 +383,7 @@ const ViewLeadManagement = () => {
         {
           withCredentials: true,
           headers: { "Content-Type": "application/json" },
-        }
+        },
       );
 
       if (response.status === STATUS_CODE.OK) {
@@ -425,7 +426,7 @@ const ViewLeadManagement = () => {
   };
   // this is the lead details data on save callback
   const handleSaveEditLeadDetailsCallback = (
-    editLeadDetailsData: LeadDetailsData
+    editLeadDetailsData: LeadDetailsData,
   ) => {
     setLeadDetailsData(editLeadDetailsData);
   };
@@ -471,7 +472,7 @@ const ViewLeadManagement = () => {
             requestedBy: loginStatus.id,
           },
           withCredentials: true,
-        }
+        },
       );
 
       if (response.status === STATUS_CODE.OK) {
@@ -491,7 +492,7 @@ const ViewLeadManagement = () => {
             updatedBy: item["updatedby"],
             updatedOn: item["updatedon"],
             isActive: item["isactive"],
-          })
+          }),
         );
 
         setLeadAssignedCompanyProduct(mappedData);
@@ -509,7 +510,7 @@ const ViewLeadManagement = () => {
   };
 
   const handleLeadProductStatusUpdate = (
-    updatedProduct: LeadAssignedCompanyProduct
+    updatedProduct: LeadAssignedCompanyProduct,
   ) => {
     setLeadAssignedCompanyProduct((prev) =>
       prev.map((product) =>
@@ -518,12 +519,12 @@ const ViewLeadManagement = () => {
               ...product,
               isActive: !product.isActive,
             }
-          : product
-      )
+          : product,
+      ),
     );
   };
   const handleLeadProductUpdate = (
-    updatedProduct: LeadAssignedCompanyProduct
+    updatedProduct: LeadAssignedCompanyProduct,
   ) => {
     setLeadAssignedCompanyProduct((prevData) =>
       prevData.map((product) =>
@@ -536,8 +537,8 @@ const ViewLeadManagement = () => {
               // changes here
               leadInterestName: updatedProduct.leadInterestName,
             }
-          : product
-      )
+          : product,
+      ),
     );
   };
 
@@ -572,7 +573,7 @@ const ViewLeadManagement = () => {
             socialMediaHandles: item.social_media_handles,
             updatedBy: item.updatedby,
             updatedOn: item.updatedon,
-          })
+          }),
         );
         setLeadContact(mappedLeadContactData);
       })
@@ -643,7 +644,7 @@ const ViewLeadManagement = () => {
       const response = await axiosClient.post(
         POST_API.UPDATE_LEAD,
         PostDataForLeadUpdate,
-        { withCredentials: true }
+        { withCredentials: true },
       );
       if (response.data.status) {
         //parse query string
@@ -687,7 +688,12 @@ const ViewLeadManagement = () => {
       }
     }
   };
-  type ActiveCard = "meeting" | "contact" | "LeadTeams" | "leadUsers" | "LeadNotes";
+  type ActiveCard =
+    | "meeting"
+    | "contact"
+    | "LeadTeams"
+    | "leadUsers"
+    | "LeadNotes";
   const [activeTab, setActiveTab] = useState<ActiveCard>("contact");
 
   const handleClickCards = (event: React.MouseEvent<HTMLElement>) => {
@@ -772,18 +778,23 @@ const ViewLeadManagement = () => {
           <div className=" flex items-center min-w-20 justify-end mr-2  ">
             {/* new code  */}
             <div className="relative inline-block">
-              <button
-                onClick={() => {
-                  if (userHasAccessToViewLeadSettings) {
-                    setIsLeadSettingModalOpen(true);
-                  } else {
-                    toast.error(
-                      MESSAGE.MODULE_ACCESS.LEAD_MODULE
-                        .UPDATE_LEAD_ACCESS_DENIED_message
-                    );
-                  }
-                }}
-                className={`px-1 py-0.5 caption-custom flex gap-1 items-center justify-center
+              <Popover
+                accessRight={userHasAccessToViewLeadSettings}
+                align="right"
+                width={400}
+                trigger={
+                  <button
+                    onClick={() => {
+                      if (userHasAccessToViewLeadSettings) {
+                        setIsLeadSettingModalOpen(true);
+                      } else {
+                        toast.error(
+                          MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                            .UPDATE_LEAD_ACCESS_DENIED_message,
+                        );
+                      }
+                    }}
+                    className={`px-1 py-0.5 caption-custom flex gap-1 items-center justify-center
     border rounded transition
     ${
       userHasAccessToViewLeadSettings
@@ -791,20 +802,23 @@ const ViewLeadManagement = () => {
         : "bg-gray-200 text-gray-400 cursor-not-allowed"
     }
   `}
+                  >
+                    <Settings size={12} />
+                    <span>Lead setting</span>
+                  </button>
+                }
               >
-                <Settings size={12} />
-                <span>Lead setting</span>
-              </button>
-
-              {isLeadSettingModalOpen && (
-                <LeadSettingForLead
-                  isOpen={isLeadSettingModalOpen}
-                  onClose={() => {
-                    setIsLeadSettingModalOpen(false);
-                  }}
-                  lead={selectedLeadData}
-                />
-              )}
+                {(onClose) => (
+                  <LeadSettingForLead
+                    isOpen={isLeadSettingModalOpen}
+                    onClose={() => {
+                      setIsLeadSettingModalOpen(false);
+                      onClose();
+                    }}
+                    lead={selectedLeadData}
+                  />
+                )}
+              </Popover>
             </div>
           </div>
         </div>
@@ -846,7 +860,7 @@ const ViewLeadManagement = () => {
                   } else {
                     toast.error(
                       MESSAGE.MODULE_ACCESS.LEAD_MODULE
-                        .UPDATE_LEAD_ACCESS_DENIED_message
+                        .UPDATE_LEAD_ACCESS_DENIED_message,
                     );
                   }
                 }}
@@ -878,7 +892,7 @@ const ViewLeadManagement = () => {
                   } else {
                     toast.error(
                       MESSAGE.MODULE_ACCESS.LEAD_MODULE
-                        .UPDATE_LEAD_ACCESS_DENIED_message
+                        .UPDATE_LEAD_ACCESS_DENIED_message,
                     );
                   }
                 }}
@@ -901,50 +915,138 @@ const ViewLeadManagement = () => {
         </div>
 
         {/* Lead Status Section */}
-        <div className="   flex  bg-slate-100   rounded-sm">
-          <div className="flex w-full">
-            <div
-              className="flex w-[100%] border bg-white"
-              style={{
-                clipPath:
-                  "polygon(0 0, calc(100% - 16px) 0, 100% 50%, calc(100% - 16px) 100%, 0 100%)",
-              }}
-            >
-              {leadStatus!.map((item: any) => (
-                <button
-                  title={item.name}
-                  key={item.id}
-                  className={`flex-1 overflow-hidden ${
-                    selectedLeadData.leadStatus === item.name
-                      ? "bg-blue-700 table-header-custom-white hover:bg-blue-500 hover:text-white"
-                      : "hover:bg-blue-700 table-header-custom hover:text-white"
+        <div className="   flex w-[100%] border-b  bg-slate-50   rounded-sm">
+          <div className="flex w-full  ">
+            {leadStatus!.map((item: any) => (
+              <div
+                // className=" w-[100%]  border "
+                // style={{
+                //   width: "100%",
+                //   // backgroundColor: "#800080",
+                //   clipPath:
+                //     "polygon(0 0, calc(100% - 16px) 0, 100% 50%, calc(100% - 16px) 100%, 0 100%)",
+                // }}
+                className={`flex-1  items-center justify-center  ${
+                  selectedLeadData.leadStatus === item.name
+                    ? "bg-blue-700 table-header-custom-white hover:bg-blue-500 hover:text-white"
+                    : "hover:bg-blue-700 table-header-custom hover:text-white"
+                }
+                      ${
+                        selectedStatusId === item.id &&
+                        "bg-sky-400 hover:bg-sky-500 table-header-custom-white"
+                      } text-center p-1`}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  width: "100%",
+                  clipPath:
+                    "polygon(0 0, calc(100% - 16px) 0, 100% 50%, calc(100% - 16px) 100%, 0 100%)",
+                }}
+              >
+                <Popover
+                  width={500}
+                  onClose={()=>{
+                    setSelectedStatusId(null);
+                  }}
+                  // onTriggerClick={}
+                  trigger={
+                    <div className="flex w-full ">
+                      <button
+                        onClick={() => {
+                          if (userHasAccessToUpdateLeadDetails) {
+                            setReasonInputBoxOpen(true);
+                            setSelectedStatusId(item.id);
+                          } else {
+                            toast.error(
+                              MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                                .UPDATE_LEAD_ACCESS_DENIED_message,
+                            );
+                          }
+                        }}
+                        title={item.name}
+                        key={item.id}
+                      >
+                        <div className=" w-[100%]">{item.name}</div>
+                      </button>
+                    </div>
                   }
-              ${
-                selectedStatusId === item.id &&
-                "bg-sky-400 hover:bg-sky-500 table-header-custom-white"
-              } text-center p-1`}
-                  style={{
-                    clipPath:
-                      "polygon(0 0, calc(100% - 16px) 0, 100% 50%, calc(100% - 16px) 100%, 0 100%)",
-                  }}
-                  onClick={() => {
-                    if (userHasAccessToUpdateLeadDetails) {
-                      setReasonInputBoxOpen(true);
-                      setSelectedStatusId(item.id);
-                    } else {
-                      toast.error(
-                        MESSAGE.MODULE_ACCESS.LEAD_MODULE
-                          .UPDATE_LEAD_ACCESS_DENIED_message
-                      );
-                    }
-                  }}
                 >
-                  {item.name}
-                </button>
-              ))}
-            </div>
+                  {(onClose) =>
+                  (
+
+                 <>
+                    {
+                      
+                      reasonInputBoxOpen && item.id!==9 &&
+                      selectedStatusId !== 9 && (
+                        <StatusUpdateModal
+                        isLeadStatusSaving={isLeadStatusSaving}
+                        handleCancel={() => {
+                          setReasonInputBoxOpen(!reasonInputBoxOpen);
+                          setSelectedStatusId(null);
+                          setReasonText("")
+                          onClose();
+                        }}
+                        handleSaveStatusUpdate={async () => {
+                          await handleSaveStatusUpdate();
+                          onClose();
+                        }}
+                        onReasonChange={(e) => setReasonText(e.target.value)}
+                        reasonText={reasonText}
+                        />
+                      )
+                    }
+                    {reasonInputBoxOpen && selectedStatusId === 9 && (
+          <ConvertLeadModal
+            isLeadStatusSaving={isLeadStatusSaving}
+            isOpen={reasonInputBoxOpen}
+            onClose={() => {
+              setReasonInputBoxOpen(!reasonInputBoxOpen);
+              setSelectedStatusId(null);
+              setReasonText("");
+              onClose();
+            }}
+            leadData={selectedLeadData}
+            handleLeadConversion={()=>{
+              handleSaveStatusUpdate()
+              onClose()
+            }}
+            onReasonChange={(e) => setReasonText(e.target.value)}
+            reasonText={reasonText}
+            handleLeadMappedToAccount={() => {
+              const parsedQuery = JSON.parse(
+                searchParams.get("leadData") || "{}",
+              );
+              parsedQuery.leadStatusId = "9";
+              parsedQuery.leadStatus = "Converted";
+              const newQueryString = qs.stringify({
+                leadData: JSON.stringify(parsedQuery),
+              });
+              
+              setSelectedLeadData((prev: any) => ({
+                ...prev,
+                leadStatus: "Converted",
+              }));
+              setReasonInputBoxOpen(false);
+              setReasonText("");
+              setSelectedStatusId(null);
+              
+              const newPath = `${window.location.pathname}?${newQueryString}`;
+              navigate(newPath, { replace: true });
+            }}
+            /> 
+        )} 
+            </>
+                     )
+                  }
+                </Popover>
+              </div>
+            ))}
+
+            {/* </div> */}
             {/* status history */}
-            <div className="flex justify-end caption-custom  mb-1 px-2">
+            <div className="flex justify-end bg-purple-50 caption-custom  mb-1 px-2">
               {/* <span className="font-semibold ">Lead Status</span> */}
               <button
                 onClick={() => {
@@ -962,7 +1064,7 @@ const ViewLeadManagement = () => {
             </div>
           </div>
         </div>
-        {reasonInputBoxOpen && selectedStatusId !== 9 && (
+        {/* {reasonInputBoxOpen && selectedStatusId !== 9 && (
           <StatusUpdateModal
             isLeadStatusSaving={isLeadStatusSaving}
             handleCancel={() => {
@@ -973,9 +1075,9 @@ const ViewLeadManagement = () => {
             onReasonChange={(e) => setReasonText(e.target.value)}
             reasonText={reasonText}
           />
-        )}
+        )} */}
 
-        {reasonInputBoxOpen && selectedStatusId === 9 && (
+        {/* {reasonInputBoxOpen && selectedStatusId === 9 && (
           <ConvertLeadModal
             isLeadStatusSaving={isLeadStatusSaving}
             isOpen={reasonInputBoxOpen}
@@ -990,7 +1092,7 @@ const ViewLeadManagement = () => {
             reasonText={reasonText}
             handleLeadMappedToAccount={() => {
               const parsedQuery = JSON.parse(
-                searchParams.get("leadData") || "{}"
+                searchParams.get("leadData") || "{}",
               );
               parsedQuery.leadStatusId = "9";
               parsedQuery.leadStatus = "Converted";
@@ -1010,7 +1112,7 @@ const ViewLeadManagement = () => {
               navigate(newPath, { replace: true });
             }}
           />
-        )}
+        )} */}
 
         {/* Sections  */}
         <div className="w-full  flex flex-col md:flex-row gap-1 mt-1">
@@ -1035,7 +1137,7 @@ const ViewLeadManagement = () => {
                       if (!userHasAccessToUpdateLead) {
                         toast.error(
                           MESSAGE.MODULE_ACCESS.LEAD_MODULE
-                            .UPDATE_LEAD_ACCESS_DENIED_message
+                            .UPDATE_LEAD_ACCESS_DENIED_message,
                         );
                       }
                     }}
@@ -1063,7 +1165,7 @@ const ViewLeadManagement = () => {
                     if (!userHasAccessToUpdateLead) {
                       toast.error(
                         MESSAGE.MODULE_ACCESS.LEAD_MODULE
-                          .UPDATE_LEAD_ACCESS_DENIED_message
+                          .UPDATE_LEAD_ACCESS_DENIED_message,
                       );
                     }
                   }}
@@ -1095,7 +1197,7 @@ const ViewLeadManagement = () => {
                     if (!userHasAccessToUpdateLead) {
                       toast.error(
                         MESSAGE.MODULE_ACCESS.LEAD_MODULE
-                          .UPDATE_LEAD_ACCESS_DENIED_message
+                          .UPDATE_LEAD_ACCESS_DENIED_message,
                       );
                     }
                   }}
@@ -1149,7 +1251,7 @@ const ViewLeadManagement = () => {
                     if (!userHasAccessToUpdateLead) {
                       toast.error(
                         MESSAGE.MODULE_ACCESS.LEAD_MODULE
-                          .UPDATE_LEAD_ACCESS_DENIED_message
+                          .UPDATE_LEAD_ACCESS_DENIED_message,
                       );
                     }
                   }}
@@ -1300,7 +1402,7 @@ const ViewLeadManagement = () => {
                 Lead Teams
               </span>
 
-               <span
+              <span
                 id="LeadNotes"
                 className={`cursor-pointer ${
                   activeTab === "LeadNotes"
@@ -1352,11 +1454,11 @@ const ViewLeadManagement = () => {
                           onClick={(e) => {
                             e.preventDefault();
                             const leadDataSearchParams = JSON.parse(
-                              searchParams.get("leadData") || "{}"
+                              searchParams.get("leadData") || "{}",
                             );
                             sessionStorage.setItem(
                               "leadData",
-                              JSON.stringify(leadDataSearchParams!)
+                              JSON.stringify(leadDataSearchParams!),
                             );
                             navigate(ROUTES_URL.SCHEDULE_MEETING);
                           }}
@@ -1424,12 +1526,10 @@ const ViewLeadManagement = () => {
                   />
                 )}
 
-                 {activeTab === "LeadNotes" && (
+                {activeTab === "LeadNotes" && (
                   <ModuleGuard permissionKey="userHasAccessToViewLeadNote">
-                  <LeadNotes
-                    selectedLeadData={selectedLeadData}
-                    />
-                    </ModuleGuard>
+                    <LeadNotes selectedLeadData={selectedLeadData} />
+                  </ModuleGuard>
                 )}
 
                 {/* {isOpenLeadTeamsCard && (
@@ -1544,7 +1644,7 @@ type DetailProps = {
   type?: "text" | "number" | "select" | "none";
   options?: string[]; //only used if type is 'select'
   onChange?: (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => void;
   handleLeadInfoSave?: () => Promise<void>;
   handleClickLeadOwnerChange?: () => void;
@@ -1594,7 +1694,7 @@ const Detail: React.FC<DetailProps> = ({
         onChange?.(syntheticEvent);
 
         toast.error(
-          MOBILE_NUMBER_VALIDATION.ERROR_MESSAGE_MOBILE_NUMBER_INDIAN
+          MOBILE_NUMBER_VALIDATION.ERROR_MESSAGE_MOBILE_NUMBER_INDIAN,
         );
         return;
       }

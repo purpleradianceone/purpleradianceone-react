@@ -9,7 +9,6 @@ import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserCon
 import LookupLeadsAgGrid from "../../../ag-grid/LookupLeadsAgGrid";
 import { LookupLead } from "../../../../@types/lookup/LookupLead";
 import SearchInput from "../../../ui/SearchInput";
-import COLORS from "../../../../constants/Colors";
 import PaginationWithoutCount from "../../../ag-grid/PaginationWithoutCount";
 
 export const LookupLeadManagement = ({
@@ -104,11 +103,11 @@ export const LookupLeadManagement = ({
   }, [pageSize, currentPage, searchParameter]);
   return (
     <>
-      <div
+      {/* <div
         className={`z-10 top-12 mt-1 p-0.5  flex items-center  text-sm ${COLORS.GRID_HEADER_SECTION_BG_COLOR} rounded-lg shadow-sm  mb-1.5 w-full`}
-      >
-        <div className="flex gap-1">
-        </div>
+      > */}
+        {/* <div className="flex gap-1">
+        </div> */}
         <div className={`relative flex items-start  w-80`}>
           <SearchInput
             value={searchParameter}
@@ -117,10 +116,10 @@ export const LookupLeadManagement = ({
             }}
           ></SearchInput>
         </div>
-      </div>
+      {/* </div> */}
       {/* search box flex div */}
 
-      <div className={`ag-theme-balham w-full h-[60vh]   `}>
+      <div className={`ag-theme-balham w-full h-[40vh]   `}>
         <LookupLeadsAgGrid
           onRowSelect={handleRowSelectedForShowLead}
           leads={lookupLeadData}

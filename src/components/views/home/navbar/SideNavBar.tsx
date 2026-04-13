@@ -19,6 +19,7 @@ import { NavLink } from "react-router-dom";
 import ROUTES_URL from "../../../../constants/Routes";
 import { useUserAccessModules } from "../../../../config/hooks/useAccessModules";
 import { SIZE } from "../../../../constants/AppConstants";
+import { LiaFileInvoiceSolid } from "react-icons/lia";
 
 function SideNavBar({ isOpen, onToggle }: SideBarProps) {
   const {
@@ -31,13 +32,14 @@ function SideNavBar({ isOpen, onToggle }: SideBarProps) {
     userHasAccessToViewStock,
     userHasAccessToViewSupportTicket,
     userHasAccessToViewTasks,
+    userHasAccessToViewCompanyInvoice,
   } = useUserAccessModules();
 
   return (
     <aside
       id="left-side-navbar"
       className={`fixed  top-0 left-0 h-full bg-white border-r transition-all duration-300 z-30
-          ${isOpen ? "w-64" : "w-12"}`}
+          ${isOpen ? "w-64 overflow-y-auto" : "w-12"}`}
     >
       <div
         className={`flex items-center border-b justify-center ${SIZE.NAVBAR.TOP_HEIGHT_USER_PREF_LEFT}`}
@@ -108,6 +110,17 @@ function SideNavBar({ isOpen, onToggle }: SideBarProps) {
               isOpen={isOpen}
               isActive={isActive}
               disabled={!userHasAccessToViewAccount}
+            />
+          )}
+        </NavLink>
+        <NavLink to={ROUTES_URL.INVOICE_MANAGEMENT}>
+          {({ isActive }) => (
+            <SideNavBarItem
+              icon={LiaFileInvoiceSolid}
+              label="Invoices"
+              isOpen={isOpen}
+              isActive={isActive}
+              disabled={!userHasAccessToViewCompanyInvoice}
             />
           )}
         </NavLink>

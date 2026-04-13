@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
 import AccountCompanyType from "./AccountCompanyType";
 import AccountCompanyProduct from "./account-company-product/AccountCompanyProduct";
@@ -11,13 +11,21 @@ import AccountContact from "./account-contact-temp/AccountContact";
 import AccountLead from "./account-lead/AccountLead";
 import AccountService from "./account-service/AccountService";
 import AccountSubscription from "./account-subscription/AccountSubscription";
+import AccountInvoice from "./account-invoice/AccountInvoice";
+import Tabs from "../../ui/Tabs";
 
 const AccountManagement: React.FC = () => {
   const { accountId } = useParams();
   const { accountDetails: company, loading: accountDetailsLoading } =
     useAccountDetails(parseInt(accountId!));
   const navigate = useNavigate();
-
+  const [activeTab, setActiveTab] = useState("product");
+  const tabList = [
+    { key: "product", label: "Product" },
+    { key: "service", label: "Service" },
+    { key: "subscription", label: "Subscription" },
+    { key: "invoice", label: "Invoice" },
+  ];
   const parsedAccountId = Number(accountId);
 
   useEffect(() => {
@@ -82,33 +90,50 @@ const AccountManagement: React.FC = () => {
           </div>
           <AccountCompanyType accountId={company!.id} />
         </div>
-
-        {/* Account company product */}
+        <Tabs tabs={tabList} activeTab={activeTab} onChange={setActiveTab} />
         <div className="bg-white col-span-2 rounded-md border p-1 border-slate-200">
+          {activeTab === "product" && (
+            <>
+              <h3 className="bg-gray-100 table-header-custom rounded-t-md px-2">
+                Product Details
+              </h3>
+              <AccountCompanyProduct accountId={company!.id} />
+            </>
+          )}
+
+          {activeTab === "service" && (
+            <AccountService accountId={company!.id} />
+          )}
+
+          {activeTab === "subscription" && (
+            <AccountSubscription accountId={company!.id} />
+          )}
+
+          {activeTab === "invoice" && <AccountInvoice account={company} />}
+        </div>
+        {/* Account company product */}
+        {/* <div className="bg-white col-span-2 rounded-md border p-1 border-slate-200">
           <h3 className="bg-gray-100 table-header-custom rounded-t-md px-2">
             Product Details
           </h3>
           <AccountCompanyProduct
             accountId={company!.id}
-          // handleShowCompanyProductData={handleShowCompanyProductData}
           />
         </div>
 
         <div className="bg-white col-span-2 rounded-md border p-1 border-slate-200">
-          {/* <h3 className="bg-gray-100 table-header-custom rounded-t-md px-2">
-            Account Service
-          </h3> */}
           <AccountService accountId={company.id} />
         </div>
         <div className="bg-white col-span-2 rounded-md border p-1 border-slate-200">
-          {/* <h3 className="bg-gray-100 table-header-custom rounded-t-md px-2">
-            Account Subscription
-          </h3> */}
           <AccountSubscription
             accountId={company!.id}
-          // handleShowCompanyProductData={handleShowCompanyProductData}
           />
         </div>
+        <div className="bg-white col-span-2 rounded-md border p-1 border-slate-200">
+          <AccountInvoice
+            account={company}
+          />
+        </div> */}
       </div>
     </div>
   );
