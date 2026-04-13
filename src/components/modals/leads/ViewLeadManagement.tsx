@@ -58,6 +58,7 @@ import LoadingPopUpAnimation from "../../views/card/LoadingPopUpAnimation";
 import FormLayout from "../../ui/FormLayout";
 import { LeadNotes } from "./lead-notes/LeadNotes";
 import { ModuleGuard } from "../../../config/guard/ModuleGuard";
+import QuotationDetails from "./QuotationDetails";
 
 const ViewLeadManagement = () => {
   const navigate = useNavigate();
@@ -1440,13 +1441,18 @@ const ViewLeadManagement = () => {
               </div>
             </div>
             {/* Activity */}
+            <div className="mt-8">
             <LeadTasksModal
               ownerId={selectedLeadData.companyUserId}
             ></LeadTasksModal>
+            </div>
             {/* End Activity */}
           </div>
+         
         </div>
-
+         <div className="w-full mt-2">
+          <QuotationDetails leadId={leadDetailsData.id}/>
+          </div>
         {/* end  */}
 
         {/* update lead form */}

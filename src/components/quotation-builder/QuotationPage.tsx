@@ -238,8 +238,6 @@ export const QuotationPage: React.FC = () => {
   //   }
   // };
 
-
-
   // const handleQuotationPdfGeneration = async () => {
   //   try {
   //     const payload = {
@@ -346,6 +344,9 @@ export const QuotationPage: React.FC = () => {
 
   const getTemplatesOfCompany = useCallback(
     async ({ reset = false }: { reset?: boolean }) => {
+      // ✅ FIX 1: prevent duplicate calls
+      if (loadingTemplates || (!reset && !hasMoreTemplates)) return;
+
       if (loginStatus.companyId === 0) return;
       if (dateRangeId === customDateRangeId && concatDate.trim() === "") return;
       // We use a functional update for setOffset to get the latest value
@@ -411,8 +412,25 @@ export const QuotationPage: React.FC = () => {
       searchParameter,
       concatDate,
       limit,
+      loadingTemplates, // ✅ added
     ],
   );
+
+  // ✅ FIX 4: ADD SCROLL LISTENER (YOU REMOVED THIS EARLIER)
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+
+    const handleScroll = () => {
+      if (el.scrollTop + el.clientHeight >= el.scrollHeight - 50) {
+        getTemplatesOfCompany({ reset: false });
+      }
+    };
+
+    el.addEventListener("scroll", handleScroll);
+
+    return () => el.removeEventListener("scroll", handleScroll);
+  }, [getTemplatesOfCompany]);
 
   if (!userHasAccessToViewQuotationTemplate)
     return (
@@ -431,7 +449,7 @@ export const QuotationPage: React.FC = () => {
     <div
       className={`w-full pt-1 ${
         userPreference.isLeftMenu ? "pl-5" : "px-1"
-      }  gap-1 h-screen flex flex-col `}
+      }  gap-1 h-[95vh] flex flex-col `}
     >
       {/* Header */}
       <div
@@ -534,16 +552,21 @@ export const QuotationPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Popup in development */}
-      <div className="flex items-center justify-center">
+      <div className="flex items-center justify-center max-h-fit ">
         {/* Main Content Area */}
         {loadingTemplatePage ? (
           <div className="flex justify-center items-center h-screen">
-            <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-600"></div>
+            <div className="animate-spin rounded-full h-17 w-16 border-t-2 border-b-2 border-blue-600"></div>
           </div>
         ) : (
-          <div className="flex w-full justify-start">
-            <div className="flex-1 overflow-x-auto" ref={containerRef}>
+          <div className="flex w-full justify-start transition-all duration-200 ease-in-out">
+            <div
+              className="flex-1 overflow-y-auto max-h-[86vh] scroll-smooth will-change-scroll " // 👈 important
+              style={{
+                scrollBehavior: "smooth"
+              }}
+              ref={containerRef}
+            >
               <QuotationTemplateList
                 templates={templates}
                 loading={loadingTemplates}
@@ -554,6 +577,7 @@ export const QuotationPage: React.FC = () => {
           </div>
         )}
 
+        {/* Popup in development */}
         {/* <div className="bg-white shadow-lg rounded-2xl p-10 text-center max-w-md w-full border">
           <div className="flex justify-center mb-4">
             <div className="bg-blue-100 text-yellow-600 p-4 rounded-full">

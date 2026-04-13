@@ -19,6 +19,7 @@ import {
   FOOTER_STORAGE_KEY_CREATE,
   HEADER_STORAGE_KEY_CREATE,
   PAGE_BLOCK_LAYOUT_Create,
+  STORAGE_KEY_CREATE,
 } from "../local-storage/LocalStorageKeys";
 import { JsonFileData } from "../quotation-template-types/JsonFileData";
 import LoadingPopUpAnimation from "../../views/card/LoadingPopUpAnimation";
@@ -63,6 +64,13 @@ export const QuotationTemplateSettingsPanelCreate: React.FC<
     return JSON.stringify(jsonFileData);
   }
 
+  function clearLocalStorageOfQuotationTemplate(){
+    localStorage.removeItem( HEADER_STORAGE_KEY_CREATE + loginStatus.id,);
+    localStorage.removeItem(FOOTER_STORAGE_KEY_CREATE + loginStatus.id,);
+    localStorage.removeItem(PAGE_BLOCK_LAYOUT_Create + loginStatus.id,);
+    localStorage.removeItem(STORAGE_KEY_CREATE + loginStatus.id);
+  }
+
   const createQuotationTemplate = (resultJson: string) => {
     setIsLoadingForQuotationCreate(true);
     try {
@@ -90,6 +98,7 @@ export const QuotationTemplateSettingsPanelCreate: React.FC<
             if (response.data.status) {
               setIsOpen(false);
               toast.success(response.data.message);
+              clearLocalStorageOfQuotationTemplate();
               navigate(`${ROUTES_URL.QUOTATION_SETTINGS}`);
             } else {
               toast.error(response.data.message);

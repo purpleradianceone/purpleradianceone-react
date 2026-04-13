@@ -26,14 +26,12 @@ export const ContentBlockQuotation: React.FC = () => {
   const [content, setContent] = useState<string>(props.htmlContent);
 
   const dynamicFields = useContext(DynamicFieldsContext);
-  
 
   const placeholderList = useMemo(() => {
-    return dynamicFields
-      .reduce((acc: Record<string, string>, item) => {
-        acc[item.value] = item.label;
-        return acc;
-      }, {});
+    return dynamicFields.reduce((acc: Record<string, string>, item) => {
+      acc[item.value] = item.label;
+      return acc;
+    }, {});
   }, [dynamicFields]);
 
   useEffect(() => {
@@ -76,6 +74,12 @@ export const ContentBlockQuotation: React.FC = () => {
       showCharsCounter: false,
       showWordsCounter: false,
       showXPathInStatusbar: false,
+      // nl2brInPlainText: false,
+      // addNewLine: false,
+      config: {
+        enter: "br",
+        enterBlock: "br",
+      },
 
       buttons: [
         "bold",
@@ -84,8 +88,11 @@ export const ContentBlockQuotation: React.FC = () => {
         "strikethrough",
         "eraser",
         "|",
+        "font",
         "fontsize",
         "brush",
+        "paragraph",
+        "lineHeight",
         "|",
         "ul",
         "ol",
@@ -134,6 +141,8 @@ export const ContentBlockQuotation: React.FC = () => {
   );
 
   const handleSave = () => {
+    console.error("content html:-------------------");
+    console.log(content);
     setProp((p: any) => {
       p.htmlContent = content;
     });
@@ -249,3 +258,4 @@ export const ContentBlockQuotation: React.FC = () => {
     canMoveOut: () => true,
   },
 };
+
