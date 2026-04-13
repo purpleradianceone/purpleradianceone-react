@@ -73,7 +73,7 @@ export const EditorCanvasForQuotation: React.FC = () => {
   const [isLoadingForData, setIsLogingForData] = useState<boolean>(true);
 
   useEffect(() => {
-    const jsonEditorState = localStorage.getItem(STORAGE_KEY_CREATE);
+    const jsonEditorState = localStorage.getItem(STORAGE_KEY_CREATE + loginStatus.id);
     if (jsonEditorState) {
       setEditorStateData(jsonEditorState);
       console.log("stored Local storage editor json state:");

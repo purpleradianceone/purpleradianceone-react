@@ -206,7 +206,7 @@ export const QuotationTemplateList: React.FC<QuotationTemplateListProps> = ({
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 transition-all duration-200 ease-in-out">
         {templates.map((template) => (
           <div
             key={template.id}
@@ -335,7 +335,7 @@ export const QuotationTemplateList: React.FC<QuotationTemplateListProps> = ({
       </div>
 
       {loading && hasmore && (
-        <div className="flex justify-center h-full items-center">
+        <div className="flex justify-center h-[7vh] items-center transition duration-200 ease-in-out">
           <Loader2 className="animate-spin text-blue-600" size={30} />
         </div>
       )}

@@ -596,21 +596,14 @@ function Navbar({ children }: { children: React.ReactNode }) {
                               label: "Email Template",
                             },
                             {
+                              icon: <QuotationIconSvg strokeWidth={2} size={SIZE.TWENTY+1}  showCurrency={true}/>,
+                              to: ROUTES_URL.QUOTATION_SETTINGS,
+                              label: "Quotation Template",
+                            },
+                            {
                               icon: <Layers size={SIZE.TWENTY} />,
                               to: ROUTES_URL.INTEGRATIONS_SETTINGS,
                               label: "Integrations",
-                            },
-                            {
-                              icon: (
-                                <QuotationIconSvg
-                                  strokeWidth={2}
-                                  size={26}
-                                  className="text-blue-600"
-                                  showCurrency={true}
-                                />
-                              ),
-                              to: ROUTES_URL.QUOTATION_SETTINGS,
-                              label: "Quotation",
                             },
                           ]}
                         />

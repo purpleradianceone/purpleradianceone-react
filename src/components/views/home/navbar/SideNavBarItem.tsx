@@ -190,8 +190,8 @@ function SideNavBarItem({
                 onMouseEnter={() => setIsTooltipVisible(false)}
                 className={`absolute left-full ml-2 bg-white rounded-lg shadow-lg py-2 min-w-36
   ${openUpwards ? "bottom-0" : "top-0"}`}
-                // className="absolute left-full top-0 ml-2 bg-white rounded-lg shadow-lg py-2 min-w-36"
-              >
+                // className="absolute left-full top-0 ml-2 bg-white rounded-lg shadow-lg py-2 min-w-36"              
+                >
                 {React.Children.toArray(children).map((child, index) => (
                   <button
                     key={index}
