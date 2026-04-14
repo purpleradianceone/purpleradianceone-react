@@ -23,7 +23,8 @@ import AccountSubscriptionManagementAgGrid from "../ag-grid/AccountSubscriptionM
 import CreateAccountSubscription from "../modals/Account/account-subscription/CreateAccountSubscription";
 import LookupCompanyProductDropdown from "../ui/LookupCompanyProductDropdown";
 
-export const accountSubscriptionDataUrlSearchParamKey: string = "accountSubscriptionData";
+export const accountSubscriptionDataUrlSearchParamKey: string =
+  "accountSubscriptionData";
 
 function AccountSubscriptionManagementList({
   handleSearchOption,
@@ -33,52 +34,53 @@ function AccountSubscriptionManagementList({
   paginationData,
   handleSelectedCompanyProductChange,
   accountSubscriptionData,
-
+  handleAddToInvoice,
   handleRowSelectedForShowAccountSubscription,
 
   accountId,
 }: AccountSubscriptionManagementListProps) {
-
   const navigate = useNavigate();
   const { position } = usePanel();
   const { userPreference } = useUserPreference();
-
 
   const {
     userHasAccessToViewAccountSubscription,
     userHasAccessToAddAccountSubscription,
   } = useUserAccessModules();
 
-  const [isCreateAccountSubscriptionModalOpen, setIsCreateAccountSubscriptionModalOpen] =
-    useState<boolean>(false);
+  const [
+    isCreateAccountSubscriptionModalOpen,
+    setIsCreateAccountSubscriptionModalOpen,
+  ] = useState<boolean>(false);
 
+  const [
+    selectedAccountSubscriptionForEdit,
+    setSelectedAccountSubscriptionForEdit,
+  ] = useState<AccountSubscriptionProps>({
+    id: 0,
+    companyId: 0,
+    accountSubscriptionCode: 0,
+    accountId: 0,
+    accountName: "",
+    companyProductId: 0,
+    companyProductName: "",
+    startDate: "",
+    endDate: "",
+    packageDetail: "",
+    isRenewal: false,
+    isAddedToInvoiceDraft: false,
+    isActive: false,
+    createdBy: "",
+    createdOn: "",
+  });
 
-  const [selectedAccountSubscriptionForEdit, setSelectedAccountSubscriptionForEdit] =
-    useState<AccountSubscriptionProps>({
-      id: 0,
-      companyId: 0,
-      accountSubscriptionCode: 0,
-      accountId: 0,
-      accountName: "",
-      companyProductId: 0,
-      companyProductName: "",
-      startDate: "",
-      endDate: "",
-      packageDetail: "",
-      isRenewal: false,
-      isActive: false,
-      createdBy: "",
-      createdOn: "",
-    });
-
-  const handleAccountSubscriptionDataFormChange = (data: AccountSubscriptionProps) => {
+  const handleAccountSubscriptionDataFormChange = (
+    data: AccountSubscriptionProps,
+  ) => {
     setSelectedAccountSubscriptionForEdit(data);
     console.log(data);
     console.log(selectedAccountSubscriptionForEdit);
   };
-
-
-
 
   const { dateRangeDropdownOptions } = useComapanySpecificSearchDateRange();
 
@@ -123,7 +125,6 @@ function AccountSubscriptionManagementList({
 
     return (
       <div className={`w-full ${position === "left"} pr-1 gap-1`}>
-
         <div
           className={`z-10 top-12 mt-1 p-1 flex items-center justify-between gap-3 text-sm 
           ${COLORS.GRID_HEADER_SECTION_BG_COLOR} rounded-lg shadow-sm mb-1.5 w-full`}
@@ -135,12 +136,13 @@ function AccountSubscriptionManagementList({
           </div>
 
           <div className="flex items-center gap-2 w-fit">
-
             <div className="relative flex items-start w-44">
               <SearchInput
                 value={handleSearchOption.searchParameter}
                 onChange={(e) => {
-                  handleSearchOption.handleSearchParameterChange(e.target.value);
+                  handleSearchOption.handleSearchParameterChange(
+                    e.target.value,
+                  );
                 }}
               />
             </div>
@@ -156,7 +158,6 @@ function AccountSubscriptionManagementList({
             </div>
 
             <div className="flex items-center gap-2 w-fit">
-
               <DateRangeFilterDropdown
                 dropdownOptions={dateRangeDropdownOptions}
                 handleDateIdChange={handleDateRangeIdChange}
@@ -172,7 +173,6 @@ function AccountSubscriptionManagementList({
                 />
               )}
 
-
               <div className="flex gap-1 justify-end w-fit">
                 <Button
                   type="button"
@@ -180,7 +180,8 @@ function AccountSubscriptionManagementList({
                   onClick={() => {
                     if (!userHasAccessToAddAccountSubscription) {
                       toast.error(
-                        MESSAGE.MODULE_ACCESS.ACCOUNT_SUBSCRIPTION.DENIED_ADD_ACCESS,
+                        MESSAGE.MODULE_ACCESS.ACCOUNT_SUBSCRIPTION
+                          .DENIED_ADD_ACCESS,
                       );
                       return;
                     }
@@ -191,14 +192,11 @@ function AccountSubscriptionManagementList({
                   +Add
                 </Button>
               </div>
-
             </div>
           </div>
-
         </div>
 
         <div className="bg-white overflow-y-auto rounded-lg shadow-sm">
-
           <div
             className={
               userPreference.isLeftMenu
@@ -207,6 +205,7 @@ function AccountSubscriptionManagementList({
             }
           >
             <AccountSubscriptionManagementAgGrid
+              handleAddToInvoice={handleAddToInvoice}
               handleRowClick={handleRowClicked}
               handleAccountSubscriptionDataFormChange={
                 handleAccountSubscriptionDataFormChange
@@ -214,7 +213,6 @@ function AccountSubscriptionManagementList({
               onRowSelect={handleRowSelected}
               accountSubscriptions={accountSubscriptionData}
               isUsedInAccountSubscriptionModule={false}
-
             />
           </div>
 
@@ -235,8 +233,6 @@ function AccountSubscriptionManagementList({
             onPageChange={paginationData.onPageChange}
           />
         </div>
-
-
       </div>
     );
   }

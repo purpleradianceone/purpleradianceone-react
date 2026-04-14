@@ -1,25 +1,30 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/rules-of-hooks */
-import {  useMemo, useRef } from "react";
+import { useMemo, useRef } from "react";
 import { INNERHTML } from "../../constants/AppConstants";
 import { AllCommunityModule, ColDef, themeBalham } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 import AccountProduct from "../../@types/account/AccountProduct";
 import { useUserAccessModules } from "../../config/hooks/useAccessModules";
+
+import COLORS from "../../constants/Colors";
+import Button from "../ui/Button";
 const AccountCompanyProductAgGrid = ({
   accountProductData,
   onRowSelect, //selected user for view lead details
-    handleRowClick,
+  // handleRowClick,
+  handleAddToInvoice,
   isUsedForSelection,
 }: {
   accountProductData: AccountProduct[];
   onRowSelect: (data: AccountProduct) => void;
   isUsedForSelection?: boolean;
-  handleRowClick? : (event : any) => void;
+  handleAddToInvoice?: (data: AccountProduct) => void;
+  handleRowClick?: (event: any) => void;
 }) => {
   const gridRef = useRef<AgGridReact>(null); // Ref to the AgGridReact component
 
-  const {userHasAccessToViewAccountProducts} = useUserAccessModules();
+  const { userHasAccessToViewAccountProducts } = useUserAccessModules();
   const columnDefs = useMemo<ColDef[]>(
     () => [
       {
@@ -85,6 +90,36 @@ const AccountCompanyProductAgGrid = ({
         headerName: "Purchase Date",
         sortable: true,
         filter: true,
+      },
+      {
+        field: "isAddedToInvoiceDraft",
+        headerName: "InvoiceStatus",
+        sortable: true,
+        filter: true,
+        cellRenderer: (params: any) => {
+          const isAdded = params.value;
+
+          return (
+            <div className="flex ">
+              {isAdded ? (
+                <span className="text-green-600 font-medium">
+                  Added to Invoice
+                </span>
+              ) : (
+                <Button
+                  type="button"
+                  className={COLORS.ADD_BUTTON}
+                  onClick={(e) => {
+                    e.stopPropagation(); // ✅ prevent row click
+                    params.context.handleAddToInvoice(params.data);
+                  }}
+                >
+                  Add to Invoice
+                </Button>
+              )}
+            </div>
+          );
+        },
       },
       {
         field: "installedByName",
@@ -267,28 +302,30 @@ const AccountCompanyProductAgGrid = ({
       // },
 
       {
-  headerName: "Actions",
-  field: "view",
-  pinned: "right",
-  maxWidth: 80,
-  cellRenderer: (params: any) => {
-    return (
-      <div className="flex items-center justify-center">
-        <button
-        disabled={!isUsedForSelection && !userHasAccessToViewAccountProducts}
-          className="lead-details cursor-pointer text-blue-600"
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation(); //  THIS IS THE FIX
-            params.context.handleRowSelect(params.data);
-          }}
-        >
-          {isUsedForSelection ? "Select" : "Details"}
-        </button>
-      </div>
-    );
-  },
-}
+        headerName: "Actions",
+        field: "view",
+        pinned: "right",
+        maxWidth: 80,
+        cellRenderer: (params: any) => {
+          return (
+            <div className="flex items-center justify-center">
+              <button
+                disabled={
+                  !isUsedForSelection && !userHasAccessToViewAccountProducts
+                }
+                className="lead-details cursor-pointer text-blue-600"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation(); //  THIS IS THE FIX
+                  params.context.handleRowSelect(params.data);
+                }}
+              >
+                {isUsedForSelection ? "Select" : "Details"}
+              </button>
+            </div>
+          );
+        },
+      },
 
       // {
       //   headerName: "Actions",
@@ -420,7 +457,7 @@ const AccountCompanyProductAgGrid = ({
       //   },
       // },
     ],
-    []
+    [],
   );
 
   const defaultColDef = useMemo(
@@ -431,7 +468,7 @@ const AccountCompanyProductAgGrid = ({
       suppressHeaderMenuButton: true,
       suppressHeaderContextMenu: true,
     }),
-    []
+    [],
   );
 
   return (
@@ -447,8 +484,11 @@ const AccountCompanyProductAgGrid = ({
         modules={[AllCommunityModule]}
         theme={themeBalham}
         overlayNoRowsTemplate={INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
-        context={{ handleRowSelect: onRowSelect }}
-        onRowClicked={handleRowClick}
+        context={{
+          handleRowSelect: onRowSelect,
+          handleAddToInvoice: handleAddToInvoice,
+        }}
+        // onRowClicked={handleRowClick}
       />
     </div>
   );

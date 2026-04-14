@@ -19,7 +19,10 @@ const AccountManagement: React.FC = () => {
   const { accountDetails: company, loading: accountDetailsLoading } =
     useAccountDetails(parseInt(accountId!));
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState("product");
+  const TAB_STORAGE_KEY = "account_active_tab";
+  const [activeTab, setActiveTab] = useState(() => {
+    return localStorage.getItem(TAB_STORAGE_KEY) || "product";
+  });
   const tabList = [
     { key: "product", label: "Product" },
     { key: "service", label: "Service" },
@@ -28,6 +31,9 @@ const AccountManagement: React.FC = () => {
   ];
   const parsedAccountId = Number(accountId);
 
+  useEffect(() => {
+    localStorage.setItem(TAB_STORAGE_KEY, activeTab);
+  }, [activeTab]);
   useEffect(() => {
     if (!accountId || Number.isNaN(parsedAccountId)) {
       navigate(ROUTES_URL.ACCOUNT_MANAGEMENT);

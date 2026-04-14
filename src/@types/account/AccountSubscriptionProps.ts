@@ -10,8 +10,9 @@ type AccountSubscriptionProps = {
   endDate: string;
   packageDetail: string;
   isRenewal: boolean;
+  isAddedToInvoiceDraft: boolean;
   isActive: boolean;
-  totalCost?: number | string,
+  totalCost?: number | string;
   createdBy: string;
   createdOn: string;
 };

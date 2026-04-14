@@ -104,6 +104,7 @@ function GenerateInvoiceModal({
 
           handleAddInvoice();
           onClose();
+         
         } else {
           toast.error(response.data.message);
         }
