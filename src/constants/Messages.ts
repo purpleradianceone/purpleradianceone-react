@@ -298,6 +298,11 @@ const MESSAGE = {
             DENIED_VIEW_ACCESS: "You do not have permission to view invoices.",
             DENIED_ADD_ACCESS: "You do not have permission to add invoice.",
             DENIED_UPDATE_ACCESS: "You do not have permission to update invoice.",
+        },
+        COMPANY_INVOICE_ITEM :  {
+            DENIED_VIEW_ACCESS: "You do not have permission to view invoice items.",
+            DENIED_ADD_ACCESS: "You do not have permission to add invoice item.",
+            DENIED_UPDATE_ACCESS: "You do not have permission to update invoice item.",
         }
 
     }

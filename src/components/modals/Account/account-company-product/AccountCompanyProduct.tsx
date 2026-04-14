@@ -39,7 +39,8 @@ const AccountCompanyProduct = ({
   const [accountCompanyProduct, setAccountCompanyProduct] = useState<
     AccountProduct[]
   >([]);
-
+  const [accountCompanyProductCount, setAccountCompanyProductCount] =
+    useState<number>(0);
   // const [refreshKey, setRefreshKey] = useState<number>(0);
 
   // const handleRowSelectAccountProduct = (data: AccountProduct) => {
@@ -151,6 +152,38 @@ const AccountCompanyProduct = ({
 
   const [hasError, setHasError] = useState(false);
 
+  const handleAddToInvoice = async (rowData: AccountProduct) => {
+    console.log(rowData);
+    const postData = {
+      company_id: loginStatus.companyId,
+      account_id: rowData.accountId,
+      account_company_product_id: rowData.id,
+      createdby_id: loginStatus.id,
+    };
+    console.log(postData);
+    // setIsSubmitting(true);
+    try {
+      const res = await axiosClient.post(
+        POST_API.CREATE_COMPANY_INVOICE_ITEM,
+        postData,
+        {
+          withCredentials: true,
+        },
+      );
+
+      if (res.data.status) {
+        toast.success(res.data.message);
+        setAccountCompanyProductCount((prev) => prev + 1);
+      } else {
+        toast.error(res.data.message);
+      }
+    } catch (error) {
+      handleApiError(error);
+    } finally {
+      // setIsSubmitting(false);s
+    }
+  };
+
   const getAccountCompanyProduct = async () => {
     setIsLoadingAccountCompanyProduct(true);
     setHasError(false);
@@ -169,6 +202,7 @@ const AccountCompanyProduct = ({
         postData,
         { withCredentials: true },
       );
+      console.log(response.data);
 
       const formattedData: AccountProduct[] = response.data.map(
         (item: any) => ({
@@ -190,6 +224,7 @@ const AccountCompanyProduct = ({
           installationDate: item.installation_date,
           installedByName: item.installed_by_name,
           installedBy: item.installed_by,
+          isAddedToInvoiceDraft: item.is_added_to_invoice_draft,
           updatedBy: item.updatedby,
           createdOn: item.createdon,
           updatedOn: item.updatedon,
@@ -211,7 +246,7 @@ const AccountCompanyProduct = ({
     if (userHasAccessToViewAccountProducts) {
       getAccountCompanyProduct();
     }
-  }, [userHasAccessToViewAccountProducts]);
+  }, [userHasAccessToViewAccountProducts, accountCompanyProductCount]);
 
   if (hasError) {
     return (
@@ -330,6 +365,7 @@ const AccountCompanyProduct = ({
           </div>
           <div className="col-span-2  w-full h-56">
             <AccountCompanyProductAgGrid
+              handleAddToInvoice={handleAddToInvoice}
               accountProductData={accountCompanyProduct}
               onRowSelect={handleRowSelectAccountProduct}
               handleRowClick={handleRowClick}

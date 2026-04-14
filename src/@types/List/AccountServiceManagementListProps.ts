@@ -18,7 +18,7 @@ type AccountServiceManagementListProps = {
   handleSelectedCompanyProductChange: (
     params: LookupCompanyProduct | null,
   ) => void;
-  
+
   selectedCompanyProduct?: LookupCompanyProduct;
 
   serviceStatusId: ServiceStatus[];
@@ -27,7 +27,7 @@ type AccountServiceManagementListProps = {
   handleRowSelectedForShowAccountService?: (
     rowData: AccountServiceProps | any,
   ) => void;
-
+  handleAddToInvoice: (rowData: AccountServiceProps) => void;
   accountId?: number;
 };
 

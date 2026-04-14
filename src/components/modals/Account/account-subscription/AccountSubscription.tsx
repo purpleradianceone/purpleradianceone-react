@@ -20,6 +20,9 @@ import AccessDeniedPopup from "../../../views/not-found/AccessDeniedPage";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
 import AccountSubscriptionProps from "../../../../@types/account/AccountSubscriptionProps";
 import AccountSubscriptionManagementList from "../../../lists/AccountSubscriptionManagementList";
+import { handleApiError } from "../../../../config/error/handleApiError";
+import toast from "react-hot-toast";
+import LoadingPopUpAnimation from "../../../views/card/LoadingPopUpAnimation";
 
 function AccountSubscription({
   accountId,
@@ -37,8 +40,7 @@ function AccountSubscription({
   const [accountSubscriptionData, setAccountSubscriptionData] = useState<
     AccountSubscriptionProps[]
   >([]);
-
-
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { loginStatus } = useLoggedInUserContext();
 
   const [accountSubscriptionUpdateCount, setAccountSubscriptionUpdateCount] =
@@ -47,7 +49,7 @@ function AccountSubscription({
   // Read filters from LocalStorage (before hook initializes)
   const savedFilters = JSON.parse(
     localStorage.getItem(LocalStorageKeys.SUPPORT_TICKET_MANAGEMENT_FILTERS) ||
-    "{}",
+      "{}",
   );
 
   const {
@@ -68,8 +70,6 @@ function AccountSubscription({
     handleStartDateChange,
   } = useSearchFilterPaginationDateHandlers(savedFilters);
 
-
-
   const [selectedCompanyProduct, setSelectedCompanyProduct] =
     useState<LookupCompanyProduct>(
       savedFilters.selectedCompanyProduct || {
@@ -80,8 +80,6 @@ function AccountSubscription({
 
   const [ref, inView] = useInView({ fallbackInView: true, threshold: 0.1 });
 
-
-
   const getAccountSubscription = async (signal: AbortSignal) => {
     if (dateRangeId === customDateRangeId && concatDate.trim() === "") return;
     const offset = (currentPage - 1) * pageSize;
@@ -91,7 +89,8 @@ function AccountSubscription({
       company_id: loginStatus.companyId,
       id: null,
       account_id: accountId,
-      company_product_id: selectedCompanyProduct.id === 0 ? null : selectedCompanyProduct.id,
+      company_product_id:
+        selectedCompanyProduct.id === 0 ? null : selectedCompanyProduct.id,
 
       search_company_specific_date_range_id:
         effectiveDateRangeId === 0 ? null : effectiveDateRangeId,
@@ -114,6 +113,8 @@ function AccountSubscription({
       );
       if (response.status === STATUS_CODE.OK) {
         const responseData = response.data;
+        console.log(responseData);
+
         // if (response.data.length > 0) {
         //   setTotalPages(Math.ceil(response.data[0].count / pageSize));
         // }
@@ -135,6 +136,7 @@ function AccountSubscription({
             endDate: item.end_date,
             packageDetail: item.package_detail,
             isRenewal: item.is_renweal,
+            isAddedToInvoiceDraft: item.is_added_to_invoice_draft,
             isActive: item.isactive,
             createdBy: item.createdby,
             createdOn: item.createdon,
@@ -156,7 +158,37 @@ function AccountSubscription({
       }
     }
   };
+  const handleAddToInvoice = async (rowData: AccountSubscriptionProps) => {
+    console.log(rowData);
+    const postData = {
+      company_id: loginStatus.companyId,
+      account_id: rowData.accountId,
+      account_subscription_id: rowData.id,
+      createdby_id: loginStatus.id,
+    };
+    console.log(postData);
+    setIsSubmitting(true);
+    try {
+      const res = await axiosClient.post(
+        POST_API.CREATE_COMPANY_INVOICE_ITEM,
+        postData,
+        {
+          withCredentials: true,
+        },
+      );
 
+      if (res.data.status) {
+        toast.success(res.data.message);
+        handleAddAccountSubscription();
+      } else {
+        toast.error(res.data.message);
+      }
+    } catch (error) {
+      handleApiError(error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
   const handleSelectedCompanyProductChange = (
     params: LookupCompanyProduct | null,
   ) => {
@@ -249,6 +281,7 @@ function AccountSubscription({
         animate={inView ? { opacity: 1, y: 0 } : {}}
         transition={{ duration: 0.4, ease: "easeOut" }}
       >
+        {isSubmitting && <LoadingPopUpAnimation show={isSubmitting} />}
         {/* {userHasAccessToViewAccountSubscription ? (
           <AccountServiceManagementList
             handleRowSelectedForShowAccountService={(data: any) =>
@@ -299,9 +332,10 @@ function AccountSubscription({
 
         {userHasAccessToViewAccountSubscription ? (
           <AccountSubscriptionManagementList
-            handleRowSelectedForShowAccountSubscription={(data: any) =>
-              console.log(data)
-            }
+            // handleRowSelectedForShowAccountSubscription={(data: any) =>
+            //   console.log(data)
+            // }
+            handleAddToInvoice={handleAddToInvoice}
             handleAddAccountSubscritption={handleAddAccountSubscription}
             handleSearchOption={{
               handleSearchParameterChange,
@@ -311,7 +345,6 @@ function AccountSubscription({
               endDate,
               searchParameter,
             }}
-
             accountSubscriptionData={accountSubscriptionData}
             onEndDateChange={handleEndDateChange}
             onStartDateChange={handleStartDateChange}
@@ -330,7 +363,6 @@ function AccountSubscription({
               handleSelectedCompanyProductChange
             }
             selectedCompanyProduct={selectedCompanyProduct}
-
             accountId={accountId}
           ></AccountSubscriptionManagementList>
         ) : (

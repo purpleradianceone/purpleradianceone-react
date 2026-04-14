@@ -39,7 +39,8 @@ function AccountServiceManagementList({
   handleSelectedCompanyProductChange,
   accountServiceData,
   handleServiceStatusId,
-  handleRowSelectedForShowAccountService,
+  handleAddToInvoice,
+  // handleRowSelectedForShowAccountService,
   accountId,
 }: AccountServiceManagementListProps) {
   // const [searchParams] = useSearchParams();
@@ -70,6 +71,7 @@ function AccountServiceManagementList({
       serviceDateTime: "",
       serviceStatusId: 0,
       serviceStatus: "",
+      isAddedToInvoiceDraft: false,
       isActive: false,
       createdBy: "",
       createdOn: "",
@@ -81,7 +83,6 @@ function AccountServiceManagementList({
     console.log(data);
     console.log(selectedSupportTicketForEdit);
   };
-
 
   const { dateRangeDropdownOptions } = useComapanySpecificSearchDateRange();
 
@@ -106,12 +107,18 @@ function AccountServiceManagementList({
     //   [supportTicketDataUrlSearchParamKey]: JSON.stringify(rowData),
     // });
     // navigate(ROUTES_URL.ACCOUNT_SERVICE + `?${queryParams}`);
-    navigate(`${ROUTES_URL.ACCOUNT_DETAILS}/${accountId}/account-service-details/${rowData.id}`);
+    navigate(
+      `${ROUTES_URL.ACCOUNT_DETAILS}/${accountId}/account-service-details/${rowData.id}`,
+    );
   };
 
   const handleRowSelected = (rowData: AccountServiceProps | any) => {
-    handleRowSelectedForShowAccountService!(rowData);
+    // handleRowSelectedForShowAccountService!(rowData);
+    navigate(
+      `${ROUTES_URL.ACCOUNT_DETAILS}/${accountId}/account-service-details/${rowData.id}`,
+    );
   };
+
 
   if (userHasAccessToViewAccountService) {
     const handleCreateAccountServiceModalClose = () => {
@@ -154,8 +161,9 @@ function AccountServiceManagementList({
             <div className="flex flex-wrap items-center gap-2 w-fit">
               {/* Search Box */}
               <div
-                className={`relative flex items-start ${isCustomDateOptionSelected ? "w-44 " : "w-44"
-                  }`}
+                className={`relative flex items-start ${
+                  isCustomDateOptionSelected ? "w-44 " : "w-44"
+                }`}
               >
                 <SearchInput
                   value={handleSearchOption.searchParameter}
@@ -268,6 +276,7 @@ function AccountServiceManagementList({
             /> */}
 
             <AccountServiceManagementAgGrid
+              handleAddToInvoice={handleAddToInvoice}
               handleRowClick={handleRowClicked}
               handleAccountServiceDataFormChange={
                 handleSupportTicketDataFormChange
@@ -300,8 +309,6 @@ function AccountServiceManagementList({
             onPageChange={paginationData.onPageChange}
           />
         </div>
-
-
       </div>
     );
   }

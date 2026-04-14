@@ -18,13 +18,13 @@ type AccountSubscriptionManagementListProps = {
   handleSelectedCompanyProductChange: (
     params: LookupCompanyProduct | null,
   ) => void;
-  
+
   selectedCompanyProduct?: LookupCompanyProduct;
 
-  
   handleRowSelectedForShowAccountSubscription?: (
     rowData: AccountSubscriptionProps | any,
   ) => void;
+  handleAddToInvoice: (rowData: AccountSubscriptionProps | any) => void;
 
   accountId?: number;
 };

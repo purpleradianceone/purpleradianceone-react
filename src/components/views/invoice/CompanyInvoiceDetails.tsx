@@ -6,7 +6,7 @@ import { FaFilePdf } from "react-icons/fa";
 import TextAreaInput from "../../ui/TextAreaInput";
 import SearchInput from "../../ui/SearchInput";
 import MetaField from "../../ui/MetaField";
-import { useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { PageLayout } from "../../ui/PageLayout";
 import AccountInvoiceProps from "../../../@types/account/AccountInvoiceProps";
 import { handleApiError } from "../../../config/error/handleApiError";
@@ -17,16 +17,26 @@ import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContex
 import toast from "react-hot-toast";
 import FormInput from "../../ui/FormInput";
 import { formatRupee } from "../../../utils/helperMethods/formatFunctions";
-import { Download, Pencil, Trash, X } from "lucide-react";
+import { ChevronRight, Download, Pencil, Trash, User, X } from "lucide-react";
 import CompanyInvoiceItemProps from "../../../@types/invoice/CompanyInvoiceItemProps";
 import InvoiceStatusChip from "../../ui/InvoiceStatusChip";
 import CustomDocumentPreviewComponent from "../../custom-document-preview-component/CustomDocumentPreviewComponent";
 import LoadingPopUpAnimation from "../card/LoadingPopUpAnimation";
 import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
+import {
+  InvoiceHeaderSkeleton,
+  InvoiceItemsSkeleton,
+} from "./CompanyInvoiceDetailSkeleton";
+import { LookupAccountDropdown } from "../lookups/lookup-account-dropdown/LookupAccountDropdown";
+import ROUTES_URL from "../../../constants/Routes";
+import COLORS from "../../../constants/Colors";
+import MESSAGE from "../../../constants/Messages";
 
 function CompanyInvoiceDetails() {
   const { invoiceId } = useParams();
+  const navigate = useNavigate();
   const [invoice, setInvoice] = useState<AccountInvoiceProps | null>(null);
+  const [invoiceLoading, setInvoiceLoading] = useState(false);
   const [items, setItems] = useState<any[]>([]);
   const { loginStatus } = useLoggedInUserContext();
   const [disabled, setDisabled] = useState<boolean>(false);
@@ -34,17 +44,24 @@ function CompanyInvoiceDetails() {
   const [editingItemId, setEditingItemId] = useState<number | null>(null);
   const [refreshCount, setRefreshCount] = useState<number>(0);
   const [tempItems, setTempItems] = useState<any[]>([]);
+  const [itemsLoading, setItemsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const [showCompanyLogoPreview, setShowCompanyLogoPreview] = useState(false);
+  const [selectedAccount, setSelectedAccount] = useState<any>(null);
+  const [showAccountName, setShowAccountName] = useState<boolean>(false);
+  const isCreateMode = !invoiceId || Number(invoiceId) === 0;
   const {
     userHasAccessToViewCompanyInvoiceItem,
     userHasAccessToUpdateCompanyInvoiceItem,
+    userHasAccessToAddCompanyInvoiceItem,
     userHasAccessToUpdateCompanyInvoiceApproval,
     userHasAccessToUpdateCompanyInvoice,
     userHasAccessToViewCompanyInvoice,
   } = useUserAccessModules();
+
   const getInvoices = async (signal: AbortSignal) => {
+    setInvoiceLoading(true);
     const postData = {
       id: Number(invoiceId),
       company_id: loginStatus.companyId,
@@ -104,11 +121,15 @@ function CompanyInvoiceDetails() {
       }
     } catch (error: any) {
       handleApiError(error);
+    } finally {
+      setInvoiceLoading(false);
+      console.log("into inv finally");
     }
   };
   console.log(disabled);
 
   const getInvoiceItems = async (signal: AbortSignal) => {
+    setItemsLoading(true);
     const postData = {
       company_id: loginStatus.companyId,
       company_invoice_id: Number(invoiceId),
@@ -193,6 +214,9 @@ function CompanyInvoiceDetails() {
       }
     } catch (error: any) {
       handleApiError(error);
+    } finally {
+      setItemsLoading(false);
+      console.log("into items finally");
     }
   };
 
@@ -319,7 +343,7 @@ function CompanyInvoiceDetails() {
     if (!userHasAccessToViewCompanyInvoice) return;
     setIsSubmitting(true);
     console.log(POST_API.COMPANY_INVOICE_DOWNLOAD);
-    
+
     try {
       const response = await axiosClient.post(
         POST_API.COMPANY_INVOICE_DOWNLOAD,
@@ -434,11 +458,15 @@ function CompanyInvoiceDetails() {
       acc.taxable += item.taxableValue || 0;
       acc.tax += item.totalTax || 0;
       acc.total += item.totalAmount || 0;
+      acc.cess += item.cessAmount || 0;
       return acc;
     },
-    { basic: 0, discount: 0, taxable: 0, tax: 0, total: 0 },
+    { basic: 0, discount: 0, taxable: 0, tax: 0, total: 0, cess: 0 },
   );
 
+  const hasCess = tempItems.some(
+    (i) => i.cessAmount != null && i.cessAmount > 0,
+  );
   const saveSingleItem = async (item: any) => {
     if (!userHasAccessToUpdateCompanyInvoiceItem) {
       return;
@@ -481,347 +509,629 @@ function CompanyInvoiceDetails() {
     setEditingItemId(null);
   };
 
-  useEffect(() => {
-    // 👉 Replace with API call
-    getInvoices(new AbortController().signal);
-    getInvoiceItems(new AbortController().signal);
-  }, [refreshCount]);
+  const handleSaveInvoice = async () => {
+    if (!selectedAccount) {
+      toast.error("Please select an account");
+      return;
+    }
+    const formPayload = {
+      company_id: loginStatus.companyId,
+      account_id: selectedAccount.id,
+      createdby_id: loginStatus.id,
+    };
+    console.log(formPayload);
 
-  if (!invoice) return null;
+    setIsSubmitting(true);
+    await axiosClient
+      .post(POST_API.CREATE_COMPANY_INVOICE, formPayload, {
+        withCredentials: true,
+      })
+      .then((response) => {
+        if (response.data.status) {
+          toast.success(response.data.message);
+          console.log(response.data);
+
+          const invoiceId = response?.data?.newid;
+          // handleAddInvoice();
+          const path = ROUTES_URL.INVOICE_DETAILS.replace(
+            ":invoiceId",
+            String(invoiceId),
+          );
+          navigate(path);
+          // onClose();
+        } else {
+          toast.error(response.data.message);
+        }
+      })
+      .catch(async (error) => {
+        console.log(error);
+        handleApiError(error);
+      })
+      .finally(() => {
+        setIsSubmitting(false);
+      });
+  };
+
+  const handleAddToInvoice = async () => {
+    const postData = {
+      company_id: loginStatus.companyId,
+      account_id: invoice?.accountId,
+      createdby_id: loginStatus.id,
+    };
+    console.log(postData);
+    setIsSubmitting(true);
+    try {
+      const res = await axiosClient.post(
+        POST_API.CREATE_COMPANY_INVOICE_ITEM,
+        postData,
+        {
+          withCredentials: true,
+        },
+      );
+
+      if (res.data.status) {
+        toast.success(res.data.message);
+        setRefreshCount((prev) => prev + 1);
+      } else {
+        toast.error(res.data.message);
+      }
+    } catch (error) {
+      handleApiError(error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleAccountSelect = (account: any) => {
+    setSelectedAccount(account);
+  };
+
+  useEffect(() => {
+    if (!invoiceId || Number(invoiceId) === 0) return;
+
+    const controller = new AbortController();
+
+    getInvoices(controller.signal);
+    getInvoiceItems(controller.signal);
+
+    return () => controller.abort();
+  }, [invoiceId, refreshCount]);
 
   return (
-    <PageLayout>
+    <PageLayout onScrollChange={setShowAccountName} scrollTopValue={80}>
       <div className="p-1 font-roboto">
         {isSubmitting && <LoadingPopUpAnimation show={isSubmitting} />}
         {/* HEADER */}
-        <div className="flex justify-between items-center mb-3">
-          <div>
-            <h1 className="table-header-custom">
-              Invoice #{invoice?.invoiceNumber || "[Auto-generated]"}
-            </h1>
-            <p className="text-sm text-gray-500">
-              Account - {invoice?.accountName}
-            </p>
-          </div>
-        </div>
 
-        {/* META */}
-        <div className="grid grid-cols-4 bg-gray-100 border rounded py-1 px-2 mb-2">
-          <MetaField
-            label="Invoice Number"
-            value={invoice.invoiceNumber || "[Auto-generated]"}
-          />
-          <MetaField
-            label="Invoice Date"
-            value={invoice.invoiceDate || "[Auto-generated]"}
-          />
-          <MetaField
-            label="Status"
-            value={<InvoiceStatusChip statusId={invoice.statusId} />}
-          />
-          {disabled ? (
-            <MetaField label="Due Date" value={invoice.dueDate} />
-          ) : (
-            <FormInput
-              label="Due Date"
-              type="date"
-              value={invoice.dueDate}
-              onChange={(e: any) =>
-                setInvoice((prev) => ({
-                  ...prev!,
-                  dueDate: e.target.value,
-                }))
-              }
-            />
-          )}
-
-          <MetaField label="Created By" value={invoice.createdBy} />
-          <MetaField label="Created On" value={invoice.createdOn} />
-          <MetaField label="Updated By" value={invoice.updatedBy} />
-          <MetaField label="Updated On" value={invoice.updatedOn} />
-        </div>
-
-        {/* ADDRESS */}
-        <div className="grid grid-cols-2 gap-x-3 border rounded p-2 bg-gray-100">
-          <TextAreaInput
-            label="Billing Address"
-            disabled={disabled}
-            value={invoice.billingAddress}
-            onChange={(e: any) =>
-              setInvoice((prev) => ({
-                ...prev!,
-                billingAddress: e.target.value,
-              }))
-            }
-            rows={3}
-            cols={3}
-          />
-
-          <TextAreaInput
-            label="Shipping Address"
-            disabled={disabled}
-            value={invoice.shippingAddress}
-            onChange={(e: any) =>
-              setInvoice((prev) => ({
-                ...prev!,
-                shippingAddress: e.target.value,
-              }))
-            }
-            rows={3}
-            cols={3}
-          />
-
-          <TextAreaInput
-            label="Terms & Conditions"
-            disabled={disabled}
-            value={invoice.termAndConditions}
-            onChange={(e: any) =>
-              setInvoice((prev) => ({
-                ...prev!,
-                termAndConditions: e.target.value,
-              }))
-            }
-            rows={3}
-            cols={3}
-          />
-          <TextAreaInput
-            label="Remarks"
-            disabled={disabled}
-            value={invoice.remarks}
-            onChange={(e: any) =>
-              setInvoice((prev) => ({
-                ...prev!,
-                remarks: e.target.value,
-              }))
-            }
-            rows={3}
-            cols={3}
-          />
-        </div>
-        <div className="flex items-center justify-end p-1">
-          <div className="flex gap-2">
-            <Button disabled={!disabled} onClick={handleInvoiceDownload}>
-              <div className="flex items-center gap-1">
-                <span>Download</span>
-                <Download size={14} />
+        {invoiceLoading ? (
+          <InvoiceHeaderSkeleton />
+        ) : (
+          <>
+            <div className=" sticky top-0 z-10 bg-slate-100 flex text-center justify-start items-center gap-3 ml-0.5 ">
+              <Link to={ROUTES_URL.INVOICE_MANAGEMENT}>
+                <Button className="caption-custom flex items-center justify-center hover:text-gray-800">
+                  Invoice
+                </Button>
+              </Link>
+              <ChevronRight size={16} />
+              <h1 className="table-header-custom">Invoice Details</h1>
+              {showAccountName && (
+                <span
+                  className={`
+                ml-1 max-w-[700px] truncate text-sm text-gray-500
+                transition-all duration-200 ease-out
+                will-change-transform will-change-opacity justify-center items-center ${
+                  showAccountName
+                    ? "opacity-100 translate-x-0"
+                    : "opacity-0 -translate-x-1 pointer-events-none"
+                } `}
+                >
+                  (<span>Account:</span>{" "}
+                  <span className="table-data-custom">{`  ${invoice?.accountName},  `}</span>
+                  <span>Invoice:</span>{" "}
+                  <span className="table-data-custom">{`  ${invoice?.invoiceNumber}`}</span>
+                  )
+                </span>
+              )}
+            </div>
+            <div className="flex justify-between items-center my-2">
+              <div>
+                {/* <h1 className="table-header-custom">
+                  Invoice #{invoice?.invoiceNumber || "[Auto-generated]"}
+                </h1> */}
+                <h1 className="table-header-custom">
+                  {isCreateMode
+                    ? "Create Invoice"
+                    : `Invoice #${invoice?.invoiceNumber || "[Auto-generated]"}`}
+                </h1>
+                {/* <p className="text-sm text-gray-500">
+                  Account - {invoice?.accountName}
+                </p> */}
+                <p className="text-sm text-gray-500">
+                  {isCreateMode
+                    ? "Select an account to create invoice"
+                    : `Account - ${invoice?.accountName}`}
+                </p>
               </div>
-            </Button>
-            {showCompanyLogoPreview && (
-              <div
-                className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50"
-                onClick={() => setShowCompanyLogoPreview(false)}
-              >
-                <CustomDocumentPreviewComponent
-                  fileUrl={logoPreview!}
-                  fileExtension={"application/pdf"}
-                  width={"50%"}
-                  height={"85%"}
-                  enableDownload={true}
-                />
+              {!isCreateMode && (
+                <div className="flex gap-x-2">
+                  <button
+                    className={`text-sm border p-2 rounded-md flex items-center gap-1 border-blue-300
+                       focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-1
+                      ${
+                        !disabled
+                          ? "bg-gray-50 cursor-not-allowed opacity-50"
+                          : "bg-gray-50 hover:bg-blue-200 "
+                      }`}
+                    disabled={!disabled}
+                    onClick={handleInvoiceDownload}
+                  >
+                    <div className="flex items-center gap-1">
+                      <span className="text-gray-700">Download</span>
+                      <Download size={14} className="text-blue-500" />
+                    </div>
+                  </button>
+                  {/* <Button disabled={!disabled} onClick={handleInvoiceDownload}>
+                    <div className="flex items-center gap-1">
+                      <span>Download</span>
+                      <Download size={14} />
+                    </div>
+                  </Button> */}
+                  <button
+                    className={`text-sm border p-2 rounded-md flex items-center gap-1 text-gray-700
+                       focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-1
+                      ${
+                        !userHasAccessToViewCompanyInvoice
+                          ? "bg-gray-50 cursor-not-allowed opacity-50"
+                          : "bg-gray-50 hover:bg-red-200 hover border-red-300"
+                      }`}
+                    disabled={!userHasAccessToViewCompanyInvoice}
+                    onClick={previewInvoice}
+                  >
+                    <div className="flex items-center gap-1">
+                      <span className="">Preview</span>
+                      <FaFilePdf size={14} className="text-red-500" />
+                    </div>
+                  </button>
+                  {/* <Button
+                    disabled={!userHasAccessToViewCompanyInvoice}
+                    onClick={previewInvoice}
+                  >
+                    <div className="flex items-center gap-1">
+                      <span>Preview</span>
+                      <FaFilePdf size={14} color="white" />
+                    </div>
+                  </Button> */}
+                </div>
+              )}
+            </div>
+            {isCreateMode && (
+              <div className="flex items-end justify-start py-1 gap-3">
+                {/* Dropdown */}
+                <div className="w-80">
+                  <LookupAccountDropdown
+                    icon={<User size={14} />}
+                    value={selectedAccount}
+                    label="Select Account"
+                    handleAccountSelection={handleAccountSelect}
+                  />
+                </div>
+
+                {/* Save Button */}
+                <div className="">
+                  <Button onClick={handleSaveInvoice}>
+                    {isSubmitting ? "Saving..." : "Save"}
+                  </Button>
+                </div>
               </div>
             )}
-            <Button
-              disabled={!userHasAccessToViewCompanyInvoice}
-              onClick={previewInvoice}
-            >
-              <div className="flex items-center gap-1">
-                <span>Preview</span>
-                <FaFilePdf size={14} color="white" />
-              </div>
-            </Button>
-            <Button
-              disabled={!userHasAccessToUpdateCompanyInvoice || disabled}
-              onClick={updateInvoice}
-            >
-              Update
-            </Button>
-            <Button
-              disabled={
-                !userHasAccessToUpdateCompanyInvoiceApproval || disabled
-              }
-              onClick={SubmitInvoice}
-            >
-              Submit
-            </Button>
-          </div>
-        </div>
 
-        {/* ITEMS */}
-        {userHasAccessToViewCompanyInvoiceItem && (
-          <div className="bg-white border rounded p-2 mb-1">
-            <div className="flex justify-between py-1">
-              <h3 className="font-semibold">Products & Services</h3>
-              <SearchInput
-                value={searchTerm}
-                onChange={(e: any) => setSearchTerm(e.target.value)}
-                placeholder="Search product..."
+            {/* META */}
+            <div className="grid grid-cols-4 bg-gray-100 border rounded py-1 px-2 mb-2">
+              <MetaField
+                label="Invoice Number"
+                value={invoice?.invoiceNumber || "[Auto-generated]"}
               />
+              <MetaField
+                label="Invoice Date"
+                value={invoice?.invoiceDate || "[Auto-generated]"}
+              />
+              <MetaField
+                label="Status"
+                value={<InvoiceStatusChip statusId={invoice?.statusId} />}
+              />
+              {disabled ? (
+                <MetaField label="Due Date" value={invoice?.dueDate} />
+              ) : (
+                <FormInput
+                  label="Due Date"
+                  type="date"
+                  value={invoice?.dueDate}
+                  onChange={(e: any) =>
+                    setInvoice((prev) => ({
+                      ...prev!,
+                      dueDate: e.target.value,
+                    }))
+                  }
+                />
+              )}
+
+              <MetaField label="Created By" value={invoice?.createdBy} />
+              <MetaField label="Created On" value={invoice?.createdOn} />
+              <MetaField label="Updated By" value={invoice?.updatedBy} />
+              <MetaField label="Updated On" value={invoice?.updatedOn} />
             </div>
 
-            <table className="w-full text-sm font-semibold">
-              <thead className="sticky top-0 bg-gray-50 z-10 border">
-                <tr className="bg-gray-100 border-b">
-                  <th>#</th>
-                  <th className="p-2 text-left">Product</th>
-                  <th>Qty</th>
-                  <th>Price</th>
-                  <th>HSN/SAC</th>
-                  <th>Amount</th>
-                  <th>Discount(%)</th>
-                  <th>Taxable Value</th>
-                  <th>CGST (%)</th>
-                  <th>SGST (%)</th>
-                  <th>IGST (%)</th>
-                  <th>Total Item Amount</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
+            {/* ADDRESS */}
+            <div className="grid grid-cols-2 gap-x-3 border rounded p-2 mb-2 bg-gray-100">
+              <TextAreaInput
+                label="Billing Address"
+                maxLength={255}
+                disabled={disabled}
+                value={invoice?.billingAddress}
+                onChange={(e: any) =>
+                  setInvoice((prev) => ({
+                    ...prev!,
+                    billingAddress: e.target.value,
+                  }))
+                }
+                rows={3}
+                cols={3}
+              />
 
-              <tbody>
-                {/* {filteredItems.map((item, i) => { */}
-                {tempItems
-                  .filter((item) =>
-                    item?.companyProductName
-                      ?.toLowerCase()
-                      .includes(searchTerm.toLowerCase()),
-                  )
-                  .map((item, i) => {
-                    return (
-                      <tr
-                        key={item.id}
-                        className="border-t font-normal text-sm hover:bg-blue-100 text-center"
-                      >
-                        <td>{i + 1}</td>
-                        <td className="p-2 text-left">
-                          {item.companyProductName}
-                        </td>
-                        <td>{item.quantity}</td>
-                        <td>{item.rate}</td>
-                        <td>{item.hsn || item.sac}</td>
-                        <td>{item.basicValue}</td>
-                        <td>
-                          <input
-                            type="number"
-                            className={`${editingItemId !== item.id ? "" : "border"} rounded p-1 text-center w-16`}
-                            value={item.discountPercent}
-                            disabled={disabled || editingItemId !== item.id}
-                            onChange={(e) =>
-                              handleDiscountChange(
-                                item.id,
-                                Number(e.target.value),
-                              )
-                            }
-                          />
-                        </td>
-                        <td>{item.taxableValue}</td>
-                        <td>{item.cgstPercent}</td>
-                        <td>{item.sgstPercent}</td>
-                        <td>{item.igstPercent}</td>
-                        <td>{item.totalAmount}</td>
+              <TextAreaInput
+                label="Shipping Address"
+                maxLength={255}
+                disabled={disabled}
+                value={invoice?.shippingAddress}
+                onChange={(e: any) =>
+                  setInvoice((prev) => ({
+                    ...prev!,
+                    shippingAddress: e.target.value,
+                  }))
+                }
+                rows={3}
+                cols={3}
+              />
 
-                        {!disabled && (
-                          <td>
-                            <div className="flex gap-2 justify-center">
-                              {editingItemId !== item.id ? (
-                                <button
-                                  disabled={
-                                    !userHasAccessToUpdateCompanyInvoiceItem ||
-                                    disabled
-                                  }
-                                  onClick={() => handleDeleteItem(item)}
-                                >
-                                  <Trash className="text-red-500" size={16} />
-                                </button>
-                              ) : null}
-                              {editingItemId === item.id ? (
-                                <div className="flex gap-1 justify-center">
-                                  <button
-                                    className="text-green-600 text-xs border px-2 rounded hover:bg-blue-500 hover:text-white"
-                                    onClick={() => saveSingleItem(item)}
-                                  >
-                                    Save
-                                  </button>
-                                  <button
-                                    className="text-gray-500 text-xs border px-2 rounded hover:bg-blue-500 hover:text-white"
-                                    onClick={cancelEdit}
-                                  >
-                                    {/* Cancel */}
-                                    <X className="text-gray-600" size={14} />
-                                  </button>
-                                </div>
-                              ) : (
-                                <button
-                                  disabled={
-                                    !userHasAccessToUpdateCompanyInvoiceItem ||
-                                    disabled
-                                  }
-                                  onClick={() => {
-                                    if (
-                                      !userHasAccessToUpdateCompanyInvoiceItem
-                                    ) {
-                                      return;
-                                    }
-                                    setEditingItemId(item.id);
-                                  }}
-                                  className="text-blue-600 text-xs px-2 "
-                                >
-                                  {/* Edit */}
-                                  <Pencil className="text-blue-600" size={14} />
-                                </button>
-                              )}
-                            </div>
-                          </td>
-                        )}
-                      </tr>
-                    );
-                  })}
-              </tbody>
-            </table>
-
-            <div className="w-full items-center justify-center  flex-1">
-              <span className="text-xs flex items-center justify-center font-medium text-gray-500 border rounded-lg px-2 py-1  bg-blue-100">
-                You can add or modify invoice items while it's in draft state.
-              </span>
+              <TextAreaInput
+                label="Terms & Conditions"
+                maxLength={500}
+                disabled={disabled}
+                value={invoice?.termAndConditions}
+                onChange={(e: any) =>
+                  setInvoice((prev) => ({
+                    ...prev!,
+                    termAndConditions: e.target.value,
+                  }))
+                }
+                rows={3}
+                cols={3}
+              />
+              <TextAreaInput
+                label="Remarks"
+                maxLength={300}
+                disabled={disabled}
+                value={invoice?.remarks}
+                onChange={(e: any) =>
+                  setInvoice((prev) => ({
+                    ...prev!,
+                    remarks: e.target.value,
+                  }))
+                }
+                rows={3}
+                cols={3}
+              />
+              <div className="col-span-2 flex items-center justify-end p-1">
+                <div className="flex gap-2">
+                  {/* <Button disabled={!disabled} onClick={handleInvoiceDownload}>
+                  <div className="flex items-center gap-1">
+                    <span>Download</span>
+                    <Download size={14} />
+                  </div>
+                </Button> */}
+                  {showCompanyLogoPreview && (
+                    <div
+                      className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50"
+                      onClick={() => setShowCompanyLogoPreview(false)}
+                    >
+                      <CustomDocumentPreviewComponent
+                        fileUrl={logoPreview!}
+                        fileExtension={"application/pdf"}
+                        width={"50%"}
+                        height={"85%"}
+                        enableDownload={true}
+                      />
+                    </div>
+                  )}
+                  {/* <Button
+                  disabled={!userHasAccessToViewCompanyInvoice}
+                  onClick={previewInvoice}
+                >
+                  <div className="flex items-center gap-1">
+                    <span>Preview</span>
+                    <FaFilePdf size={14} color="white" />
+                  </div>
+                </Button> */}
+                  {!isCreateMode && (
+                    <Button
+                      disabled={
+                        !userHasAccessToUpdateCompanyInvoice || disabled
+                      }
+                      onClick={updateInvoice}
+                    >
+                      Update
+                    </Button>
+                  )}
+                  {!isCreateMode && (
+                    <Button
+                      disabled={
+                        !userHasAccessToUpdateCompanyInvoiceApproval || disabled
+                      }
+                      onClick={SubmitInvoice}
+                    >
+                      Submit
+                    </Button>
+                  )}
+                </div>
+              </div>
             </div>
-          </div>
+          </>
         )}
-        {/* BOTTOM */}
-        <div className="grid grid-cols-2 text-sm mb-2">
-          {/* Left */}
-          <div className="space-y-2">
-            {/* <TextAreaInput label="Terms & Conditions" rows={3} cols={3} />
-                          <TextAreaInput label="Remarks" rows={1} cols={3} /> */}
-          </div>
-          <div>
-            <span className="font-medium text-gray-700 text-sm ">Summary</span>
-            {/* Right Summary */}
-            <div className="border rounded-lg p-4 bg-gray-50 space-y-2">
-              <div className="flex justify-between">
-                <span>Basic Amount</span>
-                <span>{formatRupee(summary.basic)}</span>
-              </div>
+        {/* ITEMS */}
+        {itemsLoading ? (
+          <InvoiceItemsSkeleton />
+        ) : (
+          <>
+            {!isCreateMode && userHasAccessToViewCompanyInvoiceItem && (
+              <div className="bg-white border rounded p-2 mb-1">
+                <div className="flex justify-between py-1">
+                  <h3 className="font-semibold">Invoice Items</h3>
+                  <SearchInput
+                    value={searchTerm}
+                    onChange={(e: any) => setSearchTerm(e.target.value)}
+                    placeholder="Search product..."
+                  />
+                  <div>
+                    <Button
+                      type="button"
+                      // disabled={!userHasAccessToAddCompanyInvoiceItem}
+                      onClick={() => {
+                        if (!userHasAccessToAddCompanyInvoiceItem) {
+                          toast.error(
+                            MESSAGE.MODULE_ACCESS.COMPANY_INVOICE_ITEM
+                              .DENIED_ADD_ACCESS,
+                          );
+                          return;
+                        }
+                        handleAddToInvoice();
+                      }}
+                      className={COLORS.ADD_BUTTON}
+                    >
+                      +Add All
+                    </Button>
+                  </div>
+                </div>
+                <div className="w-full max-h-[35vh] overflow-y-auto border rounded">
+                  <table className="w-full text-sm font-semibold ">
+                    <thead className="sticky top-0 bg-gray-50 z-10 border">
+                      <tr className="bg-gray-100 border-b">
+                        <th>#</th>
+                        <th className="p-2 text-left">
+                          Product/Service/Subscription
+                        </th>
+                        <th>Qty</th>
+                        <th>Price</th>
+                        <th>HSN/SAC</th>
+                        <th>Amount</th>
+                        <th>Discount(%)</th>
+                        <th>Taxable Value</th>
+                        <th>CGST (%)</th>
+                        <th>SGST (%)</th>
+                        <th>IGST (%)</th>
+                        {hasCess && <th>Cess (%)</th>}
+                        <th>Total Item Amount</th>
+                        <th>Action</th>
+                      </tr>
+                    </thead>
 
-              <div className="flex justify-between">
-                <span>Total Discount</span>
-                <span>{formatRupee(summary.discount)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Total Amount</span>
-                <span>{formatRupee(summary.taxable)}</span>
-              </div>
+                    <tbody>
+                      {tempItems.filter((item) =>
+                        item?.companyProductName
+                          ?.toLowerCase()
+                          .includes(searchTerm.toLowerCase()),
+                      ).length === 0 ? (
+                        <tr>
+                          <td
+                            colSpan={disabled ? 12 : 13}
+                            className="text-center py-4 text-gray-500"
+                          >
+                            No rows found
+                          </td>
+                        </tr>
+                      ) : (
+                        tempItems
+                          .filter((item) =>
+                            item?.companyProductName
+                              ?.toLowerCase()
+                              .includes(searchTerm.toLowerCase()),
+                          )
+                          .map((item, i) => {
+                            return (
+                              <tr
+                                key={item.id}
+                                className="border-t font-normal text-xs hover:bg-blue-100 text-center"
+                              >
+                                <td>{i + 1}</td>
+                                <td className="p-2 text-left">
+                                  {item.companyProductName}
+                                </td>
+                                <td>{item.quantity}</td>
+                                <td>{item.rate}</td>
+                                <td>{item.hsn || item.sac}</td>
+                                <td>{item.basicValue}</td>
+                                <td>
+                                  <input
+                                    type="number"
+                                    className={`${editingItemId !== item.id ? "" : "border"} rounded p-1 text-center w-16`}
+                                    value={item.discountPercent}
+                                    disabled={
+                                      disabled || editingItemId !== item.id
+                                    }
+                                    onChange={(e) =>
+                                      handleDiscountChange(
+                                        item.id,
+                                        Number(e.target.value),
+                                      )
+                                    }
+                                  />
+                                </td>
+                                <td>{item.taxableValue}</td>
+                                <td>
+                                  {item.cgstAmount} ({item.cgstPercent}%)
+                                </td>
+                                <td>
+                                  {item.sgstAmount} ({item.sgstPercent}%)
+                                </td>
+                                <td>
+                                  {item.igstAmount} ({item.igstPercent}%)
+                                </td>
+                                {hasCess && (
+                                  <td>
+                                    {item.cessAmount} ({item.cessPercent}%)
+                                  </td>
+                                )}
+                                <td>{item.totalAmount}</td>
 
-              <div className="flex justify-between">
-                <span>Total Tax</span>
-                <span>{formatRupee(summary.tax)}</span>
+                                {!disabled && (
+                                  <td>
+                                    <div className="flex gap-2 justify-center">
+                                      {editingItemId !== item.id ? (
+                                        <button
+                                          disabled={
+                                            !userHasAccessToUpdateCompanyInvoiceItem ||
+                                            disabled
+                                          }
+                                          onClick={() => handleDeleteItem(item)}
+                                        >
+                                          <Trash
+                                            className="text-red-500"
+                                            size={16}
+                                          />
+                                        </button>
+                                      ) : null}
+                                      {editingItemId === item.id ? (
+                                        <div className="flex gap-1 justify-center">
+                                          <button
+                                            className="text-green-600 text-xs border px-2 rounded hover:bg-blue-500 hover:text-white"
+                                            onClick={() => saveSingleItem(item)}
+                                          >
+                                            Save
+                                          </button>
+                                          <button
+                                            className="text-gray-500 text-xs border px-2 rounded hover:bg-blue-500 hover:text-white"
+                                            onClick={cancelEdit}
+                                          >
+                                            {/* Cancel */}
+                                            <X
+                                              className="text-gray-600"
+                                              size={14}
+                                            />
+                                          </button>
+                                        </div>
+                                      ) : (
+                                        <button
+                                          disabled={
+                                            !userHasAccessToUpdateCompanyInvoiceItem ||
+                                            disabled
+                                          }
+                                          onClick={() => {
+                                            if (
+                                              !userHasAccessToUpdateCompanyInvoiceItem
+                                            ) {
+                                              return;
+                                            }
+                                            setEditingItemId(item.id);
+                                          }}
+                                          className="text-blue-600 text-xs px-2 "
+                                        >
+                                          {/* Edit */}
+                                          <Pencil
+                                            className="text-blue-600"
+                                            size={14}
+                                          />
+                                        </button>
+                                      )}
+                                    </div>
+                                  </td>
+                                )}
+                              </tr>
+                            );
+                          })
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+                <div className="w-full items-center justify-center  flex-1">
+                  <span className="text-xs flex items-center justify-center font-medium text-gray-500 border rounded-lg px-2 py-1  bg-blue-100">
+                    You can add or modify invoice items while it's in draft
+                    state.
+                  </span>
+                </div>
               </div>
+            )}
+            {isCreateMode && (
+              <div className="w-full items-center justify-center  flex-1">
+                <span className="text-xs flex items-center justify-center font-medium text-gray-500 border rounded-lg px-2 py-1  bg-blue-100">
+                  Once an invoice is created for an account, all items assigned
+                  to that account are automatically added to the invoice.
+                </span>
+              </div>
+            )}
+            {/* BOTTOM */}
+            {!isCreateMode && (
+              <div className="grid grid-cols-2 text-sm mb-2">
+                {/* Left */}
+                <div className="space-y-2"></div>
+                <div>
+                  <span className="font-medium text-gray-700 text-sm ">
+                    Summary
+                  </span>
+                  {/* Right Summary */}
+                  <div className="border rounded-lg p-4 bg-gray-50 space-y-2">
+                    <div className="flex justify-between">
+                      <span>Basic Amount</span>
+                      <span>{formatRupee(summary.basic)}</span>
+                    </div>
 
-              <div className="border-t pt-2 flex justify-between text-base font-semibold text-blue-600">
-                <span>Total Invoice Amount</span>
-                <span>{formatRupee(summary.total)}</span>
+                    <div className="flex justify-between">
+                      <span>Total Discount</span>
+                      <span>{formatRupee(summary.discount)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Total Amount</span>
+                      <span>{formatRupee(summary.taxable)}</span>
+                    </div>
+
+                    <div className="flex justify-between">
+                      <span>Total Cess</span>
+                      <span>{formatRupee(summary.cess)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Total Tax</span>
+                      <span>{formatRupee(summary.tax)}</span>
+                    </div>
+
+                    <div className="border-t pt-2 flex justify-between text-base font-semibold text-blue-600">
+                      <span>Total Invoice Amount</span>
+                      <span>{formatRupee(summary.total)}</span>
+                    </div>
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
-        </div>
+            )}
+          </>
+        )}
       </div>
     </PageLayout>
   );

@@ -85,6 +85,58 @@ function AccountInvoiceManagementList({
     navigateToInvoice(rowData);
   };
 
+  const handleSaveHeader = async () => {
+    // if (!dueDate) {
+    //   toast.error("Please select due date");
+    //   return;
+    // }
+    // if (!hasAccount && !selectedAccount) {
+    //   toast.error("Please select an account");
+    //   return;
+    // }
+    const formPayload = {
+      company_id: loginStatus.companyId,
+      account_id: account?.id,
+      // terms_and_conditions: terms,
+      // remark: remarks,
+      // billing_address: billingAddress,
+      // shipping_address: shippingAddress,
+      // due_date: dueDate,
+      createdby_id: loginStatus.id,
+    };
+    console.log(formPayload);
+    // console.log(selectedAccount);
+    setIsSubmitting(true);
+    await axiosClient
+      .post(POST_API.CREATE_COMPANY_INVOICE, formPayload, {
+        withCredentials: true,
+      })
+      .then((response) => {
+        if (response.data.status) {
+          toast.success(response.data.message);
+          console.log(response.data);
+
+          const invoiceId = response?.data?.newid || 0;
+          handleAddInvoice();
+          const path = ROUTES_URL.INVOICE_DETAILS.replace(
+            ":invoiceId",
+            String(invoiceId),
+          );
+          navigate(path);
+          // onClose();
+        } else {
+          toast.error(response.data.message);
+        }
+      })
+      .catch(async (error) => {
+        console.log(error);
+        handleApiError(error);
+      })
+      .finally(() => {
+        setIsSubmitting(false);
+      });
+  };
+
   const onDeleteInvoice = async (rowData: AccountInvoiceProps) => {
     console.log("Delete Invoice:", rowData);
     const postData = {
@@ -124,7 +176,7 @@ function AccountInvoiceManagementList({
 
     try {
       const response = await axiosClient.post(
-        "http://localhost:8080/api/main/purple-crm-api/get/company-invoice/document",
+        POST_API.COMPANY_INVOICE_DOWNLOAD,
         {
           company_id: loginStatus.companyId,
           company_invoice_id: Number(rowData?.id),
@@ -242,7 +294,13 @@ function AccountInvoiceManagementList({
                     );
                     return;
                   }
-                  setIsCreateInvoiceModalOpen(true);
+
+                  // setIsCreateInvoiceModalOpen(true);
+                  const path = ROUTES_URL.INVOICE_DETAILS.replace(
+                    ":invoiceId",
+                    String(0),
+                  );
+                  navigate(path);
                 }}
                 // className={COLORS.ADD_BUTTON}
               >
@@ -312,7 +370,8 @@ function AccountInvoiceManagementList({
                         );
                         return;
                       }
-                      setIsCreateInvoiceModalOpen(true);
+                      handleSaveHeader();
+                      // setIsCreateInvoiceModalOpen(true);
                     }}
                     className={COLORS.ADD_BUTTON}
                   >

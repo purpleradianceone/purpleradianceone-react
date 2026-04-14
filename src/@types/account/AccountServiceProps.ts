@@ -9,6 +9,7 @@ type AccountServiceProps = {
   serviceDateTime: string;
   serviceStatusId: number;
   serviceStatus: string;
+  isAddedToInvoiceDraft: boolean;
   isActive: boolean;
   createdBy: string;
   createdOn: string;
