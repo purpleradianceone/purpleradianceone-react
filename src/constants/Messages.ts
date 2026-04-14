@@ -193,6 +193,10 @@ const MESSAGE = {
             DENIED_VIEW_ACCESS: "You do not have permission to view lead tasks.",
             DENIED_ADD_ACCESS: "You do not have permission to create lead tasks.",
             DENIED_UPDATE_ACCESS: "You do not have permission to update lead tasks.",
+        }, LEAD_QUOTATION: {
+            DENIED_VIEW_ACCESS: "You do not have permission to view lead quotation.",
+            DENIED_ADD_ACCESS: "You do not have permission to create lead quotation.",
+            DENIED_UPDATE_ACCESS: "You do not have permission to update lead quotation.",
         },TEAM_USERS: {
             DENIED_VIEW_ACCESS: "You do not have permission to view team users.",
             DENIED_ADD_ACCESS: "You do not have permission to add users to team.",

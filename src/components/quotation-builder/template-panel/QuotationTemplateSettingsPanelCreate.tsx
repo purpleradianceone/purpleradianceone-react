@@ -24,6 +24,7 @@ import {
 import { JsonFileData } from "../quotation-template-types/JsonFileData";
 import LoadingPopUpAnimation from "../../views/card/LoadingPopUpAnimation";
 import CustomDocumentPreviewComponent from "../../custom-document-preview-component/CustomDocumentPreviewComponent";
+import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
 
 type QuotationTemplateSettingsPanelCreateProps = {
   quotationTemplateNamePlaceholder?: string;
@@ -43,6 +44,8 @@ export const QuotationTemplateSettingsPanelCreate: React.FC<
     useState<boolean>(false);
   const [pdfPreviewUrl, setPdfPreviewUrl] = useState<string | null>(null);
   const [isLoadingForPreviewTemplate, setisLoadingForPreviewTemplate] = useState<boolean>(false);
+
+  const {userHasAccessToAddQuotationTemplate} = useUserAccessModules();
 
   function getCraftJson(): string {
     const storedDefaultHeader = localStorage.getItem(
@@ -181,7 +184,7 @@ export const QuotationTemplateSettingsPanelCreate: React.FC<
       {/* Save Button */}
       {/* Fixed Save Button */}
       <div className="fixed flex  gap-2 top-12 right-4 z-10">
-        <div>
+        <div className="hidden">
           <Button
             onClick={(e) => {
               e.preventDefault();
@@ -196,6 +199,7 @@ export const QuotationTemplateSettingsPanelCreate: React.FC<
         </div>
         <div>
           <Button
+            disabled={!userHasAccessToAddQuotationTemplate}
             onClick={(e) => {
               e.preventDefault();
               setIsOpen(true);

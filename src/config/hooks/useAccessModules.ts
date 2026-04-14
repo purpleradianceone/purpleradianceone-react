@@ -610,6 +610,19 @@ export const useUserAccessModules = () => {
     (accessModule) => accessModule.crm_module_id === 44 && accessModule.update,
   );
 
+  //lead-quotation
+  const userHasAccessToAddLeadQuotation = accessModules.some(
+    (accessModules) => accessModules.crm_module_id === 62 && accessModules.add,
+  );
+
+  const userHasAccessToViewLeadQuotation = accessModules.some(
+    (accessModule) => accessModule.crm_module_id === 62 && accessModule.view,
+  );
+
+  const userHasAccessToUpdateLeadQuotation = accessModules.some(
+    (accessModule) => accessModule.crm_module_id === 62 && accessModule.update,
+  );
+
   //setting-company-detail
   const userHasAccessToAddCompanyDetail = accessModules.some(
     (accessModules) => accessModules.crm_module_id === 48 && accessModules.add,
@@ -736,6 +749,20 @@ export const useUserAccessModules = () => {
     (accessModule) => accessModule.crm_module_id === 57 && accessModule.update,
   );
 
+    //Company Quotation
+  const userHasAccessToAddCompanyQuotation = accessModules.some(
+    (accessModules) => accessModules.crm_module_id === 63 && accessModules.add,
+  );
+
+  const userHasAccessToViewCompanyQuotation = accessModules.some(
+    (accessModule) => accessModule.crm_module_id === 63 && accessModule.view,
+  );
+
+  const userHasAccessToUpdateCompanyQuotation = accessModules.some(
+    (accessModule) => accessModule.crm_module_id === 63 && accessModule.update,
+  );
+
+
   //Invoice Company Product/Item
   const userHasAccessToAddCompanyInvoiceItem = accessModules.some(
     (accessModules) => accessModules.crm_module_id === 58 && accessModules.add,
@@ -844,6 +871,10 @@ export const useUserAccessModules = () => {
     userHasAccessToAddSettingLead,
     userHasAccessToViewSettingLead,
     userHasAccessToUpdateSettingLead,
+
+    userHasAccessToAddLeadQuotation,
+    userHasAccessToViewLeadQuotation,
+    userHasAccessToUpdateLeadQuotation,
 
     userHasAccessToAddEmailTemplateSetting,
     userHasAccessToViewEmailTemplateSetting,
@@ -1026,5 +1057,9 @@ export const useUserAccessModules = () => {
     userHasAccessToAddCompanyInvoiceCancel,
     userHasAccessToViewCompanyInvoiceCancel,
     userHasAccessToUpdateCompanyInvoiceCancel,
+
+    userHasAccessToAddCompanyQuotation,
+    userHasAccessToViewCompanyQuotation,
+    userHasAccessToUpdateCompanyQuotation,
   };
 };

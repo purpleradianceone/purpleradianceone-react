@@ -1550,9 +1550,11 @@ const ViewLeadManagement = () => {
           </div>
          
         </div>
-         <div className="w-full mt-2">
-          <QuotationDetails leadId={leadDetailsData.id}/>
-          </div>
+         {<div className="w-full mt-2">
+          <QuotationDetails 
+            id={selectedLeadData.id}
+            quotation_type_id={1}/>
+          </div>}
         {/* end  */}
 
         {/* update lead form */}

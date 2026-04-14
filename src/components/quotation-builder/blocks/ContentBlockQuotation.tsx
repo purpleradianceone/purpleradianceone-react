@@ -66,88 +66,93 @@ export const ContentBlockQuotation: React.FC = () => {
   }, [editing, props.htmlContent]);
 
   const joditConfig = useMemo(
-    () => ({
-      readonly: false,
-      height: 300,
-      toolbarAdaptive: false,
-      toolbarSticky: true,
-      showCharsCounter: false,
-      showWordsCounter: false,
-      showXPathInStatusbar: false,
-      // nl2brInPlainText: false,
-      // addNewLine: false,
+    () =>
+      ({
+        readonly: false,
+        height: 300,
+        toolbarAdaptive: false,
+        toolbarSticky: true,
+        showCharsCounter: false,
+        showWordsCounter: false,
+        showXPathInStatusbar: false,
+        //Fix for enter taking extra line
+        enter: "br",
+        enterBlock: "p",
+        defaultActionOnEnter: "insert_br",
 
-      // ✅ FIX START
-      // config: {
-      //   enter: "br",
-      //   enterBlock: "br",
-      // },
-      enter: "br",
-      enterBlock: "p",
-      defaultActionOnEnter: "insert_br",
+        cleanHTML: {
+          fillEmptyParagraph: false,
+          removeEmptyElements: false,
+        },
+        //Fix end
 
-      cleanHTML: {
-        fillEmptyParagraph: false,
-        removeEmptyElements: false,
-      },
-      // ✅ FIX END
+        //Fix for font family
+        allowTags: {
+          span: { style: true },
+          p: { style: true },
+        },
 
-      buttons: [
-        "bold",
-        "italic",
-        "underline",
-        "strikethrough",
-        "eraser",
-        "|",
-        "font",
-        "fontsize",
-        "brush",
-        "paragraph",
-        "lineHeight",
-        "|",
-        "ul",
-        "ol",
-        "|",
-        "align",
-        "|",
-        "hr",
-        "table",
-        "image",
-        "link",
-        "symbols",
-        "|",
-        "selectall",
+        style: {
+          font: true,
+        },
+        //Fix end
 
-        "|",
-        "placeholders",
-        "|",
+        buttons: [
+          "bold",
+          "italic",
+          "underline",
+          "strikethrough",
+          "eraser",
+          "|",
+          "font",
+          "fontsize",
+          "brush",
+          "paragraph",
+          "lineHeight",
+          "|",
+          "ul",
+          "ol",
+          "|",
+          "align",
+          "|",
+          "hr",
+          "table",
+          "image",
+          "link",
+          "symbols",
+          "|",
+          "selectall",
 
-        "|",
-        "undo",
-        "redo",
-        "|",
-        "fullsize",
-      ],
+          "|",
+          "placeholders",
+          "|",
 
-      removeButtons: [
-        "source",
-        "video",
-        "file",
-        "print",
-        // "selectall",
-        "copyformat",
-        // "hr",
-        "spellcheck",
-        "preview",
-      ],
+          "|",
+          "undo",
+          "redo",
+          "|",
+          "fullsize",
+        ],
 
-      uploader: {
-        insertImageAsBase64URI: true,
-      },
+        removeButtons: [
+          "source",
+          "video",
+          "file",
+          "print",
+          // "selectall",
+          "copyformat",
+          // "hr",
+          "spellcheck",
+          "preview",
+        ],
 
-      disablePlugins: ["file", "video", "about", "clipboard"],
-      placeholder: "Enter quotation text...",
-    } as any),
+        uploader: {
+          insertImageAsBase64URI: true,
+        },
+
+        disablePlugins: ["file", "video", "about", "clipboard"],
+        placeholder: "Enter quotation text...",
+      }) as any,
     [],
   );
 
