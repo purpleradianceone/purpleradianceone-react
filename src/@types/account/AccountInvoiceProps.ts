@@ -1,4 +1,4 @@
-/* Account Invoice मुख्य data structure */
+/* Account Invoice data structure */
 
 type AccountInvoiceProps = {
   id: number;
