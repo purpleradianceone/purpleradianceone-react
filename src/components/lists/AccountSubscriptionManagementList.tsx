@@ -35,7 +35,7 @@ function AccountSubscriptionManagementList({
   handleSelectedCompanyProductChange,
   accountSubscriptionData,
   handleAddToInvoice,
-  handleRowSelectedForShowAccountSubscription,
+  // handleRowSelectedForShowAccountSubscription,
 
   accountId,
 }: AccountSubscriptionManagementListProps) {
@@ -99,7 +99,10 @@ function AccountSubscriptionManagementList({
   };
 
   const handleRowSelected = (rowData: AccountSubscriptionProps | any) => {
-    handleRowSelectedForShowAccountSubscription!(rowData);
+    // handleRowSelectedForShowAccountSubscription!(rowData);
+    navigate(
+      `${ROUTES_URL.ACCOUNT_DETAILS}/${accountId}/account-subscription-details/${rowData.id}`,
+    );
   };
 
   if (userHasAccessToViewAccountSubscription) {

@@ -19,7 +19,7 @@ import { NavLink } from "react-router-dom";
 import ROUTES_URL from "../../../../constants/Routes";
 import { useUserAccessModules } from "../../../../config/hooks/useAccessModules";
 import { SIZE } from "../../../../constants/AppConstants";
-import { LiaFileInvoiceSolid } from "react-icons/lia";
+import { FaRegFileAlt } from "react-icons/fa";
 
 function SideNavBar({ isOpen, onToggle }: SideBarProps) {
   const {
@@ -116,7 +116,7 @@ function SideNavBar({ isOpen, onToggle }: SideBarProps) {
         <NavLink to={ROUTES_URL.INVOICE_MANAGEMENT}>
           {({ isActive }) => (
             <SideNavBarItem
-              icon={LiaFileInvoiceSolid}
+              icon={FaRegFileAlt}
               label="Invoices"
               isOpen={isOpen}
               isActive={isActive}

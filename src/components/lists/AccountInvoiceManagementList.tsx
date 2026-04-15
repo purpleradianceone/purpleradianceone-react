@@ -19,7 +19,6 @@ import AccountInvoiceProps from "../../@types/account/AccountInvoiceProps";
 import AccountInvoiceManagementAgGrid from "../ag-grid/AccountInvoiceManagementAgGrid";
 import AccountInvoiceManagementListProps from "../../@types/List/AccountInvoiceManagementListProps";
 import GenerateInvoiceModal from "../modals/Invoice/GenerateInvoiceModal";
-import { File } from "lucide-react";
 import CustomDropdown from "../modals/leads/CustomDropdown";
 import ROUTES_URL from "../../constants/Routes";
 import POST_API from "../../constants/PostApi";
@@ -29,6 +28,7 @@ import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
 import { ComponentHeaderAndLogo } from "../ui/ComponentHeaderAndLogo";
 import CustomDocumentPreviewComponent from "../custom-document-preview-component/CustomDocumentPreviewComponent";
 import LoadingPopUpAnimation from "../views/card/LoadingPopUpAnimation";
+import { FaRegFileAlt } from "react-icons/fa";
 
 export const accountInvoiceDataUrlSearchParamKey: string = "accountInvoiceData";
 
@@ -241,7 +241,7 @@ function AccountInvoiceManagementList({
             {/* LEFT */}
             <div className="flex items-center gap-2 flex-wrap">
               {/* 🔹 Title */}
-              <ComponentHeaderAndLogo logo={File} headerText="Invoices" />
+              <ComponentHeaderAndLogo logo={FaRegFileAlt} headerText="Invoices" />
               {/* 🔹 Search */}
               <div className="w-fit min-w-[120px]">
                 <SearchInput
@@ -375,7 +375,7 @@ function AccountInvoiceManagementList({
                     }}
                     className={COLORS.ADD_BUTTON}
                   >
-                    +Add
+                    Generate Invoice
                   </Button>
                 </div>
               </div>
