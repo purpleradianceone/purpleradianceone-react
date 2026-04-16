@@ -95,3 +95,15 @@ export const updateCompanyWhatsappPhone  = async (payload: object
     const response = await axiosClient.post(POST_API.UPDATE_WHATSAPP_PHONE_INTEGRATION, payload, { withCredentials: true })
     return response;
 }
+
+/**
+ * FECTHES PAGES UNDET THE FACEBOOK ACCOUNT 
+ * "http://localhost:8080/api/main/purple-crm-api/get/me-facebook-pages"
+ * @param payload 
+ * @returns 
+ */
+export const getMeFacebookAccounts  = async (payload: object
+) => {
+    const response = await axiosClient.post(POST_API.GET_ME_FACEBOOK_PAGES, payload, { withCredentials: true })
+    return response;
+}

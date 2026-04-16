@@ -90,7 +90,6 @@ import StockAgeingManagement from "../../components/views/stock-management/Stock
 import ReminderSetting from "../../components/views/settings/reminder/ReminderSetting";
 import { MetaAppsIntegrationTabsBreadcrumb } from "../../components/views/settings/social-media-integration/MetaAppsIntergrationTabsBreadcrumb";
 import { FacebookBreadCrumb } from "../../components/views/settings/social-media-integration/meta-app-facebook/FacebookBreadcrumb";
-import { PageIdIntegrationManagement } from "../../components/views/settings/social-media-integration/meta-app-facebook/PageIdIntegrationManagement";
 import AccountServiceDetails from "../../components/modals/Account/account-service/AccountServiceDetails";
 import AccountSubscriptionDetails from "../../components/modals/Account/account-subscription/AccountSubscriptionDetails";
 import WhatsappOAuthConsent from "../../components/dialogue-box/WhatsappOAuthConsent";
@@ -99,6 +98,7 @@ import { EditorCanvasForQuotationEdit } from "../../components/quotation-builder
 import AccountInvoice from "../../components/modals/Account/account-invoice/AccountInvoice";
 import CompanyInvoiceDetails from "../../components/views/invoice/CompanyInvoiceDetails";
 import UserAndCompanyProfileManagement from "../../components/user-profile/UserPreferenceManagement";
+import { FacebookPageIntegrationManagement } from "../../components/views/settings/social-media-integration/meta-app-facebook/FacebookPageIntegrationManagement";
 
 
 
@@ -1143,7 +1143,8 @@ export const router = createBrowserRouter([
               MESSAGE.MODULE_ACCESS.SETTING.INTEGRATION.DENIED_VIEW_ACCESS
             }
           >
-            <PageIdIntegrationManagement />
+            <FacebookPageIntegrationManagement/>
+            {/* <PageIdIntegrationManagement /> */}
           </ModuleGuard>
         ),
       },

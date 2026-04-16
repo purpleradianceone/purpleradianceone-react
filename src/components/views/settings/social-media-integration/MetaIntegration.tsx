@@ -18,6 +18,7 @@ import { disconnectFacebookAccount } from "../../../../config/apis/IntegrationAp
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
 import { useUserAccessModules } from "../../../../config/hooks/useAccessModules";
 import { handleApiError } from "../../../../config/error/handleApiError";
+import LoadingSpinner from "../../../../assets/animations/LoadingSpinner";
 
 interface MetaIntegrationProps {
   faceBookConnectionStatus: ResponseStatus;
@@ -32,6 +33,7 @@ const MetaIntegration: React.FC<MetaIntegrationProps> = ({
   const {loginStatus} = useLoggedInUserContext();
   const [showDisconnectPopUp, setShowDisconnectPopUp] =useState<boolean>(false);
   const {userHasAccessToUpdateIntegrationSetting, userHasAccessToAddIntegrationSetting} = useUserAccessModules();
+  const [isDeleting , setIsDeleting] = useState<boolean>(false);
 
   const stepItems = [
     {
@@ -81,6 +83,8 @@ const MetaIntegration: React.FC<MetaIntegrationProps> = ({
       return;
     }
     try{
+      setIsDeleting(true)
+      
       const response = await disconnectFacebookAccount({
         company_id : loginStatus.companyId,
         requestedby : loginStatus.id
@@ -97,6 +101,8 @@ const MetaIntegration: React.FC<MetaIntegrationProps> = ({
       }
     }catch(error){
       handleApiError(error)
+    }finally{
+      setIsDeleting(false)
     }
   };
   return (
@@ -205,6 +211,7 @@ const MetaIntegration: React.FC<MetaIntegrationProps> = ({
               <div className="flex justify-end gap-3 pt-2">
                 <button
                   type="button"
+                  disabled={isDeleting}
                    onClick={() => {
                     setShowDisconnectPopUp(false);
                   }}
@@ -214,12 +221,21 @@ const MetaIntegration: React.FC<MetaIntegrationProps> = ({
                 </button>
 
                 <button
+                disabled={isDeleting}
                  onClick={handelConfirmFacebookAccountRemove}
                   type="submit"
-                  className="flex items-center gap-2 px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700 transition"
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg ${isDeleting ? "bg-red-100":" bg-red-600 hover:bg-red-700"}  text-white  transition`}
                 >
-                  <Trash2 size={16} />
+                  {
+                    !isDeleting ? <>
+                    
+                    <Trash2 size={16} />
                   Confirm
+                  </> : <>
+                   <LoadingSpinner height={16} width={16} colour={"red"} /> Deleting
+                  </>
+                  }
+                  
                 </button>
               </div>
             </div>
