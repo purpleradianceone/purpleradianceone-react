@@ -39,9 +39,7 @@ function MetaAppsIntegration() {
 
       // Note : api call here
       const response = await getFacebookComapnyStatus(postData);
-      console.log("this is the response");
-
-      console.log(response.data);
+     
 
       if (response.status === STATUS_CODE.OK) {
         const res= response.data;

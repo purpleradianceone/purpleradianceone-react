@@ -1,7 +1,7 @@
 const FacebookPageSkeleton = () => {
   const CardSkeleton = () => {
     return (
-      <div className="w-[270px] p-4 bg-white rounded-lg shadow-md border animate-pulse">
+      <div className="w-full p-2 bg-white rounded-lg shadow-md border animate-pulse">
         {/* Header */}
         <div className="flex justify-between items-center mb-3">
           <div className="h-4 w-40 bg-gray-300 rounded"></div>
@@ -28,8 +28,8 @@ const FacebookPageSkeleton = () => {
   return (
     <>
       <CardSkeleton />
-      <CardSkeleton />
-      <CardSkeleton />
+      {/* <CardSkeleton /> */}
+      {/* <CardSkeleton /> */}
     </>
   );
 };
