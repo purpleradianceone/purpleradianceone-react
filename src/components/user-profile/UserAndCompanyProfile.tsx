@@ -57,6 +57,7 @@ const UserAndCompanyProfile = () => {
     userHasAccessToViewSettingGeneral,
     userHasAccessToViewCompanyDetail,
     userHasAccessToUpdateCompanyDetail,
+    userHasAccessToAddCompanyDetail,
     userHasAccessToUpdateSubscription,
   } = useUserAccessModules();
 
@@ -1783,8 +1784,9 @@ const UserAndCompanyProfile = () => {
 
         {/* ✅ Bank Account Section */}
         <CompanyBankAccountSection
-          userHasAccessToView={userHasAccessToViewSettingGeneral}
-          userHasAccessToUpdate={userHasAccessToUpdateSettingGeneral}
+          userHasAccessToView={userHasAccessToViewCompanyDetail}
+          userHasAccessToUpdate={userHasAccessToUpdateCompanyDetail}
+          userHasAccessToAdd={userHasAccessToAddCompanyDetail}
         />
         <AppVersionViewCard />
       </div>

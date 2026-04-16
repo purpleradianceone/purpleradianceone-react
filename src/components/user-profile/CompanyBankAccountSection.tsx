@@ -13,6 +13,7 @@ import MetaField from "../ui/MetaField";
 const CompanyBankAccountSection = ({
   userHasAccessToView,
   userHasAccessToUpdate,
+  userHasAccessToAdd,
 }: any) => {
   const { loginStatus } = useLoggedInUserContext();
 
@@ -169,7 +170,7 @@ const CompanyBankAccountSection = ({
         {/* ================= ADD NEW ================= */}
         {editingId === 0 && (
           <EditableSection
-            hasAccess={userHasAccessToUpdate}
+            hasAccess={userHasAccessToAdd}
             title="Add Bank Account"
             sectionKey="bank-new"
             isEditing={true}
