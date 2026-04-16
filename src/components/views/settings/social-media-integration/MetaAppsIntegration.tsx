@@ -84,7 +84,7 @@ function MetaAppsIntegration() {
           <AlertCircle size={18} />          
           {facebookStatus.isActive ? (
             <span className="font-medium ">
-            Facebook page is connected, integrate pages on another tab.
+            Facebook Account is connected, integrate pages or whatsapp account on other tabs.
             </span>
           ) : <span className="font-medium ">
               Facebook Account is not connected.
