@@ -30,6 +30,7 @@ const MetaIntegration: React.FC<MetaIntegrationProps> = ({
   getFacebookStatus
 }) => {
   const navigate = useNavigate();
+
   const {loginStatus} = useLoggedInUserContext();
   const [showDisconnectPopUp, setShowDisconnectPopUp] =useState<boolean>(false);
   const {userHasAccessToUpdateIntegrationSetting, userHasAccessToAddIntegrationSetting} = useUserAccessModules();
@@ -73,15 +74,16 @@ const MetaIntegration: React.FC<MetaIntegrationProps> = ({
 
   // Note : first show the pop up for the confirmation
   const handleDisconnectButtonClick = () => {
+ if(!userHasAccessToUpdateIntegrationSetting){
+      toast.error(MESSAGE.MODULE_ACCESS.SETTING.INTEGRATION.DENIED_UPDATE_ACCESS);
+      return;
+    }
     setShowDisconnectPopUp(true);
   };
 
   // Note : disconnect facebbok api call here
   const handelConfirmFacebookAccountRemove =async () => {
-    if(!userHasAccessToUpdateIntegrationSetting){
-      toast.error(MESSAGE.MODULE_ACCESS.SETTING.INTEGRATION.DENIED_UPDATE_ACCESS);
-      return;
-    }
+   
     try{
       setIsDeleting(true)
       
