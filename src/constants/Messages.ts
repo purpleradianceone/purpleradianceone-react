@@ -37,7 +37,7 @@ const MESSAGE = {
 
         MODULE_ACCESS_UPDATE: "You do not have permission to update details.",
         SAME_PRODUCT_SELECTED : "Same product selected.",
-        DENIED_FACEBOOK_INTEGRATION_MESSAGE:"Facebook account is already connected. you can integrate pages."
+        DENIED_FACEBOOK_INTEGRATION_MESSAGE:"Facebook account is already integrated. you can manage pages and whatsapp account on the other tabs."
     },
     SUCCESS: {
         LOGGED_IN: "Logged In",
@@ -270,8 +270,8 @@ const MESSAGE = {
             },
             INTEGRATION : {
                DENIED_VIEW_ACCESS: "You do not have permission to view integration setting.",
-                DENIED_ADD_ACCESS: "You do not have permission to create integration setting.",
-                DENIED_UPDATE_ACCESS: "You do not have permission to update integration setting .",  
+                DENIED_ADD_ACCESS: "You do not have permission to add integration related setting.",
+                DENIED_UPDATE_ACCESS: "You do not have permission to update integration related setting .",  
             },
             REMINDER : {
                 DENIED_VIEW_ACCESS: "You do not have permission to view reminder setting.",

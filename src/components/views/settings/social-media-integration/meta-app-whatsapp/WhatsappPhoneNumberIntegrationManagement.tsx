@@ -20,6 +20,8 @@ import { STATUS_CODE } from "../../../../../constants/AppConstants";
 import FormLayout from "../../../../ui/FormLayout";
 import { FaWhatsapp } from "react-icons/fa";
 import LoadingSpinner from "../../../../../assets/animations/LoadingSpinner";
+import { useUserAccessModules } from "../../../../../config/hooks/useAccessModules";
+import MESSAGE from "../../../../../constants/Messages";
 
 export type WhatsappPhone = {
   companyId: number;
@@ -52,7 +54,7 @@ export type WhatsappPhone = {
 
 export const WhatsappPhoneNumberIntegrationManagement = () => {
   const { loginStatus } = useLoggedInUserContext();
-
+  const {userHasAccessToAddIntegrationSetting, userHasAccessToUpdateIntegrationSetting}= useUserAccessModules(); 
   const [openCreatePopUp, setOpenCreatePopUp] = useState<boolean>(false);
 
   const [loading, setLoading] = useState<boolean>(false);
@@ -237,7 +239,11 @@ export const WhatsappPhoneNumberIntegrationManagement = () => {
 
   //Note : disconnect the whatsapp phone number using this api
   const handleUpdateWhatsappPhone = async (id: number) => {
-    if (id == null) {
+    if(!userHasAccessToUpdateIntegrationSetting){
+      toast.error(MESSAGE.MODULE_ACCESS.SETTING.INTEGRATION.DENIED_UPDATE_ACCESS);
+      return;
+    }
+    if (id == null || id ==0) {
       return;
     }
 
@@ -289,6 +295,11 @@ export const WhatsappPhoneNumberIntegrationManagement = () => {
           children={
             <Button
               onClick={() => {
+                  if(!userHasAccessToAddIntegrationSetting){
+                    toast.error(MESSAGE.MODULE_ACCESS.SETTING.INTEGRATION.DENIED_ADD_ACCESS
+                    )
+                    return;
+                  }
                 setOpenCreatePopUp(true);
                 getFacebookIntegratedWhatsappAccount();
                 setWhatsappData([]);

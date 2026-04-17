@@ -22,10 +22,13 @@ import { FaFacebook } from "react-icons/fa";
 import MetaAppWhatsappIntegration from "../meta-app-whatsapp/MetaIntegrationDeniedMessage";
 import { ResponseStatus } from "../MetaAppsIntegration";
 import FacebookPageSkeleton from "./PafeIdListCardPopUp";
+import { useUserAccessModules } from "../../../../../config/hooks/useAccessModules";
+import MESSAGE from "../../../../../constants/Messages";
 
 export const FacebookPageIntegrationManagement = () => {
   const { loginStatus } = useLoggedInUserContext();
 
+  const {userHasAccessToAddIntegrationSetting, userHasAccessToUpdateIntegrationSetting} = useUserAccessModules();
   const [openCreatePopUp, setOpenCreatePopUp] = useState<boolean>(false);
 
   const [loading, setLoading] = useState<boolean>(false);
@@ -185,16 +188,6 @@ export const FacebookPageIntegrationManagement = () => {
         company_user_id: loginStatus.id,
         createdby_id: loginStatus.id,
       };
-      //   const payload = {
-      //     company_id: loginStatus.companyId,
-      //     business_id: selectedPageData.businessId,
-      //     page_id: selectedPageData.pageId,
-      //     page_name: selectedPageData.pageName,
-      //     category: selectedPageData.category,
-      //     createdby_id: loginStatus.id,
-      //   };
-
-      console.log(payload);
 
       const response = await createConnectFacebookPage(payload);
 
@@ -218,6 +211,10 @@ export const FacebookPageIntegrationManagement = () => {
    * Disconnect Page
    */
   const handleDisconnectPage = async (item: FacebookPageDetails) => {
+    if(!userHasAccessToUpdateIntegrationSetting){
+        toast.error(MESSAGE.MODULE_ACCESS.SETTING.INTEGRATION.DENIED_UPDATE_ACCESS);
+        return;
+    }
     try {
       setIsDeleting(true);
       const response = await disconnectFacebookPage({
@@ -260,6 +257,10 @@ export const FacebookPageIntegrationManagement = () => {
           children={
             <Button
               onClick={() => {
+                if(!userHasAccessToAddIntegrationSetting){
+                    toast.error(MESSAGE.MODULE_ACCESS.SETTING.INTEGRATION.DENIED_ADD_ACCESS);
+                    return;
+                }
                 setOpenCreatePopUp(true);
                 getFacebookAccounts();
                 setSelectedPage(null);
@@ -303,7 +304,7 @@ export const FacebookPageIntegrationManagement = () => {
                 </span>
 
                 <button
-                  disabled={isDeleting}
+                  disabled={isDeleting }
                   onClick={() => handleDisconnectPage(item)}
                 >
                   {!isDeleting ? (
