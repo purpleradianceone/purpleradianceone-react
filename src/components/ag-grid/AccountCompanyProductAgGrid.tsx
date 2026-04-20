@@ -15,12 +15,14 @@ const AccountCompanyProductAgGrid = ({
   // handleRowClick,
   handleAddToInvoice,
   isUsedForSelection,
+  openSubscriptionModal,
 }: {
   accountProductData: AccountProduct[];
   onRowSelect: (data: AccountProduct) => void;
   isUsedForSelection?: boolean;
   handleAddToInvoice?: (data: AccountProduct) => void;
   handleRowClick?: (event: any) => void;
+  openSubscriptionModal?: (data: AccountProduct) => void;
 }) => {
   const gridRef = useRef<AgGridReact>(null); // Ref to the AgGridReact component
 
@@ -30,6 +32,12 @@ const AccountCompanyProductAgGrid = ({
       {
         field: "companyProductName",
         headerName: "Product",
+        sortable: true,
+        filter: true,
+      },
+      {
+        field: "ProductTypeName",
+        headerName: "Product Type",
         sortable: true,
         filter: true,
       },
@@ -118,6 +126,26 @@ const AccountCompanyProductAgGrid = ({
                 </Button>
               )}
             </div>
+          );
+        },
+      },
+      {
+        headerName: "AMC",
+        field: "AMC",
+        maxWidth: 150,
+        cellRenderer: (params: any) => {
+          return (
+            <Button
+              type="button"
+              className={COLORS.ADD_BUTTON}
+              onClick={(e) => {
+                e.stopPropagation();
+
+                params.context.openSubscriptionModal(params.data);
+              }}
+            >
+              Add AMC
+            </Button>
           );
         },
       },
@@ -253,8 +281,8 @@ const AccountCompanyProductAgGrid = ({
       },
 
       {
-        field: "updatedBy",
-        headerName: "Updated By",
+        field: "createdBy",
+        headerName: "Created By",
         sortable: true,
         filter: true,
       },
@@ -265,14 +293,14 @@ const AccountCompanyProductAgGrid = ({
         filter: true,
       },
       {
-        field: "updatedOn",
-        headerName: "Updated On",
+        field: "updatedBy",
+        headerName: "Updated By",
         sortable: true,
         filter: true,
       },
       {
-        field: "createdBy",
-        headerName: "Created By",
+        field: "updatedOn",
+        headerName: "Updated On",
         sortable: true,
         filter: true,
       },
@@ -487,6 +515,7 @@ const AccountCompanyProductAgGrid = ({
         context={{
           handleRowSelect: onRowSelect,
           handleAddToInvoice: handleAddToInvoice,
+          openSubscriptionModal: openSubscriptionModal,
         }}
         // onRowClicked={handleRowClick}
       />
