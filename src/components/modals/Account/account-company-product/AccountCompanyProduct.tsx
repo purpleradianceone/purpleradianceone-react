@@ -18,6 +18,7 @@ import COLORS from "../../../../constants/Colors";
 import axiosClient from "../../../../axios-client/AxiosClient";
 import { handleApiError } from "../../../../config/error/handleApiError";
 import AccessDeniedMessagePage from "../../../views/not-found/AccessDeniedMessagePage";
+import CreateAccountSubscription from "../account-subscription/CreateAccountSubscription";
 
 const AccountCompanyProduct = ({
   accountId,
@@ -41,6 +42,8 @@ const AccountCompanyProduct = ({
   >([]);
   const [accountCompanyProductCount, setAccountCompanyProductCount] =
     useState<number>(0);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedProductForAMC, setSelectedProductForAMC] = useState<any>(null);
   // const [refreshKey, setRefreshKey] = useState<number>(0);
 
   // const handleRowSelectAccountProduct = (data: AccountProduct) => {
@@ -150,6 +153,10 @@ const AccountCompanyProduct = ({
   //     });
   // };
 
+  const openSubscriptionModal = (rowData: any) => {
+    setSelectedProductForAMC(rowData);
+    setIsModalOpen(true);
+  };
   const [hasError, setHasError] = useState(false);
 
   const handleAddToInvoice = async (rowData: AccountProduct) => {
@@ -211,6 +218,7 @@ const AccountCompanyProduct = ({
           accountName: item.account_name,
           companyProductId: item.company_product_id,
           companyProductName: item.company_product_name,
+          ProductTypeName: item.product_type_name,
           quantity: item.quantity,
           quantityReturn: item.quantity_return,
           barcode: item.barcode,
@@ -369,8 +377,19 @@ const AccountCompanyProduct = ({
               accountProductData={accountCompanyProduct}
               onRowSelect={handleRowSelectAccountProduct}
               handleRowClick={handleRowClick}
+              openSubscriptionModal={openSubscriptionModal}
             />
           </div>
+          <CreateAccountSubscription
+            isOpen={isModalOpen}
+            onClose={() => {
+              setIsModalOpen(false);
+              setSelectedProductForAMC(null);
+            }}
+            accountId={accountId}
+            handleAddAccountSubscritption={() => {}}
+            selectedProductForAMC={selectedProductForAMC} // 👈 NEW PROP
+          />
         </div>
       )}
 

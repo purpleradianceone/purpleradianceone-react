@@ -59,7 +59,7 @@ export const AccountCompanyProductDetails: React.FC = () => {
         const item = response.data?.[0];
 
         if (!item) {
-          navigate(`${ROUTES_URL.ACCOUNT_DETAILS}/${accountId}`)
+          navigate(`${ROUTES_URL.ACCOUNT_DETAILS}/${accountId}`);
           // throw new Error("No product data returned from API");
         }
 
@@ -69,6 +69,7 @@ export const AccountCompanyProductDetails: React.FC = () => {
           accountName: item.account_name,
           companyProductId: item.company_product_id,
           companyProductName: item.company_product_name,
+          productTypeName: item.product_type_name,
           quantity: item.quantity,
           quantityReturn: item.quantity_return,
           barcode: item.barcode,
@@ -98,9 +99,7 @@ export const AccountCompanyProductDetails: React.FC = () => {
     fetchProductDetails();
   }, [loginStatus, parsedAccountId, parsedProductId]);
 
-  if (!accountCompanyProduct) return (
-    <AccountProductDetailsSkeleton />
-  );
+  if (!accountCompanyProduct) return <AccountProductDetailsSkeleton />;
   return (
     <AccountCompanyProductDetailsCard
       selectedProductCard={accountCompanyProduct}

@@ -1,4 +1,4 @@
-import { useGoogleMeetContext } from "../../../../context/meeting/GoogleMeetContext";
+// import { useGoogleMeetContext } from "../../../../context/meeting/GoogleMeetContext";
 import { useZoomMeetingContext } from "../../../../context/meeting/ZoomMeetingContext";
 import { useNavigate } from "react-router-dom";
 import ROUTES_URL from "../../../../constants/Routes";
@@ -6,23 +6,28 @@ import Button from "../../../ui/Button";
 import GoogleMeetIcon from "../../../../assets/svg/GoogleMeetIcon";
 import ZoomMeetingsIcon from "../../../../assets/svg/ZoomMeetingsIcon";
 import TeamsIcon from "../../../../assets/svg/TeamsIcon";
+import useGoogleMeetSetting from "../../../../config/hooks/useGoogleMeetSetting";
 
 function MeetingSettings() {
-  const { googleMeetStatus } = useGoogleMeetContext();
+  // const { googleMeetStatus } = useGoogleMeetContext();
+  const { GoogleMeetStatus, googleMeetSetting } = useGoogleMeetSetting();
   const { zoomMeetingStatus } = useZoomMeetingContext();
   const navigate = useNavigate();
+  console.log(GoogleMeetStatus);
 
   const meetingSettings = [
     {
       id: 1,
       name: "Connect to Google Meet",
-      isConnected: googleMeetStatus.isConnected,
+      mail: googleMeetSetting?.gmail_address,
+      isConnected: GoogleMeetStatus,
       icon: <GoogleMeetIcon className="w-6 h-6 text-green-500" />,
       iconBg: "bg-green-50",
     },
     {
       id: 2,
       name: "Connect to Zoom Meetings",
+      mail: "",
       isConnected: zoomMeetingStatus.isConnected,
       icon: <ZoomMeetingsIcon className="w-6 h-6 text-blue-500" />,
       iconBg: "bg-blue-50",
@@ -30,6 +35,7 @@ function MeetingSettings() {
     {
       id: 3,
       name: "Connect to Microsoft Teams",
+      mail: "",
       isConnected: false,
       icon: <TeamsIcon className="w-6 h-6 text-purple-500" />,
       iconBg: "bg-purple-50",
@@ -48,20 +54,19 @@ function MeetingSettings() {
               {platform.icon}
             </div>
             <div>
-              <h3 className="table-header-custom">
-                {platform.name}
-              </h3>
+              <h3 className="table-header-custom">{platform.name}</h3>
             </div>
+           
           </div>
 
           <div className="min-w-32">
             {platform.id !== 3 ? (
               <Button
-              type="submit"
+                type="submit"
                 disabled={platform.isConnected}
                 onClick={(e) => {
                   e.preventDefault();
-                  if (platform.id === 1 && !googleMeetStatus.isConnected) {
+                  if (platform.id === 1 && !GoogleMeetStatus) {
                     navigate(ROUTES_URL.GOOGLE_OAUTH);
                   } else if (
                     platform.id === 2 &&
