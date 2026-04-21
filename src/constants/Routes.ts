@@ -62,7 +62,7 @@ const ROUTES_URL = {
   WHATSAPP_OAUTH: "/authenticate/whatsapp",
   INTEGRATIONS_SETTINGS: "/settings/integrations",
 
-  // Quotation module
+  // Quotation template module
   QUOTATION_SETTINGS: "/settings/quotations",
   QUOTATION_SETTINGS_CREATE_TEMPLATE: "/settings/quotations/create",
   QUOTATION_SETTINGS_UPDATE_TEMPLATE: "/settings/quotations/update",
@@ -122,6 +122,10 @@ const ROUTES_URL = {
   //invoice
   INVOICE_MANAGEMENT: "/home/manage-invoices/company-invoice",
   INVOICE_DETAILS: "/home/manage-invoices/company-invoice/invoice-details/:invoiceId",
+
+  //Quotation Module
+  QUOTATION_MANAGEMENT: "/home/manage-company-quotation/company-quotations",
+  QUOTATION_CREATE_AND_DETAILS: "/home/manage-company-quotation/company-quotations/company-quotation-details/:quotationId",
 
 };
 export default ROUTES_URL;

@@ -14,6 +14,7 @@ import {
   LayoutPanelLeft,
   ListChecks,
   LogOut,
+  LucideFileArchive,
   LucideSettings,
   Menu,
   MessageCircle,
@@ -76,6 +77,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
     userHasAccessToViewSupportTicket,
     userHasAccessToViewTasks,
     userHasAccessToViewCompanyInvoice,
+    userHasAccessToViewCompanyQuotation,
   } = useUserAccessModules();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [accessDeniedPopUpView, setAccessDeniedPopUpView] =
@@ -502,6 +504,14 @@ function Navbar({ children }: { children: React.ReactNode }) {
                           icon={<Handshake size={SIZE.TWENTY} />}
                           label="Lead"
                         />
+
+                         <NavItem
+                          disable={!userHasAccessToViewCompanyQuotation}
+                          to={ROUTES_URL.QUOTATION_MANAGEMENT}
+                          icon={<LucideFileArchive size={SIZE.TWENTY} />}
+                          label="Quotation"
+                        />
+
                         {/* )} */}
                         {/* {!userHasAccessToViewLead && (
                           <NavItem
@@ -638,6 +648,15 @@ function Navbar({ children }: { children: React.ReactNode }) {
                               icon={<Handshake size={SIZE.TWENTY} />}
                               label=""
                               onClick={() => setIsDropdownOpen(false)}
+                            />
+                          )}
+
+                          {userHasAccessToViewCompanyQuotation && (
+                            <NavItem
+                              to={ROUTES_URL.QUOTATION_MANAGEMENT}
+                              icon={<LucideFileArchive size={SIZE.TWENTY}/>}
+                              label=""
+                              onClick={()=> setIsDropdownOpen(false)}
                             />
                           )}
 

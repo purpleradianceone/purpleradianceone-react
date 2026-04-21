@@ -1,42 +1,36 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import Select from "react-select";
 import { useEffect, useState } from "react";
-import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
-import { getLookupAccounts } from "../../../../config/apis/AccountApis";
+import Select from "react-select";
+import { getLookupQuotationTemplate } from "../../../../config/apis/CompanyQuotationApis";
 import { handleApiError } from "../../../../config/error/handleApiError";
+import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
 
-export const LookupAccountDropdown = ({
+export const LookupQuotationTemplateDropdown = ({
   icon,
   label,
   value,
-  handleAccountSelection,
-  isDisabled = false
-
+  handleQuotationTemplateSelection,
 }: {
   icon?: React.ReactNode;
   label?: string;
   value?: any;
-  handleAccountSelection: (data: any) => void;
-  isDisabled?: boolean
-
+  handleQuotationTemplateSelection: (data: any) => void;
 }) => {
   const { loginStatus } = useLoggedInUserContext();
   const [options, setOptions] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [inputValue, setInputValue] = useState("");
 
-  // 🔥 Debounce Effect
   useEffect(() => {
     const delayDebounce = setTimeout(() => {
-      fetchAccounts(inputValue);
+      fetchQuotationTemplate(inputValue);
     }, 400); // ⏱ 400ms debounce
 
     return () => clearTimeout(delayDebounce);
   }, [inputValue]);
 
-  // 🔥 API Call
-  const fetchAccounts = async (searchText: string) => {
+  const fetchQuotationTemplate = async (searchText: string) => {
     setLoading(true);
 
     const postData = {
@@ -50,11 +44,11 @@ export const LookupAccountDropdown = ({
     };
 
     try {
-      const res = await getLookupAccounts(postData);
+      const res = await getLookupQuotationTemplate(postData);
 
       const formatted = res.data.map((item: any) => ({
         value: item.id,
-        label: `${item.name} (${item.email})`,
+        label: `${item.name}  ${item.description?"("+item.description+")":""}`,
         data: item,
       }));
 
@@ -74,31 +68,29 @@ export const LookupAccountDropdown = ({
       </div>
       <Select
         styles={customStyles}
-        placeholder="Search Account..."
+        placeholder="Search template..."
         options={options}
         isLoading={loading}
-        // isClearable
         onInputChange={(value) => setInputValue(value)}
         value={
           value
             ? {
                 value: value.id,
-                label: `${value.name} (${value.email})`,
+                label: `${value.name}\n (${value.description})`,
                 data: value,
               }
             : null
-        } // ✅ CONTROLLED VALUE
+        } 
         onChange={(selected: any) => {
           if (selected) {
-            handleAccountSelection(selected.data);
+            handleQuotationTemplateSelection(selected.data);
           } else {
-            handleAccountSelection(null); // ✅ handle clear
+            handleQuotationTemplateSelection(null); 
           }
         }}
         noOptionsMessage={() =>
-          inputValue ? "No accounts found" : "Start typing to search"
+          inputValue ? "No template found" : "Start typing to search"
         }
-        isDisabled={isDisabled}
       />
     </div>
   );

@@ -99,6 +99,9 @@ import { EditorCanvasForQuotationEdit } from "../../components/quotation-builder
 import AccountInvoice from "../../components/modals/Account/account-invoice/AccountInvoice";
 import CompanyInvoiceDetails from "../../components/views/invoice/CompanyInvoiceDetails";
 import UserAndCompanyProfileManagement from "../../components/user-profile/UserPreferenceManagement";
+import CompanyQuotationManagement from "../../components/views/company-quotation-management/CompanyQuotationManagement";
+import { Modules } from "../../@types/List/CompanyQuotationManagementListProps";
+import CompanyQuotationDetails from "../../components/views/company-quotation-management/CompanyQuotationDetails";
 
 
 
@@ -281,6 +284,36 @@ export const router = createBrowserRouter([
           <div>
             <Navbar>
               <LeadManagement isUsedInLeadModule={true} />
+            </Navbar>
+          </div>
+        </PrivateRoute>
+      </MobileRedirectWrapper>
+    ),
+  },
+
+  {
+    path: ROUTES_URL.QUOTATION_MANAGEMENT,
+    element: (
+      <MobileRedirectWrapper>
+        <PrivateRoute>
+          <div>
+            <Navbar>
+              <CompanyQuotationManagement otherData={null} isUsedFor={Modules.QUOTATION_MODULE} />
+            </Navbar>
+          </div>
+        </PrivateRoute>
+      </MobileRedirectWrapper>
+    ),
+  },
+
+  {
+    path: ROUTES_URL.QUOTATION_CREATE_AND_DETAILS,
+    element: (
+      <MobileRedirectWrapper>
+        <PrivateRoute>
+          <div>
+            <Navbar>
+              <CompanyQuotationDetails />
             </Navbar>
           </div>
         </PrivateRoute>

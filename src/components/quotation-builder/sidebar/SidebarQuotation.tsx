@@ -4,10 +4,11 @@ import { useEditor } from "@craftjs/core";
 
 import "./Sidebar.css"; 
 import { PageBlockQuotation } from "../blocks/PageBlockQuotation";
-import { LucideClipboardPlus, LucidePackage, LucideTable, LucideTextSelection } from "lucide-react";
+import { LucideAlignJustify, LucideClipboardPlus, LucidePackage, LucideTable, LucideTextSelection } from "lucide-react";
 import { ContentBlockQuotation } from "../blocks/ContentBlockQuotation";
 import { SectionBlockQuotation } from "../blocks/SectionBlockQuotation";
 import { TableBlockQuotation } from "../blocks/TableBlockQuotation";
+import { QuotationSummeryBlock } from "../blocks/QuotationSummeryBlock";
 
 
 export const SidebarQuotation: React.FC = () => {
@@ -37,6 +38,14 @@ export const SidebarQuotation: React.FC = () => {
           <span>Dynamic Table Block</span>
           <span className="info-icon"
             title="This table block represent the position where the runtime product pricing table is generate."
+          >i</span>
+        </div>
+
+        <div id="dynamicQuotationSummeryBlock" ref={(ref: HTMLDivElement) => { ref && connectors.create(ref, <QuotationSummeryBlock/>); }} className="sidebar-block caption-custom">
+          <span><LucideAlignJustify/></span>
+          <span>Quotation Summery Block</span>
+          <span className="info-icon"
+            title="This block represent the position where the runtime quotation summery is generate."
           >i</span>
         </div>
 

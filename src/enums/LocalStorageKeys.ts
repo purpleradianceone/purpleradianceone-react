@@ -13,4 +13,5 @@ export enum LocalStorageKeys {
   STOCK_LEDGER_FILTERS = "stock_ledger_filters",
   STOCK_AGEING_FILTERS = "stock_ageing_filters",
   INVOICE_MANAGEMENT_FILTERS = "invoice_management_filters",
+  COMPANY_QUOTATION_MANAGEMENT_FILTERS = "company_quotation_management_filters",
 }

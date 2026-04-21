@@ -6,6 +6,7 @@ import {
   Home,
   Layers,
   ListChecks,
+  LucideFileArchive,
   Menu,
   Network,
   Settings,
@@ -33,6 +34,7 @@ function SideNavBar({ isOpen, onToggle }: SideBarProps) {
     userHasAccessToViewSupportTicket,
     userHasAccessToViewTasks,
     userHasAccessToViewCompanyInvoice,
+    userHasAccessToViewCompanyQuotation,
   } = useUserAccessModules();
 
   return (
@@ -98,6 +100,18 @@ function SideNavBar({ isOpen, onToggle }: SideBarProps) {
               isOpen={isOpen}
               isActive={isActive}
               disabled={!userHasAccessToViewLead}
+            />
+          )}
+        </NavLink>
+
+        <NavLink to={ROUTES_URL.QUOTATION_MANAGEMENT}>
+          {({ isActive }) => (
+            <SideNavBarItem
+              icon={LucideFileArchive}
+              label="Quotation"
+              isOpen={isOpen}
+              isActive={isActive}
+              disabled={!userHasAccessToViewCompanyQuotation}
             />
           )}
         </NavLink>
@@ -232,7 +246,6 @@ function SideNavBar({ isOpen, onToggle }: SideBarProps) {
                 </div>
               )}
             </NavLink>,
-            
           ]}
         />
       </nav>
