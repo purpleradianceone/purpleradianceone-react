@@ -3,62 +3,55 @@
 import Select from "react-select";
 import { useEffect, useState } from "react";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
-import { getLookupAccounts } from "../../../../config/apis/AccountApis";
 import { handleApiError } from "../../../../config/error/handleApiError";
+import { getQuotationType } from "../../../../config/apis/CompanyQuotationApis";
 
-export const LookupAccountDropdown = ({
+export const QuotationTypeDropdown = ({
   icon,
   label,
   value,
-  handleAccountSelection,
-  isDisabled = false
-
+  handleQuotationTypeSelection,
 }: {
   icon?: React.ReactNode;
   label?: string;
   value?: any;
-  handleAccountSelection: (data: any) => void;
-  isDisabled?: boolean
-
+  handleQuotationTypeSelection: (data: any) => void;
 }) => {
   const { loginStatus } = useLoggedInUserContext();
   const [options, setOptions] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [inputValue, setInputValue] = useState("");
 
-  // 🔥 Debounce Effect
   useEffect(() => {
     const delayDebounce = setTimeout(() => {
-      fetchAccounts(inputValue);
+      fetchQuotationType(inputValue);
     }, 400); // ⏱ 400ms debounce
 
     return () => clearTimeout(delayDebounce);
   }, [inputValue]);
 
-  // 🔥 API Call
-  const fetchAccounts = async (searchText: string) => {
+  const fetchQuotationType = async (searchText: string) => {
     setLoading(true);
 
     const postData = {
       company_id: loginStatus.companyId,
       id: null,
+      name: searchText,
       isactive: true,
-      limit: 20,
-      offset: 0,
-      search_parameter: searchText,
       requestedby_id: loginStatus.id,
     };
 
     try {
-      const res = await getLookupAccounts(postData);
+      const res = await getQuotationType(postData);
 
       const formatted = res.data.map((item: any) => ({
         value: item.id,
-        label: `${item.name} (${item.email})`,
+        label: `${item.name}`,
         data: item,
       }));
 
       setOptions(formatted);
+      handleQuotationTypeSelection(formatted[0].data);
     } catch (error) {
       handleApiError(error);
     } finally {
@@ -74,31 +67,29 @@ export const LookupAccountDropdown = ({
       </div>
       <Select
         styles={customStyles}
-        placeholder="Search Account..."
+        placeholder="Search Type..."
         options={options}
         isLoading={loading}
-        // isClearable
         onInputChange={(value) => setInputValue(value)}
         value={
           value
             ? {
                 value: value.id,
-                label: `${value.name} (${value.email})`,
+                label: `${value.name}`,
                 data: value,
               }
             : null
-        } // ✅ CONTROLLED VALUE
+        } 
         onChange={(selected: any) => {
           if (selected) {
-            handleAccountSelection(selected.data);
+            handleQuotationTypeSelection(selected.data);
           } else {
-            handleAccountSelection(null); // ✅ handle clear
+            handleQuotationTypeSelection(null); 
           }
         }}
         noOptionsMessage={() =>
-          inputValue ? "No accounts found" : "Start typing to search"
+          inputValue ? "No Type found" : "Start typing to search"
         }
-        isDisabled={isDisabled}
       />
     </div>
   );

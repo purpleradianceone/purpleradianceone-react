@@ -58,8 +58,8 @@ import LoadingPopUpAnimation from "../../views/card/LoadingPopUpAnimation";
 import FormLayout from "../../ui/FormLayout";
 import { LeadNotes } from "./lead-notes/LeadNotes";
 import { ModuleGuard } from "../../../config/guard/ModuleGuard";
-import QuotationDetails from "./QuotationDetails";
 import { Popover } from "../../ui/PopOver";
+import LeadQuotationDetails from "./LeadQuotationDetails";
 
 const ViewLeadManagement = () => {
   const navigate = useNavigate();
@@ -1551,9 +1551,9 @@ const ViewLeadManagement = () => {
          
         </div>
          {<div className="w-full mt-2">
-          <QuotationDetails 
-            id={selectedLeadData.id}
-            quotation_type_id={1}/>
+          <LeadQuotationDetails 
+            lead={selectedLeadData}
+            />
           </div>}
         {/* end  */}
 

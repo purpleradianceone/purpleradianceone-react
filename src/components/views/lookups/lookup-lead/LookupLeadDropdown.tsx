@@ -3,40 +3,37 @@
 import Select from "react-select";
 import { useEffect, useState } from "react";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
-import { getLookupAccounts } from "../../../../config/apis/AccountApis";
 import { handleApiError } from "../../../../config/error/handleApiError";
+import { getLookupLeadsWithSignal } from "../../../../config/apis/LeadsApi";
 
-export const LookupAccountDropdown = ({
+export const LookupLeadDropdown = ({
   icon,
   label,
   value,
-  handleAccountSelection,
-  isDisabled = false
-
+  handleLeadSelection,
+  isDisabled = false,
 }: {
   icon?: React.ReactNode;
   label?: string;
   value?: any;
-  handleAccountSelection: (data: any) => void;
+  handleLeadSelection: (data: any) => void;
   isDisabled?: boolean
-
 }) => {
   const { loginStatus } = useLoggedInUserContext();
   const [options, setOptions] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [inputValue, setInputValue] = useState("");
 
-  // 🔥 Debounce Effect
   useEffect(() => {
     const delayDebounce = setTimeout(() => {
-      fetchAccounts(inputValue);
-    }, 400); // ⏱ 400ms debounce
+      fetchLeads(inputValue);
+    }, 400); 
 
     return () => clearTimeout(delayDebounce);
   }, [inputValue]);
 
-  // 🔥 API Call
-  const fetchAccounts = async (searchText: string) => {
+  const fetchLeads = async (searchText: string) => {
+    // if(isDisabled)return;
     setLoading(true);
 
     const postData = {
@@ -50,11 +47,11 @@ export const LookupAccountDropdown = ({
     };
 
     try {
-      const res = await getLookupAccounts(postData);
+      const res = await getLookupLeadsWithSignal(postData);
 
       const formatted = res.data.map((item: any) => ({
         value: item.id,
-        label: `${item.name} (${item.email})`,
+        label: `${item.name?item.name:""} (${item.email?item.email:""})`,
         data: item,
       }));
 
@@ -74,10 +71,9 @@ export const LookupAccountDropdown = ({
       </div>
       <Select
         styles={customStyles}
-        placeholder="Search Account..."
+        placeholder="Search Lead..."
         options={options}
         isLoading={loading}
-        // isClearable
         onInputChange={(value) => setInputValue(value)}
         value={
           value
@@ -87,16 +83,16 @@ export const LookupAccountDropdown = ({
                 data: value,
               }
             : null
-        } // ✅ CONTROLLED VALUE
+        } 
         onChange={(selected: any) => {
           if (selected) {
-            handleAccountSelection(selected.data);
+            handleLeadSelection(selected.data);
           } else {
-            handleAccountSelection(null); // ✅ handle clear
+            handleLeadSelection(null); 
           }
         }}
         noOptionsMessage={() =>
-          inputValue ? "No accounts found" : "Start typing to search"
+          inputValue ? "No lead found" : "Start typing to search"
         }
         isDisabled={isDisabled}
       />
