@@ -332,9 +332,6 @@ function AccountSubscription({
 
         {userHasAccessToViewAccountSubscription ? (
           <AccountSubscriptionManagementList
-            // handleRowSelectedForShowAccountSubscription={(data: any) =>
-            //   console.log(data)
-            // }
             handleAddToInvoice={handleAddToInvoice}
             handleAddAccountSubscritption={handleAddAccountSubscription}
             handleSearchOption={{
@@ -355,10 +352,6 @@ function AccountSubscription({
               onPageChange: handlePageChange,
               onPageSizeChange: handlePageSizeChange,
             }}
-            // persistedSelectedUserId={
-            //   selectedAssignTo.id !== 0 ? selectedAssignTo.id : null
-            // }
-
             handleSelectedCompanyProductChange={
               handleSelectedCompanyProductChange
             }

@@ -7,7 +7,7 @@ export const formatRupee = (
   if (isNaN(num)) return "";
 
   return num.toLocaleString("en-IN", {
-    minimumFractionDigits: 2,
+    // minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   });
 };

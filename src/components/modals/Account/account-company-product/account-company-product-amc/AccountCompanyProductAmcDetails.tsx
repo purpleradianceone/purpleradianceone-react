@@ -16,12 +16,16 @@ export const AccountCompanyProductAmcDetails = ({
 }: {
   accountCompanyProductId: number;
 }) => {
-
-  const {userHasAccessToAddAccountProductsAmc , userHasAccessToViewAccountProductsAmc} = useUserAccessModules();
+  const {
+    userHasAccessToAddAccountProductsAmc,
+    userHasAccessToViewAccountProductsAmc,
+  } = useUserAccessModules();
   // Note : gets the data for the grid from this hook
-  const { accountCompanyProductAmc, loading , getCompanyProductAmc : trigerRefreshCall} = useAccountCompanyProductAmc(
-    accountCompanyProductId
-  );
+  const {
+    accountCompanyProductAmc,
+    loading,
+    getCompanyProductAmc: trigerRefreshCall,
+  } = useAccountCompanyProductAmc(accountCompanyProductId);
 
   // Note : selected amc from the grid for update
   const [selectedAmcForUpdate, setSelectedAmcForUpdate] =
@@ -41,12 +45,12 @@ export const AccountCompanyProductAmcDetails = ({
     setSelectedAmcForUpdate(null);
   }
 
-  if(!userHasAccessToViewAccountProductsAmc) return null;
+  if (!userHasAccessToViewAccountProductsAmc) return null;
   return (
     <div className="bg-white rounded-xl border p-1 grid gap-1 border-slate-200">
       <h3 className="flex items-center justify-between bg-gray-100 table-header-custom rounded-t-md px-2">
         <span>AMC Details</span>
-        <div className="flex justify-end items-center text-xs gap-x-2 py-0.5 text-gray-500">
+        <div className="  hidden justify-end items-center text-xs gap-x-2 py-0.5 text-gray-500">
           <Button
             disabled={!userHasAccessToAddAccountProductsAmc}
             onClick={() => {
@@ -54,7 +58,8 @@ export const AccountCompanyProductAmcDetails = ({
                 setOpenCreateAmcForm(true);
               } else {
                 toast.error(
-                  MESSAGE.MODULE_ACCESS.ACCOUNT_COMPANY_PRODUCT_AMC.DENIED_ADD_ACCESS
+                  MESSAGE.MODULE_ACCESS.ACCOUNT_COMPANY_PRODUCT_AMC
+                    .DENIED_ADD_ACCESS,
                 );
               }
             }}

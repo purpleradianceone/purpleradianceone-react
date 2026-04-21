@@ -96,27 +96,7 @@ const AccountManagement: React.FC = () => {
           </div>
           <AccountCompanyType accountId={company!.id} />
         </div>
-        <Tabs tabs={tabList} activeTab={activeTab} onChange={setActiveTab} />
-        <div className="bg-white col-span-2 rounded-md border p-1 border-slate-200">
-          {activeTab === "product" && (
-            <>
-              <h3 className="bg-gray-100 table-header-custom rounded-t-md px-2">
-                Product Details
-              </h3>
-              <AccountCompanyProduct accountId={company!.id} />
-            </>
-          )}
 
-          {activeTab === "service" && (
-            <AccountService accountId={company!.id} />
-          )}
-
-          {activeTab === "subscription" && (
-            <AccountSubscription accountId={company!.id} />
-          )}
-
-          {activeTab === "invoice" && <AccountInvoice account={company} />}
-        </div>
         {/* Account company product */}
         {/* <div className="bg-white col-span-2 rounded-md border p-1 border-slate-200">
           <h3 className="bg-gray-100 table-header-custom rounded-t-md px-2">
@@ -140,6 +120,25 @@ const AccountManagement: React.FC = () => {
             account={company}
           />
         </div> */}
+      </div>
+      <Tabs tabs={tabList} activeTab={activeTab} onChange={setActiveTab} />
+      <div className="bg-white col-span-2 rounded-md border p-1 border-slate-200">
+        {activeTab === "product" && (
+          <>
+            <h3 className="bg-gray-100 table-header-custom rounded-t-md px-2">
+              Product Details
+            </h3>
+            <AccountCompanyProduct accountId={company!.id} />
+          </>
+        )}
+
+        {activeTab === "service" && <AccountService accountId={company!.id} />}
+
+        {activeTab === "subscription" && (
+          <AccountSubscription accountId={company!.id} />
+        )}
+
+        {activeTab === "invoice" && <AccountInvoice account={company} />}
       </div>
     </div>
   );

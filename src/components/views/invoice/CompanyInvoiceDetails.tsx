@@ -31,6 +31,7 @@ import { LookupAccountDropdown } from "../lookups/lookup-account-dropdown/Lookup
 import ROUTES_URL from "../../../constants/Routes";
 import COLORS from "../../../constants/Colors";
 import MESSAGE from "../../../constants/Messages";
+import useInvoiceType from "../../../config/hooks/useInvoiceType";
 
 function CompanyInvoiceDetails() {
   const { invoiceId } = useParams();
@@ -46,11 +47,14 @@ function CompanyInvoiceDetails() {
   const [tempItems, setTempItems] = useState<any[]>([]);
   const [itemsLoading, setItemsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [logoPreview, setLogoPreview] = useState<string | null>(null);
-  const [showCompanyLogoPreview, setShowCompanyLogoPreview] = useState(false);
+  const [InvoicePreview, setInvoicePreview] = useState<string | null>(null);
+  const [showCompanyInvoicePreview, setShowCompanyInvoicePreview] =
+    useState(false);
   const [selectedAccount, setSelectedAccount] = useState<any>(null);
   const [showAccountName, setShowAccountName] = useState<boolean>(false);
   const isCreateMode = !invoiceId || Number(invoiceId) === 0;
+  const { invoiceType, isLoading } = useInvoiceType();
+  const [showDownloadOptions, setShowDownloadOptions] = useState(false);
   const {
     userHasAccessToViewCompanyInvoiceItem,
     userHasAccessToUpdateCompanyInvoiceItem,
@@ -270,6 +274,7 @@ function CompanyInvoiceDetails() {
           company_id: loginStatus.companyId,
           company_invoice_id: Number(invoiceId),
           company_invoice_type_id: 1,
+          company_invoice_type: "Copy Type",
           requestedby_id: loginStatus.id,
         },
         {
@@ -286,8 +291,8 @@ function CompanyInvoiceDetails() {
       const fileUrl = URL.createObjectURL(blob);
 
       // ✅ Same as your task document logic
-      setLogoPreview(fileUrl); // you can rename this later (e.g. setInvoicePreview)
-      setShowCompanyLogoPreview(true);
+      setInvoicePreview(fileUrl); // you can rename this later (e.g. setInvoicePreview)
+      setShowCompanyInvoicePreview(true);
     } catch (error) {
       console.error(error);
       toast.error("Failed to preview invoice");
@@ -338,7 +343,7 @@ function CompanyInvoiceDetails() {
     }
   };
 
-  const handleInvoiceDownload = async () => {
+  const handleInvoiceDownload = async (invoiceTypeId: number | null) => {
     if (!disabled) return;
     if (!userHasAccessToViewCompanyInvoice) return;
     setIsSubmitting(true);
@@ -350,7 +355,7 @@ function CompanyInvoiceDetails() {
         {
           company_id: loginStatus.companyId,
           company_invoice_id: Number(invoiceId),
-          company_invoice_type_id: 1,
+          company_invoice_type_id: invoiceTypeId,
           requestedby_id: loginStatus.id,
         },
         {
@@ -366,10 +371,8 @@ function CompanyInvoiceDetails() {
       console.log(response.data);
 
       const fileUrl = URL.createObjectURL(blob);
-
-      // ✅ Same as your task document logic
-      setLogoPreview(fileUrl); // you can rename this later (e.g. setInvoicePreview)
-      setShowCompanyLogoPreview(true);
+      setInvoicePreview(fileUrl); // you can rename this later (e.g. setInvoicePreview)
+      setShowCompanyInvoicePreview(true);
     } catch (error) {
       console.error(error);
       toast.error("Failed to download invoice");
@@ -385,7 +388,6 @@ function CompanyInvoiceDetails() {
     if (disabled) {
       return;
     }
-    // 👉 Replace with API call to delete item from backend
 
     const postData = {
       company_id: loginStatus.companyId,
@@ -553,6 +555,9 @@ function CompanyInvoiceDetails() {
   };
 
   const handleAddToInvoice = async () => {
+    if (disabled) {
+      return;
+    }
     const postData = {
       company_id: loginStatus.companyId,
       account_id: invoice?.accountId,
@@ -636,17 +641,11 @@ function CompanyInvoiceDetails() {
             </div>
             <div className="flex justify-between items-center my-2">
               <div>
-                {/* <h1 className="table-header-custom">
-                  Invoice #{invoice?.invoiceNumber || "[Auto-generated]"}
-                </h1> */}
                 <h1 className="table-header-custom">
                   {isCreateMode
                     ? "Create Invoice"
                     : `Invoice #${invoice?.invoiceNumber || "[Auto-generated]"}`}
                 </h1>
-                {/* <p className="text-sm text-gray-500">
-                  Account - {invoice?.accountName}
-                </p> */}
                 <p className="text-sm text-gray-500">
                   {isCreateMode
                     ? "Select an account to create invoice"
@@ -655,28 +654,49 @@ function CompanyInvoiceDetails() {
               </div>
               {!isCreateMode && (
                 <div className="flex gap-x-2">
-                  <button
-                    className={`text-sm border p-2 rounded-md flex items-center gap-1 border-blue-300
-                       focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-1
-                      ${
-                        !disabled
-                          ? "bg-gray-50 cursor-not-allowed opacity-50"
-                          : "bg-gray-50 hover:bg-blue-200 "
-                      }`}
-                    disabled={!disabled}
-                    onClick={handleInvoiceDownload}
-                  >
-                    <div className="flex items-center gap-1">
-                      <span className="text-gray-700">Download</span>
-                      <Download size={14} className="text-blue-500" />
-                    </div>
-                  </button>
-                  {/* <Button disabled={!disabled} onClick={handleInvoiceDownload}>
-                    <div className="flex items-center gap-1">
-                      <span>Download</span>
-                      <Download size={14} />
-                    </div>
-                  </Button> */}
+                  <div className="relative">
+                    {/* Download Button */}
+                    <button
+                      className={`text-sm border p-2 rounded-md flex items-center gap-1 border-blue-300
+      focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-1
+      ${
+        !disabled
+          ? "bg-gray-50 cursor-not-allowed opacity-50"
+          : "bg-gray-50 hover:bg-blue-200"
+      }`}
+                      disabled={!disabled}
+                      onClick={() => setShowDownloadOptions((prev) => !prev)}
+                    >
+                      <div className="flex items-center gap-1">
+                        <span className="text-gray-700">Download</span>
+                        <Download size={14} className="text-blue-500" />
+                      </div>
+                    </button>
+
+                    {/* Dropdown */}
+                    {showDownloadOptions && (
+                      <div className="absolute z-10 mt-1 w-48  bg-white border rounded-md shadow-md">
+                        {isLoading ? (
+                          <div className="px-3 py-2 text-sm text-gray-500">
+                            Loading...
+                          </div>
+                        ) : (
+                          invoiceType.map((type) => (
+                            <div
+                              key={type.id}
+                              className="px-3 py-2 text-xs  hover:bg-blue-100 cursor-pointer flex justify-between"
+                              onClick={() => {
+                                handleInvoiceDownload(type.id); // 👈 pass type id
+                                setShowDownloadOptions(false);
+                              }}
+                            >
+                              <span>{type.name}</span>
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    )}
+                  </div>
                   <button
                     className={`text-sm border p-2 rounded-md flex items-center gap-1 text-gray-700
                        focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-1
@@ -693,20 +713,11 @@ function CompanyInvoiceDetails() {
                       <FaFilePdf size={14} className="text-red-500" />
                     </div>
                   </button>
-                  {/* <Button
-                    disabled={!userHasAccessToViewCompanyInvoice}
-                    onClick={previewInvoice}
-                  >
-                    <div className="flex items-center gap-1">
-                      <span>Preview</span>
-                      <FaFilePdf size={14} color="white" />
-                    </div>
-                  </Button> */}
                 </div>
               )}
             </div>
             {isCreateMode && (
-              <div className="flex items-end justify-start py-1 gap-3">
+              <div className="flex items-end justify-between p-1 mb-2 gap-3">
                 {/* Dropdown */}
                 <div className="w-80">
                   <LookupAccountDropdown
@@ -720,7 +731,7 @@ function CompanyInvoiceDetails() {
                 {/* Save Button */}
                 <div className="">
                   <Button onClick={handleSaveInvoice}>
-                    {isSubmitting ? "Saving..." : "Save"}
+                    {isSubmitting ? "Creating..." : "Create invoice"}
                   </Button>
                 </div>
               </div>
@@ -746,6 +757,7 @@ function CompanyInvoiceDetails() {
                 <FormInput
                   label="Due Date"
                   type="date"
+                  disabled={isCreateMode || disabled}
                   value={invoice?.dueDate}
                   onChange={(e: any) =>
                     setInvoice((prev) => ({
@@ -767,7 +779,7 @@ function CompanyInvoiceDetails() {
               <TextAreaInput
                 label="Billing Address"
                 maxLength={255}
-                disabled={disabled}
+                disabled={isCreateMode || disabled}
                 value={invoice?.billingAddress}
                 onChange={(e: any) =>
                   setInvoice((prev) => ({
@@ -782,7 +794,7 @@ function CompanyInvoiceDetails() {
               <TextAreaInput
                 label="Shipping Address"
                 maxLength={255}
-                disabled={disabled}
+                disabled={isCreateMode || disabled}
                 value={invoice?.shippingAddress}
                 onChange={(e: any) =>
                   setInvoice((prev) => ({
@@ -797,7 +809,7 @@ function CompanyInvoiceDetails() {
               <TextAreaInput
                 label="Terms & Conditions"
                 maxLength={500}
-                disabled={disabled}
+                disabled={isCreateMode || disabled}
                 value={invoice?.termAndConditions}
                 onChange={(e: any) =>
                   setInvoice((prev) => ({
@@ -811,7 +823,7 @@ function CompanyInvoiceDetails() {
               <TextAreaInput
                 label="Remarks"
                 maxLength={300}
-                disabled={disabled}
+                disabled={isCreateMode || disabled}
                 value={invoice?.remarks}
                 onChange={(e: any) =>
                   setInvoice((prev) => ({
@@ -824,19 +836,13 @@ function CompanyInvoiceDetails() {
               />
               <div className="col-span-2 flex items-center justify-end p-1">
                 <div className="flex gap-2">
-                  {/* <Button disabled={!disabled} onClick={handleInvoiceDownload}>
-                  <div className="flex items-center gap-1">
-                    <span>Download</span>
-                    <Download size={14} />
-                  </div>
-                </Button> */}
-                  {showCompanyLogoPreview && (
+                  {showCompanyInvoicePreview && (
                     <div
                       className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50"
-                      onClick={() => setShowCompanyLogoPreview(false)}
+                      onClick={() => setShowCompanyInvoicePreview(false)}
                     >
                       <CustomDocumentPreviewComponent
-                        fileUrl={logoPreview!}
+                        fileUrl={InvoicePreview!}
                         fileExtension={"application/pdf"}
                         width={"50%"}
                         height={"85%"}
@@ -844,15 +850,6 @@ function CompanyInvoiceDetails() {
                       />
                     </div>
                   )}
-                  {/* <Button
-                  disabled={!userHasAccessToViewCompanyInvoice}
-                  onClick={previewInvoice}
-                >
-                  <div className="flex items-center gap-1">
-                    <span>Preview</span>
-                    <FaFilePdf size={14} color="white" />
-                  </div>
-                </Button> */}
                   {!isCreateMode && (
                     <Button
                       disabled={
@@ -895,7 +892,9 @@ function CompanyInvoiceDetails() {
                   <div>
                     <Button
                       type="button"
-                      // disabled={!userHasAccessToAddCompanyInvoiceItem}
+                      disabled={
+                        disabled || !userHasAccessToAddCompanyInvoiceItem
+                      }
                       onClick={() => {
                         if (!userHasAccessToAddCompanyInvoiceItem) {
                           toast.error(
@@ -908,7 +907,7 @@ function CompanyInvoiceDetails() {
                       }}
                       className={COLORS.ADD_BUTTON}
                     >
-                      +Add All
+                      +Add Pending Items
                     </Button>
                   </div>
                 </div>
@@ -931,7 +930,7 @@ function CompanyInvoiceDetails() {
                         <th>IGST (%)</th>
                         {hasCess && <th>Cess (%)</th>}
                         <th>Total Item Amount</th>
-                        <th>Action</th>
+                        {!disabled && <th>Action</th>}
                       </tr>
                     </thead>
 
@@ -967,9 +966,9 @@ function CompanyInvoiceDetails() {
                                   {item.companyProductName}
                                 </td>
                                 <td>{item.quantity}</td>
-                                <td>{item.rate}</td>
+                                <td>{formatRupee(item.rate)}</td>
                                 <td>{item.hsn || item.sac}</td>
-                                <td>{item.basicValue}</td>
+                                <td>{formatRupee(item.basicValue)}</td>
                                 <td>
                                   <input
                                     type="number"
@@ -986,22 +985,22 @@ function CompanyInvoiceDetails() {
                                     }
                                   />
                                 </td>
-                                <td>{item.taxableValue}</td>
+                                <td>{formatRupee(item.taxableValue)}</td>
                                 <td>
-                                  {item.cgstAmount} ({item.cgstPercent}%)
+                                  {formatRupee(item.cgstAmount)} ({item.cgstPercent}%)
                                 </td>
                                 <td>
-                                  {item.sgstAmount} ({item.sgstPercent}%)
+                                  {formatRupee(item.sgstAmount)} ({item.sgstPercent}%)
                                 </td>
                                 <td>
-                                  {item.igstAmount} ({item.igstPercent}%)
+                                  {formatRupee(item.igstAmount)} ({item.igstPercent}%)
                                 </td>
                                 {hasCess && (
                                   <td>
-                                    {item.cessAmount} ({item.cessPercent}%)
+                                    {formatRupee(item.cessAmount)} ({item.cessPercent}%)
                                   </td>
                                 )}
-                                <td>{item.totalAmount}</td>
+                                <td>{formatRupee(item.totalAmount)}</td>
 
                                 {!disabled && (
                                   <td>

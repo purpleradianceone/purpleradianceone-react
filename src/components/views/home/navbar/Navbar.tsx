@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState, useRef } from "react";
-import { LiaFileInvoiceSolid } from "react-icons/lia";
 import {
   Aperture,
   Bell,
@@ -56,6 +55,7 @@ import { LocalStorageKeys } from "../../../../enums/LocalStorageKeys";
 import { AppVersionViewCard } from "../../card/AppVersionViewCard";
 import { useUserPreference } from "../../../../context/user/UserPreference";
 import QuotationIconSvg from "../../../quotation-builder/svg/QuotationIconSvg";
+import { FaRegFileAlt } from "react-icons/fa";
 
 function Navbar({ children }: { children: React.ReactNode }) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -531,7 +531,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
                         <NavItem
                           disable={!userHasAccessToViewCompanyInvoice}
                           to={ROUTES_URL.INVOICE_MANAGEMENT}
-                          icon={<LiaFileInvoiceSolid size={SIZE.TWENTY} />}
+                          icon={<FaRegFileAlt size={SIZE.TWENTY} />}
                           label="Invoices"
                         />
 
@@ -606,7 +606,13 @@ function Navbar({ children }: { children: React.ReactNode }) {
                               label: "Email Template",
                             },
                             {
-                              icon: <QuotationIconSvg strokeWidth={2} size={SIZE.TWENTY+1}  showCurrency={true}/>,
+                              icon: (
+                                <QuotationIconSvg
+                                  strokeWidth={2}
+                                  size={SIZE.TWENTY + 1}
+                                  showCurrency={true}
+                                />
+                              ),
                               to: ROUTES_URL.QUOTATION_SETTINGS,
                               label: "Quotation Template",
                             },

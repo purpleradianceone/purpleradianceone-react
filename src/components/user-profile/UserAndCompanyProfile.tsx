@@ -41,6 +41,7 @@ import { useDistricts } from "../../config/hooks/useDisctricts";
 import { toSelectOptions } from "../../utils/toSelectOption";
 import CustomSelect from "../ui/CustomSelect";
 import CustomDocumentPreviewComponent from "../custom-document-preview-component/CustomDocumentPreviewComponent";
+import CompanyBankAccountSection from "./CompanyBankAccountSection";
 
 const UserAndCompanyProfile = () => {
   const { countries } = useCountries();
@@ -56,6 +57,7 @@ const UserAndCompanyProfile = () => {
     userHasAccessToViewSettingGeneral,
     userHasAccessToViewCompanyDetail,
     userHasAccessToUpdateCompanyDetail,
+    userHasAccessToAddCompanyDetail,
     userHasAccessToUpdateSubscription,
   } = useUserAccessModules();
 
@@ -1779,6 +1781,13 @@ const UserAndCompanyProfile = () => {
             </EditableSection>
           </div>
         </div>
+
+        {/* ✅ Bank Account Section */}
+        <CompanyBankAccountSection
+          userHasAccessToView={userHasAccessToViewCompanyDetail}
+          userHasAccessToUpdate={userHasAccessToUpdateCompanyDetail}
+          userHasAccessToAdd={userHasAccessToAddCompanyDetail}
+        />
         <AppVersionViewCard />
       </div>
     </div>
