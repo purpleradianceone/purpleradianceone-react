@@ -34,6 +34,7 @@ import "../../../assets/styles/CustomCalendarCSS.css";
 import { useMeetingPlatform } from "../../../config/hooks/useMeetingPlatforms";
 import { useInView } from "react-intersection-observer";
 import { motion } from "framer-motion";
+import axiosClient from "../../../axios-client/AxiosClient";
 
 function LeadMeetingsModal({
   isCalendarViewEnabled,
@@ -47,7 +48,7 @@ function LeadMeetingsModal({
   const { userPreference } = useUserPreference();
   const backEndDateFormat = "YYYY-MM-DD HH:mm:ss.S";
   const localizer = momentLocalizer(
-    moment.tz.setDefault(userPreference.timezoneName)
+    moment.tz.setDefault(userPreference.timezoneName),
   );
   const [ref, inView] = useInView({ fallbackInView: true, threshold: 0.1 });
 
@@ -104,20 +105,20 @@ function LeadMeetingsModal({
 
   const [concatDate, setConcatDate] = useState<string>(
     `${moment(new Date()).format("DD-MMM-YYYY")}@${moment(new Date()).format(
-      "DD-MMM-YYYY"
-    )}`
+      "DD-MMM-YYYY",
+    )}`,
   );
 
   const getGoogleMeeting = async () => {
-    setGoogleMeetEventData([]);
+    // setGoogleMeetEventData([]);
     const getGoogleMeetingsPostData = {
       company_id: loginStatus.companyId,
       company_user_id: loginStatus.id,
-      search_company_specific_date_range_id: 8,
+      search_company_specific_date_range_id: 9,
       search_parameter_date: concatDate,
       requestedby: loginStatus.id,
     };
-    await axios
+    await axiosClient
       .post(POST_API.GET_GOOGLE_MEETINGS, getGoogleMeetingsPostData, {
         withCredentials: true,
       })
@@ -127,12 +128,12 @@ function LeadMeetingsModal({
             const startDateByUserTimeZoneParsed = momentTimezone.tz(
               res["Start Date By User Time Zone"],
               backEndDateFormat,
-              userPreference.timezoneName
+              userPreference.timezoneName,
             );
             const endDateByUserTimeZoneParsed = momentTimezone.tz(
               res["End Date By User Time Zone"],
               backEndDateFormat,
-              userPreference.timezoneName
+              userPreference.timezoneName,
             );
             setGoogleMeetEventData((prev) => [
               ...prev,
@@ -189,26 +190,28 @@ function LeadMeetingsModal({
     const getZoomMeetingsPostData = {
       company_id: loginStatus.companyId,
       company_user_id: loginStatus.id,
-      search_company_specific_date_range_id: 8,
+      search_company_specific_date_range_id: 9,
       search_parameter_date: concatDate,
       requestedby: loginStatus.id,
     };
-    await axios
+    await axiosClient
       .post(POST_API.GET_ZOOM_MEETING, getZoomMeetingsPostData, {
         withCredentials: true,
       })
       .then((response) => {
         if (response.status === STATUS_CODE.OK) {
+          console.log(response.data);
+
           response.data.map((res: any) => {
             const startDateByUserTimeZoneParsed = momentTimezone.tz(
               res["Start Date By User Time Zone"],
               backEndDateFormat,
-              userPreference.timezoneName
+              userPreference.timezoneName,
             );
             const endDateByUserTimeZoneParsed = momentTimezone.tz(
               res["End Date By User Time Zone"],
               backEndDateFormat,
-              userPreference.timezoneName
+              userPreference.timezoneName,
             );
 
             setGoogleMeetEventData((prev) => [
@@ -236,7 +239,7 @@ function LeadMeetingsModal({
                 startDateByUserTimeZoneString:
                   res["Start Date By User Time Zone"],
                 endDateByUserTimeZoneString: res["End Date By User Time Zone"],
-                colorCode: res.color_code,
+                colorCode: "#2D8CFF",
                 attendeesEmailAll: res.attendees_email_all,
                 attendeesCompanyUserId: res.attendees_company_user_id,
                 isAttendeePresent: res.attendees_email_all ? true : false,
@@ -264,6 +267,64 @@ function LeadMeetingsModal({
       });
   };
 
+  const getTaskEvents = async () => {
+    try {
+      const postData = {
+        company_id: loginStatus.companyId,
+        id: null,
+        search_company_specific_date_range_id: 9,
+        limit: 1000,
+        offset: 0,
+        search_parameter: null,
+        search_parameter_date: concatDate,
+        requestedby_id: loginStatus.id,
+        task_priority_id: null,
+        task_stage_id: null,
+        source: "all",
+      };
+
+      const response = await axios.post(POST_API.GET_ALL_MY_TASK, postData, {
+        withCredentials: true,
+      });
+      console.log(response);
+
+      if (response.status === STATUS_CODE.OK) {
+        const taskEvents = response.data
+          .map((item: any) => {
+            if (!item.due_date_time) return null;
+
+            const start = momentTimezone.tz(
+              item.due_date_time,
+              "MMM DD, YYYY HH:mm:ss", // ✅ correct format
+              userPreference.timezoneName,
+            );
+
+            const end = start.clone().add(60, "minutes");
+
+            return {
+              taskId: item.id,
+              masterId: item.master_id,
+              id: `task-${item.id}`, // IMPORTANT (avoid ID clash)
+              title: item.subject || "Task",
+              description: item.description,
+              startDateByUserTimeZone: start.toDate(),
+              endDateByUserTimeZone: end.toDate(),
+
+              colorCode: "#f59e0b",
+
+              platform: 4, // TASK
+              isAttendeePresent: false,
+            };
+          })
+          .filter(Boolean);
+
+        // 🔥 MERGE with existing meetings
+        setGoogleMeetEventData((prev) => [...prev, ...taskEvents]);
+      }
+    } catch (error) {
+      console.error("Task API Error:", error);
+    }
+  };
   const eventStyleGetter = (event: CalendarEventType) => {
     const style = {
       backgroundColor: event.colorCode,
@@ -292,29 +353,29 @@ function LeadMeetingsModal({
       setConcatDate(
         `${moment(new Date()).format("DD-MMM-YYYY")}@${moment(new Date())
           .add(1, "months")
-          .format("DD-MMM-YYYY")}`
+          .format("DD-MMM-YYYY")}`,
       );
     } else if (view === "day") {
       setConcatDate(
         `${moment(new Date()).format("DD-MMM-YYYY")}@${moment(
-          new Date()
-        ).format("DD-MMM-YYYY")}`
+          new Date(),
+        ).format("DD-MMM-YYYY")}`,
       );
     } else if (view === "month") {
       setConcatDate(
         `${moment(new Date()).startOf("months").format("DD-MMM-YYYY")}@${moment(
-          new Date()
+          new Date(),
         )
           .endOf("months")
-          .format("DD-MMM-YYYY")}`
+          .format("DD-MMM-YYYY")}`,
       );
     } else if (view === "week") {
       setConcatDate(
         `${moment(new Date()).startOf("weeks").format("DD-MMM-YYYY")}@${moment(
-          new Date()
+          new Date(),
         )
           .endOf("weeks")
-          .format("DD-MMM-YYYY")}`
+          .format("DD-MMM-YYYY")}`,
       );
     }
   }, []);
@@ -324,9 +385,9 @@ function LeadMeetingsModal({
       moment(currentViewDate)
         .subtract(
           1,
-          view === "month" ? "months" : view === "week" ? "weeks" : "days"
+          view === "month" ? "months" : view === "week" ? "weeks" : "days",
         )
-        .toDate()
+        .toDate(),
     );
 
     if (view === "agenda") {
@@ -335,7 +396,7 @@ function LeadMeetingsModal({
           .subtract(1, "days")
           .format("DD-MMM-YYYY")}@${moment(currentViewDate)
           .add(1, "months")
-          .format("DD-MMM-YYYY")}`
+          .format("DD-MMM-YYYY")}`,
       );
     } else if (view === "month") {
       setConcatDate(
@@ -345,7 +406,7 @@ function LeadMeetingsModal({
           .format("DD-MMM-YYYY")}@${moment(currentViewDate)
           .subtract(1, "months")
           .endOf("month")
-          .format("DD-MMM-YYYY")}`
+          .format("DD-MMM-YYYY")}`,
       );
     } else if (view === "week") {
       setConcatDate(
@@ -355,7 +416,7 @@ function LeadMeetingsModal({
           .format("DD-MMM-YYYY")}@${moment(currentViewDate)
           .subtract(1, "week")
           .endOf("week")
-          .format("DD-MMM-YYYY")}`
+          .format("DD-MMM-YYYY")}`,
       );
     } else if (view === "day") {
       setConcatDate(
@@ -363,7 +424,7 @@ function LeadMeetingsModal({
           .subtract(1, "days")
           .format("DD-MMM-YYYY")}@${moment(currentViewDate)
           .subtract(1, "days")
-          .format("DD-MMM-YYYY")}`
+          .format("DD-MMM-YYYY")}`,
       );
     }
   }, [currentViewDate, view]);
@@ -373,9 +434,9 @@ function LeadMeetingsModal({
       moment(currentViewDate)
         .add(
           1,
-          view === "month" ? "months" : view === "week" ? "weeks" : "days"
+          view === "month" ? "months" : view === "week" ? "weeks" : "days",
         )
-        .toDate()
+        .toDate(),
     );
 
     if (view === "agenda") {
@@ -384,7 +445,7 @@ function LeadMeetingsModal({
           .add(1, "days")
           .format("DD-MMM-YYYY")}@${moment(currentViewDate)
           .add(1, "months")
-          .format("DD-MMM-YYYY")}`
+          .format("DD-MMM-YYYY")}`,
       );
     } else if (view === "month") {
       setConcatDate(
@@ -394,7 +455,7 @@ function LeadMeetingsModal({
           .format("DD-MMM-YYYY")}@${moment(currentViewDate)
           .add(1, "months")
           .endOf("month")
-          .format("DD-MMM-YYYY")}`
+          .format("DD-MMM-YYYY")}`,
       );
     } else if (view === "week") {
       setConcatDate(
@@ -404,7 +465,7 @@ function LeadMeetingsModal({
           .format("DD-MMM-YYYY")}@${moment(currentViewDate)
           .add(1, "week")
           .endOf("week")
-          .format("DD-MMM-YYYY")}`
+          .format("DD-MMM-YYYY")}`,
       );
     } else if (view === "day") {
       setConcatDate(
@@ -412,7 +473,7 @@ function LeadMeetingsModal({
           .add(1, "days")
           .format("DD-MMM-YYYY")}@${moment(currentViewDate)
           .add(1, "days")
-          .format("DD-MMM-YYYY")}`
+          .format("DD-MMM-YYYY")}`,
       );
     }
   }, [currentViewDate, view]);
@@ -425,16 +486,16 @@ function LeadMeetingsModal({
     if (newView === "agenda") {
       setConcatDate(
         `${moment(currentViewDate).format("DD-MMM-YYYY")}@${moment(
-          currentViewDate
+          currentViewDate,
         )
           .add(1, "months")
-          .format("DD-MMM-YYYY")}`
+          .format("DD-MMM-YYYY")}`,
       );
     } else if (newView === "day") {
       setConcatDate(
         `${moment(currentViewDate).format("DD-MMM-YYYY")}@${moment(
-          currentViewDate
-        ).format("DD-MMM-YYYY")}`
+          currentViewDate,
+        ).format("DD-MMM-YYYY")}`,
       );
     } else if (newView === "month") {
       setConcatDate(
@@ -442,7 +503,7 @@ function LeadMeetingsModal({
           .startOf("month")
           .format("DD-MMM-YYYY")}@${moment(currentViewDate)
           .endOf("month")
-          .format("DD-MMM-YYYY")}`
+          .format("DD-MMM-YYYY")}`,
       );
     } else if (newView === "week") {
       setConcatDate(
@@ -450,7 +511,7 @@ function LeadMeetingsModal({
           .startOf("week")
           .format("DD-MMM-YYYY")}@${moment(currentViewDate)
           .endOf("week")
-          .format("DD-MMM-YYYY")}`
+          .format("DD-MMM-YYYY")}`,
       );
     }
   };
@@ -463,7 +524,9 @@ function LeadMeetingsModal({
   };
 
   useEffect(() => {
+    setGoogleMeetEventData([]);
     getGoogleMeeting();
+    getTaskEvents();
   }, [meetingDetailsUpdateCount, concatDate]);
   return (
     <div className="bg-white w-full min-h-full">
@@ -647,29 +710,41 @@ function LeadMeetingsModal({
               <div className="flex flex-col">
                 <div className="flex items-center gap-2 justify-between w-full">
                   <div className="flex items-center gap-2">
-                    <Button type="submit" title="Previous" onClick={(e) => {
-                      e.preventDefault();
-                      goBack();
-                    }}>
+                    <Button
+                      type="submit"
+                      title="Previous"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        goBack();
+                      }}
+                    >
                       <ChevronLeft className="h-4 w-4" />
                     </Button>
-                    <Button type="submit" title="Current Date" onClick={(e) => {
-                      e.preventDefault();
-                      goToToday();
-                    }}>
+                    <Button
+                      type="submit"
+                      title="Current Date"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        goToToday();
+                      }}
+                    >
                       <Clock className="h-4 w-4" />
                     </Button>
-                    <Button type="submit" title="Next" onClick={(e) => {
-                      e.preventDefault();
-                      goNext();
-                    }}>
+                    <Button
+                      type="submit"
+                      title="Next"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        goNext();
+                      }}
+                    >
                       <ChevronRight className="h-4 w-4" />
                     </Button>
                   </div>
                   <div className="flex gap-1 justify-between w-full">
                     <div className="content-center">
                       <Button
-                      type="submit"
+                        type="submit"
                         onClick={(e) => {
                           e.preventDefault();
                           // setScheduleMeetingModalOpen(true);
@@ -677,12 +752,12 @@ function LeadMeetingsModal({
                             navigate(
                               ROUTES_URL.SCHEDULE_MEETING +
                                 "?from=" +
-                                window.location.pathname
+                                window.location.pathname,
                             );
                           } else {
                             sessionStorage.setItem(
                               "leadData",
-                              JSON.stringify(leadDataSearchParams!)
+                              JSON.stringify(leadDataSearchParams!),
                             );
                             navigate(ROUTES_URL.SCHEDULE_MEETING);
                           }
@@ -724,26 +799,28 @@ function LeadMeetingsModal({
                             className="w-3 h-3 rounded-full"
                             style={{ backgroundColor: "#24bf26" }}
                           ></div>
-                          <span className="caption-custom">
-                            Google Meet
-                          </span>
+                          <span className="caption-custom">Google Meet</span>
                         </div>
                         <div className="flex items-center gap-1">
                           <div
                             className="w-3 h-3 rounded-full"
-                            style={{ backgroundColor: "blue" }}
+                            style={{ backgroundColor: "#2D8CFF" }}
                           ></div>
                           <span className="caption-custom">Zoom</span>
                         </div>
-
+                        <div className="flex items-center gap-1">
+                          <div
+                            className="w-3 h-3 rounded-full"
+                            style={{ backgroundColor: "#f59e0b" }}
+                          ></div>
+                          <span className="caption-custom">Tasks</span>
+                        </div>
                         <div className="flex items-center gap-1">
                           <div
                             className="w-3 h-3 rounded-full"
                             style={{ backgroundColor: "#eb4b4b" }}
                           ></div>
-                          <span className="caption-custom">
-                            Cancelled
-                          </span>
+                          <span className="caption-custom">Cancelled</span>
                         </div>
                       </div>
                     </div>
@@ -762,20 +839,20 @@ function LeadMeetingsModal({
                           viewName === "month"
                             ? "Month"
                             : viewName === "week"
-                            ? "Week"
-                            : viewName === "day"
-                            ? "Day"
-                            : "Agenda"
+                              ? "Week"
+                              : viewName === "day"
+                                ? "Day"
+                                : "Agenda"
                         }
                         size="sm"
                         type="submit"
                         onClick={(e) => {
                           e.preventDefault();
                           handleViewChange(
-                            viewName as "month" | "week" | "day" | "agenda"
+                            viewName as "month" | "week" | "day" | "agenda",
                           );
                           setView(
-                            viewName as "month" | "week" | "day" | "agenda"
+                            viewName as "month" | "week" | "day" | "agenda",
                           );
                         }}
                       >
@@ -807,7 +884,7 @@ function LeadMeetingsModal({
                       eventTimeRangeFormat: (
                         { start, end },
                         culture,
-                        localizer
+                        localizer,
                       ) =>
                         localizer!.format(start, "HH:mm", culture) +
                         " - " +
@@ -822,6 +899,17 @@ function LeadMeetingsModal({
                     toolbar={false}
                     eventPropGetter={eventStyleGetter}
                     onSelectEvent={(event) => {
+                      console.log(event);
+                      if (event.platform === 4) {
+                        // task click
+                        const path = ROUTES_URL.GENERAL_TASK.replace(
+                          ":taskId",
+                          String(event.taskId),
+                        ).replace(":masterId", String(event.masterId));
+
+                        navigate(path);
+                        return;
+                      }
                       setSelectedMeetingEvent(event);
                       setIsEditMettingModalOpen(true);
                     }}

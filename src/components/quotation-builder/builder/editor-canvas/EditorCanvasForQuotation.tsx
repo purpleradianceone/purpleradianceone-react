@@ -53,6 +53,7 @@ import { QuotationTemplateSettingsPanelCreate } from "../../template-panel/Quota
 import QuotationIconSvg from "../../svg/QuotationIconSvg";
 import { STORAGE_KEY_CREATE } from "../../local-storage/LocalStorageKeys";
 import { QuotationEditorSkeleton } from "../../utils/QuotationEditorSkeleton";
+import { QuotationSummeryBlock } from "../../blocks/QuotationSummeryBlock";
 
 export const EditorCanvasForQuotation: React.FC = () => {
   const canvasBgColor = "#f9f9f9";
@@ -147,6 +148,7 @@ export const EditorCanvasForQuotation: React.FC = () => {
             FooterBlockQuotation,
             ContentBlockQuotation,
             TableBlockQuotation,
+            QuotationSummeryBlock,
           }}
         >
           {/* ROOT WRAPPER */}

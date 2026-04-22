@@ -40,6 +40,7 @@ import QuotationTemplate from "../../quotation-template-types/QuotationTemplate"
 import { JsonFileData } from "../../quotation-template-types/JsonFileData";
 import { QuotationEditorSkeleton } from "../../utils/QuotationEditorSkeleton";
 import { QuotationTemplateSettingsPanelUpdate } from "../../template-panel/QuotationTemplateSettingsPanelUpdate";
+import { QuotationSummeryBlock } from "../../blocks/QuotationSummeryBlock";
 
 export const EditorCanvasForQuotationEdit: React.FC = () => {
   const canvasBgColor = "#f9f9f9";
@@ -232,6 +233,7 @@ export const EditorCanvasForQuotationEdit: React.FC = () => {
             FooterBlockQuotation,
             ContentBlockQuotation,
             TableBlockQuotation,
+            QuotationSummeryBlock,
           }}
         >
           {/* ROOT WRAPPER */}

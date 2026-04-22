@@ -27,6 +27,7 @@ type AccountProduct = {
   id: number;
   accountName: string;
   companyProductName: string;
+  productTypeName: string;
   installedByName: string;
   warrantyIntervalName?: string;
   amcIntervalName?: string;

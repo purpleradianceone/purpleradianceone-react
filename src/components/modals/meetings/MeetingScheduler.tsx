@@ -111,6 +111,8 @@ const MeetingScheduler = () => {
 
   const navigate = useNavigate();
   const { googleMeetStatus } = useGoogleMeetContext();
+  console.log(googleMeetStatus);
+
   const { zoomMeetingStatus } = useZoomMeetingContext();
 
   const [leadData, setLeadData] = useState<Lead>();
@@ -141,12 +143,12 @@ const MeetingScheduler = () => {
     const startDateTIme = momentTimezone.tz(
       combinedPickerStartDateTimeString,
       pickerFormatString,
-      userPreference.timezoneName
+      userPreference.timezoneName,
     );
     const endDateTime = momentTimezone.tz(
       combinedPickerEndDateTimeString,
       pickerFormatString,
-      userPreference.timezoneName
+      userPreference.timezoneName,
     );
 
     if (title === "") {
@@ -299,12 +301,12 @@ const MeetingScheduler = () => {
     const startDateTIme = momentTimezone.tz(
       combinedPickerStartDateTimeString,
       pickerFormatString,
-      userPreference.timezoneName
+      userPreference.timezoneName,
     );
     const endDateTime = momentTimezone.tz(
       combinedPickerEndDateTimeString,
       pickerFormatString,
-      userPreference.timezoneName
+      userPreference.timezoneName,
     );
     if (title === "") {
       // showMessageSnackbar({
@@ -457,7 +459,7 @@ const MeetingScheduler = () => {
         getCompanyUserPostData,
         {
           withCredentials: true,
-        }
+        },
       );
 
       if (response.status === STATUS_CODE.OK) {
@@ -509,7 +511,7 @@ const MeetingScheduler = () => {
   const handleRemoveAttendee = (
     email: string,
     id: number,
-    type: "user" | "leadContact" | "normal"
+    type: "user" | "leadContact" | "normal",
   ) => {
     console.log("remove lead attanfosdn");
     console.log(email);
@@ -517,16 +519,20 @@ const MeetingScheduler = () => {
     setAttendees(attendees.filter((attendee) => attendee !== email));
     if (type === "user") {
       setSelectedCompanyUsersIdArray((prev) =>
-        prev.filter((userId) => userId !== id)
+        prev.filter((userId) => userId !== id),
       );
-      setSelectedCompanyUserDetailArray((prev) => prev.filter((user) => user.id !== id));
+      setSelectedCompanyUserDetailArray((prev) =>
+        prev.filter((user) => user.id !== id),
+      );
     }
 
     if (type === "leadContact") {
       setAddCompanyLeadContactIdArray((prev) =>
-        prev.filter((userId) => userId !== id)
+        prev.filter((userId) => userId !== id),
       );
-      setAddCompanyLeadContactDetailsArray((prev) => prev.filter((contact) => contact.id !== id));
+      setAddCompanyLeadContactDetailsArray((prev) =>
+        prev.filter((contact) => contact.id !== id),
+      );
     }
   };
 
@@ -550,7 +556,7 @@ const MeetingScheduler = () => {
 
   const handleAddCompanyUserEmailCheckboxChange = (
     params: CompanyUsersSearchProps,
-    event: React.ChangeEvent<HTMLInputElement>
+    event: React.ChangeEvent<HTMLInputElement>,
   ) => {
     if (event.target.checked) {
       setSelectedCompanyUsersIdArray((prev) => [...prev, params.id]);
@@ -564,18 +570,18 @@ const MeetingScheduler = () => {
       ]);
     } else if (!event.target.checked) {
       setSelectedCompanyUsersIdArray((prev) =>
-        prev.filter((id) => id !== params.id)
+        prev.filter((id) => id !== params.id),
       );
       setAttendees((prev) => prev.filter((email) => email !== params.email));
       setSelectedCompanyUserDetailArray((prev) =>
-        prev.filter((user) => user.id !== params.id)
+        prev.filter((user) => user.id !== params.id),
       );
     }
   };
 
   const handleCompanyLeadContactCheckBoxChange = (
     data: LeadContactType,
-    event: React.ChangeEvent<HTMLInputElement>
+    event: React.ChangeEvent<HTMLInputElement>,
   ) => {
     if (event.target.checked && data.email) {
       setAddCompanyLeadContactIdArray((prev) => [...prev, data.id]);
@@ -589,10 +595,10 @@ const MeetingScheduler = () => {
       toast.error("please add email for contact and then try again.");
     } else if (!event.target.checked && data.email) {
       setAddCompanyLeadContactIdArray((prev) =>
-        prev.filter((id) => id !== data.id)
+        prev.filter((id) => id !== data.id),
       );
       setAddCompanyLeadContactDetailsArray((prev) =>
-        prev.filter((contact) => contact.id !== data.id)
+        prev.filter((contact) => contact.id !== data.id),
       );
       setAttendees((prev) => prev.filter((email) => email !== data.email));
     }
@@ -617,7 +623,7 @@ const MeetingScheduler = () => {
 
   return createPortal(
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50  overflow-y-auto">
-      <div className="max-w-4xl mt-1 w-full p-4 bg-white rounded-lg shadow-xl overflow-y-auto">
+      <div className="max-w-5xl mt-1 w-full p-4 bg-white rounded-lg shadow-xl overflow-y-auto">
         {/* <div className="flex justify-between">
           <h1 className="text-xl font-semibold mb-3 text-gray-800">
             Schedule Meeting
@@ -638,7 +644,7 @@ const MeetingScheduler = () => {
           description="Schedule your mettings as per your need"
           preText="Schedule Meeting"
         />
-        <div className="mb-1 grid grid-cols-3 gap-1">
+        <div className="mb-1 grid grid-cols-3 gap-2">
           <div className="col-span-2">
             <FormInput
               id="title"
@@ -646,14 +652,14 @@ const MeetingScheduler = () => {
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Meeting Title"
-              className="mt-1"
+              className=""
               label="Title"
               logo={ClipboardList}
             />
           </div>
           <div className="col-span-1">
             <label htmlFor="platform" className="input-label-custom mb-0">
-              <div className="flex gap-2 text-center mt-2">
+              <div className="flex gap-2 text-center ">
                 <CalendarPlusIcon className="text-blue-600 w-3 h-3 justify-center mt-1" />
                 <span>Meeting Platform</span>
               </div>
@@ -667,7 +673,7 @@ const MeetingScheduler = () => {
                     setSelectedMeetingPlatform(e.target.value);
                   } else {
                     setSelectedMeetingPlatform(e.target.value);
-                    handleGoogleMeetAuth();
+                    // handleGoogleMeetAuth();
                   }
                 } else if (e.target.value === meetingPlatform[1].name) {
                   if (zoomMeetingStatus.isConnected) {
@@ -681,7 +687,7 @@ const MeetingScheduler = () => {
                   setSelectedMeetingPlatform("");
                 }
               }}
-              className="block w-full pl-3 pr-10 py-2 border input-label-custom border-gray-300 focus:outline-1 focus:ring-indigo-500 focus:border-indigo-500 rounded-md"
+              className=" w-full h-7 border input-label-custom border-gray-300 focus:outline-1 focus:ring-indigo-500 focus:border-indigo-500 rounded-md"
             >
               <option className="input-label-custom" value="">
                 Select Platform
@@ -698,8 +704,8 @@ const MeetingScheduler = () => {
             </select>
           </div>
         </div>
-        <div className="grid grid-cols-8 gap-2 mb-1">
-          <div className="col-span-2">
+        <div className="grid grid-cols-4 gap-2 my-1">
+          <div className="">
             <DatePickerInput
               label="Start Date"
               onChange={(e) => {
@@ -716,7 +722,7 @@ const MeetingScheduler = () => {
             /> */}
           </div>
 
-          <div className="mt-2 col-span-2">
+          <div className="">
             <label htmlFor="startTime" className="input-label-custom">
               <div className="flex gap-2 text-center">
                 <Clock className="text-blue-600 w-3 h-3 justify-center mt-1" />
@@ -727,7 +733,7 @@ const MeetingScheduler = () => {
               id="startTtime"
               value={startTime}
               onChange={(e) => setStartTime(e.target.value)}
-              className="mt-1 block w-full pl-3 pr-10 input-label-custom py-2.5 border border-gray-300 focus:outline-1 focus:ring-indigo-500 focus:border-indigo-500 rounded-md"
+              className="h-7 block w-full input-label-custom border border-gray-300 focus:outline-1 focus:ring-indigo-500 focus:border-indigo-500 rounded-md"
             >
               <option value="">Start Time</option>
               {timeOptions.map((option) => (
@@ -738,7 +744,7 @@ const MeetingScheduler = () => {
             </select>
           </div>
 
-          <div className="col-span-2">
+          <div className="">
             <DatePickerInput
               label="End Date"
               onChange={(e) => {
@@ -748,7 +754,7 @@ const MeetingScheduler = () => {
             />
           </div>
 
-          <div className="mt-2 col-span-2">
+          <div className="">
             <label htmlFor="endTime" className="input-label-custom">
               <div className="flex gap-2 text-center">
                 <Clock className="text-blue-600 w-3 h-3 justify-center mt-1" />
@@ -759,7 +765,7 @@ const MeetingScheduler = () => {
               id="endTime"
               value={endTime}
               onChange={(e) => setEndTime(e.target.value)}
-              className="mt-1 block w-full pl-3 pr-10 py-2.5 border border-gray-300 focus:outline-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+              className=" w-full h-7 border border-gray-300 focus:outline-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
             >
               <option value="">End Time</option>
               {timeOptions.map((option) => (
@@ -770,8 +776,6 @@ const MeetingScheduler = () => {
             </select>
           </div>
         </div>
-        <div className="mb-1"></div>
-        <div className="mb-1 grid grid-cols-3 gap-4"></div>
         <div className="mb-1">
           <TextAreaInput
             cols={2}
@@ -796,7 +800,7 @@ const MeetingScheduler = () => {
                 logo={UserPlus}
               />
             </div>
-            <div className="col-span-1 mt-7">
+            <div className="col-span-1 mt-5 w-fit">
               <Button
                 type="submit"
                 onClick={(e) => {
@@ -836,7 +840,7 @@ const MeetingScheduler = () => {
                 </span>
               </span>
             </div>
-            <div className="col-span-1 max-w-24">
+            <div className="col-span-1 w-fit">
               <Button
                 type="submit"
                 onClick={(e) => {
@@ -890,7 +894,7 @@ const MeetingScheduler = () => {
                               return true;
                             }
                             return false;
-                          }
+                          },
                         );
 
                         if (userRemoved) {
@@ -903,7 +907,7 @@ const MeetingScheduler = () => {
                               handleRemoveAttendee(
                                 attendee,
                                 contact.id,
-                                "leadContact"
+                                "leadContact",
                               );
                               return true;
                             }
@@ -947,11 +951,11 @@ const MeetingScheduler = () => {
               onClick={(e) => {
                 e.preventDefault();
                 if (selectedMeetingPlatform === meetingPlatform[0].name) {
-                  if (googleMeetStatus.isConnected) {
-                    createGoogleMeetMeeting();
-                  } else {
-                    handleGoogleMeetAuth();
-                  }
+                  // if (googleMeetStatus.isConnected) {
+                  createGoogleMeetMeeting();
+                  // } else {
+                  // handleGoogleMeetAuth();
+                  // }
                 } else if (
                   selectedMeetingPlatform === meetingPlatform[1].name
                 ) {
@@ -964,7 +968,7 @@ const MeetingScheduler = () => {
                   selectedMeetingPlatform === meetingPlatform[2].name
                 ) {
                   toast.error(
-                    "Microsofft teams is coming soon... Choose another platform instead."
+                    "Microsofft teams is coming soon... Choose another platform instead.",
                   );
                 } else {
                   toast.error("Select the Meeting platform first.");
@@ -1007,7 +1011,7 @@ const MeetingScheduler = () => {
         />
       )}
     </div>,
-    document.body // Use the non-null assertion here.  We've ensured it's not null.
+    document.body, // Use the non-null assertion here.  We've ensured it's not null.
   );
 };
 

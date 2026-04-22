@@ -18,6 +18,8 @@ import COLORS from "../../../../constants/Colors";
 import axiosClient from "../../../../axios-client/AxiosClient";
 import { handleApiError } from "../../../../config/error/handleApiError";
 import AccessDeniedMessagePage from "../../../views/not-found/AccessDeniedMessagePage";
+import CreateAccountSubscription from "../account-subscription/CreateAccountSubscription";
+import { Modules } from "../../../../@types/List/CompanyQuotationManagementListProps";
 
 const AccountCompanyProduct = ({
   accountId,
@@ -28,6 +30,7 @@ const AccountCompanyProduct = ({
   const {
     userHasAccessToAddAccountProducts,
     userHasAccessToViewAccountProducts,
+    userHasAccessToAddCompanyQuotation,
   } = useUserAccessModules();
   const [isLoadingAccountCompanyProduct, setIsLoadingAccountCompanyProduct] =
     useState<boolean>(true);
@@ -41,6 +44,8 @@ const AccountCompanyProduct = ({
   >([]);
   const [accountCompanyProductCount, setAccountCompanyProductCount] =
     useState<number>(0);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedProductForAMC, setSelectedProductForAMC] = useState<any>(null);
   // const [refreshKey, setRefreshKey] = useState<number>(0);
 
   // const handleRowSelectAccountProduct = (data: AccountProduct) => {
@@ -51,6 +56,22 @@ const AccountCompanyProduct = ({
   //   handleShowCompanyProductData(data);
 
   // };
+
+  const handleCreateQuotationForAccountProduct = (data: AccountProduct) =>{
+        if (!userHasAccessToAddCompanyQuotation){
+          toast.error(MESSAGE.MODULE_ACCESS.COMPANY_QUOTATION.DENIED_ADD_ACCESS);
+          return;
+        }
+            const quotationSearchParam=  `?other_id=${accountId}&quotation_type_id=${2}&isUsedFor=${Modules.AMC_QUOTATION}&account_company_product=${JSON.stringify(data)}`;
+
+        const path = ROUTES_URL.QUOTATION_CREATE_AND_DETAILS.replace(
+            ":quotationId",
+            String(0),
+          )+quotationSearchParam;
+          navigate(path);
+
+
+  }
   const handleRowSelectAccountProduct = (data: AccountProduct) => {
     if (!userHasAccessToViewAccountProducts) return;
 
@@ -150,6 +171,10 @@ const AccountCompanyProduct = ({
   //     });
   // };
 
+  const openSubscriptionModal = (rowData: any) => {
+    setSelectedProductForAMC(rowData);
+    setIsModalOpen(true);
+  };
   const [hasError, setHasError] = useState(false);
 
   const handleAddToInvoice = async (rowData: AccountProduct) => {
@@ -211,6 +236,7 @@ const AccountCompanyProduct = ({
           accountName: item.account_name,
           companyProductId: item.company_product_id,
           companyProductName: item.company_product_name,
+          ProductTypeName: item.product_type_name,
           quantity: item.quantity,
           quantityReturn: item.quantity_return,
           barcode: item.barcode,
@@ -369,8 +395,20 @@ const AccountCompanyProduct = ({
               accountProductData={accountCompanyProduct}
               onRowSelect={handleRowSelectAccountProduct}
               handleRowClick={handleRowClick}
+              openSubscriptionModal={openSubscriptionModal}
+              handleCreateQuotation={handleCreateQuotationForAccountProduct}
             />
           </div>
+          <CreateAccountSubscription
+            isOpen={isModalOpen}
+            onClose={() => {
+              setIsModalOpen(false);
+              setSelectedProductForAMC(null);
+            }}
+            accountId={accountId}
+            handleAddAccountSubscritption={() => {}}
+            selectedProductForAMC={selectedProductForAMC} // 👈 NEW PROP
+          />
         </div>
       )}
 

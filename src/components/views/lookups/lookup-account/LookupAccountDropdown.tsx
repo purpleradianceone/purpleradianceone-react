@@ -11,11 +11,15 @@ export const LookupAccountDropdown = ({
   label,
   value,
   handleAccountSelection,
+  isDisabled = false
+
 }: {
   icon?: React.ReactNode;
   label?: string;
   value?: any;
   handleAccountSelection: (data: any) => void;
+  isDisabled?: boolean
+
 }) => {
   const { loginStatus } = useLoggedInUserContext();
   const [options, setOptions] = useState<any[]>([]);
@@ -92,8 +96,9 @@ export const LookupAccountDropdown = ({
           }
         }}
         noOptionsMessage={() =>
-          inputValue ? "No accounts found" : "Start typing to search"
+          inputValue ? "Accounts not found" : "Start typing to search"
         }
+        isDisabled={isDisabled}
       />
     </div>
   );

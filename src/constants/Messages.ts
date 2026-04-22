@@ -215,6 +215,11 @@ const MESSAGE = {
             DENIED_ADD_ACCESS: "You do not have permission to assign team to product.",
             DENIED_UPDATE_ACCESS: "You do not have permission to update product team.",
         },
+         COMPANY_QUOTATION: {
+            DENIED_VIEW_ACCESS: "You do not have permission to view company quotation.",
+            DENIED_ADD_ACCESS: "You do not have permission to create company quotation.",
+            DENIED_UPDATE_ACCESS: "You do not have permission to update company quotation.",
+        },
         SUBSCRIPTION:{
             DENIED_ADD_ACCESS:"You do not have permission to purchase subscription."
         },

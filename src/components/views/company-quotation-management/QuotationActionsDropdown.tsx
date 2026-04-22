@@ -5,7 +5,8 @@ import { Download, Eye, Trash2 } from "lucide-react";
 import { JSX_CHILDREN_NAME } from "../../../constants/AppConstants";
 import ActionsDropdownButton from "../../ui/ActionsDropdownButton";
 
-const InvoiceActionsDropdown = ({ data, context }: any) => {
+const QuotationActionsDropdown = ({ data, context }: any) => {
+  console.log("QuotationActionDropdown data:")
   console.log(data);
   const [open, setOpen] = useState(false);
   const [position, setPosition] = useState({
@@ -41,17 +42,8 @@ const InvoiceActionsDropdown = ({ data, context }: any) => {
       }
     };
 
-    const handleScroll = () => {
-      setOpen(false);
-    };
-
     document.addEventListener("mousedown", handleOutside);
-    window.addEventListener("scroll", handleScroll, true); // 👈 important
-
-    return () => {
-      document.removeEventListener("mousedown", handleOutside);
-      window.removeEventListener("scroll", handleScroll, true);
-    };
+    return () => document.removeEventListener("mousedown", handleOutside);
   }, []);
 
   return (
@@ -85,7 +77,7 @@ const InvoiceActionsDropdown = ({ data, context }: any) => {
               </div>
             </ActionsDropdownButton>
 
-            {data.statusId === 2 && (
+            {data.quotationStatusId === 2 && (
               <ActionsDropdownButton
                 onClick={() => {
                   context.onDownloadInvoice(data);
@@ -99,8 +91,8 @@ const InvoiceActionsDropdown = ({ data, context }: any) => {
               </ActionsDropdownButton>
             )}
 
-            {!context.userHasAccessToUpdateCompanyInvoiceDraft ||
-              (data.statusId === 1 && (
+            {!context.userHasAccessToUpdateCompanyQuotation ||
+              (data.quotationStatusId === 1 && (
                 <ActionsDropdownButton
                   onClick={() => {
                     context.onDelete?.(data);
@@ -119,4 +111,4 @@ const InvoiceActionsDropdown = ({ data, context }: any) => {
     </>
   );
 };
-export default InvoiceActionsDropdown;
+export default QuotationActionsDropdown;
