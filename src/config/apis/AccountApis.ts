@@ -37,3 +37,10 @@ export const updateAccount  = async (payload: object
     const response = await axiosClient.post(POST_API.UPDATE_ACCOUNT, payload, { withCredentials: true })
     return response;
 }
+
+
+export const getAccountCompanyProductByProductType  = async (payload: object
+) => {
+    const response = await axiosClient.post(POST_API.GET_ACCOUNT_COMPANY_PRODUCT_BY_PRODUCT_TYPE, payload, { withCredentials: true })
+    return response;
+}

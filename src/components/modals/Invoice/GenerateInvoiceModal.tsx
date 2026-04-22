@@ -21,7 +21,7 @@ import axiosClient from "../../../axios-client/AxiosClient";
 import POST_API from "../../../constants/PostApi";
 import { handleApiError } from "../../../config/error/handleApiError";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
-import { LookupAccountDropdown } from "../../views/lookups/lookup-account-dropdown/LookupAccountDropdown";
+import { LookupAccountDropdown } from "../../views/lookups/lookup-account/LookupAccountDropdown";
 import FormInput from "../../ui/FormInput";
 import { useAccountDetails } from "../../../config/hooks/useGetAccountDetails";
 
