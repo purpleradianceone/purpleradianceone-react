@@ -96,7 +96,7 @@ export const LookupAccountDropdown = ({
           }
         }}
         noOptionsMessage={() =>
-          inputValue ? "No accounts found" : "Start typing to search"
+          inputValue ? "Accounts not found" : "Start typing to search"
         }
         isDisabled={isDisabled}
       />

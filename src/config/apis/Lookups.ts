@@ -6,3 +6,10 @@ export const getLookupCompanyProductForStockCreation  = async (payload: object
     const response = await axiosClient.post(POST_API.GET_LOOKUP_COMPANY_PRODUCT_FOR_STOCK_CREATION, payload, { withCredentials: true })
     return response;
 }
+
+
+export const getLookupCompanyProductByProductType  = async (payload: object
+) => {
+    const response = await axiosClient.post(POST_API.GET_LOOKUP_COMPANY_PRODUCT_BY_PRODUCT_TYPE, payload, { withCredentials: true })
+    return response;
+}

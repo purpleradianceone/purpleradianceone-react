@@ -27,7 +27,7 @@ import {
   InvoiceHeaderSkeleton,
   InvoiceItemsSkeleton,
 } from "./CompanyInvoiceDetailSkeleton";
-import { LookupAccountDropdown } from "../lookups/lookup-account-dropdown/LookupAccountDropdown";
+import { LookupAccountDropdown } from "../lookups/lookup-account/LookupAccountDropdown";
 import ROUTES_URL from "../../../constants/Routes";
 import COLORS from "../../../constants/Colors";
 import MESSAGE from "../../../constants/Messages";

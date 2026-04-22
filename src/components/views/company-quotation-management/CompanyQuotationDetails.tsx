@@ -5,6 +5,7 @@ import {
   File,
   FileArchive,
   Handshake,
+  LucideSubtitles,
   Pencil,
   Trash,
   User,
@@ -30,7 +31,7 @@ import SearchInput from "../../ui/SearchInput";
 import LoadingPopUpAnimation from "../card/LoadingPopUpAnimation";
 
 import ROUTES_URL from "../../../constants/Routes";
-import { LookupAccountDropdown } from "../lookups/lookup-account-dropdown/LookupAccountDropdown";
+import { LookupAccountDropdown } from "../lookups/lookup-account/LookupAccountDropdown";
 
 import CompanyQuotationProps from "../../../@types/company-quotation/CompanyQuotationProps";
 import { Modules } from "../../../@types/List/CompanyQuotationManagementListProps";
@@ -46,6 +47,8 @@ import { QuotationTypeDropdown } from "../lookups/company-quotation/QuotationTyp
 import { LookupLeadDropdown } from "../lookups/lookup-lead/LookupLeadDropdown";
 import MESSAGE from "../../../constants/Messages";
 import { getLookupQuotationTemplate } from "../../../config/apis/CompanyQuotationApis";
+import { LookupCompanyProductByProductTypeDropdown } from "../lookups/lookup-company-product/LookupCompanyProductByProductTypeDropdown";
+import { AccountCompanyProductByProductTypeDropdown } from "../lookups/lookup-account/AccountCompanyProductByProductTypeDropdown";
 
 function CompanyQuotationDetails() {
   const { quotationId } = useParams();
@@ -67,6 +70,13 @@ function CompanyQuotationDetails() {
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const [showCompanyLogoPreview, setShowCompanyLogoPreview] = useState(false);
   const [selectedAccount, setSelectedAccount] = useState<any>(null);
+  const [selectedSelectedCompanyProductType4, setSelectedCompanyProductType4] =
+    useState<any>(null);
+  const [
+    selectedAccountCompanyProductType12,
+    setSelectedAccountCompanyProductType12,
+  ] = useState<any>(null);
+
   const [selectedQuotationType, setSelectedQuotationType] = useState<any>({
     id: 1,
     name: "Lead",
@@ -81,11 +91,19 @@ function CompanyQuotationDetails() {
   const quotationTypeIdSearchParams = searchParams.get("quotation_type_id");
   const isUsedForSearchParams = searchParams.get("isUsedFor");
   const fromCreatePage = searchParams.get("fromCreatePage");
+
   const {
     userHasAccessToAddCompanyQuotation,
     userHasAccessToViewCompanyQuotation,
     userHasAccessToUpdateCompanyQuotation,
   } = useUserAccessModules();
+
+  useEffect(()=>{
+    if(searchParams.has("account_company_product")){
+        const accountCompanyProduct = JSON.parse(searchParams.get("account_company_product")??"{}")
+        setSelectedAccountCompanyProductType12(accountCompanyProduct);
+    }
+  },[searchParams])
 
   const getCompanyQuotations = async (signal: AbortSignal) => {
     if (!quotationId || Number(quotationId) === 0) return;
@@ -159,7 +177,6 @@ function CompanyQuotationDetails() {
           updatedOn: item.updatedon,
         };
 
-        ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         const postData = {
           id: formattedData.quotationTemplateId,
           company_id: loginStatus.companyId,
@@ -169,14 +186,12 @@ function CompanyQuotationDetails() {
         const res = await getLookupQuotationTemplate(postData);
         console.error(res.data[0]);
         setSelectedQuotationTemplate(res.data[0]);
-        // ✅ Set single object (NOT array)
         setQuotation(formattedData);
       }
     } catch (error: any) {
       handleApiError(error);
     } finally {
       setQuotationLoading(false);
-      console.log("into inv finally");
     }
   };
   console.log(disabled);
@@ -206,7 +221,6 @@ function CompanyQuotationDetails() {
           (a: any, b: any) => a.id - b.id,
         ); // Sort by ID to maintain order
 
-        console.log("Quotation Items:", responseData);
 
         const items = Array.isArray(responseData)
           ? responseData
@@ -359,7 +373,7 @@ function CompanyQuotationDetails() {
           requestedby_id: loginStatus.id,
         },
         {
-          responseType: "blob", 
+          responseType: "blob",
           withCredentials: true,
         },
       );
@@ -513,6 +527,8 @@ function CompanyQuotationDetails() {
     setEditingItemId(null);
   };
 
+  
+
   const handleCreateQuotation = async () => {
     if (!userHasAccessToAddCompanyQuotation) {
       toast.error(MESSAGE.MODULE_ACCESS.COMPANY_QUOTATION.DENIED_ADD_ACCESS);
@@ -524,12 +540,21 @@ function CompanyQuotationDetails() {
         return;
       }
     }
-    if (selectedQuotationType === 2) {
+    if (selectedQuotationType.id === 2) {
       if (!selectedAccount) {
         toast.error("Please select an account");
         return;
       }
+      if(!selectedAccountCompanyProductType12){
+        toast.error("Please select an account product");
+        return;
+      }
+      if(!selectedSelectedCompanyProductType4){
+        toast.error("Please select AMC type product");
+        return;
+      }
     }
+
 
     if (!selectedQuotationTemplate) {
       toast.error("Please select an quotation template");
@@ -554,7 +579,15 @@ function CompanyQuotationDetails() {
             valid_till_date_string: quotation?.validTillDate,
             createdby_id: loginStatus.id,
           }
-        : {
+        : selectedQuotationType.id === 2?{
+            company_id: loginStatus.companyId,
+            account_company_product_id: selectedAccountCompanyProductType12.id,
+            company_product_id: selectedSelectedCompanyProductType4.id,
+            quotation_template_id: selectedQuotationTemplate.id,
+            quotation_date_string: quotation?.quotationDate,
+            valid_till_date_string: quotation?.validTillDate,
+            createdby_id: loginStatus.id,
+          }:{
             company_id: loginStatus.companyId,
 
             createdby_id: loginStatus.id,
@@ -566,7 +599,7 @@ function CompanyQuotationDetails() {
       .post(
         selectedQuotationType.id === 1
           ? POST_API.CREATE_COMPANY_QUOTATION_QUOTATION_TYPE_1
-          : POST_API.CREATE_COMPANY_QUOTATION_QUOTATION_TYPE_1,
+          : POST_API.CREATE_COMPANY_QUOTATION_QUOTATION_TYPE_2,
         formPayload,
         {
           withCredentials: true,
@@ -584,7 +617,7 @@ function CompanyQuotationDetails() {
             String(invoiceId) +
               `?other_id=${selectedQuotationType === 1 ? selectedLead.id : selectedQuotationType === 2 ? selectedAccount.id : 0}&quotation_type_id=${selectedQuotationType.id}&isUsedFor=${isUsedForSearchParams}&fromCreatePage=1`,
           );
-          navigate(path , { replace: true });
+          navigate(path, { replace: true });
           // onClose();
         } else {
           toast.error(response.data.message);
@@ -631,6 +664,16 @@ function CompanyQuotationDetails() {
 
   const handleAccountSelect = (account: any) => {
     setSelectedAccount(account);
+  };
+
+  const handleCompanyProductSelection = (lookupCompanyProductType4: any) => {
+    setSelectedCompanyProductType4(lookupCompanyProductType4);
+  };
+
+  const handleAccountCompanyProductSelection = (
+    accountCompanyProductType12: any,
+  ) => {
+    setSelectedAccountCompanyProductType12(accountCompanyProductType12);
   };
 
   const handleLeadSelect = (lead: any) => {
@@ -697,6 +740,12 @@ function CompanyQuotationDetails() {
     }
   }, []);
 
+    useEffect(()=>{
+    if(quotationTypeIdSearchParams && quotationTypeIdSearchParams !== "0"){
+        setSelectedQuotationType({id:Number(quotationTypeIdSearchParams), name: quotationTypeIdSearchParams === "1"?"Lead":"AMC" })
+    }
+  },[quotationTypeIdSearchParams]);
+
   return (
     <PageLayout onScrollChange={setShowAccountName} scrollTopValue={80}>
       <div className="p-1 font-roboto">
@@ -753,7 +802,7 @@ function CompanyQuotationDetails() {
                 <h1 className="table-header-custom">
                   {isCreateMode
                     ? "Create Quotation"
-                    : `Quotation #${quotation?.quotationNumber || "[Auto-generated]"}`}
+                    : `Quotation #${quotation?.quotationNumber || "[Auto-generated]"} (${quotation?.quotationTypeName})`}
                 </h1>
                 {!otherIdSearchParams && (
                   <p className="text-sm text-gray-500">
@@ -801,86 +850,142 @@ function CompanyQuotationDetails() {
               )}
             </div>
             {isCreateMode && (
-              <div className="flex items-end justify-start py-1 gap-3">
-                {/* Dropdown */}
-                {quotationTypeIdSearchParams && (
-                  <div className="flex w-full gap-3">
-                    {quotationTypeIdSearchParams &&
-                      (quotationTypeIdSearchParams === "1" ? (
-                        <LookupLeadDropdown
-                          icon={<Handshake size={14} />}
-                          value={selectedLead}
-                          label="Lead"
-                          handleLeadSelection={handleLeadSelect}
-                          isDisabled={true}
-                        />
-                      ) : quotationTypeIdSearchParams === "2" ? (
-                        <LookupAccountDropdown
-                          icon={<User size={14} />}
-                          value={selectedAccount}
-                          label="Account"
-                          handleAccountSelection={handleAccountSelect}
-                          isDisabled={true}
-                        />
-                      ) : (
-                        "customer"
-                      ))}
-                    <LookupQuotationTemplateDropdown
-                      icon={<File size={14} />}
-                      value={selectedQuotationTemplate}
-                      label="Select Quotation Template"
-                      handleQuotationTemplateSelection={
-                        handleQuotationTemplateSelect
-                      }
-                    />
-                  </div>
-                )}
-
-                {!quotationTypeIdSearchParams && (
-                  <div className="flex w-full gap-3">
-                    <QuotationTypeDropdown
-                      icon={<FileArchive size={14} />}
-                      value={selectedQuotationType}
-                      label="Select Quotation Type"
-                      handleQuotationTypeSelection={handleQuotationTypeSelect}
-                    />
-                    {selectedQuotationType && (
-                      <div className="w-full">
-                        {selectedQuotationType.id === 1 && (
+              <div>
+                <div className="flex items-end justify-start py-1 gap-3">
+                  {/* Dropdown */}
+                  {quotationTypeIdSearchParams && (
+                    <div className="flex w-full gap-3">
+                      {quotationTypeIdSearchParams &&
+                        (quotationTypeIdSearchParams === "1" ? (
                           <LookupLeadDropdown
                             icon={<Handshake size={14} />}
                             value={selectedLead}
-                            label="Select Lead"
+                            label="Lead"
                             handleLeadSelection={handleLeadSelect}
+                            isDisabled={true}
                           />
-                        )}
-                        {selectedQuotationType.id === 2 && (
+                        ) : quotationTypeIdSearchParams === "2" ? (
                           <LookupAccountDropdown
                             icon={<User size={14} />}
                             value={selectedAccount}
-                            label="Select Account"
+                            label="Account"
                             handleAccountSelection={handleAccountSelect}
+                            isDisabled={true}
+                          />
+                        ) : (
+                          "customer"
+                        ))}
+                      {/** =================For Account Product================= */}
+                      {selectedAccount &&
+                        quotationTypeIdSearchParams === "2" && (
+                          <AccountCompanyProductByProductTypeDropdown
+                            icon={<User size={14} />}
+                            value={selectedAccountCompanyProductType12}
+                            label="Account Product"
+                            accountId={selectedAccount.id}
+                            //   accountCompanyProductId={Number(searchParams.get("account_product_id"))}
+                            productTypeId={[1, 2]}
+                            handleAccountCompanyProductSelection={
+                              handleAccountCompanyProductSelection
+                            }
+                            isDisabled={true}
                           />
                         )}
-                      </div>
-                    )}
-                    <LookupQuotationTemplateDropdown
-                      icon={<File size={14} />}
-                      value={selectedQuotationTemplate}
-                      label="Select Quotation Template"
-                      handleQuotationTemplateSelection={
-                        handleQuotationTemplateSelect
-                      }
-                    />
-                  </div>
-                )}
+                      {/** =================For Account Product AMC(subscription)================= */}
+                      {quotationTypeIdSearchParams === "2" && (
+                        <LookupCompanyProductByProductTypeDropdown
+                          icon={<LucideSubtitles size={14} />}
+                          value={selectedSelectedCompanyProductType4}
+                          label="AMC Type Product"
+                          productTypeId={4}
+                          handleCompanyProductSelection={
+                            handleCompanyProductSelection
+                          }
+                          isDisabled={false}
+                        />
+                      )}
 
-                {/* Save Button */}
-                <div className="">
-                  <Button onClick={handleCreateQuotation}>
-                    {isSubmitting ? "Saving..." : "Save"}
-                  </Button>
+                      <LookupQuotationTemplateDropdown
+                        icon={<File size={14} />}
+                        value={selectedQuotationTemplate}
+                        label="Select Quotation Template"
+                        handleQuotationTemplateSelection={
+                          handleQuotationTemplateSelect
+                        }
+                      />
+                    </div>
+                  )}
+
+                  {!quotationTypeIdSearchParams && (
+                    <div className="flex row-span-1 w-full gap-3">
+                      <QuotationTypeDropdown
+                        icon={<FileArchive size={14} />}
+                        value={selectedQuotationType}
+                        label="Select Quotation Type"
+                        handleQuotationTypeSelection={handleQuotationTypeSelect}
+                      />
+                      {selectedQuotationType && (
+                        <div className=" w-full">
+                          {selectedQuotationType.id === 1 && (
+                            <LookupLeadDropdown
+                              icon={<Handshake size={14} />}
+                              value={selectedLead}
+                              label="Select Lead"
+                              handleLeadSelection={handleLeadSelect}
+                            />
+                          )}
+                          {selectedQuotationType.id === 2 && (
+                            <LookupAccountDropdown
+                              icon={<User size={14} />}
+                              value={selectedAccount}
+                              label="Select Account"
+                              handleAccountSelection={handleAccountSelect}
+                            />
+                          )}
+                        </div>
+                      )}
+                      <LookupQuotationTemplateDropdown
+                        icon={<File size={14} />}
+                        value={selectedQuotationTemplate}
+                        label="Select Quotation Template"
+                        handleQuotationTemplateSelection={
+                          handleQuotationTemplateSelect
+                        }
+                      />
+                    </div>
+                  )}
+
+                  
                 </div>
+                {!quotationTypeIdSearchParams && <div className="grid grid-cols-3 gap-3 mb-3">
+                  {selectedQuotationType.id === 2 && (
+                    <AccountCompanyProductByProductTypeDropdown
+                      icon={<User size={14} />}
+                      value={selectedAccountCompanyProductType12}
+                      label="Account Product"
+                      accountId={selectedAccount ? selectedAccount.id : null}
+                      productTypeId={[1, 2]}
+                      handleAccountCompanyProductSelection={
+                        handleAccountCompanyProductSelection
+                      }
+                      isDisabled={selectedAccount ? false : true}
+                    />
+                  )}
+
+                  {selectedQuotationType.id === 2 && (
+                    <LookupCompanyProductByProductTypeDropdown
+                      icon={<LucideSubtitles size={14} />}
+                      value={selectedSelectedCompanyProductType4}
+                      label="AMC Type Product"
+                      productTypeId={4}
+                      handleCompanyProductSelection={
+                        handleCompanyProductSelection
+                      }
+                      isDisabled={false}
+                    />
+                  )}
+                </div>}
+                
               </div>
             )}
 
@@ -900,86 +1005,90 @@ function CompanyQuotationDetails() {
                     />
                   }
                 />
-                <div className={`${isCreateMode?"grid grid-cols-2 col-span-2": "flex gap-4"}`}>
-                {disabled ? (
-                  <MetaField
-                    label="Quotation Date"
-                    value={quotation?.quotationDate || "[Auto-generated]"}
-                  />
-                ) : (
-                  <div className="pr-2">
-                    <FormInput
+                <div
+                  className={`${isCreateMode ? "grid grid-cols-2 col-span-2" : "flex gap-4"}`}
+                >
+                  {disabled ? (
+                    <MetaField
                       label="Quotation Date"
+                      value={quotation?.quotationDate || "[Auto-generated]"}
+                    />
+                  ) : (
+                    <div className="pr-2">
+                      <FormInput
+                        label="Quotation Date"
+                        type="date"
+                        //value={invoice?.validTillDate??""}
+                        value={
+                          quotation?.quotationDate
+                            ? new Date(
+                                quotation.quotationDate,
+                              ).toLocaleDateString("en-CA")
+                            : ""
+                        }
+                        onChange={(e: any) =>
+                          setQuotation((prev) => ({
+                            ...prev!,
+                            quotationDate: e.target.value,
+                          }))
+                        }
+                      />
+                    </div>
+                  )}
+                  {disabled ? (
+                    <MetaField
+                      label="Valid Till"
+                      value={quotation?.validTillDate}
+                    />
+                  ) : (
+                    <FormInput
+                      label="Valid Till"
                       type="date"
-                      //value={invoice?.validTillDate??""}
+                      //value={quotation?.validTillDate??""}
                       value={
-                        quotation?.quotationDate
+                        quotation?.validTillDate
                           ? new Date(
-                              quotation.quotationDate,
+                              quotation.validTillDate,
                             ).toLocaleDateString("en-CA")
                           : ""
                       }
                       onChange={(e: any) =>
                         setQuotation((prev) => ({
                           ...prev!,
-                          quotationDate: e.target.value,
+                          validTillDate: e.target.value,
                         }))
                       }
                     />
-                  </div>
-                )}
-                {disabled ? (
-                  <MetaField
-                    label="Valid Till"
-                    value={quotation?.validTillDate}
-                  />
-                ) : (
-                  <FormInput
-                    label="Valid Till"
-                    type="date"
-                    //value={quotation?.validTillDate??""}
-                    value={
-                      quotation?.validTillDate
-                        ? new Date(quotation.validTillDate).toLocaleDateString(
-                            "en-CA",
-                          )
-                        : ""
-                    }
-                    onChange={(e: any) =>
-                      setQuotation((prev) => ({
-                        ...prev!,
-                        validTillDate: e.target.value,
-                      }))
-                    }
-                  />
-                )}
+                  )}
                 </div>
 
-                {!isCreateMode &&( disabled ? (
-                  <MetaField
-                    label="Quotation Template"
-                    value={
-                      selectedQuotationTemplate
-                        ? selectedQuotationTemplate.name
-                        : ""
-                    }
-                  />
-                ) : (
-                  <LookupQuotationTemplateDropdown
-                    icon={<File size={14} />}
-                    value={selectedQuotationTemplate}
-                    label="Select Quotation Template"
-                    handleQuotationTemplateSelection={
-                      handleQuotationTemplateSelect
-                    }
-                  />
-                ))}
+                {!isCreateMode &&
+                  (disabled ? (
+                    <MetaField
+                      label="Quotation Template"
+                      value={
+                        selectedQuotationTemplate
+                          ? selectedQuotationTemplate.name
+                          : ""
+                      }
+                    />
+                  ) : (
+                    <LookupQuotationTemplateDropdown
+                      icon={<File size={14} />}
+                      value={selectedQuotationTemplate}
+                      label="Select Quotation Template"
+                      handleQuotationTemplateSelection={
+                        handleQuotationTemplateSelect
+                      }
+                    />
+                  ))}
 
                 <MetaField label="Created By" value={quotation?.createdBy} />
                 <MetaField label="Created On" value={quotation?.createdOn} />
                 <MetaField label="Updated By" value={quotation?.updatedBy} />
                 <MetaField label="Updated On" value={quotation?.updatedOn} />
               </div>
+              
               {!isCreateMode && (
                 <div className="col-span-2 flex items-center justify-end p-1">
                   <div className="flex gap-2">
@@ -1021,6 +1130,8 @@ function CompanyQuotationDetails() {
                   </div>
                 </div>
               )}
+
+              
             </div>
           </>
         )}
@@ -1067,17 +1178,23 @@ function CompanyQuotationDetails() {
                           Product/Service/Subscription
                         </th>
                         <th>Qty</th>
-                        <th style={{ textAlign: "right",  }}>Price</th>
+                        <th style={{ textAlign: "right" }}>Price</th>
                         <th>HSN/SAC</th>
-                        <th style={{ textAlign: "right",  }}>Amount</th>
+                        <th style={{ textAlign: "right" }}>Amount</th>
                         <th>Discount(%)</th>
-                        <th style={{ textAlign: "right",  }}>Taxable Value</th>
-                        <th style={{ textAlign: "right",  }}>CGST (%)</th>
-                        <th style={{ textAlign: "right",  }}>SGST (%)</th>
-                        <th style={{ textAlign: "right",  }}>IGST (%)</th>
+                        <th style={{ textAlign: "right" }}>Taxable Value</th>
+                        <th style={{ textAlign: "right" }}>CGST (%)</th>
+                        <th style={{ textAlign: "right" }}>SGST (%)</th>
+                        <th style={{ textAlign: "right" }}>IGST (%)</th>
                         {hasCess && <th>Cess (%)</th>}
-                        <th style={{ textAlign: "right", paddingRight:"10px" }}>Total Item Amount</th>
-                        {!disabled && <th style={{ textAlign: "center",}}>Action</th>}
+                        <th
+                          style={{ textAlign: "right", paddingRight: "10px" }}
+                        >
+                          Total Item Amount
+                        </th>
+                        {!disabled && (
+                          <th style={{ textAlign: "center" }}>Action</th>
+                        )}
                       </tr>
                     </thead>
 
@@ -1113,9 +1230,13 @@ function CompanyQuotationDetails() {
                                   {item.company_product_name}
                                 </td>
                                 <td>{item.quantity}</td>
-                                <td style={{ textAlign: "right",  }}>{item.rate}</td>
-                                <td >{item.hsn || item.sac}</td>
-                                <td style={{ textAlign: "right", }}>{item.basic_value}</td>
+                                <td style={{ textAlign: "right" }}>
+                                  {item.rate}
+                                </td>
+                                <td>{item.hsn || item.sac}</td>
+                                <td style={{ textAlign: "right" }}>
+                                  {item.basic_value}
+                                </td>
                                 <td>
                                   <input
                                     type="number"
@@ -1132,14 +1253,16 @@ function CompanyQuotationDetails() {
                                     }
                                   />
                                 </td>
-                                <td style={{ textAlign: "right",  }}>{item.taxable_value}</td>
-                                <td style={{ textAlign: "right",  }}>
+                                <td style={{ textAlign: "right" }}>
+                                  {item.taxable_value}
+                                </td>
+                                <td style={{ textAlign: "right" }}>
                                   {item.cgst_amount} ({item.cgst_percent}%)
                                 </td>
-                                <td style={{ textAlign: "right",  }}>
+                                <td style={{ textAlign: "right" }}>
                                   {item.sgst_amount} ({item.sgst_percent}%)
                                 </td>
-                                <td style={{ textAlign: "right",  }}>
+                                <td style={{ textAlign: "right" }}>
                                   {item.igst_amount} ({item.igst_percent}%)
                                 </td>
                                 {hasCess && (
@@ -1147,10 +1270,17 @@ function CompanyQuotationDetails() {
                                     {item.cess_amount} ({item.cess_percent}%)
                                   </td>
                                 )}
-                                <td style={{ textAlign: "right", paddingRight:"10px"}}>{item.total_amount}</td>
+                                <td
+                                  style={{
+                                    textAlign: "right",
+                                    paddingRight: "10px",
+                                  }}
+                                >
+                                  {item.total_amount}
+                                </td>
 
                                 {!disabled && (
-                                  <td style={{ textAlign: "right",}}>
+                                  <td style={{ textAlign: "right" }}>
                                     <div className="flex gap-2 justify-end">
                                       {editingItemId !== item.id ? (
                                         <button
@@ -1225,11 +1355,17 @@ function CompanyQuotationDetails() {
                 </div>
               </div>
             )}
+            {isCreateMode && <div className="flex w-full justify-end items-end mb-3">
+                    <div>
+                    <Button onClick={handleCreateQuotation}>
+                      {isSubmitting ? "Saving..." : "Save"}
+                    </Button>
+                    </div>
+                  </div>}
             {isCreateMode && (
               <div className="w-full items-center justify-center  flex-1">
                 <span className="text-xs flex items-center justify-center font-medium text-gray-500 border rounded-lg px-2 py-1  bg-blue-100">
-                  Once an quotation is created, all items assigned to that
-                  customer are automatically added to the quotation.
+                  {(selectedQuotationType.id==1)?'Once an quotation is created, all items assigned to that customer are automatically added to the quotation.':`Once an quotation is created, you can modiefy the items and related data.`}
                 </span>
               </div>
             )}

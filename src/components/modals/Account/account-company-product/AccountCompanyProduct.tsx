@@ -19,6 +19,7 @@ import axiosClient from "../../../../axios-client/AxiosClient";
 import { handleApiError } from "../../../../config/error/handleApiError";
 import AccessDeniedMessagePage from "../../../views/not-found/AccessDeniedMessagePage";
 import CreateAccountSubscription from "../account-subscription/CreateAccountSubscription";
+import { Modules } from "../../../../@types/List/CompanyQuotationManagementListProps";
 
 const AccountCompanyProduct = ({
   accountId,
@@ -29,6 +30,7 @@ const AccountCompanyProduct = ({
   const {
     userHasAccessToAddAccountProducts,
     userHasAccessToViewAccountProducts,
+    userHasAccessToAddCompanyQuotation,
   } = useUserAccessModules();
   const [isLoadingAccountCompanyProduct, setIsLoadingAccountCompanyProduct] =
     useState<boolean>(true);
@@ -54,6 +56,22 @@ const AccountCompanyProduct = ({
   //   handleShowCompanyProductData(data);
 
   // };
+
+  const handleCreateQuotationForAccountProduct = (data: AccountProduct) =>{
+        if (!userHasAccessToAddCompanyQuotation){
+          toast.error(MESSAGE.MODULE_ACCESS.COMPANY_QUOTATION.DENIED_ADD_ACCESS);
+          return;
+        }
+            const quotationSearchParam=  `?other_id=${accountId}&quotation_type_id=${2}&isUsedFor=${Modules.AMC_QUOTATION}&account_company_product=${JSON.stringify(data)}`;
+
+        const path = ROUTES_URL.QUOTATION_CREATE_AND_DETAILS.replace(
+            ":quotationId",
+            String(0),
+          )+quotationSearchParam;
+          navigate(path);
+
+
+  }
   const handleRowSelectAccountProduct = (data: AccountProduct) => {
     if (!userHasAccessToViewAccountProducts) return;
 
@@ -378,6 +396,7 @@ const AccountCompanyProduct = ({
               onRowSelect={handleRowSelectAccountProduct}
               handleRowClick={handleRowClick}
               openSubscriptionModal={openSubscriptionModal}
+              handleCreateQuotation={handleCreateQuotationForAccountProduct}
             />
           </div>
           <CreateAccountSubscription

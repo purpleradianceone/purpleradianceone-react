@@ -16,13 +16,15 @@ const AccountCompanyProductAgGrid = ({
   handleAddToInvoice,
   isUsedForSelection,
   openSubscriptionModal,
-}: {
+  handleCreateQuotation,
+} : {
   accountProductData: AccountProduct[];
   onRowSelect: (data: AccountProduct) => void;
   isUsedForSelection?: boolean;
   handleAddToInvoice?: (data: AccountProduct) => void;
   handleRowClick?: (event: any) => void;
   openSubscriptionModal?: (data: AccountProduct) => void;
+  handleCreateQuotation?: (data: AccountProduct) => void;
 }) => {
   const gridRef = useRef<AgGridReact>(null); // Ref to the AgGridReact component
 
@@ -67,12 +69,7 @@ const AccountCompanyProductAgGrid = ({
         sortable: true,
         filter: true,
       },
-      {
-        field: "barcode",
-        headerName: "barcode",
-        sortable: true,
-        filter: true,
-      },
+      
       {
         field: "serialNumber",
         headerName: "Serial Number",
@@ -130,6 +127,25 @@ const AccountCompanyProductAgGrid = ({
         },
       },
       {
+        headerName: "AMC Quotation",
+        field: "AMC Quotation",
+        maxWidth: 150,
+        cellRenderer: (params: any) => {
+          return (
+            <Button
+              type="button"
+              className={COLORS.ADD_BUTTON}
+              onClick={(e) => {
+                e.stopPropagation();
+                params.context.handleCreateQuotation(params.data);
+              }}
+            >
+              + AMC Quotation
+            </Button>
+          );
+        },
+      },
+      {
         headerName: "AMC",
         field: "AMC",
         maxWidth: 150,
@@ -148,6 +164,12 @@ const AccountCompanyProductAgGrid = ({
             </Button>
           );
         },
+      },
+      {
+        field: "barcode",
+        headerName: "barcode",
+        sortable: true,
+        filter: true,
       },
       {
         field: "installedByName",
@@ -516,6 +538,7 @@ const AccountCompanyProductAgGrid = ({
           handleRowSelect: onRowSelect,
           handleAddToInvoice: handleAddToInvoice,
           openSubscriptionModal: openSubscriptionModal,
+          handleCreateQuotation: handleCreateQuotation,
         }}
         // onRowClicked={handleRowClick}
       />
