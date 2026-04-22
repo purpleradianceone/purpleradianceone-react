@@ -107,3 +107,14 @@ export const getMeFacebookAccounts  = async (payload: object
     const response = await axiosClient.post(POST_API.GET_ME_FACEBOOK_PAGES, payload, { withCredentials: true })
     return response;
 }
+
+/**
+ * GET THE STATUS OF GOOGLE ADS INTEGRATION
+ * @param payload 
+ * @returns 
+ */
+export const getGoogleAdsIntegration  = async (payload: object
+) => {
+    const response = await axiosClient.post(POST_API.GET_GOOGLE_ADS_INTEGRATION, payload, { withCredentials: true })
+    return response;
+}
