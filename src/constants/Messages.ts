@@ -37,7 +37,8 @@ const MESSAGE = {
 
         MODULE_ACCESS_UPDATE: "You do not have permission to update details.",
         SAME_PRODUCT_SELECTED : "Same product selected.",
-        DENIED_FACEBOOK_INTEGRATION_MESSAGE:"Facebook account is already integrated. you can manage pages and whatsapp account on the other tabs."
+        DENIED_FACEBOOK_INTEGRATION_MESSAGE:"Facebook account is already integrated. you can manage pages and whatsapp account on the other tabs.",
+        DENIED_GOOGLE_INTEGRATION_MESSAGE:"Google account is already integrated."
     },
     SUCCESS: {
         LOGGED_IN: "Logged In",

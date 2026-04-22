@@ -101,7 +101,6 @@ import UserAndCompanyProfileManagement from "../../components/user-profile/UserP
 import { FacebookPageIntegrationManagement } from "../../components/views/settings/social-media-integration/meta-app-facebook/FacebookPageIntegrationManagement";
 
 
-
 export const router = createBrowserRouter([
   {
     path: ROUTES_URL.NOT_FOUND,
@@ -1000,24 +999,8 @@ export const router = createBrowserRouter([
             }
           >
             <MetaAppsIntegrationTabsBreadcrumb />
-            {/* <MetaAppsIntegration /> */}
           </ModuleGuard>
         ),
-        // children: [
-        //   {
-        //     index: true,
-        //     element: (
-        //       <ModuleGuard
-        //         permissionKey="userHasAccessToViewIntegrationSetting"
-        //         deniedMessage={
-        //           MESSAGE.MODULE_ACCESS.SETTING.INTEGRATION.DENIED_VIEW_ACCESS
-        //         }
-        //       >
-        //         <MetaAppsIntegration />
-        //       </ModuleGuard>
-        //     ),
-        //   },
-        // ],
       },
       {
         path: ROUTES_URL.SETTING_INDIAMART,
@@ -1054,7 +1037,8 @@ export const router = createBrowserRouter([
               MESSAGE.MODULE_ACCESS.SETTING.INTEGRATION.DENIED_VIEW_ACCESS
             }
           >
-            <>GOOGLE ADS</>
+            <>GOOGLEADS</>
+           {/* <GoogleAdsIntegrationManagement/> */}
           </ModuleGuard>
         ),
       },
