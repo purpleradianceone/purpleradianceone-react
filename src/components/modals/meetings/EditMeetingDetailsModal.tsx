@@ -31,10 +31,7 @@ import CompanyUsersSearchProps from "../../../@types/company-users/CompanyUserPr
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
 import axios from "axios";
 import POST_API from "../../../constants/PostApi";
-import {
-  SIZE,
-  STATUS_CODE,
-} from "../../../constants/AppConstants";
+import { SIZE, STATUS_CODE } from "../../../constants/AppConstants";
 import RefreshToken from "../../../config/validations/RefreshToken";
 import ApiError from "../../../@types/error/ApiError";
 import RadioButtons from "../../ui/RadioButton";
@@ -61,32 +58,62 @@ function EditMeetingDetailsModal({
   isOpen: boolean;
   onClose: () => void;
   isAttendeesPresent: boolean;
-  handleMeetingDetailsUpdate : (date : string,summary : string) => void;
+  handleMeetingDetailsUpdate: (date: string, summary: string) => void;
   meetingPlatform: MeetingPlatforms[];
 }) {
+  // const meetingStautsRadioButtonOptions = [
+  //   {
+  //     label: "Confirm",
+  //     value: "confirmed",
+  //     id: "status",
+  //     name: "meeetingStatus",
+  //     checked:
+  //       meetingDetails.platform === 1
+  //         ? meetingDetails.meetingStatusFromGoogle === "confirmed"
+  //         : meetingDetails.meetingStatusFromZoom === "waiting",
+  //   },
+  //   {
+  //     label: "Cancel",
+  //     value: "cancelled",
+  //     id: "status",
+  //     name: "meeetingStatus",
+  //     checked:
+  //       meetingDetails.platform === 1
+  //         ? meetingDetails.meetingStatusFromGoogle === "cancelled"
+  //         : meetingDetails.meetingStatusFromZoom === "cancelled",
+  //   },
+  // ];
+  const [meetingStatus, setMeetingStatus] = useState<
+    | "confirmed"
+    | "cancelled"
+    | "waiting"
+    | "started"
+    | "end"
+    | "scheduled"
+    | "closed"
+    | ""
+  >(() => {
+    return meetingDetails.platform === 1
+      ? meetingDetails.meetingStatusFromGoogle!
+      : meetingDetails.meetingStatusFromZoom!;
+  });
+
   const meetingStautsRadioButtonOptions = [
     {
       label: "Confirm",
       value: "confirmed",
-      id: "status",
-      name: "meeetingStatus",
-      checked:
-        meetingDetails.platform === 1
-          ? meetingDetails.meetingStatusFromGoogle === "confirmed"
-          : meetingDetails.meetingStatusFromZoom === "waiting",
+      id: "status-confirm",
+      name: "meetingStatus",
+      checked: meetingStatus === "confirmed", // ✅ FIX
     },
     {
       label: "Cancel",
       value: "cancelled",
-      id: "status",
-      name: "meeetingStatus",
-      checked:
-        meetingDetails.platform === 1
-          ? meetingDetails.meetingStatusFromGoogle === "cancelled"
-          : meetingDetails.meetingStatusFromZoom === "cancelled",
+      id: "status-cancel",
+      name: "meetingStatus",
+      checked: meetingStatus === "cancelled", // ✅ FIX
     },
   ];
-
   const { userHasAccessToUpdateMeeting } = useUserAccessModules();
   const { userPreference } = useUserPreference();
 
@@ -119,7 +146,7 @@ function EditMeetingDetailsModal({
   const [endDate, setEndDate] = useState<string>(endDateValue);
   const [endTime, setEndTime] = useState<string>(endTimeValue.substring(0, 5));
   const [startTime, setStartTime] = useState<string>(
-    startTimeValue.substring(0, 5)
+    startTimeValue.substring(0, 5),
   );
 
   const [attendees, setAttendees] = useState<string[]>(() => {
@@ -127,26 +154,11 @@ function EditMeetingDetailsModal({
   });
   const [newAttendeeEmail, setNewAttendeeEmail] = useState<string>("");
   const [description, setDescription] = useState<string>(
-    meetingDetails!.description
+    meetingDetails!.description,
   );
-
 
   const navigate = useNavigate();
 
-  const [meetingStatus, setMeetingStatus] = useState<
-    | "confirmed"
-    | "cancelled"
-    | "waiting"
-    | "started"
-    | "end"
-    | "scheduled"
-    | "closed"
-    | ""
-  >(() => {
-    return meetingDetails.platform === 1
-      ? meetingDetails.meetingStatusFromGoogle!
-      : meetingDetails.meetingStatusFromZoom!;
-  });
   const [isCreating, setIsCreating] = useState<boolean>(false); // Simulate meeting creation
   const [selectedMeetingPlatform, setSelectedMeetingPlatform] =
     useState<string>(() => {
@@ -183,13 +195,12 @@ function EditMeetingDetailsModal({
 
     setServerCurrentTime(new Date(currentTime.replace(" ", "T")));
     setParsedStartDateTime(
-      parse(combinedPickerStartDateTimeString, pickerFormatString, new Date())
+      parse(combinedPickerStartDateTimeString, pickerFormatString, new Date()),
     );
     setParsedEndDateTime(
-      parse(combinedPickerEndDateTimeString, pickerFormatString, new Date())
+      parse(combinedPickerEndDateTimeString, pickerFormatString, new Date()),
     );
   }, [currentTime]);
-
 
   const [
     isAddCompanyUserEmailAttedeesModalOpen,
@@ -197,9 +208,8 @@ function EditMeetingDetailsModal({
   ] = useState<boolean>(false);
 
   const [copyStatus, setCopyStatus] = useState<"idle" | "copied" | "failed">(
-    "idle"
+    "idle",
   );
-
 
   // const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
   //   setMessageSnackbar({ open: true, message, type });
@@ -222,7 +232,7 @@ function EditMeetingDetailsModal({
 
   const handleAddCompanyUserEmailCheckboxChange = (
     params: CompanyUsersSearchProps,
-    event: React.ChangeEvent<HTMLInputElement>
+    event: React.ChangeEvent<HTMLInputElement>,
   ) => {
     if (event.target.checked) {
       setSelectedCompanyUsersIdArray((prev) => [...prev, params.id]);
@@ -236,11 +246,11 @@ function EditMeetingDetailsModal({
       ]);
     } else if (!event.target.checked) {
       setSelectedCompanyUsersIdArray((prev) =>
-        prev.filter((id) => id !== params.id)
+        prev.filter((id) => id !== params.id),
       );
       setAttendees((prev) => prev.filter((email) => email !== params.email));
       setSelectedCompanyUserDetailArray((prev) =>
-        prev.filter((user) => user.id !== params.id)
+        prev.filter((user) => user.id !== params.id),
       );
     }
   };
@@ -262,7 +272,7 @@ function EditMeetingDetailsModal({
           getCompanyUserPostData,
           {
             withCredentials: true,
-          }
+          },
         );
 
         if (response.status === STATUS_CODE.OK) {
@@ -332,7 +342,7 @@ function EditMeetingDetailsModal({
   const handleRemoveAttendee = (email: string, id: number) => {
     setAttendees(attendees.filter((attendee) => attendee !== email));
     setSelectedCompanyUsersIdArray((prev) =>
-      prev.filter((userId) => userId !== id)
+      prev.filter((userId) => userId !== id),
     );
   };
 
@@ -361,7 +371,7 @@ function EditMeetingDetailsModal({
   const timeOptions = generateTimeOptions();
 
   const getCompanyUsersPresentInAttendeesArray = async (
-    attendees: string[]
+    attendees: string[],
   ) => {
     if (
       serverCurrentTime! < parsedStartDateTime! &&
@@ -404,7 +414,7 @@ function EditMeetingDetailsModal({
                 callFunctionWithParamsNotEvent:
                   getCompanyUsersPresentInAttendeesArray,
               });
-              if(refreshTokenStatus){
+              if (refreshTokenStatus) {
                 getCompanyUsersPresentInAttendeesArray(attendees);
               }
             }
@@ -465,13 +475,13 @@ function EditMeetingDetailsModal({
       ) {
         alert(
           meetingStatus === meetingDetails.meetingStatusFromGoogle ||
-            meetingStatus === meetingDetails.meetingStatusFromZoom
+            meetingStatus === meetingDetails.meetingStatusFromZoom,
         );
         // showMessageSnackbar({
         //   message: "No changes made to meeting details",
         //   type: "error",
         // });
-        toast.error("No changes made to meeting details")
+        toast.error("No changes made to meeting details");
         return;
       }
     }
@@ -523,7 +533,7 @@ function EditMeetingDetailsModal({
             updateMeetingDetailsPostData,
             {
               withCredentials: true,
-            }
+            },
           )
           .then((response) => {
             if (response.status == STATUS_CODE.OK) {
@@ -534,7 +544,10 @@ function EditMeetingDetailsModal({
                 // });
                 toast.success(response.data.message);
                 setTimeout(() => {
-                  handleMeetingDetailsUpdate(endDate + " " + endTime + ":00",title);
+                  handleMeetingDetailsUpdate(
+                    endDate + " " + endTime + ":00",
+                    title,
+                  );
                   setIsCreating(false);
                   onClose();
                 }, 3000);
@@ -591,7 +604,7 @@ function EditMeetingDetailsModal({
       //   message: "You are not Authorised to Update the Meeting details!",
       //   type: "error",
       // });
-      toast.error("You are not Authorised to Update the Meeting details!")
+      toast.error("You are not Authorised to Update the Meeting details!");
     }
   };
 
@@ -602,7 +615,7 @@ function EditMeetingDetailsModal({
         meetingDetails.creatorAttenting !== "Attending"
       ) {
         getCompanyUsersPresentInAttendeesArray(
-          meetingDetails.attendeesEmailAll
+          meetingDetails.attendeesEmailAll,
         );
       }
     } else if (!isOpen) {
@@ -627,70 +640,81 @@ function EditMeetingDetailsModal({
       <div className="max-w-4xl mt-1 w-full p-4 bg-white rounded-lg shadow-xl overflow-y-auto">
         <div className="flex justify-between gap-1">
           <div className="flex gap-2">
-          <CalendarPlusIcon className="text-blue-600 w-6 h-6"/>
-          <h1 className="table-header-custom">
-            
-            Update Meeting
-            <div className="caption-custom">
-            Update the meeting details as per your convinence
-          </div>
-            {!meetingDetails.isActive &&
-              meetingDetails.creatorAttenting !== "Attending" && (
-                <div className="flex gap-2 ">
-                  <Info size={SIZE.TWENTY} className="caption-custom-inactive"></Info>{" "}
-                  <span className="caption-custom-inactive mt-1">
-                    You Have cancelled this Meeting
-                  </span>
-                </div>
-              )}
-            {meetingDetails.creatorAttenting === "Attending" && (
-              <div className="flex gap-2 ">
-                <Info size={SIZE.TWENTY} className="caption-custom-active"></Info>{" "}
-                <span className="caption-custom-active mt-1">
-                  You have Invited to this Meeting
-                </span>
+            <CalendarPlusIcon className="text-blue-600 w-6 h-6" />
+            <h1 className="table-header-custom">
+              Update Meeting
+              <div className="caption-custom">
+                Update the meeting details as per your convinence
               </div>
-            )}
-            {!meetingDetails.isActive &&
-              meetingDetails.creatorAttenting === "Attending" && (
+              {!meetingDetails.isActive &&
+                meetingDetails.creatorAttenting !== "Attending" && (
+                  <div className="flex gap-2 ">
+                    <Info
+                      size={SIZE.TWENTY}
+                      className="caption-custom-inactive"
+                    ></Info>{" "}
+                    <span className="caption-custom-inactive mt-1">
+                      You Have cancelled this Meeting
+                    </span>
+                  </div>
+                )}
+              {meetingDetails.creatorAttenting === "Attending" && (
                 <div className="flex gap-2 ">
-                  <Info size={SIZE.TWENTY} className="caption-custom-inactive"></Info>{" "}
-                  <span className="caption-custom-inactive mt-1">
-                    This Meeting has been cancelled by the host
-                  </span>
-                </div>
-              )}
-            {serverCurrentTime! > parsedStartDateTime! &&
-              serverCurrentTime! > parsedEndDateTime! &&
-              meetingDetails.isActive && (
-                <div className="flex gap-2 ">
-                  <Info size={SIZE.TWENTY} className="caption-custom-yellow"></Info>{" "}
-                  <span className="caption-custom-yellow mt-1">
-                    This Meeting has been Started or has already passed
-                  </span>
-                </div>
-              )}
-            {serverCurrentTime! >= parsedStartDateTime! &&
-              serverCurrentTime! <= parsedEndDateTime! &&
-              meetingDetails.isActive && (
-                <div className="flex gap-2 ">
-                  <Info size={SIZE.TWENTY} className="caption-custom-active"></Info>{" "}
+                  <Info
+                    size={SIZE.TWENTY}
+                    className="caption-custom-active"
+                  ></Info>{" "}
                   <span className="caption-custom-active mt-1">
-                    Ongoing Meeting
+                    You have Invited to this Meeting
                   </span>
                 </div>
               )}
-              
-          </h1>
+              {!meetingDetails.isActive &&
+                meetingDetails.creatorAttenting === "Attending" && (
+                  <div className="flex gap-2 ">
+                    <Info
+                      size={SIZE.TWENTY}
+                      className="caption-custom-inactive"
+                    ></Info>{" "}
+                    <span className="caption-custom-inactive mt-1">
+                      This Meeting has been cancelled by the host
+                    </span>
+                  </div>
+                )}
+              {serverCurrentTime! > parsedStartDateTime! &&
+                serverCurrentTime! > parsedEndDateTime! &&
+                meetingDetails.isActive && (
+                  <div className="flex gap-2 ">
+                    <Info
+                      size={SIZE.TWENTY}
+                      className="caption-custom-yellow"
+                    ></Info>{" "}
+                    <span className="caption-custom-yellow mt-1">
+                      This Meeting has been Started or has already passed
+                    </span>
+                  </div>
+                )}
+              {serverCurrentTime! >= parsedStartDateTime! &&
+                serverCurrentTime! <= parsedEndDateTime! &&
+                meetingDetails.isActive && (
+                  <div className="flex gap-2 ">
+                    <Info
+                      size={SIZE.TWENTY}
+                      className="caption-custom-active"
+                    ></Info>{" "}
+                    <span className="caption-custom-active mt-1">
+                      Ongoing Meeting
+                    </span>
+                  </div>
+                )}
+            </h1>
           </div>
-          
-          
 
           <div className="flex gap-2 self-start">
             {meetingDetails.isActive &&
               serverCurrentTime! < parsedEndDateTime! && (
                 <Button
-                type="submit"
+                  type="submit"
                   onClick={(e) => {
                     e.preventDefault();
                     if (meetingDetails.platform === 1) {
@@ -703,7 +727,6 @@ function EditMeetingDetailsModal({
                   <div className="flex gap-2 items-center">
                     <Video></Video>
                     <span>Join</span>
-                    
                   </div>
                 </Button>
               )}
@@ -715,8 +738,8 @@ function EditMeetingDetailsModal({
                     copyStatus === "copied"
                       ? "Copied!"
                       : copyStatus === "failed"
-                      ? "Failed to Copy"
-                      : "Copy Meeting Details"
+                        ? "Failed to Copy"
+                        : "Copy Meeting Details"
                   }
                   onClick={handleCopyMeetingDetailsToClipboard}
                 >
@@ -744,7 +767,7 @@ function EditMeetingDetailsModal({
             </button>
           </div>
         </div>
-        <div className="mb-1 grid grid-cols-3 gap-1">
+        <div className="mb-1 grid grid-cols-3 gap-1 text-sm">
           <div className="col-span-2">
             <FormInput
               id="title"
@@ -761,13 +784,10 @@ function EditMeetingDetailsModal({
               logo={ClipboardList}
             />
           </div>
-          <div className="mt-1 col-span-1">
-            <label
-              htmlFor="platform"
-              className=""
-            >
-             <div className="flex gap-2 text-center mt-2">
-                <CalendarPlusIcon className="text-blue-600 w-3 h-3 justify-center mt-2" />
+          <div className="">
+            <label htmlFor="platform" className="">
+              <div className="flex gap-1 text-center">
+                <CalendarPlusIcon className="text-blue-600 w-3 h-3 justify-center mt-1" />
                 <span>Meeting Platform</span>
               </div>
             </label>
@@ -785,27 +805,35 @@ function EditMeetingDetailsModal({
                 //     "cannot Change Platform to create new meeting meeting with different platform",
                 //   type: "error",
                 // });
-                toast.error("cannot Change Platform to create new meeting meeting with different platform")
+                toast.error(
+                  "cannot Change Platform to create new meeting meeting with different platform",
+                );
               }}
               className={
                 meetingDetails.isActive
                   ? meetingDetails.creatorAttenting !== "Attending"
-                    ? "mt-1 block w-full pl-3 pr-10 py-2 input-label-custom border border-gray-300 focus:outline-1 focus:ring-indigo-500 focus:border-indigo-500 rounded-md"
-                    : "appearance-none block w-full mt-1 px-3 py-2 input-label-custom border bg-gray-300 border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  : "appearance-none block w-full mt-1 px-3 py-2 input-label-custom border bg-gray-300 border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    ? " block w-full h-7 input-label-custom border border-gray-300 focus:outline-1 focus:ring-indigo-500 focus:border-indigo-500 rounded-md"
+                    : "appearance-none block w-full h-7 input-label-custom border bg-gray-300 border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  : "appearance-none block w-full h-7 input-label-custom border bg-gray-300 border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               }
             >
-              <option  className="input-label-custom" value="">Select Platform</option>
+              <option className="input-label-custom" value="">
+                Select Platform
+              </option>
               {meetingPlatform.map((option: MeetingPlatforms) => (
-                <option  className="input-label-custom" key={option.id} value={option.name}>
+                <option
+                  className="input-label-custom"
+                  key={option.id}
+                  value={option.name}
+                >
                   {option.name}
                 </option>
               ))}
             </select>
           </div>
         </div>
-        <div className="grid grid-cols-8 gap-2 mb-1">
-          <div className="col-span-2">
+        <div className="grid grid-cols-4 gap-2 mb-1">
+          <div className="">
             <DatePickerInput
               label="Start Date"
               logo={Calendar}
@@ -823,11 +851,8 @@ function EditMeetingDetailsModal({
             />
           </div>
 
-          <div className="mt-2 col-span-2">
-            <label
-              htmlFor="startTime"
-              className="input-label-custom"
-            >
+          <div className="">
+            <label htmlFor="startTime" className="input-label-custom">
               <div className="flex gap-2 text-center">
                 <Clock className="text-blue-600 w-3 h-3 justify-center mt-1" />
                 <span>Start Time</span>
@@ -844,9 +869,9 @@ function EditMeetingDetailsModal({
               className={
                 meetingDetails.isActive
                   ? meetingDetails.creatorAttenting !== "Attending"
-                    ? "input-label-custom mt-1 block w-full pl-3 pr-10 py-2.5 border border-gray-300 focus:outline-1 focus:ring-indigo-500 focus:border-indigo-500 rounded-md"
-                    : "input-label-custom appearance-none block w-full mt-1 px-3 py-2.5 border bg-gray-300 border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  : "input-label-custom appearance-none block w-full mt-1 px-3 py-2.5 border bg-gray-300 border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    ? "input-label-custom  block w-full h-7 border border-gray-300 focus:outline-1 focus:ring-indigo-500 focus:border-indigo-500 rounded-md"
+                    : "input-label-custom appearance-none block w-full h-7 border bg-gray-300 border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  : "input-label-custom appearance-none block w-full h-7 border bg-gray-300 border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               }
             >
               <option value="">Start Time</option>
@@ -858,7 +883,7 @@ function EditMeetingDetailsModal({
             </select>
           </div>
 
-          <div className="col-span-2">
+          <div className="">
             <DatePickerInput
               defaultValue={endDate}
               label="End Date"
@@ -873,12 +898,9 @@ function EditMeetingDetailsModal({
             />
           </div>
 
-          <div className="mt-2 col-span-2">
-            <label
-              htmlFor="endTime"
-              className="input-label-custom"
-            > 
-            <div className="flex gap-2 text-center">
+          <div className="">
+            <label htmlFor="endTime" className="input-label-custom">
+              <div className="flex gap-2 text-center">
                 <Clock className="text-blue-600 w-3 h-3 justify-center mt-1" />
                 <span>End Time</span>
               </div>
@@ -890,9 +912,9 @@ function EditMeetingDetailsModal({
               className={
                 meetingDetails.isActive
                   ? meetingDetails.creatorAttenting !== "Attending"
-                    ? "input-label-custom mt-1 block w-full pl-3 pr-10 py-2.5 border border-gray-300 focus:outline-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
-                    : "input-label-custom appearance-none block w-full mt-1 px-3 py-2.5 border bg-gray-300 border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                  : "input-label-custom appearance-none block w-full mt-1 px-3 py-2.5 border bg-gray-300 border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    ? "input-label-custom  block w-full h-7 border border-gray-300 focus:outline-1 focus:ring-indigo-500 focus:border-indigo-500 rounded-md"
+                    : "input-label-custom appearance-none block w-full h-7 border bg-gray-300 border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  : "input-label-custom appearance-none block w-full h-7 border bg-gray-300 border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
               }
             >
               <option value="">End Time</option>
@@ -904,11 +926,9 @@ function EditMeetingDetailsModal({
             </select>
           </div>
         </div>
-        <div className="mb-1"></div>
-        <div className="mb-1 grid grid-cols-3 gap-4"></div>
         <div className="mb-1">
           <TextAreaInput
-          logo={Text}
+            logo={Text}
             cols={2}
             rows={2}
             label="Description"
@@ -921,7 +941,6 @@ function EditMeetingDetailsModal({
               !meetingDetails.isActive ||
               meetingDetails.creatorAttenting === "Attending"
             }
-            
           />
         </div>
         <div className="mb-1">
@@ -942,8 +961,8 @@ function EditMeetingDetailsModal({
           {meetingDetails.isActive &&
             meetingDetails.creatorAttenting === "Creator" &&
             serverCurrentTime! < parsedStartDateTime! && (
-              <div className="grid grid-cols-7 gap-2">
-                <div className="col-span-5">
+              <div className="grid grid-cols-3 gap-2 mb-2">
+                <div className="col-span-2">
                   <FormInput
                     type="email"
                     value={newAttendeeEmail === "" ? "" : newAttendeeEmail}
@@ -954,35 +973,36 @@ function EditMeetingDetailsModal({
                     logo={UserPlus}
                   />
                 </div>
-                <div className="col-span-1 mt-7">
-                  <Button
-                    type="submit"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      setIsAddCompanyUserEmailAttedeesModalOpen(true);
-                    }}
-                  >
-                    <div className="flex gap-0.5">
-                      <UserPlus className="h-4 w-4" />
-                    <span>Users</span>
-                    </div>
-                  </Button>
-                </div>
-                <div className="col-span-1 mt-7">
-                  
-                  <Button
-                  type="submit"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      handleAddAttendee();
-                    }}
-                    // disabled={!newAttendeeEmail.trim()}
-                  >
-                    <div className="flex gap-0 5">
-                      <Plus className="h-4 w-4" />
-                    <span>Add</span>
-                    </div>
-                  </Button>
+                <div className=" flex gap-2  self-end">
+                  <div className="w-fit">
+                    <Button
+                      type="submit"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handleAddAttendee();
+                      }}
+                      // disabled={!newAttendeeEmail.trim()}
+                    >
+                      <div className="flex gap-0 5">
+                        <Plus className="h-4 w-4 self-center" />
+                        <span>Add</span>
+                      </div>
+                    </Button>
+                  </div>
+                  <div className="w-fit">
+                    <Button
+                      type="submit"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setIsAddCompanyUserEmailAttedeesModalOpen(true);
+                      }}
+                    >
+                      <div className="flex gap-0.5">
+                        <UserPlus className="h-4 w-4 self-center" />
+                        <span>Users</span>
+                      </div>
+                    </Button>
+                  </div>
                 </div>
               </div>
             )}
@@ -1032,20 +1052,20 @@ function EditMeetingDetailsModal({
             <div className="flex justify-end gap-3">
               <div className="max-w-28 mt-1 place-self-center">
                 <Button
-                type="button"
+                  type="button"
                   onClick={() => {
                     onClose();
                   }}
                 >
                   <div className="flex items-center justify-center gap-1">
-                     <X size={16}/>
+                    <X size={16} />
                     Cancel
-                   </div>
+                  </div>
                 </Button>
               </div>
               <div className="max-w-48 mt-1 place-self-center">
                 <Button
-                type="submit"
+                  type="submit"
                   onClick={(e) => {
                     e.preventDefault();
                     if (
@@ -1057,14 +1077,12 @@ function EditMeetingDetailsModal({
                       handleOAuthConsent();
                     }
                   }}
-                  disabled={
-                    isCreating
-                  }
+                  disabled={isCreating}
                 >
                   <div className="flex items-center justify-center gap-1">
-                     <Save size={16}/>
+                    <Save size={16} />
                     {isCreating ? "Saving..." : "Save"}
-                   </div>
+                  </div>
                 </Button>
               </div>
             </div>
@@ -1082,7 +1100,7 @@ function EditMeetingDetailsModal({
         isModalForMeeting={true}
       />
     </div>,
-    document.body // Use the non-null assertion here.  We've ensured it's not null.
+    document.body, // Use the non-null assertion here.  We've ensured it's not null.
   );
 }
 

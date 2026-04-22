@@ -34,6 +34,7 @@ import "../../../assets/styles/CustomCalendarCSS.css";
 import { useMeetingPlatform } from "../../../config/hooks/useMeetingPlatforms";
 import { useInView } from "react-intersection-observer";
 import { motion } from "framer-motion";
+import axiosClient from "../../../axios-client/AxiosClient";
 
 function LeadMeetingsModal({
   isCalendarViewEnabled,
@@ -117,7 +118,7 @@ function LeadMeetingsModal({
       search_parameter_date: concatDate,
       requestedby: loginStatus.id,
     };
-    await axios
+    await axiosClient
       .post(POST_API.GET_GOOGLE_MEETINGS, getGoogleMeetingsPostData, {
         withCredentials: true,
       })
@@ -193,12 +194,14 @@ function LeadMeetingsModal({
       search_parameter_date: concatDate,
       requestedby: loginStatus.id,
     };
-    await axios
+    await axiosClient
       .post(POST_API.GET_ZOOM_MEETING, getZoomMeetingsPostData, {
         withCredentials: true,
       })
       .then((response) => {
         if (response.status === STATUS_CODE.OK) {
+          console.log(response.data);
+
           response.data.map((res: any) => {
             const startDateByUserTimeZoneParsed = momentTimezone.tz(
               res["Start Date By User Time Zone"],
@@ -236,7 +239,7 @@ function LeadMeetingsModal({
                 startDateByUserTimeZoneString:
                   res["Start Date By User Time Zone"],
                 endDateByUserTimeZoneString: res["End Date By User Time Zone"],
-                colorCode: res.color_code,
+                colorCode: "#2D8CFF",
                 attendeesEmailAll: res.attendees_email_all,
                 attendeesCompanyUserId: res.attendees_company_user_id,
                 isAttendeePresent: res.attendees_email_all ? true : false,
@@ -299,6 +302,8 @@ function LeadMeetingsModal({
             const end = start.clone().add(60, "minutes");
 
             return {
+              taskId: item.id,
+              masterId: item.master_id,
               id: `task-${item.id}`, // IMPORTANT (avoid ID clash)
               title: item.subject || "Task",
               description: item.description,
@@ -799,7 +804,7 @@ function LeadMeetingsModal({
                         <div className="flex items-center gap-1">
                           <div
                             className="w-3 h-3 rounded-full"
-                            style={{ backgroundColor: "blue" }}
+                            style={{ backgroundColor: "#2D8CFF" }}
                           ></div>
                           <span className="caption-custom">Zoom</span>
                         </div>
@@ -894,6 +899,17 @@ function LeadMeetingsModal({
                     toolbar={false}
                     eventPropGetter={eventStyleGetter}
                     onSelectEvent={(event) => {
+                      console.log(event);
+                      if (event.platform === 4) {
+                        // task click
+                        const path = ROUTES_URL.GENERAL_TASK.replace(
+                          ":taskId",
+                          String(event.taskId),
+                        ).replace(":masterId", String(event.masterId));
+
+                        navigate(path);
+                        return;
+                      }
                       setSelectedMeetingEvent(event);
                       setIsEditMettingModalOpen(true);
                     }}
