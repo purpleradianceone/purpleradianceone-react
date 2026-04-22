@@ -41,8 +41,17 @@ const InvoiceActionsDropdown = ({ data, context }: any) => {
       }
     };
 
+    const handleScroll = () => {
+      setOpen(false);
+    };
+
     document.addEventListener("mousedown", handleOutside);
-    return () => document.removeEventListener("mousedown", handleOutside);
+    window.addEventListener("scroll", handleScroll, true); // 👈 important
+
+    return () => {
+      document.removeEventListener("mousedown", handleOutside);
+      window.removeEventListener("scroll", handleScroll, true);
+    };
   }, []);
 
   return (

@@ -21,7 +21,7 @@ const Tabs: React.FC<TabsProps> = ({ tabs, activeTab, onChange }) => {
           className={`px-4 py-1 text-sm font-medium rounded-t-md transition-all
             ${
               activeTab === tab.key
-                ? "bg-blue-500 border border-b border-slate-200 text-white"
+                ? "bg-blue-600 border border-b border-slate-200 text-white underline-offset-4 underline decoration-2"
                 : "bg-gray-100 text-gray-800 hover:bg-gray-200"
             }`}
         >
