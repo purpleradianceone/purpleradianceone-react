@@ -80,7 +80,7 @@ const QuotationActionsDropdown = ({ data, context }: any) => {
             {data.quotationStatusId === 2 && (
               <ActionsDropdownButton
                 onClick={() => {
-                  context.onDownloadInvoice(data);
+                  context.onDownloadQuotation(data);
                   setOpen(false);
                 }}
               >

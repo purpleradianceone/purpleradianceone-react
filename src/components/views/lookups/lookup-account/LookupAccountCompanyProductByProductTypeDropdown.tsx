@@ -4,9 +4,9 @@ import Select from "react-select";
 import { useEffect, useState } from "react";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
 import { handleApiError } from "../../../../config/error/handleApiError";
-import { getAccountCompanyProductByProductType } from "../../../../config/apis/AccountApis";
+import { getLookupAccountCompanyProductByProductType } from "../../../../config/apis/Lookups";
 
-export const AccountCompanyProductByProductTypeDropdown = ({
+export const LookupAccountCompanyProductByProductTypeDropdown = ({
   icon,
   label,
   value,
@@ -55,7 +55,7 @@ export const AccountCompanyProductByProductTypeDropdown = ({
     };
 
     try {
-      const res = await getAccountCompanyProductByProductType(postData);
+      const res = await getLookupAccountCompanyProductByProductType(postData);
 
       const formatted = res.data.map((item: any) => ({
         value: item.id,

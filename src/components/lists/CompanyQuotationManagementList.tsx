@@ -163,7 +163,7 @@ function CompanyQuotationManagementList({
       setShowCompanyLogoPreview(true);
     } catch (error) {
       console.error(error);
-      toast.error("Failed to download invoice");
+      toast.error("Failed to download quotation");
     } finally {
       setIsSubmitting(false);
     }

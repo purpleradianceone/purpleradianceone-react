@@ -198,7 +198,7 @@ function CompanyQuotationManagementAgGrid({
         context={{
           handleRowSelect: onRowSelect, 
           onDelete: onDeleteQuotation,
-          onDownloadQuotation,
+          onDownloadQuotation: onDownloadQuotation,
           userHasAccessToUpdateCompanyQuotation,
           gridRef, 
         }}

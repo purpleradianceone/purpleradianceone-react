@@ -48,7 +48,7 @@ import { LookupLeadDropdown } from "../lookups/lookup-lead/LookupLeadDropdown";
 import MESSAGE from "../../../constants/Messages";
 import { getLookupQuotationTemplate } from "../../../config/apis/CompanyQuotationApis";
 import { LookupCompanyProductByProductTypeDropdown } from "../lookups/lookup-company-product/LookupCompanyProductByProductTypeDropdown";
-import { AccountCompanyProductByProductTypeDropdown } from "../lookups/lookup-account/AccountCompanyProductByProductTypeDropdown";
+import { LookupAccountCompanyProductByProductTypeDropdown } from "../lookups/lookup-account/LookupAccountCompanyProductByProductTypeDropdown";
 
 function CompanyQuotationDetails() {
   const { quotationId } = useParams();
@@ -878,7 +878,7 @@ function CompanyQuotationDetails() {
                       {/** =================For Account Product================= */}
                       {selectedAccount &&
                         quotationTypeIdSearchParams === "2" && (
-                          <AccountCompanyProductByProductTypeDropdown
+                          <LookupAccountCompanyProductByProductTypeDropdown
                             icon={<User size={14} />}
                             value={selectedAccountCompanyProductType12}
                             label="Account Product"
@@ -959,7 +959,7 @@ function CompanyQuotationDetails() {
                 </div>
                 {!quotationTypeIdSearchParams && <div className="grid grid-cols-3 gap-3 mb-3">
                   {selectedQuotationType.id === 2 && (
-                    <AccountCompanyProductByProductTypeDropdown
+                    <LookupAccountCompanyProductByProductTypeDropdown
                       icon={<User size={14} />}
                       value={selectedAccountCompanyProductType12}
                       label="Account Product"
