@@ -70,7 +70,7 @@ interface ProductRow {
   // serialNumber: number[];
   isSerialNumber: boolean;
   productQuantity?: number;
-  totalCost : number ,
+  totalCost: number;
   purchaseDate: Date | null;
   deliveryDate: Date | null;
   deliveryAddress: string;
@@ -103,7 +103,7 @@ interface ProductRow {
     quantity?: boolean;
     zeroQuantity?: boolean;
     installedById?: boolean;
-    totalCost? :boolean
+    totalCost?: boolean;
   };
   hasValueGiven?: {
     deliveryDate?: boolean;
@@ -175,7 +175,7 @@ export const CreateMultipleAccountCompanyProduct = () => {
         loginStatus.fullName || loginStatus.email || loginStatus.mobileNumber,
       amcCycleEndDate: null,
       amcCycleStartDate: null,
-      totalCost:0,
+      totalCost: 0,
       billingAddress: "",
       deliveryAddress: "",
       deliveryDate: null,
@@ -198,7 +198,7 @@ export const CreateMultipleAccountCompanyProduct = () => {
         quantity: false,
         unit: false,
         zeroQuantity: false,
-        totalCost : false
+        totalCost: false,
       },
       hasValueGiven: {
         amcEndDate: false,
@@ -266,12 +266,13 @@ export const CreateMultipleAccountCompanyProduct = () => {
 
     try {
       const res = await axiosClient.post(
-        POST_API.GET_LOOKUP_COMPANY_PRODUCT_FOR_ACCOUNT,
+        POST_API.GET_LOOKUP_COMPANY_PRODUCT,
         {
           search_parameter: search, // null when first clicked
           offset: newOffset,
           limit,
           company_id: loginStatus.companyId,
+          product_type_id: null,
           id: null,
           search_company_specific_date_range_id: null,
           search_parameter_date: null,
@@ -363,7 +364,7 @@ export const CreateMultipleAccountCompanyProduct = () => {
         purchaseDate: null,
         warranty: 12,
         amc: 1,
-        totalCost : 0,
+        totalCost: 0,
         installedBy:
           loginStatus.fullName || loginStatus.email || loginStatus.mobileNumber,
         amcCycleEndDate: null,
@@ -417,7 +418,7 @@ export const CreateMultipleAccountCompanyProduct = () => {
         purchaseDate: !row.purchaseDate,
         zeroQuantity: qty < 1,
         quantity: false,
-        totalCost: row.totalCost <=0
+        totalCost: row.totalCost <= 0,
       };
 
       //  FINAL STOCK VALIDATION
@@ -435,7 +436,7 @@ export const CreateMultipleAccountCompanyProduct = () => {
         errors.purchaseDate ||
         errors.zeroQuantity ||
         errors.installedById ||
-        errors.totalCost 
+        errors.totalCost
       ) {
         hasMandatoryError = true;
         isValid = false;
@@ -514,7 +515,6 @@ export const CreateMultipleAccountCompanyProduct = () => {
         } else {
           newRow[field] = value;
         }
-        
 
         if (field === "unit_id") {
           newHasError.unit = false;
@@ -531,13 +531,13 @@ export const CreateMultipleAccountCompanyProduct = () => {
         /* -----------------------------
          4. Clear errors for allowed fields
       ----------------------------- */
-        const errorFields  = [
+        const errorFields = [
           "unit",
           "installedBy",
           "purchaseDate",
           "product",
           "installedById",
-          "totalCost"
+          "totalCost",
         ] as const;
 
         if (errorFields.includes(field as any)) {
@@ -769,11 +769,12 @@ export const CreateMultipleAccountCompanyProduct = () => {
     const payloadList = rows.map((row) => ({
       unit_id: row.unit_id,
       quantity: row.quantity,
-      stock_inward_id_array: row.serialNumber.map((item)=> item.stockInwardId) ?? [],
+      stock_inward_id_array:
+        row.serialNumber.map((item) => item.stockInwardId) ?? [],
       company_id: loginStatus.companyId,
       account_id: Number(accountId),
       company_product_id: row.productId,
-      total_cost : row.totalCost,
+      total_cost: row.totalCost,
       purchase_date: row.purchaseDate
         ? format(row.purchaseDate, "yyyy-MM-dd")
         : null,
@@ -811,7 +812,7 @@ export const CreateMultipleAccountCompanyProduct = () => {
 
     console.log("this is the payload");
     console.log(payloadList);
-    
+
     try {
       setShowLoadingAnimationForAssignApi(true);
       const response = await createMultipleAccountCompanyProduct(payloadList);
@@ -1062,7 +1063,7 @@ export const CreateMultipleAccountCompanyProduct = () => {
                               updateRow(index, "quantity", qty);
                             }}
                           />
-                        </div> 
+                        </div>
                         <div className="w-1/2 mt-0.5 ">
                           <CustomDropdown
                             key={row.unit_id}
@@ -1282,30 +1283,29 @@ export const CreateMultipleAccountCompanyProduct = () => {
                         </div>
                       </div>
                     )}
-                     <div className="">
-                          <FormInput
-                            logo={Box}
-                            label="Total Cost "
-                            readonly={!row.productId}
-                            required
-                            placeholder="Enter Total Cost"
-                            type="number"
-                            value={row.totalCost ==0 ?"" : row.totalCost}
-                            // min={0}
-                            // max={row.productQuantity!}
-                            onChange={(e) => {
-                              const totalCost = Number(e.target.value);
-                              updateRow(index, "totalCost", totalCost);
-                            }}
-                          />
-                        {row.hasError?.totalCost && (
-                          <p className="text-red-500 text-xs mt-1">
-                            Total cost is required.
-                          </p>
-                        )}
-                        </div>
+                    <div className="">
+                      <FormInput
+                        logo={Box}
+                        label="Total Cost "
+                        readonly={!row.productId}
+                        required
+                        placeholder="Enter Total Cost"
+                        type="number"
+                        value={row.totalCost == 0 ? "" : row.totalCost}
+                        // min={0}
+                        // max={row.productQuantity!}
+                        onChange={(e) => {
+                          const totalCost = Number(e.target.value);
+                          updateRow(index, "totalCost", totalCost);
+                        }}
+                      />
+                      {row.hasError?.totalCost && (
+                        <p className="text-red-500 text-xs mt-1">
+                          Total cost is required.
+                        </p>
+                      )}
+                    </div>
                     <div>
-
                       <ControlledMuiDatePicker
                         readonly={!row.productId}
                         label="Purchase Date"
@@ -1322,7 +1322,7 @@ export const CreateMultipleAccountCompanyProduct = () => {
                         </p>
                       )}
                     </div>
-                   
+
                     {/* Warranty start date */}
                     <ControlledMuiDatePicker
                       readonly={!row.productId}
@@ -1343,7 +1343,7 @@ export const CreateMultipleAccountCompanyProduct = () => {
                       }}
                       logo={Calendar}
                     />
-                     <ControlledMuiDatePicker
+                    <ControlledMuiDatePicker
                       readonly={!row.productId}
                       label="Delivery Date"
                       value={row.deliveryDate}
@@ -1352,7 +1352,7 @@ export const CreateMultipleAccountCompanyProduct = () => {
                       }}
                       logo={Calendar}
                     />
-                     <ControlledMuiDatePicker
+                    <ControlledMuiDatePicker
                       readonly={!row.productId}
                       label="AMC Start Date"
                       value={row.amcCycleStartDate}
@@ -1409,7 +1409,6 @@ export const CreateMultipleAccountCompanyProduct = () => {
                         </p>
                       )}
                     </div>
-                   
                   </div>
 
                   <div className="col-span-4 grid grid-cols-3 gap-x-1">

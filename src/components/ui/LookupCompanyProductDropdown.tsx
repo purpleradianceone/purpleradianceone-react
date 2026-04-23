@@ -13,7 +13,7 @@ export default function LookupCompanyProductDropdown({
   placeholder = "Search Product...",
 }: {
   onProductSelected: (product: any | null) => void;
-  productTypeId?: number
+  productTypeId?: number[];
   placeholder?: string;
 }) {
   const { loginStatus } = useLoggedInUserContext();
@@ -39,7 +39,7 @@ export default function LookupCompanyProductDropdown({
   // ---------------- SEARCH API ----------------
 
   const fetchProducts = async (searchText: string, nextOffset = 0) => {
-    if (!searchText || searchText.length < 2) return;
+    // if (!searchText || searchText.length < 2) return;
 
     abortController.abort();
     abortController = new AbortController();
@@ -47,10 +47,7 @@ export default function LookupCompanyProductDropdown({
     try {
       setLoading(true);
 
-      const apiUrl =
-        (productTypeId && POST_API.GET_LOOKUP_COMPANY_PRODUCT_BY_PRODUCT_TYPE) ||
-        POST_API.GET_LOOKUP_COMPANY_PRODUCT;
-
+      const apiUrl = POST_API.GET_LOOKUP_COMPANY_PRODUCT;
       const response = await axiosClient.post(
         apiUrl,
         {
@@ -58,7 +55,7 @@ export default function LookupCompanyProductDropdown({
           requestedby: loginStatus.id,
           limit,
           offset: nextOffset,
-          search_parameter: searchText,
+          search_parameter: searchText || "",
           isactive: true,
           product_type_id: productTypeId ?? null,
         },
@@ -67,8 +64,6 @@ export default function LookupCompanyProductDropdown({
           signal: abortController.signal,
         },
       );
-
-
 
       const newData = response.data || [];
 
@@ -179,6 +174,13 @@ export default function LookupCompanyProductDropdown({
         onFocus={() => {
           setShowDropdown(true);
           updatePosition();
+
+          // ✅ NEW: load initial list
+          if (results.length === 0) {
+            setOffset(0);
+            setHasMore(true);
+            fetchProducts("", 0);
+          }
         }}
         className="appearance-none block w-full px-1 pb-1 pt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 input-label-custom"
       />

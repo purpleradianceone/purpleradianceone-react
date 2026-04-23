@@ -119,7 +119,6 @@ function AccountServiceManagementList({
     );
   };
 
-
   if (userHasAccessToViewAccountService) {
     const handleCreateAccountServiceModalClose = () => {
       setIsCreateAccountServiceModalOpen(false);
@@ -185,7 +184,7 @@ function AccountServiceManagementList({
                       handleSelectedCompanyProductChange({ id: 0, name: "" });
                     }
                   }}
-                  productTypeId={3}
+                  productTypeId={[3]}
                 />
               </div>
 
