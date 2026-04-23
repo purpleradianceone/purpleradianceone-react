@@ -1,44 +1,51 @@
-
-
 type CalendarEventType = {
-    count? : number,
-    companyId : number,
-    id : number,
-    companyUserId : number,
-    meetingIdFromGoogle? : string,
-    meetingStatusFromGoogle? : "confirmed" | "cancelled" | "",
-    meetingLink? : string,
-    meetingConferenceId? : string,
-    meetingIdFromZoom? : number,
-    meetingHostIdFromZoom? : string,
-    meetingStatusFromZoom? : "waiting" | "started" | "end" | "scheduled" | "closed" | "cancelled" | "",
-    title : string,
-    description : string,
-    creatorEmail : string,
-    zoomMeetingJoinLink? : string,
-    zoomMeetingStartLink? : string,
-    zoomMeetingPasswordGeneral? : string,
-    zoomMeetingPasswordH323? : string,
-    zoomMeetingPassworsPstn? : string,
-    creatorAttenting : string,
-    organizerEmail? : string,
-    startDateByIST : string,
-    endDateByIST : string,
-    colorCode : string,
-    startDateByUserTimeZone : Date,
-    startDateByUserTimeZoneString : string,
-    endDateByUserTimeZone : Date,
-    endDateByUserTimeZoneString : string,
-    attendeesEmailAll : string[],
-    attendeesCompanyUserId : number[],
-    isAttendeePresent : boolean,
-    isActive? : boolean,
-    createdBy? : string,
-    updatedBy? : string,
-    createdOn? : string,
-    updatedOn? : string,
-    platform : number
-}
+  count?: number;
+  companyId: number;
+  id: number;
+  companyUserId: number;
+  meetingIdFromGoogle?: string;
+  meetingStatusFromGoogle?: "confirmed" | "cancelled" | "";
+  meetingLink?: string;
+  meetingConferenceId?: string;
+  meetingIdFromZoom?: number;
+  meetingHostIdFromZoom?: string;
+  meetingStatusFromZoom?:
+    | "waiting"
+    | "started"
+    | "end"
+    | "scheduled"
+    | "closed"
+    | "cancelled"
+    | "";
+  title: string;
+  description: string;
+  creatorEmail: string;
+  zoomMeetingJoinLink?: string;
+  zoomMeetingStartLink?: string;
+  zoomMeetingPasswordGeneral?: string;
+  zoomMeetingPasswordH323?: string;
+  zoomMeetingPassworsPstn?: string;
+  creatorAttenting: string;
+  organizerEmail?: string;
+  startDateByIST: string;
+  endDateByIST: string;
+  colorCode: string;
+  startDateByUserTimeZone: Date;
+  startDateByUserTimeZoneString: string;
+  endDateByUserTimeZone: Date;
+  endDateByUserTimeZoneString: string;
+  attendeesEmailAll: string[];
+  attendeesCompanyUserId: number[];
+  isAttendeePresent: boolean;
+  isActive?: boolean;
+  createdBy?: string;
+  updatedBy?: string;
+  createdOn?: string;
+  updatedOn?: string;
+  platform: number;
+  taskId?: number;
+  masterId?: number;
+};
 
 export default CalendarEventType;
 
@@ -77,8 +84,6 @@ export default CalendarEventType;
 //         "createdon": "May 19, 2025",//
 //         "updatedon": "May 19, 2025"//
 //     }
-
-
 
 //     {
 //         "count": 2,
