@@ -38,7 +38,7 @@ const STATUS_MAP: Record<number, StatusConfig> = {
 };
 
 const DEFAULT_STATUS: StatusConfig = {
-  label: "UNKNOWN",
+  label: "CREATING",
   bg: "bg-gray-50",
   text: "text-gray-500",
   border: "border-gray-200",

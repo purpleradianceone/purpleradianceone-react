@@ -156,7 +156,7 @@ function AccountSubscriptionManagementList({
                   console.log(product);
                   handleSelectedCompanyProductChange(product);
                 }}
-                productTypeId={4}
+                productTypeId={[4]}
               />
             </div>
 

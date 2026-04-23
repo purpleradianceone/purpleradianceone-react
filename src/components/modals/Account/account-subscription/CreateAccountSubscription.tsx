@@ -295,7 +295,7 @@ const CreateAccountSubscription = ({
       company_id: loginStatus.companyId,
       id: null,
       isactive: true,
-      product_type_id: 4,
+      product_type_id: [4],
       search_parameter: search || null,
       offset: currentOffset,
       limit: PAGE_SIZE,
@@ -304,7 +304,7 @@ const CreateAccountSubscription = ({
 
     try {
       const response = await axiosClient.post(
-        POST_API.GET_LOOKUP_COMPANY_PRODUCT_BY_PRODUCT_TYPE,
+        POST_API.GET_LOOKUP_COMPANY_PRODUCT,
         postData,
         { withCredentials: true },
       );
@@ -330,7 +330,7 @@ const CreateAccountSubscription = ({
   const fetchAccountCompanyProductByProductType = async () => {
     try {
       const response = await axiosClient.post(
-        POST_API.GET_ACCOUNT_COMPANY_PRODUCT_BY_PRODUCT_TYPE,
+        POST_API.GET_LOOKUP_ACCOUNT_COMPANY_PRODUCT_BY_PRODUCT_TYPE,
         {
           company_id: loginStatus.companyId,
           product_type_id: [1, 2],

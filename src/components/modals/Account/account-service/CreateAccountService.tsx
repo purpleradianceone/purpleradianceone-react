@@ -307,7 +307,7 @@ const AddStock = ({
 
     if (isSaving) return;
     const customizationsForBackend = Object.fromEntries(
-      fields.map(field => [field.key, field.value])
+      fields.map((field) => [field.key, field.value]),
     );
 
     const postData = {
@@ -328,7 +328,9 @@ const AddStock = ({
       customer_feedback: addCreateServiceDetailFormData.customer_feedback,
       is_follow_up_required: isFollowUpRequired,
       next_service_due_date:
-        addCreateServiceDetailFormData.next_service_due_date === "" ? null : addCreateServiceDetailFormData.next_service_due_date,
+        addCreateServiceDetailFormData.next_service_due_date === ""
+          ? null
+          : addCreateServiceDetailFormData.next_service_due_date,
       total_cost: totalCost ?? 0,
       createdby_id: loginStatus.id,
     };
@@ -389,7 +391,7 @@ const AddStock = ({
       company_id: loginStatus.companyId,
       id: null,
       isactive: true,
-      product_type_id: 3,
+      product_type_id: [3],
       search_parameter: search || null,
       offset: currentOffset,
       limit: PAGE_SIZE,
@@ -398,7 +400,7 @@ const AddStock = ({
 
     try {
       const response = await axiosClient.post(
-        POST_API.GET_LOOKUP_COMPANY_PRODUCT_BY_PRODUCT_TYPE,
+        POST_API.GET_LOOKUP_COMPANY_PRODUCT,
         postData,
         { withCredentials: true },
       );
@@ -695,7 +697,7 @@ const AddStock = ({
                 value={addCreateServiceDetailFormData.location_address}
                 maxLength={VALIDATIONS.MAX_DESCRIPTION_LENGTH}
                 onChange={handleCreateServiceDetailFormChange}
-              // className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
+                // className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
               />
               <TextAreaInput
                 logo={ShieldCheck}
@@ -717,7 +719,7 @@ const AddStock = ({
                 value={addCreateServiceDetailFormData.cancellation_reason}
                 maxLength={VALIDATIONS.MAX_DESCRIPTION_LENGTH}
                 onChange={handleCreateServiceDetailFormChange}
-              // className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
+                // className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
               />
 
               <TextAreaInput
@@ -730,7 +732,7 @@ const AddStock = ({
                 value={addCreateServiceDetailFormData.customer_feedback}
                 maxLength={VALIDATIONS.MAX_DESCRIPTION_LENGTH}
                 onChange={handleCreateServiceDetailFormChange}
-              // className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
+                // className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
               />
 
               <div className="p-2 bg-white border rounded-lg shadow-sm col-span-2">
@@ -738,7 +740,6 @@ const AddStock = ({
                   <h3 className="text-lg font-semibold text-gray-800">
                     Customizations
                   </h3>
-
 
                   <Button
                     type="button"
@@ -783,7 +784,10 @@ const AddStock = ({
                         type="button"
                         onClick={() => removeField(field.id)}
                       >
-                        <Trash size={SIZE.ICON_DELETE_BUTTON_SIZE} className={COLORS.ICON_DELETE_BUTTON}></Trash>
+                        <Trash
+                          size={SIZE.ICON_DELETE_BUTTON_SIZE}
+                          className={COLORS.ICON_DELETE_BUTTON}
+                        ></Trash>
                       </button>
                     </div>
                   ))}
@@ -796,7 +800,6 @@ const AddStock = ({
                 </div>
               </div>
 
-
               <div className="grid grid-cols-1 items-center  gap-2  mb-0">
                 <div>
                   <div className="grid grid-cols-1">
@@ -806,7 +809,6 @@ const AddStock = ({
                       // defaultValue={supportTicketData?.assignedToName}
                       onUserSelected={(user) => {
                         if (user && user?.id) {
-
                           setAssignedTo(user);
                         }
                         if (user === null || user === undefined) {
