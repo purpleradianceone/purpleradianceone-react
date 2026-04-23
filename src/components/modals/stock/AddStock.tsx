@@ -38,7 +38,7 @@ import { toSelectOptions } from "../../../utils/toSelectOption";
 import axiosClient from "../../../axios-client/AxiosClient";
 import { handleApiError } from "../../../config/error/handleApiError";
 import { LookupCompanyProductForStockCreation } from "../../../@types/lookup/LookupCompanyProductForStockCreation";
-import { getLookupCompanyProductForStockCreation } from "../../../config/apis/Lookups";
+import { getLookupCompanyProduct } from "../../../config/apis/Lookups";
 
 const AddStock = ({
   // isUsedInProductModal = false,
@@ -414,8 +414,7 @@ const AddStock = ({
           limit: 1,
           requestedby: loginStatus.id,
         };
-        const response =
-          await getLookupCompanyProductForStockCreation(postData);
+        const response = await getLookupCompanyProduct(postData);
 
         if (response) {
           setSelectedUnitId(undefined);

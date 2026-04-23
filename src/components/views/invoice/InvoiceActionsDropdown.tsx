@@ -4,10 +4,13 @@ import { createPortal } from "react-dom";
 import { Download, Eye, Trash2 } from "lucide-react";
 import { JSX_CHILDREN_NAME } from "../../../constants/AppConstants";
 import ActionsDropdownButton from "../../ui/ActionsDropdownButton";
+import ConfirmationDialog from "../../dialogue-box/ConfirmationDialogue";
 
 const InvoiceActionsDropdown = ({ data, context }: any) => {
   console.log(data);
   const [open, setOpen] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [selectedRow, setSelectedRow] = useState<any>(null);
   const [position, setPosition] = useState({
     top: 0,
     left: 0,
@@ -29,6 +32,14 @@ const InvoiceActionsDropdown = ({ data, context }: any) => {
     });
 
     setOpen((prev) => !prev);
+  };
+
+  const handleConfirmDelete = () => {
+    if (selectedRow) {
+      context.onDelete?.(selectedRow);
+    }
+    setConfirmOpen(false);
+    setSelectedRow(null);
   };
 
   useEffect(() => {
@@ -102,8 +113,13 @@ const InvoiceActionsDropdown = ({ data, context }: any) => {
             {!context.userHasAccessToUpdateCompanyInvoiceDraft ||
               (data.statusId === 1 && (
                 <ActionsDropdownButton
+                  // onClick={() => {
+                  //   context.onDelete?.(data);
+                  //   setOpen(false);
+                  // }}
                   onClick={() => {
-                    context.onDelete?.(data);
+                    setSelectedRow(data);
+                    setConfirmOpen(true);
                     setOpen(false);
                   }}
                 >
@@ -116,6 +132,20 @@ const InvoiceActionsDropdown = ({ data, context }: any) => {
           </div>,
           document.body,
         )}
+      <ConfirmationDialog
+        message={`You are about to delete invoice ${
+          selectedRow?.invoiceNumber || ""
+        } for ${
+          selectedRow?.accountName || "this account"
+        }. This action cannot be undone. Do you want to continue?`}
+        onCancel={() => {
+          setConfirmOpen(false);
+          setSelectedRow(null);
+        }}
+        onConfirm={handleConfirmDelete}
+        open={confirmOpen}
+        title="Delete Invoice"
+      />
     </>
   );
 };
