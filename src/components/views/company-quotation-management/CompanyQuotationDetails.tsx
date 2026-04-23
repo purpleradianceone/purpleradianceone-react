@@ -36,7 +36,9 @@ import { LookupAccountDropdown } from "../lookups/lookup-account/LookupAccountDr
 import CompanyQuotationProps from "../../../@types/company-quotation/CompanyQuotationProps";
 import { Modules } from "../../../@types/List/CompanyQuotationManagementListProps";
 import { getLookupAccounts } from "../../../config/apis/AccountApis";
+import { getLookupQuotationTemplate } from "../../../config/apis/CompanyQuotationApis";
 import { getLookupLeadsWithSignal } from "../../../config/apis/LeadsApi";
+import MESSAGE from "../../../constants/Messages";
 import QuotationStatusChip from "../../ui/QuotationStatusChip";
 import {
   InvoiceHeaderSkeleton,
@@ -44,11 +46,9 @@ import {
 } from "../invoice/CompanyInvoiceDetailSkeleton";
 import { LookupQuotationTemplateDropdown } from "../lookups/company-quotation/LookupQuotationTemplateDropdown";
 import { QuotationTypeDropdown } from "../lookups/company-quotation/QuotationTypeDropdown";
-import { LookupLeadDropdown } from "../lookups/lookup-lead/LookupLeadDropdown";
-import MESSAGE from "../../../constants/Messages";
-import { getLookupQuotationTemplate } from "../../../config/apis/CompanyQuotationApis";
-import { LookupCompanyProductByProductTypeDropdown } from "../lookups/lookup-company-product/LookupCompanyProductByProductTypeDropdown";
 import { LookupAccountCompanyProductByProductTypeDropdown } from "../lookups/lookup-account/LookupAccountCompanyProductByProductTypeDropdown";
+import { LookupCompanyProductDropdown } from "../lookups/lookup-company-product/LookupCompanyProductDropdown";
+import { LookupLeadDropdown } from "../lookups/lookup-lead/LookupLeadDropdown";
 
 function CompanyQuotationDetails() {
   const { quotationId } = useParams();
@@ -893,11 +893,11 @@ function CompanyQuotationDetails() {
                         )}
                       {/** =================For Account Product AMC(subscription)================= */}
                       {quotationTypeIdSearchParams === "2" && (
-                        <LookupCompanyProductByProductTypeDropdown
+                        <LookupCompanyProductDropdown
                           icon={<LucideSubtitles size={14} />}
                           value={selectedSelectedCompanyProductType4}
                           label="AMC Type Product"
-                          productTypeId={4}
+                          productTypeId={[4]}
                           handleCompanyProductSelection={
                             handleCompanyProductSelection
                           }
@@ -973,11 +973,11 @@ function CompanyQuotationDetails() {
                   )}
 
                   {selectedQuotationType.id === 2 && (
-                    <LookupCompanyProductByProductTypeDropdown
+                    <LookupCompanyProductDropdown
                       icon={<LucideSubtitles size={14} />}
                       value={selectedSelectedCompanyProductType4}
                       label="AMC Type Product"
-                      productTypeId={4}
+                      productTypeId={[4]}
                       handleCompanyProductSelection={
                         handleCompanyProductSelection
                       }
@@ -1149,25 +1149,7 @@ function CompanyQuotationDetails() {
                     onChange={(e: any) => setSearchTerm(e.target.value)}
                     placeholder="Search product..."
                   />
-                  {/* <div>
-                    <Button
-                      type="button"
-                      // disabled={!userHasAccessToAddCompanyInvoiceItem}
-                      onClick={() => {
-                        if (!userHasAccessToAddCompanyInvoiceItem) {
-                          toast.error(
-                            MESSAGE.MODULE_ACCESS.COMPANY_INVOICE_ITEM
-                              .DENIED_ADD_ACCESS,
-                          );
-                          return;
-                        }
-                        handleAddToInvoice();
-                      }}
-                      className={COLORS.ADD_BUTTON}
-                    >
-                      +Add All
-                    </Button>
-                  </div> */}
+                  
                 </div>
                 <div className="w-full overflow-y-auto border rounded">
                   <table className="w-full text-sm font-semibold ">
@@ -1365,7 +1347,7 @@ function CompanyQuotationDetails() {
             {isCreateMode && (
               <div className="w-full items-center justify-center  flex-1">
                 <span className="text-xs flex items-center justify-center font-medium text-gray-500 border rounded-lg px-2 py-1  bg-blue-100">
-                  {(selectedQuotationType.id==1)?'Once an quotation is created, all items assigned to that customer are automatically added to the quotation.':`Once an quotation is created, you can modiefy the items and related data.`}
+                  {(selectedQuotationType.id==1)?'Once an quotation is created, all items assigned to that customer are automatically added to the quotation.':`Once an quotation is created, you can modify the items and related data.`}
                 </span>
               </div>
             )}

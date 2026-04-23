@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useNode, useEditor } from "@craftjs/core";
 import { Edit, Save, Trash2 } from "lucide-react";
 import Button from "../../ui/Button";
@@ -70,14 +70,14 @@ export const QuotationSummeryBlock: React.FC = () => {
 
     rows.forEach((r: any) => {
       const qty = num(r.quantity, 1);
-      const rate = num(r.rate ?? r.price);
+      const basicCost = num(r.basicValue ?? r.price);
       const discP = num(r.discountPercent ?? r.discount);
       const cgp = num(r.cgstPercent ?? r.cgst);
       const sgp = num(r.sgstPercent ?? r.gst);
       const igp = num(r.igstPercent ?? r.igst);
       const cesp = num(r.cessPercent);
 
-      const rowBasic = qty * rate;
+      const rowBasic = qty * basicCost;
       const discAmt = (rowBasic * discP) / 100;
       const taxable = rowBasic - discAmt;
 
@@ -109,11 +109,11 @@ export const QuotationSummeryBlock: React.FC = () => {
       tax,
       total,
     };
-  }, [query]);
+  }, [query, actions]);
 
   const amountInWords = useMemo(() => {
-  return CurrencyUtil.formatInr(totals.total);
-}, [totals.total]);
+    return CurrencyUtil.formatInr(totals.total);
+  }, [totals.total]);
 
   /* =====================================================
      SUMMARY ROWS
@@ -125,10 +125,9 @@ export const QuotationSummeryBlock: React.FC = () => {
     { label: "SGST", value: totals.sgst },
     { label: "IGST", value: totals.igst },
     { label: "Cess", value: totals.cess },
-    { label: "Total Tax Value", value: totals.tax },
-    { label: "Total Quotation Value", value: totals.total },
+    { label: "Total Tax Amount", value: totals.tax },
     {
-      label: "Total Payable Value",
+      label: "Total Quotation Amount",
       value: totals.total,
       highlight: true,
     },
@@ -144,6 +143,22 @@ export const QuotationSummeryBlock: React.FC = () => {
   };
 
   /* =====================================================
+       CTRL + S
+    ===================================================== */
+  useEffect(() => {
+    const handle = (e: KeyboardEvent) => {
+      if (e.ctrlKey && e.key.toLowerCase() === "s") {
+        e.preventDefault();
+        setEditing(false);
+      }
+    };
+
+    window.addEventListener("keydown", handle);
+
+    return () => window.removeEventListener("keydown", handle);
+  }, []);
+
+  /* =====================================================
      UI
   ===================================================== */
   return (
@@ -151,6 +166,7 @@ export const QuotationSummeryBlock: React.FC = () => {
       ref={(ref) => ref && connect(drag(ref))}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
+      onDoubleClick={() => setEditing(true)}
       style={{
         position: "relative",
         width: "100%",
@@ -181,6 +197,61 @@ export const QuotationSummeryBlock: React.FC = () => {
             </Button>
           </div>
 
+          {editing && (
+            <div
+              style={{
+                position: "absolute",
+                left: "27%",
+                transform: "translateX(-50%)",
+                top: 8,
+                zIndex: 10,
+              }}
+            >
+              {/* CHANGED: Dropdown instead of Button */}
+              <select
+                value={props.fontFamily || "Arial"}
+                onChange={(e) =>
+                  setProp((p: any) => {
+                    p.fontFamily = e.target.value;
+                  })
+                }
+                style={{
+                  height: "34px",
+                  padding: "0 10px",
+                  border: "1px solid #d1d5db",
+                  borderRadius: "6px",
+                  fontSize: "14px",
+                  background: "#fff",
+                  cursor: "pointer",
+                }}
+              >
+                <option value="Arial">Arial</option>
+                <option value="Roboto">Roboto</option>
+                <option value="Times-Roman">Times-Roman</option>
+                <option value="Cambria">Cambria</option>
+                <option value="Helvetica">Helvetica</option>
+                <option value="Courier">Courier</option>
+
+                <option value="Verdana">Verdana</option>
+                <option value="Tahoma">Tahoma</option>
+                <option value="Georgia">Georgia</option>
+                <option value="Trebuchet MS">Trebuchet MS</option>
+
+                <option value="Calibri">Calibri</option>
+                {/* <option value="Garamond">Garamond</option>
+                <option value="Book Antiqua">Book Antiqua</option>
+
+                <option value="Palatino Linotype">Palatino Linotype</option>
+                <option value="Courier New">Courier New</option>
+                <option value="Lucida Sans Unicode">Lucida Sans Unicode</option>
+
+                <option value="Segoe UI">Segoe UI</option>
+                <option value="Noto Sans">Noto Sans</option>
+                <option value="DejaVu Sans">DejaVu Sans</option> */}
+              </select>
+            </div>
+          )}
+
           <div
             style={{
               position: "absolute",
@@ -204,6 +275,7 @@ export const QuotationSummeryBlock: React.FC = () => {
           width: "100%",
           marginTop: "48px",
           minHeight: "220px",
+          fontFamily: props.fontFamily,
         }}
       >
         {/* LEFT PANEL */}
@@ -220,6 +292,7 @@ export const QuotationSummeryBlock: React.FC = () => {
               marginBottom: "8px",
               fontSize: "14px",
               textAlign: "left",
+              fontFamily: props.fontFamily,
             }}
           >
             Terms & Conditions
@@ -237,6 +310,7 @@ export const QuotationSummeryBlock: React.FC = () => {
                 resize: "none",
                 fontSize: "12px",
                 textAlign: "left",
+                fontFamily: props.fontFamily,
               }}
             />
           ) : (
@@ -246,6 +320,7 @@ export const QuotationSummeryBlock: React.FC = () => {
                 fontSize: "12px",
                 lineHeight: "1.6",
                 textAlign: "left",
+                fontFamily: props.fontFamily,
               }}
             >
               {props.terms}
@@ -295,20 +370,20 @@ export const QuotationSummeryBlock: React.FC = () => {
         </div>
       </div>
       <div
-  style={{
-    width: "100%",
-    borderTop: "1px solid #d1d5db",
-    padding: "10px",
-    fontSize: "12px",
-    lineHeight: "1.6",
-    textAlign: "left",
-    background: "#fff",
-  }}
->
-  <strong>Amount in Words:</strong>
-  <br />
-  {amountInWords}
-</div>
+        style={{
+          width: "100%",
+          borderTop: "1px solid #d1d5db",
+          padding: "10px",
+          fontSize: "12px",
+          lineHeight: "1.6",
+          textAlign: "left",
+          background: "#fff",
+        }}
+      >
+        <strong>Amount in Words:</strong>
+        <br />
+        {amountInWords}
+      </div>
     </div>
   );
 };
@@ -326,6 +401,8 @@ export const QuotationSummeryBlock: React.FC = () => {
     3. Taxes extra as applicable.
     4. Delivery within 5 working days.`,
   },
+
+  fontFamily: "Arial",
 
   rules: {
     canMoveIn: () => false,
