@@ -64,11 +64,11 @@ function Footer() {
                   About Us
                 </a>
               </li>
-              <li>
+              {/* <li>
                 <a href={ROUTES_URL.CAREERS} className="caption-custom hover:text-white transition-colors">
                   Careers
                 </a>
-              </li>
+              </li> */}
               <li>
                 <a href={ROUTES_URL.CONTACT_US} className="caption-custom hover:text-white transition-colors">
                   Contact

@@ -344,12 +344,12 @@ function Navbar({ children }: { children: React.ReactNode }) {
                   >
                     Contact Us
                   </a>
-                  <a
+                  {/* <a
                     href={ROUTES_URL.CAREERS}
                     className="text-gray-700 hover:text-blue-600"
                   >
                     Careers
-                  </a>
+                  </a> */}
 
                   <Link to={ROUTES_URL.SIGN_UP}>
                     <button className="bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700">
