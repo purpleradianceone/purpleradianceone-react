@@ -8,9 +8,9 @@ export const getLookupCompanyProductForStockCreation  = async (payload: object
 }
 
 
-export const getLookupCompanyProductByProductType  = async (payload: object
+export const getLookupCompanyProduct  = async (payload: object
 ) => {
-    const response = await axiosClient.post(POST_API.GET_LOOKUP_COMPANY_PRODUCT_BY_PRODUCT_TYPE, payload, { withCredentials: true })
+    const response = await axiosClient.post(POST_API.GET_LOOKUP_COMPANY_PRODUCT, payload, { withCredentials: true })
     return response;
 }
 
