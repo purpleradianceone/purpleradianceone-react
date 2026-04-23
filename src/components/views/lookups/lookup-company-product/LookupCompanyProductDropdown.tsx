@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import Select from "react-select";
 import { useEffect, useState } from "react";
-import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
+import Select from "react-select";
+import { getLookupCompanyProduct } from "../../../../config/apis/Lookups";
 import { handleApiError } from "../../../../config/error/handleApiError";
-import { getLookupCompanyProductByProductType } from "../../../../config/apis/Lookups";
+import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
 
-export const LookupCompanyProductByProductTypeDropdown = ({
+export const LookupCompanyProductDropdown = ({
   icon,
   label,
   value,
@@ -18,7 +18,7 @@ export const LookupCompanyProductByProductTypeDropdown = ({
   icon?: React.ReactNode;
   label?: string;
   value?: any;
-  productTypeId?: number;
+  productTypeId?: number[];
   handleCompanyProductSelection: (data: any) => void;
   isDisabled?: boolean
 
@@ -51,7 +51,7 @@ export const LookupCompanyProductByProductTypeDropdown = ({
     };
 
     try {
-      const res = await getLookupCompanyProductByProductType(postData);
+      const res = await getLookupCompanyProduct(postData);
 
       const formatted = res.data.map((item: any) => ({
         value: item.id,

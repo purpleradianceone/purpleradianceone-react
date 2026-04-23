@@ -4,8 +4,7 @@ import { useNode, useEditor } from "@craftjs/core";
 import { Trash2, Plus, Edit, Save } from "lucide-react";
 import Button from "../../ui/Button";
 import { SIZE } from "../../../constants/AppConstants";
-import  CurrencyUtil   from "../utils/CurrencyUtil";
-
+import CurrencyUtil from "../utils/CurrencyUtil";
 
 /* =====================================================
    TYPES
@@ -62,9 +61,9 @@ const normalizeRow = (row: any): Row => ({
 
   quantity: num(row?.quantity, 1),
 
-  rate: num(row?.rate ?? row?.price, 0),
-
   basicValue: num(row?.basicValue),
+  
+  rate: num(row?.rate ?? row?.price, 0)*num(row?.quantity,1),
 
   discountPercent: num(row?.discountPercent ?? row?.discount, 0),
 
@@ -119,11 +118,11 @@ export const TableBlockQuotation: React.FC = () => {
     return rows.map((rawRow: any) => {
       const row = normalizeRow(rawRow);
 
-      const basicValue = row.quantity! * row.rate!;
+      const rate = row.quantity! * row.basicValue!;
 
-      const discountAmount = (basicValue * row.discountPercent!) / 100;
+      const discountAmount = (rate * row.discountPercent!) / 100;
 
-      const taxableValue = basicValue - discountAmount;
+      const taxableValue = rate - discountAmount;
 
       const sgstAmount = (taxableValue * row.sgstPercent!) / 100;
 
@@ -137,7 +136,7 @@ export const TableBlockQuotation: React.FC = () => {
 
       return {
         ...row,
-        basicValue,
+        rate,
         discountAmount,
         taxableValue,
         sgstAmount,
@@ -193,7 +192,8 @@ export const TableBlockQuotation: React.FC = () => {
         sac: "",
 
         quantity: 1,
-        rate: 0,
+        rate:0,
+        basicValue: 100,
 
         discountPercent: 0,
 
@@ -247,6 +247,7 @@ export const TableBlockQuotation: React.FC = () => {
         border: "1px solid #d8dee6",
         borderRadius: "10px",
         overflow: "hidden",
+        fontFamily: props.fontFamily,
       }}
     >
       {(hovered || editing) && (
@@ -269,6 +270,61 @@ export const TableBlockQuotation: React.FC = () => {
             </Button>
           </div>
 
+          {editing && (
+            <div
+              style={{
+                position: "absolute",
+                left: "27%",
+                transform: "translateX(-50%)",
+                top: 8,
+                zIndex: 10,
+              }}
+            >
+              {/* CHANGED: Dropdown instead of Button */}
+              <select
+                value={props.fontFamily || "Arial"}
+                onChange={(e) =>
+                  setProp((p: any) => {
+                    p.fontFamily = e.target.value; 
+                  })
+                }
+                style={{
+                  height: "34px",
+                  padding: "0 10px",
+                  border: "1px solid #d1d5db",
+                  borderRadius: "6px",
+                  fontSize: "14px",
+                  background: "#fff",
+                  cursor: "pointer",
+                }}
+              >
+                <option value="Arial">Arial</option>
+                <option value="Roboto">Roboto</option>
+                <option value="Times-Roman">Times-Roman</option>
+                <option value="Cambria">Cambria</option>
+                <option value="Helvetica">Helvetica</option>
+                <option value="Courier">Courier</option>
+
+                <option value="Verdana">Verdana</option>
+                <option value="Tahoma">Tahoma</option>
+                <option value="Georgia">Georgia</option>
+                <option value="Trebuchet MS">Trebuchet MS</option>
+
+                {/* <option value="Calibri">Calibri</option>
+                <option value="Garamond">Garamond</option>
+                <option value="Book Antiqua">Book Antiqua</option>
+
+                <option value="Palatino Linotype">Palatino Linotype</option>
+                <option value="Courier New">Courier New</option>
+                <option value="Lucida Sans Unicode">Lucida Sans Unicode</option>
+
+                <option value="Segoe UI">Segoe UI</option>
+                <option value="Noto Sans">Noto Sans</option>
+                <option value="DejaVu Sans">DejaVu Sans</option> */}
+              </select>
+            </div>
+          )}
+
           <div
             style={{
               position: "absolute",
@@ -287,7 +343,7 @@ export const TableBlockQuotation: React.FC = () => {
 
       <div
         style={{
-          marginTop: "52px",
+          marginTop: `${editing ? "52px" : "2px"}`,
         }}
       >
         <table
@@ -295,22 +351,23 @@ export const TableBlockQuotation: React.FC = () => {
             width: "100%",
             tableLayout: "fixed",
             borderCollapse: "collapse",
-            fontSize: "10px",
+            fontSize: "12px",
+            fontFamily: props.fontFamily,
+
           }}
         >
           <thead>
             <tr>
               {[
-                "Sr",
+                "#",
                 "Product",
                 "Qty",
-                "Rate",
                 "Basic",
-                "Disc %",
-                "Disc Amt",
+                "Rate",
+                "Discount (%)",
                 "Taxable",
-                "SGST %",
-                "CGST %",
+                "SGST (%)",
+                "CGST (%)",
                 "Total",
               ].map((h) => (
                 <th key={h} style={headerCell}>
@@ -391,17 +448,15 @@ export const TableBlockQuotation: React.FC = () => {
                     <input
                       type="number"
                       style={input}
-                      value={row.rate}
-                      onChange={(e) =>
-                        updateCell(i, "rate", e.target.value)
-                      }
+                      value={row.basicValue}
+                      onChange={(e) => updateCell(i, "basicValue", e.target.value)}
                     />
                   ) : (
-                   money(row.rate)
+                    money(row.basicValue)
                   )}
                 </td>
 
-                <td style={cell}>{money(row.basicValue)}</td>
+                <td style={cell}>{money(row.rate)}</td>
 
                 {/* <td style={cell}>{row.discountPercent}</td> */}
 
@@ -416,11 +471,11 @@ export const TableBlockQuotation: React.FC = () => {
                       }
                     />
                   ) : (
-                   row.discountPercent
+                    `${money(row.discountAmount)+" ("+ row.discountPercent+"%)"}`
                   )}
                 </td>
 
-                <td style={cell}>{money(row.discountAmount)}</td>
+                {/* <td style={cell}>{money(row.discountAmount)}</td> */}
 
                 <td style={cell}>{money(row.taxableValue)}</td>
 
@@ -437,7 +492,7 @@ export const TableBlockQuotation: React.FC = () => {
                       }
                     />
                   ) : (
-                   row.sgstPercent
+                    `${money(row.sgstAmount)+" ("+ row.sgstPercent+"%)"}`
                   )}
                 </td>
 
@@ -454,7 +509,7 @@ export const TableBlockQuotation: React.FC = () => {
                       }
                     />
                   ) : (
-                   row.cgstPercent
+                    `${money(row.cgstAmount)+" ("+ row.cgstPercent+"%)"}`
                   )}
                 </td>
 
@@ -464,7 +519,7 @@ export const TableBlockQuotation: React.FC = () => {
 
             <tr>
               <td
-                colSpan={10}
+                colSpan={9}
                 style={{
                   ...cell,
                   fontWeight: 700,
@@ -484,25 +539,25 @@ export const TableBlockQuotation: React.FC = () => {
               </td>
             </tr>
 
-             {/* =====================================================
+            {/* =====================================================
                CHANGE 3: ADD THIS BELOW GRAND TOTAL ROW
           ===================================================== */}
-          <tr>
-            <td
-              colSpan={11}
-              style={{
-                textAlign: "left",
-                padding: "8px",
-                fontWeight: 600,
-                lineHeight: "1.5",
-                borderTop: "1px solid #ddd",
-              }}
-            >
-              <strong>Amount in Words:</strong>
-              <br />
-              {amountInWords}
-            </td>
-          </tr>
+            <tr>
+              <td
+                colSpan={10}
+                style={{
+                  textAlign: "left",
+                  padding: "8px",
+                  fontWeight: 600,
+                  lineHeight: "1.5",
+                  borderTop: "1px solid #ddd",
+                }}
+              >
+                <strong>Amount in Words:</strong>
+                <br />
+                {amountInWords}
+              </td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -558,17 +613,17 @@ const input: React.CSSProperties = {
       {
         companyProductName: "Product A",
         quantity: 1,
-        rate: 100,
+        rate: 0,
+        basicValue: 100,
         discountPercent: 5,
-        cgstPercent: 9,
-        sgstPercent: 9,
+        cgstPercent: 4.5,
+        sgstPercent: 4.5,
       },
     ],
+    fontFamily: "Arial",
   },
   rules: {
     canMoveIn: () => false,
     canMoveOut: () => true,
   },
 };
-
-
