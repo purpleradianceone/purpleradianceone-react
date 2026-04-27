@@ -226,49 +226,8 @@ const ViewLeadManagement = () => {
     requestedby: "",
     generate_password: "",
   });
-  // const [isLeadOwnerPopUpOpen, setIsLeadOwnerPopUpOpen] =
-  //   useState<boolean>(false);
-  // const [persistedSelectedUserId, setPersistedSelectedUserId] = useState<
-  //   number | null
-  // >(selectedLeadData.companyUserId);
 
   previouseOwnerRef.current = selectedLeadData.companyUserId;
-
-  // const handleSelectedCompanyUserChange = (params: CompanyUser | null) => {
-  //   if (params) {
-  //     setPersistedSelectedUserId(params.id);
-
-  //     setSelectedCompanyUser({
-  //       company_id: params.company_id,
-  //       id: params.id,
-  //       fullname: params.fullname,
-  //       email: params.email,
-  //       mobilenumber: params.mobilenumber,
-  //       createdby: "",
-  //       isactive: params.isactive,
-  //       requestedby: "",
-  //       generate_password: "",
-  //     });
-  //   } else {
-  //     setPersistedSelectedUserId(null);
-  //     // Reset selectedCompanyUser to its initial state when null is received
-  //     setSelectedCompanyUser({
-  //       company_id: 0,
-  //       id: 0,
-  //       fullname: "",
-  //       email: "",
-  //       mobilenumber: "",
-  //       createdby: "",
-  //       isactive: false,
-  //       requestedby: "",
-  //       generate_password: "",
-  //     });
-  //   }
-  // };
-
-  // const handleClickLeadOwnerChange = () => {
-  //   setIsLeadOwnerPopUpOpen(true);
-  // };
 
   const [showSpinnerForSavingLeadOwner, setShowSpinnerForSavingLeadOwner] =
     useState<boolean>(false);
@@ -322,14 +281,6 @@ const ViewLeadManagement = () => {
       }
     } catch (error: any) {
       handleApiError(error);
-      // if (error.status === STATUS_CODE.UNATHORISED) {
-      //   const refreshTokenStatus = await RefreshToken({
-      //     callFunction: handleLeadOwnerChange,
-      //   });
-      //   if (refreshTokenStatus) {
-      //     handleLeadOwnerChange();
-      //   }
-      // }
     } finally {
       // selected company user should become null after this function runs
       setReasonInputBoxOpenForLeadOwner(false);
@@ -701,14 +652,6 @@ const ViewLeadManagement = () => {
     setActiveTab(id);
   };
 
-  // const getHeightAboveTasks = useCallback(() => {
-  //   if (isOpenMeetingsModal) {
-  //     return "min-h-40";
-  //   } else {
-  //     return "min-h-72";
-  //   }
-  // }, [isOpenMeetingsModal]);
-
   // New Code
   const [isAddProductModalOpen, setIsAddProductModalOpen] = useState(false);
   const [isLeadSettingModalOpen, setIsLeadSettingModalOpen] =
@@ -824,11 +767,6 @@ const ViewLeadManagement = () => {
         </div>
       </div>
 
-      {/* // <div */}
-      {/* //   className={`fixed top-8 inset-0 z-10 bg-white ${
-    //     userPreference.isLeftMenu ? "ml-[54px] mt-4" : " mt-6"
-    //   } overflow-auto`}
-    // > */}
       <motion.section
         ref={ref}
         initial={{ opacity: 0, y: 40 }}
@@ -919,13 +857,6 @@ const ViewLeadManagement = () => {
           <div className="flex w-full  ">
             {leadStatus!.map((item: any) => (
               <div
-                // className=" w-[100%]  border "
-                // style={{
-                //   width: "100%",
-                //   // backgroundColor: "#800080",
-                //   clipPath:
-                //     "polygon(0 0, calc(100% - 16px) 0, 100% 50%, calc(100% - 16px) 100%, 0 100%)",
-                // }}
                 className={`flex-1  items-center justify-center  ${
                   selectedLeadData.leadStatus === item.name
                     ? "bg-blue-700 table-header-custom-white hover:bg-blue-500 hover:text-white"
@@ -946,13 +877,13 @@ const ViewLeadManagement = () => {
               >
                 <Popover
                   width={500}
-                  onClose={()=>{
+                  onClose={() => {
                     setSelectedStatusId(null);
                   }}
-                  // onTriggerClick={}
                   trigger={
                     <div className="flex w-full ">
                       <button
+                        // disabled={!userHasAccessToUpdateLeadDetails}
                         onClick={() => {
                           if (userHasAccessToUpdateLeadDetails) {
                             setReasonInputBoxOpen(true);
@@ -972,74 +903,71 @@ const ViewLeadManagement = () => {
                     </div>
                   }
                 >
-                  {(onClose) =>
-                  (
+                  { (onClose) => (
+                    <>
+                      {reasonInputBoxOpen &&
+                        item.id !== 9 &&
+                        selectedStatusId !== 9 && (
+                          <StatusUpdateModal
+                            isLeadStatusSaving={isLeadStatusSaving}
+                            handleCancel={() => {
+                              setReasonInputBoxOpen(!reasonInputBoxOpen);
+                              setSelectedStatusId(null);
+                              setReasonText("");
+                              onClose();
+                            }}
+                            handleSaveStatusUpdate={async () => {
+                              await handleSaveStatusUpdate();
+                              onClose();
+                            }}
+                            onReasonChange={(e) =>
+                              setReasonText(e.target.value)
+                            }
+                            reasonText={reasonText}
+                          />
+                        )}
+                      {reasonInputBoxOpen && selectedStatusId === 9 && (
+                        <ConvertLeadModal
+                          isLeadStatusSaving={isLeadStatusSaving}
+                          isOpen={reasonInputBoxOpen}
+                          onClose={() => {
+                            setReasonInputBoxOpen(!reasonInputBoxOpen);
+                            setSelectedStatusId(null);
+                            setReasonText("");
+                            onClose();
+                          }}
+                          leadData={selectedLeadData}
+                          handleLeadConversion={() => {
+                            handleSaveStatusUpdate();
+                            onClose();
+                          }}
+                          onReasonChange={(e) => setReasonText(e.target.value)}
+                          reasonText={reasonText}
+                          handleLeadMappedToAccount={() => {
+                            const parsedQuery = JSON.parse(
+                              searchParams.get("leadData") || "{}",
+                            );
+                            parsedQuery.leadStatusId = "9";
+                            parsedQuery.leadStatus = "Converted";
+                            const newQueryString = qs.stringify({
+                              leadData: JSON.stringify(parsedQuery),
+                            });
 
-                 <>
-                    {
-                      
-                      reasonInputBoxOpen && item.id!==9 &&
-                      selectedStatusId !== 9 && (
-                        <StatusUpdateModal
-                        isLeadStatusSaving={isLeadStatusSaving}
-                        handleCancel={() => {
-                          setReasonInputBoxOpen(!reasonInputBoxOpen);
-                          setSelectedStatusId(null);
-                          setReasonText("")
-                          onClose();
-                        }}
-                        handleSaveStatusUpdate={async () => {
-                          await handleSaveStatusUpdate();
-                          onClose();
-                        }}
-                        onReasonChange={(e) => setReasonText(e.target.value)}
-                        reasonText={reasonText}
+                            setSelectedLeadData((prev: any) => ({
+                              ...prev,
+                              leadStatus: "Converted",
+                            }));
+                            setReasonInputBoxOpen(false);
+                            setReasonText("");
+                            setSelectedStatusId(null);
+
+                            const newPath = `${window.location.pathname}?${newQueryString}`;
+                            navigate(newPath, { replace: true });
+                          }}
                         />
-                      )
-                    }
-                    {reasonInputBoxOpen && selectedStatusId === 9 && (
-          <ConvertLeadModal
-            isLeadStatusSaving={isLeadStatusSaving}
-            isOpen={reasonInputBoxOpen}
-            onClose={() => {
-              setReasonInputBoxOpen(!reasonInputBoxOpen);
-              setSelectedStatusId(null);
-              setReasonText("");
-              onClose();
-            }}
-            leadData={selectedLeadData}
-            handleLeadConversion={()=>{
-              handleSaveStatusUpdate()
-              onClose()
-            }}
-            onReasonChange={(e) => setReasonText(e.target.value)}
-            reasonText={reasonText}
-            handleLeadMappedToAccount={() => {
-              const parsedQuery = JSON.parse(
-                searchParams.get("leadData") || "{}",
-              );
-              parsedQuery.leadStatusId = "9";
-              parsedQuery.leadStatus = "Converted";
-              const newQueryString = qs.stringify({
-                leadData: JSON.stringify(parsedQuery),
-              });
-              
-              setSelectedLeadData((prev: any) => ({
-                ...prev,
-                leadStatus: "Converted",
-              }));
-              setReasonInputBoxOpen(false);
-              setReasonText("");
-              setSelectedStatusId(null);
-              
-              const newPath = `${window.location.pathname}?${newQueryString}`;
-              navigate(newPath, { replace: true });
-            }}
-            /> 
-        )} 
-            </>
-                     )
-                  }
+                      )}
+                    </>
+                  )}
                 </Popover>
               </div>
             ))}
@@ -1542,19 +1470,18 @@ const ViewLeadManagement = () => {
             </div>
             {/* Activity */}
             <div className="mt-8">
-            <LeadTasksModal
-              ownerId={selectedLeadData.companyUserId}
-            ></LeadTasksModal>
+              <LeadTasksModal
+                ownerId={selectedLeadData.companyUserId}
+              ></LeadTasksModal>
             </div>
             {/* End Activity */}
           </div>
-         
         </div>
-         {<div className="w-full mt-2">
-          <LeadQuotationDetails 
-            lead={selectedLeadData}
-            />
-          </div>}
+        {
+          <div className="w-full mt-2">
+            <LeadQuotationDetails lead={selectedLeadData} />
+          </div>
+        }
         {/* end  */}
 
         {/* update lead form */}

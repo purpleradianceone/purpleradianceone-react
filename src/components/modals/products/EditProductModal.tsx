@@ -604,6 +604,7 @@ function EditCompanyProductModal({
                 placeholder="Enter Product Cost"
                 defaultValue={intialEditCompanyProductFormData.cost}
                 onChange={handleEditCompanyProductFormDataChange}
+                  step={'0.0001'}  
               />
               {/* Minimum Stock */}
               <FormInput

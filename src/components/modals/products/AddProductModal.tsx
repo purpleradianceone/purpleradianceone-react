@@ -547,7 +547,7 @@ function AddProductModal({
                 onChange={handleAddProductFormDataChange}
                 error={errors.cost}
                 min={0}
-              />
+                step={'0.0001'}              />
               {/* Minimum Stock */}
               <FormInput
                 label="Minimum Stock : "
