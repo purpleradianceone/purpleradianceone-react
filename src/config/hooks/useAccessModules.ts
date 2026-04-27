@@ -815,6 +815,22 @@ export const useUserAccessModules = () => {
     (accessModule) => accessModule.crm_module_id === 61 && accessModule.update,
   );
 
+
+  const userHasAccessToAddAccountQuotation = accessModules.some(
+    (accessModules) => accessModules.crm_module_id === 64 && accessModules.add,
+  );
+
+  const userHasAccessToViewAccountQuotation = accessModules.some(
+    (accessModule) => accessModule.crm_module_id === 64 && accessModule.view,
+  );
+
+  const userHasAccessToUpdateAccountQuotation = accessModules.some(
+    (accessModule) => accessModule.crm_module_id === 64 && accessModule.update,
+  );
+
+  
+
+
   return {
     userHasAccessToAddUser,
     userHasAccessToViewUser,
@@ -1041,7 +1057,7 @@ export const useUserAccessModules = () => {
     userHasAccessToAddAccountSubscription,
     userHasAccessToViewAccountSubscription,
     userHasAccessToUpdateAccountSubscription,
-    
+
     userHasAccessToAddCompanyInvoice,
     userHasAccessToViewCompanyInvoice,
     userHasAccessToUpdateCompanyInvoice,
@@ -1061,5 +1077,9 @@ export const useUserAccessModules = () => {
     userHasAccessToAddCompanyQuotation,
     userHasAccessToViewCompanyQuotation,
     userHasAccessToUpdateCompanyQuotation,
+
+    userHasAccessToAddAccountQuotation,
+    userHasAccessToViewAccountQuotation,
+    userHasAccessToUpdateAccountQuotation,
   };
 };

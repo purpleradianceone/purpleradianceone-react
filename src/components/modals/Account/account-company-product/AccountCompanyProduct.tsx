@@ -30,7 +30,7 @@ const AccountCompanyProduct = ({
   const {
     userHasAccessToAddAccountProducts,
     userHasAccessToViewAccountProducts,
-    userHasAccessToAddCompanyQuotation,
+    userHasAccessToAddAccountQuotation,
   } = useUserAccessModules();
   const [isLoadingAccountCompanyProduct, setIsLoadingAccountCompanyProduct] =
     useState<boolean>(true);
@@ -58,8 +58,8 @@ const AccountCompanyProduct = ({
   // };
 
   const handleCreateQuotationForAccountProduct = (data: AccountProduct) =>{
-        if (!userHasAccessToAddCompanyQuotation){
-          toast.error(MESSAGE.MODULE_ACCESS.COMPANY_QUOTATION.DENIED_ADD_ACCESS);
+        if (!userHasAccessToAddAccountQuotation){
+          toast.error(MESSAGE.MODULE_ACCESS.ACCOUNT_QUOTATION.DENIED_ADD_ACCESS);
           return;
         }
             const quotationSearchParam=  `?other_id=${accountId}&quotation_type_id=${2}&isUsedFor=${Modules.AMC_QUOTATION}&account_company_product=${JSON.stringify(data)}`;
