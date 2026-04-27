@@ -272,7 +272,7 @@ export const CreateMultipleAccountCompanyProduct = () => {
           offset: newOffset,
           limit,
           company_id: loginStatus.companyId,
-          product_type_id: null,
+          product_type_id: [1,2],
           id: null,
           search_company_specific_date_range_id: null,
           search_parameter_date: null,
