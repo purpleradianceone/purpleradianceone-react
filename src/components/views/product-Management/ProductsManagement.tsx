@@ -49,7 +49,7 @@ function ProductManagement({
   const { userHasAccessToViewProduct } = useUserAccessModules();
   const { loginStatus } = useLoggedInUserContext();
   const [ref, inView] = useInView({ fallbackInView: true, threshold: 0.1 });
-
+  const [isDataLoading , setIsDataLoading] = useState<boolean>(false);
   const [accessDeniedPopUpOpen, setAccessDeniedPopUpOpen] = useState(false);
 
   const [productsData, setProductsData] = useState<Product[]>([]);
@@ -109,6 +109,7 @@ function ProductManagement({
       };
 
       try {
+        setIsDataLoading(true)
         const response = await axios.post(
           isGridForAccountProduct ? POST_API.GET_LOOKUP_COMPANY_PRODUCT : POST_API.GET_PRODUCTS,
           getProductPostData,
@@ -168,6 +169,8 @@ function ProductManagement({
         } else {
           // toast.error(MESSAGE.ERROR.SOMETHING_WENT_WRONG_TRY_AGAIN)
         }
+      }finally{
+        setIsDataLoading(false)
       }
     }
   };
@@ -274,6 +277,7 @@ function ProductManagement({
                 products={productsData}
                 isGridForAccountProduct={isGridForAccountProduct}
                 onRowSelect={onRowSelect}
+                isDataLoading={isDataLoading}
               // isListForProductUser={false}
               />
             </div>

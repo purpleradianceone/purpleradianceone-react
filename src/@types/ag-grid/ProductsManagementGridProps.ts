@@ -11,6 +11,7 @@ type ProductsManagementGridProps = {
       isGridForAccountProduct? : boolean
        onRowSelect? : (data :Product| any ) =>void,
        handleCreateStockModalOpen? : (status : boolean ) => void;
+       isDataLoading : boolean
 }
 
 export default ProductsManagementGridProps;

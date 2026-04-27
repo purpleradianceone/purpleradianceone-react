@@ -6,5 +6,6 @@ type WareHouseStockListProps = {
     paginationData: PaginationDataWithoutCountProps;
     searchParameter: string;
     handleSearchParameterChange: (value: string) => void;
+    isDataLoading : boolean
 }
 export default WareHouseStockListProps;

@@ -19,7 +19,7 @@ const StockManagement = () => {
   const { userHasAccessToViewProductWiseStock } = useUserAccessModules();
   const { loginStatus } = useLoggedInUserContext();
   const [ref, inView] = useInView({ fallbackInView: true, threshold: 0.1 });
-
+  const [isDataLoading , setIsDataLoading] = useState<boolean>(false);
   const [liveStockForCompanyProduct, setLiveStockForCompanyProduct] = useState<
     LiveStockForCompanyProduct[]
   >([]);
@@ -57,6 +57,7 @@ const StockManagement = () => {
       requestedby_id: loginStatus.id,
     };
 
+    setIsDataLoading(true)
     await axios
       .post(POST_API.GET_STOCK_LIVE_COMPANY_PRODUCT, postData, {
         signal: signal,
@@ -88,6 +89,10 @@ const StockManagement = () => {
       })
       .catch(async (error: ApiError | any) => {
         handleApiError(error);
+      })
+      .finally(()=>{
+
+        setIsDataLoading(false)
       });
   };
 
@@ -152,6 +157,7 @@ const StockManagement = () => {
               }}
               handleSearchParameterChange={handleSearchParameterChange}
               searchParameter={searchParameter}
+              isDataLoading ={isDataLoading}
             />
           </>
         ) : (

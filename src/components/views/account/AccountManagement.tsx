@@ -59,7 +59,7 @@ function GetAccounts({
   const { loginStatus } = useLoggedInUserContext();
   const [accessDeniedPopUpOpen, setAccessDeniedPopUpOpen] = useState(false);
   const [accountChangeCount, setAccountChangeCount] = useState<number>(0);
-
+  const [isDataLoading , setIsDataLoading] = useState<boolean>(false);
   const handleCreateCompanyAccountType = () => {
     setAccountChangeCount(accountChangeCount + 1);
   };
@@ -109,6 +109,7 @@ const savedFilters = JSON.parse(
     };
 
     try {
+      setIsDataLoading(true)
       const response = await axiosClient.post(POST_API.GET_ACCOUNT, postData, {
         withCredentials: true,
       });
@@ -155,6 +156,8 @@ const savedFilters = JSON.parse(
           fetchAccounts();
         }
       }
+    }finally{
+      setIsDataLoading(false);
     }
   };
 
@@ -245,6 +248,7 @@ const savedFilters = JSON.parse(
                 isUsedForAccountLead={isUsedForAccountLead}
                 handleRowSelectedForLead={handleRowSelectedForLead}
                 isUsedForSupportTicketCreation = {isUsedForSupportTicketCreation}
+                isDataLoading ={isDataLoading}
               />
             </motion.section>
           </div>

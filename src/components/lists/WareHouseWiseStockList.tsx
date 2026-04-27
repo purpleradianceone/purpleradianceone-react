@@ -11,6 +11,7 @@ const WareHouseWiseStockList = ({
   paginationData,
   searchParameter,
   handleSearchParameterChange,
+  isDataLoading
 }: WareHouseStockListProps) => {
   const { userPreference } = useUserPreference();
 
@@ -51,7 +52,7 @@ const WareHouseWiseStockList = ({
               : "ag-theme-balham w-full h-[calc(100vh-192px)]"
           }
         >
-          <StockLiveAgGrid data={warehouseStock} />
+          <StockLiveAgGrid data={warehouseStock} isDataLoading={isDataLoading} />
         </div>
         <div className="flex items-center justify-end ">
           <PaginationWithoutCount

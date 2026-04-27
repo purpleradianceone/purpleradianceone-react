@@ -8,6 +8,7 @@ import StockAgeingAgGrid from "../ag-grid/StockAgeingAgGrid";
 const StockAgeingList = ({
   stockAgeing,
   paginationData,
+  isDataLoading
 }: StockAgeingListProps) => {
   const { userPreference } = useUserPreference();
 
@@ -35,7 +36,7 @@ const StockAgeingList = ({
               : "ag-theme-balham w-full h-[calc(100vh-192px)]"
           }
         >
-          <StockAgeingAgGrid data={stockAgeing} />
+          <StockAgeingAgGrid data={stockAgeing} isDataLoading={isDataLoading} />
         </div>
         <div className="flex items-center justify-end ">
           <PaginationWithoutCount

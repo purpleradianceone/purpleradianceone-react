@@ -22,9 +22,8 @@ const StockLedgerManagement = () => {
   const [ref, inView] = useInView({ fallbackInView: true, threshold: 0.1 });
 
   const [stockLedger, setStockLedger] = useState<Transaction[]>([]);
-  const { loading: transactionTypeDataLoading, transactionType } =
+  const {  transactionType } =
     useTransactionType();
-  console.log(transactionTypeDataLoading);
 
   const [transactionDate, setTransactionDate] = useState<string>(
     new Date().toISOString().split("T")[0],
@@ -34,6 +33,8 @@ const StockLedgerManagement = () => {
     useState<any>(null);
   const [accessDeniedPopUpOpen, setAccessDeniedPopUpOpen] =
     useState<boolean>(false);
+
+    const [isDataLoading , setIsDataLoading] = useState<boolean>(false);
   useEffect(() => {
     if (!userHasAccessToViewStockLedger) {
       setAccessDeniedPopUpOpen(true);
@@ -79,8 +80,7 @@ const StockLedgerManagement = () => {
         limit: pageSize,
         requestedby_id: loginStatus.id,
       };
-      console.log(selectedTransactionType);
-
+      setIsDataLoading(true)
       await axiosClient
         .post(POST_API.GET_STOCK, postData, {
           signal: signal,
@@ -114,7 +114,11 @@ const StockLedgerManagement = () => {
         })
         .catch(async (error: ApiError | any) => {
           handleApiError(error);
-        });
+        })
+        .finally(()=>{
+          setIsDataLoading(false)
+        })
+        ;
     },
     [
       transactionDate,
@@ -196,6 +200,7 @@ const StockLedgerManagement = () => {
               handleDateChange={handleDateChange}
               transactionDate={transactionDate}
               setCompanyProductId={setCompanyProductId}
+              isDataLoading={isDataLoading}
             />
           </>
         ) : (

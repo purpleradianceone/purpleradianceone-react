@@ -22,6 +22,7 @@ function ProductTeamManagement() {
   const { loginStatus } = useLoggedInUserContext();
   const [ref, inView] = useInView({ fallbackInView: true, threshold: 0.1 });
 
+  const [isDataLoading, setIsDataLoading] = useState<boolean>(false);
 
   const [accessDeniedPopUpOpen, setAccessDeniedPopUpOpen] = useState(
     false
@@ -66,6 +67,7 @@ function ProductTeamManagement() {
         search_parameter_date: concatDate,
       };
 
+      setIsDataLoading(true)
       try {
         const response = await axios.post(
           POST_API.GET_PRODUCTS,
@@ -111,6 +113,8 @@ function ProductTeamManagement() {
            fetchCompanyProducts(signal);
           }
         }
+      }finally{
+        setIsDataLoading(false)
       }
     }
   };
@@ -168,6 +172,7 @@ function ProductTeamManagement() {
 
               }}
               products={productsData}
+              isDataLoading={isDataLoading}
               // isListForProductUser={true}
 
             /> 

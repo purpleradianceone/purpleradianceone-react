@@ -84,6 +84,7 @@ function CompanyProductTeamsModal({
   const [companyProductTeamAddCount, setCompanyProductTeamAddCount] =
     useState<number>(0);
 
+  const [isDataLoading, setIsDataLoading] = useState<boolean>(false)
   // const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
   //   open: false,
   //   message: "",
@@ -367,6 +368,8 @@ function CompanyProductTeamsModal({
         search_parameter: companyTeamsNotAssignedSearchParameter,
         search_parameter_date: "",
       };
+      
+      setIsDataLoading(true)
       const response = await axios.post(
         POST_API.GET_COMPANY_PRODUCT_TEAMS_NOT_ASSIGNED,
         getCompanyTeamsPostData,
@@ -453,6 +456,7 @@ function CompanyProductTeamsModal({
         }
       }
     } finally {
+      setIsDataLoading(false)
       if (companyTeamsNotAssignedSearchParameter.length > 0) {
         setIsCompanyTeamsNotAssignedLoading(false);
         companyTeamsNotAssignedFetchingRef.current = false;
@@ -687,6 +691,7 @@ function CompanyProductTeamsModal({
                       handleCompanyTeamsNotAssignedViewPortChanged
                     }
                     onGridReady={companyTeamsNotAssignedOnGridReady}
+                    isDataLoading={isDataLoading}
                   />
                 
               </div>

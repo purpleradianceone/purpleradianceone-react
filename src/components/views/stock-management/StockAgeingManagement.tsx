@@ -20,6 +20,7 @@ function StockAgeingManagement() {
   const { loginStatus } = useLoggedInUserContext();
   const [ref, inView] = useInView({ fallbackInView: true, threshold: 0.1 });
 
+  const [isDataLoading, setIsDataLoading ] = useState<boolean>(false);
   const [stockAgeing, setStockAgeing] = useState<StockAgeing[]>([]);
   const [accessDeniedPopUpOpen, setAccessDeniedPopUpOpen] =
     useState<boolean>(false);
@@ -53,6 +54,7 @@ function StockAgeingManagement() {
       requestedby_id: loginStatus.id,
     };
 
+    setIsDataLoading (true)
     await axiosClient
       .post(POST_API.GET_STOCK_AGEING, postData, {
         signal: signal,
@@ -84,6 +86,10 @@ function StockAgeingManagement() {
       })
       .catch(async (error: ApiError | any) => {
         handleApiError(error);
+      })
+      .finally(()=>{
+        
+        setIsDataLoading(false)
       });
   };
 
@@ -146,6 +152,7 @@ function StockAgeingManagement() {
                 pageSize,
                 currentPageData,
               }}
+              isDataLoading={isDataLoading}
             />
           </>
         ) : (

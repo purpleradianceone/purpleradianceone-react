@@ -18,6 +18,7 @@ const StockLedgerList = ({
   handleDateChange,
   transactionDate,
   setCompanyProductId,
+  isDataLoading
 }: {
   stockLedger: Transaction[];
   paginationData: any;
@@ -27,6 +28,7 @@ const StockLedgerList = ({
   handleDateChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   transactionDate: string;
   setCompanyProductId: (id: number | null) => void;
+  isDataLoading : boolean
 }) => {
   const { userPreference } = useUserPreference();
   // console.log(stockLedger);
@@ -87,7 +89,7 @@ const StockLedgerList = ({
               : "ag-theme-balham w-full h-[calc(100vh-192px)]"
           }
         >
-          <TransactionAgGrid data={stockLedger} />
+          <TransactionAgGrid data={stockLedger} isDataLoading={isDataLoading} />
         </div>
         <div className="flex items-center justify-end ">
           <PaginationWithoutCount

@@ -40,6 +40,7 @@ function GetCompanyUsersList({
   handleCompanyUserChangeOnEdit,
   isUsedInAccountProductForAssingingInstalledBy,
   onRowSelect,
+  isDataLoading
 }: GetCompanyUsersListProps) {
   const { userPreference } = useUserPreference();
   const [isAccessModalOpen, setIsAccessModalOpen] = useState<boolean>(false);
@@ -382,6 +383,7 @@ function GetCompanyUsersList({
             handleIsDashboardModalOpen={handleIsDashboardModalOpen}
             isActionsTourEnded={isActionsTourEnded}
             handleActionsTourEnd={handleActionsTourEnd}
+            isDataLoading={isDataLoading}
           />
         </div>
         <CompanyUserAccessManagementModalNew

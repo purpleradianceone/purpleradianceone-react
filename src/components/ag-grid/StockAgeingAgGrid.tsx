@@ -2,9 +2,9 @@ import { useMemo } from "react";
 import { AllCommunityModule, ColDef, themeBalham } from "ag-grid-community";
 import StockAgeing from "../../@types/stock/StockAgeing";
 import { AgGridReact } from "ag-grid-react";
-import { INNERHTML } from "../../constants/AppConstants";
+import { SkeletonRowsAgGrid } from "../ui/SkeletonRowsAgGrid";
 
-const StockAgeingAgGrid = ({ data }: { data: StockAgeing[] }) => {
+const StockAgeingAgGrid = ({ data , isDataLoading }: { data: StockAgeing[] , isDataLoading : boolean }) => {
   const columnDefs = useMemo<ColDef[]>(
     () => [
       {
@@ -45,6 +45,12 @@ const StockAgeingAgGrid = ({ data }: { data: StockAgeing[] }) => {
     [],
   );
 
+   const skeletonRows = useMemo(() => {
+    return Array.from({ length: 30 }).map(() => ({
+      __isSkeleton: true,
+    }));
+  }, []);
+
   const defaultColDef = useMemo(() => {
     return {
       filter: "agTextColumnFilter",
@@ -52,6 +58,14 @@ const StockAgeingAgGrid = ({ data }: { data: StockAgeing[] }) => {
       flex: 0.8,
       suppressHeaderMenuButton: true,
       suppressHeaderContextMenu: true,
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            cellRenderer: (params: any) => {
+              if (params.data?.__isSkeleton) {
+                return <SkeletonRowsAgGrid />;
+              }
+              return params.value;
+            },
     };
   }, []);
 
@@ -61,11 +75,11 @@ const StockAgeingAgGrid = ({ data }: { data: StockAgeing[] }) => {
       style={{ height: "100%", width: "100%" }}
     >
       <AgGridReact
-        rowData={data}
+        rowData={ isDataLoading ?skeletonRows : data}
         columnDefs={columnDefs}
         defaultColDef={defaultColDef}
         modules={[AllCommunityModule]}
-        overlayNoRowsTemplate={INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
+        // overlayNoRowsTemplate={INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
         theme={themeBalham}
       />
     </div>

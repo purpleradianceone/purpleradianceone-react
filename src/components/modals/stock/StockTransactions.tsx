@@ -35,6 +35,7 @@ const StockTransactions = ({
   );
 
   const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [isDataLoading, setIsDataLoading] = useState<boolean>(false);
   function handleDateChange(e: ChangeEvent<HTMLInputElement>) {
     e.preventDefault();
     setTransactionDate(e.target.value);
@@ -72,6 +73,7 @@ const StockTransactions = ({
         requestedby_id: loginStatus.id,
       };
 
+      setIsDataLoading(true)
       await axios
         .post(POST_API.GET_STOCK, postData, { withCredentials: true })
         .then((response) => {
@@ -106,6 +108,8 @@ const StockTransactions = ({
               getStockTrasactions(signal);
             }
           }
+        }).finally(()=>{
+          setIsDataLoading(false)
         });
     },
     [transactionDate, formattedDate, currentPage, pageSize, transactionId]
@@ -194,7 +198,7 @@ const StockTransactions = ({
             : "h-[60vh]"
         }`}
       >
-        <TransactionAgGrid data={transactions} />
+        <TransactionAgGrid data={transactions} isDataLoading={isDataLoading} />
       </div>
       <div className="flex items-center justify-end ">
         <PaginationWithoutCount

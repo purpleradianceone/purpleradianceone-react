@@ -52,6 +52,7 @@ function LeadManagementList({
   handleLeadSelectedSource,
   isUsedInLeadModule,
   handleRowSelectedForShowAccountLead,
+  isLoading
 }: LeadManagementListProps) {
   const navigate = useNavigate();
   const { position } = usePanel();
@@ -380,6 +381,7 @@ function LeadManagementList({
               onRowSelect={handleRowSelectedForShowLead}
               handleLeadDataFormChange={handleLeadDataFormChange}
               leads={leadData}
+              isLoadingData ={isLoading}
             />
           </div>
           <CreateLeadModal

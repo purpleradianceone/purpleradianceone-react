@@ -25,6 +25,7 @@ const StockManagementList = ({
   paginationData,
   searchParameter,
   handleSearchParameterChange,
+  isDataLoading
 }: StockManagementListProps) => {
   const { userPreference } = useUserPreference();
   const { userHasAccessToAddStock } = useUserAccessModules();
@@ -159,6 +160,7 @@ const StockManagementList = ({
           <StockLiveForCompanyProductAgGrid
             data={liveStockForCompanyProduct}
             onRowSelect={handleSelectedStockLiveForCompanyProduct}
+            isDataLoading={isDataLoading}
             // handleRowClick={}
           />
         </div>

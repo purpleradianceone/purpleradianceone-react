@@ -5,10 +5,12 @@ import { AgGridReact } from "ag-grid-react";
 import React, { useMemo } from "react";
 import Transaction from "../../@types/stock/Transaction";
 import StatusIndicator from "../ui/StatusIndicator";
+import { SkeletonRowsAgGrid } from "../ui/SkeletonRowsAgGrid";
 
 const TransactionAgGrid: React.FC<{
   data: Transaction[];
-}> = ({ data }) => {
+  isDataLoading : boolean
+}> = ({ data  , isDataLoading}) => {
   //     count : number,
   // id : number,
   // companyProductId : number,
@@ -49,6 +51,10 @@ const TransactionAgGrid: React.FC<{
         field: "isInward",
         headerName: "Inward ",
         cellRenderer: (params: any) => {
+          if (params.data?.__isSkeleton) {
+                return <SkeletonRowsAgGrid />;
+              }
+              
           return (
             <div className="flex items-center gap-1">
               <StatusIndicator
@@ -82,6 +88,12 @@ const TransactionAgGrid: React.FC<{
     [],
   );
 
+  const skeletonRows = useMemo(() => {
+    return Array.from({ length: 30 }).map(() => ({
+      __isSkeleton: true,
+    }));
+  }, []);
+
   const defaultColDef = useMemo(() => {
     return {
       filter: "agTextColumnFilter",
@@ -89,6 +101,13 @@ const TransactionAgGrid: React.FC<{
       flex: 0.8,
       suppressHeaderMenuButton: true,
       suppressHeaderContextMenu: true,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            cellRenderer: (params: any) => {
+              if (params.data?.__isSkeleton) {
+                return <SkeletonRowsAgGrid />;
+              }
+              return params.value;
+            },
     };
   }, []);
   return (
@@ -97,7 +116,7 @@ const TransactionAgGrid: React.FC<{
       style={{ height: "100%", width: "100%" }}
     >
       <AgGridReact
-        rowData={data}
+        rowData={ isDataLoading  ? skeletonRows :data}
         columnDefs={columnDefs}
         defaultColDef={defaultColDef}
         modules={[AllCommunityModule]}

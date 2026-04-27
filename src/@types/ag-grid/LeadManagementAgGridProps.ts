@@ -9,7 +9,8 @@ type LeadManagementAgGridProps = {
     onRowSelect : (data :LeadDataProps | any ) =>void,
     handleLeadDataFormChange : (data: LeadDataProps) => void,
     handleRowClick : (event : any) => void;
-    isUsedInLeadModule : boolean
+    isUsedInLeadModule : boolean;
+    isLoadingData : boolean
 }
 
 export default LeadManagementAgGridProps;

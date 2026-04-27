@@ -125,9 +125,9 @@ const AccountManagement: React.FC = () => {
       <div className="bg-white col-span-2 rounded-md border p-1 border-slate-200">
         {activeTab === "product" && (
           <>
-            <h3 className="bg-gray-100 table-header-custom rounded-t-md px-2">
+            {/* <h3 className="bg-gray-100 table-header-custom rounded-t-md px-2">
               Product Details
-            </h3>
+            </h3> */}
             <AccountCompanyProduct accountId={company!.id} />
           </>
         )}

@@ -2,16 +2,17 @@
 import { AllCommunityModule, ColDef, themeBalham } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 import { useMemo, useRef } from "react";
-import { INNERHTML, JSX_CHILDREN_NAME } from "../../constants/AppConstants";
+import { JSX_CHILDREN_NAME } from "../../constants/AppConstants";
 import LeadManagementAgGridProps from "../../@types/ag-grid/LeadManagementAgGridProps";
 import LeadDataProps from "../../@types/lead-management/LeadProps";
+import { SkeletonRowsAgGrid } from "../ui/SkeletonRowsAgGrid";
 
 function LeadManagementAgGrid({
   leads,
   onRowSelect, //selected user for view lead details
   handleRowClick,
   isUsedInLeadModule,
-  
+  isLoadingData,
 }: LeadManagementAgGridProps) {
   const gridRef = useRef<AgGridReact>(null); // Ref to the AgGridReact component
 
@@ -66,13 +67,13 @@ function LeadManagementAgGrid({
         sortable: true,
         filter: true,
       },
-        {
+      {
         field: "countryName",
         headerName: "Country",
         sortable: true,
         filter: true,
       },
-       {
+      {
         field: "stateName",
         headerName: "State",
         sortable: true,
@@ -85,7 +86,6 @@ function LeadManagementAgGrid({
         filter: true,
       },
 
-     
       {
         field: "leadDetailAddress",
         headerName: "Address",
@@ -140,6 +140,11 @@ function LeadManagementAgGrid({
         // autoHeight: true,
         // suppressSizeToFit: true,
         cellRenderer: (params: LeadDataProps | any) => {
+           if (params.data?.__isSkeleton) {
+          return (
+            <SkeletonRowsAgGrid/>
+          );
+        }
           return (
             <div className="flex items-center justify-center  ">
               <span
@@ -148,18 +153,35 @@ function LeadManagementAgGrid({
                   params.context.handleRowSelect(params.data);
                 }}
               >
-                
-                {
-                  isUsedInLeadModule ? "Details": "Select"
-                }
+                {isUsedInLeadModule ? "Details" : "Select"}
               </span>
             </div>
           );
         },
       },
     ],
-    []
+    [],
   );
+
+  const skeletonRows = useMemo(() => {
+    return Array.from({ length: 30 }).map(() => ({
+      name: "",
+      email: "",
+      mobileNumber: "",
+      leadOwner: "",
+      leadStatus: "",
+      leadSource: "",
+      countryName: "",
+      stateName: "",
+      districtName: "",
+      leadDetailAddress: "",
+      createdBy: "",
+      createdOn: "",
+      updatedBy: "",
+      updatedOn: "",
+      __isSkeleton: true,
+    }));
+  }, []);
 
   const defaultColDef = useMemo(
     () => ({
@@ -168,8 +190,17 @@ function LeadManagementAgGrid({
       flex: 0.8,
       suppressHeaderMenuButton: true,
       suppressHeaderContextMenu: true,
+
+      cellRenderer: (params: any) => {
+        if (params.data?.__isSkeleton) {
+          return (
+            <SkeletonRowsAgGrid/>
+          );
+        }
+        return params.value;
+      },
     }),
-    []
+    [],
   );
 
   return (
@@ -179,14 +210,13 @@ function LeadManagementAgGrid({
     >
       <AgGridReact
         ref={gridRef} // Attach the ref
-        rowData={leads}
+        rowData={isLoadingData ? skeletonRows : leads}
         columnDefs={columnDefs}
         defaultColDef={defaultColDef}
         modules={[AllCommunityModule]}
         theme={themeBalham}
-        overlayNoRowsTemplate={INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
-        context={{ handleRowSelect: onRowSelect }}
-        onRowClicked={handleRowClick}
+        context={{ handleRowSelect: isLoadingData ? undefined : onRowSelect }}
+        onRowClicked={isLoadingData ? undefined : handleRowClick}
       />
     </div>
   );
