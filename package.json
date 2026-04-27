@@ -43,6 +43,7 @@
     "jodit-react": "^5.3.21",
     "jwt-decode": "^4.0.0",
     "lexical": "^0.31.2",
+    "localforage": "^1.10.0",
     "lodash": "^4.17.21",
     "lucide-react": "^0.344.0",
     "moment": "^2.30.1",
