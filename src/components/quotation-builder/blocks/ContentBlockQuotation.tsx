@@ -69,7 +69,7 @@ export const ContentBlockQuotation: React.FC = () => {
     () =>
       ({
         readonly: false,
-        height: 300,
+        height: 90,
         toolbarAdaptive: false,
         toolbarSticky: true,
         showCharsCounter: false,
@@ -94,6 +94,9 @@ export const ContentBlockQuotation: React.FC = () => {
 
         style: {
           font: true,
+
+          // for tabs below 1
+          tabSize: 4,
         },
         //Fix end
 
@@ -150,6 +153,65 @@ export const ContentBlockQuotation: React.FC = () => {
           insertImageAsBase64URI: true,
         },
 
+        events: {
+          afterInit: (editor: any) => {
+            const MIN_HEIGHT = 90;
+
+            const autoResize = () => {
+              requestAnimationFrame(() => {
+                const content = editor.editor;
+
+                // Reset first so shrink also works
+                content.style.height = "auto";
+
+                const contentHeight = content.scrollHeight;
+                const toolbarHeight =
+                  editor.toolbar?.container?.offsetHeight || 0;
+
+                const finalHeight = Math.max(
+                  MIN_HEIGHT,
+                  contentHeight + toolbarHeight + 20,
+                );
+
+                editor.container.style.height = finalHeight + "px";
+                editor.workplace.style.height =
+                  finalHeight - toolbarHeight + "px";
+
+                content.style.height = finalHeight - toolbarHeight + "px";
+              });
+            };
+
+            // Initial height when edit mode opens
+            setTimeout(autoResize, 100);
+
+            // Resize only when layout/content actually changes
+            editor.e.on("paste", () => setTimeout(autoResize, 50));
+            editor.e.on("mouseup", autoResize);
+
+            // ===============================
+            // FINAL TAB SUPPORT (MULTIPLE TABS)
+            // ===============================
+            editor.editor.addEventListener("keydown", (e: KeyboardEvent) => {
+              if (e.key === "Tab") {
+                e.preventDefault();
+                e.stopPropagation();
+
+                editor.s.focus();
+
+                // each Tab press inserts 4 preserved spaces
+                // multiple tabs supported
+                editor.execCommand(
+                  "insertHTML",
+                  false,
+                  '<span style="white-space:nowrap;">&nbsp;&nbsp;&nbsp;&nbsp;</span>',
+                );
+
+              }
+              setTimeout(autoResize, 0);
+            });
+          },
+        },
+
         disablePlugins: ["file", "video", "about", "clipboard"],
         placeholder: "Enter quotation text...",
       }) as any,
@@ -195,8 +257,8 @@ export const ContentBlockQuotation: React.FC = () => {
     <div
       ref={(ref) => ref && (!editing ? connect(drag(ref)) : connect(ref))}
       style={{
-        minHeight: "120px",
-        padding: "16px",
+        minHeight: "60px",
+        padding: "4px",
         width: "100%",
         backgroundColor: "#fafafa",
         borderTop: "1px dashed #ddd",
@@ -254,7 +316,8 @@ export const ContentBlockQuotation: React.FC = () => {
       ) : (
         <div
           dangerouslySetInnerHTML={{
-            __html: props.htmlContent || "<em>Click edit to add text</em>",
+            __html:
+              props.htmlContent || "<em>Click 'Edit Content' to add text</em>",
           }}
           style={{ wordBreak: "break-word" }}
         />
@@ -267,11 +330,10 @@ export const ContentBlockQuotation: React.FC = () => {
 (ContentBlockQuotation as any).craft = {
   displayName: "Content Block Text",
   props: {
-    htmlContent: "<p>Your quotation text</p>",
+    htmlContent: "",
   },
   rules: {
     canMoveIn: () => false,
     canMoveOut: () => true,
   },
 };
-
