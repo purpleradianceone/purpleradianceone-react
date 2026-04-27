@@ -25,13 +25,24 @@ export const useGoogleMeetStatus = () => {
           validateGoogleMeetConnectionPostData,
           {
             withCredentials: true,
-          }
+          },
         )
         .then((response) => {
           if (response.status === STATUS_CODE.OK) {
-            setGoogleMeetStatus({
-              isConnected: response.data.status,
-            });
+            console.log(response.data);
+            const data = response.data?.[0];
+
+            if (data) {
+              setGoogleMeetStatus({
+                isConnected: data.isactive,
+                email: data.gmail_address,
+              });
+            } else {
+              setGoogleMeetStatus({
+                isConnected: false,
+                email: undefined,
+              });
+            }
           }
         })
         .catch(async (error: ApiError | any) => {

@@ -69,7 +69,7 @@ export const LookupAccountDropdown = ({
   return (
     <div className="w-full">
       <div className="flex gap-1">
-        {icon && <span className="text-blue-500">{icon}</span>}
+        {icon && <span className="text-blue-500 mt-0.5">{icon}</span>}
         <label className="block input-label-custom">{label}</label>
       </div>
       <Select
