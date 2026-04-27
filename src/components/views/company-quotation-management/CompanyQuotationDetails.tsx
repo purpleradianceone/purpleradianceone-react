@@ -93,7 +93,8 @@ function CompanyQuotationDetails() {
   const fromCreatePage = searchParams.get("fromCreatePage");
 
   const {
-    userHasAccessToAddCompanyQuotation,
+    userHasAccessToAddLeadQuotation,
+    userHasAccessToAddAccountQuotation,
     userHasAccessToViewCompanyQuotation,
     userHasAccessToUpdateCompanyQuotation,
   } = useUserAccessModules();
@@ -530,8 +531,14 @@ function CompanyQuotationDetails() {
   
 
   const handleCreateQuotation = async () => {
-    if (!userHasAccessToAddCompanyQuotation) {
-      toast.error(MESSAGE.MODULE_ACCESS.COMPANY_QUOTATION.DENIED_ADD_ACCESS);
+
+
+    if (selectedQuotationType.id === 1 && (!userHasAccessToAddLeadQuotation)) {
+      toast.error(MESSAGE.MODULE_ACCESS.LEAD_QUOTATION.DENIED_ADD_ACCESS);
+      return;
+    }
+    if (selectedQuotationType.id === 2 && (!userHasAccessToAddAccountQuotation)) {
+      toast.error(MESSAGE.MODULE_ACCESS.ACCOUNT_QUOTATION.DENIED_ADD_ACCESS);
       return;
     }
     if (selectedQuotationType.id === 1) {

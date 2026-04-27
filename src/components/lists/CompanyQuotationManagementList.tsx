@@ -47,8 +47,10 @@ function CompanyQuotationManagementList({
   const navigate = useNavigate();
   const { userPreference } = useUserPreference();
   const {
-    userHasAccessToViewCompanyInvoice,
-    userHasAccessToAddCompanyInvoice,
+    userHasAccessToViewCompanyQuotation,
+    userHasAccessToAddCompanyQuotation,
+    userHasAccessToAddLeadQuotation,
+    userHasAccessToAddAccountQuotation,
   } = useUserAccessModules();
   const { loginStatus } = useLoggedInUserContext();
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
@@ -182,7 +184,7 @@ function CompanyQuotationManagementList({
     setIsCustomDateOptionSelected,
   ]);
 
-  if (userHasAccessToViewCompanyInvoice) {
+  if (userHasAccessToViewCompanyQuotation) {
     const selectedDateName =
       dateRangeDropdownOptions.find(
         (o) => o.search_date_range_id === handleSearchOption.dateRangeId,
@@ -257,9 +259,9 @@ function CompanyQuotationManagementList({
             {/* RIGHT */}
             <div>
               <Button
-                disabled={!userHasAccessToAddCompanyInvoice}
+                disabled={!userHasAccessToAddCompanyQuotation}
                 onClick={() => {
-                  if (!userHasAccessToAddCompanyInvoice) {
+                  if (!userHasAccessToAddCompanyQuotation) {
                     toast.error(
                       MESSAGE.MODULE_ACCESS.COMPANY_QUOTATION.DENIED_ADD_ACCESS,
                     );
@@ -330,12 +332,14 @@ function CompanyQuotationManagementList({
                 <div className="flex gap-1 justify-end w-fit">
                   <Button
                     type="button"
-                    disabled={!userHasAccessToAddCompanyInvoice}
+                    disabled={!(isUsedFor === Modules.LEAD_QUOTATION?userHasAccessToAddLeadQuotation:(isUsedFor === Modules.AMC_QUOTATION? userHasAccessToAddAccountQuotation :userHasAccessToAddCompanyQuotation))
+                    }
                     onClick={() => {
-                      if (!userHasAccessToAddCompanyInvoice) {
+                      if (!(isUsedFor === Modules.LEAD_QUOTATION?userHasAccessToAddLeadQuotation:(isUsedFor === Modules.AMC_QUOTATION? userHasAccessToAddAccountQuotation :userHasAccessToAddCompanyQuotation))) {
                         toast.error(
+                          isUsedFor === Modules.LEAD_QUOTATION?
                           MESSAGE.MODULE_ACCESS.LEAD_QUOTATION
-                            .DENIED_ADD_ACCESS,
+                            .DENIED_ADD_ACCESS:(isUsedFor === Modules.AMC_QUOTATION? MESSAGE.MODULE_ACCESS.ACCOUNT_QUOTATION.DENIED_ADD_ACCESS: MESSAGE.MODULE_ACCESS.COMPANY_QUOTATION.DENIED_ADD_ACCESS)
                         );
                         return;
                       }
