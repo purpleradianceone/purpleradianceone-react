@@ -13,12 +13,14 @@ import { LocalStorageKeys } from "../../../../enums/LocalStorageKeys";
 import POST_API from "../../../../constants/PostApi";
 import { STATUS_CODE } from "../../../../constants/AppConstants";
 import { useUserAccessModules } from "../../../../config/hooks/useAccessModules";
-import AccessDeniedPopup from "../../../views/not-found/AccessDeniedPage";
+// import AccessDeniedPopup from "../../../views/not-found/AccessDeniedPage";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
 import AccountInvoiceProps from "../../../../@types/account/AccountInvoiceProps";
 import AccountInvoiceManagementList from "../../../lists/AccountInvoiceManagementList";
 import { handleApiError } from "../../../../config/error/handleApiError";
 import useInvoiceStatus from "../../../../config/hooks/useInvoiceStatus";
+import AccessDeniedMessagePage from "../../../views/not-found/AccessDeniedMessagePage";
+import MESSAGE from "../../../../constants/Messages";
 
 function AccountInvoice({
   account,
@@ -29,9 +31,9 @@ function AccountInvoice({
 }) {
   //   console.log(account);
 
-  const { userHasAccessToViewCompanyInvoice } = useUserAccessModules();
+  const { userHasAccessToViewCompanyInvoiceDraft } = useUserAccessModules();
   const { invoiceStatus } = useInvoiceStatus();
-  const [accessDeniedPopUpOpen, setAccessDeniedPopUpOpen] = useState(false);
+  // const [accessDeniedPopUpOpen, setAccessDeniedPopUpOpen] = useState(false);
 
   const [invoiceData, setInvoiceData] = useState<AccountInvoiceProps[]>([]);
   const { loginStatus } = useLoggedInUserContext();
@@ -68,6 +70,7 @@ function AccountInvoice({
 
   // 🔥 API CALL
   const getInvoices = async (signal: AbortSignal) => {
+    if (!userHasAccessToViewCompanyInvoiceDraft) return;
     if (dateRangeId === customDateRangeId && concatDate.trim() === "") return;
 
     const offset = (currentPage - 1) * pageSize;
@@ -158,11 +161,11 @@ function AccountInvoice({
   ]);
 
   //   🔒 Access Control
-  useEffect(() => {
-    if (!userHasAccessToViewCompanyInvoice) {
-      setAccessDeniedPopUpOpen(true);
-    }
-  }, [userHasAccessToViewCompanyInvoice]);
+  // useEffect(() => {
+  //   if (!userHasAccessToViewCompanyInvoice) {
+  //     setAccessDeniedPopUpOpen(true);
+  //   }
+  // }, [userHasAccessToViewCompanyInvoice]);
 
   // 💾 Save filters
   useEffect(() => {
@@ -211,7 +214,7 @@ function AccountInvoice({
         animate={inView ? { opacity: 1, y: 0 } : {}}
         transition={{ duration: 0.4, ease: "easeOut" }}
       >
-        {userHasAccessToViewCompanyInvoice ? (
+        {userHasAccessToViewCompanyInvoiceDraft ? (
           <AccountInvoiceManagementList
             handleAddInvoice={handleAddInvoice}
             handleSearchOption={{
@@ -241,14 +244,12 @@ function AccountInvoice({
             isUsedForSidebar={isUsedForSidebar}
           />
         ) : (
-          <div className="flex-none mx-96 mt-14">
-            <AccessDeniedPopup
-              isOpen={accessDeniedPopUpOpen}
-              onClose={() => {
-                setAccessDeniedPopUpOpen(false);
-                window.history.back();
-              }}
-            />
+          <div
+            className={`flex  ${isUsedForSidebar ? "h-[85vh]" : "h-[40vh]"} justify-center items-center`}
+          >
+            <AccessDeniedMessagePage
+              message={MESSAGE.MODULE_ACCESS.COMPANY_INVOICE.DENIED_VIEW_ACCESS}
+            ></AccessDeniedMessagePage>
           </div>
         )}
       </motion.section>

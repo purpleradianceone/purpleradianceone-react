@@ -49,7 +49,7 @@ function AccountInvoiceManagementList({
   const { userPreference } = useUserPreference();
   const {
     userHasAccessToViewCompanyInvoice,
-    userHasAccessToAddCompanyInvoice,
+    userHasAccessToAddCompanyInvoiceDraft,
   } = useUserAccessModules();
   const { loginStatus } = useLoggedInUserContext();
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
@@ -241,7 +241,10 @@ function AccountInvoiceManagementList({
             {/* LEFT */}
             <div className="flex items-center gap-2 flex-wrap">
               {/* 🔹 Title */}
-              <ComponentHeaderAndLogo logo={FaRegFileAlt} headerText="Invoices" />
+              <ComponentHeaderAndLogo
+                logo={FaRegFileAlt}
+                headerText="Invoices"
+              />
               {/* 🔹 Search */}
               <div className="w-fit min-w-[120px]">
                 <SearchInput
@@ -286,9 +289,9 @@ function AccountInvoiceManagementList({
             {/* RIGHT */}
             <div>
               <Button
-                disabled={!userHasAccessToAddCompanyInvoice}
+                disabled={!userHasAccessToAddCompanyInvoiceDraft}
                 onClick={() => {
-                  if (!userHasAccessToAddCompanyInvoice) {
+                  if (!userHasAccessToAddCompanyInvoiceDraft) {
                     toast.error(
                       MESSAGE.MODULE_ACCESS.COMPANY_INVOICE.DENIED_ADD_ACCESS,
                     );
@@ -361,9 +364,9 @@ function AccountInvoiceManagementList({
                 <div className="flex gap-1 justify-end w-fit">
                   <Button
                     type="button"
-                    disabled={!userHasAccessToAddCompanyInvoice}
+                    disabled={!userHasAccessToAddCompanyInvoiceDraft}
                     onClick={() => {
-                      if (!userHasAccessToAddCompanyInvoice) {
+                      if (!userHasAccessToAddCompanyInvoiceDraft) {
                         toast.error(
                           MESSAGE.MODULE_ACCESS.COMPANY_INVOICE
                             .DENIED_ADD_ACCESS,

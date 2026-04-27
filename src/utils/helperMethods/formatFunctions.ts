@@ -8,7 +8,7 @@ export const formatRupee = (
 
   return num.toLocaleString("en-IN", {
     // minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
+    maximumFractionDigits: 4,
   });
 };
 

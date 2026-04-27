@@ -62,9 +62,13 @@ function CompanyInvoiceDetails() {
     userHasAccessToUpdateCompanyInvoiceApproval,
     userHasAccessToUpdateCompanyInvoice,
     userHasAccessToViewCompanyInvoice,
+    userHasAccessToAddCompanyInvoiceDraft,
+    userHasAccessToViewCompanyInvoiceDraft,
+    userHasAccessToUpdateCompanyInvoiceDraft,
   } = useUserAccessModules();
 
   const getInvoices = async (signal: AbortSignal) => {
+    if (!userHasAccessToViewCompanyInvoiceDraft) return;
     setInvoiceLoading(true);
     const postData = {
       id: Number(invoiceId),
@@ -133,6 +137,12 @@ function CompanyInvoiceDetails() {
   console.log(disabled);
 
   const getInvoiceItems = async (signal: AbortSignal) => {
+    if (
+      !invoiceId ||
+      Number(invoiceId) === 0 ||
+      !userHasAccessToViewCompanyInvoiceItem
+    )
+      return;
     setItemsLoading(true);
     const postData = {
       company_id: loginStatus.companyId,
@@ -306,7 +316,7 @@ function CompanyInvoiceDetails() {
     if (disabled) {
       return;
     }
-    if (!userHasAccessToUpdateCompanyInvoice) return;
+    if (!userHasAccessToUpdateCompanyInvoiceDraft) return;
     const postData = {
       id: invoice.id,
       company_id: loginStatus.companyId,
@@ -512,6 +522,7 @@ function CompanyInvoiceDetails() {
   };
 
   const handleSaveInvoice = async () => {
+    if (!userHasAccessToAddCompanyInvoiceDraft) return;
     if (!selectedAccount) {
       toast.error("Please select an account");
       return;
@@ -604,7 +615,7 @@ function CompanyInvoiceDetails() {
 
   return (
     <PageLayout onScrollChange={setShowAccountName} scrollTopValue={80}>
-      <div className="p-1 font-roboto">
+      <div className="font-roboto">
         {isSubmitting && <LoadingPopUpAnimation show={isSubmitting} />}
         {/* HEADER */}
 
@@ -612,7 +623,7 @@ function CompanyInvoiceDetails() {
           <InvoiceHeaderSkeleton />
         ) : (
           <>
-            <div className=" sticky top-0 z-10 bg-slate-100 flex text-center justify-start items-center gap-3 ml-0.5 ">
+            <div className=" sticky top-0 z-10  bg-slate-100 flex text-center justify-start items-center gap-3 ml-0.5 ">
               <Link to={ROUTES_URL.INVOICE_MANAGEMENT}>
                 <Button className="caption-custom flex items-center justify-center hover:text-gray-800">
                   Invoice
@@ -730,7 +741,14 @@ function CompanyInvoiceDetails() {
 
                 {/* Save Button */}
                 <div className="">
-                  <Button onClick={handleSaveInvoice}>
+                  <Button
+                    disabled={
+                      !selectedAccount ||
+                      isSubmitting ||
+                      !userHasAccessToAddCompanyInvoiceDraft
+                    }
+                    onClick={handleSaveInvoice}
+                  >
                     {isSubmitting ? "Creating..." : "Create invoice"}
                   </Button>
                 </div>
@@ -987,17 +1005,21 @@ function CompanyInvoiceDetails() {
                                 </td>
                                 <td>{formatRupee(item.taxableValue)}</td>
                                 <td>
-                                  {formatRupee(item.cgstAmount)} ({item.cgstPercent}%)
+                                  {formatRupee(item.cgstAmount)} (
+                                  {item.cgstPercent}%)
                                 </td>
                                 <td>
-                                  {formatRupee(item.sgstAmount)} ({item.sgstPercent}%)
+                                  {formatRupee(item.sgstAmount)} (
+                                  {item.sgstPercent}%)
                                 </td>
                                 <td>
-                                  {formatRupee(item.igstAmount)} ({item.igstPercent}%)
+                                  {formatRupee(item.igstAmount)} (
+                                  {item.igstPercent}%)
                                 </td>
                                 {hasCess && (
                                   <td>
-                                    {formatRupee(item.cessAmount)} ({item.cessPercent}%)
+                                    {formatRupee(item.cessAmount)} (
+                                    {item.cessPercent}%)
                                   </td>
                                 )}
                                 <td>{formatRupee(item.totalAmount)}</td>

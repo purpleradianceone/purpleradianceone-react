@@ -6,28 +6,33 @@ import Button from "../../../ui/Button";
 import GoogleMeetIcon from "../../../../assets/svg/GoogleMeetIcon";
 import ZoomMeetingsIcon from "../../../../assets/svg/ZoomMeetingsIcon";
 import TeamsIcon from "../../../../assets/svg/TeamsIcon";
-import useGoogleMeetSetting from "../../../../config/hooks/useGoogleMeetSetting";
+import { useGoogleMeetContext } from "../../../../context/meeting/GoogleMeetContext";
+import { useGoogleMeetStatus } from "../../../../config/hooks/useGoogleMeetStatus";
+import { useZoomMeetingsStatus } from "../../../../config/hooks/useZoomMeetingsStatus";
+import { Mail } from "lucide-react";
 
 function MeetingSettings() {
-  // const { googleMeetStatus } = useGoogleMeetContext();
-  const { GoogleMeetStatus, googleMeetSetting } = useGoogleMeetSetting();
+  useGoogleMeetStatus();
+  useZoomMeetingsStatus();
+
+  const { googleMeetStatus } = useGoogleMeetContext();
   const { zoomMeetingStatus } = useZoomMeetingContext();
   const navigate = useNavigate();
-  console.log(GoogleMeetStatus);
+  console.log(googleMeetStatus, zoomMeetingStatus);
 
   const meetingSettings = [
     {
       id: 1,
       name: "Connect to Google Meet",
-      mail: googleMeetSetting?.gmail_address,
-      isConnected: GoogleMeetStatus,
+      mail: googleMeetStatus.email,
+      isConnected: googleMeetStatus.isConnected,
       icon: <GoogleMeetIcon className="w-6 h-6 text-green-500" />,
       iconBg: "bg-green-50",
     },
     {
       id: 2,
       name: "Connect to Zoom Meetings",
-      mail: "",
+      mail: zoomMeetingStatus.email,
       isConnected: zoomMeetingStatus.isConnected,
       icon: <ZoomMeetingsIcon className="w-6 h-6 text-blue-500" />,
       iconBg: "bg-blue-50",
@@ -35,7 +40,7 @@ function MeetingSettings() {
     {
       id: 3,
       name: "Connect to Microsoft Teams",
-      mail: "",
+      mail: zoomMeetingStatus.email,
       isConnected: false,
       icon: <TeamsIcon className="w-6 h-6 text-purple-500" />,
       iconBg: "bg-purple-50",
@@ -53,10 +58,16 @@ function MeetingSettings() {
             <div className={`${platform.iconBg} p-3 rounded-full`}>
               {platform.icon}
             </div>
-            <div>
+            <div className="flex flex-col">
               <h3 className="table-header-custom">{platform.name}</h3>
+              {platform.isConnected && platform.mail && (
+                <p className="text-xs flex items-center gap-1 text-gray-500 mt-1">
+                  <Mail size={12} color="red" />
+                  Connected as:{" "}
+                  <span className="font-medium">{platform.mail}</span>
+                </p>
+              )}
             </div>
-           
           </div>
 
           <div className="min-w-32">
@@ -66,7 +77,7 @@ function MeetingSettings() {
                 disabled={platform.isConnected}
                 onClick={(e) => {
                   e.preventDefault();
-                  if (platform.id === 1 && !GoogleMeetStatus) {
+                  if (platform.id === 1 && !googleMeetStatus.isConnected) {
                     navigate(ROUTES_URL.GOOGLE_OAUTH);
                   } else if (
                     platform.id === 2 &&
