@@ -35,6 +35,7 @@ function AccountManagementList({
   isUsedForAccountLead,
   handleRowSelectedForLead,
   isUsedForSupportTicketCreation,
+  isDataLoading
 }: {
   // fetchAccounts: () => Promise<void>;
   accounts: Account[];
@@ -46,6 +47,7 @@ function AccountManagementList({
   isUsedForAccountLead: boolean;
   handleRowSelectedForLead?: (data: Account | any) => void;
   isUsedForSupportTicketCreation?: boolean;
+  isDataLoading : boolean
 }) {
   const navigate = useNavigate();
   const { position } = usePanel();
@@ -251,6 +253,7 @@ function AccountManagementList({
             handleRowClick={handleOnRowClick}
             onRowSelect={handleRowSelectedToShowAccountDetails}
             isUsedForAccountLead={isUsedForAccountLead}
+            isDataLoading={isDataLoading}
           />
         </div>
       </div>

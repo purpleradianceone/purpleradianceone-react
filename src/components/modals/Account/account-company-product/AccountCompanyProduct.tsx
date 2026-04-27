@@ -301,8 +301,15 @@ const AccountCompanyProduct = ({
       ) : accountCompanyProduct.length === 0 &&
         !isLoadingAccountCompanyProduct &&
         !hasError ? (
+          <>
+           <h3 className="bg-gray-100 table-header-custom rounded-t-md px-2">
+              Product Details
+            </h3>
+         
         <div className="flex items-center justify-center w-full   h-full">
+         
           <div className="flex gap-1 w-full text-xs  h-16 bg-green-0 py-3 items-center justify-center">
+            
             <Link
               to={ROUTES_URL.ACCOUNT_MULTIPLE_COMPANY_PRODUCT}
               state={{
@@ -349,10 +356,13 @@ const AccountCompanyProduct = ({
             <span className="italic caption-custom">No data available.</span>
           </div>
         </div>
+         </>
       ) : (
-        <div className="grid grid-cols-2 gap-1 w-full">
-          <div className="col-span-2 flex justify-end p-0.5">
-            <Link
+        <div className="w-full ">
+         <div className="w-full flex justify-between bg-gray-100 table-header-custom  rounded-t-md p-1">
+              Product Details
+
+              <Link
               to={ROUTES_URL.ACCOUNT_MULTIPLE_COMPANY_PRODUCT}
               state={{
                 assignProducts: true,
@@ -388,6 +398,13 @@ const AccountCompanyProduct = ({
                 +Add
               </Button>
             </Link>
+            </div>
+       
+        <div className="grid grid-cols-2  w-full">
+         
+          <div className="col-span-2 flex justify-end p-0.5">
+            
+            
           </div>
           <div className="col-span-2  w-full h-56">
             <AccountCompanyProductAgGrid
@@ -410,6 +427,7 @@ const AccountCompanyProduct = ({
             selectedProductForAMC={selectedProductForAMC} // 👈 NEW PROP
           />
         </div>
+         </div>
       )}
 
       {/* {selectedProductCard && (

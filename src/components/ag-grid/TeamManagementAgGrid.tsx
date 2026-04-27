@@ -2,8 +2,8 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import { AllCommunityModule, ColDef, themeBalham } from "ag-grid-community";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { INNERHTML, JSX_CHILDREN_NAME } from "../../constants/AppConstants";
-import {  ReceiptText, } from "lucide-react";
+import {  JSX_CHILDREN_NAME } from "../../constants/AppConstants";
+import { ReceiptText } from "lucide-react";
 import { AgGridReact } from "ag-grid-react";
 import { createPortal } from "react-dom";
 import { useUserAccessModules } from "../../config/hooks/useAccessModules";
@@ -11,6 +11,7 @@ import ActionsDropdownButton from "../ui/ActionsDropdownButton";
 import { CLASS_NAMES } from "../../constants/ClassNames";
 import TeamManagementAgGridProps from "../../@types/ag-grid/TeamManagementAgGridProps";
 import StatusIndicator from "../ui/StatusIndicator";
+import { SkeletonRowsAgGrid } from "../ui/SkeletonRowsAgGrid";
 
 function TeamManagementAgGrid({
   companyTeamList,
@@ -21,8 +22,9 @@ function TeamManagementAgGrid({
   handleCompanyTeamCheckboxChange,
   handleViewPortChanged,
   onGridReady,
+  isDataLoading,
 }: TeamManagementAgGridProps) {
-  const {   userHasAccessToViewTeamManagement } = useUserAccessModules();
+  const { userHasAccessToViewTeamManagement } = useUserAccessModules();
 
   const columnDefs = useMemo<ColDef[]>(
     () => [
@@ -32,7 +34,7 @@ function TeamManagementAgGrid({
         sortable: true,
         filter: true,
         flex: 1,
-        cellClass: "font-bold text-gray-800  px-2 py-1 rounded"
+        cellClass: "font-bold text-gray-800  px-2 py-1 rounded",
       },
       {
         headerName: "Team Description",
@@ -51,9 +53,12 @@ function TeamManagementAgGrid({
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         cellRenderer: (params: any) => {
+          if (params.data?.__isSkeleton) {
+          return <SkeletonRowsAgGrid />;
+        }
           return (
             <div className="flex items-center gap-1">
-              <StatusIndicator isActive={params.value}/>
+              <StatusIndicator isActive={params.value} />
             </div>
           );
         },
@@ -79,6 +84,9 @@ function TeamManagementAgGrid({
         pinned: "right",
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         cellRenderer: (params: any) => {
+          if (params.data?.__isSkeleton) {
+          return <SkeletonRowsAgGrid />;
+        }
           const [isActionsDropDownOpen, setIsActionsDropDownOpen] =
             useState(false);
           const [position, setPosition] = useState({
@@ -122,12 +130,12 @@ function TeamManagementAgGrid({
 
             document.addEventListener(
               "mousedown",
-              handleClickOutsideActionsDropDown
+              handleClickOutsideActionsDropDown,
             );
             return () =>
               document.removeEventListener(
                 "mousedown",
-                handleClickOutsideActionsDropDown
+                handleClickOutsideActionsDropDown,
               );
           }, []);
 
@@ -161,25 +169,29 @@ function TeamManagementAgGrid({
                             isUpdateCompanyTeamModalOpen!(params.data);
                           }}
                         >
-                          <ReceiptText className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR} />
+                          <ReceiptText
+                            className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR}
+                          />
                           Details
                         </ActionsDropdownButton>
                       )}
 
                       {!userHasAccessToViewTeamManagement && (
                         <ActionsDropdownButton disabled>
-                          <ReceiptText className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR} />
+                          <ReceiptText
+                            className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR}
+                          />
                           Details
                         </ActionsDropdownButton>
                       )}
                     </div>,
-                    document.body // Render dropdown in body to avoid clipping
+                    document.body, // Render dropdown in body to avoid clipping
                   )}
               </>
             );
           } else if (isGridForProductTeam || isGridForLeadProductTeam) {
             const isChecked = addCompanyProductTeamArray!.includes(
-              params.data.id
+              params.data.id,
             );
             return (
               <div className="flex justify-center mt-1 items-center">
@@ -197,8 +209,14 @@ function TeamManagementAgGrid({
         },
       },
     ],
-    [addCompanyProductTeamArray, companyTeamList]
+    [addCompanyProductTeamArray, companyTeamList],
   );
+
+  const skeletonRows = useMemo(() => {
+    return Array.from({ length: 30 }).map(() => ({
+      __isSkeleton: true,
+    }));
+  }, []);
 
   const defaultColDef = useMemo(() => {
     return {
@@ -207,6 +225,14 @@ function TeamManagementAgGrid({
       flex: 0.8,
       suppressHeaderMenuButton: true,
       suppressHeaderContextMenu: true,
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      cellRenderer: (params: any) => {
+        if (params.data?.__isSkeleton) {
+          return <SkeletonRowsAgGrid />;
+        }
+        return params.value;
+      },
     };
   }, []);
 
@@ -220,11 +246,11 @@ function TeamManagementAgGrid({
       }
     >
       <AgGridReact
-        rowData={companyTeamList}
+        rowData={isDataLoading ? skeletonRows : companyTeamList}
         columnDefs={columnDefs}
         defaultColDef={defaultColDef}
         modules={[AllCommunityModule]}
-        overlayNoRowsTemplate={INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
+        // overlayNoRowsTemplate={INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
         theme={themeBalham}
         onViewportChanged={handleViewPortChanged!}
         onGridReady={onGridReady!}

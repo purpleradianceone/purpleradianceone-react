@@ -18,10 +18,10 @@ const Tabs: React.FC<TabsProps> = ({ tabs, activeTab, onChange }) => {
         <button
           key={tab.key}
           onClick={() => onChange(tab.key)}
-          className={`px-4 py-1 text-sm font-medium rounded-t-md transition-all
+          className={`px-4 py-1  text-sm font-medium rounded-t-md transition-all
             ${
               activeTab === tab.key
-                ? "bg-blue-600 border border-b border-slate-200 text-white underline-offset-4 underline decoration-2"
+                ? "bg-blue-700 border  border-slate-200 text-white"
                 : "bg-gray-100 text-gray-800 hover:bg-gray-200"
             }`}
         >

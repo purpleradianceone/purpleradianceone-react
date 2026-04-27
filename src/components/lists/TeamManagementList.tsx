@@ -27,6 +27,7 @@ function TeamManagementList({
   paginationData,
   handleCompanyTeamChangeOnUpdate,
   handleCompanyTeamChangeOnAdd,
+  isDataLoading
 }: TeamManagementListProps) {
   const { userPreference } = useUserPreference();
   const { isLargeScreen, isMediumScreen, isSmallScreen } = useScreenSize();
@@ -214,6 +215,7 @@ function TeamManagementList({
             companyTeamList={companyTeamList}
             isUpdateCompanyTeamModalOpen={handleIsUpdateCompanyTeamModalOpen}
             isGridForProductTeam={false}
+            isDataLoading={isDataLoading}
           />
         </div>
       </div>

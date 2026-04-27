@@ -38,6 +38,7 @@ type LeadManagementListProps = {
     handleLeadSelectedSource : HandleLeadSelectedSource
     isUsedInLeadModule : boolean,
     handleRowSelectedForShowAccountLead? : (rowData: LeadDataProps | any) => void;
+    isLoading : boolean
 }
 
 export default LeadManagementListProps;

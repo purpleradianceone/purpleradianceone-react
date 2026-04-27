@@ -4,7 +4,7 @@ import { AgGridReact } from "ag-grid-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Edit, LucideLayoutDashboard, UserCheck } from "lucide-react";
 import { createPortal } from "react-dom";
-import { INNERHTML, JSX_CHILDREN_NAME } from "../../constants/AppConstants";
+import {  JSX_CHILDREN_NAME } from "../../constants/AppConstants";
 import { CLASS_NAMES } from "../../constants/ClassNames";
 import ActionsDropdownButton from "../ui/ActionsDropdownButton";
 import { useUserAccessModules } from "../../config/hooks/useAccessModules";
@@ -14,6 +14,7 @@ import MESSAGE from "../../constants/Messages";
 import StatusIndicator from "../ui/StatusIndicator";
 import AppTutorailManager from "../views/tutorails/AppTutorailManager";
 import { CompanyUsersGridActionsButtonStep } from "../../constants/AppTutorailsSteps";
+import { SkeletonRowsAgGrid } from "../ui/SkeletonRowsAgGrid";
 // import "ag-grid-community/styles/ag-theme-balham.css";
 function CompanyUserAgGrid({
   users,
@@ -24,7 +25,8 @@ function CompanyUserAgGrid({
   handleActionsTourEnd,
   isActionsTourEnded,
   isUsedInAccountProductForAssingingInstalledBy,
-  onRowSelect
+  onRowSelect,
+   isDataLoading
 }: CompanyUserAgGridProps) {
   const {
     userHasAccessToViewAccess,
@@ -80,6 +82,9 @@ function CompanyUserAgGrid({
         filter: true,
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         cellRenderer: (params: any) => {
+           if (params.data?.__isSkeleton) {
+                return <SkeletonRowsAgGrid />;
+              }
           return (
             <div className="flex items-center text-sm gap-1 mt-1">
               <StatusIndicator isActive={params.value} />
@@ -99,6 +104,10 @@ function CompanyUserAgGrid({
         // suppressSizeToFit: true,
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         cellRenderer: (params:   any) => {
+           if (params.data?.__isSkeleton) {
+                return <SkeletonRowsAgGrid />;
+              }
+
           return (
             <div className="flex items-center justify-center  ">
               <span
@@ -124,6 +133,11 @@ function CompanyUserAgGrid({
         headerClass: "company-users-actions-column",
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         cellRenderer: (params: any) => {
+
+           if (params.data?.__isSkeleton) {
+                return <SkeletonRowsAgGrid />;
+              }
+
           const [isActionsDropDownOpen, setIsActionsDropDownOpen] =
             useState(false);
 
@@ -321,6 +335,13 @@ function CompanyUserAgGrid({
     []
   );
 
+
+  const skeletonRows = useMemo(() => {
+    return Array.from({ length: 30 }).map(() => ({
+      __isSkeleton: true,
+    }));
+  }, []);
+
   const defaultColDef = useMemo(() => {
     return {
       filter: "agTextColumnFilter",
@@ -328,6 +349,14 @@ function CompanyUserAgGrid({
       flex: 0.8,
       suppressHeaderMenuButton: true,
       suppressHeaderContextMenu: true,
+
+       // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            cellRenderer: (params: any) => {
+              if (params.data?.__isSkeleton) {
+                return <SkeletonRowsAgGrid />;
+              }
+              return params.value;
+            },
     };
   }, []);
 
@@ -337,13 +366,13 @@ function CompanyUserAgGrid({
       style={{ height: "100%", width: "100%" }}
     >
       <AgGridReact
-        rowData={users}
+        rowData={ isDataLoading ? skeletonRows : users}
         columnDefs={columnDefs}
         defaultColDef={defaultColDef}
         modules={[AllCommunityModule]}
-        overlayNoRowsTemplate={INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
+        // overlayNoRowsTemplate={INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
         theme={themeBalham}
-        context={{ handleRowSelect: onRowSelect }}
+        context={{ handleRowSelect: isDataLoading ? undefined: onRowSelect }}
       />
     </div>
   );

@@ -14,6 +14,7 @@ type GetCompanyUsersListProps = {
     isUsedInAccountProductForAssingingInstalledBy? : boolean
      // eslint-disable-next-line @typescript-eslint/no-explicit-any
      onRowSelect? : (data : any ) =>void,
+     isDataLoading : boolean
 }
 
 export default GetCompanyUsersListProps;

@@ -62,6 +62,7 @@ function CompanyTeamsNotAssignedToLead({
     useState(false);
   const [companyTeamsNotAssignedHasMore, setCompanyTeamsNotAssignedHasMore] =
     useState(true);
+    const [isDataLoading, setIsDataLoading] = useState<boolean>(false);
 
   // Refs for flow control
   const companyTeamsNotAssignedFetchingRef = useRef(false);
@@ -216,7 +217,7 @@ function CompanyTeamsNotAssignedToLead({
         search_parameter: searchParam,
         search_parameter_date: null,
       };
-
+      setIsDataLoading(true)
       const response = await axiosClient.post(
         POST_API.GET_COMPANY_TEAMS_NOT_ASSIGNED_TO_LEAD,
         getCompanyTeamsPostData,
@@ -275,6 +276,7 @@ function CompanyTeamsNotAssignedToLead({
     } finally {
       setIsCompanyTeamsNotAssignedLoading(false);
       companyTeamsNotAssignedFetchingRef.current = false;
+      setIsDataLoading(false);
     }
   };
 
@@ -449,6 +451,7 @@ function CompanyTeamsNotAssignedToLead({
                   addCompanyProductTeamArray={addCompanyProductTeamArray}
                   handleViewPortChanged={handleCompanyTeamsNotAssignedViewPortChanged}
                   onGridReady={companyTeamsNotAssignedOnGridReady}
+                  isDataLoading={isDataLoading}
                 />
               </div>
 

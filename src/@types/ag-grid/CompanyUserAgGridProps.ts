@@ -12,6 +12,7 @@ type CompanyUserAgGridProps = {
   isUsedInAccountProductForAssingingInstalledBy? : boolean;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onRowSelect? : (data : any ) =>void,
+  isDataLoading : boolean
 };
 
 export default CompanyUserAgGridProps;
