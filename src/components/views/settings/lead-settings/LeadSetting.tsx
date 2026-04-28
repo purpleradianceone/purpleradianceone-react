@@ -21,6 +21,7 @@ import CompanyUser from "../../../../@types/company-users/CompanyUser";
 import { useUserAccessModules } from "../../../../config/hooks/useAccessModules";
 import axiosClient from "../../../../axios-client/AxiosClient";
 import MESSAGE from "../../../../constants/Messages";
+import FacebookPageSkeleton from "../social-media-integration/meta-app-facebook/PafeIdListCardPopUp";
 
 const LeadSetting: React.FC = () => {
   useGoogleMeetStatus();
@@ -211,9 +212,14 @@ const LeadSetting: React.FC = () => {
           wantBorderBottom={false}
         />
         {isLoading ? (
-          <div className="flex justify-center items-center mt-20">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-blue-500" />
-          </div>
+          <div className="grid md:grid-cols-3 sm:grid-cols-2 gap-4">
+        <FacebookPageSkeleton />
+        <FacebookPageSkeleton />
+        <FacebookPageSkeleton />
+      </div>
+          // <div className="flex justify-center items-center mt-20">
+          //   <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-blue-500" />
+          // </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-1">
             {leadSetting.map((per) => (

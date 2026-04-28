@@ -34,6 +34,7 @@ function GetCompanyUsersForLead({
 
   const {  userHasAccessToViewLeadSettings } = useUserAccessModules();
   const [userUpdateCount, setUserUpdateCount] = useState(0);
+  const [isDataLoading, setIsDataLoading] = useState<boolean>( false);
 
   const {
     currentPage,
@@ -92,6 +93,8 @@ function GetCompanyUsersForLead({
     };
 
     try {
+
+      setIsDataLoading(true)
       const response = await (isUsedForSettings ? axiosClient : axios).post(
         isUsedForSettings
           ? POST_API.GET_LEAD_COMPANY_USERS
@@ -115,6 +118,8 @@ function GetCompanyUsersForLead({
           fetchCompanyUsers();
         }
       }
+    }finally{
+      setIsDataLoading(false);
     }
   };
 
@@ -173,6 +178,7 @@ function GetCompanyUsersForLead({
               users={companyUsers}
               isUsedForSettings={isUsedForSettings}
               handleUpdateLeadUser={handleUpdateLeadUser}
+              isDataLoading={isDataLoading}
             />
           </div>
         </>
