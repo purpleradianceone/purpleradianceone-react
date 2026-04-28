@@ -6,6 +6,13 @@ export default {
       fontFamily: {
         sora: ["Sora", "sans-serif"],
         roboto: ["Roboto", "sans-serif"],
+        syne: ["Syne", "sans-serif"],
+        dm: ["DM Sans", "sans-serif"],
+      },
+      colors: {
+        purple: "#5b4bff",
+        "purple-light": "#eeedfe",
+        "purple-dark": "#3730a3",
       },
       animation: {
         "fade-in": "fadeIn 1s ease-in-out forwards",

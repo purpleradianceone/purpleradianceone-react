@@ -11,15 +11,13 @@ export const LookupAccountDropdown = ({
   label,
   value,
   handleAccountSelection,
-  isDisabled = false
-
+  isDisabled = false,
 }: {
   icon?: React.ReactNode;
   label?: string;
   value?: any;
   handleAccountSelection: (data: any) => void;
-  isDisabled?: boolean
-
+  isDisabled?: boolean;
 }) => {
   const { loginStatus } = useLoggedInUserContext();
   const [options, setOptions] = useState<any[]>([]);
@@ -51,10 +49,11 @@ export const LookupAccountDropdown = ({
 
     try {
       const res = await getLookupAccounts(postData);
+      console.log(res.data);
 
       const formatted = res.data.map((item: any) => ({
         value: item.id,
-        label: `${item.name} (${item.email})`,
+        label: `${item.name} (${item.email} / ${item.mobilenumber})`,
         data: item,
       }));
 
@@ -83,7 +82,7 @@ export const LookupAccountDropdown = ({
           value
             ? {
                 value: value.id,
-                label: `${value.name} (${value.email})`,
+                label: `${value.name} (${value.email} / ${value.mobilenumber})`,
                 data: value,
               }
             : null
