@@ -59,7 +59,7 @@ const AccountManagement: React.FC = () => {
   return (
     // <>
 
-    <div className="pb-3 mt-0.5">
+    <div className="pb-3 mt-0.5  ">
       {/* Header Section */}
       {/* Main Content Grid */}
       <div className="grid sm:grid-cols-1 md:grid-cols-2    gap-1">

@@ -26,7 +26,7 @@ export const PageLayout = ({
   return (
     <div
       onScroll={handleScroll}
-      className={`fixed top-8 inset-0 z-10 ${bgColor} ${
+      className={`fixed  custom-scrollbar-black top-8 inset-0 z-10 ${bgColor} ${
         userPreference.isLeftMenu
           ? userPreference.sidebarOpen
             ? "ml-64 mr-0 mt-3"

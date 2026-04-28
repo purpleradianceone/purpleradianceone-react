@@ -242,19 +242,19 @@ const NotificationPopup: React.FC<NotificationPopupProps> = ({ onClose }) => {
       className="absolute -right-72 mt-1 w-96 bg-white border border-gray-300 rounded-2xl shadow-2xl z-50"
     >
       {/* Header with Clear All */}
-      <div className="flex justify-between items-center p-3 border-b table-header-custom bg-gray-100 rounded-t-2xl">
+      <div className="flex justify-between items-center p-2 border-b table-header-custom bg-gray-100 rounded-t-2xl">
         <span>Notifications!</span>
         <button
           type="button"
           onClick={handleUpdateNotificationListWebClear}
-          className="input-label-custom-inactive hover:text-red-700"
+          className="caption-custom-inactive hover:text-red-600"
         >
-          Clear All
+          Clear all
         </button>
       </div>
 
       {/* Notifications List */}
-      <div className="max-h-[500px]  overflow-y-auto custom-scrollbar">
+      <div className="max-h-[500px] rounded-b-2xl  overflow-y-auto custom-scrollbar">
         {notificationList.length === 0 && !showLoadingSpinner ? (
           <div className="p-6 text-center caption-custom">
             No notifications to display
@@ -264,7 +264,7 @@ const NotificationPopup: React.FC<NotificationPopupProps> = ({ onClose }) => {
             <LoadingSpinner />
           </div>
         ) : (
-          <div className="border-b">
+          <div className="border-b ">
             {notificationList.map((notification, index) => (
               <div
                 key={notification.id}

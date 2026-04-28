@@ -82,7 +82,7 @@ export default function AccountNavbarBreadcrumb() {
   );
   const [showName, setShowName] = useState<boolean>(false);
   return (
-    <>
+    <div className="custom-scrollbar">
         <PageLayout onScrollChange={setShowName}>
           {/* Sticky Navigation Header */}
           <div className="sticky top-0 z-20 bg-white py-0.5 border-b">
@@ -156,9 +156,9 @@ export default function AccountNavbarBreadcrumb() {
           </div>
 
           {/* Page Content */}
-
+              
           <Outlet />
         </PageLayout>
-    </>
+    </div>
   );
 }
