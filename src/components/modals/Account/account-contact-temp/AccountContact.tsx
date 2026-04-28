@@ -440,7 +440,7 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
   if (userHasAccessToViewAccountContacts && showLoadingSpinner)
     return (
       <>
-        <div className="w-full h-full  flex justify-center items-center">
+        <div className="w-full h-full min-h-[280px] flex justify-center items-center">
           <LoadingSpinner />
         </div>
       </>
@@ -452,9 +452,9 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
       />
     );
   return (
-    <>
+    <div className="h-full min-h-[280px]  w-full">
       {accountContact.length === 0 ? (
-        <div className=" w-full h-full bg-slate-0">
+        <div className=" w-full h-full min-h-[280px] bg-slate-0 flex  justify-center items-center">
           <div className="flex gap-1 w-full text-xs h-full bg-green-0 items-center justify-center">
             <Button
               disabled={!userHasAccessToAddAccountContacts}
@@ -477,9 +477,9 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
           </div>
         </div>
       ) : (
-        <>
+        <div>
           {/* Header */}
-          <div className="flex justify-end items-center text-xs gap-x-2 py-1 text-gray-500">
+          <div className="flex justify-end items-center text-xs gap-x-2 py-1  text-gray-500">
             <Button
               disabled={!userHasAccessToAddAccountContacts}
               onClick={() => {
@@ -806,7 +806,7 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
               </div>,
               document.body,
             )}
-        </>
+        </div>
       )}
       {/* Add Contact Form Modal */}
       {isOpenAddAccountContactForm &&
@@ -1016,7 +1016,7 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
           document.body,
         )}
       {isSaving && <LoadingPopUpAnimation show={isSaving} />}
-    </>
+    </div>
   );
 };
 export default AccountContact;

@@ -12,6 +12,7 @@ import {
   XCircle,
   Scale,
   Pen,
+  User
 } from "lucide-react";
 import Account from "../../../@types/account/Account";
 import POST_API from "../../../constants/PostApi";
@@ -554,13 +555,13 @@ const AccountDetailsUpdated: React.FC = () => {
                   )} */}
                   {!isEditing ? (
                     <>
-                      <span className="input-label-custom">
+                      <span className="input-label-custom" >
                         {formData.countryName ? (
                           formData.countryName
                         ) : (
                           <>
-                            <span className="caption-custom italic">
-                              Enter country Name
+                            <span  className="caption-custom italic">
+                              No country given
                             </span>
                           </>
                         )}
@@ -1142,7 +1143,7 @@ const AccountDetailsUpdated: React.FC = () => {
                       formData.billingAddress
                     ) : (
                       <span className="caption-custom italic">
-                        No billing address
+                        No billing address 
                       </span>
                     )}
                   </span>
@@ -1214,7 +1215,7 @@ const AccountDetailsUpdated: React.FC = () => {
                       formData.registeredOfficeAddress
                     ) : (
                       <span className="caption-custom italic">
-                        No registered office address
+                        No registered office address 
                       </span>
                     )}
                   </span>
@@ -1269,12 +1270,12 @@ const AccountDetailsUpdated: React.FC = () => {
                 >
                   <Building2 className="h-6 w-6 text-white" />
                 </div>
-                <div className="w-full bg-pink-00">
+                <div className="w-full bg-pink-00  justify-between items-center gap-1">
                   {isEditing ? (
                     <div className="w-full">
                       <FormInput
                         required
-                        logo={Mail}
+                        logo={User}
                         type="text"
                         label="Name:"
                         name="name"
@@ -1302,8 +1303,10 @@ const AccountDetailsUpdated: React.FC = () => {
                     </>
                   )}
                   {/* </h/1> */}
-                  {!isEditing && (
-                    <div
+                 <div className="flex justify-end">
+                   {!isEditing && (
+                    <div 
+                    title="Update Account details, primary contact, legal information, address."
                       className="cursor-pointer caption-custom-blue "
                       onClick={() => {
                         if (userHasAccessToUpdateAccount) {
@@ -1316,26 +1319,28 @@ const AccountDetailsUpdated: React.FC = () => {
                         }
                       }}
                     >
-                      <span>Edit</span>
+                      <span className="bg-blue-500 p-0.5 flex items-center h-[20px] px-1  rounded text-white">  Edit</span>
                     </div>
                   )}
                   {isEditing && (
-                    <div className="flex gap-2">
-                      <div
-                        className="cursor-pointer caption-custom-blue "
-                        onClick={handleSaveAccountDetails}
-                      >
-                        <span>Save</span>
-                      </div>
+                    <div className="flex gap-2 pt-1">
+                      
 
                       <div
                         className="cursor-pointer caption-custom-blue "
                         onClick={handleCancelAccountDetails}
                       >
-                        <span>Cancel</span>
+                        <span className="bg-gray-400  flex items-center h-[20px] px-1  rounded text-white">Cancel</span>
+                      </div>
+                      <div
+                        className="cursor-pointer caption-custom-blue "
+                        onClick={handleSaveAccountDetails}
+                      >
+                        <span className="bg-blue-600  flex items-center h-[20px] px-1  rounded text-white">Save</span>
                       </div>
                     </div>
                   )}
+                 </div>
                 </div>
               </div>
 
