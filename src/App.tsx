@@ -21,6 +21,21 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 
+import dayjs from "dayjs";
+
+// import common locales you expect
+import "dayjs/locale/en";
+import "dayjs/locale/en-gb";
+import "dayjs/locale/en-in";
+import localizedFormat from "dayjs/plugin/localizedFormat";
+
+import "dayjs/locale/en-gb";
+
+dayjs.extend(localizedFormat);
+
+const systemLocale = navigator.language.toLowerCase(); // en-gb
+
+dayjs.locale(systemLocale);
 const queryClient = new QueryClient();
 /**
  *
@@ -30,8 +45,13 @@ function App() {
   const { confirmHandler, dialogMessage, isDialogOpen } =
     useAxiosForbiddenHandler();
 
+  
+
   return (
-    <LocalizationProvider dateAdapter={AdapterDayjs}>
+    <LocalizationProvider
+      dateAdapter={AdapterDayjs}
+      adapterLocale={systemLocale}
+    >
       <LoggedInUserContextProvider>
         <TutorailDataContextProvider>
           <AccessManagementContextProvider>
@@ -48,7 +68,6 @@ function App() {
                               style: { zIndex: 2147483647 }, // max safe z-index
                             }}
                           />
-
                           <DialogueBox
                             isOpen={isDialogOpen}
                             // onClose={closeDialog}
@@ -57,7 +76,6 @@ function App() {
                             message={dialogMessage}
                           />
                           <RouterProvider router={router} />
-
                         </NotificationProvider>
                       </QueryClientProvider>
                     </GoogleMeetContextProvider>
