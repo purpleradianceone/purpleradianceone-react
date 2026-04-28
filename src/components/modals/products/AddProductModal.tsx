@@ -487,31 +487,6 @@ function AddProductModal({
               autoFocus={true}
             />
             <div className="grid grid-cols-2 gap-3 ">
-              {/* Unit */}
-              <div>
-                <CustomDropdown
-                  labelName="Unit :"
-                  logo={LucideTimer}
-                  preselectedOption={0}
-                  onSelect={(data) => {
-                    if (data) {
-                      setSelectedUnitError(false);
-                    }
-                    setUnitId(data);
-                  }}
-                  // options={unitData}
-                  options={filteredUnits}
-                  requiredRedDot={true}
-                  readOnly={
-                    selectedProductTypeId === 3 || selectedProductTypeId === 4
-                  }
-                />
-                {selectedUnitError && (
-                  <div className="caption-custom-inactive">
-                    Product Unit is required
-                  </div>
-                )}
-              </div>
               {/* product type */}
               <div className="">
                 <CustomDropdown
@@ -533,6 +508,32 @@ function AddProductModal({
                   </div>
                 )}
               </div>
+              {/* Unit */}
+              <div>
+                <CustomDropdown
+                  labelName="Unit :"
+                  logo={LucideTimer}
+                  preselectedOption={0}
+                  key={selectedProductTypeId}
+                  onSelect={(data) => {
+                    if (data) {
+                      setSelectedUnitError(false);
+                    }
+                    setUnitId(data);
+                  }}
+                  // options={unitData}
+                  options={filteredUnits}
+                  requiredRedDot={true}
+                  readOnly={
+                    selectedProductTypeId === 3 || selectedProductTypeId === 4
+                  }
+                />
+                {selectedUnitError && (
+                  <div className="caption-custom-inactive">
+                    Product Unit is required
+                  </div>
+                )}
+              </div>
             </div>
             <div className="grid grid-cols-3 gap-3 ">
               {/* basic cost */}
@@ -547,7 +548,7 @@ function AddProductModal({
                 onChange={handleAddProductFormDataChange}
                 error={errors.cost}
                 min={0}
-                step={'0.0001'}              />
+                step={'0.0001'} />
               {/* Minimum Stock */}
               <FormInput
                 label="Minimum Stock : "
