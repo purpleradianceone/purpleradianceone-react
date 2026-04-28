@@ -13,10 +13,10 @@ import MESSAGE from "../../../../constants/Messages";
 import SupportTicketCategoryType from "../../../../@types/support-ticket-category/SupportTicketCategoryType";
 import Button from "../../../ui/Button";
 import CreateSupportTicketCategory from "./CreateSupportTicketCategory";
-import LoadingSpinner from "../../../../assets/animations/LoadingSpinner";
 import ToggleButton from "../../../ui/ToggleButton";
 import validateName from "../../../../config/validations/ValidateName";
 import validateDescription from "../../../../config/validations/ValidateDescription";
+import FacebookPageSkeleton from "../social-media-integration/meta-app-facebook/PafeIdListCardPopUp";
 
 const SupportTicketCategorySetting: React.FC = () => {
   const {
@@ -171,11 +171,19 @@ const SupportTicketCategorySetting: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="h-screen flex items-center justify-center">
-        <div className="flex items-center justify-between gap-3">
-          {/* <span>Loading...</span> */}
-          <LoadingSpinner />
-        </div>
+      <div className="grid md:grid-cols-3 sm:grid-cols-2 gap-4">
+        <FacebookPageSkeleton />
+        <FacebookPageSkeleton />
+        <FacebookPageSkeleton />
+        <FacebookPageSkeleton />
+        <FacebookPageSkeleton />
+        <FacebookPageSkeleton />
+        <FacebookPageSkeleton />
+        <FacebookPageSkeleton />
+        <FacebookPageSkeleton />
+        <FacebookPageSkeleton />
+        <FacebookPageSkeleton />
+        <FacebookPageSkeleton />
       </div>
     );
   }

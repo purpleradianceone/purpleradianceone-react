@@ -13,13 +13,13 @@ import { useUserAccessModules } from "../../../../config/hooks/useAccessModules"
 import MESSAGE from "../../../../constants/Messages";
 import CreateAccountType from "./CreateAccountType";
 import Button from "../../../ui/Button";
-import LoadingSpinner from "../../../../assets/animations/LoadingSpinner";
 import ToggleButton from "../../../ui/ToggleButton";
+import FacebookPageSkeleton from "../social-media-integration/meta-app-facebook/PafeIdListCardPopUp";
 
 const AccountTypeSetting: React.FC = () => {
   const {
     userHasAccessToAddCompanyAccountType,
-    userHasAccessToUpdateCompanyAccountType,    
+    userHasAccessToUpdateCompanyAccountType,
   } = useUserAccessModules();
   const { loginStatus } = useLoggedInUserContext();
   const [accountType, setAccountType] = useState<AccountType[]>([]);
@@ -81,7 +81,7 @@ const AccountTypeSetting: React.FC = () => {
       const response = await axios.post(
         POST_API.UPDATE_COMPANY_ACCOUNT_TYPE,
         postDataToUpdateCompanyAccountType,
-        { withCredentials: true }
+        { withCredentials: true },
       );
 
       if (response.data.status === true) {
@@ -127,7 +127,7 @@ const AccountTypeSetting: React.FC = () => {
       .post(
         POST_API.GET_COMPANY_ACCOUNT_TYPE,
         PostDataToGetCompanyAccountType,
-        { withCredentials: true }
+        { withCredentials: true },
       )
       .then((response) => {
         if (response.status === STATUS_CODE.OK) {
@@ -145,7 +145,7 @@ const AccountTypeSetting: React.FC = () => {
               createdOn: item.createdon,
               updatedBy: item.updatedby,
               updatedOn: item.updatedon,
-            })
+            }),
           );
           setCompanyAccountType(companyAccountData);
         }
@@ -169,11 +169,8 @@ const AccountTypeSetting: React.FC = () => {
 
   //Component render first time call
   useEffect(() => {
-    
-
-      getAccountType();
-      getComapnyAccountType();
-  
+    getAccountType();
+    getComapnyAccountType();
   }, []);
 
   //  track which parent types are expanded
@@ -184,26 +181,37 @@ const AccountTypeSetting: React.FC = () => {
       (prev) =>
         prev.includes(parentType)
           ? prev.filter((p) => p !== parentType) // collapse if open
-          : [...prev, parentType] // expand if closed
+          : [...prev, parentType], // expand if closed
     );
   };
 
   // --- Group companyAccountType by parent ---
-  const groupedData = companyAccountType.reduce((acc, item) => {
-    if (!acc[item.accountTypeName]) {
-      acc[item.accountTypeName] = [];
-    }
-    acc[item.accountTypeName].push(item);
-    return acc;
-  }, {} as Record<string, CompanyAccountType[]>);
+  const groupedData = companyAccountType.reduce(
+    (acc, item) => {
+      if (!acc[item.accountTypeName]) {
+        acc[item.accountTypeName] = [];
+      }
+      acc[item.accountTypeName].push(item);
+      return acc;
+    },
+    {} as Record<string, CompanyAccountType[]>,
+  );
 
   if (loading) {
     return (
-      <div className="h-screen flex items-center justify-center">
-        <div className="flex items-center justify-between gap-3">
-          {/* <span>Loading...</span> */}
-           <LoadingSpinner />
-        </div>
+      <div className="grid md:grid-cols-3 sm:grid-cols-2 gap-4">
+        <FacebookPageSkeleton />
+        <FacebookPageSkeleton />
+        <FacebookPageSkeleton />
+        <FacebookPageSkeleton />
+        <FacebookPageSkeleton />
+        <FacebookPageSkeleton />
+        <FacebookPageSkeleton />
+        <FacebookPageSkeleton />
+        <FacebookPageSkeleton />
+        <FacebookPageSkeleton />
+        <FacebookPageSkeleton />
+        <FacebookPageSkeleton />
       </div>
     );
   }
@@ -211,13 +219,11 @@ const AccountTypeSetting: React.FC = () => {
     <div className="min-h-screen bg-gray-50 rounded-md">
       <div className=" mx-auto p-1">
         <div className="flex justify-between">
-          <h1 className="section-header-custom my-3">
-            Company Account Type 
-          </h1>
+          <h1 className="section-header-custom my-3">Company Account Type</h1>
           {!showAddForm && (
             <div>
               <Button
-              disabled={!userHasAccessToAddCompanyAccountType}
+                disabled={!userHasAccessToAddCompanyAccountType}
                 type="submit"
                 onClick={(e) => {
                   e.preventDefault();
@@ -226,7 +232,7 @@ const AccountTypeSetting: React.FC = () => {
                   } else {
                     toast.error(
                       MESSAGE.MODULE_ACCESS.ACCOUNT_TYPE_ACCESS
-                        .DENIED_ADD_ACCESS
+                        .DENIED_ADD_ACCESS,
                     );
                   }
                 }}
@@ -306,7 +312,9 @@ const AccountTypeSetting: React.FC = () => {
                         key={item.id}
                         className="p-2 grid grid-col rounded-xl border border-gray-00 bg-white shadow-sm hover:bg-emerald-0 hover:shadow-md "
                       >
-                        <label htmlFor="" className="caption-custom">Name</label>
+                        <label htmlFor="" className="caption-custom">
+                          Name
+                        </label>
                         {/*  */}
                         {/* Editable Name */}
                         {editingTypeId === item.id ? (
@@ -349,7 +357,7 @@ const AccountTypeSetting: React.FC = () => {
                               } else {
                                 toast.error(
                                   MESSAGE.MODULE_ACCESS.ACCOUNT_TYPE_ACCESS
-                                    .DENIED_UPDATE_ACCESS
+                                    .DENIED_UPDATE_ACCESS,
                                 );
                               }
                             }}

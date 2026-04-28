@@ -2,7 +2,6 @@
 
 import { Bell, Mail } from "lucide-react";
 import React, { useEffect, useState } from "react";
-import LoadingSpinner from "../../../../assets/animations/LoadingSpinner";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
 import FormHeader from "../../../ui/FormHeader";
 import GoogleCalendarIcon from "../../../../assets/svg/GoogleCalendarIcon";
@@ -12,6 +11,7 @@ import POST_API from "../../../../constants/PostApi";
 import { useUserAccessModules } from "../../../../config/hooks/useAccessModules";
 import AccessDeniedMessagePage from "../../not-found/AccessDeniedMessagePage";
 import MESSAGE from "../../../../constants/Messages";
+import FacebookPageSkeleton from "../social-media-integration/meta-app-facebook/PafeIdListCardPopUp";
 
 interface ProviderCardProps {
   icon: React.ElementType;
@@ -206,7 +206,9 @@ function ReminderSetting() {
       />
 
       {isLoading ? (
-        <LoadingSpinner />
+         <div className="grid md:grid-cols-3 sm:grid-cols-2 gap-4">
+                <FacebookPageSkeleton />
+              </div>
       ) : (
         <div className="grid grid-cols-2 p-5 gap-6 mt-1">
           {/* //  <div className="w-full max-w-2xl min-h-96 mx-auto p-4 space-y-4"> */}
