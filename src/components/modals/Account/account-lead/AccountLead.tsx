@@ -179,7 +179,7 @@ const AccountLead = ({ account }: CreateAccountLeadType) => {
   };
   if (userHasAccessToViewAccountLeads && isLoading) {
     return (
-      <div className="h-20 flex items-center justify-center">
+      <div className=" min-h-[280px]  h-full  flex items-center justify-center">
         <LoadingSpinner />
       </div>
     );
@@ -195,7 +195,7 @@ const AccountLead = ({ account }: CreateAccountLeadType) => {
 
       {/* Empty State */}
       {!isLoading && accountLead.length === 0 && (
-        <div className="flex items-center justify-center h-full bg-pink-0 ">
+        <div className="flex items-center justify-center h-full bg-pink-0  min-h-[280px]  ">
           <span className="italic caption-custom flex gap-1 items-center ">
             <CreateAccountLead
               account={account}

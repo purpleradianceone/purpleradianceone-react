@@ -1,18 +1,16 @@
 import React, { useEffect, useState } from "react";
 
-import AccountCompanyType from "./AccountCompanyType";
 import AccountCompanyProduct from "./account-company-product/AccountCompanyProduct";
 import { useAccountDetails } from "../../../config/hooks/useGetAccountDetails";
 import ROUTES_URL from "../../../constants/Routes";
 import { useNavigate, useParams } from "react-router-dom";
 import { parseInt } from "lodash";
 import AccountDetailsUpdated from "./AccountDetailsUpdated";
-import AccountContact from "./account-contact-temp/AccountContact";
-import AccountLead from "./account-lead/AccountLead";
 import AccountService from "./account-service/AccountService";
 import AccountSubscription from "./account-subscription/AccountSubscription";
 import AccountInvoice from "./account-invoice/AccountInvoice";
 import Tabs from "../../ui/Tabs";
+import { AccountContactLeadTypeConjuction } from "./AccountContactLeadTypeConjuctionComponent";
 
 const AccountManagement: React.FC = () => {
   const { accountId } = useParams();
@@ -71,31 +69,31 @@ const AccountManagement: React.FC = () => {
 
         {/* Right Card - Empty for future use */}
 
-        <div className="bg-white rounded-md border p-1 border-slate-200">
-          <h3 className="bg-gray-100 table-header-custom rounded-t-md px-2">
-            Account Contacts
-          </h3>
-          <AccountContact accountId={company!.id} />
+        <div className="bg-white rounded-md border  border-slate-200">
+          
+          <AccountContactLeadTypeConjuction
+            account={company}
+          />
         </div>
 
         {/* Account Lead */}
 
-        <div className="bg-white rounded-md border p-1 border-slate-200">
-          {/* Header */}
+        {/* <div className="bg-white rounded-md border p-1 border-slate-200">
+         
           <div className="bg-gray-100 table-header-custom rounded-t-md px-2 ">
             <span>Account Related Leads</span>
           </div>
-          <AccountLead account={company!} />
-        </div>
+          
+        </div> */}
 
         {/* Account company type */}
 
-        <div className="bg-white rounded-md border p-1 border-slate-200">
+        {/* <div className="bg-white rounded-md border p-1 border-slate-200">
           <div className="bg-gray-100 table-header-custom rounded-t-md px-2 ">
             <span>Company Account Type</span>
           </div>
-          <AccountCompanyType accountId={company!.id} />
-        </div>
+         
+        </div> */}
 
         {/* Account company product */}
         {/* <div className="bg-white col-span-2 rounded-md border p-1 border-slate-200">
