@@ -284,6 +284,14 @@
   border-radius: 6px;
 }
 
+.custom-scrollbar-black::-webkit-scrollbar {
+  width: 6px;
+}
+.custom-scrollbar-black::-webkit-scrollbar-thumb {
+  background: #636969;
+  border-radius: 6px;
+}
+
 .ag-skeleton-overlay {
   padding-top: 25px;
   width: 100%;
