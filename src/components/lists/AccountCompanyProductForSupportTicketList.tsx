@@ -96,7 +96,7 @@ function AccountCompanyProductForSupportTicketList({
                       e.target.value,
                     );
                   }}
-                  placeholder={"Search by Account's Email, mobilenumber"}
+                  placeholder={"🔍Name, email, mobile, serial number, barcode"}
                   value={handleSearchOption.searchParameter}
                 ></SearchInput>
               </div>
