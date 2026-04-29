@@ -42,6 +42,7 @@ import { QuotationEditorSkeleton } from "../../utils/QuotationEditorSkeleton";
 import { QuotationTemplateSettingsPanelUpdate } from "../../template-panel/QuotationTemplateSettingsPanelUpdate";
 import { QuotationSummeryBlock } from "../../blocks/QuotationSummeryBlock";
 import { EmptyLineBlockQuotation } from "../../blocks/EmptyLineBlockQuotation";
+import localforage from "localforage";
 
 export const EditorCanvasForQuotationEdit: React.FC = () => {
   const canvasBgColor = "#f9f9f9";
@@ -55,16 +56,32 @@ export const EditorCanvasForQuotationEdit: React.FC = () => {
   const parsedFields: DynamicFieldOption[] =
     convertPlaceholdersToFields(placeHolderData);
 
-  const [editorStateData, setEditorStateData] = useState(() => {
-    const jsonEditorState = localStorage.getItem(
-      STORAGE_KEY_UPDATE + loginStatus.id,
-    );
-    return jsonEditorState;
-  });
-
   const [quotationTemplate, setQuotationTemplate] =
     useState<QuotationTemplate>();
   const [isLoadingForData, setIsLogingForData] = useState<boolean>(true);
+
+  //Local Storage
+  //  const [editorStateData, setEditorStateData] = useState(() => {
+  //     const jsonEditorState = localStorage.getItem(
+  //       STORAGE_KEY_UPDATE + loginStatus.id,
+  //     );
+  //     return jsonEditorState;
+  //   });
+
+  //Local Forage
+  const [editorStateData, setEditorStateData] = useState<string | null>(null);
+  useEffect(() => {
+    const loadEditorState = async () => {
+      const jsonEditorState = await localforage.getItem<string>(
+        STORAGE_KEY_UPDATE + loginStatus.id,
+      );
+
+      setEditorStateData(jsonEditorState || null);
+    };
+
+    loadEditorState();
+  }, []);
+  //
 
   useEffect(() => {
     if (jsonFileData) {
@@ -127,39 +144,88 @@ export const EditorCanvasForQuotationEdit: React.FC = () => {
   };
 
   useEffect(() => {
-    const response = localStorage.getItem(STORAGE_KEY_UPDATE + loginStatus.id);
+    //Local Storage
+    // const response = localStorage.getItem(STORAGE_KEY_UPDATE + loginStatus.id);
+    // if (quotationTemplate?.id) {
+    //   if (!response) {
+    //     getQuotationTemplateFile();
+    //   } else {
+    //     setIsLogingForData(false);
+    //   }
+    // }
+
+    // Local Forage
+    const checkStoredTemplate = async () => {
+    const response = await localforage.getItem<string>(
+      STORAGE_KEY_UPDATE + loginStatus.id
+    );
+
     if (quotationTemplate?.id) {
       if (!response) {
         getQuotationTemplateFile();
-      }else{
+      } else {
         setIsLogingForData(false);
       }
     }
+  };
+  checkStoredTemplate();
+
   }, [quotationTemplate]);
 
   useEffect(() => {
-    if (jsonFileData) {
-      console.log("json file data:= ");
-      console.log(jsonFileData);
-      localStorage.setItem(
-        STORAGE_KEY_UPDATE + loginStatus.id,
-        jsonFileData.quotationTemplateData,
-      );
-      localStorage.setItem(
-        FOOTER_STORAGE_KEY_UPDATE + loginStatus.id,
-        jsonFileData.defaultFooter,
-      );
+    //Local Storage
+    // if (jsonFileData) {
+    //   console.log("json file data:= ");
+    //   console.log(jsonFileData);
+    //   localStorage.setItem(
+    //     STORAGE_KEY_UPDATE + loginStatus.id,
+    //     jsonFileData.quotationTemplateData,
+    //   );
+    //   localStorage.setItem(
+    //     FOOTER_STORAGE_KEY_UPDATE + loginStatus.id,
+    //     jsonFileData.defaultFooter,
+    //   );
 
-      localStorage.setItem(
-        HEADER_STORAGE_KEY_UPDATE + loginStatus.id,
-        jsonFileData.defaultHeader,
-      );
+    //   localStorage.setItem(
+    //     HEADER_STORAGE_KEY_UPDATE + loginStatus.id,
+    //     jsonFileData.defaultHeader,
+    //   );
 
-      localStorage.setItem(
-        PAGE_BLOCK_LAYOUT_UPDATE + loginStatus.id,
-        jsonFileData.defaultPageLayout,
-      );
-    }
+    //   localStorage.setItem(
+    //     PAGE_BLOCK_LAYOUT_UPDATE + loginStatus.id,
+    //     jsonFileData.defaultPageLayout,
+    //   );
+    // }
+
+    //Local Forage
+    const saveTemplateData = async () => {
+    if (!jsonFileData) return;
+
+    console.log("json file data:= ");
+    console.log(jsonFileData);
+
+    await localforage.setItem(
+      STORAGE_KEY_UPDATE + loginStatus.id,
+      jsonFileData.quotationTemplateData
+    );
+
+    await localforage.setItem(
+      FOOTER_STORAGE_KEY_UPDATE + loginStatus.id,
+      jsonFileData.defaultFooter
+    );
+
+    await localforage.setItem(
+      HEADER_STORAGE_KEY_UPDATE + loginStatus.id,
+      jsonFileData.defaultHeader
+    );
+
+    await localforage.setItem(
+      PAGE_BLOCK_LAYOUT_UPDATE + loginStatus.id,
+      jsonFileData.defaultPageLayout
+    );
+  };
+  saveTemplateData();
+  
   }, [jsonFileData]);
 
   const getPlaceholderForQuotation = () => {
@@ -236,7 +302,6 @@ export const EditorCanvasForQuotationEdit: React.FC = () => {
             TableBlockQuotation,
             QuotationSummeryBlock,
             EmptyLineBlockQuotation,
-
           }}
         >
           {/* ROOT WRAPPER */}

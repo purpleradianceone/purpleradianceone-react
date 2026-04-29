@@ -14,6 +14,9 @@ import {
   searchParamKey,
 } from "../local-storage/LocalStorageKeys";
 
+import localforage from "localforage";
+
+
 export const HeaderBlockQuotation: React.FC = () => {
   const {
     id,
@@ -42,7 +45,7 @@ export const HeaderBlockQuotation: React.FC = () => {
   const quotationTemplateId = searchParams.get(searchParamKey);
 
   /* ===== Save ===== */
-  const handleSave = () => {
+  const handleSave = async () => {
     setProp((p: any) => {
       p.height = tempHeight;
       p.padding = tempPadding;
@@ -52,13 +55,14 @@ export const HeaderBlockQuotation: React.FC = () => {
     const headerBlockStorageKey = quotationTemplateId
       ? HEADER_STORAGE_KEY_UPDATE
       : HEADER_STORAGE_KEY_CREATE;
-    const result = localStorage.getItem(headerBlockStorageKey+loginStatus.id);
+    // const result = localStorage.getItem(headerBlockStorageKey+loginStatus.id);
+    const result = await localforage.getItem(headerBlockStorageKey+loginStatus.id);
     if(!result){
-      saveHeaderToStorage();
+      await saveHeaderToStorage();
     }
   };
 
-  const saveHeaderToStorage = () => {
+  const saveHeaderToStorage = async () => {
     const headerBlockStorageKey = quotationTemplateId
       ? HEADER_STORAGE_KEY_UPDATE
       : HEADER_STORAGE_KEY_CREATE;
@@ -96,7 +100,12 @@ export const HeaderBlockQuotation: React.FC = () => {
         },
       };
 
-      localStorage.setItem(
+      // localStorage.setItem(
+      //   headerBlockStorageKey + loginStatus.id,
+      //   JSON.stringify(localStorageData),
+      // );
+
+      await localforage.setItem(
         headerBlockStorageKey + loginStatus.id,
         JSON.stringify(localStorageData),
       );
@@ -105,30 +114,58 @@ export const HeaderBlockQuotation: React.FC = () => {
     }
   };
 
-  const handleSaveHeaderLayout = () => {
+  const handleSaveHeaderLayout = async () => {
     setProp((p: any) => {
       p.height = tempHeight;
       p.padding = tempPadding;
       p.backgroundColor = tempBg;
     });
 
-    saveHeaderToStorage(); // Save header
-    handleSave(); // Save
+    await saveHeaderToStorage(); // Save header
+    await handleSave(); // Save
     setEditing(false);
     setIsConfirmationPopupOpen(false);
     window.location.reload();
   };
 
   useEffect(() => {
+// Local Storage
+    // const headerBlockStorageKey = quotationTemplateId
+    //   ? HEADER_STORAGE_KEY_UPDATE
+    //   : HEADER_STORAGE_KEY_CREATE;
+
+    // const stored = localStorage.getItem(headerBlockStorageKey + loginStatus.id);
+    // if (!stored) return;
+
+    // try {
+    //   const parsed = JSON.parse(stored);
+    //   setProp((p: any) => {
+    //     p.padding = parsed.props.padding;
+    //     p.backgroundColor = parsed.props.backgroundColor;
+    //     p.height = parsed.props.height;
+    //   });
+    // } catch (err) {
+    //   console.log("Error loading header props:", err);
+    // }
+
+    //Local Forage
+    const loadHeaderData = async () => {
     const headerBlockStorageKey = quotationTemplateId
       ? HEADER_STORAGE_KEY_UPDATE
       : HEADER_STORAGE_KEY_CREATE;
 
-    const stored = localStorage.getItem(headerBlockStorageKey + loginStatus.id);
+    const stored = await localforage.getItem(
+      headerBlockStorageKey + loginStatus.id
+    );
+
     if (!stored) return;
 
     try {
-      const parsed = JSON.parse(stored);
+      const parsed =
+        typeof stored === "string"
+          ? JSON.parse(stored)
+          : stored;
+
       setProp((p: any) => {
         p.padding = parsed.props.padding;
         p.backgroundColor = parsed.props.backgroundColor;
@@ -137,41 +174,85 @@ export const HeaderBlockQuotation: React.FC = () => {
     } catch (err) {
       console.log("Error loading header props:", err);
     }
+  };
+
+  loadHeaderData();
+
   }, [id]);
 
   useEffect(() => {
+    //Local Storage
+    // const headerBlockStorageKey = quotationTemplateId
+    //   ? HEADER_STORAGE_KEY_UPDATE
+    //   : HEADER_STORAGE_KEY_CREATE;
+
+    // const stored = localStorage.getItem(headerBlockStorageKey + loginStatus.id);
+    // if (!stored) return;
+
+    // try {
+    //   const parsed = JSON.parse(stored);
+
+    //   const editorState = query.getState();
+    //   const canvasId = editorState.nodes[id].data.linkedNodes[`${id}-canvas`];
+
+    //   if (!canvasId) return;
+
+    //   const node = query.parseSerializedNode(parsed.data).toNode();
+
+    //   // VERY IMPORTANT: Inject only if empty
+    //   const canvasNode = editorState.nodes[canvasId];
+    //   if (canvasNode.data.nodes.length > 0) return;
+
+    //   actions.add(node, canvasId);
+    // } catch (err) {
+    //   console.log("Error loading header:", err);
+    // }
+
+    // Local Forage
+    const loadHeaderBlock = async () => {
     const headerBlockStorageKey = quotationTemplateId
       ? HEADER_STORAGE_KEY_UPDATE
       : HEADER_STORAGE_KEY_CREATE;
 
-    const stored = localStorage.getItem(headerBlockStorageKey + loginStatus.id);
+    const stored = await localforage.getItem(
+      headerBlockStorageKey + loginStatus.id
+    );
+
     if (!stored) return;
 
     try {
-      const parsed = JSON.parse(stored);
+      const parsed =
+        typeof stored === "string"
+          ? JSON.parse(stored)
+          : stored;
 
       const editorState = query.getState();
-      const canvasId = editorState.nodes[id].data.linkedNodes[`${id}-canvas`];
+      const canvasId =
+        editorState.nodes[id].data.linkedNodes[`${id}-canvas`];
 
       if (!canvasId) return;
 
       const node = query.parseSerializedNode(parsed.data).toNode();
 
-      // VERY IMPORTANT: Inject only if empty
+      // Inject only if empty
       const canvasNode = editorState.nodes[canvasId];
+
       if (canvasNode.data.nodes.length > 0) return;
 
       actions.add(node, canvasId);
     } catch (err) {
       console.log("Error loading header:", err);
     }
+  };
+
+  loadHeaderBlock();
   }, [id]);
 
   //For Ctrl+s
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.ctrlKey && e.key.toLowerCase() === "s") {
-        handleSave();
+    const handleKeyDown = async (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "s") {
+        await handleSave();
       }
     };
 
