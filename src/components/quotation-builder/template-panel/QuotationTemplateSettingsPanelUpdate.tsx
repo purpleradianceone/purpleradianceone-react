@@ -23,6 +23,7 @@ import {
 import { JsonFileData } from "../quotation-template-types/JsonFileData";
 import QuotationTemplate from "../quotation-template-types/QuotationTemplate";
 import LoadingPopUpAnimation from "../../views/card/LoadingPopUpAnimation";
+import localforage from "localforage";
 
 type QuotationTemplateSettingsPanelUpdateProps = {
   editQuotationTemplateJson?: QuotationTemplate;
@@ -56,26 +57,52 @@ export const QuotationTemplateSettingsPanelUpdate: React.FC<
   const { query } = useEditor();
   const { loginStatus } = useLoggedInUserContext();
 
-  function getCraftJson(): string {
-    setIsLoadingForQuotationUpdate(true);
-    const storedDefaultHeader = localStorage.getItem(
-      HEADER_STORAGE_KEY_UPDATE + loginStatus.id,
-    );
-    const storedDefaultFooter = localStorage.getItem(
-      FOOTER_STORAGE_KEY_UPDATE + loginStatus.id,
-    );
-    const storedDefaultPageLayout = localStorage.getItem(
-      PAGE_BLOCK_LAYOUT_UPDATE + loginStatus.id,
-    );
-    const jsonFileData: JsonFileData = {
-      defaultHeader: storedDefaultHeader,
-      defaultFooter: storedDefaultFooter,
-      defaultPageLayout: storedDefaultPageLayout,
-      quotationTemplateData: query.serialize(),
-    };
+  //Local Storage
+  // function getCraftJson(): string {
+  //   setIsLoadingForQuotationUpdate(true);
+  //   const storedDefaultHeader = localStorage.getItem(
+  //     HEADER_STORAGE_KEY_UPDATE + loginStatus.id,
+  //   );
+  //   const storedDefaultFooter = localStorage.getItem(
+  //     FOOTER_STORAGE_KEY_UPDATE + loginStatus.id,
+  //   );
+  //   const storedDefaultPageLayout = localStorage.getItem(
+  //     PAGE_BLOCK_LAYOUT_UPDATE + loginStatus.id,
+  //   );
+  //   const jsonFileData: JsonFileData = {
+  //     defaultHeader: storedDefaultHeader,
+  //     defaultFooter: storedDefaultFooter,
+  //     defaultPageLayout: storedDefaultPageLayout,
+  //     quotationTemplateData: query.serialize(),
+  //   };
 
-    return JSON.stringify(jsonFileData);
-  }
+  //   return JSON.stringify(jsonFileData);
+  // }
+
+  async function getCraftJson(): Promise<string> {
+  setIsLoadingForQuotationUpdate(true);
+
+  const storedDefaultHeader = await localforage.getItem<string>(
+    HEADER_STORAGE_KEY_UPDATE + loginStatus.id
+  );
+
+  const storedDefaultFooter = await localforage.getItem<string>(
+    FOOTER_STORAGE_KEY_UPDATE + loginStatus.id
+  );
+
+  const storedDefaultPageLayout = await localforage.getItem<string>(
+    PAGE_BLOCK_LAYOUT_UPDATE + loginStatus.id
+  );
+
+  const jsonFileData: JsonFileData = {
+    defaultHeader: storedDefaultHeader,
+    defaultFooter: storedDefaultFooter,
+    defaultPageLayout: storedDefaultPageLayout,
+    quotationTemplateData: query.serialize(),
+  };
+
+  return JSON.stringify(jsonFileData);
+}
 
   const updateQuotationTemplate = (resultJson: string) => {
     try {
@@ -181,9 +208,9 @@ export const QuotationTemplateSettingsPanelUpdate: React.FC<
           onClick={(e) => e.stopPropagation()} // prevent overlay close
         >
           <form
-            onSubmit={(e) => {
+            onSubmit={async (e) => {
               e.preventDefault();
-              const resultJson = getCraftJson();
+              const resultJson = await getCraftJson();
               updateQuotationTemplate(resultJson);
             }}
           >

@@ -147,7 +147,7 @@ export const QuotationSummeryBlock: React.FC = () => {
     ===================================================== */
   useEffect(() => {
     const handle = (e: KeyboardEvent) => {
-      if (e.ctrlKey && e.key.toLowerCase() === "s") {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "s") {
         e.preventDefault();
         setEditing(false);
       }

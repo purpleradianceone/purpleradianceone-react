@@ -40,7 +40,7 @@ export const EmptyLineBlockQuotation: React.FC = () => {
   /* CTRL + S */
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.ctrlKey && e.key.toLowerCase() === "s") {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "s") {
         e.preventDefault();
         handleSave();
       }
