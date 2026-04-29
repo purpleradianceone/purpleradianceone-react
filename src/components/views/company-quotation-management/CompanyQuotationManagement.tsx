@@ -237,6 +237,7 @@ function CompanyQuotationManagement({
               setSelectedCompanyQuotationStatus(selectedStatus)
             }
             isUsedFor={isUsedFor}
+            leadStatusId={otherData?otherData.leadStatusId:0}
           />
         ) : (
           <div className="flex-none mx-96 mt-14">

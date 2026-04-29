@@ -43,6 +43,7 @@ function CompanyQuotationManagementList({
   handleSelectedQuotationStatus,
   handleAddQuotation,
   isUsedFor = Modules.QUOTATION_MODULE,
+  leadStatusId,
 }: CompanyQuotationManagementListProps) {
   const navigate = useNavigate();
   const { userPreference } = useUserPreference();
@@ -332,14 +333,14 @@ function CompanyQuotationManagementList({
                 <div className="flex gap-1 justify-end w-fit">
                   <Button
                     type="button"
-                    disabled={!(isUsedFor === Modules.LEAD_QUOTATION?userHasAccessToAddLeadQuotation:(isUsedFor === Modules.AMC_QUOTATION? userHasAccessToAddAccountQuotation :userHasAccessToAddCompanyQuotation))
+                    disabled={!(isUsedFor === Modules.LEAD_QUOTATION?(userHasAccessToAddLeadQuotation ? leadStatusId !== 9 : false ):(isUsedFor === Modules.AMC_QUOTATION? userHasAccessToAddAccountQuotation :userHasAccessToAddCompanyQuotation))
                     }
                     onClick={() => {
-                      if (!(isUsedFor === Modules.LEAD_QUOTATION?userHasAccessToAddLeadQuotation:(isUsedFor === Modules.AMC_QUOTATION? userHasAccessToAddAccountQuotation :userHasAccessToAddCompanyQuotation))) {
+                      if (!(isUsedFor === Modules.LEAD_QUOTATION?(userHasAccessToAddLeadQuotation ? leadStatusId !== 9 : false ):(isUsedFor === Modules.AMC_QUOTATION? userHasAccessToAddAccountQuotation :userHasAccessToAddCompanyQuotation))) {
                         toast.error(
-                          isUsedFor === Modules.LEAD_QUOTATION?
+                          isUsedFor === Modules.LEAD_QUOTATION?(leadStatusId !==9 ?
                           MESSAGE.MODULE_ACCESS.LEAD_QUOTATION
-                            .DENIED_ADD_ACCESS:(isUsedFor === Modules.AMC_QUOTATION? MESSAGE.MODULE_ACCESS.ACCOUNT_QUOTATION.DENIED_ADD_ACCESS: MESSAGE.MODULE_ACCESS.COMPANY_QUOTATION.DENIED_ADD_ACCESS)
+                            .DENIED_ADD_ACCESS:"Can't generate quotation for converted lead."):(isUsedFor === Modules.AMC_QUOTATION? MESSAGE.MODULE_ACCESS.ACCOUNT_QUOTATION.DENIED_ADD_ACCESS: MESSAGE.MODULE_ACCESS.COMPANY_QUOTATION.DENIED_ADD_ACCESS)
                         );
                         return;
                       }
