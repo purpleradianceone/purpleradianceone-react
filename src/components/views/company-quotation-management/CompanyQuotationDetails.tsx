@@ -243,9 +243,9 @@ function CompanyQuotationDetails() {
     if (disabled) {
       return;
     }
-    if (!userHasAccessToUpdateCompanyQuotation) {
-      return;
-    }
+    // if (!userHasAccessToUpdateCompanyQuotation) {
+    //   return;
+    // }
     const postData = {
       company_id: loginStatus.companyId,
       id: quotation.id,
@@ -322,7 +322,7 @@ function CompanyQuotationDetails() {
     if (disabled) {
       return;
     }
-    if (!userHasAccessToUpdateCompanyQuotation) return;
+    // if (!userHasAccessToUpdateCompanyQuotation) return;
     const postData = {
       id: quotation.id,
       company_id: loginStatus.companyId,
@@ -1117,7 +1117,7 @@ function CompanyQuotationDetails() {
                     {!isCreateMode && (
                       <Button
                         disabled={
-                          !userHasAccessToUpdateCompanyQuotation || disabled
+                          disabled
                         }
                         onClick={updateQuotation}
                       >
@@ -1127,7 +1127,7 @@ function CompanyQuotationDetails() {
                     {!isCreateMode && (
                       <Button
                         disabled={
-                          !userHasAccessToUpdateCompanyQuotation || disabled
+                          disabled
                         }
                         onClick={submitCompanyQuotation}
                       >
