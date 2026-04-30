@@ -40,15 +40,12 @@ import { getLookupQuotationTemplate } from "../../../config/apis/CompanyQuotatio
 import { getLookupLeadsWithSignal } from "../../../config/apis/LeadsApi";
 import MESSAGE from "../../../constants/Messages";
 import QuotationStatusChip from "../../ui/QuotationStatusChip";
-import {
-  InvoiceHeaderSkeleton,
-  InvoiceItemsSkeleton,
-} from "../invoice/CompanyInvoiceDetailSkeleton";
 import { LookupQuotationTemplateDropdown } from "../lookups/company-quotation/LookupQuotationTemplateDropdown";
 import { QuotationTypeDropdown } from "../lookups/company-quotation/QuotationTypeDropdown";
 import { LookupAccountCompanyProductByProductTypeDropdown } from "../lookups/lookup-account/LookupAccountCompanyProductByProductTypeDropdown";
 import { LookupCompanyProductDropdown } from "../lookups/lookup-company-product/LookupCompanyProductDropdown";
 import { LookupLeadDropdown } from "../lookups/lookup-lead/LookupLeadDropdown";
+import { CompanyQuotationHeaderSkeleton, CompanyQuotationItemsSkeleton } from "./CompanyQuotationDetailsSkeleton";
 
 function CompanyQuotationDetails() {
   const { quotationId } = useParams();
@@ -64,6 +61,8 @@ function CompanyQuotationDetails() {
   const [searchTerm, setSearchTerm] = useState("");
   const [editingItemId, setEditingItemId] = useState<number | null>(null);
   const [refreshCount, setRefreshCount] = useState<number>(0);
+  const [refreshCountItem, setRefreshCountItem] = useState<number>(0);
+
   const [tempItems, setTempItems] = useState<any[]>([]);
   const [itemsLoading, setItemsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -267,7 +266,8 @@ function CompanyQuotationDetails() {
 
       if (res.data.status) {
         toast.success(res.data.message);
-        getCompanyQuotations(new AbortController().signal);
+        // getCompanyQuotations(new AbortController().signal);
+        setRefreshCount((prev)=>prev+1);
       } else {
         toast.error(res.data.message);
       }
@@ -347,6 +347,7 @@ function CompanyQuotationDetails() {
       if (res.data.status) {
         toast.success(res.data.message);
         getCompanyQuotations(new AbortController().signal);
+        setRefreshCount((prev) => prev + 1)
       } else {
         toast.error(res.data.message);
       }
@@ -399,13 +400,9 @@ function CompanyQuotationDetails() {
   };
 
   const handleDeleteItem = async (item: any) => {
-    console.log("Delete item with id:", item.id);
-    console.log(disabled);
-
     if (disabled) {
       return;
     }
-
     const postData = {
       company_id: loginStatus.companyId,
       id: item.id,
@@ -425,9 +422,10 @@ function CompanyQuotationDetails() {
 
       if (res.data.status) {
         toast.success(res.data.message);
-        setRefreshCount((prev) => prev + 1); // trigger refresh of items
+        setRefreshCountItem((prev) => prev + 1); // trigger refresh of items
       } else {
         toast.error(res.data.message);
+        cancelEdit();
       }
     } catch (error) {
       handleApiError(error);
@@ -487,9 +485,9 @@ function CompanyQuotationDetails() {
     (i) => i.cess_amount != null && i.cess_amount > 0,
   );
   const saveSingleItem = async (item: any) => {
-    if (!userHasAccessToUpdateCompanyQuotation) {
-      return;
-    }
+    // if (!userHasAccessToUpdateCompanyQuotation) {
+    //   return;
+    // }
     const postData = {
       company_id: loginStatus.companyId,
       id: item.id,
@@ -511,10 +509,11 @@ function CompanyQuotationDetails() {
 
       if (res.data.status) {
         toast.success(res.data.message);
-        setRefreshCount((prev) => prev + 1);
+        setRefreshCountItem((prev) => prev + 1);
         setEditingItemId(null);
       } else {
         toast.error(res.data.message);
+        cancelEdit();
       }
     } catch (error) {
       handleApiError(error);
@@ -524,7 +523,7 @@ function CompanyQuotationDetails() {
   };
 
   const cancelEdit = () => {
-    setTempItems(items); // reset
+    setTempItems(items); // reset condition
     setEditingItemId(null);
   };
 
@@ -699,11 +698,20 @@ function CompanyQuotationDetails() {
     if (!quotationId || Number(quotationId) === 0) return;
     const controller = new AbortController();
     getCompanyQuotations(controller.signal);
-    getCompanyQuotationItems(controller.signal);
+    // getCompanyQuotationItems(controller.signal);
 
     return () => controller.abort();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [quotationId, refreshCount]);
+
+
+   useEffect(() => {
+    if (!quotationId || Number(quotationId) === 0) return;
+    const controller = new AbortController();
+    getCompanyQuotationItems(controller.signal);
+    return () => controller.abort();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [quotationId, refreshCountItem]);
 
   async function getSearchParamLead() {
     const postData = {
@@ -760,7 +768,7 @@ function CompanyQuotationDetails() {
         {/* HEADER */}
 
         {quotationLoading ? (
-          <InvoiceHeaderSkeleton />
+          <CompanyQuotationHeaderSkeleton />
         ) : (
           <>
             <div className=" sticky top-0 z-10 bg-slate-100 flex text-center justify-start items-center gap-3 ml-0.5 ">
@@ -1144,7 +1152,7 @@ function CompanyQuotationDetails() {
         )}
         {/* ITEMS */}
         {itemsLoading ? (
-          <InvoiceItemsSkeleton />
+          <CompanyQuotationItemsSkeleton />
         ) : (
           <>
             {!isCreateMode && userHasAccessToViewCompanyQuotation && (
@@ -1274,7 +1282,6 @@ function CompanyQuotationDetails() {
                                       {editingItemId !== item.id ? (
                                         <button
                                           disabled={
-                                            !userHasAccessToUpdateCompanyQuotation ||
                                             disabled
                                           }
                                           onClick={() => handleDeleteItem(item)}
