@@ -1336,8 +1336,8 @@ function CompanyQuotationDetails() {
               <div className="w-full items-center justify-center  flex-1">
                 <span className="text-xs flex items-center justify-center font-medium text-gray-500 border rounded-lg px-2 py-1  bg-blue-100">
                   {selectedQuotationType.id == 1
-                    ? "Once an quotation is created, all items assigned to that customer are automatically added to the quotation."
-                    : `Once an quotation is created, you can modify the items and related data.`}
+                    ? "Once a quotation is created, all items assigned to that customer are automatically added to the quotation."
+                    : `Once a quotation is created, you can modify the items and related data.`}
                 </span>
               </div>
             )}
@@ -1386,7 +1386,7 @@ function CompanyQuotationDetails() {
           </>
         )}
         <ConfirmationDialog
-          title="Do you want to submit this quotation!"
+          title="Confirm Submission of Quotation"
           description="Once submitted, this quotation cannot be edited."
           message="After submission, this quotation will be locked and no further changes or edits will be allowed. Please review all details carefully before submitting."
           open={showConfirmationDialoge}
