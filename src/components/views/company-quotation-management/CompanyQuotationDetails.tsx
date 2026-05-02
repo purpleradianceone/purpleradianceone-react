@@ -95,7 +95,6 @@ function CompanyQuotationDetails() {
     userHasAccessToAddLeadQuotation,
     userHasAccessToAddAccountQuotation,
     userHasAccessToViewCompanyQuotation,
-    userHasAccessToUpdateCompanyQuotation,
   } = useUserAccessModules();
 
   useEffect(()=>{
@@ -1314,12 +1313,11 @@ function CompanyQuotationDetails() {
                                       ) : (
                                         <button
                                           disabled={
-                                            !userHasAccessToUpdateCompanyQuotation ||
                                             disabled
                                           }
                                           onClick={() => {
                                             if (
-                                              !userHasAccessToUpdateCompanyQuotation
+                                              disabled
                                             ) {
                                               return;
                                             }

@@ -747,8 +747,12 @@ const UserAndCompanyProfile = () => {
     }
   }, [loginStatus.companyId]);
 
+  const [isLoadingForCompanyLogo, setIsLoadingForCompanyLogo] =
+    useState<boolean>(true);
+
   const getCompanyLogo = () => {
     if (loginStatus.companyId === 0) return;
+    setIsLoadingForCompanyLogo(true);
     axios
       .post(
         POST_API.GET_COMPANY_LOGO,
@@ -775,6 +779,9 @@ const UserAndCompanyProfile = () => {
       })
       .catch((e) => {
         console.log("inside get company logo catch" + e);
+      })
+      .finally(() => {
+        setIsLoadingForCompanyLogo(false);
       });
   };
 
@@ -1042,77 +1049,91 @@ const UserAndCompanyProfile = () => {
           {/** Company Logo */}
           <div className="border-t pt-4">
             {/* Left aligned container */}
-            <div className="flex flex-col items-start">
-              {/* Image */}
-              <div className="w-40 h-40 border rounded-lg overflow-hidden flex items-center justify-center bg-gray-50">
-                {logoPreview || companyDetail?.logo_file_extension ? (
-                  <img
-                    src={logoPreview ?? companyDetail?.logo_cdn_url}
-                    alt="Company Logo"
-                    className="w-full h-full object-contain"
-                    onDoubleClick={() => setShowCompanyLogoPreview(true)}
-                  />
-                ) : (
-                  <span className="caption-custom">No Logo</span>
-                )}
-                {showCompanyLogoPreview && (
-                  <div
-                    className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50"
-                    onClick={() => setShowCompanyLogoPreview(false)}
-                  >
-                    {/* <img
+            {!isLoadingForCompanyLogo ? (
+              <div className="flex flex-col items-start">
+                {/* Image */}
+                <div className="w-40 h-40 border rounded-lg overflow-hidden flex items-center justify-center bg-gray-50">
+                  {logoPreview || companyDetail?.logo_file_extension ? (
+                    <img
+                      src={logoPreview ?? companyDetail?.logo_cdn_url}
+                      alt="Company Logo"
+                      className="w-full h-full object-contain"
+                      onDoubleClick={() => setShowCompanyLogoPreview(true)}
+                    />
+                  ) : (
+                    <span className="caption-custom">No Logo</span>
+                  )}
+                  {showCompanyLogoPreview && (
+                    <div
+                      className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50"
+                      onClick={() => setShowCompanyLogoPreview(false)}
+                    >
+                      {/* <img
                       src={logoPreview ?? companyDetail?.logo_cdn_url}
                       alt="Company Logo"
                       className="max-w-[80%] max-h-[80%] object-contain rounded-lg shadow-lg"
                     /> */}
-                    <CustomDocumentPreviewComponent
-                      fileUrl={logoPreview ?? companyDetail?.logo_cdn_url}
-                      fileExtension={companyDetail.logo_file_extension}
-                      width={"50%"}
-                      enableDownload={true}
-                    />
-                  </div>
-                )}
-              </div>
-
-              {/* Button centered under image */}
-              {userHasAccessToUpdateCompanyDetail &&
-                (!isLogoChange ? (
-                  <div className="w-40 flex justify-center mt-2">
-                    <label className="cursor-pointer px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700">
-                      {logoPreview || companyDetail?.logo_file_extension
-                        ? "Change Logo"
-                        : "Upload Logo"}
-
-                      <input
-                        type="file"
-                        accept="image/*"
-                        hidden
-                        onChange={handleLogoChange}
+                      <CustomDocumentPreviewComponent
+                        fileUrl={logoPreview ?? companyDetail?.logo_cdn_url}
+                        fileExtension={companyDetail.logo_file_extension}
+                        width={"50%"}
+                        enableDownload={true}
                       />
-                    </label>
-                  </div>
-                ) : (
-                  <div className="w-55 flex justify-center mt-2 gap-2">
-                    <div>
-                      <Button
-                        type="button"
-                        onClick={() => setLogoPreview(logoPreviousPreview)}
-                      >
-                        Cancel
-                      </Button>
                     </div>
-                    <div>
-                      <Button
-                        className="cursor-pointer px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-                        onClick={handleCompanyLogoUpload}
-                      >
-                        Save Logo
-                      </Button>
+                  )}
+                </div>
+
+                {/* Button centered under image */}
+                {userHasAccessToUpdateCompanyDetail &&
+                  (!isLogoChange ? (
+                    <div className="w-40 flex justify-center mt-2">
+                      <label className="cursor-pointer px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                        {logoPreview || companyDetail?.logo_file_extension
+                          ? "Change Logo"
+                          : "Upload Logo"}
+
+                        <input
+                          type="file"
+                          accept="image/*"
+                          hidden
+                          onChange={handleLogoChange}
+                        />
+                      </label>
                     </div>
-                  </div>
-                ))}
-            </div>
+                  ) : (
+                    <div className="w-55 flex justify-center mt-2 gap-2">
+                      <div>
+                        <Button
+                          type="button"
+                          onClick={() => setLogoPreview(logoPreviousPreview)}
+                        >
+                          Cancel
+                        </Button>
+                      </div>
+                      <div>
+                        <Button
+                          className="cursor-pointer px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                          onClick={handleCompanyLogoUpload}
+                        >
+                          Save Logo
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            ) : (
+              <div className="flex flex-col items-start animate-pulse">
+                {/* Image Skeleton */}
+                <div className="w-40 h-40 border rounded-lg overflow-hidden flex items-center justify-center bg-gray-100">
+                  <div className="w-32 h-32 bg-gray-300 rounded-md"></div>
+                </div>
+
+                {/* Button Skeleton */}
+                <div className="w-40 flex justify-center mt-2">
+                  <div className="h-8 w-28 bg-gray-300 rounded-md"></div>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* COMPANY DETAILS SECTION */}
