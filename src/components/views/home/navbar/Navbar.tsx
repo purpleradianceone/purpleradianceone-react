@@ -310,40 +310,46 @@ function Navbar({ children }: { children: React.ReactNode }) {
               <div className="flex justify-between h-10">
                 <div className="flex items-center">
                   <div className=" justify-self-start">
-                    <img
-                      height={28}
-                      width={100}
-                      src={IMAGE_SOURCE.PR_ONE_LOGO}
-                      alt="Logo"
-                    />
+                    <Link to={ROUTES_URL.LANDING_PAGE}>
+                      <img
+                        height={28}
+                        width={100}
+                        src={IMAGE_SOURCE.PR_ONE_LOGO}
+                        alt="Logo"
+                      />
+                    </Link>
                   </div>
                 </div>
 
                 <div className="hidden md:flex items-center space-x-8">
-                  <a
-                    href={ROUTES_URL.FEATURES}
+                  <Link
+                    to={ROUTES_URL.FEATURES}
+                    // href={ROUTES_URL.FEATURES}
                     className="text-gray-700 hover:text-blue-600"
                   >
                     Features
-                  </a>
-                  <a
-                    href={ROUTES_URL.PRICING}
+                  </Link>
+                  <Link
+                    to={ROUTES_URL.PRICING}
+                    // href={ROUTES_URL.PRICING}
                     className="text-gray-700 hover:text-blue-600"
                   >
                     Pricing
-                  </a>
-                  <a
-                    href={ROUTES_URL.ABOUT_US}
+                  </Link>
+                  <Link
+                    to={ROUTES_URL.ABOUT_US}
+                    // href={ROUTES_URL.ABOUT_US}
                     className="text-gray-700 hover:text-blue-600"
                   >
                     About Us
-                  </a>
-                  <a
-                    href={ROUTES_URL.CONTACT_US}
+                  </Link>
+                  <Link
+                    to={ROUTES_URL.CONTACT_US}
+                    // href={ROUTES_URL.CONTACT_US}
                     className="text-gray-700 hover:text-blue-600"
                   >
                     Contact Us
-                  </a>
+                  </Link>
                   {/* <a
                     href={ROUTES_URL.CAREERS}
                     className="text-gray-700 hover:text-blue-600"
@@ -505,7 +511,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
                           label="Lead"
                         />
 
-                         <NavItem
+                        <NavItem
                           disable={!userHasAccessToViewCompanyQuotation}
                           to={ROUTES_URL.QUOTATION_MANAGEMENT}
                           icon={<LucideFileArchive size={SIZE.TWENTY} />}
@@ -660,9 +666,9 @@ function Navbar({ children }: { children: React.ReactNode }) {
                           {userHasAccessToViewCompanyQuotation && (
                             <NavItem
                               to={ROUTES_URL.QUOTATION_MANAGEMENT}
-                              icon={<LucideFileArchive size={SIZE.TWENTY}/>}
+                              icon={<LucideFileArchive size={SIZE.TWENTY} />}
                               label=""
-                              onClick={()=> setIsDropdownOpen(false)}
+                              onClick={() => setIsDropdownOpen(false)}
                             />
                           )}
 
