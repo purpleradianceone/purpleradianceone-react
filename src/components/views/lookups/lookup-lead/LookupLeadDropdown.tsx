@@ -41,6 +41,7 @@ export const LookupLeadDropdown = ({
   }, [inputValue, isDisabled]);
 
   const fetchLeads = async (searchText: string) => {
+    if(loginStatus.companyId === 0)return;
     setLoading(true);
 
     const postData = {

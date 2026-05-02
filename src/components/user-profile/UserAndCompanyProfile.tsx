@@ -70,6 +70,17 @@ const UserAndCompanyProfile = () => {
 
   const [showUserLogoPreview, setShowUserLogoPreview] = useState(false);
 
+  const [isLodingForCompanyDetailData, setIsLoadingForCompanDetailData] =
+    useState<boolean>(true);
+
+  const [
+    isLoadingForCompanyDetailsUpdate,
+    setIsLoadingForCompanyDetailsUpdate,
+  ] = useState<boolean>(false);
+
+  const [isLoadingForUpdateCompanyUser, setIsLoadingForUpdateCompanyUser] =
+    useState<boolean>(false);
+
   const [companyDetail, setCompanyDetail] = useState<CompanyDetail>({
     id: 0,
 
@@ -216,6 +227,7 @@ const UserAndCompanyProfile = () => {
   const [searchText, setSearchText] = useState("");
   // const [totalCount, setTotalCount] = useState<number | null>(null);
 
+  const [isLoadingForUserPreferenceChange, setIsLoadingForUserPreferenceChange] = useState<boolean>(false);
   const handleTimezonePreferenceChange = async () => {
     if (loginStatus.companyId === 0) return;
     //getting the id as per value
@@ -223,6 +235,7 @@ const UserAndCompanyProfile = () => {
       (option) => parseInt(option.rowsInGrid) === selectedRowsPerPage,
     );
 
+    setIsLoadingForUserPreferenceChange(true);
     const postData = {
       company_id: loginStatus.companyId,
       id: userPreference.id,
@@ -279,6 +292,8 @@ const UserAndCompanyProfile = () => {
           handleTimezonePreferenceChange();
         }
       }
+    }finally{
+      setIsLoadingForUserPreferenceChange(false);
     }
   };
 
@@ -428,6 +443,7 @@ const UserAndCompanyProfile = () => {
   const updateUserProfile = async () => {
     if (loginStatus.companyId === 0) return;
     try {
+      setIsLoadingForUpdateCompanyUser(true);
       const postData = {
         company_id: loginStatus.companyId,
         id: loginStatus.id,
@@ -468,6 +484,8 @@ const UserAndCompanyProfile = () => {
           updateUserProfile();
         }
       }
+    } finally {
+      setIsLoadingForUpdateCompanyUser(false);
     }
   };
 
@@ -584,9 +602,6 @@ const UserAndCompanyProfile = () => {
     console.log("Company logo file: " + logoPreview?.toString());
   }, [logoPreview]);
 
-  const [isLodingForCompanyDetailData, setIsLoadingForCompanDetailData] =
-    useState<boolean>(true);
-    
   const getCompanyDetail = async () => {
     if (loginStatus.companyId === 0) return;
     try {
@@ -604,7 +619,6 @@ const UserAndCompanyProfile = () => {
           }
         })
         .catch((e) => {
-          console.log("inside get company detail catch");
           handleApiError(e);
         });
     } catch (ex) {
@@ -661,7 +675,6 @@ const UserAndCompanyProfile = () => {
           .finally(() => {
             setIsLogoChange(false);
           });
-        console.log("inside if condition");
       } catch (ex) {
         console.log(ex);
         handleApiError(ex);
@@ -678,18 +691,13 @@ const UserAndCompanyProfile = () => {
     }
   };
 
-  const [
-    isLoadingForCompanyDetailsUpdate,
-    setIsLoadingForCompanyDetailsUpdate,
-  ] = useState<boolean>(false);
-
-  const updateCompanyDetail = () => {
+  const updateCompanyDetail = async () => {
     if (loginStatus.companyId === 0) return;
 
     if (!isCompanyDetailEqual(previousCompanyDetail, companyDetail)) {
       setIsLoadingForCompanyDetailsUpdate(true);
       try {
-        axiosClient
+        await axiosClient
           .post(POST_API.UPDATE_COMPANY_DETAIL, {
             company_id: loginStatus.companyId,
             industry_type_id: companyDetail.industry_type_id,
@@ -728,7 +736,6 @@ const UserAndCompanyProfile = () => {
           .catch((e) => {
             handleApiError(e);
           });
-        console.log("inside if condition");
       } catch (ex) {
         console.log(ex);
         handleApiError(ex);
@@ -921,6 +928,7 @@ const UserAndCompanyProfile = () => {
               sectionKey="user detail"
               onSave={handleUserDetailSave}
               isLoadingForData={false}
+              isLoadingForUpdate={isLoadingForUpdateCompanyUser}
             >
               {editingSection === "user detail" ? (
                 <div className="grid grid-cols-2 sm:grid-cols-2 gap-4">
@@ -1598,7 +1606,7 @@ const UserAndCompanyProfile = () => {
                   );
                 }
               }}
-              isLoadingForUpdate={isLoadingForCompanyDetailsUpdate}
+              isLoadingForUpdate={isLoadingForUserPreferenceChange}
             >
               {editingSection === "preferences" ? (
                 <div className="space-y-1">

@@ -41,6 +41,7 @@ export const LookupQuotationTemplateDropdown = ({
   }, [inputValue, isDisabled]);
 
   const fetchQuotationTemplate = async (searchText: string) => {
+    if(loginStatus.companyId === 0)return;
     setLoading(true);
 
     const postData = {

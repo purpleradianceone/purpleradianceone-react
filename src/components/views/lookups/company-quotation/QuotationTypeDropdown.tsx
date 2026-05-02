@@ -37,6 +37,7 @@ export const QuotationTypeDropdown = ({
   }, []);
 
   const fetchQuotationType = async () => {
+    if(loginStatus.companyId === 0)return;
     setLoading(true);
 
     const postData = {
