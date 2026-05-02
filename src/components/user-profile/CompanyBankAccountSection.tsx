@@ -176,7 +176,7 @@ const CompanyBankAccountSection = ({
             isEditing={true}
             onCancel={handleCancel}
             onSave={handleSave}
-            isLoading={isLoading}
+            isLoadingForUpdate={isLoading}
             onEdit={() => {}}
           >
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2">
@@ -271,7 +271,7 @@ const CompanyBankAccountSection = ({
               isEditing={isEditing}
               onCancel={handleCancel}
               onSave={handleSave}
-              isLoading={isLoading}
+              isLoadingForUpdate={isLoading}
             >
               {isEditing ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2 mt-6">

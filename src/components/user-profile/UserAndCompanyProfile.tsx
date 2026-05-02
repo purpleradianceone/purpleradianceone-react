@@ -584,10 +584,14 @@ const UserAndCompanyProfile = () => {
     console.log("Company logo file: " + logoPreview?.toString());
   }, [logoPreview]);
 
-  const getCompanyDetail = () => {
+  const [isLodingForCompanyDetailData, setIsLoadingForCompanDetailData] =
+    useState<boolean>(true);
+    
+  const getCompanyDetail = async () => {
     if (loginStatus.companyId === 0) return;
     try {
-      axiosClient
+      setIsLoadingForCompanDetailData(true);
+      await axiosClient
         .post(POST_API.GET_COMPANY_DETAIL, {
           company_id: loginStatus.companyId,
           requestedby_id: loginStatus.id,
@@ -605,6 +609,8 @@ const UserAndCompanyProfile = () => {
         });
     } catch (ex) {
       handleApiError(ex);
+    } finally {
+      setIsLoadingForCompanDetailData(false);
     }
   };
 
@@ -914,6 +920,7 @@ const UserAndCompanyProfile = () => {
               onCancel={handleEditableSectionCancel}
               sectionKey="user detail"
               onSave={handleUserDetailSave}
+              isLoadingForData={false}
             >
               {editingSection === "user detail" ? (
                 <div className="grid grid-cols-2 sm:grid-cols-2 gap-4">
@@ -1150,7 +1157,8 @@ const UserAndCompanyProfile = () => {
                 onSave={() => {
                   handleEditableSectionSave();
                 }}
-                isLoading={isLoadingForCompanyDetailsUpdate}
+                isLoadingForUpdate={isLoadingForCompanyDetailsUpdate}
+                isLoadingForData={isLodingForCompanyDetailData}
               >
                 {editingSection === "company" ? (
                   <FormInput
@@ -1192,7 +1200,8 @@ const UserAndCompanyProfile = () => {
                 onSave={() => {
                   handleEditableSectionSave();
                 }}
-                isLoading={isLoadingForCompanyDetailsUpdate}
+                isLoadingForUpdate={isLoadingForCompanyDetailsUpdate}
+                isLoadingForData={isLodingForCompanyDetailData}
               >
                 {editingSection === "business" ? (
                   <div className="grid grid-cols-2 gap-2">
@@ -1280,7 +1289,8 @@ const UserAndCompanyProfile = () => {
                     }
                   }
                 }}
-                isLoading={isLoadingForCompanyDetailsUpdate}
+                isLoadingForUpdate={isLoadingForCompanyDetailsUpdate}
+                isLoadingForData={isLodingForCompanyDetailData}
               >
                 {editingSection === "location" ? (
                   <div className="grid grid-cols-2 gap-2">
@@ -1369,7 +1379,8 @@ const UserAndCompanyProfile = () => {
                 onSave={() => {
                   handleEditableSectionSave();
                 }}
-                isLoading={isLoadingForCompanyDetailsUpdate}
+                isLoadingForUpdate={isLoadingForCompanyDetailsUpdate}
+                isLoadingForData={isLodingForCompanyDetailData}
               >
                 {editingSection === "tax" ? (
                   <div className="grid grid-cols-2 gap-2">
@@ -1480,7 +1491,8 @@ const UserAndCompanyProfile = () => {
                 onSave={() => {
                   handleEditableSectionSave();
                 }}
-                isLoading={isLoadingForCompanyDetailsUpdate}
+                isLoadingForUpdate={isLoadingForCompanyDetailsUpdate}
+                isLoadingForData={isLodingForCompanyDetailData}
               >
                 {editingSection === "address" ? (
                   <div className="space-y-2">
@@ -1586,7 +1598,7 @@ const UserAndCompanyProfile = () => {
                   );
                 }
               }}
-              isLoading={isLoadingForCompanyDetailsUpdate}
+              isLoadingForUpdate={isLoadingForCompanyDetailsUpdate}
             >
               {editingSection === "preferences" ? (
                 <div className="space-y-1">
@@ -1781,7 +1793,7 @@ const UserAndCompanyProfile = () => {
               onCancel={() => {}}
               onSave={() => {}}
               editButtonText="Update Subscription"
-              isLoading={false}
+              isLoadingForUpdate={false}
               key={"subscription"}
             >
               <div className="grid grid-cols-2 items-start border-b pb-1">
