@@ -227,7 +227,10 @@ const UserAndCompanyProfile = () => {
   const [searchText, setSearchText] = useState("");
   // const [totalCount, setTotalCount] = useState<number | null>(null);
 
-  const [isLoadingForUserPreferenceChange, setIsLoadingForUserPreferenceChange] = useState<boolean>(false);
+  const [
+    isLoadingForUserPreferenceChange,
+    setIsLoadingForUserPreferenceChange,
+  ] = useState<boolean>(false);
   const handleTimezonePreferenceChange = async () => {
     if (loginStatus.companyId === 0) return;
     //getting the id as per value
@@ -292,7 +295,7 @@ const UserAndCompanyProfile = () => {
           handleTimezonePreferenceChange();
         }
       }
-    }finally{
+    } finally {
       setIsLoadingForUserPreferenceChange(false);
     }
   };
@@ -324,12 +327,13 @@ const UserAndCompanyProfile = () => {
       setIsSaveEnabled(false);
     } else {
       toast("No Details Changed", {
-        icon: "⚠️",
         style: {
-          border: "1px solid #facc15",
-          background: "#fffbeb",
-          color: "#92400e",
+          color: "#991b1b",
+          border: "1px solid #fca5a5",
+          borderRadius: "8px",
+          fontSize: "14px",
         },
+        icon: "⚠️",
       });
     }
   };
@@ -681,12 +685,13 @@ const UserAndCompanyProfile = () => {
       }
     } else {
       toast("No File Selected For Upload", {
-        icon: "⚠️",
         style: {
-          border: "1px solid #facc15",
-          background: "#fffbeb",
-          color: "#92400e",
+          color: "#991b1b",
+          border: "1px solid #fca5a5",
+          borderRadius: "8px",
+          fontSize: "14px",
         },
+        icon: "⚠️",
       });
     }
   };
@@ -744,12 +749,13 @@ const UserAndCompanyProfile = () => {
       }
     } else {
       toast("No Details Changed", {
-        icon: "⚠️",
         style: {
-          border: "1px solid #facc15",
-          background: "#fffbeb",
-          color: "#92400e",
+          color: "#991b1b",
+          border: "1px solid #fca5a5",
+          borderRadius: "8px",
+          fontSize: "14px",
         },
+        icon: "⚠️",
       });
     }
   };
