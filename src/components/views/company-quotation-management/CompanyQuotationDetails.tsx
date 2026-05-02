@@ -45,13 +45,18 @@ import { QuotationTypeDropdown } from "../lookups/company-quotation/QuotationTyp
 import { LookupAccountCompanyProductByProductTypeDropdown } from "../lookups/lookup-account/LookupAccountCompanyProductByProductTypeDropdown";
 import { LookupCompanyProductDropdown } from "../lookups/lookup-company-product/LookupCompanyProductDropdown";
 import { LookupLeadDropdown } from "../lookups/lookup-lead/LookupLeadDropdown";
-import { CompanyQuotationHeaderSkeleton, CompanyQuotationItemsSkeleton } from "./CompanyQuotationDetailsSkeleton";
+import {
+  CompanyQuotationHeaderSkeleton,
+  CompanyQuotationItemsSkeleton,
+} from "./CompanyQuotationDetailsSkeleton";
 import ConfirmationDialog from "../../dialogue-box/ConfirmationDialogue";
 
 function CompanyQuotationDetails() {
   const { quotationId } = useParams();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const [previousQuotation, setPreviousQuotation] =
+    useState<CompanyQuotationProps | null>(null);
   const [quotation, setQuotation] = useState<CompanyQuotationProps | null>(
     null,
   );
@@ -98,12 +103,14 @@ function CompanyQuotationDetails() {
     userHasAccessToViewCompanyQuotation,
   } = useUserAccessModules();
 
-  useEffect(()=>{
-    if(searchParams.has("account_company_product")){
-        const accountCompanyProduct = JSON.parse(searchParams.get("account_company_product")??"{}")
-        setSelectedAccountCompanyProductType12(accountCompanyProduct);
+  useEffect(() => {
+    if (searchParams.has("account_company_product")) {
+      const accountCompanyProduct = JSON.parse(
+        searchParams.get("account_company_product") ?? "{}",
+      );
+      setSelectedAccountCompanyProductType12(accountCompanyProduct);
     }
-  },[searchParams])
+  }, [searchParams]);
 
   const getCompanyQuotations = async (signal: AbortSignal) => {
     if (!quotationId || Number(quotationId) === 0) return;
@@ -187,6 +194,7 @@ function CompanyQuotationDetails() {
         console.error(res.data[0]);
         setSelectedQuotationTemplate(res.data[0]);
         setQuotation(formattedData);
+        setPreviousQuotation(formattedData);
       }
     } catch (error: any) {
       handleApiError(error);
@@ -221,7 +229,6 @@ function CompanyQuotationDetails() {
           (a: any, b: any) => a.id - b.id,
         ); // Sort by ID to maintain order
 
-
         const items = Array.isArray(responseData)
           ? responseData
           : [responseData];
@@ -236,7 +243,8 @@ function CompanyQuotationDetails() {
       console.log("into items finally");
     }
   };
-const[showConfirmationDialoge, setShowConfirmationDialoge] = useState<boolean>(false);
+  const [showConfirmationDialoge, setShowConfirmationDialoge] =
+    useState<boolean>(false);
   const submitCompanyQuotation = async () => {
     if (!quotation) return;
     if (disabled) {
@@ -268,7 +276,7 @@ const[showConfirmationDialoge, setShowConfirmationDialoge] = useState<boolean>(f
       if (res.data.status) {
         toast.success(res.data.message);
         // getCompanyQuotations(new AbortController().signal);
-        setRefreshCount((prev)=>prev+1);
+        setRefreshCount((prev) => prev + 1);
       } else {
         toast.error(res.data.message);
       }
@@ -323,6 +331,14 @@ const[showConfirmationDialoge, setShowConfirmationDialoge] = useState<boolean>(f
     if (disabled) {
       return;
     }
+    if (
+      previousQuotation?.quotationDate === quotation.quotationDate &&
+      previousQuotation?.validTillDate === quotation.validTillDate &&
+      previousQuotation?.quotationTemplateId === selectedQuotationTemplate.id
+    ) {
+      toast.error("No changes were detected. Please update at least one field before updating.");
+      return;
+    }
     // if (!userHasAccessToUpdateCompanyQuotation) return;
     const postData = {
       id: quotation.id,
@@ -348,7 +364,7 @@ const[showConfirmationDialoge, setShowConfirmationDialoge] = useState<boolean>(f
       if (res.data.status) {
         toast.success(res.data.message);
         getCompanyQuotations(new AbortController().signal);
-        setRefreshCount((prev) => prev + 1)
+        setRefreshCount((prev) => prev + 1);
       } else {
         toast.error(res.data.message);
       }
@@ -382,15 +398,14 @@ const[showConfirmationDialoge, setShowConfirmationDialoge] = useState<boolean>(f
       );
 
       const blob = new Blob([response.data], {
-        type: "application/pdf", // fixed for invoice
+        type: "application/pdf",
       });
 
       console.log(response.data);
 
       const fileUrl = URL.createObjectURL(blob);
 
-      // ✅ Same as your task document logic
-      setLogoPreview(fileUrl); // you can rename this later (e.g. setInvoicePreview)
+      setLogoPreview(fileUrl);
       setShowCompanyLogoPreview(true);
     } catch (error) {
       console.error(error);
@@ -528,16 +543,12 @@ const[showConfirmationDialoge, setShowConfirmationDialoge] = useState<boolean>(f
     setEditingItemId(null);
   };
 
-  
-
   const handleCreateQuotation = async () => {
-
-
-    if (selectedQuotationType.id === 1 && (!userHasAccessToAddLeadQuotation)) {
+    if (selectedQuotationType.id === 1 && !userHasAccessToAddLeadQuotation) {
       toast.error(MESSAGE.MODULE_ACCESS.LEAD_QUOTATION.DENIED_ADD_ACCESS);
       return;
     }
-    if (selectedQuotationType.id === 2 && (!userHasAccessToAddAccountQuotation)) {
+    if (selectedQuotationType.id === 2 && !userHasAccessToAddAccountQuotation) {
       toast.error(MESSAGE.MODULE_ACCESS.ACCOUNT_QUOTATION.DENIED_ADD_ACCESS);
       return;
     }
@@ -552,16 +563,15 @@ const[showConfirmationDialoge, setShowConfirmationDialoge] = useState<boolean>(f
         toast.error("Please select an account");
         return;
       }
-      if(!selectedAccountCompanyProductType12){
+      if (!selectedAccountCompanyProductType12) {
         toast.error("Please select an account product");
         return;
       }
-      if(!selectedSelectedCompanyProductType4){
+      if (!selectedSelectedCompanyProductType4) {
         toast.error("Please select AMC type product");
         return;
       }
     }
-
 
     if (!selectedQuotationTemplate) {
       toast.error("Please select an quotation template");
@@ -586,19 +596,22 @@ const[showConfirmationDialoge, setShowConfirmationDialoge] = useState<boolean>(f
             valid_till_date_string: quotation?.validTillDate,
             createdby_id: loginStatus.id,
           }
-        : selectedQuotationType.id === 2?{
-            company_id: loginStatus.companyId,
-            account_company_product_id: selectedAccountCompanyProductType12.id,
-            company_product_id: selectedSelectedCompanyProductType4.id,
-            quotation_template_id: selectedQuotationTemplate.id,
-            quotation_date_string: quotation?.quotationDate,
-            valid_till_date_string: quotation?.validTillDate,
-            createdby_id: loginStatus.id,
-          }:{
-            company_id: loginStatus.companyId,
+        : selectedQuotationType.id === 2
+          ? {
+              company_id: loginStatus.companyId,
+              account_company_product_id:
+                selectedAccountCompanyProductType12.id,
+              company_product_id: selectedSelectedCompanyProductType4.id,
+              quotation_template_id: selectedQuotationTemplate.id,
+              quotation_date_string: quotation?.quotationDate,
+              valid_till_date_string: quotation?.validTillDate,
+              createdby_id: loginStatus.id,
+            }
+          : {
+              company_id: loginStatus.companyId,
 
-            createdby_id: loginStatus.id,
-          };
+              createdby_id: loginStatus.id,
+            };
     console.log(formPayload);
 
     setIsSubmitting(true);
@@ -639,7 +652,6 @@ const[showConfirmationDialoge, setShowConfirmationDialoge] = useState<boolean>(f
       });
   };
 
-
   const handleAccountSelect = (account: any) => {
     setSelectedAccount(account);
   };
@@ -676,8 +688,7 @@ const[showConfirmationDialoge, setShowConfirmationDialoge] = useState<boolean>(f
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [quotationId, refreshCount]);
 
-
-   useEffect(() => {
+  useEffect(() => {
     if (!quotationId || Number(quotationId) === 0) return;
     const controller = new AbortController();
     getCompanyQuotationItems(controller.signal);
@@ -727,11 +738,14 @@ const[showConfirmationDialoge, setShowConfirmationDialoge] = useState<boolean>(f
     }
   }, []);
 
-    useEffect(()=>{
-    if(quotationTypeIdSearchParams && quotationTypeIdSearchParams !== "0"){
-        setSelectedQuotationType({id:Number(quotationTypeIdSearchParams), name: quotationTypeIdSearchParams === "1"?"Lead":"AMC" })
+  useEffect(() => {
+    if (quotationTypeIdSearchParams && quotationTypeIdSearchParams !== "0") {
+      setSelectedQuotationType({
+        id: Number(quotationTypeIdSearchParams),
+        name: quotationTypeIdSearchParams === "1" ? "Lead" : "AMC",
+      });
     }
-  },[quotationTypeIdSearchParams]);
+  }, [quotationTypeIdSearchParams]);
 
   return (
     <PageLayout onScrollChange={setShowAccountName} scrollTopValue={80}>
@@ -941,38 +955,37 @@ const[showConfirmationDialoge, setShowConfirmationDialoge] = useState<boolean>(f
                       />
                     </div>
                   )}
-
-                  
                 </div>
-                {!quotationTypeIdSearchParams && <div className="grid grid-cols-3 gap-3 mb-3">
-                  {selectedQuotationType.id === 2 && (
-                    <LookupAccountCompanyProductByProductTypeDropdown
-                      icon={<User size={14} />}
-                      value={selectedAccountCompanyProductType12}
-                      label="Account Product"
-                      accountId={selectedAccount ? selectedAccount.id : null}
-                      productTypeId={[1, 2]}
-                      handleAccountCompanyProductSelection={
-                        handleAccountCompanyProductSelection
-                      }
-                      isDisabled={selectedAccount ? false : true}
-                    />
-                  )}
+                {!quotationTypeIdSearchParams && (
+                  <div className="grid grid-cols-3 gap-3 mb-3">
+                    {selectedQuotationType.id === 2 && (
+                      <LookupAccountCompanyProductByProductTypeDropdown
+                        icon={<User size={14} />}
+                        value={selectedAccountCompanyProductType12}
+                        label="Account Product"
+                        accountId={selectedAccount ? selectedAccount.id : null}
+                        productTypeId={[1, 2]}
+                        handleAccountCompanyProductSelection={
+                          handleAccountCompanyProductSelection
+                        }
+                        isDisabled={selectedAccount ? false : true}
+                      />
+                    )}
 
-                  {selectedQuotationType.id === 2 && (
-                    <LookupCompanyProductDropdown
-                      icon={<LucideSubtitles size={14} />}
-                      value={selectedSelectedCompanyProductType4}
-                      label="AMC Type Product"
-                      productTypeId={[4]}
-                      handleCompanyProductSelection={
-                        handleCompanyProductSelection
-                      }
-                      isDisabled={false}
-                    />
-                  )}
-                </div>}
-                
+                    {selectedQuotationType.id === 2 && (
+                      <LookupCompanyProductDropdown
+                        icon={<LucideSubtitles size={14} />}
+                        value={selectedSelectedCompanyProductType4}
+                        label="AMC Type Product"
+                        productTypeId={[4]}
+                        handleCompanyProductSelection={
+                          handleCompanyProductSelection
+                        }
+                        isDisabled={false}
+                      />
+                    )}
+                  </div>
+                )}
               </div>
             )}
 
@@ -1075,7 +1088,7 @@ const[showConfirmationDialoge, setShowConfirmationDialoge] = useState<boolean>(f
                 <MetaField label="Updated By" value={quotation?.updatedBy} />
                 <MetaField label="Updated On" value={quotation?.updatedOn} />
               </div>
-              
+
               {!isCreateMode && (
                 <div className="col-span-2 flex items-center justify-end p-1">
                   <div className="flex gap-2">
@@ -1095,24 +1108,17 @@ const[showConfirmationDialoge, setShowConfirmationDialoge] = useState<boolean>(f
                     )}
 
                     {!isCreateMode && (
-                      <Button
-                        disabled={
-                          disabled
-                        }
-                        onClick={updateQuotation}
-                      >
+                      <Button disabled={disabled} onClick={updateQuotation}>
                         Update
                       </Button>
                     )}
                     {!isCreateMode && (
                       <Button
-                        disabled={
-                          disabled
-                        }
+                        disabled={disabled}
                         // onClick={submitCompanyQuotation}
-                        onClick={()=>{
-                          if(disabled)return;
-                          setShowConfirmationDialoge(true)
+                        onClick={() => {
+                          if (disabled) return;
+                          setShowConfirmationDialoge(true);
                         }}
                       >
                         Submit
@@ -1121,8 +1127,6 @@ const[showConfirmationDialoge, setShowConfirmationDialoge] = useState<boolean>(f
                   </div>
                 </div>
               )}
-
-              
             </div>
           </>
         )}
@@ -1140,7 +1144,6 @@ const[showConfirmationDialoge, setShowConfirmationDialoge] = useState<boolean>(f
                     onChange={(e: any) => setSearchTerm(e.target.value)}
                     placeholder="Search product..."
                   />
-                  
                 </div>
                 <div className="w-full overflow-y-auto border rounded">
                   <table className="w-full text-sm font-semibold ">
@@ -1257,9 +1260,7 @@ const[showConfirmationDialoge, setShowConfirmationDialoge] = useState<boolean>(f
                                     <div className="flex gap-2 justify-end">
                                       {editingItemId !== item.id ? (
                                         <button
-                                          disabled={
-                                            disabled
-                                          }
+                                          disabled={disabled}
                                           onClick={() => handleDeleteItem(item)}
                                         >
                                           <Trash
@@ -1289,13 +1290,9 @@ const[showConfirmationDialoge, setShowConfirmationDialoge] = useState<boolean>(f
                                         </div>
                                       ) : (
                                         <button
-                                          disabled={
-                                            disabled
-                                          }
+                                          disabled={disabled}
                                           onClick={() => {
-                                            if (
-                                              disabled
-                                            ) {
+                                            if (disabled) {
                                               return;
                                             }
                                             setEditingItemId(item.id);
@@ -1326,17 +1323,21 @@ const[showConfirmationDialoge, setShowConfirmationDialoge] = useState<boolean>(f
                 </div>
               </div>
             )}
-            {isCreateMode && <div className="flex w-full justify-end items-end mb-3">
-                    <div>
-                    <Button onClick={handleCreateQuotation}>
-                      {isSubmitting ? "Saving..." : "Save"}
-                    </Button>
-                    </div>
-                  </div>}
+            {isCreateMode && (
+              <div className="flex w-full justify-end items-end mb-3">
+                <div>
+                  <Button onClick={handleCreateQuotation}>
+                    {isSubmitting ? "Saving..." : "Save"}
+                  </Button>
+                </div>
+              </div>
+            )}
             {isCreateMode && (
               <div className="w-full items-center justify-center  flex-1">
                 <span className="text-xs flex items-center justify-center font-medium text-gray-500 border rounded-lg px-2 py-1  bg-blue-100">
-                  {(selectedQuotationType.id==1)?'Once an quotation is created, all items assigned to that customer are automatically added to the quotation.':`Once an quotation is created, you can modify the items and related data.`}
+                  {selectedQuotationType.id == 1
+                    ? "Once an quotation is created, all items assigned to that customer are automatically added to the quotation."
+                    : `Once an quotation is created, you can modify the items and related data.`}
                 </span>
               </div>
             )}
@@ -1385,14 +1386,14 @@ const[showConfirmationDialoge, setShowConfirmationDialoge] = useState<boolean>(f
           </>
         )}
         <ConfirmationDialog
-        title="Do you want to submit this quotation!"
-        description="Once submitted, this quotation cannot be edited."
-        message="After submission, this quotation will be locked and no further changes or edits will be allowed. Please review all details carefully before submitting."
-        open={showConfirmationDialoge}
-        onConfirm={()=>{
+          title="Do you want to submit this quotation!"
+          description="Once submitted, this quotation cannot be edited."
+          message="After submission, this quotation will be locked and no further changes or edits will be allowed. Please review all details carefully before submitting."
+          open={showConfirmationDialoge}
+          onConfirm={() => {
             submitCompanyQuotation();
-        }}
-        onCancel={()=>setShowConfirmationDialoge(false)}
+          }}
+          onCancel={() => setShowConfirmationDialoge(false)}
         />
       </div>
     </PageLayout>
