@@ -109,10 +109,10 @@ function AboutUs() {
       animate={inView ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.4, ease: "easeOut" }}
     >
-      <div id="aboutUs" className="font-dm text-[#0f0e1a] bg-[#fafafa]">
+      <div id="aboutUs" className="font-dm text-[#0f0e1a] py-6 bg-[#fafafa]">
         {/* HERO */}
-        <section className="relative text-center px-6 py-20 bg-gradient-to-br from-[#f4f2ff] via-white to-[#f0f7ff] overflow-hidden">
-          <div className="inline-flex items-center gap-2 border px-4 py-1 rounded-full shadow-md text-sm text-gray-500 mb-6 bg-white">
+        <section className="relative border-y text-center px-6 py-20 bg-gradient-to-br from-[#f4f2ff] via-white to-[#f0f7ff] overflow-hidden">
+          <div className="inline-flex items-center gap-2 border px-4 py-1 rounded-full shadow-md text-xs text-gray-500 mb-6 bg-white">
             <span className="w-2 h-2 bg-purple rounded-full "></span>
             Our story
           </div>
@@ -132,7 +132,7 @@ function AboutUs() {
           </p>
         </section>
 
-        <section className="max-w-3xl mx-auto px-6 py-20">
+        <section className="max-w-3xl  mx-auto px-6 py-20">
           {/* Label */}
           <p className="text-[12px] font-semibold text-[#5b4bff] mb-3 uppercase tracking-[1px]">
             The problem we saw
@@ -166,20 +166,7 @@ function AboutUs() {
           </p>
 
           {/* Highlight box */}
-          <div
-            className="
-    bg-[#eeedfe] 
-    border-l-[3px] 
-    border-[#5b4bff] 
-    rounded-r-xl 
-    px-5 py-4 
-    italic 
-    text-[15px] 
-    text-[#0f0e1a] 
-    leading-[1.7] 
-    mb-6
-  "
-          >
+          <div className="bg-[#eeedfe] border-l-[3px] border-[#5b4bff] rounded-r-xl px-5 py-4 italic text-[15px] text-[#0f0e1a] leading-[1.7] mb-6">
             "The tools that existed were either too complex, too expensive, or
             built for enterprises — not for the salon owner managing 80 clients
             or the sports academy collecting fees from 200 families."
@@ -199,42 +186,6 @@ function AboutUs() {
           </p>
         </section>
         {/* MISSION VISION */}
-        {/* <section className="bg-white border-y py-16 px-6">
-        <div className="max-w-6xl mx-auto text-center">
-          <h2 className="font-syne text-3xl font-bold mb-10">
-            Mission. Vision. Values.
-          </h2>
-
-          <div className="grid md:grid-cols-3 gap-6">
-            {[
-              {
-                title: "Our Mission",
-                text: "Help businesses stop losing revenue.",
-                border: "border-purple",
-              },
-              {
-                title: "Our Vision",
-                text: "Everything automated. No manual follow-ups.",
-                border: "border-green-500",
-              },
-              {
-                title: "Our Promise",
-                text: "One platform for everything.",
-                border: "border-yellow-600",
-              },
-            ].map((item, i) => (
-              <div
-                key={i}
-                className={`p-6 border rounded-xl border-t-4 ${item.border}`}
-              >
-                <h3 className="font-syne font-semibold mb-2">{item.title}</h3>
-                <p className="text-sm text-gray-500">{item.text}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section> */}
-
         <section className="bg-white border-y border-[#e8e8f0] py-20 px-6">
           <div className="max-w-5xl mx-auto text-center">
             {/* Label */}
@@ -243,16 +194,7 @@ function AboutUs() {
             </p>
 
             {/* Heading */}
-            <h2
-              className="
-      font-syne 
-      text-[28px] md:text-[34px] 
-      font-[700] 
-      leading-[1.3] 
-      tracking-[-0.01em] 
-      mb-12
-    "
-            >
+            <h2 className="font-syne text-[28px] md:text-[34px] font-[700] leading-[1.3] tracking-[-0.01em] mb-12">
               Mission. Vision. Values.
             </h2>
 
@@ -302,29 +244,6 @@ function AboutUs() {
         </section>
 
         {/* FOUR PILLARS */}
-        {/* <section className="max-w-6xl mx-auto px-6 py-16">
-        <p className="text-[12px] font-semibold text-[#5b4bff] uppercase tracking-[1px] mb-3">
-          What we do
-        </p>
-
-        <h2 className="font-syne text-3xl text-center font-bold mb-10">
-          Four problems. One platform.
-        </h2>
-
-        <div className="grid md:grid-cols-4 gap-4">
-          {["Lead capture", "Reminders", "Billing", "Support"].map(
-            (item, i) => (
-              <div key={i} className="p-4 border rounded-xl bg-white">
-                <h4 className="font-syne text-sm font-semibold">{item}</h4>
-                <p className="text-xs text-gray-500 mt-1">
-                  Simplified automation for your business.
-                </p>
-              </div>
-            ),
-          )}
-        </div>
-      </section> */}
-
         <section className="max-w-6xl mx-auto px-6 py-20">
           {/* Label */}
           <p className="text-[12px] font-semibold text-[#5b4bff] uppercase tracking-[1px] mb-3 text-center">
@@ -332,17 +251,7 @@ function AboutUs() {
           </p>
 
           {/* Heading */}
-          <h2
-            className="
-    font-syne 
-    text-[28px] md:text-[32px] 
-    text-center 
-    font-[700] 
-    leading-[1.3] 
-    tracking-[-0.01em] 
-    mb-12
-  "
-          >
+          <h2 className="font-syne text-[28px] md:text-[32px] text-center font-[700] leading-[1.3] tracking-[-0.01em] mb-12">
             Four problems. One platform. Zero revenue leaks.
           </h2>
 
@@ -351,7 +260,7 @@ function AboutUs() {
             {/* CARD 1 */}
             <div className="flex gap-4 items-start bg-white border border-[#e8e8f0] rounded-[14px] p-4 border-l-[4px] border-l-[#5b4bff]">
               <div className="w-9 h-9 rounded-lg bg-[#e8e7fd] flex items-center justify-center shrink-0">
-                <BsFillPersonCheckFill className="" />
+                <BsFillPersonCheckFill className="text-purple" />
               </div>
               <div>
                 <h4 className="font-syne text-[13px] font-[600] mb-1">

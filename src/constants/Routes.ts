@@ -1,5 +1,4 @@
 const ROUTES_URL = {
-
   NOT_FOUND: "*",
   LANDING_PAGE: "/",
   SIGN_IN: "/signin",
@@ -51,9 +50,9 @@ const ROUTES_URL = {
   TERMS_OF_SERVICE: "/policy/terms-of-service",
   COOKIE_POLICY: "/policy/cookie-policy",
   CAREERS: "/careers",
-  ABOUT_US: "/#aboutUs",
+  ABOUT_US: "/aboutUs",
   CONTACT_US: "/#contactUs",
-  FEATURES: "/#features",
+  FEATURES: "/features",
   PRICING: "/pricing",
   NOT_AUTHORIZED: "/not-authorized",
   SETTINGS_ALREADY_EXISTS: "/meeting/settings/already-exists",
@@ -112,20 +111,22 @@ const ROUTES_URL = {
   MY_TASKS: "my-tasks",
   GENERAL_TASK: "/home/manage-tasks/general-task/:taskId/:masterId",
   MASTER_TASK_DETAILS: "/home/master-task/details/:taskId",
-    
+
   //META APP INTEGRATIONS
   SETTING_META_APP_INTEGRATION_FACEBOOK: "/settings/facebook",
-  SETTING_META_APP_INTEGRATION_FACEBOOK_PAGE_ADDITION : "integrate-meta-app",
+  SETTING_META_APP_INTEGRATION_FACEBOOK_PAGE_ADDITION: "integrate-meta-app",
   SETTING_META_APP_INTEGRATION_WHATSAPP: "integrate-whatsapp",
-  SETTING_META_APP_INTEGRATION_WHATSAPP_PHONE_NUMBER_ADDITION : "integrate-whatsapp-phone-number",
+  SETTING_META_APP_INTEGRATION_WHATSAPP_PHONE_NUMBER_ADDITION:
+    "integrate-whatsapp-phone-number",
 
   //invoice
   INVOICE_MANAGEMENT: "/home/manage-invoices/company-invoice",
-  INVOICE_DETAILS: "/home/manage-invoices/company-invoice/invoice-details/:invoiceId",
+  INVOICE_DETAILS:
+    "/home/manage-invoices/company-invoice/invoice-details/:invoiceId",
 
   //Quotation Module
   QUOTATION_MANAGEMENT: "/home/manage-company-quotation/company-quotations",
-  QUOTATION_CREATE_AND_DETAILS: "/home/manage-company-quotation/company-quotations/company-quotation-details/:quotationId",
-
+  QUOTATION_CREATE_AND_DETAILS:
+    "/home/manage-company-quotation/company-quotations/company-quotation-details/:quotationId",
 };
 export default ROUTES_URL;
