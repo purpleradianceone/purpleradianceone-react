@@ -288,6 +288,22 @@ function CompanyQuotationDetails() {
   };
 
   const previewCompanyQuotation = async () => {
+    if (tempItems.length <= 0) {
+      toast.error(
+        "No items available to preview this quotation. \nPlease create a new quotation.",
+        {
+          style: {
+            background: "white",
+            color: "#991b1b",
+            border: "1px solid #fca5a5",
+            borderRadius: "8px",
+            fontSize: "14px",
+          },
+          icon: "⚠️",
+        },
+      );
+      return;
+    }
     if (!userHasAccessToViewCompanyQuotation) return;
     setIsSubmitting(true);
 
@@ -336,7 +352,18 @@ function CompanyQuotationDetails() {
       previousQuotation?.validTillDate === quotation.validTillDate &&
       previousQuotation?.quotationTemplateId === selectedQuotationTemplate.id
     ) {
-      toast.error("No changes were detected. Please update at least one field before updating.");
+      toast.error(
+        "No changes were detected. Please update at least one field.",
+        {
+          style: {
+            color: "#991b1b",
+            border: "1px solid #fca5a5",
+            borderRadius: "8px",
+            fontSize: "14px",
+          },
+          icon: "⚠️",
+        },
+      );
       return;
     }
     // if (!userHasAccessToUpdateCompanyQuotation) return;
@@ -1118,6 +1145,23 @@ function CompanyQuotationDetails() {
                         // onClick={submitCompanyQuotation}
                         onClick={() => {
                           if (disabled) return;
+                          if (tempItems.length <= 0) {
+                            toast.error(
+                              "No items available to submit this quotation. \nPlease create a new quotation.",
+                              {
+                                style: {
+                                  background: "white",
+                                  color: "#991b1b",
+                                  border: "1px solid #fca5a5",
+                                  borderRadius: "8px",
+                                  fontSize: "14px",
+                                },
+                                icon: "⚠️",
+                              },
+                            );
+                            return;
+                          }
+
                           setShowConfirmationDialoge(true);
                         }}
                       >
