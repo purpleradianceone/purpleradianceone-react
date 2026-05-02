@@ -21,10 +21,13 @@ const CompanyBankAccountSection = ({
   const [editingId, setEditingId] = useState<number | null>(null); // 0 = new
   const [bankForm, setBankForm] = useState<any>({});
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingForData, setIsLoadingForData] = useState<boolean>(true);
 
   // ================= FETCH =================
   const fetchBankAccounts = async () => {
+    if(loginStatus.companyId === 0)return;
     try {
+      setIsLoadingForData(true);
       const res = await axiosClient.post(
         POST_API.GET_COMPANY_BANK_ACCOUNT,
         {
@@ -38,6 +41,8 @@ const CompanyBankAccountSection = ({
       setBankList(res.data || []);
     } catch {
       toast.error("Failed to fetch bank accounts");
+    }finally{
+      setIsLoadingForData(false);
     }
   };
 
@@ -177,6 +182,7 @@ const CompanyBankAccountSection = ({
             onCancel={handleCancel}
             onSave={handleSave}
             isLoadingForUpdate={isLoading}
+            isLoadingForData={isLoadingForData}
             onEdit={() => {}}
           >
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2">
@@ -272,6 +278,7 @@ const CompanyBankAccountSection = ({
               onCancel={handleCancel}
               onSave={handleSave}
               isLoadingForUpdate={isLoading}
+              isLoadingForData={isLoadingForData}
             >
               {isEditing ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2 mt-6">

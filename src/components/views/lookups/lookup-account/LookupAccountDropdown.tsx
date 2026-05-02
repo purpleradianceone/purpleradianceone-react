@@ -41,6 +41,7 @@ export const LookupAccountDropdown = ({
   }, [inputValue, isDisabled]);
 
   const fetchAccounts = async (searchText: string) => {
+    if(loginStatus.companyId === 0)return;
     setLoading(true);
 
     const postData = {

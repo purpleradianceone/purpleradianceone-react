@@ -47,6 +47,7 @@ export const LookupAccountCompanyProductByProductTypeDropdown = ({
   const fetchAccountCompanyProductByProductType = async (
     searchText: string,
   ) => {
+    if(loginStatus.companyId === 0)return;
     if (!accountId) return;
 
     setLoading(true);

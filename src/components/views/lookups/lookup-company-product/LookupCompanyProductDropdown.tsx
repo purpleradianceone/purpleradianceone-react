@@ -43,6 +43,7 @@ export const LookupCompanyProductDropdown = ({
   }, [inputValue, productTypeId, isDisabled]);
 
   const fetchLookupCompanyProductByProductType = async (searchText: string) => {
+    if(loginStatus.companyId === 0)return;
     setLoading(true);
 
     const postData = {
