@@ -1110,7 +1110,10 @@ const[showConfirmationDialoge, setShowConfirmationDialoge] = useState<boolean>(f
                           disabled
                         }
                         // onClick={submitCompanyQuotation}
-                        onClick={()=>setShowConfirmationDialoge(true)}
+                        onClick={()=>{
+                          if(disabled)return;
+                          setShowConfirmationDialoge(true)
+                        }}
                       >
                         Submit
                       </Button>
