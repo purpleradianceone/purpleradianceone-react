@@ -46,6 +46,7 @@ import { LookupAccountCompanyProductByProductTypeDropdown } from "../lookups/loo
 import { LookupCompanyProductDropdown } from "../lookups/lookup-company-product/LookupCompanyProductDropdown";
 import { LookupLeadDropdown } from "../lookups/lookup-lead/LookupLeadDropdown";
 import { CompanyQuotationHeaderSkeleton, CompanyQuotationItemsSkeleton } from "./CompanyQuotationDetailsSkeleton";
+import ConfirmationDialog from "../../dialogue-box/ConfirmationDialogue";
 
 function CompanyQuotationDetails() {
   const { quotationId } = useParams();
@@ -235,12 +236,13 @@ function CompanyQuotationDetails() {
       console.log("into items finally");
     }
   };
-
+const[showConfirmationDialoge, setShowConfirmationDialoge] = useState<boolean>(false);
   const submitCompanyQuotation = async () => {
     if (!quotation) return;
     if (disabled) {
       return;
     }
+
     // if (!userHasAccessToUpdateCompanyQuotation) {
     //   return;
     // }
@@ -637,35 +639,6 @@ function CompanyQuotationDetails() {
       });
   };
 
-  //   const handleAddToInvoice = async () => {
-  //     const postData = {
-  //       company_id: loginStatus.companyId,
-  //       account_id: invoice?.accountId,
-  //       createdby_id: loginStatus.id,
-  //     };
-  //     console.log(postData);
-  //     setIsSubmitting(true);
-  //     try {
-  //       const res = await axiosClient.post(
-  //         POST_API.CREATE_COMPANY_INVOICE_ITEM,
-  //         postData,
-  //         {
-  //           withCredentials: true,
-  //         },
-  //       );
-
-  //       if (res.data.status) {
-  //         toast.success(res.data.message);
-  //         setRefreshCount((prev) => prev + 1);
-  //       } else {
-  //         toast.error(res.data.message);
-  //       }
-  //     } catch (error) {
-  //       handleApiError(error);
-  //     } finally {
-  //       setIsSubmitting(false);
-  //     }
-  //   };
 
   const handleAccountSelect = (account: any) => {
     setSelectedAccount(account);
@@ -1136,7 +1109,8 @@ function CompanyQuotationDetails() {
                         disabled={
                           disabled
                         }
-                        onClick={submitCompanyQuotation}
+                        // onClick={submitCompanyQuotation}
+                        onClick={()=>setShowConfirmationDialoge(true)}
                       >
                         Submit
                       </Button>
@@ -1407,6 +1381,16 @@ function CompanyQuotationDetails() {
             )}
           </>
         )}
+        <ConfirmationDialog
+        title="Do you want to submit this quotation!"
+        description="Once submitted, this quotation cannot be edited."
+        message="After submission, this quotation will be locked and no further changes or edits will be allowed. Please review all details carefully before submitting."
+        open={showConfirmationDialoge}
+        onConfirm={()=>{
+            submitCompanyQuotation();
+        }}
+        onCancel={()=>setShowConfirmationDialoge(false)}
+        />
       </div>
     </PageLayout>
   );
