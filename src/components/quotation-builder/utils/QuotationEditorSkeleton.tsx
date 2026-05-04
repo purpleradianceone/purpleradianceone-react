@@ -17,7 +17,7 @@ export const QuotationEditorSkeleton = () => {
           <div className="h-5 w-40 bg-gray-300 rounded"></div>
 
           <div className="grid grid-cols-2 gap-4">
-            {Array.from({ length: 4 }).map((_, i) => (
+            {Array.from({ length: 6 }).map((_, i) => (
               <div
                 key={i}
                 className="h-24 bg-gray-300 rounded-xl"
