@@ -1,12 +1,12 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { useEffect, useState, useRef } from "react";
+import { ListOrdered, ScanBarcode } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import Select, { components } from "react-select";
-import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
-import { handleApiError } from "../../../../config/error/handleApiError";
 import { getLookupAccountCompanyProductByProductType } from "../../../../config/apis/Lookups";
-import { Barcode, Hash } from "lucide-react";
+import { handleApiError } from "../../../../config/error/handleApiError";
+import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
 
 export const LookupAccountCompanyProductByProductTypeDropdown = ({
   icon,
@@ -129,11 +129,11 @@ export const LookupAccountCompanyProductByProductTypeDropdown = ({
                 <div
                   style={{
                     display: "flex",
-                    gap: "6px",
+                    gap: "4px",
                     alignItems: "center",
                   }}
                 >
-                  <Hash size={13} style={{ flexShrink: 0 }} />
+                  <ListOrdered size={13} style={{ flexShrink: 0 }} />
                   <span>{data.data.serial_number}</span>
                 </div>
               )}
@@ -143,11 +143,11 @@ export const LookupAccountCompanyProductByProductTypeDropdown = ({
                 <div
                   style={{
                     display: "flex",
-                    gap: "6px",
+                    gap: "4px",
                     alignItems: "center",
                   }}
                 >
-                  <Barcode size={13} style={{ flexShrink: 0 }} />
+                  <ScanBarcode size={13} style={{ flexShrink: 0 }} />
                   <span>{data.data.barcode}</span>
                 </div>
               )}
