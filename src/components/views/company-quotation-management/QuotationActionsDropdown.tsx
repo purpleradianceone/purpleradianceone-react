@@ -6,7 +6,7 @@ import { JSX_CHILDREN_NAME } from "../../../constants/AppConstants";
 import ActionsDropdownButton from "../../ui/ActionsDropdownButton";
 
 const QuotationActionsDropdown = ({ data, context }: any) => {
-  console.log("QuotationActionDropdown data:")
+  console.log("QuotationActionDropdown data:");
   console.log(data);
   const [open, setOpen] = useState(false);
   const [position, setPosition] = useState({
@@ -91,20 +91,19 @@ const QuotationActionsDropdown = ({ data, context }: any) => {
               </ActionsDropdownButton>
             )}
 
-            {!context.userHasAccessToUpdateCompanyQuotation ||
-              (data.quotationStatusId === 1 && (
-                <ActionsDropdownButton
-                  onClick={() => {
-                    context.onDelete?.(data);
-                    setOpen(false);
-                  }}
-                >
-                  <div className="flex items-center gap-2 text-red-600">
-                    <Trash2 size={14} />
-                    Delete
-                  </div>
-                </ActionsDropdownButton>
-              ))}
+            {data.quotationStatusId === 1 && (
+              <ActionsDropdownButton
+                onClick={() => {
+                  context.onDelete?.(data);
+                  setOpen(false);
+                }}
+              >
+                <div className="flex items-center gap-2 text-red-600">
+                  <Trash2 size={14} />
+                  Delete
+                </div>
+              </ActionsDropdownButton>
+            )}
           </div>,
           document.body,
         )}
