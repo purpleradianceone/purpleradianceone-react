@@ -6,7 +6,7 @@ import Select, { components } from "react-select";
 import { getLookupCompanyProduct } from "../../../../config/apis/Lookups";
 import { handleApiError } from "../../../../config/error/handleApiError";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
-import { Barcode } from "lucide-react";
+import { ScanBarcode } from "lucide-react";
 
 export const LookupCompanyProductDropdown = ({
   icon,
@@ -104,13 +104,13 @@ export const LookupCompanyProductDropdown = ({
               style={{
                 display: "flex",
                 alignItems: "flex-start",
-                gap: "6px",
+                gap: "4px",
                 marginTop: "4px",
                 fontSize: "12px",
                 color: isSelected ? "#dbeafe" : "#64748b",
               }}
             >
-              <Barcode size={13} style={{ flexShrink: 0, marginTop: "2px" }} />
+              <ScanBarcode size={13} style={{ flexShrink: 0, marginTop: "2px" }} />
               <span
                 style={{
                   wordBreak: "break-word",
