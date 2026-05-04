@@ -590,7 +590,7 @@ function CompanyQuotationDetails() {
     }
     if (selectedQuotationType.id === 1) {
       if (!selectedLead) {
-        toast.error("Please select an lead");
+        toast.error("Please select a lead");
         return;
       }
     }
@@ -610,7 +610,7 @@ function CompanyQuotationDetails() {
     }
 
     if (!selectedQuotationTemplate) {
-      toast.error("Please select an quotation template");
+      toast.error("Please select a quotation template");
       return;
     }
     if (!quotation?.quotationDate) {
