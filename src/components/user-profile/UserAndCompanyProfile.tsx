@@ -885,6 +885,13 @@ const UserAndCompanyProfile = () => {
 
   // },[companyDetail.state_id,companyDetail.district_id]);
 
+  const formatUrl = (url?: string) => {
+  if (!url) return "#";
+  return url.startsWith("http://") || url.startsWith("https://")
+    ? url
+    : `https://${url}`;
+};
+
   return (
     <div className="w-full mx-24 min-h-screen bg-gray-100 py-8 px-2 space-y-10">
       {/* Profile Info Card */}
@@ -1189,7 +1196,7 @@ const UserAndCompanyProfile = () => {
                       <div className="input-label-custom py-1">Website:</div>
 
                       <a
-                        href={companyDetail?.website}
+                        href={formatUrl(companyDetail?.website)}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="caption-custom-blue py-1.5 break-all"

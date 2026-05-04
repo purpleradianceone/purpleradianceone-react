@@ -7,6 +7,8 @@ import {
   Handshake,
   LucideSubtitles,
   Pencil,
+  Save,
+  Send,
   Trash,
   User,
   X,
@@ -39,6 +41,7 @@ import { getLookupAccounts } from "../../../config/apis/AccountApis";
 import { getLookupQuotationTemplate } from "../../../config/apis/CompanyQuotationApis";
 import { getLookupLeadsWithSignal } from "../../../config/apis/LeadsApi";
 import MESSAGE from "../../../constants/Messages";
+import ConfirmationDialog from "../../dialogue-box/ConfirmationDialogue";
 import QuotationStatusChip from "../../ui/QuotationStatusChip";
 import { LookupQuotationTemplateDropdown } from "../lookups/company-quotation/LookupQuotationTemplateDropdown";
 import { QuotationTypeDropdown } from "../lookups/company-quotation/QuotationTypeDropdown";
@@ -49,7 +52,6 @@ import {
   CompanyQuotationHeaderSkeleton,
   CompanyQuotationItemsSkeleton,
 } from "./CompanyQuotationDetailsSkeleton";
-import ConfirmationDialog from "../../dialogue-box/ConfirmationDialogue";
 
 function CompanyQuotationDetails() {
   const { quotationId } = useParams();
@@ -245,6 +247,12 @@ function CompanyQuotationDetails() {
   };
   const [showConfirmationDialoge, setShowConfirmationDialoge] =
     useState<boolean>(false);
+
+  const [
+    showConfirmationDialogeForNewQuotationCreation,
+    setShowConfirmationDialogeForNewQuotationCreation,
+  ] = useState<boolean>(false);
+
   const submitCompanyQuotation = async () => {
     if (!quotation) return;
     if (disabled) {
@@ -302,6 +310,7 @@ function CompanyQuotationDetails() {
           icon: "⚠️",
         },
       );
+      setShowConfirmationDialogeForNewQuotationCreation(true);
       return;
     }
     if (!userHasAccessToViewCompanyQuotation) return;
@@ -774,6 +783,10 @@ function CompanyQuotationDetails() {
     }
   }, [quotationTypeIdSearchParams]);
 
+  function navigatePreviousPage() {
+    navigate(-1);
+  }
+
   return (
     <PageLayout onScrollChange={setShowAccountName} scrollTopValue={80}>
       <div className="p-1 font-roboto">
@@ -1136,8 +1149,36 @@ function CompanyQuotationDetails() {
                     )}
 
                     {!isCreateMode && (
-                      <Button disabled={disabled} onClick={updateQuotation}>
-                        Update
+                      <Button
+                        disabled={disabled}
+                        onClick={() => {
+                          if (disabled) return;
+                          if (tempItems.length <= 0) {
+                            toast.error(
+                              "No items available to update this quotation. \nPlease create a new quotation.",
+                              {
+                                style: {
+                                  background: "white",
+                                  color: "#991b1b",
+                                  border: "1px solid #fca5a5",
+                                  borderRadius: "8px",
+                                  fontSize: "14px",
+                                },
+                                icon: "⚠️",
+                              },
+                            );
+                            setShowConfirmationDialogeForNewQuotationCreation(
+                              true,
+                            );
+                            return;
+                          }
+                          updateQuotation();
+                        }}
+                      >
+                        <div className="flex items-center gap-1">
+                          <Save size={16} />
+                          <span>Update</span>
+                        </div>
                       </Button>
                     )}
                     {!isCreateMode && (
@@ -1160,13 +1201,18 @@ function CompanyQuotationDetails() {
                                 icon: "⚠️",
                               },
                             );
+                            setShowConfirmationDialogeForNewQuotationCreation(
+                              true,
+                            );
                             return;
                           }
-
                           setShowConfirmationDialoge(true);
                         }}
                       >
-                        Submit
+                        <div className="flex items-center gap-1">
+                          <Send size={16} />
+                          <span>Submit</span>
+                        </div>
                       </Button>
                     )}
                   </div>
@@ -1369,23 +1415,27 @@ function CompanyQuotationDetails() {
               </div>
             )}
             {isCreateMode && (
-              <div className="flex w-full justify-end items-end mb-3">
+              <div className="w-full items-center justify-center  flex-1">
+                <span className="text-xs flex items-center justify-center font-medium text-gray-500 border rounded-lg px-2 py-1  bg-blue-100">
+                  {selectedQuotationType.id == 1
+                    ? "Once a quotation is created, all items associated with the selected customer are automatically included."
+                    : `After a quotation is created, you can update its items and related details.`}
+                </span>
+              </div>
+            )}
+            {isCreateMode && (
+              <div className="flex w-full justify-end items-end mt-3 mb-3">
                 <div>
                   <Button onClick={handleCreateQuotation}>
-                    {isSubmitting ? "Saving..." : "Save"}
+                    <div className="flex items-center gap-1">
+                      <Save size={16} />
+                      <span>{isSubmitting ? "Saving..." : "Save"}</span>
+                    </div>
                   </Button>
                 </div>
               </div>
             )}
-            {isCreateMode && (
-              <div className="w-full items-center justify-center  flex-1">
-                <span className="text-xs flex items-center justify-center font-medium text-gray-500 border rounded-lg px-2 py-1  bg-blue-100">
-                  {selectedQuotationType.id == 1
-                    ? "Once a quotation is created, all items assigned to that customer are automatically added to the quotation."
-                    : `Once a quotation is created, you can modify the items and related data.`}
-                </span>
-              </div>
-            )}
+
             {/* BOTTOM */}
             {!isCreateMode && (
               <div className="grid grid-cols-2 text-sm mb-2">
@@ -1439,6 +1489,18 @@ function CompanyQuotationDetails() {
             submitCompanyQuotation();
           }}
           onCancel={() => setShowConfirmationDialoge(false)}
+        />
+        <ConfirmationDialog
+          title="Quotation Deleted"
+          description="This quotation has been automatically deleted."
+          message={`Since the last item was removed, this ${quotation?.quotationTypeName ? quotation?.quotationTypeName.toLowerCase() + " quotation" : "quotation"} is no longer valid. \nPlease create a new one to proceed.`}
+          open={showConfirmationDialogeForNewQuotationCreation}
+          onConfirm={navigatePreviousPage}
+          confirmButtonText="OK"
+          showCancelButton={false}
+          onCancel={() =>
+            setShowConfirmationDialogeForNewQuotationCreation(false)
+          }
         />
       </div>
     </PageLayout>
