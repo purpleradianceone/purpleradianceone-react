@@ -1127,6 +1127,7 @@ function CompanyQuotationDetails() {
                         <CustomDocumentPreviewComponent
                           fileUrl={logoPreview!}
                           fileExtension={"application/pdf"}
+                          fileName={quotation?.quotationNumber}
                           width={"60%"}
                           height={"85%"}
                           enableDownload={true}

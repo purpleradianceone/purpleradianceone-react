@@ -56,6 +56,7 @@ function CompanyQuotationManagementList({
   const { loginStatus } = useLoggedInUserContext();
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const [showCompanyLogoPreview, setShowCompanyLogoPreview] = useState(false);
+  const [quotationFileName, setQuotationFileName] = useState<string>();
   const [isSubmitting, setIsSubmitting] = useState(false);
   // for invoice modal open
   //   const [isCreateInvoiceModalOpen, setIsCreateInvoiceModalOpen] =
@@ -137,6 +138,7 @@ function CompanyQuotationManagementList({
 
   const handleQuotationDownload = async (rowData: CompanyQuotationProps) => {
     setIsSubmitting(true);
+    setQuotationFileName(rowData.quotationNumber);
 
     try {
       const response = await axiosClient.post(
@@ -145,7 +147,9 @@ function CompanyQuotationManagementList({
           company_id: loginStatus.companyId,
           id:Number(rowData?.id),
           company_quotation_id: Number(rowData?.id),
-          company_quotation_type_id: 1,
+          quotation_status_id: Number(rowData?.quotationStatusId),
+          // company_quotation_type_id: 1,
+          company_quotation_type_id: Number(rowData?.quotationTypeId),
           requestedby_id: loginStatus.id,
         },
         {
@@ -364,6 +368,7 @@ function CompanyQuotationManagementList({
             <CustomDocumentPreviewComponent
               fileUrl={logoPreview!}
               fileExtension={"application/pdf"}
+              fileName={quotationFileName}
               width={"60%"}
               height={"85%"}
               enableDownload={true}
