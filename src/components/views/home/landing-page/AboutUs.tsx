@@ -98,7 +98,9 @@
 // export default AboutUs;
 import { useInView } from "react-intersection-observer";
 import { motion } from "framer-motion";
-import { BsFillPersonCheckFill } from "react-icons/bs";
+import { BsChatLeftTextFill, BsFillPersonCheckFill } from "react-icons/bs";
+import { CiCalendar } from "react-icons/ci";
+import { LuFileText } from "react-icons/lu";
 
 function AboutUs() {
   const [ref, inView] = useInView({ fallbackInView: true, threshold: 0.1 });
@@ -134,7 +136,7 @@ function AboutUs() {
 
         <section className="max-w-3xl  mx-auto px-6 py-20">
           {/* Label */}
-          <p className="text-[12px] font-semibold text-[#5b4bff] mb-3 uppercase tracking-[1px]">
+          <p className="text-xs font-semibold text-purple mb-3 uppercase tracking-[1px]">
             The problem we saw
           </p>
 
@@ -166,7 +168,7 @@ function AboutUs() {
           </p>
 
           {/* Highlight box */}
-          <div className="bg-[#eeedfe] border-l-[3px] border-[#5b4bff] rounded-r-xl px-5 py-4 italic text-[15px] text-[#0f0e1a] leading-[1.7] mb-6">
+          <div className="bg-[#eeedfe] border-l-[3px] border-purple rounded-r-xl px-5 py-4 italic text-[15px] text-[#0f0e1a] leading-[1.7] mb-6">
             "The tools that existed were either too complex, too expensive, or
             built for enterprises — not for the salon owner managing 80 clients
             or the sports academy collecting fees from 200 families."
@@ -189,7 +191,7 @@ function AboutUs() {
         <section className="bg-white border-y border-[#e8e8f0] py-20 px-6">
           <div className="max-w-5xl mx-auto text-center">
             {/* Label */}
-            <p className="text-[12px] font-semibold text-[#5b4bff] uppercase tracking-[1px] mb-3">
+            <p className="text-xs font-semibold text-purple uppercase tracking-[1px] mb-3">
               What drives us
             </p>
 
@@ -201,12 +203,13 @@ function AboutUs() {
             {/* Cards */}
             <div className="grid md:grid-cols-3 gap-6">
               {/* Card 1 */}
-              <div className="bg-white border border-[#e8e8f0] border-t-4 border-t-[#5b4bff] rounded-[14px] p-8 text-left hover:shadow-md transition">
+              <div className="bg-white border border-[#e8e8f0] border-t-4 border-t-purple rounded-[14px] p-8 text-left hover:shadow-xl hover:-translate-y-2 transition-all duration-300 ease-out cursor-pointer">
+                {" "}
                 <div className="text-2xl mb-4">🎯</div>
-                <h3 className="font-syne text-[16px] font-[700] mb-2">
+                <h3 className="font-syne text-base font-[700] mb-2">
                   Our Mission
                 </h3>
-                <p className="text-[13px] text-[#6b6b80] leading-[1.7]">
+                <p className="text-sm text-[#6b6b80] leading-[1.7]">
                   To help every growing business — a spa, an academy, a
                   manufacturer, a product company — stop losing revenue to
                   missed follow-ups, forgotten reminders, and unresolved issues.
@@ -214,30 +217,28 @@ function AboutUs() {
               </div>
 
               {/* Card 2 */}
-              <div className="bg-white border border-[#e8e8f0] border-t-4 border-t-[#0F6E56] rounded-[14px] p-8 text-left hover:shadow-md transition">
+              <div className="bg-white border border-[#e8e8f0] border-t-4 border-t-[#0F6E56] rounded-[14px] p-8 text-left hover:shadow-xl hover:-translate-y-2 transition-all duration-300 ease-out cursor-pointer">
                 <div className="text-2xl mb-4">🔭</div>
-                <h3 className="font-syne text-[16px] font-[700] mb-2">
+                <h3 className="font-syne text-base font-[700] mb-2">
                   Our Vision
                 </h3>
-                <p className="text-[13px] text-[#6b6b80] leading-[1.7]">
+                <p className="text-sm text-[#6b6b80] leading-[1.7]">
                   A world where no business owner has to manually chase a lead,
                   remind a customer to pay, or follow up on a complaint.
                 </p>
               </div>
 
               {/* Card 3 */}
-              <div className="bg-white border border-[#e8e8f0] border-t-4 border-t-[#854F0B] rounded-[14px] p-8 text-left hover:shadow-md transition">
+              <div className="bg-white border border-[#e8e8f0] border-t-4 border-t-[#854F0B] rounded-[14px] p-8 text-left hover:shadow-xl hover:-translate-y-2 transition-all duration-300 ease-out cursor-pointer">
                 <div className="text-2xl mb-4">🤝</div>
-                <h3 className="font-syne text-[16px] font-[700] mb-2">
+                <h3 className="font-syne text-base font-[700] mb-2">
                   Our Promise
                 </h3>
-                <p className="text-[13px] text-[#6b6b80] leading-[1.7]">
+                <p className="text-sm text-[#6b6b80] leading-[1.7]">
                   We are not a CRM. We are not a billing tool. We are not a
                   helpdesk. We are the one platform built for businesses that
                   cannot afford to lose a single lead or payment.
                 </p>
-
-                <div className="absolute top-0 left-0 w-full h-[3px] bg-[#854F0B] rounded-t-[14px]"></div>
               </div>
             </div>
           </div>
@@ -246,7 +247,7 @@ function AboutUs() {
         {/* FOUR PILLARS */}
         <section className="max-w-6xl mx-auto px-6 py-20">
           {/* Label */}
-          <p className="text-[12px] font-semibold text-[#5b4bff] uppercase tracking-[1px] mb-3 text-center">
+          <p className="text-xs font-semibold text-purple uppercase tracking-[1px] mb-3 text-center">
             What we do
           </p>
 
@@ -258,60 +259,60 @@ function AboutUs() {
           {/* Cards */}
           <div className="grid md:grid-cols-4 gap-5">
             {/* CARD 1 */}
-            <div className="flex gap-4 items-start bg-white border border-[#e8e8f0] rounded-[14px] p-4 border-l-[4px] border-l-[#5b4bff]">
+            <div className="flex gap-4 items-start bg-white border border-[#e8e8f0] rounded-[14px] p-4 border-l-[4px] border-l-purple hover:shadow-md transition cursor-pointer">
               <div className="w-9 h-9 rounded-lg bg-[#e8e7fd] flex items-center justify-center shrink-0">
                 <BsFillPersonCheckFill className="text-purple" />
               </div>
               <div>
-                <h4 className="font-syne text-[13px] font-[600] mb-1">
+                <h4 className="font-syne text-sm font-[600] mb-1">
                   Lead capture
                 </h4>
-                <p className="text-[12px] text-[#6b6b80] leading-[1.5]">
+                <p className="text-sm text-[#6b6b80] leading-[1.5]">
                   Every enquiry auto-replied and tracked before it goes cold.
                 </p>
               </div>
             </div>
 
             {/* CARD 2 */}
-            <div className="flex gap-4 items-start bg-white border border-[#e8e8f0] rounded-[14px] p-4 border-l-[4px] border-l-[#854F0B]">
+            <div className="flex gap-4 items-start bg-white border border-[#e8e8f0] rounded-[14px] p-4 border-l-[4px] border-l-[#854F0B] hover:shadow-md transition cursor-pointer">
               <div className="w-9 h-9 rounded-lg bg-[#FAEEDA] flex items-center justify-center shrink-0">
-                📅
+                <CiCalendar className="text-amber-700" size={20} />
               </div>
               <div>
-                <h4 className="font-syne text-[13px] font-[600] mb-1">
+                <h4 className="font-syne text-sm font-[600] mb-1">
                   Subscription reminders
                 </h4>
-                <p className="text-[12px] text-[#6b6b80] leading-[1.5]">
+                <p className="text-sm text-[#6b6b80] leading-[1.5]">
                   Automated fee reminders so you collect without chasing.
                 </p>
               </div>
             </div>
 
             {/* CARD 3 */}
-            <div className="flex gap-4 items-start bg-white border border-[#e8e8f0] rounded-[14px] p-4 border-l-[4px] border-l-[#185FA5]">
+            <div className="flex gap-4 items-start bg-white border border-[#e8e8f0] rounded-[14px] p-4 border-l-[4px] border-l-[#185FA5] hover:shadow-md transition cursor-pointer">
               <div className="w-9 h-9 rounded-lg bg-[#E6F1FB] flex items-center justify-center shrink-0">
-                🧾
+                <LuFileText className="text-blue-600" size={20} />
               </div>
               <div>
-                <h4 className="font-syne text-[13px] font-[600] mb-1">
+                <h4 className="font-syne text-sm font-[600] mb-1">
                   Billing & invoicing
                 </h4>
-                <p className="text-[12px] text-[#6b6b80] leading-[1.5]">
+                <p className="text-sm text-[#6b6b80] leading-[1.5]">
                   GST invoices with payment links in under 2 minutes.
                 </p>
               </div>
             </div>
 
             {/* CARD 4 */}
-            <div className="flex gap-4 items-start bg-white border border-[#e8e8f0] rounded-[14px] p-4 border-l-[4px] border-l-[#0F6E56]">
+            <div className="flex gap-4 items-start bg-white border border-[#e8e8f0] rounded-[14px] p-4 border-l-[4px] border-l-[#0F6E56] hover:shadow-md transition cursor-pointer">
               <div className="w-9 h-9 rounded-lg bg-[#E1F5EE] flex items-center justify-center shrink-0">
-                💬
+                <BsChatLeftTextFill className="text-emerald-800" size={20} />
               </div>
               <div>
-                <h4 className="font-syne text-[13px] font-[600] mb-1">
+                <h4 className="font-syne text-sm font-[600] mb-1">
                   Support tickets
                 </h4>
-                <p className="text-[12px] text-[#6b6b80] leading-[1.5]">
+                <p className="text-sm text-[#6b6b80] leading-[1.5]">
                   Every complaint tracked to resolution — nothing buried in
                   chat.
                 </p>
@@ -332,7 +333,7 @@ function AboutUs() {
             <h2
               className="
       font-syne 
-      text-[28px] md:text-[34px] 
+      text-3xl md:text-[34px] 
       font-[700] 
       leading-[1.3] 
       tracking-[-0.01em] 
@@ -343,7 +344,7 @@ function AboutUs() {
             </h2>
 
             {/* Sub text */}
-            <p className="text-[15px] text-white/50 max-w-lg leading-[1.7] mb-12">
+            <p className="text-base text-white/50 max-w-lg leading-[1.7] mb-12">
               We are not built for Fortune 500 companies. We are built for the
               business owner who is doing everything themselves and can't afford
               to lose a single customer.
@@ -357,7 +358,7 @@ function AboutUs() {
                 <h4 className="font-syne text-[14px] font-[600] mb-2">
                   Salons & Spas
                 </h4>
-                <p className="text-[12px] text-white/50 leading-[1.6]">
+                <p className="text-sm text-white/50 leading-[1.6]">
                   Capture walk-in enquiries, send appointment reminders, collect
                   membership fees, and win back clients.
                 </p>
@@ -369,7 +370,7 @@ function AboutUs() {
                 <h4 className="font-syne text-[14px] font-[600] mb-2">
                   Sports Academies
                 </h4>
-                <p className="text-[12px] text-white/50 leading-[1.6]">
+                <p className="text-sm text-white/50 leading-[1.6]">
                   Collect batch fees without calling every parent. Auto-remind
                   overdue students.
                 </p>
@@ -381,7 +382,7 @@ function AboutUs() {
                 <h4 className="font-syne text-[14px] font-[600] mb-2">
                   Manufacturing
                 </h4>
-                <p className="text-[12px] text-white/50 leading-[1.6]">
+                <p className="text-sm text-white/50 leading-[1.6]">
                   Capture B2B leads, follow up on quotations, raise invoices,
                   and track complaints.
                 </p>
@@ -393,7 +394,7 @@ function AboutUs() {
                 <h4 className="font-syne text-[14px] font-[600] mb-2">
                   IT & Product Companies
                 </h4>
-                <p className="text-[12px] text-white/50 leading-[1.6]">
+                <p className="text-sm text-white/50 leading-[1.6]">
                   Auto-respond to demo requests, manage SaaS renewals, and run
                   support systems.
                 </p>
@@ -404,8 +405,8 @@ function AboutUs() {
 
         {/* VALUES */}
         <section className="bg-white py-20 px-6">
-          <div className="max-w-5xl mx-auto text-center">
-            <p className="text-[12px] font-semibold text-[#5b4bff] uppercase tracking-[1px] mb-4 text-center">
+          <div className="max-w-6xl mx-auto text-center">
+            <p className="text-[12px] font-semibold text-purple uppercase tracking-[1px] mb-4 text-center">
               How we operate
             </p>
 
@@ -454,13 +455,13 @@ function AboutUs() {
                   key={i}
                   className="p-5 border rounded-xl bg-gray-50 items-start text-left"
                 >
-                  <span className="text-xs font-bold text-purple mb-1 block">
+                  <span className="text-sm font-bold text-purple mb-1 block">
                     {item.number}
                   </span>
                   <h4 className="font-syne text-sm font-semibold">
                     {item.title}
                   </h4>
-                  <p className="text-[12px] text-gray-500 leading-[1.6] mt-2">
+                  <p className="text-sm text-gray-500 leading-[1.6] mt-2">
                     {item.discription}
                   </p>
                 </div>

@@ -103,6 +103,7 @@ import { Modules } from "../../@types/List/CompanyQuotationManagementListProps";
 import CompanyQuotationDetails from "../../components/views/company-quotation-management/CompanyQuotationDetails";
 import { FacebookPageIntegrationManagement } from "../../components/views/settings/social-media-integration/meta-app-facebook/FacebookPageIntegrationManagement";
 import Features from "../../components/views/home/landing-page/Features";
+import ProformaInvoiceDetails from "../../components/views/proforma-invoice/ProformaInvoiceDetails";
 
 export const router = createBrowserRouter([
   {
@@ -131,7 +132,7 @@ export const router = createBrowserRouter([
             {/* <AboutUs /> */}
             {/* <Features /> */}
             {/* <Testimonials /> */}
-            <ContactUs />
+            {/* <ContactUs /> */}
             <CallToAction />
             <Footer />
           </Navbar>
@@ -185,6 +186,19 @@ export const router = createBrowserRouter([
         <div className="min-h-screen">
           <Navbar>
             <Features />
+            <Footer />
+          </Navbar>
+        </div>
+      </LoggedInRoute>
+    ),
+  },
+  {
+    path: ROUTES_URL.CONTACT_US,
+    element: (
+      <LoggedInRoute>
+        <div className="min-h-screen">
+          <Navbar>
+            <ContactUs />
             <Footer />
           </Navbar>
         </div>
@@ -399,6 +413,20 @@ export const router = createBrowserRouter([
           <div>
             <Navbar>
               <CompanyInvoiceDetails />
+            </Navbar>
+          </div>
+        </PrivateRoute>
+      </MobileRedirectWrapper>
+    ),
+  },
+  {
+    path: ROUTES_URL.PROFORMA_INVOICE_DETAILS,
+    element: (
+      <MobileRedirectWrapper>
+        <PrivateRoute>
+          <div>
+            <Navbar>
+              <ProformaInvoiceDetails />
             </Navbar>
           </div>
         </PrivateRoute>

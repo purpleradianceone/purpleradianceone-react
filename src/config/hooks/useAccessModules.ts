@@ -828,6 +828,18 @@ export const useUserAccessModules = () => {
     (accessModule) => accessModule.crm_module_id === 64 && accessModule.update,
   );
 
+  //proforma invoice
+    const userHasAccessToAddAccountProformaInvoice = accessModules.some(
+    (accessModules) => accessModules.crm_module_id === 65 && accessModules.add,
+  );
+
+  const userHasAccessToViewAccountProformaInvoice = accessModules.some(
+    (accessModule) => accessModule.crm_module_id === 65 && accessModule.view,
+  );
+
+  const userHasAccessToUpdateAccountProformaInvoice = accessModules.some(
+    (accessModule) => accessModule.crm_module_id === 65 && accessModule.update,
+  );
   
 
 
@@ -1081,5 +1093,9 @@ export const useUserAccessModules = () => {
     userHasAccessToAddAccountQuotation,
     userHasAccessToViewAccountQuotation,
     userHasAccessToUpdateAccountQuotation,
+
+    userHasAccessToAddAccountProformaInvoice,
+    userHasAccessToViewAccountProformaInvoice,
+    userHasAccessToUpdateAccountProformaInvoice,
   };
 };
