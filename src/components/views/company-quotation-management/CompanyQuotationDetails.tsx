@@ -52,6 +52,7 @@ import {
   CompanyQuotationHeaderSkeleton,
   CompanyQuotationItemsSkeleton,
 } from "./CompanyQuotationDetailsSkeleton";
+import { amountToWords } from "../../../utils/helperMethods/amountToWords";
 
 function CompanyQuotationDetails() {
   const { quotationId } = useParams();
@@ -359,7 +360,9 @@ function CompanyQuotationDetails() {
     if (
       previousQuotation?.quotationDate === quotation.quotationDate &&
       previousQuotation?.validTillDate === quotation.validTillDate &&
-      previousQuotation?.quotationTemplateId === selectedQuotationTemplate.id
+      previousQuotation?.quotationTemplateId === selectedQuotationTemplate.id &&
+      previousQuotation?.adjustmentForRoundOff ===
+        quotation.adjustmentForRoundOff
     ) {
       toast.error(
         "No changes were detected. Please update at least one field.",
@@ -382,6 +385,7 @@ function CompanyQuotationDetails() {
       quotation_template_id: selectedQuotationTemplate.id,
       quotation_date_string: quotation.quotationDate,
       valid_till_date_string: quotation.validTillDate,
+      adjustment_for_round_off: quotation.adjustmentForRoundOff,
       quotation_status_id: null,
       updatedby_id: loginStatus.id,
       isactive: quotation.isActive,
@@ -528,6 +532,7 @@ function CompanyQuotationDetails() {
       acc.tax += item.total_tax || 0;
       acc.total += item.total_amount || 0;
       acc.cess += item.cess_amount || 0;
+      acc.adjustment_for_round_off = quotation?.adjustmentForRoundOff || 0;
       return acc;
     },
     { basic: 0, discount: 0, taxable: 0, tax: 0, total: 0, cess: 0 },
@@ -786,6 +791,29 @@ function CompanyQuotationDetails() {
   function navigatePreviousPage() {
     navigate(-1);
   }
+
+  const handleResetRoundOff = () => {
+    setQuotation((prev: any) => ({
+      ...prev,
+      adjustmentForRoundOff: previousQuotation?.adjustmentForRoundOff, // remove roundOff impact
+    }));
+  };
+  const getRoundOffValues = (total: number) => {
+    const roundedTotal = Math.round(total);
+    const roundOff = Number((roundedTotal - total).toFixed(2));
+    return {
+      roundedTotal, // final rounded amount
+      roundOff, // adjustment (+/-)
+    };
+  };
+
+  const [roundOffValues, setRoundOffValues] = useState(
+    getRoundOffValues(quotation?.totalAmount ?? 0),
+  );
+
+  useEffect(() => {
+    setRoundOffValues(getRoundOffValues(quotation?.totalAmount ?? 0));
+  }, [quotation?.adjustmentForRoundOff, quotation?.totalAmount, quotation]);
 
   return (
     <PageLayout onScrollChange={setShowAccountName} scrollTopValue={80}>
@@ -1437,16 +1465,17 @@ function CompanyQuotationDetails() {
             )}
 
             {/* BOTTOM */}
-            {!isCreateMode && (
+
+            {/* {!isCreateMode && (
               <div className="grid grid-cols-2 text-sm mb-2">
-                {/* Left */}
-                <div className="space-y-2"></div>
+                <div></div>
+
                 <div>
-                  <span className="font-medium text-gray-700 text-sm ">
+                  <span className="font-medium text-gray-700 text-sm">
                     Summary
                   </span>
-                  {/* Right Summary */}
-                  <div className="border rounded-lg p-4 bg-gray-50 space-y-2">
+
+                  <div className="border rounded-lg p-4 bg-white space-y-3 mt-2">
                     <div className="flex justify-between">
                       <span>Basic Amount</span>
                       <span>{formatRupee(summary.basic)}</span>
@@ -1456,23 +1485,211 @@ function CompanyQuotationDetails() {
                       <span>Total Discount</span>
                       <span>{formatRupee(summary.discount)}</span>
                     </div>
+
+                    <hr />
+
                     <div className="flex justify-between">
-                      <span>Total Amount</span>
+                      <span>Taxable Value</span>
                       <span>{formatRupee(summary.taxable)}</span>
                     </div>
 
-                    <div className="flex justify-between">
-                      <span>Total Cess</span>
-                      <span>{formatRupee(summary.cess)}</span>
-                    </div>
+
+
+                    <hr />
+                    {summary.cess && (
+                      <div className="flex justify-between">
+                        <span>Total Cess</span>
+                        <span>{formatRupee(summary.cess)}</span>
+                      </div>
+                    )}
                     <div className="flex justify-between">
                       <span>Total Tax</span>
                       <span>{formatRupee(summary.tax)}</span>
                     </div>
+                    <hr />
+                     <div className="flex justify-between">
+                      <span>Total Amount</span>
+                      <span>₹{formatRupee(summary.total)}</span>
+                    </div>
 
-                    <div className="border-t pt-2 flex justify-between text-base font-semibold text-blue-600">
-                      <span>Total Quotation Amount</span>
+                    <div className="bg-gray-50 border rounded-lg p-3 space-y-3">
+                      <div className="flex items-start justify-between gap-2">
+                        <div>
+                          <p className="text-blue-600 font-medium">Round Off</p>
+                          <p className="caption-custom">
+                            Adjust the amount to make the invoice total rounded.
+                          </p>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="number"
+                            className="border rounded px-2 py-1 w-24 text-right"
+                            value={quotation?.adjustmentForRoundOff}
+                            onChange={(e: any) =>
+                              setQuotation((prev) => ({
+                                ...prev!,
+                                adjustmentForRoundOff: Number(e.target.value),
+                              }))
+                            }
+                          />
+
+                          <button className="border rounded px-3 py-1 text-blue-600 flex items-center gap-1"
+                          onClick={updateQuotation}
+                          >
+                            Apply
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="flex justify-between items-center bg-blue-50 border rounded px-3 py-2 text-sm">
+                        <span className="caption-custom">
+                          Suggested: {roundOffValues.roundOff} to make{" "}
+                          {roundOffValues.roundedTotal}
+                        </span>
+
+                        <button
+                          className="caption-custom-blue"
+                          onClick={handleResetRoundOff}
+                        >
+                          Reset
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="border-t pt-3 flex justify-between items-center">
+                      <div>
+                        <p className="text-blue-600 font-semibold">
+                          Total Quotation Amount
+                        </p>
+                        <p className="caption-custom">
+                          <span className="caption-custom-blue mt-5">Amount in words:</span> {amountToWords(summary.total+quotation?.adjustmentForRoundOff)}
+                        </p>
+                      </div>
+
+                      <span className="text-xl font-bold text-blue-600">
+                        ₹{formatRupee(summary.total+quotation?.adjustmentForRoundOff)}
+                      </span>
+                    </div>
+
+                    <div className="bg-gray-50 border rounded px-3 py-2 caption-custom">
+                      Round off amount will be shown separately in the printed
+                      invoice.
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )} */}
+
+            {/** Summery Block */}
+            {!isCreateMode && (
+              <div className="grid grid-cols-2 text-sm mb-2">
+                <div></div>
+
+                <div>
+                  <span className="font-medium text-gray-700 text-sm">
+                    Quotation Summary
+                  </span>
+
+                  <div className="border rounded-lg p-3 bg-white mt-2 space-y-2">
+                    {/* Basic + Discount */}
+                    <div className="flex justify-between">
+                      <span>Subtotal</span>
+                      <span>{formatRupee(summary.basic)}</span>
+                    </div>
+
+                    <div className="flex justify-between">
+                      <span>Discount</span>
+                      <span>{formatRupee(summary.discount)}</span>
+                    </div>
+
+                    {/* Taxable */}
+                    <div className="flex justify-between text-gray-600 border-t pt-2">
+                      <span>Taxable</span>
+                      <span>{formatRupee(summary.taxable)}</span>
+                    </div>
+
+                    {/* Tax + Cess in one row */}
+                    <div className="flex justify-between text-gray-600">
+                      <span>Total Tax {summary.cess ? "+ Cess" : ""}</span>
+                      <span>
+                        {formatRupee(summary.tax + (summary.cess || 0))}
+                      </span>
+                    </div>
+
+                    {/* Total */}
+                    <div className="flex justify-between font-medium border-t pt-2">
+                      <span>Total</span>
                       <span>{formatRupee(summary.total)}</span>
+                    </div>
+
+                    {/* Round Off Compact */}
+                    <div className="flex items-center justify-between bg-gray-50 border rounded px-2 py-2 text-xs">
+                      {/* Left */}
+                      <div className="flex flex-col">
+                        <span className="text-blue-600 font-medium text-xs">
+                          Round Off (Adjustment)
+                        </span>
+                        <span className="text-gray-500">
+                          Suggested: {roundOffValues.roundOff} to make{" "}
+                          {roundOffValues.roundedTotal}
+                        </span>
+                      </div>
+
+                      {/* Right */}
+                      <div className="flex items-center gap-1">
+                        <input
+                          disabled={disabled}
+                          type="number"
+                          className="border rounded px-1 py-0.5 w-20 text-right text-xs"
+                          value={quotation?.adjustmentForRoundOff}
+                          onChange={(e: any) =>
+                            setQuotation((prev) => ({
+                              ...prev!,
+                              adjustmentForRoundOff: Number(e.target.value),
+                            }))
+                          }
+                        />
+
+                        <button
+                          disabled={disabled}
+                          className="text-blue-600 text-xs"
+                          onClick={updateQuotation}
+                        >
+                          Apply
+                        </button>
+
+                        <button
+                          disabled={disabled}
+                          className="text-gray-500 text-xs"
+                          onClick={handleResetRoundOff}
+                        >
+                          Reset
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Final Total */}
+                    <div className="flex justify-between items-center border-t pt-2">
+                      <div className="text-xs text-gray-500 leading-tight">
+                        <p className="text-blue-600 font-medium text-sm">
+                          Total Quotation Amount
+                        </p>
+                        <p className="caption-custom">
+                          <span className="caption-custom-blue">Amount In Words:</span>
+                          {amountToWords(
+                            summary.total +
+                              (quotation?.adjustmentForRoundOff || 0),
+                          )}
+                        </p>
+                      </div>
+
+                      <span className="text-lg font-bold text-blue-600">
+                        {formatRupee(
+                          summary.total +
+                            (quotation?.adjustmentForRoundOff || 0),
+                        )}
+                      </span>
                     </div>
                   </div>
                 </div>
