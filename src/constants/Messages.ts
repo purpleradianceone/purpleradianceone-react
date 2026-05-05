@@ -314,6 +314,11 @@ const MESSAGE = {
             DENIED_ADD_ACCESS: "You do not have permission to add invoice.",
             DENIED_UPDATE_ACCESS: "You do not have permission to update invoice.",
         },
+        ACCOUNT_PROFORMA_INVOICE: {
+            DENIED_VIEW_ACCESS: "You do not have permission to view account proforma invoices.",
+            DENIED_ADD_ACCESS: "You do not have permission to add account proforma invoice.",
+            DENIED_UPDATE_ACCESS: "You do not have permission to update account proforma invoice.",
+        },
         COMPANY_INVOICE_ITEM :  {
             DENIED_VIEW_ACCESS: "You do not have permission to view invoice items.",
             DENIED_ADD_ACCESS: "You do not have permission to add invoice item.",

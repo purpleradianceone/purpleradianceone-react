@@ -51,7 +51,7 @@ const ROUTES_URL = {
   COOKIE_POLICY: "/policy/cookie-policy",
   CAREERS: "/careers",
   ABOUT_US: "/aboutUs",
-  CONTACT_US: "/#contactUs",
+  CONTACT_US: "/contactUs",
   FEATURES: "/features",
   PRICING: "/pricing",
   NOT_AUTHORIZED: "/not-authorized",
@@ -123,6 +123,9 @@ const ROUTES_URL = {
   INVOICE_MANAGEMENT: "/home/manage-invoices/company-invoice",
   INVOICE_DETAILS:
     "/home/manage-invoices/company-invoice/invoice-details/:invoiceId",
+
+  PROFORMA_INVOICE_DETAILS:
+    "/home/manage-invoices/company-proforma-invoice/proforma-invoice-details/:invoiceId/:accountId",
 
   //Quotation Module
   QUOTATION_MANAGEMENT: "/home/manage-company-quotation/company-quotations",

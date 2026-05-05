@@ -140,10 +140,10 @@ function Hero() {
           </p>
 
           <div className="flex justify-center gap-4 mt-8 font-dm flex-wrap">
-            <button className="bg-purple text-white px-6 py-3 rounded-full">
+            <button className="bg-purple text-white px-6 py-3 rounded-full hover:bg-purple-dark transition">
               Start free trial
             </button>
-            <button className="border border-purple text-purple px-6 py-3 rounded-full">
+            <button className="border border-purple text-purple px-6 py-3 rounded-full hover:bg-purple-light transition">
               See demo
             </button>
           </div>
@@ -157,7 +157,7 @@ function Hero() {
             ].map((item, i) => (
               <span
                 key={i}
-                className="text-xs border px-3 py-1 rounded-full font-dm text-gray-500 bg-white"
+                className="text-sm border px-3 py-1 rounded-full font-dm text-gray-500 bg-white"
               >
                 {item}
               </span>
@@ -189,13 +189,13 @@ function Hero() {
               valueColor: "text-green-600",
             },
           ].map((stat, i) => (
-            <div key={i} className="text-center border py-8 bg-white">
+            <div key={i} className="text-center border py-8 bg-white ">
               <div
                 className={`font-syne text-3xl font-bold ${stat.valueColor}`}
               >
                 {stat.value}
               </div>
-              <div className="text-xs text-gray-500 font-dm mt-2">
+              <div className="text-sm text-gray-500 font-dm mt-2">
                 {stat.text}
               </div>
             </div>
@@ -203,7 +203,7 @@ function Hero() {
         </section>
 
         {/* VERTICALS */}
-        <section className="max-w-6xl mx-auto px-6 py-16">
+        <section className="max-w-7xl mx-auto px-6 py-16">
           <div className="text-center mx-auto flex flex-col gap-3 max-w-3xl">
             <p className="text-xs uppercase text-purple font-dm font-semibold mb-2">
               Built for your business
@@ -270,7 +270,7 @@ function Hero() {
             ].map((item, i) => (
               <div
                 key={i}
-                className="border border-gray-200 p-6 rounded-2xl bg-white hover:shadow-xl transition-shadow duration-300 flex flex-col"
+                className="border border-gray-200 p-6 rounded-2xl bg-white hover:shadow-xl hover:-translate-y-2 transition-all duration-300 ease-out cursor-pointer flex flex-col"
               >
                 {/* Icon Header */}
                 <div className="flex items-center text-sm gap-3 mb-4">
@@ -285,7 +285,7 @@ function Hero() {
                 </div>
 
                 {/* Description */}
-                <p className="text-xs font-dm leading-relaxed text-gray-500 mb-3 flex-grow">
+                <p className="text-sm font-dm leading-relaxed text-gray-500 mb-3 flex-grow">
                   {item.description}
                 </p>
 
@@ -294,7 +294,7 @@ function Hero() {
                   {item.tags.map((tag, index) => (
                     <span
                       key={index}
-                      className={`px-3 py-1 rounded-full text-[10px] font-medium ${item.tagColor}`}
+                      className={`px-3 py-1 rounded-full text-xs font-medium ${item.tagColor}`}
                     >
                       {tag}
                     </span>
@@ -306,8 +306,8 @@ function Hero() {
         </section>
 
         {/* FOUR PILLARS */}
-        <section className="bg-white border-y py-16 px-6">
-          <div className="max-w-5xl mx-auto text-center">
+        <section className="bg-white max-w-6xl mx-auto border-y py-16 px-6">
+          <div className=" text-center ">
             <p className="text-xs font-dm uppercase text-purple font-semibold mb-4">
               Everything that breaks — fixed
             </p>
@@ -363,7 +363,7 @@ function Hero() {
               ].map((item, i) => (
                 <div
                   key={i}
-                  className={`border ${item.borderColor} border-t-4 p-4 rounded-xl bg-white shadow-sm text-left flex flex-col h-full`}
+                  className={`border ${item.borderColor} border-t-4 p-4 rounded-xl bg-white shadow-sm text-left flex flex-col h-full  hover:shadow-md transition cursor-pointer`}
                 >
                   <div
                     className={`w-8 h-8 ${item.iconBg} rounded-lg flex items-center justify-center mb-2`}
@@ -380,7 +380,7 @@ function Hero() {
                     {item.tags.map((tag, index) => (
                       <span
                         key={index}
-                        className="text-[10px] font-dm px-3 py-1 rounded-full border border-gray-200 text-gray-600 bg-gray-50"
+                        className="text-xs font-dm px-3 py-1 rounded-full border border-gray-200 text-gray-600 bg-gray-50"
                       >
                         {tag}
                       </span>
@@ -448,7 +448,7 @@ function Hero() {
                   <h4 className="font-syne font-bold text-gray-800 text-[15px] mb-2 px-2">
                     {step.title}
                   </h4>
-                  <p className="text-[13px] text-gray-400 leading-relaxed max-w-[180px] mx-auto">
+                  <p className="text-sm text-gray-400 leading-relaxed max-w-[180px] mx-auto">
                     {step.desc}
                   </p>
                 </div>
@@ -509,7 +509,7 @@ function Hero() {
                       <span className="bg-red-100 text-red-700 text-[10px] font-bold font-dm px-2 py-1 rounded min-w-[50px] text-center uppercase">
                         {item.label}
                       </span>
-                      <p className="text-xs text-red-700 font-medium  font-dm leading-tight">
+                      <p className="text-sm text-red-700 font-medium  font-dm leading-tight">
                         {item.text}
                       </p>
                     </div>
@@ -546,12 +546,12 @@ function Hero() {
                   ].map((item, i) => (
                     <div
                       key={i}
-                      className="flex gap-4 items-start border-b border-emerald-100 pb-4 last:border-0 last:pb-0"
+                      className="flex gap-4 items-start border-b border-emerald-100 pb-4 last:border-0 last:pb-0 "
                     >
                       <span className="bg-emerald-100 text-emerald-700 text-[10px] font-bold font-dm px-2 py-1 rounded min-w-[50px] text-center uppercase">
                         {item.label}
                       </span>
-                      <p className="text-xs text-emerald-600 font-medium font-dm  leading-tight">
+                      <p className="text-sm text-emerald-600 font-medium font-dm  leading-tight">
                         {item.text}
                       </p>
                     </div>
@@ -633,12 +633,12 @@ function Hero() {
               ].map((card, i) => (
                 <div
                   key={i}
-                  className={`bg-white border border-gray-200 shadow-sm rounded-xl p-4 border-l-4 ${card.border} flex flex-col justify-between`}
+                  className={`bg-white border border-gray-200 shadow-sm rounded-xl p-4 border-l-4 ${card.border} flex flex-col justify-between  hover:shadow-md transition cursor-pointer`}
                 >
-                  <p className="text-xs font-dm leading-relaxed text-gray-700 italic">
+                  <p className="text-sm font-dm leading-relaxed text-gray-700 italic">
                     "{card.quote}"
                   </p>
-                  <p className="mt-2 text-gray-700 font-dm text-xs">
+                  <p className="mt-2 text-gray-700 font-dm text-sm">
                     — {card.author}
                   </p>
                 </div>
@@ -657,25 +657,25 @@ function Hero() {
           </h2>
 
           {/* Subtext */}
-          <p className="text-gray-400 mt-6 text-[15px]">
+          <p className="text-gray-400 font-dm mt-6 text-[15px]">
             Join hundreds of businesses already using PurpleRadiance.
           </p>
 
           {/* Buttons */}
-          <div className="mt-10 flex flex-col sm:flex-row justify-center gap-4">
-            <button className="bg-[#5a52ff] hover:bg-[#4a42ef] text-white font-bold px-8 py-4 rounded-full transition-all text-[15px]">
+          <div className="mt-10 flex flex-col sm:flex-row justify-center font-dm gap-4">
+            <button className="bg-purple hover:bg-purple-dark text-white font-medium px-8 py-4 rounded-full transition-all text-[15px]">
               Start your free trial
             </button>
-            <button className="border border-gray-700 hover:border-white text-white font-bold px-8 py-4 rounded-full transition-all text-[15px]">
+            <button className="border border-gray-700 hover:border-white text-white font-medium px-8 py-4 rounded-full transition-all text-[15px]">
               Book a demo
             </button>
           </div>
         </section>
         <div className="fixed bottom-0 left-0 w-full bg-white border-t shadow-md font-dm p-2 flex gap-3 z-50 ">
-          <button className="flex-1 bg-purple text-white py-3 rounded-full text-sm font-medium">
+          <button className="flex-1 bg-purple text-white py-3 rounded-full text-sm font-medium hover:bg-purple-dark">
             Start free trial
           </button>
-          <button className="flex-1 border border-purple text-purple py-3 rounded-full text-sm font-medium">
+          <button className="flex-1 border border-purple text-purple py-3 rounded-full text-sm font-medium hover:bg-purple-light">
             See demo
           </button>
         </div>

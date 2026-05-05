@@ -1,13 +1,12 @@
 /* Account Invoice data structure */
 
-type AccountInvoiceProps = {
+type AccountProformaInvoiceProps = {
   id: number;
   companyId: number;
   accountId: number;
   accountName: string;
   invoiceNumber: string;
   invoiceDate: string;
-  dueDate: string;
   status: string; // PAID | PENDING | OVERDUE
   statusId: number; // 1: DRAFT, 2: SUBMITTED, 3: CANCELLED
   billingAddress?: string;
@@ -27,4 +26,4 @@ type AccountInvoiceProps = {
   updatedOn?: string;
 };
 
-export default AccountInvoiceProps;
+export default AccountProformaInvoiceProps;
