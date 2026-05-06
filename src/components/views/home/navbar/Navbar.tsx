@@ -25,7 +25,7 @@ import {
   UserCogIcon,
   X,
 } from "lucide-react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import SideNavBar from "./SideNavBar";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
 import ROUTES_URL from "../../../../constants/Routes";
@@ -304,61 +304,115 @@ function Navbar({ children }: { children: React.ReactNode }) {
   ) {
     return (
       <div>
-        <header className="fixed bg-white w-full shadow-sm z-50 py-5">
-          <nav className="">
+        {/* <header className="fixed bg-white w-full shadow-sm z-50 py-5"> */}
+        <header className="fixed w-full bg-white/80 backdrop-blur-md shadow-sm z-50 py-4">
+          <nav className=" font-dm text-sm">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              <div className="flex justify-between h-10">
+              <div className="flex justify-between items-center h-10">
                 <div className="flex items-center">
                   <div className=" justify-self-start">
-                    <img
-                      height={28}
-                      width={100}
-                      src={IMAGE_SOURCE.PR_ONE_LOGO}
-                      alt="Logo"
-                    />
+                    <Link to={ROUTES_URL.LANDING_PAGE}>
+                      <img
+                        height={28}
+                        width={100}
+                        src={IMAGE_SOURCE.PR_ONE_LOGO}
+                        alt="Logo"
+                        onClick={() =>
+                          window.scrollTo({ top: 0, behavior: "smooth" })
+                        }
+                      />
+                    </Link>
                   </div>
                 </div>
 
                 <div className="hidden md:flex items-center space-x-8">
-                  <a
-                    href={ROUTES_URL.FEATURES}
-                    className="text-gray-700 hover:text-blue-600"
+                  <NavLink
+                    to={ROUTES_URL.LANDING_PAGE}
+                    // href={ROUTES_URL.FEATURES}
+                    onClick={() =>
+                      window.scrollTo({ top: 0, behavior: "smooth" })
+                    }
+                    className={({ isActive }) =>
+                      isActive
+                        ? "text-purple font-semibold border-b-2 border-purple "
+                        : "text-gray-700 hover:text-purple"
+                    }
+                  >
+                    Home
+                  </NavLink>
+                  <NavLink
+                    to={ROUTES_URL.FEATURES}
+                    // href={ROUTES_URL.FEATURES}
+                    onClick={() =>
+                      window.scrollTo({ top: 0, behavior: "smooth" })
+                    }
+                    className={({ isActive }) =>
+                      isActive
+                        ? "text-purple font-semibold border-b-2 border-purple "
+                        : "text-gray-700 hover:text-purple"
+                    }
                   >
                     Features
-                  </a>
-                  <a
-                    href={ROUTES_URL.PRICING}
-                    className="text-gray-700 hover:text-blue-600"
+                  </NavLink>
+                  <NavLink
+                    to={ROUTES_URL.PRICING}
+                    // href={ROUTES_URL.PRICING}
+                    onClick={() =>
+                      window.scrollTo({ top: 0, behavior: "smooth" })
+                    }
+                    className={({ isActive }) =>
+                      isActive
+                        ? "text-purple font-semibold border-b-2 border-purple "
+                        : "text-gray-700 hover:text-purple"
+                    }
                   >
                     Pricing
-                  </a>
-                  <a
-                    href={ROUTES_URL.ABOUT_US}
-                    className="text-gray-700 hover:text-blue-600"
+                  </NavLink>
+                  <NavLink
+                    to={ROUTES_URL.ABOUT_US}
+                    // href={ROUTES_URL.ABOUT_US}
+                    onClick={() =>
+                      window.scrollTo({ top: 0, behavior: "smooth" })
+                    }
+                    // className="text-gray-700 hover:text-blue-600"
+                    className={({ isActive }) =>
+                      isActive
+                        ? "text-purple font-semibold border-b-2 border-purple "
+                        : "text-gray-700 hover:text-purple"
+                    }
                   >
                     About Us
-                  </a>
-                  <a
-                    href={ROUTES_URL.CONTACT_US}
-                    className="text-gray-700 hover:text-blue-600"
+                  </NavLink>
+                  <NavLink
+                    to={ROUTES_URL.CONTACT_US}
+                    // href={ROUTES_URL.CONTACT_US}
+                    onClick={() =>
+                      window.scrollTo({ top: 0, behavior: "smooth" })
+                    }
+                    className={({ isActive }) =>
+                      isActive
+                        ? "text-purple font-semibold border-b-2 border-purple "
+                        : "text-gray-700 hover:text-purple"
+                    }
                   >
                     Contact Us
-                  </a>
+                  </NavLink>
                   {/* <a
                     href={ROUTES_URL.CAREERS}
                     className="text-gray-700 hover:text-blue-600"
                   >
                     Careers
                   </a> */}
-
-                  <Link to={ROUTES_URL.SIGN_UP}>
-                    <button className="bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700">
-                      Get Started
+                </div>
+                <div className="hidden md:flex gap-4">
+                  <Link to={ROUTES_URL.SIGN_IN}>
+                    <button className="border border-purple text-purple px-6 py-2  rounded-full w-full hover:bg-purple-light">
+                      Login
                     </button>
                   </Link>
-                  <Link to={ROUTES_URL.SIGN_IN}>
-                    <button className="bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700">
-                      Login
+                  <Link to={ROUTES_URL.SIGN_UP}>
+                    <button className="bg-purple text-white px-6 py-2 rounded-full w-full hover:bg-purpleHover">
+                      Get Started
                     </button>
                   </Link>
                 </div>
@@ -376,9 +430,9 @@ function Navbar({ children }: { children: React.ReactNode }) {
             </div>
 
             {isOpen && (
-              <div className="md:hidden">
+              <div className="md:hidden font-dm text-sm">
                 <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-                  <a
+                  {/* <a
                     href="#features"
                     className="block px-3 py-2 text-gray-700 hover:text-blue-600"
                   >
@@ -395,16 +449,96 @@ function Navbar({ children }: { children: React.ReactNode }) {
                     className="block px-3 py-2 text-gray-700 hover:text-blue-600"
                   >
                     Pricing
-                  </a>
-                  <Link to={ROUTES_URL.SIGN_UP}>
-                    <Button className="bg-blue-600 text-white px-4 py-2 rounded-full hover:bg-blue-700 w-full text-center">
-                      Get Started
+                  </a> */}
+                  <NavLink
+                    to={ROUTES_URL.LANDING_PAGE}
+                    // href={ROUTES_URL.LANDING_PAGE}
+                    onClick={() =>
+                      window.scrollTo({ top: 0, behavior: "smooth" })
+                    }
+                    className={({ isActive }) =>
+                      `block px-3 py-2 rounded-md transition ${
+                        isActive
+                          ? "bg-blue-50 text-purple font-semibold"
+                          : "text-gray-700 hover:bg-gray-100 hover:text-purple"
+                      }`
+                    }
+                  >
+                    Home
+                  </NavLink>
+                  <NavLink
+                    to={ROUTES_URL.FEATURES}
+                    // href={ROUTES_URL.FEATURES}
+                    onClick={() =>
+                      window.scrollTo({ top: 0, behavior: "smooth" })
+                    }
+                    className={({ isActive }) =>
+                      `block px-3 py-2 rounded-md transition ${
+                        isActive
+                          ? "bg-blue-50 text-purple font-semibold"
+                          : "text-gray-700 hover:bg-gray-100 hover:text-purple"
+                      }`
+                    }
+                  >
+                    Features
+                  </NavLink>
+                  <NavLink
+                    to={ROUTES_URL.PRICING}
+                    // href={ROUTES_URL.PRICING}
+                    onClick={() =>
+                      window.scrollTo({ top: 0, behavior: "smooth" })
+                    }
+                    className={({ isActive }) =>
+                      `block px-3 py-2 rounded-md transition ${
+                        isActive
+                          ? "bg-blue-50 text-purple font-semibold"
+                          : "text-gray-700 hover:bg-gray-100 hover:text-purple"
+                      }`
+                    }
+                  >
+                    Pricing
+                  </NavLink>
+                  <NavLink
+                    to={ROUTES_URL.ABOUT_US}
+                    // href={ROUTES_URL.ABOUT_US}
+                    onClick={() =>
+                      window.scrollTo({ top: 0, behavior: "smooth" })
+                    }
+                    className={({ isActive }) =>
+                      `block px-3 py-2 rounded-md transition ${
+                        isActive
+                          ? "bg-blue-50 text-purple font-semibold"
+                          : "text-gray-700 hover:bg-gray-100 hover:text-purple"
+                      }`
+                    }
+                  >
+                    About Us
+                  </NavLink>
+                  <NavLink
+                    to={ROUTES_URL.CONTACT_US}
+                    onClick={() =>
+                      window.scrollTo({ top: 0, behavior: "smooth" })
+                    }
+                    // href={ROUTES_URL.CONTACT_US}
+                    className={({ isActive }) =>
+                      `block px-3 py-2 rounded-md transition ${
+                        isActive
+                          ? "bg-blue-50 text-purple font-semibold"
+                          : "text-gray-700 hover:bg-gray-100 hover:text-purple"
+                      }`
+                    }
+                  >
+                    Contact Us
+                  </NavLink>
+                  <Link to={ROUTES_URL.SIGN_IN}>
+                    <Button className="border border-purple text-purple px-6 py-2 rounded-full w-full hover:bg-purple-light ">
+                      Login
                     </Button>
                   </Link>
-                  <Link to={ROUTES_URL.SIGN_IN}>
-                    <button className="bg-blue-600 text-white px-4 py-2 rounded-full hover:bg-blue-700 w-full text-center">
-                      Login
-                    </button>
+                  <Link to={ROUTES_URL.SIGN_UP}>
+                    <Button className="bg-purple text-white px-6 py-2 rounded-full mt-1 w-full hover:bg-purpleHover">
+                      Get Started
+                    </Button>
                   </Link>
                 </div>
               </div>
@@ -505,7 +639,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
                           label="Lead"
                         />
 
-                         <NavItem
+                        <NavItem
                           disable={!userHasAccessToViewCompanyQuotation}
                           to={ROUTES_URL.QUOTATION_MANAGEMENT}
                           icon={<LucideFileArchive size={SIZE.TWENTY} />}
@@ -660,9 +794,9 @@ function Navbar({ children }: { children: React.ReactNode }) {
                           {userHasAccessToViewCompanyQuotation && (
                             <NavItem
                               to={ROUTES_URL.QUOTATION_MANAGEMENT}
-                              icon={<LucideFileArchive size={SIZE.TWENTY}/>}
+                              icon={<LucideFileArchive size={SIZE.TWENTY} />}
                               label=""
-                              onClick={()=> setIsDropdownOpen(false)}
+                              onClick={() => setIsDropdownOpen(false)}
                             />
                           )}
 

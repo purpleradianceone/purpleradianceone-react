@@ -10,6 +10,7 @@ import {
   STORAGE_KEY_UPDATE,
 } from "../../local-storage/LocalStorageKeys";
 import { useSearchParams } from "react-router-dom";
+import localforage from "localforage";
 
 export const CanvasWrapperQuotation = ({ data }: { data: string }) => {
   const { canUndo, canRedo, actions, query, store } = useEditor(
@@ -40,31 +41,55 @@ export const CanvasWrapperQuotation = ({ data }: { data: string }) => {
 
   //Auto save editor state
   useEffect(() => {
-    const unsubscribe = store.subscribe(
-      (state) => state,
-      () => {
-        const serialized = query.serialize();
-        const data = JSON.parse(serialized);
-        const result = isCanvasTrulyEmpty(data, "ROOT");
-        // console.log(`Craft Json: ${serialized}`);
-        const storageKey = !quotationTemplateId
-          ? STORAGE_KEY_CREATE
-          : STORAGE_KEY_UPDATE;
-        if (!result)
-          localStorage.setItem(storageKey + loginStatus.id, serialized);
-      },
-    );
+    //Local Storage
+    // const unsubscribe = store.subscribe(
+    //   (state) => state,
+    //   () => {
+    //     const serialized = query.serialize();
+    //     const data = JSON.parse(serialized);
+    //     const result = isCanvasTrulyEmpty(data, "ROOT");
+    //     // console.log(`Craft Json: ${serialized}`);
+    //     const storageKey = !quotationTemplateId
+    //       ? STORAGE_KEY_CREATE
+    //       : STORAGE_KEY_UPDATE;
+    //     if (!result)
+    //       localStorage.setItem(storageKey + loginStatus.id, serialized);
+    //   },
+    // );
+    // return () => unsubscribe();
 
-    return () => unsubscribe();
+    //Local forage
+      const unsubscribe = store.subscribe(
+    (state) => state,
+    async () => {
+      const serialized = query.serialize();
+      const data = JSON.parse(serialized);
+
+      const result = isCanvasTrulyEmpty(data, "ROOT");
+
+      const storageKey = !quotationTemplateId
+        ? STORAGE_KEY_CREATE
+        : STORAGE_KEY_UPDATE;
+
+      if (!result) {
+        await localforage.setItem(
+          storageKey + loginStatus.id,
+          serialized
+        );
+      }
+    }
+  );
+
+  return () => unsubscribe();
   }, [store, query]);
 
   //For undo and redo handler
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.ctrlKey && e.key.toLowerCase() === "z") {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "z") {
         actions.history.undo();
       }
-      if (e.ctrlKey && e.key.toLowerCase() === "y") {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "y") {
         actions.history.redo();
       }
     };

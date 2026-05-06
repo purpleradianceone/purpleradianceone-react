@@ -52,7 +52,7 @@ function CreateLeadModal({
   const { loginStatus } = useLoggedInUserContext();
   const { errors } = useFormValidation(
     initialCreatLeadFormData,
-    "registration"
+    "registration",
   );
   const {
     formData: createLeadModalFormData,
@@ -81,23 +81,22 @@ function CreateLeadModal({
 
   // NOTE : ADD THIS selectedStatus
   const [selectedStatus, setSelectedStatus] = useState<number | undefined>(
-    undefined
+    undefined,
   );
   // NOTE : ADD THIS selectedSource
   const [selectedSource, setSelectedSource] = useState<number | undefined>(
-    undefined
+    undefined,
   );
 
   // const [openPopUpOfCompanyUserModal, setOpenPopUpOfCompanyUserModal] =
   //   useState(false);
 
-    // Note : lead owner state 
-    const [selectedLeadOwner, setSelectedLeadOwner] =
-    useState<number | null>(null);
+  // Note : lead owner state
+  const [selectedLeadOwner, setSelectedLeadOwner] = useState<number | null>(
+    null,
+  );
 
-  const leadOwnerId =
-    selectedLeadOwner || loginStatus.id; //  default rule applied here
-
+  const leadOwnerId = selectedLeadOwner || loginStatus.id; //  default rule applied here
 
   // const handleCompanyUserPopUp = () => {
   //   setOpenPopUpOfCompanyUserModal(true);
@@ -181,7 +180,7 @@ function CreateLeadModal({
         postDataForLeadSource,
         {
           withCredentials: true,
-        }
+        },
       );
       if (response.status === STATUS_CODE.OK) {
         setLeadSource(response.data);
@@ -215,7 +214,7 @@ function CreateLeadModal({
         postDataForLeadStatus,
         {
           withCredentials: true,
-        }
+        },
       );
 
       setLeadStatus(response.data);
@@ -310,7 +309,6 @@ function CreateLeadModal({
       return;
     }
 
-
     if (
       createLeadModalFormData.email !== "" ||
       createLeadModalFormData.mobileNumber !== "" ||
@@ -319,10 +317,7 @@ function CreateLeadModal({
     ) {
       const postDataForCreateLead: PostDataForCreateLead = {
         company_id: loginStatus.companyId,
-        ownerid:
-          leadOwnerId === 0
-            ? loginStatus.id
-            :leadOwnerId,
+        ownerid: leadOwnerId === 0 ? loginStatus.id : leadOwnerId,
         name:
           createLeadModalFormData.name === ""
             ? null
@@ -374,7 +369,7 @@ function CreateLeadModal({
     if (!isOpen) {
       errors.email = "";
       errors.name = "";
-      setSelectedLeadOwner(null)
+      setSelectedLeadOwner(null);
       // setOpenPopUpOfCompanyUserModal(false);
       // setPersistedSelectedUserId(null);
       // setSelectedCompanyUser({
@@ -410,126 +405,126 @@ function CreateLeadModal({
 
   if (!isOpen) return null;
   return (
-   
-      <FormLayout width={3} padding={3}>
-        {/* Header */}
-        <FormHeader
-          icon={Handshake}
-          onClose={onClose}
-          preText="Create new "
-          userName="Opportunity"
-          description="Fill in the details below to create a new lead."
-        />
+    <FormLayout width={3} padding={3}>
+      {/* Header */}
+      <FormHeader
+        icon={Handshake}
+        onClose={onClose}
+        preText="Create new "
+        userName="Opportunity"
+        description="Fill in the details below to create a new lead."
+      />
 
-        {isSaving && <LoadingPopUpAnimation show={isSaving} />}
-        {/* Form */}
-        <form className="space-y-2 mt-2" onSubmit={handleSubmit}>
-          <div className="grid grid-cols-2 space-y-1 gap-2">
-            <div className="col-span-2">
-              <FormInput
-                label="Name:"
-                logo={User}
-                type="text"
-                name="name"
-                placeholder="Enter name "
-                value={createLeadModalFormData.name}
-                onChange={handleCreateLeadModalFormDataChange}
-                autoFocus
-              />
-            </div>
+      {isSaving && <LoadingPopUpAnimation show={isSaving} />}
+      {/* Form */}
+      <form className="space-y-2 mt-2" onSubmit={handleSubmit}>
+        <div className="grid grid-cols-2 space-y-1 gap-2">
+          <div className="col-span-2">
+            <FormInput
+              label="Name:"
+              logo={User}
+              type="text"
+              name="name"
+              placeholder="Enter name "
+              value={createLeadModalFormData.name}
+              onChange={handleCreateLeadModalFormDataChange}
+              autoFocus
+            />
+          </div>
 
-            {/* NOTE : EIGHTER ONE THEM IS REQUIRED FIELD (from email and mobile number) */}
-            <div className="">
-              <FormInput
-                label="Email:"
-                logo={Mail}
-                type="email"
-                name="email"
-                placeholder="Enter email "
-                value={createLeadModalFormData.email}
-                onChange={handleCreateLeadModalFormDataChange}
-                onBlur={handleBlur}
-              />
-              {error.email && (
-                <div className="text-red-500 text-xs">{error.email}</div>
-              )}
-            </div>
+          {/* NOTE : EIGHTER ONE THEM IS REQUIRED FIELD (from email and mobile number) */}
+          <div className="">
+            <FormInput
+              label="Email:"
+              logo={Mail}
+              type="email"
+              name="email"
+              placeholder="Enter email "
+              value={createLeadModalFormData.email}
+              onChange={handleCreateLeadModalFormDataChange}
+              onBlur={handleBlur}
+            />
+            {error.email && (
+              <div className="text-red-500 text-xs">{error.email}</div>
+            )}
+          </div>
 
-            <div className="">
-              <FormInput
-                type="text"
-                label="Mobile Number:"
-                logo={Phone}
-                className={createLeadInputTagCss}
-                name="mobileNumber"
-                placeholder="Enter mobile number "
-                value={createLeadModalFormData.mobileNumber}
-                onBlur={handleBlur}
-                onChange={handleCreateLeadModalFormDataChange}
-              />
-              {error.mobileNumber && (
-                <div className="caption-custom-inactive">
-                  {error.mobileNumber}
-                </div>
-              )}
-            </div>
-            {/* Lead Source */}
-            <div className="space-y-1">
-              <CustomSelect
-                label="Lead Source"
-                value={selectedSource}
-                onChange={handleLeadSelectedSource}
-                options={leadSourceOptions}
-                icon={Link}
-                isRequired={true}
-              />
-              {/* <CustomDropdown
+          <div className="">
+            <FormInput
+              type="text"
+              label="Mobile Number:"
+              logo={Phone}
+              className={createLeadInputTagCss}
+              name="mobileNumber"
+              placeholder="Enter mobile number "
+              value={createLeadModalFormData.mobileNumber}
+              onBlur={handleBlur}
+              onChange={handleCreateLeadModalFormDataChange}
+            />
+            {error.mobileNumber && (
+              <div className="caption-custom-inactive">
+                {error.mobileNumber}
+              </div>
+            )}
+          </div>
+          {/* Lead Source */}
+          <div className="space-y-1">
+            <CustomSelect
+              label="Lead Source"
+              value={selectedSource}
+              onChange={handleLeadSelectedSource}
+              options={leadSourceOptions}
+              icon={Link}
+              isRequired={true}
+            />
+            {/* <CustomDropdown
                 logo={Link}
                 requiredRedDot
                 labelName="Lead Source :"
                 options={leadSource!}
                 onSelect={handleLeadSelectedSource}
               /> */}
-              {showErrorAtLeadSource && !selectedSource && (
-                <div className="text-red-500 text-xs">
-                  Please select Lead Source
-                </div>
-              )}
-            </div>
-            {/* Lead Status */}
-            <div className="space-y-1">
-              <CustomSelect
-                label="Lead Status"
-                value={selectedStatus}
-                onChange={handleLeadSelectedStatus}
-                options={leadStatusOptions}
-                icon={Clock}
-                isRequired={true}
-              />
-              {/* <CustomDropdown
+            {showErrorAtLeadSource && !selectedSource && (
+              <div className="text-red-500 text-xs">
+                Please select Lead Source
+              </div>
+            )}
+          </div>
+          {/* Lead Status */}
+          <div className="space-y-1">
+            <CustomSelect
+              label="Lead Status"
+              value={selectedStatus}
+              onChange={handleLeadSelectedStatus}
+              options={leadStatusOptions}
+              icon={Clock}
+              isRequired={true}
+            />
+            {/* <CustomDropdown
                 logo={Clock}
                 requiredRedDot
                 labelName="Lead Status :"
                 options={leadStatus!}
                 onSelect={handleLeadSelectedStatus}
               /> */}
-              {showErrorAtLeadStatus && !selectedStatus && (
-                <div className="text-red-500 text-xs">
-                  Please select Lead Status
-                </div>
-              )}
-            </div>
+            {showErrorAtLeadStatus && !selectedStatus && (
+              <div className="text-red-500 text-xs">
+                Please select Lead Status
+              </div>
+            )}
+          </div>
 
-            <CustomSelectLookupCompanyUser
+          <CustomSelectLookupCompanyUser
             onChange={setSelectedLeadOwner}
             value={selectedLeadOwner}
-            />
-            <div>
-              <span className="caption-custom">
-                <span className="">Note :</span> If no lead owner is selected, the lead will be assigned to the lead creator by default.
-              </span>
-            </div>
-            {/* <div className="col-span-2">
+          />
+          <div>
+            <span className="caption-custom">
+              <span className="">Note :</span> If no lead owner is selected, the
+              lead will be assigned to the lead creator by default.
+            </span>
+          </div>
+          {/* <div className="col-span-2">
             <div className="flex items-center justify-between  gap-1 w-full">
              <div className="flex items-center gap-x-2">
                <Button
@@ -564,28 +559,28 @@ function CreateLeadModal({
               <span className=""> Creator</span> by default.
             </span>
           </div> */}
-          </div>
+        </div>
 
-          <div className="flex justify-end ">
-            <div className="flex gap-2">
-              <Button onClick={onClose} type="button">
-                <div className="flex items-center gap-0.5">
-                  <X size={16} />
-                  <span>Cancel</span>
-                </div>
-              </Button>
-              <Button type="submit">
-                <div className="flex items-center gap-1">
-                  <Save size={16} />
-                  <span>Save</span>
-                </div>
-              </Button>
-            </div>
+        <div className="flex justify-end ">
+          <div className="flex gap-2">
+            <Button onClick={onClose} type="button">
+              <div className="flex items-center gap-0.5">
+                <X size={16} />
+                <span>Cancel</span>
+              </div>
+            </Button>
+            <Button type="submit">
+              <div className="flex items-center gap-1">
+                <Save size={16} />
+                <span>Save</span>
+              </div>
+            </Button>
           </div>
-        </form>
-        {/* </div> */}
+        </div>
+      </form>
+      {/* </div> */}
 
-        {/* {openPopUpOfCompanyUserModal &&
+      {/* {openPopUpOfCompanyUserModal &&
           createPortal(
             <div className="fixed inset-0 z-50 bg-black bg-opacity-40 flex items-center justify-center p-4">
               <div className="bg-white rounded-2xl p-3 shadow-lg w-full max-w-5xl max-h-[100vh] overflow-y-auto relative animate-fadeIn">

@@ -15,6 +15,7 @@ import {
   PAGE_BLOCK_LAYOUT_UPDATE,
   searchParamKey,
 } from "../local-storage/LocalStorageKeys";
+import localforage from "localforage";
 
 const A4_WIDTH = 794;
 const A4_HEIGHT = 1123;
@@ -57,7 +58,8 @@ export const PageBlockQuotation: React.FC = () => {
   const [isHeaderRequired, setIsHeaderRequired] = useState<boolean>(hasHeader);
   const [isFooterRequired, setIsFooterRequired] = useState<boolean>(hasFooter);
 
-  const handleSave = () => {
+  const handleSave = async () => {
+    console.log("inside save Page Block");
     const pageBlockLayoutKey = quotationTemplateId
       ? PAGE_BLOCK_LAYOUT_UPDATE
       : PAGE_BLOCK_LAYOUT_Create;
@@ -84,7 +86,10 @@ export const PageBlockQuotation: React.FC = () => {
       p.isHeader = isHeaderRequired;
       p.isFooter = isFooterRequired;
     });
-    const result = localStorage.getItem(pageBlockLayoutKey + loginStatus.id);
+    // const result = localStorage.getItem(pageBlockLayoutKey + loginStatus.id);
+    const result = await localforage.getItem(
+      pageBlockLayoutKey + loginStatus.id,
+    );
     if (!result) {
       handleSavePageLayout();
     }
@@ -92,56 +97,124 @@ export const PageBlockQuotation: React.FC = () => {
   };
 
   useEffect(() => {
-    const pageBlockLayoutKey = quotationTemplateId
-      ? PAGE_BLOCK_LAYOUT_UPDATE
-      : PAGE_BLOCK_LAYOUT_Create;
-    const result = localStorage.getItem(pageBlockLayoutKey + loginStatus.id);
-    if (!result) {
-      handleSavePageLayout();
-    }
+    //Local Storage
+    // const pageBlockLayoutKey = quotationTemplateId
+    //   ? PAGE_BLOCK_LAYOUT_UPDATE
+    //   : PAGE_BLOCK_LAYOUT_Create;
+    // const result = localStorage.getItem(pageBlockLayoutKey + loginStatus.id);
+    // if (!result) {
+    //   handleSavePageLayout();
+    // }
+
+    //Local Forage
+    const checkPageLayout = async () => {
+      const pageBlockLayoutKey = quotationTemplateId
+        ? PAGE_BLOCK_LAYOUT_UPDATE
+        : PAGE_BLOCK_LAYOUT_Create;
+
+      const result = await localforage.getItem(
+        pageBlockLayoutKey + loginStatus.id,
+      );
+
+      if (!result) {
+        if (!quotationTemplateId) await handleSavePageLayout();
+      }
+    };
+
+    checkPageLayout();
   }, []);
 
-  const handleSavePageLayout = () => {
+  const handleSavePageLayout = async () => {
     const pageBlockLayoutKey = quotationTemplateId
       ? PAGE_BLOCK_LAYOUT_UPDATE
       : PAGE_BLOCK_LAYOUT_Create;
 
-    setProp((p: any) => {
-      p.padding = tempPadding;
-      p.backgroundColor = tempBackground;
-      p.align = tempAlign;
-      p.isHeader = isHeaderRequired;
-      p.isFooter = isFooterRequired;
-    });
-    console.log(JSON.stringify(props));
-    localStorage.setItem(
+    const newLayout = {
+      padding: tempPadding,
+      backgroundColor: tempBackground,
+      align: tempAlign,
+      isHeader: isHeaderRequired,
+      isFooter: isFooterRequired,
+    };
+
+    // ✅ 1. Save to localforage
+    await localforage.setItem(
       pageBlockLayoutKey + loginStatus.id,
-      JSON.stringify(props),
+      JSON.stringify(newLayout),
     );
+
+    // ✅ 2. Apply to ALL Page Blocks in editor
+    const allNodes = query.getNodes();
+
+    Object.keys(allNodes).forEach((nodeId) => {
+      const node = allNodes[nodeId];
+
+      if (node.data.displayName === "Page Block") {
+        actions.setProp(nodeId, (props: any) => {
+          props.padding = newLayout.padding;
+          props.backgroundColor = newLayout.backgroundColor;
+          props.align = newLayout.align;
+          props.isHeader = newLayout.isHeader;
+          props.isFooter = newLayout.isFooter;
+        });
+      }
+    });
+
     setEditing(false);
     setIsConfirmationPopupOpen(false);
     window.location.reload();
   };
 
   useEffect(() => {
-    const pageBlockLayoutKey = quotationTemplateId
-      ? PAGE_BLOCK_LAYOUT_UPDATE
-      : PAGE_BLOCK_LAYOUT_Create;
-    const stored = localStorage.getItem(pageBlockLayoutKey + loginStatus.id);
-    if (!stored) return;
+    //Local Storage
+    // const pageBlockLayoutKey = quotationTemplateId
+    //   ? PAGE_BLOCK_LAYOUT_UPDATE
+    //   : PAGE_BLOCK_LAYOUT_Create;
+    // const stored = localStorage.getItem(pageBlockLayoutKey + loginStatus.id);
+    // if (!stored) return;
 
-    try {
-      const parsed = JSON.parse(stored);
-      setProp((p: any) => {
-        p.padding = parsed.padding;
-        p.backgroundColor = parsed.backgroundColor;
-        p.align = parsed.align;
-        // p.isHeader = false;
-        // p.isFooter = false;
-      });
-    } catch (err) {
-      console.log("Error loading page props:", err);
-    }
+    // try {
+    //   const parsed = JSON.parse(stored);
+    //   setProp((p: any) => {
+    //     p.padding = parsed.padding;
+    //     p.backgroundColor = parsed.backgroundColor;
+    //     p.align = parsed.align;
+    //     // p.isHeader = false;
+    //     // p.isFooter = false;
+    //   });
+    // } catch (err) {
+    //   console.log("Error loading page props:", err);
+    // }
+
+    //Local forage
+    const loadPageLayout = async () => {
+      const pageBlockLayoutKey = quotationTemplateId
+        ? PAGE_BLOCK_LAYOUT_UPDATE
+        : PAGE_BLOCK_LAYOUT_Create;
+
+      const stored = await localforage.getItem(
+        pageBlockLayoutKey + loginStatus.id,
+      );
+
+      if (quotationTemplateId) return;
+      if (!stored) return;
+
+      try {
+        const parsed = typeof stored === "string" ? JSON.parse(stored) : stored;
+
+        setProp((p: any) => {
+          p.padding = parsed.padding;
+          p.backgroundColor = parsed.backgroundColor;
+          p.align = parsed.align;
+          // p.isHeader = false;
+          // p.isFooter = false;
+        });
+      } catch (err) {
+        console.log("Error loading page props:", err);
+      }
+    };
+
+    loadPageLayout();
   }, [id]);
 
   const addHeader = () => {

@@ -13,6 +13,7 @@ import {
   FOOTER_STORAGE_KEY_UPDATE,
   searchParamKey,
 } from "../local-storage/LocalStorageKeys";
+import localforage from "localforage";
 
 export const FooterBlockQuotation: React.FC = () => {
   const {
@@ -47,7 +48,8 @@ export const FooterBlockQuotation: React.FC = () => {
   const quotationTemplateId = searchParams.get(searchParamKey);
 
   /* ===== Save ===== */
-  const handleSave = () => {
+  const handleSave = async () => {
+    console.log("inside footer block save");
     setProp((p: any) => {
       p.height = tempHeight;
       p.padding = tempPadding;
@@ -59,13 +61,17 @@ export const FooterBlockQuotation: React.FC = () => {
       ? FOOTER_STORAGE_KEY_UPDATE
       : FOOTER_STORAGE_KEY_CREATE;
 
-      const result = localStorage.getItem(footerBlockStorageKey+loginStatus.id);
-      if(!result){
-        saveFooterToStorage();
-      }
+    // const result = localStorage.getItem(footerBlockStorageKey+loginStatus.id);
+
+    const result = await localforage.getItem(
+      footerBlockStorageKey + loginStatus.id,
+    );
+    if (!result) {
+     await saveFooterToStorage();
+    }
   };
 
-  const saveFooterToStorage = () => {
+  const saveFooterToStorage = async () => {
     const footerBlockStorageKey = quotationTemplateId
       ? FOOTER_STORAGE_KEY_UPDATE
       : FOOTER_STORAGE_KEY_CREATE;
@@ -104,75 +110,231 @@ export const FooterBlockQuotation: React.FC = () => {
 
       console.log(localStorageData);
 
-      localStorage.setItem(
+      // localStorage.setItem(
+      //   footerBlockStorageKey + loginStatus.id,
+      //   JSON.stringify(localStorageData),
+      // );
+
+      await localforage.setItem(
         footerBlockStorageKey + loginStatus.id,
         JSON.stringify(localStorageData),
       );
+
       setIsConfirmationPopupOpen(false);
     } catch (err) {
       console.log("Error storing header:", err);
     }
   };
 
-  const handleSaveFooterLayout = () => {
-    handleSave();
-    saveFooterToStorage();
-    window.location.reload();
-  };
+  // const handleSaveFooterLayout = async () => {
+  //   await handleSave();
+  //   await saveFooterToStorage();
+  //   window.location.reload();
+  // };
+
+  const handleSaveFooterLayout = async () => {
+  const footerBlockStorageKey = quotationTemplateId
+    ? FOOTER_STORAGE_KEY_UPDATE
+    : FOOTER_STORAGE_KEY_CREATE;
+
+  try {
+    const editorState = query.getState();
+
+    // 👉 Current footer canvas
+    const currentCanvasId =
+      editorState.nodes[id].data.linkedNodes[`${id}-canvas`];
+
+    if (!currentCanvasId) return;
+
+    const currentCanvasNode = editorState.nodes[currentCanvasId];
+
+    if (!currentCanvasNode.data.nodes.length) return;
+
+    // 👉 Get first content node
+    const firstNodeId = currentCanvasNode.data.nodes[0];
+
+    const serializedNode = query
+      .node(firstNodeId)
+      .toSerializedNode();
+
+    const newLayout = {
+      height: tempHeight,
+      padding: tempPadding,
+      backgroundColor: tempBg,
+    };
+
+    const savedData = {
+      data: serializedNode,
+      props: newLayout,
+    };
+
+    // ✅ 1. Save to localforage
+    await localforage.setItem(
+      footerBlockStorageKey + loginStatus.id,
+      JSON.stringify(savedData)
+    );
+
+    // ✅ 2. Sync ALL Footer Blocks
+    const allNodes = query.getNodes();
+
+    Object.keys(allNodes).forEach((nodeId) => {
+      const node = allNodes[nodeId];
+
+      if (node.data.displayName === "Footer Block") {
+        const canvasId =
+          editorState.nodes[nodeId].data.linkedNodes[
+            `${nodeId}-canvas`
+          ];
+
+        if (!canvasId) return;
+
+        const canvasNode = editorState.nodes[canvasId];
+
+        // 🔥 Remove old content
+        canvasNode.data.nodes.forEach((childId: string) => {
+          actions.delete(childId);
+        });
+
+        // 🔥 Add new content
+        const newNode = query
+          .parseSerializedNode(savedData.data)
+          .toNode();
+
+        actions.add(newNode, canvasId);
+
+        // 🔥 Update props
+        actions.setProp(nodeId, (props: any) => {
+          props.height = newLayout.height;
+          props.padding = newLayout.padding;
+          props.backgroundColor = newLayout.backgroundColor;
+        });
+      }
+    });
+
+    setEditing(false);
+    setIsConfirmationPopupOpen(false);
+  } catch (err) {
+    console.log("Error syncing footer layout:", err);
+  }
+};
 
   useEffect(() => {
-    const footerBlockStorageKey = quotationTemplateId
-      ? FOOTER_STORAGE_KEY_UPDATE
-      : FOOTER_STORAGE_KEY_CREATE;
+    //Local Storage
+    // const footerBlockStorageKey = quotationTemplateId
+    //   ? FOOTER_STORAGE_KEY_UPDATE
+    //   : FOOTER_STORAGE_KEY_CREATE;
 
-    const stored = localStorage.getItem(footerBlockStorageKey + loginStatus.id);
-    if (!stored) return;
+    // const stored = localStorage.getItem(footerBlockStorageKey + loginStatus.id);
+    // if (!stored) return;
 
-    try {
-      const parsed = JSON.parse(stored);
-      setProp((p: any) => {
-        p.padding = parsed.props.padding;
-        p.backgroundColor = parsed.props.backgroundColor;
-        p.height = parsed.props.height;
-      });
-    } catch (err) {
-      console.log("Error loading header props:", err);
-    }
+    // try {
+    //   const parsed = JSON.parse(stored);
+    //   setProp((p: any) => {
+    //     p.padding = parsed.props.padding;
+    //     p.backgroundColor = parsed.props.backgroundColor;
+    //     p.height = parsed.props.height;
+    //   });
+    // } catch (err) {
+    //   console.log("Error loading header props:", err);
+    // }
+
+    // Local Forage
+    const loadFooterProps = async () => {
+      const footerBlockStorageKey = quotationTemplateId
+        ? FOOTER_STORAGE_KEY_UPDATE
+        : FOOTER_STORAGE_KEY_CREATE;
+
+      const stored = await localforage.getItem(
+        footerBlockStorageKey + loginStatus.id,
+      );
+
+      if (!stored) return;
+
+      try {
+        const parsed = typeof stored === "string" ? JSON.parse(stored) : stored;
+
+        setProp((p: any) => {
+          p.padding = parsed.props.padding;
+          p.backgroundColor = parsed.props.backgroundColor;
+          p.height = parsed.props.height;
+        });
+      } catch (err) {
+        console.log("Error loading header props:", err);
+      }
+    };
+
+    loadFooterProps();
   }, [id]);
 
   useEffect(() => {
-    const footerBlockStorageKey = quotationTemplateId
-      ? FOOTER_STORAGE_KEY_UPDATE
-      : FOOTER_STORAGE_KEY_CREATE;
+    //Local Storage
+    // const footerBlockStorageKey = quotationTemplateId
+    //   ? FOOTER_STORAGE_KEY_UPDATE
+    //   : FOOTER_STORAGE_KEY_CREATE;
 
-    const stored = localStorage.getItem(footerBlockStorageKey + loginStatus.id);
-    if (!stored) return;
+    // const stored = localStorage.getItem(footerBlockStorageKey + loginStatus.id);
+    // if (!stored) return;
 
-    try {
-      const parsed = JSON.parse(stored);
+    // try {
+    //   const parsed = JSON.parse(stored);
 
-      const editorState = query.getState();
-      const canvasId = editorState.nodes[id].data.linkedNodes[`${id}-canvas`];
+    //   const editorState = query.getState();
+    //   const canvasId = editorState.nodes[id].data.linkedNodes[`${id}-canvas`];
 
-      if (!canvasId) return;
+    //   if (!canvasId) return;
 
-      const node = query.parseSerializedNode(parsed.data).toNode();
+    //   const node = query.parseSerializedNode(parsed.data).toNode();
 
-      // VERY IMPORTANT: Inject only if empty
-      const canvasNode = editorState.nodes[canvasId];
-      if (canvasNode.data.nodes.length > 0) return;
+    //   // VERY IMPORTANT: Inject only if empty
+    //   const canvasNode = editorState.nodes[canvasId];
+    //   if (canvasNode.data.nodes.length > 0) return;
 
-      actions.add(node, canvasId);
-    } catch (err) {
-      console.log("Error loading footer:", err);
-    }
+    //   actions.add(node, canvasId);
+    // } catch (err) {
+    //   console.log("Error loading footer:", err);
+    // }
+
+    //Local Forage
+    const loadFooterBlock = async () => {
+      const footerBlockStorageKey = quotationTemplateId
+        ? FOOTER_STORAGE_KEY_UPDATE
+        : FOOTER_STORAGE_KEY_CREATE;
+
+      const stored = await localforage.getItem(
+        footerBlockStorageKey + loginStatus.id,
+      );
+
+      if (!stored) return;
+
+      try {
+        const parsed = typeof stored === "string" ? JSON.parse(stored) : stored;
+
+        const editorState = query.getState();
+        const canvasId = editorState.nodes[id].data.linkedNodes[`${id}-canvas`];
+
+        if (!canvasId) return;
+
+        const node = query.parseSerializedNode(parsed.data).toNode();
+
+        // Inject only if empty
+        const canvasNode = editorState.nodes[canvasId];
+
+        if (canvasNode.data.nodes.length > 0) return;
+
+        actions.add(node, canvasId);
+      } catch (err) {
+        console.log("Error loading footer:", err);
+      }
+    };
+
+    loadFooterBlock();
   }, [id]);
 
   //For Ctrl+s
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.ctrlKey && e.key.toLowerCase() === "s") {
-        handleSave();
+    const handleKeyDown = async (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "s") {
+        await handleSave();
       }
     };
 

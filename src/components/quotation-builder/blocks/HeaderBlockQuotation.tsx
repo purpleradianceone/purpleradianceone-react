@@ -14,6 +14,9 @@ import {
   searchParamKey,
 } from "../local-storage/LocalStorageKeys";
 
+import localforage from "localforage";
+
+
 export const HeaderBlockQuotation: React.FC = () => {
   const {
     id,
@@ -42,7 +45,7 @@ export const HeaderBlockQuotation: React.FC = () => {
   const quotationTemplateId = searchParams.get(searchParamKey);
 
   /* ===== Save ===== */
-  const handleSave = () => {
+  const handleSave = async () => {
     setProp((p: any) => {
       p.height = tempHeight;
       p.padding = tempPadding;
@@ -52,13 +55,14 @@ export const HeaderBlockQuotation: React.FC = () => {
     const headerBlockStorageKey = quotationTemplateId
       ? HEADER_STORAGE_KEY_UPDATE
       : HEADER_STORAGE_KEY_CREATE;
-    const result = localStorage.getItem(headerBlockStorageKey+loginStatus.id);
+    // const result = localStorage.getItem(headerBlockStorageKey+loginStatus.id);
+    const result = await localforage.getItem(headerBlockStorageKey+loginStatus.id);
     if(!result){
-      saveHeaderToStorage();
+      await saveHeaderToStorage();
     }
   };
 
-  const saveHeaderToStorage = () => {
+  const saveHeaderToStorage = async () => {
     const headerBlockStorageKey = quotationTemplateId
       ? HEADER_STORAGE_KEY_UPDATE
       : HEADER_STORAGE_KEY_CREATE;
@@ -96,7 +100,12 @@ export const HeaderBlockQuotation: React.FC = () => {
         },
       };
 
-      localStorage.setItem(
+      // localStorage.setItem(
+      //   headerBlockStorageKey + loginStatus.id,
+      //   JSON.stringify(localStorageData),
+      // );
+
+      await localforage.setItem(
         headerBlockStorageKey + loginStatus.id,
         JSON.stringify(localStorageData),
       );
@@ -105,30 +114,148 @@ export const HeaderBlockQuotation: React.FC = () => {
     }
   };
 
-  const handleSaveHeaderLayout = () => {
-    setProp((p: any) => {
-      p.height = tempHeight;
-      p.padding = tempPadding;
-      p.backgroundColor = tempBg;
+  // const handleSaveHeaderLayout = async () => {
+  //   setProp((p: any) => {
+  //     p.height = tempHeight;
+  //     p.padding = tempPadding;
+  //     p.backgroundColor = tempBg;
+  //   });
+
+  //   await saveHeaderToStorage(); // Save header
+  //   await handleSave(); // Save
+  //   setEditing(false);
+  //   setIsConfirmationPopupOpen(false);
+  //   window.location.reload();
+  // };
+
+  const handleSaveHeaderLayout = async () => {
+  const headerBlockStorageKey = quotationTemplateId
+    ? HEADER_STORAGE_KEY_UPDATE
+    : HEADER_STORAGE_KEY_CREATE;
+
+  try {
+    const editorState = query.getState();
+
+    // 👉 Get current header canvas
+    const currentCanvasId =
+      editorState.nodes[id].data.linkedNodes[`${id}-canvas`];
+
+    if (!currentCanvasId) return;
+
+    const currentCanvasNode = editorState.nodes[currentCanvasId];
+
+    if (!currentCanvasNode.data.nodes.length) return;
+
+    // 👉 Take first node (your header content root)
+    const firstNodeId = currentCanvasNode.data.nodes[0];
+
+    const serializedNode = query
+      .node(firstNodeId)
+      .toSerializedNode();
+
+    const newLayout = {
+      height: tempHeight,
+      padding: tempPadding,
+      backgroundColor: tempBg,
+    };
+
+    const savedData = {
+      data: serializedNode,
+      props: newLayout,
+    };
+
+    //  1. Save to localforage
+    await localforage.setItem(
+      headerBlockStorageKey + loginStatus.id,
+      JSON.stringify(savedData)
+    );
+
+    //  2. Sync ALL Header Blocks
+    const allNodes = query.getNodes();
+
+    Object.keys(allNodes).forEach((nodeId) => {
+      const node = allNodes[nodeId];
+
+      if (node.data.displayName === "Header Block") {
+        const canvasId =
+          editorState.nodes[nodeId].data.linkedNodes[
+            `${nodeId}-canvas`
+          ];
+
+        if (!canvasId) return;
+
+        const canvasNode = editorState.nodes[canvasId];
+
+        //  Remove old content
+        canvasNode.data.nodes.forEach((childId: string) => {
+          actions.delete(childId);
+        });
+
+        //  Add new content
+        const newNode = query
+          .parseSerializedNode(savedData.data)
+          .toNode();
+
+        actions.add(newNode, canvasId);
+
+        //  Update props
+        actions.setProp(nodeId, (props: any) => {
+          props.height = newLayout.height;
+          props.padding = newLayout.padding;
+          props.backgroundColor = newLayout.backgroundColor;
+        });
+      }
     });
 
-    saveHeaderToStorage(); // Save header
-    handleSave(); // Save
     setEditing(false);
     setIsConfirmationPopupOpen(false);
-    window.location.reload();
-  };
+
+  } catch (err) {
+    console.log("Error syncing header layout:", err);
+  } finally{
+  //  window.location.reload();
+
+  }
+};
 
   useEffect(() => {
+// Local Storage
+    // const headerBlockStorageKey = quotationTemplateId
+    //   ? HEADER_STORAGE_KEY_UPDATE
+    //   : HEADER_STORAGE_KEY_CREATE;
+
+    // const stored = localStorage.getItem(headerBlockStorageKey + loginStatus.id);
+    // if (!stored) return;
+
+    // try {
+    //   const parsed = JSON.parse(stored);
+    //   setProp((p: any) => {
+    //     p.padding = parsed.props.padding;
+    //     p.backgroundColor = parsed.props.backgroundColor;
+    //     p.height = parsed.props.height;
+    //   });
+    // } catch (err) {
+    //   console.log("Error loading header props:", err);
+    // }
+
+    //Local Forage
+    const loadHeaderData = async () => {
     const headerBlockStorageKey = quotationTemplateId
       ? HEADER_STORAGE_KEY_UPDATE
       : HEADER_STORAGE_KEY_CREATE;
 
-    const stored = localStorage.getItem(headerBlockStorageKey + loginStatus.id);
+    const stored = await localforage.getItem(
+      headerBlockStorageKey + loginStatus.id
+    );
+
     if (!stored) return;
 
     try {
-      const parsed = JSON.parse(stored);
+      const parsed =
+        typeof stored === "string"
+          ? JSON.parse(stored)
+          : stored;
+
       setProp((p: any) => {
         p.padding = parsed.props.padding;
         p.backgroundColor = parsed.props.backgroundColor;
@@ -137,41 +264,85 @@ export const HeaderBlockQuotation: React.FC = () => {
     } catch (err) {
       console.log("Error loading header props:", err);
     }
+  };
+
+  loadHeaderData();
+
   }, [id]);
 
   useEffect(() => {
+    //Local Storage
+    // const headerBlockStorageKey = quotationTemplateId
+    //   ? HEADER_STORAGE_KEY_UPDATE
+    //   : HEADER_STORAGE_KEY_CREATE;
+
+    // const stored = localStorage.getItem(headerBlockStorageKey + loginStatus.id);
+    // if (!stored) return;
+
+    // try {
+    //   const parsed = JSON.parse(stored);
+
+    //   const editorState = query.getState();
+    //   const canvasId = editorState.nodes[id].data.linkedNodes[`${id}-canvas`];
+
+    //   if (!canvasId) return;
+
+    //   const node = query.parseSerializedNode(parsed.data).toNode();
+
+    //   // VERY IMPORTANT: Inject only if empty
+    //   const canvasNode = editorState.nodes[canvasId];
+    //   if (canvasNode.data.nodes.length > 0) return;
+
+    //   actions.add(node, canvasId);
+    // } catch (err) {
+    //   console.log("Error loading header:", err);
+    // }
+
+    // Local Forage
+    const loadHeaderBlock = async () => {
     const headerBlockStorageKey = quotationTemplateId
       ? HEADER_STORAGE_KEY_UPDATE
       : HEADER_STORAGE_KEY_CREATE;
 
-    const stored = localStorage.getItem(headerBlockStorageKey + loginStatus.id);
+    const stored = await localforage.getItem(
+      headerBlockStorageKey + loginStatus.id
+    );
+
     if (!stored) return;
 
     try {
-      const parsed = JSON.parse(stored);
+      const parsed =
+        typeof stored === "string"
+          ? JSON.parse(stored)
+          : stored;
 
       const editorState = query.getState();
-      const canvasId = editorState.nodes[id].data.linkedNodes[`${id}-canvas`];
+      const canvasId =
+        editorState.nodes[id].data.linkedNodes[`${id}-canvas`];
 
       if (!canvasId) return;
 
       const node = query.parseSerializedNode(parsed.data).toNode();
 
-      // VERY IMPORTANT: Inject only if empty
+      // Inject only if empty
       const canvasNode = editorState.nodes[canvasId];
+
       if (canvasNode.data.nodes.length > 0) return;
 
       actions.add(node, canvasId);
     } catch (err) {
       console.log("Error loading header:", err);
     }
+  };
+
+  loadHeaderBlock();
   }, [id]);
 
   //For Ctrl+s
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.ctrlKey && e.key.toLowerCase() === "s") {
-        handleSave();
+    const handleKeyDown = async (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "s") {
+        await handleSave();
       }
     };
 

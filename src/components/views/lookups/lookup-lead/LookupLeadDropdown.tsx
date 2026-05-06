@@ -1,10 +1,12 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import Select from "react-select";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
+import Select, { components } from "react-select";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
 import { handleApiError } from "../../../../config/error/handleApiError";
 import { getLookupLeadsWithSignal } from "../../../../config/apis/LeadsApi";
+import { Mail, Phone } from "lucide-react";
 
 export const LookupLeadDropdown = ({
   icon,
@@ -17,23 +19,29 @@ export const LookupLeadDropdown = ({
   label?: string;
   value?: any;
   handleLeadSelection: (data: any) => void;
-  isDisabled?: boolean
+  isDisabled?: boolean;
 }) => {
   const { loginStatus } = useLoggedInUserContext();
+
   const [options, setOptions] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [inputValue, setInputValue] = useState("");
 
+  const selectRef = useRef<any>(null);
+
+  /* ================= FETCH ================= */
   useEffect(() => {
+    if (isDisabled) return;
+
     const delayDebounce = setTimeout(() => {
       fetchLeads(inputValue);
-    }, 400); 
+    }, 400);
 
     return () => clearTimeout(delayDebounce);
-  }, [inputValue]);
+  }, [inputValue, isDisabled]);
 
   const fetchLeads = async (searchText: string) => {
-    // if(isDisabled)return;
+    if(loginStatus.companyId === 0)return;
     setLoading(true);
 
     const postData = {
@@ -51,54 +59,177 @@ export const LookupLeadDropdown = ({
 
       const formatted = res.data.map((item: any) => ({
         value: item.id,
-        label: `${item.name?item.name:""} (${item.email?item.email:""})`,
+        label: item.name || "Unnamed",
         data: item,
       }));
 
       setOptions(formatted);
+      setLoading(false);
     } catch (error) {
       handleApiError(error);
-    } finally {
       setLoading(false);
+    } finally {
+      //
     }
   };
 
+  /* ================= CUSTOM OPTION ================= */
+  const CustomOption = (props: any) => {
+    const { data, isSelected } = props;
+
+    return (
+      <components.Option {...props}>
+        <div
+          style={{
+            padding: "6px 1px",
+            fontFamily: "Inter, sans-serif",
+            borderBottom: `1px solid ${isSelected ? "#2563eb" : "#f1f5f9"}`,
+            transition: "all 0.15s ease",
+          }}
+        >
+          {/* NAME */}
+          <div
+            style={{
+              fontSize: "13px",
+              fontWeight: 500,
+              color: isSelected ? "#ffffff" : "#0f172a",
+            }}
+          >
+            {data.data.name || "Unnamed"}
+          </div>
+
+          {/* CONTACT INFO */}
+          {(data.data.email || data.data.mobilenumber) && (
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                alignItems: "center",
+                gap: "12px",
+                marginTop: "4px",
+                fontSize: "12px",
+                color: isSelected ? "#dbeafe" : "#64748b",
+              }}
+            >
+              {data.data.email && (
+                <div
+                  style={{ display: "flex", gap: "4px", alignItems: "center" }}
+                >
+                  <Mail size={13} />
+                  <span>{data.data.email}</span>
+                </div>
+              )}
+
+              {data.data.mobilenumber && (
+                <div
+                  style={{ display: "flex", gap: "4px", alignItems: "center" }}
+                >
+                  <Phone size={13} />
+                  <span>{data.data.mobilenumber}</span>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </components.Option>
+    );
+  };
+
+  /* ================= SELECTED VALUE ================= */
+  const CustomSingleValue = (props: any) => {
+    return (
+      <components.SingleValue {...props}>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            height: "100%",
+            fontSize: "13px",
+            fontWeight: 500,
+            fontFamily: "Roboto, Inter, sans-serif",
+          }}
+        >
+          {props.data.data.name ||
+            props.data.data.mobilenumber ||
+            props.data.data.email ||
+            "Unnamed"}
+        </div>
+      </components.SingleValue>
+    );
+  };
+
+  /* ================= CURSOR FIX ================= */
+  useEffect(() => {
+    if (selectRef.current) {
+      setTimeout(() => {
+        const input = selectRef.current.inputRef;
+        if (input) {
+          input.setSelectionRange(0, 0); // always start
+        }
+      }, 0);
+    }
+  }, [value]);
+
+  /* ================= RENDER ================= */
   return (
     <div className="w-full">
       <div className="flex gap-1">
         {icon && <span className="text-blue-500">{icon}</span>}
         <label className="block input-label-custom">{label}</label>
       </div>
+
       <Select
+        ref={selectRef}
         styles={customStyles}
         placeholder="Search Lead..."
         options={options}
         isLoading={loading}
-        onInputChange={(value) => setInputValue(value)}
+        isDisabled={isDisabled}
+        filterOption={() => true}  //fixed
+        components={{
+          Option: CustomOption,
+          SingleValue: CustomSingleValue,
+        }}
+        inputValue={inputValue}
+        onInputChange={(value, { action }) => {
+          if (action === "input-change") {
+            setInputValue(value);
+          }
+
+          if (action === "menu-close") {
+            setInputValue("");
+          }
+
+          if (action === "set-value") {
+            return "";
+          }
+        }}
         value={
           value
             ? {
                 value: value.id,
-                label: `${value.name} (${value.email})`,
+                label: value.name,
                 data: value,
               }
             : null
-        } 
+        }
         onChange={(selected: any) => {
           if (selected) {
             handleLeadSelection(selected.data);
+            setInputValue("");
           } else {
-            handleLeadSelection(null); 
+            handleLeadSelection(null);
           }
         }}
         noOptionsMessage={() =>
           inputValue ? "No lead found" : "Start typing to search"
         }
-        isDisabled={isDisabled}
       />
     </div>
   );
 };
+
+/* ================= YOUR ORIGINAL STYLES (UNCHANGED) ================= */
 
 const customStyles = {
   control: (base: any, state: any) => ({
@@ -172,3 +303,4 @@ const customStyles = {
     padding: "4px",
   }),
 };
+

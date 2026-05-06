@@ -11,6 +11,7 @@ import AccountSubscription from "./account-subscription/AccountSubscription";
 import AccountInvoice from "./account-invoice/AccountInvoice";
 import Tabs from "../../ui/Tabs";
 import { AccountContactLeadTypeConjuction } from "./AccountContactLeadTypeConjuctionComponent";
+import AccountProformaInvoice from "./account-proforma-invoice/AccountProformaInvoice";
 
 const AccountManagement: React.FC = () => {
   const { accountId } = useParams();
@@ -26,6 +27,7 @@ const AccountManagement: React.FC = () => {
     { key: "service", label: "Service" },
     { key: "subscription", label: "Subscription" },
     { key: "invoice", label: "Invoice" },
+    { key: "proforma-invoice", label: "Proforma Invoice" },
   ];
   const parsedAccountId = Number(accountId);
 
@@ -69,9 +71,8 @@ const AccountManagement: React.FC = () => {
 
         {/* Right Card - Empty for future use */}
         <div className="bg-white rounded-md border  border-slate-200">
-          <AccountContactLeadTypeConjuction
-            account={company}
-          />
+
+          <AccountContactLeadTypeConjuction account={company} />
         </div>
 
         {/* Account Lead */}
@@ -135,6 +136,9 @@ const AccountManagement: React.FC = () => {
         )}
 
         {activeTab === "invoice" && <AccountInvoice account={company} />}
+        {activeTab === "proforma-invoice" && (
+          <AccountProformaInvoice account={company} />
+        )}
       </div>
     </div>
   );

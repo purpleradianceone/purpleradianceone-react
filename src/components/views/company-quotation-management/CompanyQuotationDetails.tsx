@@ -1,12 +1,17 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {
+  Check,
   ChevronRight,
   Download,
   File,
   FileArchive,
   Handshake,
+  LucideLightbulb,
   LucideSubtitles,
   Pencil,
+  RotateCcw,
+  Save,
+  Send,
   Trash,
   User,
   X,
@@ -39,21 +44,25 @@ import { getLookupAccounts } from "../../../config/apis/AccountApis";
 import { getLookupQuotationTemplate } from "../../../config/apis/CompanyQuotationApis";
 import { getLookupLeadsWithSignal } from "../../../config/apis/LeadsApi";
 import MESSAGE from "../../../constants/Messages";
+import ConfirmationDialog from "../../dialogue-box/ConfirmationDialogue";
 import QuotationStatusChip from "../../ui/QuotationStatusChip";
-import {
-  InvoiceHeaderSkeleton,
-  InvoiceItemsSkeleton,
-} from "../invoice/CompanyInvoiceDetailSkeleton";
 import { LookupQuotationTemplateDropdown } from "../lookups/company-quotation/LookupQuotationTemplateDropdown";
 import { QuotationTypeDropdown } from "../lookups/company-quotation/QuotationTypeDropdown";
 import { LookupAccountCompanyProductByProductTypeDropdown } from "../lookups/lookup-account/LookupAccountCompanyProductByProductTypeDropdown";
 import { LookupCompanyProductDropdown } from "../lookups/lookup-company-product/LookupCompanyProductDropdown";
 import { LookupLeadDropdown } from "../lookups/lookup-lead/LookupLeadDropdown";
+import {
+  CompanyQuotationHeaderSkeleton,
+  CompanyQuotationItemsSkeleton,
+} from "./CompanyQuotationDetailsSkeleton";
+import { amountToWords } from "../../../utils/helperMethods/amountToWords";
 
 function CompanyQuotationDetails() {
   const { quotationId } = useParams();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const [previousQuotation, setPreviousQuotation] =
+    useState<CompanyQuotationProps | null>(null);
   const [quotation, setQuotation] = useState<CompanyQuotationProps | null>(
     null,
   );
@@ -64,6 +73,8 @@ function CompanyQuotationDetails() {
   const [searchTerm, setSearchTerm] = useState("");
   const [editingItemId, setEditingItemId] = useState<number | null>(null);
   const [refreshCount, setRefreshCount] = useState<number>(0);
+  const [refreshCountItem, setRefreshCountItem] = useState<number>(0);
+
   const [tempItems, setTempItems] = useState<any[]>([]);
   const [itemsLoading, setItemsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -96,15 +107,16 @@ function CompanyQuotationDetails() {
     userHasAccessToAddLeadQuotation,
     userHasAccessToAddAccountQuotation,
     userHasAccessToViewCompanyQuotation,
-    userHasAccessToUpdateCompanyQuotation,
   } = useUserAccessModules();
 
-  useEffect(()=>{
-    if(searchParams.has("account_company_product")){
-        const accountCompanyProduct = JSON.parse(searchParams.get("account_company_product")??"{}")
-        setSelectedAccountCompanyProductType12(accountCompanyProduct);
+  useEffect(() => {
+    if (searchParams.has("account_company_product")) {
+      const accountCompanyProduct = JSON.parse(
+        searchParams.get("account_company_product") ?? "{}",
+      );
+      setSelectedAccountCompanyProductType12(accountCompanyProduct);
     }
-  },[searchParams])
+  }, [searchParams]);
 
   const getCompanyQuotations = async (signal: AbortSignal) => {
     if (!quotationId || Number(quotationId) === 0) return;
@@ -188,6 +200,7 @@ function CompanyQuotationDetails() {
         console.error(res.data[0]);
         setSelectedQuotationTemplate(res.data[0]);
         setQuotation(formattedData);
+        setPreviousQuotation(formattedData);
       }
     } catch (error: any) {
       handleApiError(error);
@@ -222,7 +235,6 @@ function CompanyQuotationDetails() {
           (a: any, b: any) => a.id - b.id,
         ); // Sort by ID to maintain order
 
-
         const items = Array.isArray(responseData)
           ? responseData
           : [responseData];
@@ -237,15 +249,23 @@ function CompanyQuotationDetails() {
       console.log("into items finally");
     }
   };
+  const [showConfirmationDialoge, setShowConfirmationDialoge] =
+    useState<boolean>(false);
+
+  const [
+    showConfirmationDialogeForNewQuotationCreation,
+    setShowConfirmationDialogeForNewQuotationCreation,
+  ] = useState<boolean>(false);
 
   const submitCompanyQuotation = async () => {
     if (!quotation) return;
     if (disabled) {
       return;
     }
-    if (!userHasAccessToUpdateCompanyQuotation) {
-      return;
-    }
+
+    // if (!userHasAccessToUpdateCompanyQuotation) {
+    //   return;
+    // }
     const postData = {
       company_id: loginStatus.companyId,
       id: quotation.id,
@@ -267,7 +287,8 @@ function CompanyQuotationDetails() {
 
       if (res.data.status) {
         toast.success(res.data.message);
-        getCompanyQuotations(new AbortController().signal);
+        // getCompanyQuotations(new AbortController().signal);
+        setRefreshCount((prev) => prev + 1);
       } else {
         toast.error(res.data.message);
       }
@@ -279,6 +300,23 @@ function CompanyQuotationDetails() {
   };
 
   const previewCompanyQuotation = async () => {
+    if (tempItems.length <= 0) {
+      toast.error(
+        "No items available to preview this quotation. \nPlease create a new quotation.",
+        {
+          style: {
+            background: "white",
+            color: "#991b1b",
+            border: "1px solid #fca5a5",
+            borderRadius: "8px",
+            fontSize: "14px",
+          },
+          icon: "⚠️",
+        },
+      );
+      setShowConfirmationDialogeForNewQuotationCreation(true);
+      return;
+    }
     if (!userHasAccessToViewCompanyQuotation) return;
     setIsSubmitting(true);
 
@@ -322,13 +360,35 @@ function CompanyQuotationDetails() {
     if (disabled) {
       return;
     }
-    if (!userHasAccessToUpdateCompanyQuotation) return;
+    if (
+      previousQuotation?.quotationDate === quotation.quotationDate &&
+      previousQuotation?.validTillDate === quotation.validTillDate &&
+      previousQuotation?.quotationTemplateId === selectedQuotationTemplate.id &&
+      previousQuotation?.adjustmentForRoundOff ===
+        quotation.adjustmentForRoundOff
+    ) {
+      toast.error(
+        "No changes were detected. Please update at least one field.",
+        {
+          style: {
+            color: "#991b1b",
+            border: "1px solid #fca5a5",
+            borderRadius: "8px",
+            fontSize: "14px",
+          },
+          icon: "⚠️",
+        },
+      );
+      return;
+    }
+    // if (!userHasAccessToUpdateCompanyQuotation) return;
     const postData = {
       id: quotation.id,
       company_id: loginStatus.companyId,
       quotation_template_id: selectedQuotationTemplate.id,
       quotation_date_string: quotation.quotationDate,
       valid_till_date_string: quotation.validTillDate,
+      adjustment_for_round_off: quotation.adjustmentForRoundOff,
       quotation_status_id: null,
       updatedby_id: loginStatus.id,
       isactive: quotation.isActive,
@@ -347,6 +407,7 @@ function CompanyQuotationDetails() {
       if (res.data.status) {
         toast.success(res.data.message);
         getCompanyQuotations(new AbortController().signal);
+        setRefreshCount((prev) => prev + 1);
       } else {
         toast.error(res.data.message);
       }
@@ -380,15 +441,14 @@ function CompanyQuotationDetails() {
       );
 
       const blob = new Blob([response.data], {
-        type: "application/pdf", // fixed for invoice
+        type: "application/pdf",
       });
 
       console.log(response.data);
 
       const fileUrl = URL.createObjectURL(blob);
 
-      // ✅ Same as your task document logic
-      setLogoPreview(fileUrl); // you can rename this later (e.g. setInvoicePreview)
+      setLogoPreview(fileUrl);
       setShowCompanyLogoPreview(true);
     } catch (error) {
       console.error(error);
@@ -399,13 +459,9 @@ function CompanyQuotationDetails() {
   };
 
   const handleDeleteItem = async (item: any) => {
-    console.log("Delete item with id:", item.id);
-    console.log(disabled);
-
     if (disabled) {
       return;
     }
-
     const postData = {
       company_id: loginStatus.companyId,
       id: item.id,
@@ -425,9 +481,10 @@ function CompanyQuotationDetails() {
 
       if (res.data.status) {
         toast.success(res.data.message);
-        setRefreshCount((prev) => prev + 1); // trigger refresh of items
+        setRefreshCountItem((prev) => prev + 1); // trigger refresh of items
       } else {
         toast.error(res.data.message);
+        cancelEdit();
       }
     } catch (error) {
       handleApiError(error);
@@ -477,7 +534,9 @@ function CompanyQuotationDetails() {
       acc.taxable += item.taxable_value || 0;
       acc.tax += item.total_tax || 0;
       acc.total += item.total_amount || 0;
+      acc.igst += item.igst_amount || 0;
       acc.cess += item.cess_amount || 0;
+      acc.adjustment_for_round_off = quotation?.adjustmentForRoundOff || 0;
       return acc;
     },
     { basic: 0, discount: 0, taxable: 0, tax: 0, total: 0, cess: 0 },
@@ -487,9 +546,9 @@ function CompanyQuotationDetails() {
     (i) => i.cess_amount != null && i.cess_amount > 0,
   );
   const saveSingleItem = async (item: any) => {
-    if (!userHasAccessToUpdateCompanyQuotation) {
-      return;
-    }
+    // if (!userHasAccessToUpdateCompanyQuotation) {
+    //   return;
+    // }
     const postData = {
       company_id: loginStatus.companyId,
       id: item.id,
@@ -511,10 +570,11 @@ function CompanyQuotationDetails() {
 
       if (res.data.status) {
         toast.success(res.data.message);
-        setRefreshCount((prev) => prev + 1);
+        setRefreshCountItem((prev) => prev + 1);
         setEditingItemId(null);
       } else {
         toast.error(res.data.message);
+        cancelEdit();
       }
     } catch (error) {
       handleApiError(error);
@@ -524,26 +584,22 @@ function CompanyQuotationDetails() {
   };
 
   const cancelEdit = () => {
-    setTempItems(items); // reset
+    setTempItems(items); // reset condition
     setEditingItemId(null);
   };
 
-  
-
   const handleCreateQuotation = async () => {
-
-
-    if (selectedQuotationType.id === 1 && (!userHasAccessToAddLeadQuotation)) {
+    if (selectedQuotationType.id === 1 && !userHasAccessToAddLeadQuotation) {
       toast.error(MESSAGE.MODULE_ACCESS.LEAD_QUOTATION.DENIED_ADD_ACCESS);
       return;
     }
-    if (selectedQuotationType.id === 2 && (!userHasAccessToAddAccountQuotation)) {
+    if (selectedQuotationType.id === 2 && !userHasAccessToAddAccountQuotation) {
       toast.error(MESSAGE.MODULE_ACCESS.ACCOUNT_QUOTATION.DENIED_ADD_ACCESS);
       return;
     }
     if (selectedQuotationType.id === 1) {
       if (!selectedLead) {
-        toast.error("Please select an lead");
+        toast.error("Please select a lead");
         return;
       }
     }
@@ -552,19 +608,18 @@ function CompanyQuotationDetails() {
         toast.error("Please select an account");
         return;
       }
-      if(!selectedAccountCompanyProductType12){
+      if (!selectedAccountCompanyProductType12) {
         toast.error("Please select an account product");
         return;
       }
-      if(!selectedSelectedCompanyProductType4){
+      if (!selectedSelectedCompanyProductType4) {
         toast.error("Please select AMC type product");
         return;
       }
     }
 
-
     if (!selectedQuotationTemplate) {
-      toast.error("Please select an quotation template");
+      toast.error("Please select a quotation template");
       return;
     }
     if (!quotation?.quotationDate) {
@@ -586,19 +641,22 @@ function CompanyQuotationDetails() {
             valid_till_date_string: quotation?.validTillDate,
             createdby_id: loginStatus.id,
           }
-        : selectedQuotationType.id === 2?{
-            company_id: loginStatus.companyId,
-            account_company_product_id: selectedAccountCompanyProductType12.id,
-            company_product_id: selectedSelectedCompanyProductType4.id,
-            quotation_template_id: selectedQuotationTemplate.id,
-            quotation_date_string: quotation?.quotationDate,
-            valid_till_date_string: quotation?.validTillDate,
-            createdby_id: loginStatus.id,
-          }:{
-            company_id: loginStatus.companyId,
+        : selectedQuotationType.id === 2
+          ? {
+              company_id: loginStatus.companyId,
+              account_company_product_id:
+                selectedAccountCompanyProductType12.id,
+              company_product_id: selectedSelectedCompanyProductType4.id,
+              quotation_template_id: selectedQuotationTemplate.id,
+              quotation_date_string: quotation?.quotationDate,
+              valid_till_date_string: quotation?.validTillDate,
+              createdby_id: loginStatus.id,
+            }
+          : {
+              company_id: loginStatus.companyId,
 
-            createdby_id: loginStatus.id,
-          };
+              createdby_id: loginStatus.id,
+            };
     console.log(formPayload);
 
     setIsSubmitting(true);
@@ -639,36 +697,6 @@ function CompanyQuotationDetails() {
       });
   };
 
-  //   const handleAddToInvoice = async () => {
-  //     const postData = {
-  //       company_id: loginStatus.companyId,
-  //       account_id: invoice?.accountId,
-  //       createdby_id: loginStatus.id,
-  //     };
-  //     console.log(postData);
-  //     setIsSubmitting(true);
-  //     try {
-  //       const res = await axiosClient.post(
-  //         POST_API.CREATE_COMPANY_INVOICE_ITEM,
-  //         postData,
-  //         {
-  //           withCredentials: true,
-  //         },
-  //       );
-
-  //       if (res.data.status) {
-  //         toast.success(res.data.message);
-  //         setRefreshCount((prev) => prev + 1);
-  //       } else {
-  //         toast.error(res.data.message);
-  //       }
-  //     } catch (error) {
-  //       handleApiError(error);
-  //     } finally {
-  //       setIsSubmitting(false);
-  //     }
-  //   };
-
   const handleAccountSelect = (account: any) => {
     setSelectedAccount(account);
   };
@@ -699,11 +727,19 @@ function CompanyQuotationDetails() {
     if (!quotationId || Number(quotationId) === 0) return;
     const controller = new AbortController();
     getCompanyQuotations(controller.signal);
-    getCompanyQuotationItems(controller.signal);
+    // getCompanyQuotationItems(controller.signal);
 
     return () => controller.abort();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [quotationId, refreshCount]);
+
+  useEffect(() => {
+    if (!quotationId || Number(quotationId) === 0) return;
+    const controller = new AbortController();
+    getCompanyQuotationItems(controller.signal);
+    return () => controller.abort();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [quotationId, refreshCountItem]);
 
   async function getSearchParamLead() {
     const postData = {
@@ -747,11 +783,42 @@ function CompanyQuotationDetails() {
     }
   }, []);
 
-    useEffect(()=>{
-    if(quotationTypeIdSearchParams && quotationTypeIdSearchParams !== "0"){
-        setSelectedQuotationType({id:Number(quotationTypeIdSearchParams), name: quotationTypeIdSearchParams === "1"?"Lead":"AMC" })
+  useEffect(() => {
+    if (quotationTypeIdSearchParams && quotationTypeIdSearchParams !== "0") {
+      setSelectedQuotationType({
+        id: Number(quotationTypeIdSearchParams),
+        name: quotationTypeIdSearchParams === "1" ? "Lead" : "AMC",
+      });
     }
-  },[quotationTypeIdSearchParams]);
+  }, [quotationTypeIdSearchParams]);
+
+  function navigatePreviousPage() {
+    navigate(-1);
+  }
+
+  const handleResetRoundOff = () => {
+    setQuotation((prev: any) => ({
+      ...prev,
+      adjustmentForRoundOff: previousQuotation?.adjustmentForRoundOff, // remove roundOff impact
+    }));
+  };
+  const getRoundOffValues = (total: number) => {
+    const roundedTotal = Math.round(total);
+    const roundOff = Number((roundedTotal - total).toFixed(2));
+    return {
+      roundedTotal, // final rounded amount
+      roundOff, // adjustment (+/-)
+      isRounded: roundOff === 0, // ✅ true if already rounded
+    };
+  };
+
+  const [roundOffValues, setRoundOffValues] = useState(
+    getRoundOffValues(quotation?.totalAmount ?? 0),
+  );
+
+  useEffect(() => {
+    setRoundOffValues(getRoundOffValues(quotation?.totalAmount ?? 0));
+  }, [quotation?.adjustmentForRoundOff, quotation?.totalAmount, quotation]);
 
   return (
     <PageLayout onScrollChange={setShowAccountName} scrollTopValue={80}>
@@ -760,7 +827,7 @@ function CompanyQuotationDetails() {
         {/* HEADER */}
 
         {quotationLoading ? (
-          <InvoiceHeaderSkeleton />
+          <CompanyQuotationHeaderSkeleton />
         ) : (
           <>
             <div className=" sticky top-0 z-10 bg-slate-100 flex text-center justify-start items-center gap-3 ml-0.5 ">
@@ -833,8 +900,8 @@ function CompanyQuotationDetails() {
                     onClick={handleCompanyQuotationDownload}
                   >
                     <div className="flex items-center gap-1">
-                      <span className="text-gray-700">Download</span>
                       <Download size={14} className="text-blue-500" />
+                      <span className="text-gray-700">Download</span>
                     </div>
                   </button>
                   <button
@@ -849,8 +916,8 @@ function CompanyQuotationDetails() {
                     onClick={previewCompanyQuotation}
                   >
                     <div className="flex items-center gap-1">
-                      <span className="">Preview</span>
                       <FaFilePdf size={14} className="text-red-500" />
+                      <span className="">Preview</span>
                     </div>
                   </button>
                 </div>
@@ -961,43 +1028,42 @@ function CompanyQuotationDetails() {
                       />
                     </div>
                   )}
-
-                  
                 </div>
-                {!quotationTypeIdSearchParams && <div className="grid grid-cols-3 gap-3 mb-3">
-                  {selectedQuotationType.id === 2 && (
-                    <LookupAccountCompanyProductByProductTypeDropdown
-                      icon={<User size={14} />}
-                      value={selectedAccountCompanyProductType12}
-                      label="Account Product"
-                      accountId={selectedAccount ? selectedAccount.id : null}
-                      productTypeId={[1, 2]}
-                      handleAccountCompanyProductSelection={
-                        handleAccountCompanyProductSelection
-                      }
-                      isDisabled={selectedAccount ? false : true}
-                    />
-                  )}
+                {!quotationTypeIdSearchParams && (
+                  <div className="grid grid-cols-3 gap-3 mb-3">
+                    {selectedQuotationType.id === 2 && (
+                      <LookupAccountCompanyProductByProductTypeDropdown
+                        icon={<User size={14} />}
+                        value={selectedAccountCompanyProductType12}
+                        label="Account Product"
+                        accountId={selectedAccount ? selectedAccount.id : null}
+                        productTypeId={[1, 2]}
+                        handleAccountCompanyProductSelection={
+                          handleAccountCompanyProductSelection
+                        }
+                        isDisabled={selectedAccount ? false : true}
+                      />
+                    )}
 
-                  {selectedQuotationType.id === 2 && (
-                    <LookupCompanyProductDropdown
-                      icon={<LucideSubtitles size={14} />}
-                      value={selectedSelectedCompanyProductType4}
-                      label="AMC Type Product"
-                      productTypeId={[4]}
-                      handleCompanyProductSelection={
-                        handleCompanyProductSelection
-                      }
-                      isDisabled={false}
-                    />
-                  )}
-                </div>}
-                
+                    {selectedQuotationType.id === 2 && (
+                      <LookupCompanyProductDropdown
+                        icon={<LucideSubtitles size={14} />}
+                        value={selectedSelectedCompanyProductType4}
+                        label="AMC Type Product"
+                        productTypeId={[4]}
+                        handleCompanyProductSelection={
+                          handleCompanyProductSelection
+                        }
+                        isDisabled={false}
+                      />
+                    )}
+                  </div>
+                )}
               </div>
             )}
 
             {/* META */}
-            <div className="bg-gray-100 border rounded py-1 px-2 mb-2">
+            <div className="bg-gray-100 border rounded py-1 px-2 mb-1">
               <div className="grid grid-cols-4 ">
                 <MetaField
                   label="Quotation Number"
@@ -1095,7 +1161,7 @@ function CompanyQuotationDetails() {
                 <MetaField label="Updated By" value={quotation?.updatedBy} />
                 <MetaField label="Updated On" value={quotation?.updatedOn} />
               </div>
-              
+
               {!isCreateMode && (
                 <div className="col-span-2 flex items-center justify-end p-1">
                   <div className="flex gap-2">
@@ -1107,6 +1173,7 @@ function CompanyQuotationDetails() {
                         <CustomDocumentPreviewComponent
                           fileUrl={logoPreview!}
                           fileExtension={"application/pdf"}
+                          fileName={quotation?.quotationNumber}
                           width={"60%"}
                           height={"85%"}
                           enableDownload={true}
@@ -1116,39 +1183,84 @@ function CompanyQuotationDetails() {
 
                     {!isCreateMode && (
                       <Button
-                        disabled={
-                          !userHasAccessToUpdateCompanyQuotation || disabled
-                        }
-                        onClick={updateQuotation}
+                        disabled={disabled}
+                        onClick={() => {
+                          if (disabled) return;
+                          if (tempItems.length <= 0) {
+                            toast.error(
+                              "No items available to update this quotation. \nPlease create a new quotation.",
+                              {
+                                style: {
+                                  background: "white",
+                                  color: "#991b1b",
+                                  border: "1px solid #fca5a5",
+                                  borderRadius: "8px",
+                                  fontSize: "14px",
+                                },
+                                icon: "⚠️",
+                              },
+                            );
+                            setShowConfirmationDialogeForNewQuotationCreation(
+                              true,
+                            );
+                            return;
+                          }
+                          updateQuotation();
+                        }}
                       >
-                        Update
+                        <div className="flex items-center gap-1">
+                          <Save size={16} />
+                          <span>Update</span>
+                        </div>
                       </Button>
                     )}
                     {!isCreateMode && (
                       <Button
-                        disabled={
-                          !userHasAccessToUpdateCompanyQuotation || disabled
-                        }
-                        onClick={submitCompanyQuotation}
+                        disabled={disabled}
+                        // onClick={submitCompanyQuotation}
+                        onClick={() => {
+                          if (disabled) return;
+                          if (tempItems.length <= 0) {
+                            toast.error(
+                              "No items available to submit this quotation. \nPlease create a new quotation.",
+                              {
+                                style: {
+                                  background: "white",
+                                  color: "#991b1b",
+                                  border: "1px solid #fca5a5",
+                                  borderRadius: "8px",
+                                  fontSize: "14px",
+                                },
+                                icon: "⚠️",
+                              },
+                            );
+                            setShowConfirmationDialogeForNewQuotationCreation(
+                              true,
+                            );
+                            return;
+                          }
+                          setShowConfirmationDialoge(true);
+                        }}
                       >
-                        Submit
+                        <div className="flex items-center gap-1">
+                          <Send size={16} />
+                          <span>Submit</span>
+                        </div>
                       </Button>
                     )}
                   </div>
                 </div>
               )}
-
-              
             </div>
           </>
         )}
         {/* ITEMS */}
-        {itemsLoading ? (
-          <InvoiceItemsSkeleton />
+        {itemsLoading || quotationLoading ? (
+          <CompanyQuotationItemsSkeleton />
         ) : (
           <>
             {!isCreateMode && userHasAccessToViewCompanyQuotation && (
-              <div className="bg-white border rounded p-2 mb-1">
+              <div className="bg-white border rounded p-1 mb-1">
                 <div className="flex justify-between py-1">
                   <h3 className="font-semibold">Quotation Items</h3>
                   <SearchInput
@@ -1156,7 +1268,6 @@ function CompanyQuotationDetails() {
                     onChange={(e: any) => setSearchTerm(e.target.value)}
                     placeholder="Search product..."
                   />
-                  
                 </div>
                 <div className="w-full overflow-y-auto border rounded">
                   <table className="w-full text-sm font-semibold ">
@@ -1273,10 +1384,7 @@ function CompanyQuotationDetails() {
                                     <div className="flex gap-2 justify-end">
                                       {editingItemId !== item.id ? (
                                         <button
-                                          disabled={
-                                            !userHasAccessToUpdateCompanyQuotation ||
-                                            disabled
-                                          }
+                                          disabled={disabled}
                                           onClick={() => handleDeleteItem(item)}
                                         >
                                           <Trash
@@ -1306,14 +1414,9 @@ function CompanyQuotationDetails() {
                                         </div>
                                       ) : (
                                         <button
-                                          disabled={
-                                            !userHasAccessToUpdateCompanyQuotation ||
-                                            disabled
-                                          }
+                                          disabled={disabled}
                                           onClick={() => {
-                                            if (
-                                              !userHasAccessToUpdateCompanyQuotation
-                                            ) {
+                                            if (disabled) {
                                               return;
                                             }
                                             setEditingItemId(item.id);
@@ -1344,31 +1447,40 @@ function CompanyQuotationDetails() {
                 </div>
               </div>
             )}
-            {isCreateMode && <div className="flex w-full justify-end items-end mb-3">
-                    <div>
-                    <Button onClick={handleCreateQuotation}>
-                      {isSubmitting ? "Saving..." : "Save"}
-                    </Button>
-                    </div>
-                  </div>}
             {isCreateMode && (
               <div className="w-full items-center justify-center  flex-1">
                 <span className="text-xs flex items-center justify-center font-medium text-gray-500 border rounded-lg px-2 py-1  bg-blue-100">
-                  {(selectedQuotationType.id==1)?'Once an quotation is created, all items assigned to that customer are automatically added to the quotation.':`Once an quotation is created, you can modify the items and related data.`}
+                  {selectedQuotationType.id == 1
+                    ? "Once a quotation is created, all items associated with the selected customer are automatically included."
+                    : `After a quotation is created, you can update its items and related details.`}
                 </span>
               </div>
             )}
-            {/* BOTTOM */}
-            {!isCreateMode && (
-              <div className="grid grid-cols-2 text-sm mb-2">
-                {/* Left */}
-                <div className="space-y-2"></div>
+            {isCreateMode && (
+              <div className="flex w-full justify-end items-end mt-3 mb-3">
                 <div>
-                  <span className="font-medium text-gray-700 text-sm ">
+                  <Button onClick={handleCreateQuotation}>
+                    <div className="flex items-center gap-1">
+                      <Save size={16} />
+                      <span>{isSubmitting ? "Saving..." : "Save"}</span>
+                    </div>
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {/* BOTTOM */}
+
+            {/* {!isCreateMode && (
+              <div className="grid grid-cols-2 text-sm mb-2">
+                <div></div>
+
+                <div>
+                  <span className="font-medium text-gray-700 text-sm">
                     Summary
                   </span>
-                  {/* Right Summary */}
-                  <div className="border rounded-lg p-4 bg-gray-50 space-y-2">
+
+                  <div className="border rounded-lg p-4 bg-white space-y-3 mt-2">
                     <div className="flex justify-between">
                       <span>Basic Amount</span>
                       <span>{formatRupee(summary.basic)}</span>
@@ -1378,30 +1490,267 @@ function CompanyQuotationDetails() {
                       <span>Total Discount</span>
                       <span>{formatRupee(summary.discount)}</span>
                     </div>
+
+                    <hr />
+
                     <div className="flex justify-between">
-                      <span>Total Amount</span>
+                      <span>Taxable Value</span>
                       <span>{formatRupee(summary.taxable)}</span>
                     </div>
 
-                    <div className="flex justify-between">
-                      <span>Total Cess</span>
-                      <span>{formatRupee(summary.cess)}</span>
-                    </div>
+
+
+                    <hr />
+                    {summary.cess && (
+                      <div className="flex justify-between">
+                        <span>Total Cess</span>
+                        <span>{formatRupee(summary.cess)}</span>
+                      </div>
+                    )}
                     <div className="flex justify-between">
                       <span>Total Tax</span>
                       <span>{formatRupee(summary.tax)}</span>
                     </div>
+                    <hr />
+                     <div className="flex justify-between">
+                      <span>Total Amount</span>
+                      <span>₹{formatRupee(summary.total)}</span>
+                    </div>
 
-                    <div className="border-t pt-2 flex justify-between text-base font-semibold text-blue-600">
-                      <span>Total Quotation Amount</span>
-                      <span>{formatRupee(summary.total)}</span>
+                    <div className="bg-gray-50 border rounded-lg p-3 space-y-3">
+                      <div className="flex items-start justify-between gap-2">
+                        <div>
+                          <p className="text-blue-600 font-medium">Round Off</p>
+                          <p className="caption-custom">
+                            Adjust the amount to make the invoice total rounded.
+                          </p>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="number"
+                            className="border rounded px-2 py-1 w-24 text-right"
+                            value={quotation?.adjustmentForRoundOff}
+                            onChange={(e: any) =>
+                              setQuotation((prev) => ({
+                                ...prev!,
+                                adjustmentForRoundOff: Number(e.target.value),
+                              }))
+                            }
+                          />
+
+                          <button className="border rounded px-3 py-1 text-blue-600 flex items-center gap-1"
+                          onClick={updateQuotation}
+                          >
+                            Apply
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="flex justify-between items-center bg-blue-50 border rounded px-3 py-2 text-sm">
+                        <span className="caption-custom">
+                          Suggested: {roundOffValues.roundOff} to make{" "}
+                          {roundOffValues.roundedTotal}
+                        </span>
+
+                        <button
+                          className="caption-custom-blue"
+                          onClick={handleResetRoundOff}
+                        >
+                          Reset
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="border-t pt-3 flex justify-between items-center">
+                      <div>
+                        <p className="text-blue-600 font-semibold">
+                          Total Quotation Amount
+                        </p>
+                        <p className="caption-custom">
+                          <span className="caption-custom-blue mt-5">Amount in words:</span> {amountToWords(summary.total+quotation?.adjustmentForRoundOff)}
+                        </p>
+                      </div>
+
+                      <span className="text-xl font-bold text-blue-600">
+                        ₹{formatRupee(summary.total+quotation?.adjustmentForRoundOff)}
+                      </span>
+                    </div>
+
+                    <div className="bg-gray-50 border rounded px-3 py-2 caption-custom">
+                      Round off amount will be shown separately in the printed
+                      invoice.
                     </div>
                   </div>
+                </div>
+              </div>
+            )} */}
+
+            {/** Summery Block */}
+            {!isCreateMode && (
+              <div className="grid grid-cols-2 text-sm mb-2">
+                <div></div>
+
+                <div className="border rounded-lg p-3 bg-white mt-2 space-y-2">
+                  <span className="font-medium text-gray-700 text-sm">
+                    Quotation Summary
+                  </span>
+
+                  <div className="border rounded-lg p-3 bg-white mt-2 space-y-2">
+                    {/* Basic + Discount */}
+                    <div className="flex justify-between">
+                      <span>A. Basic Value</span>
+                      <span>{formatRupee(summary.basic)}</span>
+                    </div>
+
+                    <div className="flex justify-between">
+                      <span>B. Total Discount</span>
+                      <span>{formatRupee(summary.discount)}</span>
+                    </div>
+
+                    {/* Taxable */}
+                    <div className="flex justify-between text-gray-600 border-t pt-2">
+                     <div className="flex"><span className="text-black">C</span> <span>. Taxable Value (A-B)</span></div>
+                      <span>{formatRupee(summary.taxable)}</span>
+                    </div>
+
+                    {/* Tax + Cess in one row */}
+                    <div className="flex justify-between text-gray-600">
+                      <div className="flex"><span className="text-black">D</span><span>. Total Tax ({summary.igst?"IGST":"CGST + SGST"} {summary.cess ? "+ Cess" : ""})</span></div>
+                      <span>{formatRupee(summary.tax)}</span>
+                    </div>
+
+                    {/* Total */}
+                    <div className="flex justify-between font-medium border-t pt-2">
+                      <span>E. Total Amount (C+D)</span>
+                      <span>₹{formatRupee(summary.total)}</span>
+                    </div>
+
+                    {/* Round Off Compact */}
+                    <div className="flex items-center justify-between bg-gray-50 border rounded px-2 py-2 text-xs">
+                      {/* Left */}
+                      <div className="flex flex-col ">
+                        <span className="flex gap-3 justify-start items-center table-header-custom-blue ">
+                          F. Round Off{" "}
+                          <span className="caption-custom">
+                            Adjust the amount to make the quotation total
+                            rounded.
+                          </span>
+                        </span>
+                        {!roundOffValues.isRounded && (
+                          <span className="caption-custom mt-1">
+                            <span className="flex">
+                              {" "}
+                              <LucideLightbulb size={14} />
+                              Suggested: {roundOffValues.roundOff} to make{" "}
+                              {roundOffValues.roundedTotal}
+                            </span>
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Right */}
+                      <div className="flex items-center gap-1">
+                        <div className="w-20">
+                          <FormInput
+                            disabled={disabled}
+                            type="number"
+                            min={-1}
+                            max={1}
+                            // className="border rounded px-1 py-0.5 w-10 text-right text-xs"
+                            value={quotation?.adjustmentForRoundOff}
+                            onChange={(e: any) =>
+                              setQuotation((prev) => ({
+                                ...prev!,
+                                adjustmentForRoundOff: Number(e.target.value),
+                              }))
+                            }
+                          />
+                        </div>
+
+                        <div className="flex items-center gap-1">
+                          <button
+                            disabled={disabled}
+                            onClick={updateQuotation}
+                            className="flex items-center gap-1 px-2 py-1 rounded-md text-xs 
+               text-blue-600 border border-blue-200 bg-blue-50 
+               hover:bg-blue-100 disabled:opacity-50"
+                          >
+                            <Check size={14} />
+                            Apply
+                          </button>
+
+                          <button
+                            disabled={disabled}
+                            onClick={handleResetRoundOff}
+                            className="flex items-center gap-1 px-2 py-1 rounded-md text-xs 
+               text-gray-600 border border-gray-200 bg-gray-50 
+               hover:bg-gray-100 disabled:opacity-50"
+                          >
+                            <RotateCcw size={14} />
+                            Reset
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Final Total */}
+                    <div className="flex justify-between items-center border-t pt-2">
+                      <div className="text-xs text-gray-500 leading-tight">
+                        <p className="text-blue-600 font-medium text-sm">
+                          Total Quotation Amount (E+F)
+                        </p>
+                        <p className="flex gap-2 ml-3 caption-custom">
+                          <span className="caption-custom text-black">
+                            <p> Amount In Words: </p>
+                          </span>
+                          {amountToWords(
+                            summary.total +
+                              (quotation?.adjustmentForRoundOff || 0),
+                          )}
+                        </p>
+                      </div>
+
+                      <span className="text-lg font-bold text-blue-600">
+                        ₹{formatRupee(
+                          summary.total +
+                            (quotation?.adjustmentForRoundOff || 0),
+                        )}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex justify-start items-center gap-1 bg-gray-50 border rounded px-3 py-0.5 caption-custom">
+                    <span><LucideSubtitles size={16}/></span>
+                      Round off amount will be shown separately in the printed
+                      quotation.
+                    </div>
                 </div>
               </div>
             )}
           </>
         )}
+        <ConfirmationDialog
+          title="Confirm Submission of Quotation"
+          description="Once submitted, this quotation cannot be edited."
+          message="After submission, this quotation will be locked and no further changes or edits will be allowed. Please review all details carefully before submitting."
+          open={showConfirmationDialoge}
+          onConfirm={() => {
+            submitCompanyQuotation();
+          }}
+          onCancel={() => setShowConfirmationDialoge(false)}
+        />
+        <ConfirmationDialog
+          title="Quotation Deleted"
+          description="This quotation has been automatically deleted."
+          message={`Since the last item was removed, this ${quotation?.quotationTypeName ? quotation?.quotationTypeName.toLowerCase() + " quotation" : "quotation"} is no longer valid. \nPlease create a new one to proceed.`}
+          open={showConfirmationDialogeForNewQuotationCreation}
+          onConfirm={navigatePreviousPage}
+          confirmButtonText="OK"
+          showCancelButton={false}
+          onCancel={() =>
+            setShowConfirmationDialogeForNewQuotationCreation(false)
+          }
+        />
       </div>
     </PageLayout>
   );

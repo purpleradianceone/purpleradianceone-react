@@ -70,6 +70,17 @@ const UserAndCompanyProfile = () => {
 
   const [showUserLogoPreview, setShowUserLogoPreview] = useState(false);
 
+  const [isLodingForCompanyDetailData, setIsLoadingForCompanDetailData] =
+    useState<boolean>(true);
+
+  const [
+    isLoadingForCompanyDetailsUpdate,
+    setIsLoadingForCompanyDetailsUpdate,
+  ] = useState<boolean>(false);
+
+  const [isLoadingForUpdateCompanyUser, setIsLoadingForUpdateCompanyUser] =
+    useState<boolean>(false);
+
   const [companyDetail, setCompanyDetail] = useState<CompanyDetail>({
     id: 0,
 
@@ -216,6 +227,10 @@ const UserAndCompanyProfile = () => {
   const [searchText, setSearchText] = useState("");
   // const [totalCount, setTotalCount] = useState<number | null>(null);
 
+  const [
+    isLoadingForUserPreferenceChange,
+    setIsLoadingForUserPreferenceChange,
+  ] = useState<boolean>(false);
   const handleTimezonePreferenceChange = async () => {
     if (loginStatus.companyId === 0) return;
     //getting the id as per value
@@ -223,6 +238,7 @@ const UserAndCompanyProfile = () => {
       (option) => parseInt(option.rowsInGrid) === selectedRowsPerPage,
     );
 
+    setIsLoadingForUserPreferenceChange(true);
     const postData = {
       company_id: loginStatus.companyId,
       id: userPreference.id,
@@ -279,6 +295,8 @@ const UserAndCompanyProfile = () => {
           handleTimezonePreferenceChange();
         }
       }
+    } finally {
+      setIsLoadingForUserPreferenceChange(false);
     }
   };
 
@@ -309,12 +327,13 @@ const UserAndCompanyProfile = () => {
       setIsSaveEnabled(false);
     } else {
       toast("No Details Changed", {
-        icon: "⚠️",
         style: {
-          border: "1px solid #facc15",
-          background: "#fffbeb",
-          color: "#92400e",
+          color: "#991b1b",
+          border: "1px solid #fca5a5",
+          borderRadius: "8px",
+          fontSize: "14px",
         },
+        icon: "⚠️",
       });
     }
   };
@@ -428,6 +447,7 @@ const UserAndCompanyProfile = () => {
   const updateUserProfile = async () => {
     if (loginStatus.companyId === 0) return;
     try {
+      setIsLoadingForUpdateCompanyUser(true);
       const postData = {
         company_id: loginStatus.companyId,
         id: loginStatus.id,
@@ -468,6 +488,8 @@ const UserAndCompanyProfile = () => {
           updateUserProfile();
         }
       }
+    } finally {
+      setIsLoadingForUpdateCompanyUser(false);
     }
   };
 
@@ -584,10 +606,11 @@ const UserAndCompanyProfile = () => {
     console.log("Company logo file: " + logoPreview?.toString());
   }, [logoPreview]);
 
-  const getCompanyDetail = () => {
+  const getCompanyDetail = async () => {
     if (loginStatus.companyId === 0) return;
     try {
-      axiosClient
+      setIsLoadingForCompanDetailData(true);
+      await axiosClient
         .post(POST_API.GET_COMPANY_DETAIL, {
           company_id: loginStatus.companyId,
           requestedby_id: loginStatus.id,
@@ -600,11 +623,12 @@ const UserAndCompanyProfile = () => {
           }
         })
         .catch((e) => {
-          console.log("inside get company detail catch");
           handleApiError(e);
         });
     } catch (ex) {
       handleApiError(ex);
+    } finally {
+      setIsLoadingForCompanDetailData(false);
     }
   };
 
@@ -655,35 +679,30 @@ const UserAndCompanyProfile = () => {
           .finally(() => {
             setIsLogoChange(false);
           });
-        console.log("inside if condition");
       } catch (ex) {
         console.log(ex);
         handleApiError(ex);
       }
     } else {
       toast("No File Selected For Upload", {
-        icon: "⚠️",
         style: {
-          border: "1px solid #facc15",
-          background: "#fffbeb",
-          color: "#92400e",
+          color: "#991b1b",
+          border: "1px solid #fca5a5",
+          borderRadius: "8px",
+          fontSize: "14px",
         },
+        icon: "⚠️",
       });
     }
   };
 
-  const [
-    isLoadingForCompanyDetailsUpdate,
-    setIsLoadingForCompanyDetailsUpdate,
-  ] = useState<boolean>(false);
-
-  const updateCompanyDetail = () => {
+  const updateCompanyDetail = async () => {
     if (loginStatus.companyId === 0) return;
 
     if (!isCompanyDetailEqual(previousCompanyDetail, companyDetail)) {
       setIsLoadingForCompanyDetailsUpdate(true);
       try {
-        axiosClient
+        await axiosClient
           .post(POST_API.UPDATE_COMPANY_DETAIL, {
             company_id: loginStatus.companyId,
             industry_type_id: companyDetail.industry_type_id,
@@ -722,7 +741,6 @@ const UserAndCompanyProfile = () => {
           .catch((e) => {
             handleApiError(e);
           });
-        console.log("inside if condition");
       } catch (ex) {
         console.log(ex);
         handleApiError(ex);
@@ -731,12 +749,13 @@ const UserAndCompanyProfile = () => {
       }
     } else {
       toast("No Details Changed", {
-        icon: "⚠️",
         style: {
-          border: "1px solid #facc15",
-          background: "#fffbeb",
-          color: "#92400e",
+          color: "#991b1b",
+          border: "1px solid #fca5a5",
+          borderRadius: "8px",
+          fontSize: "14px",
         },
+        icon: "⚠️",
       });
     }
   };
@@ -747,8 +766,12 @@ const UserAndCompanyProfile = () => {
     }
   }, [loginStatus.companyId]);
 
+  const [isLoadingForCompanyLogo, setIsLoadingForCompanyLogo] =
+    useState<boolean>(true);
+
   const getCompanyLogo = () => {
     if (loginStatus.companyId === 0) return;
+    setIsLoadingForCompanyLogo(true);
     axios
       .post(
         POST_API.GET_COMPANY_LOGO,
@@ -775,6 +798,9 @@ const UserAndCompanyProfile = () => {
       })
       .catch((e) => {
         console.log("inside get company logo catch" + e);
+      })
+      .finally(() => {
+        setIsLoadingForCompanyLogo(false);
       });
   };
 
@@ -859,6 +885,13 @@ const UserAndCompanyProfile = () => {
 
   // },[companyDetail.state_id,companyDetail.district_id]);
 
+  const formatUrl = (url?: string) => {
+  if (!url) return "#";
+  return url.startsWith("http://") || url.startsWith("https://")
+    ? url
+    : `https://${url}`;
+};
+
   return (
     <div className="w-full mx-24 min-h-screen bg-gray-100 py-8 px-2 space-y-10">
       {/* Profile Info Card */}
@@ -907,6 +940,8 @@ const UserAndCompanyProfile = () => {
               onCancel={handleEditableSectionCancel}
               sectionKey="user detail"
               onSave={handleUserDetailSave}
+              isLoadingForData={false}
+              isLoadingForUpdate={isLoadingForUpdateCompanyUser}
             >
               {editingSection === "user detail" ? (
                 <div className="grid grid-cols-2 sm:grid-cols-2 gap-4">
@@ -1042,77 +1077,91 @@ const UserAndCompanyProfile = () => {
           {/** Company Logo */}
           <div className="border-t pt-4">
             {/* Left aligned container */}
-            <div className="flex flex-col items-start">
-              {/* Image */}
-              <div className="w-40 h-40 border rounded-lg overflow-hidden flex items-center justify-center bg-gray-50">
-                {logoPreview || companyDetail?.logo_file_extension ? (
-                  <img
-                    src={logoPreview ?? companyDetail?.logo_cdn_url}
-                    alt="Company Logo"
-                    className="w-full h-full object-contain"
-                    onDoubleClick={() => setShowCompanyLogoPreview(true)}
-                  />
-                ) : (
-                  <span className="caption-custom">No Logo</span>
-                )}
-                {showCompanyLogoPreview && (
-                  <div
-                    className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50"
-                    onClick={() => setShowCompanyLogoPreview(false)}
-                  >
-                    {/* <img
+            {!isLoadingForCompanyLogo ? (
+              <div className="flex flex-col items-start">
+                {/* Image */}
+                <div className="w-40 h-40 border rounded-lg overflow-hidden flex items-center justify-center bg-gray-50">
+                  {logoPreview || companyDetail?.logo_file_extension ? (
+                    <img
+                      src={logoPreview ?? companyDetail?.logo_cdn_url}
+                      alt="Company Logo"
+                      className="w-full h-full object-contain"
+                      onDoubleClick={() => setShowCompanyLogoPreview(true)}
+                    />
+                  ) : (
+                    <span className="caption-custom">No Logo</span>
+                  )}
+                  {showCompanyLogoPreview && (
+                    <div
+                      className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50"
+                      onClick={() => setShowCompanyLogoPreview(false)}
+                    >
+                      {/* <img
                       src={logoPreview ?? companyDetail?.logo_cdn_url}
                       alt="Company Logo"
                       className="max-w-[80%] max-h-[80%] object-contain rounded-lg shadow-lg"
                     /> */}
-                    <CustomDocumentPreviewComponent
-                      fileUrl={logoPreview ?? companyDetail?.logo_cdn_url}
-                      fileExtension={companyDetail.logo_file_extension}
-                      width={"50%"}
-                      enableDownload={true}
-                    />
-                  </div>
-                )}
-              </div>
-
-              {/* Button centered under image */}
-              {userHasAccessToUpdateCompanyDetail &&
-                (!isLogoChange ? (
-                  <div className="w-40 flex justify-center mt-2">
-                    <label className="cursor-pointer px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700">
-                      {logoPreview || companyDetail?.logo_file_extension
-                        ? "Change Logo"
-                        : "Upload Logo"}
-
-                      <input
-                        type="file"
-                        accept="image/*"
-                        hidden
-                        onChange={handleLogoChange}
+                      <CustomDocumentPreviewComponent
+                        fileUrl={logoPreview ?? companyDetail?.logo_cdn_url}
+                        fileExtension={companyDetail.logo_file_extension}
+                        width={"50%"}
+                        enableDownload={true}
                       />
-                    </label>
-                  </div>
-                ) : (
-                  <div className="w-55 flex justify-center mt-2 gap-2">
-                    <div>
-                      <Button
-                        type="button"
-                        onClick={() => setLogoPreview(logoPreviousPreview)}
-                      >
-                        Cancel
-                      </Button>
                     </div>
-                    <div>
-                      <Button
-                        className="cursor-pointer px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-                        onClick={handleCompanyLogoUpload}
-                      >
-                        Save Logo
-                      </Button>
+                  )}
+                </div>
+
+                {/* Button centered under image */}
+                {userHasAccessToUpdateCompanyDetail &&
+                  (!isLogoChange ? (
+                    <div className="w-40 flex justify-center mt-2">
+                      <label className="cursor-pointer px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                        {logoPreview || companyDetail?.logo_file_extension
+                          ? "Change Logo"
+                          : "Upload Logo"}
+
+                        <input
+                          type="file"
+                          accept="image/*"
+                          hidden
+                          onChange={handleLogoChange}
+                        />
+                      </label>
                     </div>
-                  </div>
-                ))}
-            </div>
+                  ) : (
+                    <div className="w-55 flex justify-center mt-2 gap-2">
+                      <div>
+                        <Button
+                          type="button"
+                          onClick={() => setLogoPreview(logoPreviousPreview)}
+                        >
+                          Cancel
+                        </Button>
+                      </div>
+                      <div>
+                        <Button
+                          className="cursor-pointer px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                          onClick={handleCompanyLogoUpload}
+                        >
+                          Save Logo
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            ) : (
+              <div className="flex flex-col items-start animate-pulse">
+                {/* Image Skeleton */}
+                <div className="w-40 h-40 border rounded-lg overflow-hidden flex items-center justify-center bg-gray-100">
+                  <div className="w-32 h-32 bg-gray-300 rounded-md"></div>
+                </div>
+
+                {/* Button Skeleton */}
+                <div className="w-40 flex justify-center mt-2">
+                  <div className="h-8 w-28 bg-gray-300 rounded-md"></div>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* COMPANY DETAILS SECTION */}
@@ -1129,7 +1178,8 @@ const UserAndCompanyProfile = () => {
                 onSave={() => {
                   handleEditableSectionSave();
                 }}
-                isLoading={isLoadingForCompanyDetailsUpdate}
+                isLoadingForUpdate={isLoadingForCompanyDetailsUpdate}
+                isLoadingForData={isLodingForCompanyDetailData}
               >
                 {editingSection === "company" ? (
                   <FormInput
@@ -1146,7 +1196,7 @@ const UserAndCompanyProfile = () => {
                       <div className="input-label-custom py-1">Website:</div>
 
                       <a
-                        href={companyDetail?.website}
+                        href={formatUrl(companyDetail?.website)}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="caption-custom-blue py-1.5 break-all"
@@ -1171,7 +1221,8 @@ const UserAndCompanyProfile = () => {
                 onSave={() => {
                   handleEditableSectionSave();
                 }}
-                isLoading={isLoadingForCompanyDetailsUpdate}
+                isLoadingForUpdate={isLoadingForCompanyDetailsUpdate}
+                isLoadingForData={isLodingForCompanyDetailData}
               >
                 {editingSection === "business" ? (
                   <div className="grid grid-cols-2 gap-2">
@@ -1259,7 +1310,8 @@ const UserAndCompanyProfile = () => {
                     }
                   }
                 }}
-                isLoading={isLoadingForCompanyDetailsUpdate}
+                isLoadingForUpdate={isLoadingForCompanyDetailsUpdate}
+                isLoadingForData={isLodingForCompanyDetailData}
               >
                 {editingSection === "location" ? (
                   <div className="grid grid-cols-2 gap-2">
@@ -1348,7 +1400,8 @@ const UserAndCompanyProfile = () => {
                 onSave={() => {
                   handleEditableSectionSave();
                 }}
-                isLoading={isLoadingForCompanyDetailsUpdate}
+                isLoadingForUpdate={isLoadingForCompanyDetailsUpdate}
+                isLoadingForData={isLodingForCompanyDetailData}
               >
                 {editingSection === "tax" ? (
                   <div className="grid grid-cols-2 gap-2">
@@ -1459,7 +1512,8 @@ const UserAndCompanyProfile = () => {
                 onSave={() => {
                   handleEditableSectionSave();
                 }}
-                isLoading={isLoadingForCompanyDetailsUpdate}
+                isLoadingForUpdate={isLoadingForCompanyDetailsUpdate}
+                isLoadingForData={isLodingForCompanyDetailData}
               >
                 {editingSection === "address" ? (
                   <div className="space-y-2">
@@ -1565,7 +1619,7 @@ const UserAndCompanyProfile = () => {
                   );
                 }
               }}
-              isLoading={isLoadingForCompanyDetailsUpdate}
+              isLoadingForUpdate={isLoadingForUserPreferenceChange}
             >
               {editingSection === "preferences" ? (
                 <div className="space-y-1">
@@ -1760,7 +1814,7 @@ const UserAndCompanyProfile = () => {
               onCancel={() => {}}
               onSave={() => {}}
               editButtonText="Update Subscription"
-              isLoading={false}
+              isLoadingForUpdate={false}
               key={"subscription"}
             >
               <div className="grid grid-cols-2 items-start border-b pb-1">

@@ -33,6 +33,7 @@ import {
   PAGE_BLOCK_LAYOUT_UPDATE,
   STORAGE_KEY_UPDATE,
 } from "./local-storage/LocalStorageKeys";
+import localforage from "localforage";
 
 export const QuotationPage: React.FC = () => {
   const { userPreference } = useUserPreference();
@@ -108,10 +109,32 @@ export const QuotationPage: React.FC = () => {
   }, [dateRangeId, concatDate, searchParameter]);
 
   useEffect(() => {
-    localStorage.removeItem(STORAGE_KEY_UPDATE + loginStatus.id);
-    localStorage.removeItem(PAGE_BLOCK_LAYOUT_UPDATE + loginStatus.id);
-    localStorage.removeItem(HEADER_STORAGE_KEY_UPDATE + loginStatus.id);
-    localStorage.removeItem(FOOTER_STORAGE_KEY_UPDATE + loginStatus.id);
+    //Local Storage
+    // localStorage.removeItem(STORAGE_KEY_UPDATE + loginStatus.id);
+    // localStorage.removeItem(PAGE_BLOCK_LAYOUT_UPDATE + loginStatus.id);
+    // localStorage.removeItem(HEADER_STORAGE_KEY_UPDATE + loginStatus.id);
+    // localStorage.removeItem(FOOTER_STORAGE_KEY_UPDATE + loginStatus.id);
+
+    //Local Forage
+    const clearStoredData = async () => {
+    await localforage.removeItem(
+      STORAGE_KEY_UPDATE + loginStatus.id
+    );
+
+    await localforage.removeItem(
+      PAGE_BLOCK_LAYOUT_UPDATE + loginStatus.id
+    );
+
+    await localforage.removeItem(
+      HEADER_STORAGE_KEY_UPDATE + loginStatus.id
+    );
+
+    await localforage.removeItem(
+      FOOTER_STORAGE_KEY_UPDATE + loginStatus.id
+    );
+  };
+
+  clearStoredData();
   }, []);
 
   // const handleDemoQuotationPdf = async () => {

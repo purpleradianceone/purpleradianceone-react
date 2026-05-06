@@ -25,6 +25,7 @@ type CompanyQuotationManagementListProps = {
   quotationStatus?: PostDataTypeForInvoiceStatus[];
   handleSelectedQuotationStatus: (selectedPriority: number | undefined) => void;
   isUsedFor?: Modules;
+  leadStatusId?: number;
 };
 
 export default CompanyQuotationManagementListProps;

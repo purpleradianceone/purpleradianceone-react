@@ -8,14 +8,12 @@ import SearchInput from "../../ui/SearchInput";
 import MetaField from "../../ui/MetaField";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { PageLayout } from "../../ui/PageLayout";
-import AccountInvoiceProps from "../../../@types/account/AccountInvoiceProps";
 import { handleApiError } from "../../../config/error/handleApiError";
 import { STATUS_CODE } from "../../../constants/AppConstants";
 import axiosClient from "../../../axios-client/AxiosClient";
 import POST_API from "../../../constants/PostApi";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
 import toast from "react-hot-toast";
-import FormInput from "../../ui/FormInput";
 import { formatRupee } from "../../../utils/helperMethods/formatFunctions";
 import { ChevronRight, Download, Pencil, Trash, User, X } from "lucide-react";
 import CompanyInvoiceItemProps from "../../../@types/invoice/CompanyInvoiceItemProps";
@@ -23,23 +21,26 @@ import InvoiceStatusChip from "../../ui/InvoiceStatusChip";
 import CustomDocumentPreviewComponent from "../../custom-document-preview-component/CustomDocumentPreviewComponent";
 import LoadingPopUpAnimation from "../card/LoadingPopUpAnimation";
 import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
+
+import { LookupAccountDropdown } from "../lookups/lookup-account/LookupAccountDropdown";
+import ROUTES_URL from "../../../constants/Routes";
+// import COLORS from "../../../constants/Colors";
+// import MESSAGE from "../../../constants/Messages";
 import {
   InvoiceHeaderSkeleton,
   InvoiceItemsSkeleton,
-} from "./CompanyInvoiceDetailSkeleton";
-import { LookupAccountDropdown } from "../lookups/lookup-account/LookupAccountDropdown";
-import ROUTES_URL from "../../../constants/Routes";
-import COLORS from "../../../constants/Colors";
-import MESSAGE from "../../../constants/Messages";
-import useInvoiceType from "../../../config/hooks/useInvoiceType";
+} from "../invoice/CompanyInvoiceDetailSkeleton";
 import { amountToWords } from "../../../utils/helperMethods/amountToWords";
+import AccountProformaInvoiceProps from "../../../@types/account/AccountProformaInvoiceProps";
 
-function CompanyInvoiceDetails() {
-  const { invoiceId } = useParams();
+function ProformaInvoiceDetails() {
+  const { invoiceId, accountId } = useParams();
   const navigate = useNavigate();
-  const [invoice, setInvoice] = useState<AccountInvoiceProps | null>(null);
+  const [invoice, setInvoice] = useState<AccountProformaInvoiceProps | null>(
+    null,
+  );
   const [previousInvoice, setPreviousInvoice] =
-    useState<AccountInvoiceProps | null>(null);
+    useState<AccountProformaInvoiceProps | null>(null);
   const [invoiceLoading, setInvoiceLoading] = useState(false);
   const [items, setItems] = useState<any[]>([]);
   const { loginStatus } = useLoggedInUserContext();
@@ -56,36 +57,36 @@ function CompanyInvoiceDetails() {
   const [selectedAccount, setSelectedAccount] = useState<any>(null);
   const [showAccountName, setShowAccountName] = useState<boolean>(false);
   const isCreateMode = !invoiceId || Number(invoiceId) === 0;
-  const { invoiceType, isLoading } = useInvoiceType();
-  const [showDownloadOptions, setShowDownloadOptions] = useState(false);
   const {
-    userHasAccessToViewCompanyInvoiceItem,
-    userHasAccessToUpdateCompanyInvoiceItem,
-    userHasAccessToAddCompanyInvoiceItem,
-    userHasAccessToUpdateCompanyInvoiceApproval,
-    userHasAccessToUpdateCompanyInvoice,
-    userHasAccessToViewCompanyInvoice,
-    userHasAccessToAddCompanyInvoiceDraft,
-    userHasAccessToViewCompanyInvoiceDraft,
-    userHasAccessToUpdateCompanyInvoiceDraft,
+    userHasAccessToViewAccountProformaInvoice,
+    userHasAccessToAddAccountProformaInvoice,
+    userHasAccessToUpdateAccountProformaInvoice,
   } = useUserAccessModules();
 
-  const getInvoices = async (signal: AbortSignal) => {
-    if (!userHasAccessToViewCompanyInvoiceDraft) return;
+  const getProformaInvoices = async (signal: AbortSignal) => {
+    if (!userHasAccessToViewAccountProformaInvoice) return;
     setInvoiceLoading(true);
     const postData = {
       id: Number(invoiceId),
+      account_id: Number(accountId),
       company_id: loginStatus.companyId,
       limit: 1,
       offset: 0,
       requestedby_id: loginStatus.id,
     };
 
+    console.log(postData);
+
     try {
-      const response = await axiosClient.post(POST_API.GET_INVOICE, postData, {
-        signal,
-        withCredentials: true,
-      });
+      const response = await axiosClient.post(
+        POST_API.GET_COMPANY_PROFORMA_INVOICE,
+        postData,
+        {
+          signal,
+          withCredentials: true,
+        },
+      );
+      console.log(response.data);
 
       if (response.status === STATUS_CODE.OK) {
         const responseData = response.data;
@@ -101,14 +102,13 @@ function CompanyInvoiceDetails() {
 
         setDisabled(item.invoice_status_name?.trim().toUpperCase() !== "DRAFT");
 
-        const formattedData: AccountInvoiceProps = {
+        const formattedData: AccountProformaInvoiceProps = {
           id: item.id,
           companyId: item.company_id,
           invoiceNumber: item.invoice_number,
           accountId: item.account_id,
           accountName: item.account_name,
           invoiceDate: item.invoice_date,
-          dueDate: item.due_date,
           billingAddress: item.billing_address,
           shippingAddress: item.shipping_address,
           termAndConditions: item.terms_and_conditions,
@@ -130,7 +130,7 @@ function CompanyInvoiceDetails() {
 
         // ✅ Set single object (NOT array)
         setInvoice(formattedData);
-        setPreviousInvoice(formattedData); // store previous for reset
+        setPreviousInvoice(formattedData);
       }
     } catch (error: any) {
       handleApiError(error);
@@ -141,24 +141,24 @@ function CompanyInvoiceDetails() {
   };
   console.log(disabled);
 
-  const getInvoiceItems = async (signal: AbortSignal) => {
+  const getProformaInvoiceItems = async (signal: AbortSignal) => {
     if (
       !invoiceId ||
       Number(invoiceId) === 0 ||
-      !userHasAccessToViewCompanyInvoiceItem
+      !userHasAccessToViewAccountProformaInvoice
     )
       return;
     setItemsLoading(true);
     const postData = {
       company_id: loginStatus.companyId,
-      company_invoice_id: Number(invoiceId),
+      company_proforma_invoice_id: Number(invoiceId),
       isactive: true,
       requestedby_id: loginStatus.id,
     };
 
     try {
       const response = await axiosClient.post(
-        POST_API.GET_INVOICE_ITEM,
+        POST_API.GET_COMPANY_PROFORMA_INVOICE_ITEM,
         postData,
         {
           signal,
@@ -244,7 +244,7 @@ function CompanyInvoiceDetails() {
     if (disabled) {
       return;
     }
-    if (!userHasAccessToUpdateCompanyInvoiceApproval) {
+    if (!userHasAccessToUpdateAccountProformaInvoice) {
       return;
     }
     const postData = {
@@ -258,7 +258,7 @@ function CompanyInvoiceDetails() {
     setIsSubmitting(true);
     try {
       const res = await axiosClient.post(
-        POST_API.UPDATE_COMPANY_INVOICE,
+        POST_API.UPDATE_COMPANY_PROFORMA_INVOICE,
         postData,
         {
           withCredentials: true,
@@ -267,7 +267,7 @@ function CompanyInvoiceDetails() {
 
       if (res.data.status) {
         toast.success(res.data.message);
-        getInvoices(new AbortController().signal);
+        getProformaInvoices(new AbortController().signal);
       } else {
         toast.error(res.data.message);
       }
@@ -279,17 +279,15 @@ function CompanyInvoiceDetails() {
   };
 
   const previewInvoice = async () => {
-    if (!userHasAccessToViewCompanyInvoice) return;
+    if (!userHasAccessToViewAccountProformaInvoice) return;
     setIsSubmitting(true);
 
     try {
       const response = await axiosClient.post(
-        POST_API.PREVIEW_COMPANY_INVOICE,
+        POST_API.PREVIEW_COMPANY_PROFORMA_INVOICE,
         {
           company_id: loginStatus.companyId,
-          company_invoice_id: Number(invoiceId),
-          company_invoice_type_id: 1,
-          company_invoice_type: "Copy Type",
+          company_proforma_invoice_id: Number(invoiceId),
           requestedby_id: loginStatus.id,
         },
         {
@@ -341,16 +339,15 @@ function CompanyInvoiceDetails() {
     if (disabled) {
       return;
     }
-    if (!userHasAccessToUpdateCompanyInvoiceDraft) return;
+    if (!userHasAccessToUpdateAccountProformaInvoice) return;
     const postData = {
       id: invoice.id,
       company_id: loginStatus.companyId,
-      due_date: invoice.dueDate,
       invoice_status_id: null,
       billing_address: invoice.billingAddress,
       shipping_address: invoice.shippingAddress,
-      adjustment_for_round_off: invoice.adjustmentForRoundOff,
       terms_and_conditions: invoice.termAndConditions,
+      adjustment_for_round_off: invoice.adjustmentForRoundOff,
       remark: invoice.remarks,
       updatedby_id: loginStatus.id,
       isactive: invoice.isActive,
@@ -359,7 +356,7 @@ function CompanyInvoiceDetails() {
     setIsSubmitting(true);
     try {
       const res = await axiosClient.post(
-        POST_API.UPDATE_COMPANY_INVOICE,
+        POST_API.UPDATE_COMPANY_PROFORMA_INVOICE,
         postData,
         {
           withCredentials: true,
@@ -368,7 +365,7 @@ function CompanyInvoiceDetails() {
 
       if (res.data.status) {
         toast.success(res.data.message);
-        getInvoices(new AbortController().signal);
+        getProformaInvoices(new AbortController().signal);
       } else {
         toast.error(res.data.message);
       }
@@ -379,19 +376,18 @@ function CompanyInvoiceDetails() {
     }
   };
 
-  const handleInvoiceDownload = async (invoiceTypeId: number | null) => {
+  const handleInvoiceDownload = async () => {
     if (!disabled) return;
-    if (!userHasAccessToViewCompanyInvoice) return;
+    if (!userHasAccessToViewAccountProformaInvoice) return;
     setIsSubmitting(true);
-    console.log(POST_API.COMPANY_INVOICE_DOWNLOAD);
+    console.log(POST_API.COMPANY_PROFORMA_INVOICE_DOWNLOAD);
 
     try {
       const response = await axiosClient.post(
-        POST_API.COMPANY_INVOICE_DOWNLOAD,
+        POST_API.COMPANY_PROFORMA_INVOICE_DOWNLOAD,
         {
           company_id: loginStatus.companyId,
-          company_invoice_id: Number(invoiceId),
-          company_invoice_type_id: invoiceTypeId,
+          company_proforma_invoice_id: Number(invoiceId),
           requestedby_id: loginStatus.id,
         },
         {
@@ -435,7 +431,7 @@ function CompanyInvoiceDetails() {
     setIsSubmitting(true);
     try {
       const res = await axiosClient.post(
-        POST_API.UPDATE_COMPANY_INVOICE_ITEM,
+        POST_API.UPDATE_COMPANY_PROFORMA_INVOICE_ITEM,
         postData,
         {
           withCredentials: true,
@@ -455,40 +451,116 @@ function CompanyInvoiceDetails() {
     }
   };
 
-  const handleDiscountChange = (id: number, discountPercent: number) => {
-    setTempItems((prevItems) =>
-      prevItems.map((item) => {
+  //   const handleDiscountChange = (id: number, discountPercent: number) => {
+  //     setTempItems((prevItems) =>
+  //       prevItems.map((item) => {
+  //         if (item.id !== id) return item;
+
+  //         const safeDiscount = Math.max(0, Math.min(100, discountPercent));
+
+  //         const discountAmount = (item.basicValue * safeDiscount) / 100;
+  //         const taxableValue = item.basicValue - discountAmount;
+
+  //         const cgstAmount = (taxableValue * item.cgstPercent) / 100;
+  //         const sgstAmount = (taxableValue * item.sgstPercent) / 100;
+  //         const igstAmount = (taxableValue * item.igstPercent) / 100;
+  //         const cessAmount = (taxableValue * item.cessPercent) / 100;
+
+  //         const totalTax = cgstAmount + sgstAmount + igstAmount + cessAmount;
+  //         const totalAmount = taxableValue + totalTax;
+
+  //         return {
+  //           ...item,
+  //           discountPercent: safeDiscount,
+  //           discountAmount,
+  //           taxableValue,
+  //           cgstAmount,
+  //           sgstAmount,
+  //           igstAmount,
+  //           cessAmount,
+  //           totalTax,
+  //           totalAmount,
+  //         };
+  //       }),
+  //     );
+  //   };
+
+  const calculateItem = (
+    item: any,
+    quantity: number,
+    rate: number,
+    discountPercent: number,
+  ) => {
+    const safeQty = Math.max(0, quantity);
+    const safeRate = Math.max(0, rate);
+    const safeDiscount = Math.max(0, Math.min(100, discountPercent));
+
+    const basicValue = safeQty * safeRate;
+
+    const discountAmount = (basicValue * safeDiscount) / 100;
+    const taxableValue = basicValue - discountAmount;
+
+    const cgstAmount = (taxableValue * item.cgstPercent) / 100;
+    const sgstAmount = (taxableValue * item.sgstPercent) / 100;
+    const igstAmount = (taxableValue * item.igstPercent) / 100;
+    const cessAmount = (taxableValue * item.cessPercent) / 100;
+
+    const totalTax = cgstAmount + sgstAmount + igstAmount + cessAmount;
+    const totalAmount = taxableValue + totalTax;
+
+    return {
+      quantity: safeQty,
+      rate: safeRate,
+      basicValue,
+      discountPercent: safeDiscount,
+      discountAmount,
+      taxableValue,
+      cgstAmount,
+      sgstAmount,
+      igstAmount,
+      cessAmount,
+      totalTax,
+      totalAmount,
+    };
+  };
+  const handleQuantityChange = (id: number, quantity: number) => {
+    setTempItems((prev) =>
+      prev.map((item) => {
         if (item.id !== id) return item;
-
-        const safeDiscount = Math.max(0, Math.min(100, discountPercent));
-
-        const discountAmount = (item.basicValue * safeDiscount) / 100;
-        const taxableValue = item.basicValue - discountAmount;
-
-        const cgstAmount = (taxableValue * item.cgstPercent) / 100;
-        const sgstAmount = (taxableValue * item.sgstPercent) / 100;
-        const igstAmount = (taxableValue * item.igstPercent) / 100;
-        const cessAmount = (taxableValue * item.cessPercent) / 100;
-
-        const totalTax = cgstAmount + sgstAmount + igstAmount + cessAmount;
-        const totalAmount = taxableValue + totalTax;
 
         return {
           ...item,
-          discountPercent: safeDiscount,
-          discountAmount,
-          taxableValue,
-          cgstAmount,
-          sgstAmount,
-          igstAmount,
-          cessAmount,
-          totalTax,
-          totalAmount,
+          ...calculateItem(item, quantity, item.rate, item.discountPercent),
         };
       }),
     );
   };
 
+  const handleRateChange = (id: number, rate: number) => {
+    setTempItems((prev) =>
+      prev.map((item) => {
+        if (item.id !== id) return item;
+
+        return {
+          ...item,
+          ...calculateItem(item, item.quantity, rate, item.discountPercent),
+        };
+      }),
+    );
+  };
+
+  const handleDiscountChange = (id: number, discountPercent: number) => {
+    setTempItems((prev) =>
+      prev.map((item) => {
+        if (item.id !== id) return item;
+
+        return {
+          ...item,
+          ...calculateItem(item, item.quantity, item.rate, discountPercent),
+        };
+      }),
+    );
+  };
   const summary = tempItems.reduce(
     (acc, item) => {
       acc.basic += item.basicValue || 0;
@@ -506,12 +578,14 @@ function CompanyInvoiceDetails() {
     (i) => i.cessAmount != null && i.cessAmount > 0,
   );
   const saveSingleItem = async (item: any) => {
-    if (!userHasAccessToUpdateCompanyInvoiceItem) {
+    if (!userHasAccessToUpdateAccountProformaInvoice) {
       return;
     }
     const postData = {
       company_id: loginStatus.companyId,
       id: item.id,
+      quantity: item.quantity,
+      rate: item.rate,
       discount_percent: item.discountPercent,
       isactive: item.isActive,
       updatedby_id: loginStatus.id,
@@ -521,7 +595,7 @@ function CompanyInvoiceDetails() {
     setIsSubmitting(true);
     try {
       const res = await axiosClient.post(
-        POST_API.UPDATE_COMPANY_INVOICE_ITEM,
+        POST_API.UPDATE_COMPANY_PROFORMA_INVOICE_ITEM,
         postData,
         {
           withCredentials: true,
@@ -548,7 +622,7 @@ function CompanyInvoiceDetails() {
   };
 
   const handleSaveInvoice = async () => {
-    if (!userHasAccessToAddCompanyInvoiceDraft) return;
+    if (!userHasAccessToAddAccountProformaInvoice) return;
     if (!selectedAccount) {
       toast.error("Please select an account");
       return;
@@ -591,38 +665,38 @@ function CompanyInvoiceDetails() {
       });
   };
 
-  const handleAddToInvoice = async () => {
-    if (disabled) {
-      return;
-    }
-    const postData = {
-      company_id: loginStatus.companyId,
-      account_id: invoice?.accountId,
-      createdby_id: loginStatus.id,
-    };
-    console.log(postData);
-    setIsSubmitting(true);
-    try {
-      const res = await axiosClient.post(
-        POST_API.CREATE_COMPANY_INVOICE_ITEM,
-        postData,
-        {
-          withCredentials: true,
-        },
-      );
+  // const handleAddToInvoice = async () => {
+  //   if (disabled) {
+  //     return;
+  //   }
+  //   const postData = {
+  //     company_id: loginStatus.companyId,
+  //     account_id: invoice?.accountId,
+  //     createdby_id: loginStatus.id,
+  //   };
+  //   console.log(postData);
+  //   setIsSubmitting(true);
+  //   try {
+  //     const res = await axiosClient.post(
+  //       POST_API.CREATE_COMPANY_INVOICE_ITEM,
+  //       postData,
+  //       {
+  //         withCredentials: true,
+  //       },
+  //     );
 
-      if (res.data.status) {
-        toast.success(res.data.message);
-        setRefreshCount((prev) => prev + 1);
-      } else {
-        toast.error(res.data.message);
-      }
-    } catch (error) {
-      handleApiError(error);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+  //     if (res.data.status) {
+  //       toast.success(res.data.message);
+  //       setRefreshCount((prev) => prev + 1);
+  //     } else {
+  //       toast.error(res.data.message);
+  //     }
+  //   } catch (error) {
+  //     handleApiError(error);
+  //   } finally {
+  //     setIsSubmitting(false);
+  //   }
+  // };
 
   const handleAccountSelect = (account: any) => {
     setSelectedAccount(account);
@@ -631,14 +705,13 @@ function CompanyInvoiceDetails() {
   useEffect(() => {
     setRoundOffValues(getRoundOffValues(invoice?.totalAmount ?? 0));
   }, [invoice?.adjustmentForRoundOff, invoice?.totalAmount, invoice]);
-
   useEffect(() => {
     if (!invoiceId || Number(invoiceId) === 0) return;
 
     const controller = new AbortController();
 
-    getInvoices(controller.signal);
-    getInvoiceItems(controller.signal);
+    getProformaInvoices(controller.signal);
+    getProformaInvoiceItems(controller.signal);
 
     return () => controller.abort();
   }, [invoiceId, refreshCount]);
@@ -654,13 +727,19 @@ function CompanyInvoiceDetails() {
         ) : (
           <>
             <div className=" sticky top-0 z-10  bg-slate-100 flex text-center justify-start items-center gap-3 ml-0.5 ">
-              <Link to={ROUTES_URL.INVOICE_MANAGEMENT}>
+              <Link to={`${ROUTES_URL.ACCOUNT_DETAILS}`}>
                 <Button className="caption-custom flex items-center justify-center hover:text-gray-800">
-                  Invoice
+                  Account
                 </Button>
               </Link>
               <ChevronRight size={16} />
-              <h1 className="table-header-custom">Invoice Details</h1>
+              <Link to={`${ROUTES_URL.ACCOUNT_DETAILS}/${accountId}`}>
+                <Button className="caption-custom flex items-center justify-center hover:text-gray-800">
+                  Account Details
+                </Button>
+              </Link>
+              <ChevronRight size={16} />
+              <h1 className="table-header-custom">Proforma Invoice Details</h1>
               {showAccountName && (
                 <span
                   className={`
@@ -684,8 +763,8 @@ function CompanyInvoiceDetails() {
               <div>
                 <h1 className="table-header-custom">
                   {isCreateMode
-                    ? "Create Invoice"
-                    : `Invoice #${invoice?.invoiceNumber || "[Auto-generated]"}`}
+                    ? "Create Proforma Invoice"
+                    : `Proforma Invoice #${invoice?.invoiceNumber || "[Auto-generated]"}`}
                 </h1>
                 <p className="text-sm text-gray-500">
                   {isCreateMode
@@ -695,58 +774,25 @@ function CompanyInvoiceDetails() {
               </div>
               {!isCreateMode && (
                 <div className="flex gap-x-2">
-                  <div className="relative">
-                    {/* Download Button */}
-                    <button
-                      className={`text-sm border p-2 rounded-md flex items-center gap-1 border-blue-300
-      focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-1
-      ${
-        !disabled
-          ? "bg-gray-50 cursor-not-allowed opacity-50"
-          : "bg-gray-50 hover:bg-blue-200"
-      }`}
-                      disabled={!disabled}
-                      onClick={() => setShowDownloadOptions((prev) => !prev)}
-                    >
-                      <div className="flex items-center gap-1">
-                        <span className="text-gray-700">Download</span>
-                        <Download size={14} className="text-blue-500" />
-                      </div>
-                    </button>
-
-                    {/* Dropdown */}
-                    {showDownloadOptions && (
-                      <div className="absolute z-10 mt-1 w-48  bg-white border rounded-md shadow-md">
-                        {isLoading ? (
-                          <div className="px-3 py-2 text-sm text-gray-500">
-                            Loading...
-                          </div>
-                        ) : (
-                          invoiceType.map((type) => (
-                            <div
-                              key={type.id}
-                              className="px-3 py-2 text-xs  hover:bg-blue-100 cursor-pointer flex justify-between"
-                              onClick={() => {
-                                handleInvoiceDownload(type.id); // 👈 pass type id
-                                setShowDownloadOptions(false);
-                              }}
-                            >
-                              <span>{type.name}</span>
-                            </div>
-                          ))
-                        )}
-                      </div>
-                    )}
-                  </div>
+                  <button
+                    className={`text-sm border p-2 rounded-md flex items-center gap-1 border-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-1 ${!disabled ? "bg-gray-50 cursor-not-allowed opacity-50" : "bg-gray-50 hover:bg-blue-200"}`}
+                    disabled={!disabled}
+                    onClick={handleInvoiceDownload}
+                  >
+                    <div className="flex items-center gap-1">
+                      <span className="text-gray-700">Download</span>
+                      <Download size={14} className="text-blue-500" />
+                    </div>
+                  </button>
                   <button
                     className={`text-sm border p-2 rounded-md flex items-center gap-1 text-gray-700
                        focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-1
                       ${
-                        !userHasAccessToViewCompanyInvoice
+                        !userHasAccessToViewAccountProformaInvoice
                           ? "bg-gray-50 cursor-not-allowed opacity-50"
                           : "bg-gray-50 hover:bg-red-200 hover border-red-300"
                       }`}
-                    disabled={!userHasAccessToViewCompanyInvoice}
+                    disabled={!userHasAccessToViewAccountProformaInvoice}
                     onClick={previewInvoice}
                   >
                     <div className="flex items-center gap-1">
@@ -775,11 +821,11 @@ function CompanyInvoiceDetails() {
                     disabled={
                       !selectedAccount ||
                       isSubmitting ||
-                      !userHasAccessToAddCompanyInvoiceDraft
+                      !userHasAccessToAddAccountProformaInvoice
                     }
                     onClick={handleSaveInvoice}
                   >
-                    {isSubmitting ? "Creating..." : "Create invoice"}
+                    {isSubmitting ? "Creating..." : "Create proforma invoice"}
                   </Button>
                 </div>
               </div>
@@ -799,22 +845,6 @@ function CompanyInvoiceDetails() {
                 label="Status"
                 value={<InvoiceStatusChip statusId={invoice?.statusId} />}
               />
-              {disabled ? (
-                <MetaField label="Due Date" value={invoice?.dueDate} />
-              ) : (
-                <FormInput
-                  label="Due Date"
-                  type="date"
-                  disabled={isCreateMode || disabled}
-                  value={invoice?.dueDate}
-                  onChange={(e: any) =>
-                    setInvoice((prev) => ({
-                      ...prev!,
-                      dueDate: e.target.value,
-                    }))
-                  }
-                />
-              )}
 
               <MetaField label="Created By" value={invoice?.createdBy} />
               <MetaField label="Created On" value={invoice?.createdOn} />
@@ -901,7 +931,7 @@ function CompanyInvoiceDetails() {
                   {!isCreateMode && (
                     <Button
                       disabled={
-                        !userHasAccessToUpdateCompanyInvoice || disabled
+                        !userHasAccessToUpdateAccountProformaInvoice || disabled
                       }
                       onClick={updateInvoice}
                     >
@@ -911,7 +941,7 @@ function CompanyInvoiceDetails() {
                   {!isCreateMode && (
                     <Button
                       disabled={
-                        !userHasAccessToUpdateCompanyInvoiceApproval || disabled
+                        !userHasAccessToUpdateAccountProformaInvoice || disabled
                       }
                       onClick={SubmitInvoice}
                     >
@@ -928,7 +958,7 @@ function CompanyInvoiceDetails() {
           <InvoiceItemsSkeleton />
         ) : (
           <>
-            {!isCreateMode && userHasAccessToViewCompanyInvoiceItem && (
+            {!isCreateMode && userHasAccessToViewAccountProformaInvoice && (
               <div className="bg-white border rounded p-2 mb-1">
                 <div className="flex justify-between py-1">
                   <h3 className="font-semibold">Invoice Items</h3>
@@ -937,16 +967,17 @@ function CompanyInvoiceDetails() {
                     onChange={(e: any) => setSearchTerm(e.target.value)}
                     placeholder="Search product..."
                   />
-                  <div>
+                  <div></div>
+                  {/* <div>
                     <Button
                       type="button"
                       disabled={
-                        disabled || !userHasAccessToAddCompanyInvoiceItem
+                        disabled || !userHasAccessToAddAccountProformaInvoiceItem
                       }
                       onClick={() => {
-                        if (!userHasAccessToAddCompanyInvoiceItem) {
+                        if (!userHasAccessToAddAccountProformaInvoiceItem) {
                           toast.error(
-                            MESSAGE.MODULE_ACCESS.COMPANY_INVOICE_ITEM
+                            MESSAGE.MODULE_ACCESS.ACCOUNT_PROFORMA_INVOICE_ITEM
                               .DENIED_ADD_ACCESS,
                           );
                           return;
@@ -957,7 +988,7 @@ function CompanyInvoiceDetails() {
                     >
                       +Add Pending Items
                     </Button>
-                  </div>
+                  </div> */}
                 </div>
                 <div className="w-full max-h-[35vh] overflow-y-auto border rounded">
                   <table className="w-full text-sm font-semibold ">
@@ -1013,8 +1044,40 @@ function CompanyInvoiceDetails() {
                                 <td className="p-2 text-left">
                                   {item.companyProductName}
                                 </td>
-                                <td>{item.quantity}</td>
-                                <td>{formatRupee(item.rate)}</td>
+                                {/* <td>{item.quantity}</td> */}
+                                <td>
+                                  <input
+                                    type="number"
+                                    className={`${editingItemId !== item.id ? "" : "border"} rounded p-1 text-center w-20`}
+                                    value={item.quantity}
+                                    disabled={
+                                      disabled || editingItemId !== item.id
+                                    }
+                                    onChange={(e) =>
+                                      handleQuantityChange(
+                                        item.id,
+                                        Number(e.target.value),
+                                      )
+                                    }
+                                  />
+                                </td>
+                                <td>
+                                  <input
+                                    type="number"
+                                    className={`${editingItemId !== item.id ? "" : "border"} rounded p-1 text-center w-24`}
+                                    value={item.rate}
+                                    disabled={
+                                      disabled || editingItemId !== item.id
+                                    }
+                                    onChange={(e) =>
+                                      handleRateChange(
+                                        item.id,
+                                        Number(e.target.value),
+                                      )
+                                    }
+                                  />
+                                </td>
+                                {/* <td>{formatRupee(item.rate)}</td> */}
                                 <td>{item.hsn || item.sac}</td>
                                 <td>{formatRupee(item.basicValue)}</td>
                                 <td>
@@ -1060,7 +1123,7 @@ function CompanyInvoiceDetails() {
                                       {editingItemId !== item.id ? (
                                         <button
                                           disabled={
-                                            !userHasAccessToUpdateCompanyInvoiceItem ||
+                                            !userHasAccessToUpdateAccountProformaInvoice ||
                                             disabled
                                           }
                                           onClick={() => handleDeleteItem(item)}
@@ -1093,12 +1156,12 @@ function CompanyInvoiceDetails() {
                                       ) : (
                                         <button
                                           disabled={
-                                            !userHasAccessToUpdateCompanyInvoiceItem ||
+                                            !userHasAccessToUpdateAccountProformaInvoice ||
                                             disabled
                                           }
                                           onClick={() => {
                                             if (
-                                              !userHasAccessToUpdateCompanyInvoiceItem
+                                              !userHasAccessToUpdateAccountProformaInvoice
                                             ) {
                                               return;
                                             }
@@ -1179,8 +1242,6 @@ function CompanyInvoiceDetails() {
                 </div>
               </div>
             )} */}
-
-            {/** Summery Block */}
             {!isCreateMode && (
               <div className="grid grid-cols-2 text-sm mb-2">
                 <div></div>
@@ -1211,9 +1272,7 @@ function CompanyInvoiceDetails() {
                     {/* Tax + Cess in one row */}
                     <div className="flex justify-between text-gray-600">
                       <span>Total Tax {summary.cess ? "+ Cess" : ""}</span>
-                      <span>
-                        {formatRupee(summary.tax)}
-                      </span>
+                      <span>{formatRupee(summary.tax)}</span>
                     </div>
 
                     {/* Total */}
@@ -1302,4 +1361,4 @@ function CompanyInvoiceDetails() {
   );
 }
 
-export default CompanyInvoiceDetails;
+export default ProformaInvoiceDetails;

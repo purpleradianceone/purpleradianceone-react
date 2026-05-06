@@ -10,7 +10,8 @@ interface EditableSectionProps {
   onSave: () => void;
   children: React.ReactNode;
   hasAccess: boolean;
-  isLoading?: boolean; 
+  isLoadingForUpdate?: boolean;
+  isLoadingForData?: boolean;
 }
 
 const EditableSection = ({
@@ -22,8 +23,19 @@ const EditableSection = ({
   onSave,
   children,
   hasAccess,
-  isLoading = false,
+  isLoadingForUpdate = false,
+  isLoadingForData = false,
 }: EditableSectionProps) => {
+  if (isLoadingForData) {
+    return (
+      <div className="animate-pulse space-y-3">
+        <div className="h-6 bg-gray-300 rounded w-3/4"></div>
+        <div className="h-6 bg-gray-300 rounded w-1/2"></div>
+        <div className="h-32 bg-gray-300 rounded"></div>
+      </div>
+    );
+  }
+
   return (
     <div className="border rounded-xl p-4 bg-gray-50 relative">
       {/* Header only when title exists */}
@@ -41,13 +53,13 @@ const EditableSection = ({
               onClick={onEdit}
               className="text-blue-600 caption-custom hover:underline"
             >
-              {editButtonText?editButtonText:"Edit"}
+              {editButtonText ? editButtonText : "Edit"}
             </button>
           )
         ) : (
           <div className="flex gap-2">
-            <Button onClick={onSave} disabled={isLoading}>
-              {isLoading ? (
+            <Button onClick={onSave} disabled={isLoadingForUpdate}>
+              {isLoadingForUpdate && isEditing ? (
                 <span className="flex items-center gap-2">
                   <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
                   Saving...
@@ -60,7 +72,7 @@ const EditableSection = ({
             <Button
               type="button"
               onClick={onCancel}
-              disabled={isLoading}
+              disabled={isLoadingForUpdate}
               className="px-3 py-1 bg-gray-400 text-white rounded"
             >
               Cancel

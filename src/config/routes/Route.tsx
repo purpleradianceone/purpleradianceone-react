@@ -7,9 +7,9 @@ import ForgotPasswordRequestPage from "../../assets/animations/EmailSentAnimatio
 import CreatePasswordForm from "../../components/forms/CreatePasswordForm";
 import Navbar from "../../components/views/home/navbar/Navbar";
 import Hero from "../../components/views/home/landing-page/Hero";
-import Features from "../../components/views/home/landing-page/Features";
+// import Features from "../../components/views/home/landing-page/Features";
 import CallToAction from "../../components/views/home/landing-page/CallToAction";
-import Testimonials from "../../components/views/home/landing-page/Testimonials";
+// import Testimonials from "../../components/views/home/landing-page/Testimonials";
 import EmailVerificationLayout from "../../components/views/auth/EmailVerificationLayout";
 import GetCompanyUsers from "../../components/views/manage-company-users/CompanyUsersManagement";
 import PrivateRoute from "./PrivateRoute";
@@ -102,8 +102,8 @@ import CompanyQuotationManagement from "../../components/views/company-quotation
 import { Modules } from "../../@types/List/CompanyQuotationManagementListProps";
 import CompanyQuotationDetails from "../../components/views/company-quotation-management/CompanyQuotationDetails";
 import { FacebookPageIntegrationManagement } from "../../components/views/settings/social-media-integration/meta-app-facebook/FacebookPageIntegrationManagement";
-
-
+import Features from "../../components/views/home/landing-page/Features";
+import ProformaInvoiceDetails from "../../components/views/proforma-invoice/ProformaInvoiceDetails";
 
 export const router = createBrowserRouter([
   {
@@ -129,10 +129,10 @@ export const router = createBrowserRouter([
         <div className="min-h-screen">
           <Navbar>
             <Hero />
-            <AboutUs />
-            <Features />
-            <Testimonials />
-            <ContactUs />
+            {/* <AboutUs /> */}
+            {/* <Features /> */}
+            {/* <Testimonials /> */}
+            {/* <ContactUs /> */}
             <CallToAction />
             <Footer />
           </Navbar>
@@ -160,6 +160,45 @@ export const router = createBrowserRouter([
         <div className="min-h-screen">
           <Navbar>
             <Pricing />
+            <Footer />
+          </Navbar>
+        </div>
+      </LoggedInRoute>
+    ),
+  },
+  {
+    path: ROUTES_URL.ABOUT_US,
+    element: (
+      <LoggedInRoute>
+        <div className="min-h-screen">
+          <Navbar>
+            <AboutUs />
+            <Footer />
+          </Navbar>
+        </div>
+      </LoggedInRoute>
+    ),
+  },
+  {
+    path: ROUTES_URL.FEATURES,
+    element: (
+      <LoggedInRoute>
+        <div className="min-h-screen">
+          <Navbar>
+            <Features />
+            <Footer />
+          </Navbar>
+        </div>
+      </LoggedInRoute>
+    ),
+  },
+  {
+    path: ROUTES_URL.CONTACT_US,
+    element: (
+      <LoggedInRoute>
+        <div className="min-h-screen">
+          <Navbar>
+            <ContactUs />
             <Footer />
           </Navbar>
         </div>
@@ -298,7 +337,10 @@ export const router = createBrowserRouter([
         <PrivateRoute>
           <div>
             <Navbar>
-              <CompanyQuotationManagement otherData={null} isUsedFor={Modules.QUOTATION_MODULE} />
+              <CompanyQuotationManagement
+                otherData={null}
+                isUsedFor={Modules.QUOTATION_MODULE}
+              />
             </Navbar>
           </div>
         </PrivateRoute>
@@ -370,7 +412,21 @@ export const router = createBrowserRouter([
         <PrivateRoute>
           <div>
             <Navbar>
-              <CompanyInvoiceDetails  />
+              <CompanyInvoiceDetails />
+            </Navbar>
+          </div>
+        </PrivateRoute>
+      </MobileRedirectWrapper>
+    ),
+  },
+  {
+    path: ROUTES_URL.PROFORMA_INVOICE_DETAILS,
+    element: (
+      <MobileRedirectWrapper>
+        <PrivateRoute>
+          <div>
+            <Navbar>
+              <ProformaInvoiceDetails />
             </Navbar>
           </div>
         </PrivateRoute>
@@ -1072,7 +1128,7 @@ export const router = createBrowserRouter([
             }
           >
             <>GOOGLEADS</>
-           {/* <GoogleAdsIntegrationManagement/> */}
+            {/* <GoogleAdsIntegrationManagement/> */}
           </ModuleGuard>
         ),
       },
@@ -1161,12 +1217,12 @@ export const router = createBrowserRouter([
               MESSAGE.MODULE_ACCESS.SETTING.INTEGRATION.DENIED_VIEW_ACCESS
             }
           >
-            <FacebookPageIntegrationManagement/>
+            <FacebookPageIntegrationManagement />
             {/* <PageIdIntegrationManagement /> */}
           </ModuleGuard>
         ),
       },
-       {
+      {
         path: ROUTES_URL.SETTING_META_APP_INTEGRATION_WHATSAPP,
         element: (
           <ModuleGuard
@@ -1175,7 +1231,7 @@ export const router = createBrowserRouter([
               MESSAGE.MODULE_ACCESS.SETTING.INTEGRATION.DENIED_VIEW_ACCESS
             }
           >
-              <WhatsappPhoneNumberIntegrationManagement/>
+            <WhatsappPhoneNumberIntegrationManagement />
           </ModuleGuard>
         ),
       },

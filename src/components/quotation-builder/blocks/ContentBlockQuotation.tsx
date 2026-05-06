@@ -244,7 +244,7 @@ export const ContentBlockQuotation: React.FC = () => {
   //For Ctrl+s
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.ctrlKey && e.key.toLowerCase() === "s") {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "s") {
         handleSave();
       }
     };

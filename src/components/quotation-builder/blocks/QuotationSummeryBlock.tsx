@@ -119,15 +119,16 @@ export const QuotationSummeryBlock: React.FC = () => {
      SUMMARY ROWS
   ===================================================== */
   const rows: SummaryRow[] = [
-    { label: "Basic Value", value: totals.basic },
-    { label: "Total Discount", value: totals.discount },
-    { label: "CGST", value: totals.cgst },
-    { label: "SGST", value: totals.sgst },
-    { label: "IGST", value: totals.igst },
-    { label: "Cess", value: totals.cess },
-    { label: "Total Tax Amount", value: totals.tax },
+    { label: "A. Basic Value", value: totals.basic },
+    { label: "B. Total Discount", value: totals.discount },
+    { label: "C. Taxable Amount (A-B)", value: (totals.basic - totals.discount) },
+    { label: "D. CGST", value: totals.cgst },
+    { label: "E. SGST", value: totals.sgst },
+    { label: "F. IGST", value: totals.igst },
+    { label: "G. Cess", value: totals.cess },
+    { label: "H. Total Tax Amount (D+E+F+G)", value: totals.tax },
     {
-      label: "Total Quotation Amount",
+      label: "Total Quotation Amount (C+H)",
       value: totals.total,
       highlight: true,
     },
@@ -147,7 +148,7 @@ export const QuotationSummeryBlock: React.FC = () => {
     ===================================================== */
   useEffect(() => {
     const handle = (e: KeyboardEvent) => {
-      if (e.ctrlKey && e.key.toLowerCase() === "s") {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "s") {
         e.preventDefault();
         setEditing(false);
       }
@@ -273,7 +274,7 @@ export const QuotationSummeryBlock: React.FC = () => {
         style={{
           display: "flex",
           width: "100%",
-          marginTop: "48px",
+          marginTop: `${editing?"48px":"0px"}`,
           minHeight: "220px",
           fontFamily: props.fontFamily,
         }}
@@ -281,7 +282,7 @@ export const QuotationSummeryBlock: React.FC = () => {
         {/* LEFT PANEL */}
         <div
           style={{
-            width: "65%",
+            width: "60%",
             borderRight: "1px solid #d1d5db",
             padding: "10px",
           }}
@@ -331,7 +332,7 @@ export const QuotationSummeryBlock: React.FC = () => {
         {/* RIGHT PANEL */}
         <div
           style={{
-            width: "35%",
+            width: "40%",
           }}
         >
           {rows.map((row, i) => (

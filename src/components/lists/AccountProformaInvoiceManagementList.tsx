@@ -1,66 +1,63 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect, useState } from "react";
-import toast from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
-import CompanyQuotationProps from "../../@types/company-quotation/CompanyQuotationProps";
-import CompanyQuotationManagementListProps, {
-  Modules,
-} from "../../@types/List/CompanyQuotationManagementListProps";
-import axiosClient from "../../axios-client/AxiosClient";
-import { handleApiError } from "../../config/error/handleApiError";
+import Button from "../ui/Button";
 import { useUserAccessModules } from "../../config/hooks/useAccessModules";
+import { useEffect, useState } from "react";
+import SearchInput from "../ui/SearchInput";
+import DateRangePicker from "../ui/DateRangePicker";
 import { useComapanySpecificSearchDateRange } from "../../config/hooks/useCompanySpecificDateRange";
 import { useDateRangeIdChange } from "../../config/hooks/useDateRangeIdChange";
-import { customDateRangeId } from "../../config/hooks/usePaginationHandler";
-import COLORS from "../../constants/Colors";
-import MESSAGE from "../../constants/Messages";
-import POST_API from "../../constants/PostApi";
-import ROUTES_URL from "../../constants/Routes";
-import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
-import { useUserPreference } from "../../context/user/UserPreference";
-import CompanyQuotationManagementAgGrid from "../ag-grid/CompanyQuotationManagementAgGrid";
-import PaginationWithoutCount from "../ag-grid/PaginationWithoutCount";
-import CustomDocumentPreviewComponent from "../custom-document-preview-component/CustomDocumentPreviewComponent";
-import CustomDropdown from "../modals/leads/CustomDropdown";
-import Button from "../ui/Button";
 import DateRangeFilterDropdown from "../ui/DateRangeFilterDropdown";
-import DateRangePicker from "../ui/DateRangePicker";
-import SearchInput from "../ui/SearchInput";
+import { useNavigate } from "react-router-dom";
+import { usePanel } from "../../context/panel/usePanel";
+import toast from "react-hot-toast";
+import MESSAGE from "../../constants/Messages";
+import { useUserPreference } from "../../context/user/UserPreference";
+import COLORS from "../../constants/Colors";
+import PaginationWithoutCount from "../ag-grid/PaginationWithoutCount";
+import { customDateRangeId } from "../../config/hooks/usePaginationHandler";
+import CustomDropdown from "../modals/leads/CustomDropdown";
+import ROUTES_URL from "../../constants/Routes";
+import POST_API from "../../constants/PostApi";
+import axiosClient from "../../axios-client/AxiosClient";
+import { handleApiError } from "../../config/error/handleApiError";
+import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
+import { ComponentHeaderAndLogo } from "../ui/ComponentHeaderAndLogo";
+import CustomDocumentPreviewComponent from "../custom-document-preview-component/CustomDocumentPreviewComponent";
 import LoadingPopUpAnimation from "../views/card/LoadingPopUpAnimation";
-import QuotationIconSvg from "../quotation-builder/svg/QuotationIconSvg";
+import { FaRegFileAlt } from "react-icons/fa";
+import AccountProformaInvoiceManagementListProps from "../../@types/List/AccountProformaInvoiceManagementListProps";
+import AccountProformaInvoiceProps from "../../@types/account/AccountProformaInvoiceProps";
+import CreateProformaInvoiceModal from "../modals/ProformaInvoice/CreateProformaInvoiceModal";
+import AccountProformaInvoiceManagementAgGrid from "../ag-grid/AccountProformaInvoiceManagementAgGrid";
 
-export const companyQuotationDataUrlSearchParamKey: string =
-  "companyQuotationData";
+export const accountInvoiceDataUrlSearchParamKey: string = "accountInvoiceData";
 
-function CompanyQuotationManagementList({
+function AccountProformaInvoiceManagementList({
   handleSearchOption,
   onStartDateChange,
   onEndDateChange,
   paginationData,
-  quotaionData,
-  otherData,
-  quotationStatus,
-  handleSelectedQuotationStatus,
-  handleAddQuotation,
-  isUsedFor = Modules.QUOTATION_MODULE,
-  leadStatusId,
-}: CompanyQuotationManagementListProps) {
+  invoiceData,
+  account,
+  invoiceStatus,
+  handleSelectedInvoiceStatus,
+  handleAddProformaInvoice,
+  isUsedForSidebar = false,
+}: AccountProformaInvoiceManagementListProps) {
   const navigate = useNavigate();
+  const { position } = usePanel();
   const { userPreference } = useUserPreference();
   const {
-    userHasAccessToViewCompanyQuotation,
-    userHasAccessToAddCompanyQuotation,
-    userHasAccessToAddLeadQuotation,
-    userHasAccessToAddAccountQuotation,
+    userHasAccessToViewAccountProformaInvoice,
+    userHasAccessToAddAccountProformaInvoice,
   } = useUserAccessModules();
   const { loginStatus } = useLoggedInUserContext();
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const [showCompanyLogoPreview, setShowCompanyLogoPreview] = useState(false);
-  const [quotationFileName, setQuotationFileName] = useState<string>();
   const [isSubmitting, setIsSubmitting] = useState(false);
   // for invoice modal open
-  //   const [isCreateInvoiceModalOpen, setIsCreateInvoiceModalOpen] =
-  //     useState<boolean>(false);
+  const [isCreateInvoiceModalOpen, setIsCreateInvoiceModalOpen] =
+    useState<boolean>(false);
 
   const { dateRangeDropdownOptions } = useComapanySpecificSearchDateRange();
 
@@ -73,47 +70,72 @@ function CompanyQuotationManagementList({
     handleSearchOption,
   });
 
-  const navigateToCompanyQuotation = (rowData: CompanyQuotationProps) => {
-    // console.log(rowData);
+  const navigateToInvoice = (rowData: AccountProformaInvoiceProps) => {
+    console.log(rowData);
 
-    const path = ROUTES_URL.QUOTATION_CREATE_AND_DETAILS.replace(
-      ":quotationId",
-      String(rowData?.id)
-      +`?other_id=${otherData?otherData.id:0}&quotation_type_id=${0}&isUsedFor=${isUsedFor}`,
-    );
+    const path = ROUTES_URL.PROFORMA_INVOICE_DETAILS.replace(
+      ":invoiceId",
+      String(rowData?.id),
+    ).replace(":accountId", String(rowData?.accountId));
 
     navigate(path);
   };
   const handleRowClicked = (event: any) => {
-    const rowData: CompanyQuotationProps = event.data;
-    navigateToCompanyQuotation(rowData);
+    const rowData: AccountProformaInvoiceProps = event.data;
+    navigateToInvoice(rowData);
   };
 
-  const handleSaveHeader = async () => {
-    const quotationSearchParam= isUsedFor === Modules.LEAD_QUOTATION?`?other_id=${otherData.id}&quotation_type_id=${1}&isUsedFor=${isUsedFor}`: (isUsedFor === Modules.AMC_QUOTATION?`?other_id=${otherData.id}&quotation_type_id=${2}&isUsedFor=${isUsedFor}`:`other_id=${0}&quotation_type_id=${0}&isUsedFor=${isUsedFor}`);
+  //   const handleSaveHeader = async () => {
+  //     const formPayload = {
+  //       company_id: loginStatus.companyId,
+  //       account_id: account?.id,
+  //       createdby_id: loginStatus.id,
+  //     };
+  //     console.log(formPayload);
+  //     // console.log(selectedAccount);
+  //     setIsSubmitting(true);
+  //     await axiosClient
+  //       .post(POST_API.CREATE_COMPANY_INVOICE, formPayload, {
+  //         withCredentials: true,
+  //       })
+  //       .then((response) => {
+  //         if (response.data.status) {
+  //           toast.success(response.data.message);
+  //           console.log(response.data);
 
-    //demo part need to remove
-    const path = ROUTES_URL.QUOTATION_CREATE_AND_DETAILS.replace(
-            ":quotationId",
-            String(0),
-          )+quotationSearchParam;
-          navigate(path);
-  };
+  //           const invoiceId = response?.data?.newid || 0;
+  //           handleAddProformaInvoice();
+  //           const path = ROUTES_URL.PROFORMA_INVOICE_DETAILS.replace(
+  //             ":invoiceId",
+  //             String(invoiceId),
+  //           );
+  //           navigate(path);
+  //           // onClose();
+  //         } else {
+  //           toast.error(response.data.message);
+  //         }
+  //       })
+  //       .catch(async (error) => {
+  //         console.log(error);
+  //         handleApiError(error);
+  //       })
+  //       .finally(() => {
+  //         setIsSubmitting(false);
+  //       });
+  //   };
 
-  const onDeleteQuotation = async (rowData: CompanyQuotationProps) => {
-    console.log("Delete Quotation:", rowData);
+  const onDeleteInvoice = async (rowData: AccountProformaInvoiceProps) => {
+    console.log("Delete Invoice:", rowData);
     const postData = {
-      company_id: loginStatus.companyId,
       id: rowData.id,
-    //   quotation_date_string: rowData.quotationDate,
-    //   valid_till_date_string: rowData.validTillDate,
-      isactive: false,
+      company_id: loginStatus.companyId,
       updatedby_id: loginStatus.id,
+      isactive: false,
     };
     setIsSubmitting(true);
     try {
       const res = await axiosClient.post(
-        POST_API.UPDATE_COMPANY_QUOTATION,
+        POST_API.UPDATE_COMPANY_PROFORMA_INVOICE,
         postData,
         {
           withCredentials: true,
@@ -123,9 +145,7 @@ function CompanyQuotationManagementList({
 
       if (res.data.status) {
         toast.success(res.data.message);
-        handleAddQuotation();
-        // 🔄 Refresh latest data
-        // getInvoices(new AbortController().signal);
+        handleAddProformaInvoice();
       } else {
         toast.error(res.data.message);
       }
@@ -136,48 +156,46 @@ function CompanyQuotationManagementList({
     }
   };
 
-  const handleQuotationDownload = async (rowData: CompanyQuotationProps) => {
+  const handleInvoiceDownload = async (
+    rowData: AccountProformaInvoiceProps,
+  ) => {
     setIsSubmitting(true);
-    setQuotationFileName(rowData.quotationNumber);
 
     try {
       const response = await axiosClient.post(
-        POST_API.PREVIEW_DOWNLOAD_COMPANY_QUOTATION_DOWNLOAD,
+        POST_API.COMPANY_PROFORMA_INVOICE_DOWNLOAD,
         {
           company_id: loginStatus.companyId,
-          id:Number(rowData?.id),
-          company_quotation_id: Number(rowData?.id),
-          quotation_status_id: Number(rowData?.quotationStatusId),
-          // company_quotation_type_id: 1,
-          company_quotation_type_id: Number(rowData?.quotationTypeId),
+          company_proforma_invoice_id: Number(rowData?.id),
           requestedby_id: loginStatus.id,
         },
         {
-          responseType: "blob",
+          responseType: "blob", // ✅ IMPORTANT
           withCredentials: true,
         },
       );
 
       const blob = new Blob([response.data], {
-        type: "application/pdf",
+        type: "application/pdf", // fixed for invoice
       });
 
       console.log(response.data);
 
       const fileUrl = URL.createObjectURL(blob);
 
-      setLogoPreview(fileUrl);
+      // ✅ Same as your task document logic
+      setLogoPreview(fileUrl); // you can rename this later (e.g. setInvoicePreview)
       setShowCompanyLogoPreview(true);
     } catch (error) {
       console.error(error);
-      toast.error("Failed to download quotation");
+      toast.error("Failed to download invoice");
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const handleRowSelected = (rowData: CompanyQuotationProps) => {
-    navigateToCompanyQuotation(rowData);
+  const handleRowSelected = (rowData: AccountProformaInvoiceProps) => {
+    navigateToInvoice(rowData);
   };
   useEffect(() => {
     if (handleSearchOption.dateRangeId === customDateRangeId) {
@@ -189,7 +207,7 @@ function CompanyQuotationManagementList({
     setIsCustomDateOptionSelected,
   ]);
 
-  if (userHasAccessToViewCompanyQuotation) {
+  if (userHasAccessToViewAccountProformaInvoice) {
     const selectedDateName =
       dateRangeDropdownOptions.find(
         (o) => o.search_date_range_id === handleSearchOption.dateRangeId,
@@ -197,11 +215,11 @@ function CompanyQuotationManagementList({
 
     return (
       <div
-        className={`w-full  ${isUsedFor == Modules.QUOTATION_MODULE ? (userPreference.isLeftMenu?"pl-5":"pl-1" ): ""} gap-1`}
+        className={`w-full ${position === "left"} ${isUsedForSidebar ? "pl-5" : ""} gap-1`}
       >
         {isSubmitting && <LoadingPopUpAnimation show={isSubmitting} />}
         {/* 🔹 Header */}
-        {isUsedFor == Modules.QUOTATION_MODULE ? (
+        {isUsedForSidebar ? (
           <div
             className={`sticky z-10 top-12 mt-1 p-1 flex items-center justify-between gap-3 text-sm 
               ${COLORS.GRID_HEADER_SECTION_BG_COLOR} rounded-lg shadow-sm mb-1.5 w-full`}
@@ -209,17 +227,10 @@ function CompanyQuotationManagementList({
             {/* LEFT */}
             <div className="flex items-center gap-2 flex-wrap">
               {/* 🔹 Title */}
-              {/* <ComponentHeaderAndLogo logo={File} headerText="Quotation" /> */}
-              <div className="flex justify-center items-center gap-1 pr-3">
-                {/* <Quote className={COLORS.GRID_HEADER_ICONS_COLOR_AND_SIZE} /> */}
-                <QuotationIconSvg
-                  strokeWidth={2}
-                  size={24}
-                  className="text-blue-600"
-                  showCurrency={true}
-                />
-                <span className="section-header-custom">Quotation</span>
-              </div>
+              <ComponentHeaderAndLogo
+                logo={FaRegFileAlt}
+                headerText="Invoices"
+              />
               {/* 🔹 Search */}
               <div className="w-fit min-w-[120px]">
                 <SearchInput
@@ -236,12 +247,12 @@ function CompanyQuotationManagementList({
                 <CustomDropdown
                   preselectedOption={handleSearchOption.selectedInvoiceStatus}
                   labelName="status"
-                  options={quotationStatus!}
-                  onSelect={handleSelectedQuotationStatus}
+                  options={invoiceStatus!}
+                  onSelect={handleSelectedInvoiceStatus}
                 />
               </div>
               {/* 🔹 Date Filter + Picker (Grouped) */}
-              <div className="flex   items-center gap-2">
+              <div className="flex  items-center gap-2">
                 <DateRangeFilterDropdown
                   dropdownOptions={dateRangeDropdownOptions}
                   handleDateIdChange={handleDateRangeIdChange}
@@ -264,35 +275,37 @@ function CompanyQuotationManagementList({
             {/* RIGHT */}
             <div>
               <Button
-                disabled={!userHasAccessToAddCompanyQuotation}
+                disabled={!userHasAccessToAddAccountProformaInvoice}
                 onClick={() => {
-                  if (!userHasAccessToAddCompanyQuotation) {
+                  if (!userHasAccessToAddAccountProformaInvoice) {
                     toast.error(
-                      MESSAGE.MODULE_ACCESS.COMPANY_QUOTATION.DENIED_ADD_ACCESS,
+                      MESSAGE.MODULE_ACCESS.ACCOUNT_PROFORMA_INVOICE
+                        .DENIED_ADD_ACCESS,
                     );
                     return;
                   }
 
-                  const path = ROUTES_URL.QUOTATION_CREATE_AND_DETAILS.replace(
-                    ":quotationId",
+                  // setIsCreateInvoiceModalOpen(true);
+                  const path = ROUTES_URL.INVOICE_DETAILS.replace(
+                    ":invoiceId",
                     String(0),
                   );
                   navigate(path);
                 }}
                 // className={COLORS.ADD_BUTTON}
               >
-                + Create Quotation
+                + Add Invoice
               </Button>
             </div>
           </div>
         ) : (
           <div
-            className={`z-10 top-12 mt-1 flex items-center justify-between gap-3 text-sm 
+            className={`z-10 top-12 mt-1 p-1 flex items-center justify-between gap-3 text-sm 
           ${COLORS.GRID_HEADER_SECTION_BG_COLOR} rounded-lg shadow-sm mb-1.5 w-full`}
           >
             <div className="flex gap-1 items-center w-fit">
-              <h3 className="table-header-custom rounded-t-md px-1 ">
-                {`${isUsedFor === Modules.LEAD_QUOTATION ? "Lead Quotations" : isUsedFor === Modules.AMC_QUOTATION ? "AMC Quotations" : "Quotations"}`}
+              <h3 className="table-header-custom rounded-t-md px-1">
+                Proforma Invoices
               </h3>
             </div>
 
@@ -312,11 +325,12 @@ function CompanyQuotationManagementList({
                 <CustomDropdown
                   preselectedOption={handleSearchOption.selectedPriority}
                   labelName="status"
-                  options={quotationStatus!}
-                  onSelect={handleSelectedQuotationStatus}
+                  options={invoiceStatus!}
+                  onSelect={handleSelectedInvoiceStatus}
                 />
               </div>
 
+              {/* 📅 Date Filters */}
               <div className="flex items-center gap-2 w-fit">
                 <DateRangeFilterDropdown
                   dropdownOptions={dateRangeDropdownOptions}
@@ -333,27 +347,25 @@ function CompanyQuotationManagementList({
                   />
                 )}
 
-                {/* Add Quotation */}
+                {/* ➕ Add Invoice */}
                 <div className="flex gap-1 justify-end w-fit">
                   <Button
                     type="button"
-                    disabled={!(isUsedFor === Modules.LEAD_QUOTATION?(userHasAccessToAddLeadQuotation ? leadStatusId !== 9 : false ):(isUsedFor === Modules.AMC_QUOTATION? userHasAccessToAddAccountQuotation :userHasAccessToAddCompanyQuotation))
-                    }
+                    disabled={!userHasAccessToAddAccountProformaInvoice}
                     onClick={() => {
-                      if (!(isUsedFor === Modules.LEAD_QUOTATION?(userHasAccessToAddLeadQuotation ? leadStatusId !== 9 : false ):(isUsedFor === Modules.AMC_QUOTATION? userHasAccessToAddAccountQuotation :userHasAccessToAddCompanyQuotation))) {
+                      if (!userHasAccessToAddAccountProformaInvoice) {
                         toast.error(
-                          isUsedFor === Modules.LEAD_QUOTATION?(leadStatusId !==9 ?
-                          MESSAGE.MODULE_ACCESS.LEAD_QUOTATION
-                            .DENIED_ADD_ACCESS:"Can't generate quotation for converted lead."):(isUsedFor === Modules.AMC_QUOTATION? MESSAGE.MODULE_ACCESS.ACCOUNT_QUOTATION.DENIED_ADD_ACCESS: MESSAGE.MODULE_ACCESS.COMPANY_QUOTATION.DENIED_ADD_ACCESS)
+                          MESSAGE.MODULE_ACCESS.ACCOUNT_PROFORMA_INVOICE
+                            .DENIED_ADD_ACCESS,
                         );
                         return;
                       }
-                      handleSaveHeader();
-                      // setIsCreateInvoiceModalOpen(true);
+                      //   handleSaveHeader();
+                      setIsCreateInvoiceModalOpen(true);
                     }}
                     className={COLORS.ADD_BUTTON}
                   >
-                    +Generate Quotation
+                    + Add
                   </Button>
                 </div>
               </div>
@@ -368,8 +380,7 @@ function CompanyQuotationManagementList({
             <CustomDocumentPreviewComponent
               fileUrl={logoPreview!}
               fileExtension={"application/pdf"}
-              fileName={quotationFileName}
-              width={"60%"}
+              width={"50%"}
               height={"85%"}
               enableDownload={true}
             />
@@ -381,38 +392,37 @@ function CompanyQuotationManagementList({
             className={
               userPreference.isLeftMenu
                 ? `ag-theme-balham w-full ${
-                    isUsedFor === Modules.QUOTATION_MODULE
+                    isUsedForSidebar
                       ? "h-[calc(100vh-120px)]"
-                      : isUsedFor === Modules.LEAD_QUOTATION
+                      : isUsedForSidebar
                         ? "h-[calc(40vh-100px)]"
                         : "h-[calc(50vh-120px)]"
                   }`
                 : `ag-theme-balham w-full ${
-                    isUsedFor === Modules.QUOTATION_MODULE
-                      ? "h-[calc(100vh-120px)]"
-                      : isUsedFor === Modules.LEAD_QUOTATION
+                    isUsedForSidebar
+                      ? "h-[calc(100vh-192px)]"
+                      : isUsedForSidebar
                         ? "h-[calc(40vh-100px)]"
                         : "h-[calc(50vh-122px)]"
                   }`
             }
           >
-            <CompanyQuotationManagementAgGrid
+            <AccountProformaInvoiceManagementAgGrid
               handleRowClick={handleRowClicked}
               onRowSelect={handleRowSelected}
-              onDeleteQuotation={onDeleteQuotation}
-              onDownloadQuotation={handleQuotationDownload}
-              quotations={quotaionData}
-              isUsedInQuotationModule={false}
+              onDeleteInvoice={onDeleteInvoice}
+              onDownloadInvoice={handleInvoiceDownload}
+              proformaInvoices={invoiceData}
+              isUsedInInvoiceModule={false}
             />
           </div>
 
-          {/* 🔹 Create Modal
-          <GenerateInvoiceModal
+          <CreateProformaInvoiceModal
             isOpen={isCreateInvoiceModalOpen}
             onClose={() => setIsCreateInvoiceModalOpen(false)}
-            account={otherData}
-            handleAddInvoice={handleAddQuotation}
-          /> */}
+            account={account} // 👉 pass account if page is account-specific
+            handleAddInvoice={handleAddProformaInvoice}
+          />
         </div>
 
         {/* 🔹 Pagination */}
@@ -430,4 +440,4 @@ function CompanyQuotationManagementList({
   }
 }
 
-export default CompanyQuotationManagementList;
+export default AccountProformaInvoiceManagementList;
