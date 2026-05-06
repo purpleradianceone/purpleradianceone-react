@@ -217,10 +217,10 @@ function UpdateLeadTaskModal({
     console.log(leadTask.leadActivityDetails);
   }, []);
 
-  const UpdateLeadTask = async (event: React.FormEvent<HTMLButtonElement>) => {
+  const UpdateLeadTask = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
     if (isSaving) return;
 
-    event.preventDefault();
     const jsonData = generateTaskDetailsJson();
     // console.log(jsonData);
 
@@ -431,7 +431,7 @@ function UpdateLeadTaskModal({
       />
       {isSaving && <LoadingPopUpAnimation show={isSaving} />}
       {/* Form Grid */}
-      <form className="space-y-1">
+      <form className="space-y-1" onSubmit={UpdateLeadTask}>
         <div className="grid grid-cols-3 gap-x-2">
           <div className="flex items-center col-span-3 justify-end gap-3 py-1  border-blue-00">
             <ToggleButton
@@ -511,7 +511,7 @@ function UpdateLeadTaskModal({
               className="mb-1   ">
                 <Button
                   className="bg-white text-blue-800 "
-                  type="submit"
+                  type="button"
                   onClick={(e) => {
                     e.preventDefault();
                     setIsAddCompanyLeadContactModalOpen(true);
@@ -559,6 +559,7 @@ function UpdateLeadTaskModal({
                   </span>
                   <Button
                     size="sm"
+                    type="button"
                     onClick={() => {
                       setAddCompanyLeadContactIdArray((prev) =>
                         prev.filter((id) => id !== contact.id)
@@ -622,6 +623,7 @@ function UpdateLeadTaskModal({
           <FormInput
             label="Subject: "
             required
+            autoFocus={true}
             logo={FileTextIcon}
             type="text"
             value={subject}
@@ -745,7 +747,7 @@ function UpdateLeadTaskModal({
                     </span>
                   </Button> */}
             <Button
-              type="submit"
+              type="button"
                className="bg-white text-blue-800 "
               onClick={(e) => {
                 e.preventDefault();
@@ -846,9 +848,7 @@ function UpdateLeadTaskModal({
             </div>
           </div>
         )}
-      </form>
-
-      {/* Footer Buttons */}
+        {/* Footer Buttons */}
       <div className="flex justify-center gap-4 mt-6">
         <div className=" flex w-full justify-end ">
           <div className="flex items-center gap-1 ">
@@ -868,10 +868,10 @@ function UpdateLeadTaskModal({
             <Button
               type="submit"
               disabled={isSaving}
-              onClick={(event: React.FormEvent<HTMLButtonElement>) => {
-                if (isSaving) return;
-                UpdateLeadTask(event);
-              }}
+              // onClick={(event: React.FormEvent<HTMLButtonElement>) => {
+              //   if (isSaving) return;
+              //   ;
+              // }}
             >
               <div className="flex items-center gap-1">
                 <Save size={16} />
@@ -881,6 +881,9 @@ function UpdateLeadTaskModal({
           </div>
         </div>
       </div>
+      </form>
+
+      
       <LeadAssociatedUsersModal
         isOpen={isAssignUsersModalOpen}
         onClose={() => {

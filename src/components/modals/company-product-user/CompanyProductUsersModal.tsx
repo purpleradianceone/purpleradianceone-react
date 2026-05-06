@@ -6,7 +6,7 @@ import useScreenSize from "../../../config/hooks/useScreenSize";
 import CompanyTeamUsersAgGrid from "../../ag-grid/CompanyTeamUsersAgGrid";
 import CompanyProductUsersModalProps from "../../../@types/modal/CompanyProductUsersModalProps";
 import CompanyProductUser from "../../../@types/product-users-management/CompanyProductUser";
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import CompanyUsersSearchProps from "../../../@types/company-users/CompanyUserProps";
 import ApiError from "../../../@types/error/ApiError";
 import RefreshToken from "../../../config/validations/RefreshToken";
@@ -33,6 +33,7 @@ function CompanyProductUsersModal({
     CompanyProductUser[]
   >([]);
 
+  const [isDataLoadingForCompanyProductUser, setIsDataLoadingForCompanyProductUser] = useState<boolean>(false);
   const [
     isCompanyProductUsersFetchedForFirstTime,
     setIsCompanyProductUsersFetchedForFirstTime,
@@ -86,7 +87,9 @@ function CompanyProductUsersModal({
       );
     }
   };
-  const handleAddCompanyProductUsers = async () => {
+  const handleAddCompanyProductUsers = async (event : React.FormEvent<HTMLFormElement>
+  ) => {
+    event.preventDefault()
     if (userHasAccessToAddProductUsers) {
       const createCompanyProductUserPostData = {
         company_id: loginStatus.companyId,
@@ -123,10 +126,10 @@ function CompanyProductUsersModal({
         .catch(async (error: ApiError | any) => {
           if (error.status === STATUS_CODE.UNATHORISED) {
             const refreshTokenResponse = await RefreshToken({
-              callFunction: handleAddCompanyProductUsers,
+              callFunctionWithEvent: handleAddCompanyProductUsers,
             });
             if (refreshTokenResponse) {
-              handleAddCompanyProductUsers();
+              handleAddCompanyProductUsers(event);
             }
           }
         });
@@ -161,6 +164,7 @@ function CompanyProductUsersModal({
           companyProductUsersLastScrollPositionRef.current = rowIndex;
         }
       }
+      setIsDataLoadingForCompanyProductUser(true)
       const getCompanyProductUsersPostData = {
         company_id: loginStatus.companyId,
         company_product_id: companyProduct!.id,
@@ -287,6 +291,7 @@ function CompanyProductUsersModal({
         setIsCompanyProductUsersLoading(false);
         companyProductUsersFetchingRef.current = false;
       }
+      setIsDataLoadingForCompanyProductUser(false)
     }
   };
 
@@ -412,6 +417,7 @@ function CompanyProductUsersModal({
               }
               isAddUsersCompleted={isCompanyProductUsersAddCompleted}
               usersUpdateCount={companyProductUserUpdateCount}
+              isDataLoadingForCompanyProductUser={isDataLoadingForCompanyProductUser}
             ></CompanyTeamUsersAgGrid>
           </div>
         </div>

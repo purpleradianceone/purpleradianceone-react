@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Calendar,
   FileCheck,
@@ -72,7 +72,8 @@ function GenerateInvoiceModal({
     }
   }, [isOpen]);
 
-  const handleSaveHeader = async () => {
+  const handleSaveHeader = async (event : React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
     if (!dueDate) {
       toast.error("Please select due date");
       return;
@@ -134,6 +135,7 @@ function GenerateInvoiceModal({
       />
 
       <div className="text-sm font-roboto bg-gray-50 flex flex-col">
+        <form onSubmit={handleSaveHeader}>
         <div className="flex-1 overflow-auto py-2">
           <div className="grid grid-cols-2 gap-x-4 gap-y-2">
             {!hasAccount && (
@@ -209,7 +211,7 @@ function GenerateInvoiceModal({
               </div>
             </Button>
 
-            <Button disabled={isSubmitting} onClick={handleSaveHeader}>
+            <Button disabled={isSubmitting}  type="submit">
               <div className="flex items-center gap-1">
                 <Save size={16} />
                 <span>Save</span>
@@ -217,6 +219,7 @@ function GenerateInvoiceModal({
             </Button>
           </div>
         </div>
+        </form>
       </div>
     </FormLayout>
   );

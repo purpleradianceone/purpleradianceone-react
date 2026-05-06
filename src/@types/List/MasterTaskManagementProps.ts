@@ -28,6 +28,7 @@ type MasterTaskManagementProps = {
     isActive : boolean | null;
     setIsActive : (isActive: boolean | null) => void;
     downloadTaskDocument: (taskId : number) => void;
+    isDataLoading: boolean
    
 }
 export default MasterTaskManagementProps;

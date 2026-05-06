@@ -270,7 +270,7 @@ function CreateLeadModal({
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (isSaving) return;
     if (error.mobileNumber !== "") {

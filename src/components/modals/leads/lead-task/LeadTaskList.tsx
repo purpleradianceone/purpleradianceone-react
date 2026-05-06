@@ -395,7 +395,7 @@ function LeadTaskList({
             </div>
           ) : (
             <div
-              className="space-y-2 max-h-72 overflow-y-auto [&::-webkit-scrollbar]:w-2
+              className="space-y-2 max-h-72  overflow-y-auto [&::-webkit-scrollbar]:w-2
   [&::-webkit-scrollbar-track]:bg-gray-50
   [&::-webkit-scrollbar-thumb]:bg-gray-50
     [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full"
@@ -403,7 +403,7 @@ function LeadTaskList({
               {leadTasks.map((activity) => (
                 <div
                   key={activity.id}
-                  className={`bg-white min-h-16 px-2 py-2 rounded-xl shadow-md hover:shadow-xl border-2 transition-shadow duration-300 flex items-start space-x-2 border-gray-100 relative`}
+                  className={`bg-slate-50 min-h-16 px-2 py-2 rounded-lg  hover:shadow-md border transition-shadow  duration-300 flex items-start space-x-2  relative`}
                 >
                  
                   <div className="flex-shrink-0 p-1 bg-gray-200 rounded-full">

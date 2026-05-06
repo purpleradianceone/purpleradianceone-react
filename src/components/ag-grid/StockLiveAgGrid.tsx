@@ -13,24 +13,24 @@ const StockLiveAgGrid = ({
 }) => {
   const columnDefs = useMemo<ColDef[]>(
     () => [
+       {
+        field: "companyWarehouseName",
+        headerName: "Warehouse",
+        cellStyle:{
+          color : "black",
+          fontWeight: "bold",
+        }
+      },
       {
         hide: false,
         field: "companyProductName",
         headerName: " Product",
-        cellStyle: {
-          color: "black",
-          // fontWeight: "bold",
-        },
+        // cellStyle: {
+        //   color: "black",
+        //   // fontWeight: "bold",
+        // },
       },
-      {
-        field: "companyWarehouseName",
-        headerName: "Warehouse",
-        hide: false,
-        cellStyle: {
-          color: "black",
-          // fontWeight: "bold",
-        },
-      },
+     
       {
         field: "quantityLive",
         headerName: "Current Quantity",

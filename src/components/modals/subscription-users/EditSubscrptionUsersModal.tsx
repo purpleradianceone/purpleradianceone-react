@@ -45,6 +45,8 @@ function EditSubscriptionUsersModal({
   const [companyUsersList, setCompanyUsersList] = useState<
     companyUsersSearchProps[]
   >([]);
+  const [isDataLoading, setIsDataLoading] = useState<boolean>(false);
+
 
   const [
     statusChangeOfCompanyUserCountFromAggrid,
@@ -96,7 +98,7 @@ function EditSubscriptionUsersModal({
           companyUserLastScrollPositionRef.current = rowIndex;
         }
       }
-
+      setIsDataLoading(true)
       const getCompanyUserPostData = {
         company_id: loginStatus.companyId,
         requestedby: loginStatus.id,
@@ -158,6 +160,7 @@ function EditSubscriptionUsersModal({
         setIsCompanyUsersLoading(false);
         companyUsersFetchingRef.current = false;
       }
+      setIsDataLoading(false)
     }
   };
 
@@ -314,6 +317,7 @@ function EditSubscriptionUsersModal({
                     handleCompanyUserToggleChange={
                       handleCompanyUserToggleChange
                     }
+                    isDataLoading={isDataLoading}
                   />
                 </div>
                 <div className="flex items-center justify-end col-span-1 mt-1">

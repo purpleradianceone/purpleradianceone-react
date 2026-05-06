@@ -9,7 +9,7 @@ import { useFormChange } from "../../../config/hooks/useFormChange";
 import TextAreaInput from "../../ui/TextAreaInput";
 import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
 import Button from "../../ui/Button";
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useFormValidation } from "../../../config/hooks/useFormValidation";
 import CompanyTeamUsersAgGrid from "../../ag-grid/CompanyTeamUsersAgGrid";
 import MESSAGE from "../../../constants/Messages";
@@ -63,6 +63,7 @@ function EditCompanyTeamModal({
   const [companyTeamUsersList, setCompanyTeamUsersList] = useState<
     CompanyTeamUsers[]
   >([]);
+  const [isDataLoadingForCompanyProductUser,setIsDataLoadingForCompanyProductUser] = useState<boolean>(false);
 
   const [addCompanyTeamUserArray, setAddCompanyTeamUserArray] = useState<
     number[]
@@ -137,7 +138,9 @@ function EditCompanyTeamModal({
     setCompanyTeamUsersUpdateCount(companyTeamUsersUpdateCount + 1);
   };
 
-  const handleAddCompanyTeamUsers = async () => {
+  const handleAddCompanyTeamUsers = async (event : React.FormEvent<HTMLFormElement>
+  ) => {
+    event.preventDefault()
     if (!userHasAccessToUpdateTeamUSers) {
       toast.error(MESSAGE.MODULE_ACCESS.TEAM_USERS.DENIED_ADD_ACCESS)
       return;
@@ -176,10 +179,10 @@ function EditCompanyTeamModal({
         .catch(async (error: ApiError | any) => {
           if (error.status === STATUS_CODE.UNATHORISED) {
             const refreshTokenResponse = await RefreshToken({
-              callFunction: handleAddCompanyTeamUsers,
+              callFunctionWithEvent: handleAddCompanyTeamUsers,
             });
             if (refreshTokenResponse) {
-              handleAddCompanyTeamUsers();
+              handleAddCompanyTeamUsers(event);
             }
           }
         });
@@ -212,6 +215,7 @@ function EditCompanyTeamModal({
         }
       }
 
+      setIsDataLoadingForCompanyProductUser(true)
       const getCompanyTeamUserPostData = {
         company_id: loginStatus.companyId,
         company_team_id: companyTeam!.id,
@@ -328,6 +332,7 @@ function EditCompanyTeamModal({
         setIsCompanyTeamUsersLoading(false);
         companyTeamUsersFetchingRef.current = false;
       }
+      setIsDataLoadingForCompanyProductUser(false);
     }
   };
 
@@ -599,6 +604,7 @@ function EditCompanyTeamModal({
               }
               isAddUsersCompleted={isCompanyTeamUsersAddCompleted}
               usersUpdateCount={companyTeamUsersUpdateCount}
+              isDataLoadingForCompanyProductUser={isDataLoadingForCompanyProductUser}
               />
               :<AccessDeniedMessagePage message={MESSAGE.MODULE_ACCESS.TEAM_USERS.DENIED_VIEW_ACCESS}/>
             }

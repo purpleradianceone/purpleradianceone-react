@@ -38,6 +38,20 @@ const TransactionAgGrid: React.FC<{
         field: "transactionTypeName",
         headerName: "Transaction Type",
         hide: false,
+        cellRenderer : (params : any)=>{
+          if (params.data?.__isSkeleton) {
+                return <SkeletonRowsAgGrid />;
+              }
+          return(
+             <div className="flex items-center gap-1">
+              <StatusIndicator
+                isActive={params.value==="Adjustment" ? true : false}
+                activeLabel="Adjustment"
+                inactiveLabel="Sell"
+              />
+            </div>
+          )
+        }
       },
       {
         field: "quantity",
@@ -48,6 +62,7 @@ const TransactionAgGrid: React.FC<{
         headerName: "Transaction Date",
       },
       {
+        hide:true,
         field: "isInward",
         headerName: "Inward ",
         cellRenderer: (params: any) => {

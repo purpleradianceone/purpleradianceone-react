@@ -104,73 +104,7 @@ const AccountCompanyProduct = ({
     );
   }
 
-  // const getAccountCompanyProduct = async () => {
-  //   const postData = {
-  //     company_id: loginStatus.companyId,
-  //     account_id: accountId,
-  //     id: null,
-  //     company_product_id: null,
-  //     requestedby: loginStatus.id,
-  //   };
-
-  //   await axiosClient
-  //     .post(POST_API.GET_ACCOUNT_COMPANY_PRODUCT, postData, {
-  //       withCredentials: true,
-  //     })
-  //     .then((response) => {
-  //       if (response.status === STATUS_CODE.OK) {
-  //         const data = response.data;
-
-  //         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  //         const formattedData: AccountProduct[] = data.map((item: any) => ({
-  //           id: item.id,
-  //           accountId: item.account_id,
-  //           accountName: item.account_name,
-  //           companyProductId: item.company_product_id,
-  //           companyProductName: item.company_product_name,
-  //           quantity: item.quantity,
-  //           quantityReturn: item.quantity_return,
-  //           barcode: item.barcode,
-  //           serialNumber: item.serial_number,
-  //           unitName: item.unit_name,
-  //           unitNameInStock: item.unit_name_in_stock,
-  //           purchaseDate: item.purchase_date,
-  //           deliveryDate: item.delivery_date,
-  //           deliveryAddress: item.delivery_address,
-  //           billingAddress: item.billing_address,
-  //           installationDate: item.installation_date,
-  //           installedByName: item.installed_by_name,
-  //           installedBy: item.installed_by,
-  //           // warrantyIntervalTypeId: item.warranty_interval_type_id,
-  //           // warrantyIntervalName: item.warranty_interval_name,
-  //           // warranty: item.warranty,
-  //           // warrantyStartDate: item.warranty_start_date,
-  //           // warrantyEndDate: item.warranty_end_date,
-  //           // warrantyTerms: item.warranty_terms,
-  //           // amcCycleIntervalTypeId: item.amc_cycle_interval_type_id,
-  //           // amcCycle: item.amc_cycle,
-  //           // amcCycleStartDate: item.amc_cycle_start_date,
-  //           // amcCycleEndDate: item.amc_cycle_end_date,
-  //           // amcIntervalName: item.amc_interval_name,
-  //           updatedBy: item.updatedby,
-  //           createdOn: item.createdon,
-  //           updatedOn: item.updatedon,
-  //           createdBy: item.createdby,
-  //         }));
-  //         setAccountCompanyProduct(formattedData);
-  //         setRefreshKey((prev) => prev + 1);
-  //       }
-  //     })
-  //     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  //     .catch(async (error: ApiError | any) => {
-
-  //        handleApiError(error)
-  //     })
-  //     .finally(() => {
-  //       setIsLoadingAccountCompanyProduct(false);
-  //     });
-  // };
-
+  
   const openSubscriptionModal = (rowData: any) => {
     setSelectedProductForAMC(rowData);
     setIsModalOpen(true);
@@ -295,7 +229,7 @@ const AccountCompanyProduct = ({
       {/* Main Content */}
 
       {isLoadingAccountCompanyProduct ? (
-        <div className="flex justify-center items-center h-full">
+        <div className="flex justify-center items-center h-full min-h-44">
           <LoadingSpinner />
         </div>
       ) : accountCompanyProduct.length === 0 &&
@@ -336,6 +270,7 @@ const AccountCompanyProduct = ({
             >
               {" "}
               <Button
+              type="button"
                 disabled={!userHasAccessToAddAccountProducts}
                 // onClick={() => {
                 //   if (userHasAccessToUpdateAccount) {
@@ -384,6 +319,7 @@ const AccountCompanyProduct = ({
               }
             >
               <Button
+               type="button"
                 disabled={!userHasAccessToAddAccountProducts}
                 // onClick={() => {
                 //   if (userHasAccessToUpdateAccountProducts) {

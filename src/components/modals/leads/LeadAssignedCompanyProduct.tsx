@@ -231,7 +231,7 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
   }
   
   return (
-    <div className=" h-auto w-full overflow-auto  bg-gray-0 ">
+    <div className="  w-full  h-[400px] overflow-auto  bg-gray-0 ">
       {/* Header row */}
       <div className="grid grid-cols-[2.3fr_1.2fr_1fr_1fr_0.5fr] bg-gray-200 border-gray-500 px-1 py-0.5 ">
         <div className="table-header-custom">Product Name</div>
@@ -243,7 +243,7 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
        {!userHasAccessToViewLeadProduct && (
 <AccessDeniedMessagePage message={MESSAGE.MODULE_ACCESS.LEAD_PRODUCT.DENIED_VIEW_ACCESS}/>      )}
       { userHasAccessToViewLeadProduct && data.length == 0 && (
-        <div className="flex w-full gap-1 h-28 caption-custom justify-center items-center ">
+        <div className="flex w-full gap-1 min-h-28 h-80  caption-custom justify-center items-center ">
           <Button
             disabled={!userHasAccessToAddLeadProduct}
             onClick={() =>{

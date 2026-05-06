@@ -12,16 +12,14 @@ import {
   TargetIcon,
   Text,
   User,
-
   Users,
   X,
 } from "lucide-react";
 import Button from "../../../ui/Button";
-import CustomDropdown from "../CustomDropdown";
 import FormInput from "../../../ui/FormInput";
 import DatePickerInput from "../../../ui/DatePickerInput";
 import TextAreaInput from "../../../ui/TextAreaInput";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import {  useNavigate, useSearchParams } from "react-router-dom";
 import ROUTES_URL from "../../../../constants/Routes";
 import LeadActivityType from "../../../../@types/lead-management/LeadActivityType";
 import LeadTaskPriorityType from "../../../../@types/lead-management/LeadTaskPriorityType";
@@ -42,6 +40,8 @@ import MESSAGE from "../../../../constants/Messages";
 import LoadingPopUpAnimation from "../../../views/card/LoadingPopUpAnimation";
 import FormLayout from "../../../ui/FormLayout";
 import axiosClient from "../../../../axios-client/AxiosClient";
+import CustomSelect from "../../../ui/CustomSelect";
+import { toSelectOptions } from "../../../../utils/toSelectOption";
 
 function CreateLeadTaskModal({
   isOpen,
@@ -72,7 +72,9 @@ function CreateLeadTaskModal({
   const [dueDate, setDueDate] = useState<string>("");
   const [dueTime, setDueTime] = useState<string>("");
   const [leadActivityId, setLeadActivityId] = useState<number>(0);
-  const [leadTaskPriorityId, setLeadTaskPriorityId] = useState<number>(0);
+  const [leadTaskPriorityId, setLeadTaskPriorityId] = useState<
+    number | undefined
+  >(0);
   const [leadTaskStageId, setLeadTaskStageId] = useState<number>(0);
   const [resultOutcome, setResultOutcome] = useState<string>("");
   const [leadData, setLeadData] = useState<Lead>();
@@ -83,6 +85,16 @@ function CreateLeadTaskModal({
   const [physicalMeetingAddress, setPhysicalMeetingAddress] =
     useState<string>("");
 
+  const leadTaskPriorityOptions = toSelectOptions(
+    leadTaskPriority,
+    "id",
+    "name",
+  );
+  const leadActivityOptions = toSelectOptions(leadActivity, "id", "name");
+  const leadTaskStageOptions = toSelectOptions(leadTaskStage, "id", "name");
+  const handleLeadSelectedSource = (value: number | undefined) => {
+    setLeadTaskPriorityId(value);
+  };
   const [isAssignUsersModalOpen, setIsAssignUsersModalOpen] =
     useState<boolean>(false);
   const [
@@ -128,7 +140,7 @@ function CreateLeadTaskModal({
 
   const handleAddCompanyUserCheckboxChange = (
     params: CompanyUsersSearchProps,
-    event: React.ChangeEvent<HTMLInputElement>
+    event: React.ChangeEvent<HTMLInputElement>,
   ) => {
     const { checked } = event.target;
     if (checked) {
@@ -137,14 +149,14 @@ function CreateLeadTaskModal({
     } else if (!checked) {
       setAssignedTo(assignedTo.filter((id) => id !== params.id));
       setSelectedCompanyUsers((prev) =>
-        prev.filter((user) => user.id !== params.id)
+        prev.filter((user) => user.id !== params.id),
       );
     }
   };
 
   const handleCompanyLeadContactCheckBoxChange = (
     data: LeadContactType,
-    event: React.ChangeEvent<HTMLInputElement>
+    event: React.ChangeEvent<HTMLInputElement>,
   ) => {
     const { checked } = event.target;
     if (checked) {
@@ -152,10 +164,10 @@ function CreateLeadTaskModal({
       setLeadContactDataSelectedArray((prev) => [...prev, data]);
     } else if (!checked) {
       setAddCompanyLeadContactIdArray((prev) =>
-        prev.filter((id) => id !== data.id)
+        prev.filter((id) => id !== data.id),
       );
       setLeadContactDataSelectedArray((prev) =>
-        prev.filter((leadData) => leadData.id !== data.id)
+        prev.filter((leadData) => leadData.id !== data.id),
       );
     }
   };
@@ -175,7 +187,8 @@ function CreateLeadTaskModal({
     }
   };
 
-  const createLeadTask = async (event: React.FormEvent) => {
+  const createLeadTask = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
     if (isSaving) return;
     if (leadActivityId === 0) {
       toast.error("Please Select Lead Task Activity");
@@ -200,7 +213,6 @@ function CreateLeadTaskModal({
       return;
     }
 
-    event.preventDefault();
     const jsonData = generateTaskDetailsJson();
     const createLeadTaskPostData = {
       company_id: loginStatus.companyId,
@@ -293,6 +305,12 @@ function CreateLeadTaskModal({
     }
   }, [isOpen]);
 
+  //we are preselecting the options here
+  useEffect(() => {
+    setLeadTaskPriorityId(2);
+    setLeadTaskStageId(2);
+  }, [isOpen]);
+
   if (!isOpen) return null;
   return (
     <FormLayout width={6}>
@@ -306,10 +324,10 @@ function CreateLeadTaskModal({
       {isSaving && <LoadingPopUpAnimation show={isSaving} />}
 
       {/* Form Grid */}
-      <form className="space-y-2 mt-2">
+      <form className="space-y-2 mt-2" onSubmit={createLeadTask}>
         <div className="grid grid-cols-3 gap-3">
           {/* type */}
-          <CustomDropdown
+          {/* <CustomDropdown
             requiredRedDot
             logo={Text}
             labelName="Type:"
@@ -326,9 +344,39 @@ function CreateLeadTaskModal({
               }
             }}
             options={leadActivity}
-          ></CustomDropdown>
+          ></CustomDropdown> */}
+
+          <CustomSelect
+            label="Type:"
+            value={leadActivityId}
+            onChange={(id: number | undefined) => {
+              if (id !== 4) {
+                if (id) {
+                  setLeadActivityId(id);
+                } else {
+                  setLeadActivityId(0);
+                }
+              } else {
+                sessionStorage.setItem("leadData", JSON.stringify(leadData));
+                navigate(ROUTES_URL.SCHEDULE_MEETING);
+              }
+            }}
+            options={leadActivityOptions}
+            icon={Text}
+            isRequired={true}
+            autoFocus={true}
+          />
+
+          <CustomSelect
+            label="Priority:"
+            value={leadTaskPriorityId}
+            onChange={handleLeadSelectedSource}
+            options={leadTaskPriorityOptions}
+            icon={Text}
+            isRequired={true}
+          />
           {/* priority */}
-          <CustomDropdown
+          {/* <CustomDropdown
             requiredRedDot
             logo={Text}
             labelName="Priority :"
@@ -341,13 +389,13 @@ function CreateLeadTaskModal({
               }
             }}
             options={leadTaskPriority}
-          />
+          /> */}
 
           {/* Stage */}
-          <CustomDropdown
-            requiredRedDot
-            logo={Text}
-            labelName="Stage"
+          {/* <CustomDropdown
+            // requiredRedDot
+            // logo={Text}
+            // labelName="Stage"
             preselectedOption={2}
             onSelect={(e) => {
               if (e) {
@@ -357,8 +405,21 @@ function CreateLeadTaskModal({
               }
             }}
             options={leadTaskStage}
-          ></CustomDropdown>
-
+          ></CustomDropdown> */}
+          <CustomSelect
+            label="Stage:"
+            value={leadTaskStageId}
+            onChange={(id: number | undefined) => {
+              if (id) {
+                setLeadTaskStageId(id);
+              } else {
+                setLeadTaskStageId(0);
+              }
+            }}
+            options={leadTaskStageOptions}
+            icon={Text}
+            isRequired={true}
+          />
           {leadActivityId !== 3 &&
             leadActivityId !== 8 &&
             leadActivityId !== 0 && (
@@ -396,18 +457,21 @@ function CreateLeadTaskModal({
                   </div>
                 </label>
                 <div
-                  // id="phoneCallBtn" 
-                  className="mb-1   ">
+                  // id="phoneCallBtn"
+                  className="mb-1   "
+                >
                   <Button
                     className="bg-white text-blue-800 "
-                    type="submit"
+                    type="button"
                     onClick={(e) => {
                       e.preventDefault();
                       setIsAddCompanyLeadContactModalOpen(true);
                     }}
                   >
                     <span className="text-xs text-blue-500  text-nowrap underline ">
-                      {leadContactDataSelectedArray.length === 0 ? "Select" : "Select/Change"}
+                      {leadContactDataSelectedArray.length === 0
+                        ? "Select"
+                        : "Select/Change"}
                       {/* <Contact size={14}></Contact> */}
                       {/* <span>lead contact</span> */}
                     </span>
@@ -434,9 +498,7 @@ function CreateLeadTaskModal({
         )} */}
         {leadContactDataSelectedArray.length != 0 && (
           <div className="border  rounded-md">
-            <div className=" p-1 table-header-custom">
-              Selected Contacts :
-            </div>
+            <div className=" p-1 table-header-custom">Selected Contacts :</div>
             <div className=" grid grid-cols-3 p-1  max-h-36 gap-0.5 overflow-y-auto">
               {leadContactDataSelectedArray.map((contact) => (
                 <div
@@ -454,10 +516,10 @@ function CreateLeadTaskModal({
                       size="sm"
                       onClick={() => {
                         setAddCompanyLeadContactIdArray((prev) =>
-                          prev.filter((id) => id !== contact.id)
+                          prev.filter((id) => id !== contact.id),
                         );
                         setLeadContactDataSelectedArray((prev) =>
-                          prev.filter((item) => item.id !== contact.id)
+                          prev.filter((item) => item.id !== contact.id),
                         );
                       }}
                       className="caption-custom hover:text-red-500"
@@ -598,7 +660,7 @@ function CreateLeadTaskModal({
                     </span>
                   </Button> */}
             <Button
-              type="submit"
+              type="button"
               className="bg-white text-blue-800 "
               onClick={(e) => {
                 e.preventDefault();
@@ -625,7 +687,9 @@ function CreateLeadTaskModal({
 
         {selectedCompanyUsers.length != 0 && (
           <div className="border rounded-md">
-            <span className="p-1 table-header-custom">Currently Assigned Users:</span>
+            <span className="p-1 table-header-custom">
+              Currently Assigned Users:
+            </span>
             <div className=" grid grid-cols-3 p-1 max-h-36 gap-0.5 overflow-y-auto">
               {selectedCompanyUsers.map((user) => (
                 <div
@@ -646,10 +710,10 @@ function CreateLeadTaskModal({
                       type="button"
                       onClick={() => {
                         setAssignedTo((prev) =>
-                          prev.filter((id) => id !== user.id)
+                          prev.filter((id) => id !== user.id),
                         );
                         setSelectedCompanyUsers((prev) =>
-                          prev.filter((item) => item.id !== user.id)
+                          prev.filter((item) => item.id !== user.id),
                         );
                       }}
                       className="caption-custom hover:text-red-500"
@@ -662,36 +726,37 @@ function CreateLeadTaskModal({
             </div>
           </div>
         )}
-      </form>
 
-      {/* Footer Buttons */}
-      <div className="flex w-full justify-center gap-4 mt-6">
-        <div className=" flex w-full justify-end ">
-          <div className="flex items-center gap-1 ">
-            {/* Cancel */}
-            <Button onClick={handleClose} type="button">
-              <div className="flex items-center gap-1">
-                <X size={16} />
-                Cancel
-              </div>
-            </Button>
-            {/* Save */}
-            <Button
-              type="submit"
-              disabled={isSaving}
-              onClick={(event: React.FormEvent<HTMLButtonElement>) => {
-                if (isSaving) return;
-                createLeadTask(event);
-              }}
-            >
-              <div className="flex items-center gap-1">
-                <Save size={16} />
-                {isSaving ? "Saving..." : "Save"}
-              </div>
-            </Button>
+        {/* Footer Buttons */}
+        <div className="flex w-full justify-center gap-4 mt-6">
+          <div className=" flex w-full justify-end ">
+            <div className="flex items-center gap-1 ">
+              {/* Cancel */}
+              <Button onClick={handleClose} type="button">
+                <div className="flex items-center gap-1">
+                  <X size={16} />
+                  Cancel
+                </div>
+              </Button>
+              {/* Save */}
+              <Button
+                type="submit"
+                disabled={isSaving}
+                // onClick={(event: React.FormEvent<HTMLButtonElement>) => {
+                //   if (isSaving) return;
+                //   createLeadTask(event);
+                // }}
+              >
+                <div className="flex items-center gap-1">
+                  <Save size={16} />
+                  {isSaving ? "Saving..." : "Save"}
+                </div>
+              </Button>
+            </div>
           </div>
         </div>
-      </div>
+      </form>
+
       {/* </div> */}
       <LeadAssociatedUsersModal
         isOpen={isAssignUsersModalOpen}

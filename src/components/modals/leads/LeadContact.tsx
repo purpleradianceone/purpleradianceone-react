@@ -16,7 +16,7 @@ import {
   X,
 } from "lucide-react";
 import LeadContactType from "../../../@types/lead-management/LeadContact";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Button from "../../ui/Button";
 import {
   MOBILE_NUMBER_VALIDATION,
@@ -221,7 +221,7 @@ const LeadContact = ({
         }
       });
   };
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (isSaving) return;
     const { name, email, mobileNumber } = leadContactForm;
@@ -336,6 +336,7 @@ const LeadContact = ({
           address: "",
         });
         setSocialMediaHandles([]);
+        setTempHandle("")
         if (userHasAccessToViewLeadContacts) {
           fetchLeadContact();
         }
@@ -357,6 +358,7 @@ const LeadContact = ({
         address: "",
       });
       setSocialMediaHandles([]);
+      setTempHandle("")
     }
   }, [isOpenAddLeadContactForm]);
 
@@ -450,6 +452,7 @@ const LeadContact = ({
 
               // RESET SOCIAL HANDLES
               setSocialMediaHandles([]);
+              setTempHandle("")
 
               // finally open the form
               setIsOpenAddLeadContactForm(true);
@@ -841,6 +844,7 @@ const LeadContact = ({
               setIsOpenAddLeadContactForm(false);
               setEditContactData(null);
               setSocialMediaHandles([]);
+              setTempHandle("")
               setLeadContactForm({
                 name: "",
                 email: "",
@@ -855,11 +859,12 @@ const LeadContact = ({
           />
 
           {/* Form Grid */}
-          <form>
+          <form onSubmit={handleSubmit}>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2 text-sm text-gray-500">
               <div>
                 <FormInput
                   logo={User}
+                  autoFocus
                   label="Full Name :"
                   required
                   type="text"
@@ -1030,11 +1035,11 @@ const LeadContact = ({
 
                   <div className="mt-4">
                     <Button
+                        type="button"
                       onClick={(e) => {
                         e.preventDefault();
                         handleAddSocialMedia();
                       }}
-                      type="submit"
                     >
                       + Add
                     </Button>
@@ -1053,6 +1058,7 @@ const LeadContact = ({
                       </div>
                       <Button
                         size="icon"
+                        type="button"
                         onClick={() =>
                           setSocialMediaHandles((prev) =>
                             prev.filter((h) => h !== handle),
@@ -1111,10 +1117,10 @@ const LeadContact = ({
                 <Button
                   type="submit"
                   disabled={isSaving}
-                  onClick={(event) => {
-                    if (isSaving) return;
-                    handleSubmit(event);
-                  }}
+                  // onClick={(event) => {
+                  //   if (isSaving) return;
+                  //   handleSubmit(event);
+                  // }}
                 >
                   <div className="flex items-center gap-1">
                     <Save size={16} />

@@ -7,6 +7,7 @@ type MyTaskManagementAgGridProps = {
   handleAllTaskDataFormChange: (data: MyAllTaskProps) => void;
   handleRowClick: (event: any) => void;
   isUsedInAllTasksModule: boolean;
-  gridLoading: boolean;
+  gridLoading?: boolean;
+  isDataLoading : boolean
 };
 export default MyTaskManagementAgGridProps;

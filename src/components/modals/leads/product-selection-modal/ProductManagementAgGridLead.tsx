@@ -20,12 +20,14 @@ import { CheckCircle2, XCircle } from "lucide-react";
 import LeadProductsManagementGridProps from "../../../../@types/ag-grid/LeadProductsManagementGridProps";
 import { Product } from "../../../../@types/products/ProductsManagementProps";
 import toast from "react-hot-toast";
+import { SkeletonRowsAgGrid } from "../../../ui/SkeletonRowsAgGrid";
 
 const ProductsManagementGridLead: React.FC<LeadProductsManagementGridProps> = ({
   products,
   interestTypeData,
   handleProductCheckboxChange,
   alreadyAssignedCompanyProduct = [],
+  isDataLoading
 }) => {
   const [gridApi, setGridApi] = useState<GridApi | null>(null);
   const [rowData, setRowData] = useState<Product[]>(products); // State for row data
@@ -39,6 +41,9 @@ const ProductsManagementGridLead: React.FC<LeadProductsManagementGridProps> = ({
   
   const actionCellRenderer = useCallback(
     (params: ICellRendererParams) => {
+      if (params.data?.__isSkeleton) {
+                            return <SkeletonRowsAgGrid />;
+                          }
       const currentId = params.data.id;
       const alreadyAssignedIds =
         alreadyAssignedCompanyProduct?.map((p) => p.companyProductId) || [];
@@ -99,6 +104,7 @@ const ProductsManagementGridLead: React.FC<LeadProductsManagementGridProps> = ({
       };
 
       return (
+
         <div className="flex items-center justify-center mt-1" title={title} onClick={handleShowToaster}>
           <input
             type="checkbox"
@@ -167,6 +173,9 @@ const ProductsManagementGridLead: React.FC<LeadProductsManagementGridProps> = ({
         headerName: "Req. Quantity",
         flex: 1,
         cellRenderer: (params: ICellRendererParams) => {
+          if (params.data?.__isSkeleton) {
+                            return <SkeletonRowsAgGrid />;
+                          }
           const [value, setValue] = useState<string | number>(
             params.value ?? ""
           );
@@ -214,6 +223,9 @@ const ProductsManagementGridLead: React.FC<LeadProductsManagementGridProps> = ({
         headerName: "Expected Cost",
         flex: 1,
         cellRenderer: (params: ICellRendererParams) => {
+          if (params.data?.__isSkeleton) {
+                            return <SkeletonRowsAgGrid />;
+                          }
           const [value, setValue] = useState<string | number>(
             params.value ?? ""
           );
@@ -299,7 +311,11 @@ const ProductsManagementGridLead: React.FC<LeadProductsManagementGridProps> = ({
         headerName: "Active",
         sortable: true,
         filter: true,
-        cellRenderer: (params: ICellRendererParams<Product>) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        cellRenderer: (params: ICellRendererParams<Product | any>) => {
+          if (params.data?.__isSkeleton) {
+                            return <SkeletonRowsAgGrid />;
+                          }
           return (
             <div className="flex items-center gap-1 mt-1">
               {params.value ? (
@@ -382,6 +398,13 @@ const ProductsManagementGridLead: React.FC<LeadProductsManagementGridProps> = ({
       flex: 0.8,
       suppressHeaderMenuButton: true,
       suppressHeaderContextMenu: true,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                        cellRenderer: (params: any) => {
+                          if (params.data?.__isSkeleton) {
+                            return <SkeletonRowsAgGrid />;
+                          }
+                          return params.value;
+                        },
     };
   }, []);
 
@@ -401,6 +424,11 @@ const ProductsManagementGridLead: React.FC<LeadProductsManagementGridProps> = ({
     }
   }, [gridApi, products, alreadyAssignedCompanyProduct]);
 
+  const skeletonRows = useMemo(() => {
+      return Array.from({ length: 30 }).map(() => ({
+        __isSkeleton: true,
+      }));
+    }, []);
   return (
     <div
       className="ag-theme-balham w-full"
@@ -408,7 +436,7 @@ const ProductsManagementGridLead: React.FC<LeadProductsManagementGridProps> = ({
     >
       <AgGridReact
         ref={gridRef}
-        rowData={rowData}
+        rowData={isDataLoading ? skeletonRows: rowData}
         columnDefs={columnDefs}
         defaultColDef={defaultColDef}
         modules={[AllCommunityModule]}

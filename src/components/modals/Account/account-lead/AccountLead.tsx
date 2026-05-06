@@ -187,7 +187,7 @@ const AccountLead = ({ account }: CreateAccountLeadType) => {
 
   if(!userHasAccessToViewAccountLeads)return <AccessDeniedMessagePage message={MESSAGE.MODULE_ACCESS.ACCOUNT_LEADS.DENIED_VIEW_ACCESS}/>
   return (
-    <div className=" flex flex-col min-h-14 h-full   max-h-96 overflow-auto">
+    <div className=" flex flex-col min-h-14 h-full   max-h-96  ">
       {/* Header */}
       {/* <div className="bg-gray-100 table-header-custom rounded-t-md px-2 ">
       <span>Account related leads</span> */}

@@ -8,12 +8,14 @@ import MasterTaskManagementAgGridProps from "../../@types/ag-grid/MasterTaskMana
 import { INNERHTML, JSX_CHILDREN_NAME } from "../../constants/AppConstants";
 import StatusIndicator from "../ui/StatusIndicator";
 import TaskPriorityChip from "../ui/TaskPriorityChip";
+import { SkeletonRowsAgGrid } from "../ui/SkeletonRowsAgGrid";
 
 function MasterTaskManagementAgGrid({
   MasterTaskData,
   onRowSelect,
   handleRowClick,
   isUsedInAllTasksModule,
+  isDataLoading
 }: MasterTaskManagementAgGridProps) {
   const gridRef = useRef<AgGridReact>(null); // Ref to the AgGridReact component
   const columnDefs = useMemo<ColDef[]>(
@@ -35,13 +37,18 @@ function MasterTaskManagementAgGrid({
         headerName: "Priority",
         sortable: true,
         filter: true,
-        cellRenderer: (params: any) => (
-          <div className="flex items-center">
-            <TaskPriorityChip
-              priorityName={params.data.generalTaskPriorityName}
-            />
-          </div>
-        ),
+        cellRenderer: (params: any) => {
+           if (params.data?.__isSkeleton) {
+                      return (
+                        <SkeletonRowsAgGrid/>
+                      );
+                    }
+          return (
+            <div className="flex items-center">
+              <TaskPriorityChip priorityName={params.value} />
+            </div>
+          );
+        },
       },
       {
         field: "description",
@@ -86,6 +93,11 @@ function MasterTaskManagementAgGrid({
         filter: true,
         // hide: isUsedForAccountLead,
         cellRenderer: (params: any) => {
+          if (params.data?.__isSkeleton) {
+                            return (
+                              <SkeletonRowsAgGrid/>
+                            );
+                          }
           return (
             <div className="flex items-center text-sm gap-1 mt-1">
               <StatusIndicator isActive={params.value} />
@@ -136,6 +148,11 @@ function MasterTaskManagementAgGrid({
         pinned: "right",
         maxWidth: 80,
         cellRenderer: (params: any) => {
+          if (params.data?.__isSkeleton) {
+                            return (
+                              <SkeletonRowsAgGrid/>
+                            );
+                          }
           return (
             <div className="flex items-center justify-center">
               <span
@@ -266,9 +283,24 @@ function MasterTaskManagementAgGrid({
       flex: 0.8,
       suppressHeaderMenuButton: true,
       suppressHeaderContextMenu: true,
+
+       cellRenderer: (params: any) => {
+                          if (params.data?.__isSkeleton) {
+                            return (
+                              <SkeletonRowsAgGrid/>
+                            );
+                          }
+                          return params.value;
+                        },
     }),
     [],
   );
+
+   const skeletonRows = useMemo(() => {
+        return Array.from({ length: 30 }).map(() => ({
+          __isSkeleton: true,
+        }));
+      }, []);
 
   return (
     <div
@@ -277,7 +309,7 @@ function MasterTaskManagementAgGrid({
     >
       <AgGridReact
         ref={gridRef} // Attach the ref
-        rowData={MasterTaskData}
+        rowData={isDataLoading ? skeletonRows: MasterTaskData}
         columnDefs={columnDefs}
         defaultColDef={defaultColDef}
         modules={[AllCommunityModule]}

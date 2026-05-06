@@ -3,8 +3,6 @@ import { useMemo, useRef } from "react";
 import MyTaskManagementAgGridProps from "../../@types/ag-grid/MyTaskManagementAgGridProps";
 import { AgGridReact } from "ag-grid-react";
 import {
-  GRIDSKELETON,
-  INNERHTML,
   JSX_CHILDREN_NAME,
 } from "../../constants/AppConstants";
 import { AllCommunityModule, ColDef, themeBalham } from "ag-grid-community";
@@ -13,13 +11,14 @@ import { Flag } from "lucide-react";
 import TaskStageChip from "../ui/TaskStageChip";
 import TaskPriorityChip from "../ui/TaskPriorityChip";
 import StatusIndicator from "../ui/StatusIndicator";
+import { SkeletonRowsAgGrid } from "../ui/SkeletonRowsAgGrid";
 
 function MyTaskManagementAgGrid({
   allTaskData,
   onRowSelect,
   handleRowClick,
   isUsedInAllTasksModule,
-  gridLoading,
+  isDataLoading
 }: MyTaskManagementAgGridProps) {
   const gridRef = useRef<AgGridReact>(null); // Ref to the AgGridReact component
   const columnDefs = useMemo<ColDef[]>(
@@ -49,6 +48,11 @@ function MyTaskManagementAgGrid({
         filter: true,
         // cellRenderer: PriorityCellRenderer,
         cellRenderer: (params: any) => {
+           if (params.data?.__isSkeleton) {
+                      return (
+                        <SkeletonRowsAgGrid/>
+                      );
+                    }
           return (
             <div className="flex items-center">
               <TaskPriorityChip priorityName={params.value} />
@@ -63,6 +67,11 @@ function MyTaskManagementAgGrid({
         sortable: true,
         filter: true,
         cellRenderer: (params: MyAllTaskProps | any) => {
+           if (params.data?.__isSkeleton) {
+                      return (
+                        <SkeletonRowsAgGrid/>
+                      );
+                    }
           return (
             <div className="flex items-center">
               <TaskStageChip
@@ -105,6 +114,11 @@ function MyTaskManagementAgGrid({
         filter: true,
         // hide: isUsedForAccountLead,
         cellRenderer: (params: MyAllTaskProps | any) => {
+           if (params.data?.__isSkeleton) {
+                      return (
+                        <SkeletonRowsAgGrid/>
+                      );
+                    }
           return (
             <div className="flex items-center text-sm gap-1 mt-1">
               <StatusIndicator isActive={params.value} />
@@ -141,6 +155,11 @@ function MyTaskManagementAgGrid({
         // autoHeight: true,
         // suppressSizeToFit: true,
         cellRenderer: (params: MyAllTaskProps | any) => {
+           if (params.data?.__isSkeleton) {
+                      return (
+                        <SkeletonRowsAgGrid/>
+                      );
+                    }
           return (
             <div className="flex items-center justify-center  ">
               <span
@@ -166,9 +185,25 @@ function MyTaskManagementAgGrid({
       flex: 0.8,
       suppressHeaderMenuButton: true,
       suppressHeaderContextMenu: true,
+
+       cellRenderer: (params: any) => {
+                    if (params.data?.__isSkeleton) {
+                      return (
+                        <SkeletonRowsAgGrid/>
+                      );
+                    }
+                    return params.value;
+                  },
     }),
     [],
   );
+
+  const skeletonRows = useMemo(() => {
+      return Array.from({ length: 30 }).map(() => ({
+        __isSkeleton: true,
+      }));
+    }, []);
+  
 
   return (
     <div
@@ -177,14 +212,14 @@ function MyTaskManagementAgGrid({
     >
       <AgGridReact
         ref={gridRef} // Attach the ref
-        rowData={allTaskData}
+        rowData={isDataLoading ?  skeletonRows: allTaskData}
         columnDefs={columnDefs}
         defaultColDef={defaultColDef}
         modules={[AllCommunityModule]}
         theme={themeBalham}
-        loading={gridLoading}
-        overlayLoadingTemplate={GRIDSKELETON.MY_TASK_GRID}
-        overlayNoRowsTemplate={INNERHTML.GRID_NO_DATE_FOUND}
+        // loading={gridLoading}
+        // overlayLoadingTemplate={GRIDSKELETON.MY_TASK_GRID}
+        // overlayNoRowsTemplate={INNERHTML.GRID_NO_DATE_FOUND}
         context={{ handleRowSelect: onRowSelect }}
         onRowClicked={handleRowClick}
       />

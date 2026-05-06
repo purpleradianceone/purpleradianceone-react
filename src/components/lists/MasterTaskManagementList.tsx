@@ -46,6 +46,7 @@ function MasterTaskManagementList({
   selectedCompanyUser,
   handleSelectedCompanyUser,
   downloadTaskDocument,
+  isDataLoading
   // isActive,
   // setIsActive,
 }: MasterTaskManagementProps) {
@@ -354,6 +355,7 @@ function MasterTaskManagementList({
               handleAllTaskDataFormChange={handleAllTaskDataFormChange}
               MasterTaskData={MasterTaskData}
               downloadTaskDocument={downloadTaskDocument}
+              isDataLoading={isDataLoading}
             />
           </div>
           <CreateGeneralTaskMasterModal

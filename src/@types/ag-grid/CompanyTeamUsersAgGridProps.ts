@@ -13,14 +13,15 @@ type CompanyTeamUsersAgGridProps = {
     handleViewPortChanged : (params : ViewportChangedEvent) => void;
      onGridReady : (params : {api :GridApi}) => void;
     companyTeamUsersList? : CompanyTeamUsers[];
-    handleAddCompanyTeamUsers : ()=> Promise<void>;
+    handleAddCompanyTeamUsers : (event : React.FormEvent<HTMLFormElement>)=> Promise<void>;
     handleCompanyUserCheckBoxChange : (params : CompanyUsersSearchProps,event :React.ChangeEvent<HTMLInputElement>) => void;
     isCompanyUserNotAssignedReadyToFetch : boolean;
     addCompanyTeamAndProductUserArray : number[];
     companyProductUsersList? : CompanyProductUser[]; 
     handleSearchParameterChange : (searchValue : string) => void;
     isAddUsersCompleted : boolean;
-    usersUpdateCount : number;    
+    usersUpdateCount : number;  
+    isDataLoadingForCompanyProductUser: boolean  
 }
 
 export default CompanyTeamUsersAgGridProps;
