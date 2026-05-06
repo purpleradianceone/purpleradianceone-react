@@ -55,7 +55,7 @@ export const AccountContactLeadTypeConjuction = ({
           Company Account Type
         </span>
       </div>
-      <div className="h-full max-h-[270px] custom-scrollbar overflow-auto w-full ">
+      <div className="h-full max-h-[270px]  overflow-auto custom-scrollbar w-full ">
 
       {activeTab === "contact" && (
         <div className="h-full px-1"

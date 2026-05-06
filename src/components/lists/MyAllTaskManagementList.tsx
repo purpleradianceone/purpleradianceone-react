@@ -416,6 +416,7 @@ function MyAllTaskManagementList({
               handleAllTaskDataFormChange={handleAllTaskDataFormChange}
               allTaskData={allTaskData}
               gridLoading={gridLoading}
+              isDataLoading={gridLoading}
             />
           </div>
           <CreateGeneralTaskMasterModal

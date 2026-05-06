@@ -43,7 +43,7 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
     addCompanyUserFormData,
     "registration"
   );
-  const handleAddUserSubmit = async (event: React.FormEvent) => {
+  const handleAddUserSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if(isSaving) return;
     const mobileRegex = REGEX.MOBILE_NUMBER;
@@ -160,6 +160,7 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
               <form className="space-y-3" onSubmit={handleAddUserSubmit}>
                 <FormInput
                 logo={User}
+                autoFocus={true}
                   id="company-user-module-add-name"
                   label="Name"
                   type="text"

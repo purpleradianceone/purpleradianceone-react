@@ -17,7 +17,7 @@ interface ConfirmationDialogProps {
   showCancelButton?: boolean;
   cancelButtonText?: string;
   confirmButtonText?: string;
-  onConfirm: () => void;
+  onConfirm: ()=> Promise<void>;
   onCancel: () => void;
 }
 
@@ -35,6 +35,11 @@ const LeadUpdateConfirmationDialogue: React.FC<ConfirmationDialogProps> = ({
   onConfirm,
   onCancel,
 }) => {
+
+  const handleSubmit = async (event : React.FormEvent<HTMLFormElement>)=>{
+    event.preventDefault()
+   await onConfirm()
+  }
   if (!open) return null;
 
   return (
@@ -44,6 +49,8 @@ const LeadUpdateConfirmationDialogue: React.FC<ConfirmationDialogProps> = ({
       <div
         className={`bg-white rounded-xl shadow-lg w-full max-w-md ${PADDING.CONFIRMATION_DIALOG_PADDING} relative`}
       >
+        <form onSubmit={handleSubmit}>
+        
         <FormHeader
           icon={icon}
           postText={title}
@@ -84,11 +91,7 @@ const LeadUpdateConfirmationDialogue: React.FC<ConfirmationDialogProps> = ({
           )}
           <div>
             <Button
-              onClick={(e) => {
-                e.preventDefault();
-                onConfirm();
-                onCancel();
-              }}
+            autoFocus={true}
               type="submit"
             >
               <div className="flex items-center justify-center gap-0.5">
@@ -98,6 +101,7 @@ const LeadUpdateConfirmationDialogue: React.FC<ConfirmationDialogProps> = ({
             </Button>
           </div>
         </div>
+         </form>
       </div>
     </div>
   );

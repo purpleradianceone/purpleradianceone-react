@@ -4,19 +4,20 @@
 import { AllCommunityModule, ColDef, themeAlpine } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 import { useMemo, useState } from "react";
-import { INNERHTML } from "../../constants/AppConstants";
 import { useUserAccessModules } from "../../config/hooks/useAccessModules";
 import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
 import axios from "axios";
 import POST_API from "../../constants/PostApi";
 import CompanyProductTeamsAgGridProps from "../../@types/ag-grid/CompanyProductTeamsAgGridProps";
 import ToggleButton from "../ui/ToggleButton";
+import { SkeletonRowsAgGrid } from "../ui/SkeletonRowsAgGrid";
 
 function CompanyProductTeamsAgGrid({
   companyProductTeams,
   handleCompanyProductTeamUpdate,
   handleViewPortChanged,
   onGridReady,
+  isDataLoading
 }: CompanyProductTeamsAgGridProps) {
   const { userHasAccessToUpdateProductTeam } = useUserAccessModules();
   const { loginStatus } = useLoggedInUserContext();
@@ -43,6 +44,11 @@ function CompanyProductTeamsAgGrid({
         pinned: "right",
         width: 100,
         cellRenderer: (params: any) => {
+          if (params.data?.__isSkeleton) {
+                      return (
+                        <SkeletonRowsAgGrid/>
+                      );
+                    }
           const [isActive, setIsActive] = useState<boolean>(
             params.data.isActive
           );
@@ -75,6 +81,7 @@ function CompanyProductTeamsAgGrid({
             }
           };
           return (
+            
             <div className="flex flex-col items-center mt-1">
               {/* <button
                 id={params.data.id.toString()}
@@ -129,17 +136,30 @@ function CompanyProductTeamsAgGrid({
       flex: 0.8,
       suppressHeaderMenuButton: true,
       suppressHeaderContextMenu: true,
+             cellRenderer: (params: any) => {
+                    if (params.data?.__isSkeleton) {
+                      return (
+                        <SkeletonRowsAgGrid/>
+                      );
+                    }
+                    return params.value;
+                  },
     };
   }, []);
+  
+  const skeletonRows = useMemo(() => {
+      return Array.from({ length: 30 }).map(() => ({
+        __isSkeleton: true,
+      }));
+    }, []);
 
   return (
     <div className="ag-theme-balham w-full h-full mt-2">
       <AgGridReact
-        rowData={companyProductTeams}
+        rowData={isDataLoading? skeletonRows : companyProductTeams}
         columnDefs={companyProductTeamsColDefs}
         defaultColDef={defaultColDef}
         modules={[AllCommunityModule]}
-        overlayNoRowsTemplate={INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
         theme={themeAlpine}
         onViewportChanged={handleViewPortChanged}
         onGridReady={onGridReady}

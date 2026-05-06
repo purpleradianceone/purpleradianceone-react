@@ -38,6 +38,7 @@ function CompanyProductTeamsModal({
     CompanyProductTeam[]
   >([]);
 
+  const [isDataLoadingCompanyProductTeams, setIsDataLoadingCompanyProductTeams] = useState<boolean>(false)
   const [companyTeamsNotAssignedList, setCompanyTeamsNotAssignedList] =
     useState<CompanyTeamSearchProps[]>([]);
   const [
@@ -199,7 +200,7 @@ function CompanyProductTeamsModal({
         companyProductTeamsSearchParameter;
       companyProductTeamsFetchingRef.current = true;
       setIsCompanyProductTeamsLoading(true);
-
+      setIsDataLoadingCompanyProductTeams(true)
       // Save current scroll position before fetching
       if (companyProductTeamsGridApiRef.current) {
         const rowIndex =
@@ -325,6 +326,7 @@ function CompanyProductTeamsModal({
         setIsCompanyProductTeamsLoading(false);
         companyProductTeamsFetchingRef.current = false;
       }
+      setIsDataLoadingCompanyProductTeams(false)
     }
   };
 
@@ -645,6 +647,7 @@ function CompanyProductTeamsModal({
                     handleCompanyProductTeamsViewPortChanged
                   }
                   onGridReady={companyProductTeamsOnGridReady}
+                  isDataLoading={isDataLoadingCompanyProductTeams}
                 ></CompanyProductTeamsAgGrid>
               </div>
 

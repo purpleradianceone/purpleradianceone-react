@@ -18,7 +18,7 @@ import RefreshToken from "../../../config/validations/RefreshToken";
 import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
 import toast from "react-hot-toast";
 import COLORS from "../../../constants/Colors";
-import { Pen, Save } from "lucide-react";
+import {  Pen, Save } from "lucide-react";
 import { useUserPreference } from "../../../context/user/UserPreference";
 import axiosClient from "../../../axios-client/AxiosClient";
 import AccessDeniedMessagePage from "../../views/not-found/AccessDeniedMessagePage";
@@ -107,7 +107,7 @@ const LeadDetails = ({
 
   const [isSavingLeadDetailsData , setIsSavingLeadDetailsData] = useState<boolean>(false);
   // Note : Create or Edit save api call
-  const handleSave = async (e: React.MouseEvent) => {
+  const handleSave = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     // Note : if the is Saving is true and then user again clicks the button then will check here 
@@ -368,7 +368,7 @@ const LeadDetails = ({
         value: val.name,
         id: val.id,
       }))
-    : [];
+    : [];    
 
   // useEffect(() => {
   //   if (!userPreference || !editLeadDetails) return;
@@ -417,17 +417,17 @@ const LeadDetails = ({
 
   return (
     <div>
-      <form>
+      <form onSubmit={handleSave}               
+>
         <div className="w-full flex justify-between  bg-slate-200 px-1 mb-1 ">
           {/* <div className="w-auto flex justify-between  bg-slate-200 px-1 mb-1  "> */}
           {/* <span className="table-header-custom">Details</span> */}
           <HeaderInfo />
           {showSaveLeadButton && (
             <button
+            type="submit"
             disabled={isSavingLeadDetailsData}
-              type="submit"
               className={isSavingLeadDetailsData? "border rounded-md caption-custom  px-1 py-0.5 bg-gray-100 text-gray-500 cursor-not-allowed ": COLORS.ADD_BUTTON}
-              onClick={handleSave}
             >
               <div className="flex items-center gap-0.5">
                 {
@@ -495,6 +495,7 @@ const LeadDetails = ({
               });
             }}
           />
+           
 
           <FormField
             maxLength={10}
@@ -758,6 +759,16 @@ const FormField = ({
             value={String(selectedId)}
             onBlur={handleBlur}
             onChange={onChange}
+             onKeyDown={(e) => {
+    if (e.key === "Enter") {
+      e.preventDefault(); // prevents dropdown open
+      e.stopPropagation();
+
+      // submit form manually
+      const form = (e.target as HTMLElement).closest("form");
+      form?.requestSubmit();
+    }
+  }}
             className="caption-custom border border-gray-300 w-36 rounded p-1 focus:outline-none"
           >
             <option value=""> Select {label} </option>
@@ -776,6 +787,12 @@ const FormField = ({
             onChange={onChange}
             onBlur={handleBlur}
             autoFocus
+             onKeyDown={(e : React.KeyboardEvent<HTMLTextAreaElement>)=>{
+                      if(e.key === "Enter" && !e.shiftKey){
+                        e.preventDefault();
+                        (e.currentTarget.form  as HTMLFormElement)?.requestSubmit()
+                      }
+                    }}
             className="caption-custom border border-gray-300 rounded p-1 focus:outline-none "
           />
         ) : (

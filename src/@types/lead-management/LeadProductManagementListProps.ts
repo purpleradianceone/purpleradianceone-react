@@ -16,6 +16,7 @@ type LeadProductsManagementListProps = {
    handleProductCheckboxChange: (params:any , event: React.ChangeEvent<HTMLInputElement>) => void;
 //    preservedSelectedProductIdArray: number[],
    alreadyAssignedCompanyProduct : LeadAssignedCompanyProduct[],
+   isDataLoading: boolean
 }
  
 export default LeadProductsManagementListProps;

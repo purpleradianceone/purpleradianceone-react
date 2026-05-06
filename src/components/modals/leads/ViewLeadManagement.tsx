@@ -60,6 +60,7 @@ import { LeadNotes } from "./lead-notes/LeadNotes";
 import { ModuleGuard } from "../../../config/guard/ModuleGuard";
 import { Popover } from "../../ui/PopOver";
 import LeadQuotationDetails from "./LeadQuotationDetails";
+import TextAreaInput from "../../ui/TextAreaInput";
 
 const ViewLeadManagement = () => {
   const navigate = useNavigate();
@@ -152,7 +153,9 @@ const ViewLeadManagement = () => {
     }
   };
   const [isLeadStatusSaving, setIsLeadStatusSaving] = useState<boolean>(false);
-  const handleSaveStatusUpdate = async () => {
+  const handleSaveStatusUpdate = async (event : React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+
     if (!selectedLeadData || selectedStatusId === null) return;
     if (isLeadStatusSaving) return;
 
@@ -206,7 +209,7 @@ const ViewLeadManagement = () => {
           callFunctionWithEvent: handleSaveStatusUpdate,
         });
         if (refreshTokenStatus) {
-          handleSaveStatusUpdate();
+          handleSaveStatusUpdate(event);
         }
       }
     } finally {
@@ -231,7 +234,9 @@ const ViewLeadManagement = () => {
 
   const [showSpinnerForSavingLeadOwner, setShowSpinnerForSavingLeadOwner] =
     useState<boolean>(false);
-  const handleLeadOwnerChange = async () => {
+  const handleLeadOwnerChange = async (event : React.FormEvent<HTMLFormElement>
+  ) => {
+    event.preventDefault();
     if (selectedCompanyUser.id === null || selectedCompanyUser.id === 0) {
       setReasonInputBoxOpenForLeadOwner(false);
       toast.error("Select new lead owner before procedding.");
@@ -687,7 +692,7 @@ const ViewLeadManagement = () => {
         <div className=" flex items-center justify-between  gap-3    ">
           <div className="flex gap-3 items-center">
             <Link to={ROUTES_URL.GET_LEAD_MANAGEMENT}>
-              <Button className="flex caption-custom ml-1 items-center justify-center hover:text-gray-800">
+              <Button type="button" className="flex caption-custom ml-1 items-center justify-center hover:text-gray-800">
                 <span>Leads</span>
               </Button>
             </Link>
@@ -727,6 +732,7 @@ const ViewLeadManagement = () => {
                 width={400}
                 trigger={
                   <button
+                  type="button"
                     onClick={() => {
                       if (userHasAccessToViewLeadSettings) {
                         setIsLeadSettingModalOpen(true);
@@ -777,6 +783,7 @@ const ViewLeadManagement = () => {
         <div className="hidden   bg-slate-100 mx-2 p-0.5 rounded  items-center justify-between     ">
           <div className="flex w-[30%] gap-6">
             <button
+            type="button"
               className="flex items-center gap-1 caption-custom justify-center hover:text-blue-600 "
               onClick={() => {
                 navigate(-1);
@@ -792,6 +799,7 @@ const ViewLeadManagement = () => {
             {/* new code  */}
             <div className="relative inline-block">
               <button
+              type="button"
                 onClick={() => {
                   if (userHasAccessToUpdateLead) {
                     setIsLeadSettingModalOpen(true);
@@ -823,6 +831,7 @@ const ViewLeadManagement = () => {
             {/* new code  */}
             <div className="relative inline-block">
               <button
+              type="button"
                 disabled={!userHasAccessToViewLead}
                 onClick={() => {
                   if (userHasAccessToUpdateLead) {
@@ -842,6 +851,7 @@ const ViewLeadManagement = () => {
             </div>
 
             <button
+            type="button"
               className="hidden  text-xs rounded border px-3 my-1 text-gray-500"
               onClick={() => {
                 setIsUpdateLeadFormOpen(true);
@@ -883,6 +893,7 @@ const ViewLeadManagement = () => {
                   trigger={
                     <div className="flex w-full ">
                       <button
+                      type="button"
                         // disabled={!userHasAccessToUpdateLeadDetails}
                         onClick={() => {
                           if (userHasAccessToUpdateLeadDetails) {
@@ -916,11 +927,15 @@ const ViewLeadManagement = () => {
                               setReasonText("");
                               onClose();
                             }}
-                            handleSaveStatusUpdate={async () => {
-                              await handleSaveStatusUpdate();
+                            handleSaveStatusUpdate={async (event : React.FormEvent<HTMLFormElement>) => {
+                              event.preventDefault()
+                              await handleSaveStatusUpdate(event
+                              );
                               onClose();
                             }}
-                            onReasonChange={(e) =>
+                            onReasonChange={(e :  
+                                  | React.ChangeEvent<HTMLInputElement>
+                                  | React.ChangeEvent<HTMLTextAreaElement>,) =>
                               setReasonText(e.target.value)
                             }
                             reasonText={reasonText}
@@ -937,8 +952,10 @@ const ViewLeadManagement = () => {
                             onClose();
                           }}
                           leadData={selectedLeadData}
-                          handleLeadConversion={() => {
-                            handleSaveStatusUpdate();
+                          handleLeadConversion={(event : React.FormEvent<HTMLFormElement>
+                          ) => {
+                            event.preventDefault()
+                            handleSaveStatusUpdate(event);
                             onClose();
                           }}
                           onReasonChange={(e) => setReasonText(e.target.value)}
@@ -977,6 +994,7 @@ const ViewLeadManagement = () => {
             <div className="flex justify-end bg-purple-50 caption-custom  mb-1 px-2">
               {/* <span className="font-semibold ">Lead Status</span> */}
               <button
+              type="button"
                 onClick={() => {
                   setIsOpenLeadStatusHistory(!isOpenLeadStatusHistory);
                 }}
@@ -1206,6 +1224,7 @@ const ViewLeadManagement = () => {
                       }}
                     />
                     <button
+                    type="button"
                       title="Lead owner history"
                       className="absolute left-24 caption-custom flex items-center mt-1 hover:text-blue-700"
                       onClick={() => {
@@ -1221,11 +1240,16 @@ const ViewLeadManagement = () => {
                 // <div className="fixed inset-0 bg-black bg-opacity-5 flex items-center justify-center z-50">
                 //   <div className="bg-white rounded-xl shadow-lg p-2 w-full max-w-md mx-2">
                 <FormLayout width={2} padding={2}>
+                  <form onSubmit={ handleLeadOwnerChange}>
+
+                  
                   <div className="flex flex-col gap-1">
-                    <label className="table-header-custom">
+                    {/* <label className="table-header-custom">
                       Reason (Optional)
-                    </label>
-                    <textarea
+                    </label> */}
+                    <TextAreaInput
+                    cols={2}
+                    label="Reason (Optional)"
                       autoFocus={true}
                       rows={7}
                       placeholder="Enter reason for lead owner update"
@@ -1239,10 +1263,10 @@ const ViewLeadManagement = () => {
                       <div className="flex gap-1">
                         <Button
                           type="submit"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            handleLeadOwnerChange();
-                          }}
+                          // onClick={(e) => {
+                          //   e.preventDefault();
+                          //  ();
+                          // }}
                         >
                           <div className="flex items-center gap-1">
                             <Save size={16} />
@@ -1261,6 +1285,7 @@ const ViewLeadManagement = () => {
                       </div>
                     </div>
                   </div>
+                  </form>
                 </FormLayout>
                 // </div>
                 // </div>
@@ -1280,7 +1305,7 @@ const ViewLeadManagement = () => {
             </div>
 
             {/* Assigned Company Product */}
-            <div className=" shadow-md rounded">
+            <div className=" shadow-md  rounded">
               <LeadAssignedComponyProducts
                 setIsAddProductModalOpen={setIsAddProductModalOpen}
                 data={leadAssignedCompanyProduct}
@@ -1292,9 +1317,12 @@ const ViewLeadManagement = () => {
           </div>
 
           {/* Column 2 */}
-          <div className="w-full md:w-1/2 flex border  flex-col gap-0 shadow-sm">
+          <div className="w-full md:w-1/2 flex  bg-pink-00 flex-col gap-0 ">
             {/* Meeting / Contact / Span Tabs */}
-            <div className="bg-slate-200 pl-1 mb-2 border-b-2 flex caption-custom gap-4">
+            <div className=" min-h-[342px] mb-2 shadow-md ">
+
+           
+            <div className="bg-slate-200   pl-1 mb-0.5  border-b-2 flex caption-custom gap-4">
               <span
                 id="contact"
                 className={`cursor-pointer ${
@@ -1353,7 +1381,7 @@ const ViewLeadManagement = () => {
                 Lead Users
               </span> */}
             </div>
-            <div className="flex flex-col min-h-72  gap-2">
+            <div className="flex flex-col min-h-72 max-h-72 h-full bg-red-00  gap-2">
               <div
                 // ${getHeightAboveTasks()}
                 className={`flex min-h-72 max-h-72  overflow-y-scroll flex-col  gap-2 [&::-webkit-scrollbar]:w-2
@@ -1468,14 +1496,16 @@ const ViewLeadManagement = () => {
                 )} */}
               </div>
             </div>
+             </div>
             {/* Activity */}
-            <div className="mt-8">
+            <div className=" shadow-md ">
               <LeadTasksModal
                 ownerId={selectedLeadData.companyUserId}
               ></LeadTasksModal>
             </div>
             {/* End Activity */}
           </div>
+          
         </div>
         {
           <div className="w-full mt-2">
@@ -1593,66 +1623,183 @@ const Detail: React.FC<DetailProps> = ({
   const [isEditing, setIsEditing] = useState(false);
 
   const prevValueRef = useRef(value);
-
+  const isSubmittingRef = useRef(false);
   const handleClick = () => {
     prevValueRef.current = value;
     setIsEditing(true);
   };
 
+  // const handleBlur = () => {
+  //   setIsEditing(false);
+
+  //   const trimmedValue = value.trim();
+  //   // Step 1: Check if value changed
+  //   if (trimmedValue === prevValueRef.current) {
+  //     // toast.error(MESSAGE.ERROR.NO_CHANGES);
+  //     return; // No changes made, do nothing
+  //   }
+
+  //   if (label === "Mobile number") {
+  //     const isValid = value
+  //       .trim()
+  //       .match(MOBILE_NUMBER_VALIDATION.MOBILE_NUMBER_PATTERN_INDIAN);
+
+  //     if (!isValid) {
+  //       //revert to previous value
+  //       const syntheticEvent = {
+  //         target: { value: prevValueRef.current },
+  //       } as React.ChangeEvent<HTMLInputElement | HTMLSelectElement>;
+
+  //       onChange?.(syntheticEvent);
+
+  //       toast.error(
+  //         MOBILE_NUMBER_VALIDATION.ERROR_MESSAGE_MOBILE_NUMBER_INDIAN,
+  //       );
+  //       return;
+  //     }
+  //   } else if (label === "Email") {
+  //     const isValid = value.trim().match(VALIDATIONS.EMAIL);
+  //     if (!isValid) {
+  //       //revert to previous value
+  //       const syntheticEvent = {
+  //         target: { value: prevValueRef.current },
+  //       } as React.ChangeEvent<HTMLInputElement | HTMLSelectElement>;
+
+  //       onChange?.(syntheticEvent);
+
+  //       toast.error(MESSAGE.ERROR.EMAIL_NOT_VALID_ERROR);
+  //       return;
+  //     }
+  //   }
+  //   //  Apply trimmed value before saving
+  //   if (trimmedValue !== value) {
+  //     const syntheticEvent = {
+  //       target: { value: trimmedValue },
+  //     } as React.ChangeEvent<HTMLInputElement | HTMLSelectElement>;
+
+  //     onChange?.(syntheticEvent); // update UI with trimmed value
+  //   }
+  //   if (value !== prevValueRef.current) {
+  //     handleLeadInfoSave!();
+  //   }
+  // };
+
   const handleBlur = () => {
-    setIsEditing(false);
+  setIsEditing(false);
+  validateAndSave();
+};
 
-    const trimmedValue = value.trim();
-    // Step 1: Check if value changed
-    if (trimmedValue === prevValueRef.current) {
-      // toast.error(MESSAGE.ERROR.NO_CHANGES);
-      return; // No changes made, do nothing
+
+//   const validateAndSave = () => {
+//   const trimmedValue = value.trim();
+
+//   // Step 1: No change check
+//   if (trimmedValue === prevValueRef.current) {
+//     return;
+//   }
+
+//   if (label === "Mobile number") {
+//     const isValid = trimmedValue.match(
+//       MOBILE_NUMBER_VALIDATION.MOBILE_NUMBER_PATTERN_INDIAN
+//     );
+
+//     if (!isValid) {
+//       const syntheticEvent = {
+//         target: { value: prevValueRef.current },
+//       } as React.ChangeEvent<HTMLInputElement | HTMLSelectElement>;
+
+//       onChange?.(syntheticEvent);
+//       toast.error(
+//         MOBILE_NUMBER_VALIDATION.ERROR_MESSAGE_MOBILE_NUMBER_INDIAN
+//       );
+//       return;
+//     }
+//   }
+
+//   if (label === "Email") {
+//     const isValid = trimmedValue.match(VALIDATIONS.EMAIL);
+
+//     if (!isValid) {
+//       const syntheticEvent = {
+//         target: { value: prevValueRef.current },
+//       } as React.ChangeEvent<HTMLInputElement | HTMLSelectElement>;
+
+//       onChange?.(syntheticEvent);
+//       toast.error(MESSAGE.ERROR.EMAIL_NOT_VALID_ERROR);
+//       return;
+//     }
+//   }
+
+//   // Apply trimmed value
+//   if (trimmedValue !== value) {
+//     const syntheticEvent = {
+//       target: { value: trimmedValue },
+//     } as React.ChangeEvent<HTMLInputElement | HTMLSelectElement>;
+
+//     onChange?.(syntheticEvent);
+//   }
+
+//   handleLeadInfoSave?.();
+// };
+const validateAndSave = () => {
+  if (isSubmittingRef.current) return;
+
+  const trimmedValue = value.trim();
+
+  if (trimmedValue === prevValueRef.current) {
+    return;
+  }
+
+  if (label === "Mobile number") {
+    const isValid = trimmedValue.match(
+      MOBILE_NUMBER_VALIDATION.MOBILE_NUMBER_PATTERN_INDIAN
+    );
+
+    if (!isValid) {
+      onChange?.({
+        target: { value: prevValueRef.current },
+      } as React.ChangeEvent<HTMLInputElement>);
+      toast.error(
+        MOBILE_NUMBER_VALIDATION.ERROR_MESSAGE_MOBILE_NUMBER_INDIAN
+      );
+      return;
     }
+  }
 
-    if (label === "Mobile number") {
-      const isValid = value
-        .trim()
-        .match(MOBILE_NUMBER_VALIDATION.MOBILE_NUMBER_PATTERN_INDIAN);
+  if (label === "Email") {
+    const isValid = trimmedValue.match(VALIDATIONS.EMAIL);
 
-      if (!isValid) {
-        //revert to previous value
-        const syntheticEvent = {
-          target: { value: prevValueRef.current },
-        } as React.ChangeEvent<HTMLInputElement | HTMLSelectElement>;
-
-        onChange?.(syntheticEvent);
-
-        toast.error(
-          MOBILE_NUMBER_VALIDATION.ERROR_MESSAGE_MOBILE_NUMBER_INDIAN,
-        );
-        return;
-      }
-    } else if (label === "Email") {
-      const isValid = value.trim().match(VALIDATIONS.EMAIL);
-      if (!isValid) {
-        //revert to previous value
-        const syntheticEvent = {
-          target: { value: prevValueRef.current },
-        } as React.ChangeEvent<HTMLInputElement | HTMLSelectElement>;
-
-        onChange?.(syntheticEvent);
-
-        toast.error(MESSAGE.ERROR.EMAIL_NOT_VALID_ERROR);
-        return;
-      }
+    if (!isValid) {
+      onChange?.({
+        target: { value: prevValueRef.current },
+      } as React.ChangeEvent<HTMLInputElement>);
+      toast.error(MESSAGE.ERROR.EMAIL_NOT_VALID_ERROR);
+      return;
     }
-    //  Apply trimmed value before saving
-    if (trimmedValue !== value) {
-      const syntheticEvent = {
-        target: { value: trimmedValue },
-      } as React.ChangeEvent<HTMLInputElement | HTMLSelectElement>;
+  }
 
-      onChange?.(syntheticEvent); // update UI with trimmed value
+  if (trimmedValue !== value) {
+    onChange?.({
+      target: { value: trimmedValue },
+    } as React.ChangeEvent<HTMLInputElement>);
+  }
+
+  isSubmittingRef.current = true;
+  handleLeadInfoSave?.();
+
+  // Reset after tick
+  setTimeout(() => {
+    isSubmittingRef.current = false;
+  }, 0);
+};
+
+  const handleKeyDown = (event : React.KeyboardEvent<HTMLInputElement>)=>{
+    if(event.key ==="Enter"){
+      event.preventDefault()
+      event.currentTarget.blur()// optional: removes focus
+      // validateAndSave()
     }
-    if (value !== prevValueRef.current) {
-      handleLeadInfoSave!();
-    }
-  };
+  }
   return (
     <div className="">
       <label className="caption-custom block  whitespace-nowrap overflow-hidden  ">
@@ -1685,6 +1832,7 @@ const Detail: React.FC<DetailProps> = ({
               onBlur={handleBlur}
               autoFocus
               maxLength={60}
+              onKeyDown={handleKeyDown}
               size={value ? value.length : 10}
             />
           )

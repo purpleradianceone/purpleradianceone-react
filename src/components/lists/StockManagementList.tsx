@@ -17,6 +17,7 @@ import StockLiveForCompanyProductAgGrid from "../ag-grid/StockLiveForCompanyProd
 import AddStock from "../modals/stock/AddStock";
 import SearchInput from "../ui/SearchInput";
 import { getLookupCompanyProduct } from "../../config/apis/Lookups";
+import { ComponentHeaderAndLogo } from "../ui/ComponentHeaderAndLogo";
 
 type StockView = ActionTypeForStockMOdule | null;
 
@@ -130,15 +131,20 @@ const StockManagementList = ({
         className={`sticky z-10 top-9 py-0.5 flex items-center justify-between ${COLORS.GRID_HEADER_SECTION_BG_COLOR} rounded-lg shadow-sm  mb-1.5 w-full`}
       >
         <div className="flex items-center pl-1 gap-5">
-          <div className="flex gap-1">
+          {/* <div className="flex gap-1">
             <Package className={COLORS.GRID_HEADER_ICONS_COLOR_AND_SIZE} />
             <span className="section-header-custom">Product Stock</span>
-          </div>
+          </div> */}
+          <ComponentHeaderAndLogo
+            headerText="Product Stock"
+            logo={Package}
+          />
 
           <div className="flex justify-center items-center  gap-1">
             {/* search box flex div */}
             <div className="flex items-start w-80">
               <SearchInput
+              autoFocus={true}
                 id="company-user-module-search-box"
                 onChange={(e) => {
                   handleSearchParameterChange(e.target.value);

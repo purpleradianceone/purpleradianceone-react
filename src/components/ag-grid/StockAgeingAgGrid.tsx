@@ -13,17 +13,18 @@ const StockAgeingAgGrid = ({ data , isDataLoading }: { data: StockAgeing[] , isD
         headerName: " Product",
         cellStyle: {
           color: "black",
-          // fontWeight: "bold",
-        },
+          fontWeight: "bold",
+        }
+        
       },
       {
         field: "unitName",
         headerName: "unit",
         hide: false,
-        cellStyle: {
-          color: "black",
-          // fontWeight: "bold",
-        },
+        // cellStyle: {
+        //   color: "black",
+        //   // fontWeight: "bold",
+        // },
       },
       {
         field: "zeroToThirtyDays",

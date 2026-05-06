@@ -23,6 +23,8 @@ export const LookupAccountManagement = ({
     []
   );
 
+  const [isDataLoading, setIsDataLoading] = useState<boolean>(false);
+
 //   Note : pagination hook  
   const {
     currentPage,
@@ -50,6 +52,7 @@ export const LookupAccountManagement = ({
       requestedby_id: loginStatus.id,
     };
     try {
+      setIsDataLoading(true)
       const response = await getLookupAccounts(
         postDataToGetLookupAccounts,
         signal
@@ -58,8 +61,7 @@ export const LookupAccountManagement = ({
         setCurrentPageData({currentPage: currentPage, pageDataLength: response.data.length});
         //lead status call was here
         const responseData = response.data;
-       
-
+        
         const formattedData = responseData.map((item: any) => ({
           id: item.id,
           name: item.name,
@@ -73,6 +75,8 @@ export const LookupAccountManagement = ({
       }
     } catch (error: any) {
       handleApiError(error);
+    }finally{
+      setIsDataLoading(false)
     }
   };
 
@@ -115,6 +119,7 @@ export const LookupAccountManagement = ({
         <LookupAccountAgGrid
           onRowSelect={handleAccountSelectedForAssigningLead}
           accounts={lookupAccountData}
+          isDataLoading={isDataLoading}
         />
       </div>
       <div className="flex items-center justify-end ">

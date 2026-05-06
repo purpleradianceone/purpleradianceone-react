@@ -421,6 +421,7 @@ const CompanyUserSearchFieldInput = forwardRef<
 
           {query && !readOnly && !isDisabled && has.xLogo && (
             <button
+            type="button"
               onClick={clearSelected}
               className="absolute right-2 top-1.5 text-gray-400 hover:text-gray-600"
             >

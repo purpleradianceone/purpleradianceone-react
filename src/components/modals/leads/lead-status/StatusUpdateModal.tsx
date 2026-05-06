@@ -1,8 +1,8 @@
 import React from "react";
 import COLORS from "../../../../constants/Colors";
 import LoadingPopUpAnimation from "../../../views/card/LoadingPopUpAnimation";
-import TextAreaInput from "../../../ui/TextAreaInput";
 import { FileText } from "lucide-react";
+import TextAreaInput from "../../../ui/TextAreaInput";
 
 function StatusUpdateModal({
   reasonText,
@@ -17,12 +17,13 @@ function StatusUpdateModal({
       | React.ChangeEvent<HTMLInputElement>
       | React.ChangeEvent<HTMLTextAreaElement>,
   ) => void;
-  handleSaveStatusUpdate: () => Promise<void>;
+  handleSaveStatusUpdate: (event : React.FormEvent<HTMLFormElement>) => Promise<void>;
   handleCancel: () => void;
   isLeadStatusSaving: boolean;
 }) {
   return (
     <div className="  w-full">
+      <form onSubmit={handleSaveStatusUpdate}>
       {/* Reason Label */}
       <TextAreaInput
       autoFocus={true}
@@ -34,9 +35,6 @@ function StatusUpdateModal({
         value={reasonText}
         onChange={onReasonChange}
       />
-      {/* <label className="input-label-custom">
-        Reason (Optional)
-        </label> */}
       {isLeadStatusSaving && (
         <LoadingPopUpAnimation show={isLeadStatusSaving} />
       )}
@@ -52,6 +50,7 @@ function StatusUpdateModal({
 
       <div className="flex justify-end items-center p-1 gap-1">
         <button
+        type="button"
           className={`caption-custom white-text h-fit px-2 py-1 rounded-md ${COLORS.BG_GRAY_500_COLOR} ${COLORS.HOVER_BG_GRAY_600_COLOR_HOVER}`}
           onClick={handleCancel}
         >
@@ -61,9 +60,10 @@ function StatusUpdateModal({
           </div>
         </button>
         <button
+        type="submit"
           className={`caption-custom white-text h-fit px-2 py-1 rounded-md ${COLORS.BG_BLUE_600_COLOR}`}
           // className={COLORS.ADD_BUTTON} // Using the provided COLORS constant
-          onClick={handleSaveStatusUpdate}
+          // onClick={handleSaveStatusUpdate}
         >
           <div className="flex gap-0.5 items-center">
             {/* <Save className="w-4 h-4 -mt-0.5"/> */}
@@ -71,6 +71,7 @@ function StatusUpdateModal({
           </div>
         </button>
       </div>
+      </form>
     </div>
   );
 }

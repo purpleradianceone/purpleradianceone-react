@@ -1,9 +1,9 @@
 const COLORS={
     BG_BLUE_600_COLOR:"bg-blue-600",
     HOVER_BG_BLUE_700_COLOR_HOVER:"hover:bg-blue-700",
-    BG_GRAY_500_COLOR:"bg-gray-500",
+    BG_GRAY_500_COLOR:"bg-gray-400",
     CANCEL_BUTTON_TEXT_COLOR: "text-gray-500",
-    HOVER_BG_GRAY_600_COLOR_HOVER:"hover:bg-gray-600",
+    HOVER_BG_GRAY_600_COLOR_HOVER:"hover:bg-gray-500",
     PRIMARY_SNACKBAR_TEXT_GREEN_COLOR:"text-green-800",
     PRIMARY_SNACKBAR_TEXT_RED_COLOR:"text-red-800",
     WHITE_SMOKE : "#f5f5f5",

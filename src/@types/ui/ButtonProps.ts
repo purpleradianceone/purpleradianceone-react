@@ -20,6 +20,7 @@ type ButtonProps = {
     title? : string;
     label? : string;
     id? : string;
+    autoFocus?:boolean
   };
   
   export default ButtonProps;

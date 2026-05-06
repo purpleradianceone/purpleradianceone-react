@@ -68,9 +68,7 @@ const AccountManagement: React.FC = () => {
         </div>
 
         {/* Right Card - Empty for future use */}
-
         <div className="bg-white rounded-md border  border-slate-200">
-          
           <AccountContactLeadTypeConjuction
             account={company}
           />

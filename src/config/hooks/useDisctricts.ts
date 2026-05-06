@@ -8,10 +8,11 @@ import ApiError from "../../@types/error/ApiError";
 import District from "../../@types/general/District";
 import axiosClient from "../../axios-client/AxiosClient";
 
-export const useDistricts = (stateId: number) => {
+export const useDistricts = (stateId: number | undefined) => {
   const [districts, setDistricts] = useState<District[]>([]);
 
   const getAllDistricts = async () => {
+    if(stateId == undefined)return;
     const PostData: District = {
       id: null,
       state_id: stateId,

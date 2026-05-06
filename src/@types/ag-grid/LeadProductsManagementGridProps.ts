@@ -8,7 +8,9 @@ type LeadProductsManagementGridProps = {
       // handleSelectedProductChange: (product: number[]) => void;
       interestTypeData : InterestType[];
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      handleProductCheckboxChange?: (params:any , event: React.ChangeEvent<HTMLInputElement>) => void;      alreadyAssignedCompanyProduct : LeadAssignedCompanyProduct[]
+      handleProductCheckboxChange?: (params:any , event: React.ChangeEvent<HTMLInputElement>) => void;      
+      alreadyAssignedCompanyProduct : LeadAssignedCompanyProduct[];
+      isDataLoading : boolean
 }
 
 export default LeadProductsManagementGridProps;

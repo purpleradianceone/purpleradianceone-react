@@ -1,5 +1,6 @@
 // import { LucideIcon } from "lucide-react";
 import { ElementType } from "react";
+import COLORS from "../../constants/Colors";
 
 /**
  * COMPONENT HEADER LOGO AND NAME 
@@ -18,7 +19,7 @@ export const ComponentHeaderAndLogo = ({
 }) => {
   return (
     <div className="flex items-center gap-1">
-      <Logo className="text-blue-600 h-5 w-5" />
+      <Logo className={`${COLORS.GRID_HEADER_ICONS_COLOR_AND_SIZE}`}  />
       <span className="section-header-custom">{headerText}</span>
     </div>
   );

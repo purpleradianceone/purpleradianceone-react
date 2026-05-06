@@ -63,6 +63,8 @@ function AddTeamModal({
   const [companyUsers, setCompanyUsers] = useState<CompanyUsersSearchProps[]>(
     []
   );
+  const [isDataLoading, setIsDataLoading] = useState<boolean>(false);
+
   const [isCompanyUsersLoading, setIsCompanyUsersLoading] = useState(false);
   const [companyUsersHasMore, setCompanyUsersHasMore] = useState(true);
   const [isCompanyUsersFetchedCount, setIsCompanyUsersFetchedCount] =
@@ -184,7 +186,7 @@ function AddTeamModal({
       //   search_parameter: companyUsersSearchParameter,
       //   search_parameter_date: "",
       // };
-
+      setIsDataLoading(true)
       const postData = {
         company_id: loginStatus.companyId,
         // company_team_id: null,
@@ -273,6 +275,7 @@ function AddTeamModal({
           setIsCompanyUsersFetchedCount(0);
         }
       }
+      setIsDataLoading(false)
     }
   };
 
@@ -349,7 +352,7 @@ function AddTeamModal({
   if (!isOpen) return null;
 
   return (
-    <FormLayout padding={2} width={5}>
+    <FormLayout padding={4} width={5}>
       <>
         <div className="">
           {/* Form header */}
@@ -363,6 +366,7 @@ function AddTeamModal({
           <form className="space-y-1 " onSubmit={handleAddTeamFormSubmit}>
             <FormInput
               logo={Users}
+              autoFocus={true}
               label="Name : "
               maxLength={VALIDATIONS.MAX_NAME_LENGTH}
               minLength={VALIDATIONS.MIN_NAME_LENGTH}
@@ -420,6 +424,7 @@ function AddTeamModal({
                   }
                   addCompanyTeamUserArray={addCompanyTeamUserArray}
                   isGridForSubscription={false}
+                  isDataLoading={isDataLoading}
                 />
               </div>
 

@@ -34,7 +34,7 @@ function MasterTaskManagement({
   const { userHasAccessToViewMasterTasks } = useUserAccessModules();
   const [accessDeniedPopUpOpen, setAccessDeniedPopUpOpen] = useState(false);
   const [MasterTaskData, setMasterTaskData] = useState<MasterTaskProps[]>([]);
-
+  const [isDataLoading, setIsDataLoading] = useState<boolean>(false);
   const { loginStatus } = useLoggedInUserContext();
   const { taskPriority } = useTaskPriority();
   const { taskType } = useTaskType();
@@ -123,6 +123,7 @@ function MasterTaskManagement({
     };
     try {
       if (PostDataToGetAllTask.company_id === 0 || pageSize === 10) return;
+      setIsDataLoading(true)
       const response = await axiosClient.post(
         POST_API.GET_MASTER_TASK,
         PostDataToGetAllTask,
@@ -176,6 +177,8 @@ function MasterTaskManagement({
           getMasterTaskData(signal);
         }
       }
+    }finally{
+      setIsDataLoading(false);
     }
   };
 
@@ -344,6 +347,7 @@ function MasterTaskManagement({
             isActive={isActive}
             setIsActive={setIsActive}
             downloadTaskDocument={downloadTaskDocument}
+            isDataLoading={isDataLoading}
           />
         ) : (
           <div className="flex-none mx-96 mt-14">

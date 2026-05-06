@@ -8,6 +8,7 @@ import TransactionAgGrid from "../ag-grid/TransactionAgGrid";
 import CustomDropdown from "../modals/leads/CustomDropdown";
 import DatePickerInput from "../ui/DatePickerInput";
 import LookupCompanyProductDropdown from "../ui/LookupCompanyProductDropdown";
+import { ComponentHeaderAndLogo } from "../ui/ComponentHeaderAndLogo";
 
 const StockLedgerList = ({
   stockLedger,
@@ -43,11 +44,10 @@ const StockLedgerList = ({
         className={`sticky z-10 top-9 py-0.5 flex items-center justify-between ${COLORS.GRID_HEADER_SECTION_BG_COLOR} rounded-lg shadow-sm  mb-1.5 w-full`}
       >
         <div className="flex items-center pl-1 gap-5">
-          <div className="flex gap-1">
-            <BookOpen className={COLORS.GRID_HEADER_ICONS_COLOR_AND_SIZE} />
-            <span className="section-header-custom">Stock Ledger</span>
-          </div>
-
+          <ComponentHeaderAndLogo
+            headerText="Stock Ledger"
+            logo={BookOpen}
+          />
           <div className="flex justify-center items-center  gap-1">
             {/* search box flex div */}
             <div className="min-w-[250px]">

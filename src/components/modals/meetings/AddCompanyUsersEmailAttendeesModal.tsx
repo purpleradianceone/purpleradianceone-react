@@ -35,6 +35,7 @@ function AddCompanyUsersEmailAttendeesModal({
     const [companyUsersList, setCompanyUsersList] = useState<
     CompanyUsersSearchProps[]
   >([]);
+  const[isDataLoading, setIsDataLoading] = useState<boolean>(false);  
 
     const [
         isCompanyUsersSearchParameterCleared,
@@ -71,7 +72,7 @@ function AddCompanyUsersEmailAttendeesModal({
               companyUserLastScrollPositionRef.current = rowIndex;
             }
           }
-    
+          setIsDataLoading(true)
           const getCompanyUserPostData = {
             company_id: loginStatus.companyId,
             requestedby: loginStatus.id,
@@ -168,6 +169,7 @@ function AddCompanyUsersEmailAttendeesModal({
             setIsCompanyUsersLoading(false);
             companyUsersFetchingRef.current = false;
           }
+          setIsDataLoading(false);
         }
       };
     
@@ -286,6 +288,7 @@ function AddCompanyUsersEmailAttendeesModal({
                     addCompanyTeamUserArray={addCompanyTeamUserArray}
                     handleCompanyUserCheckBoxChange={handleAddCompanyUserEmailCheckboxChange}
                     isGridForUpdateCompanyUser = {false}
+                    isDataLoading={isDataLoading}
                     />
             </div>
     

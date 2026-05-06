@@ -25,6 +25,7 @@ interface AppSelectProps {
   onMenuScrollToBottom?: () => void;
   onInputChange?: (value: string) => void;
   isLoading?: boolean;
+  autoFocus? : boolean
 }
 
 
@@ -51,6 +52,7 @@ const CustomSelect: React.FC<AppSelectProps> = ({
   onInputChange,
   onMenuOpen,
   onMenuScrollToBottom,
+  autoFocus = false
 }) => {
   const selectedOption = useMemo(
     () => options.find((opt) => opt.value === value) ?? null,
@@ -75,6 +77,7 @@ const CustomSelect: React.FC<AppSelectProps> = ({
 
       <Select<SelectOption, false>
         options={options}
+        autoFocus={autoFocus}
         value={selectedOption}
         onChange={handleChange}
         isClearable={isClearable}

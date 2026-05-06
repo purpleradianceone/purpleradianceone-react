@@ -38,6 +38,7 @@ function LeadAssociatedUsersModal({
   const [companyUsersList, setCompanyUsersList] = useState<
     CompanyUsersSearchProps[]
   >([]);
+  const [isDataLoading, setIsDataLoading] = useState<boolean>(false)
 
   const [
     isCompanyUsersSearchParameterCleared,
@@ -75,7 +76,7 @@ function LeadAssociatedUsersModal({
           companyUserLastScrollPositionRef.current = rowIndex;
         }
       }
-
+      setIsDataLoading(true)
       const getCompanyUserPostData = {
         company_id: loginStatus.companyId,
         lead_id: leadId,
@@ -167,6 +168,7 @@ function LeadAssociatedUsersModal({
         setIsCompanyUsersLoading(false);
         companyUsersFetchingRef.current = false;
       }
+      setIsDataLoading(false);
     }
   };
 
@@ -293,6 +295,7 @@ function LeadAssociatedUsersModal({
                   handleAddCompanyUserEmailCheckboxChange
                 }
                 isGridForUpdateCompanyUser={false}
+                isDataLoading={isDataLoading}
               />
             </div>
 

@@ -31,6 +31,10 @@ const StockLiveForCompanyProductAgGrid = ({
         filter: true,
         flex: 1.5,
         minWidth: 150,
+        cellStyle:{
+          color : "black",
+          fontWeight: "bold",
+        }
       },
       {
         hide: true,
