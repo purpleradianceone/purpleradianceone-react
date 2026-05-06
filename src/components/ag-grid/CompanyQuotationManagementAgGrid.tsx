@@ -5,7 +5,7 @@ import { AgGridReact } from "ag-grid-react";
 import { useMemo, useRef } from "react";
 import CompanyQuotationManagementAgGridProps from "../../@types/ag-grid/CompanyQuotationManagementAgGridProps";
 import { useUserAccessModules } from "../../config/hooks/useAccessModules";
-import { INNERHTML, JSX_CHILDREN_NAME } from "../../constants/AppConstants";
+import { INNERHTML, } from "../../constants/AppConstants";
 import QuotationStatusChip from "../ui/QuotationStatusChip";
 import StatusIndicator from "../ui/StatusIndicator";
 import QuotationActionsDropdown from "../views/company-quotation-management/QuotationActionsDropdown";
@@ -143,24 +143,9 @@ function CompanyQuotationManagementAgGrid({
         sortable: true,
         filter: true,
       },
-
       {
-        hide: true,
         headerName: "Actions",
         field: "actions",
-        cellRenderer: () => JSX_CHILDREN_NAME.ACTIONS,
-        sortable: false,
-        maxWidth: 110,
-        pinned: "right",
-        cellStyle: {
-          color: "#2563eb",
-          cursor: "pointer",
-          fontWeight: "400",
-        },
-      },
-      {
-        headerName: "Actions",
-        field: "view",
         pinned: "right",
         maxWidth: 90,
         cellRenderer: (params: any) => (
@@ -202,7 +187,15 @@ function CompanyQuotationManagementAgGrid({
           userHasAccessToUpdateCompanyQuotation,
           gridRef, 
         }}
+         onCellClicked={(params) => {
+          //Ignore clicks on Actions column
+          if (params.colDef.field === "actions") return;
+          //Call row select handler
+          params.context.handleRowSelect?.(params.data);
+        }}
+
         // onRowClicked={handleRowClick}
+
       />
     </div>
   );
