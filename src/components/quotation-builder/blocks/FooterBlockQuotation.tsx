@@ -126,11 +126,97 @@ export const FooterBlockQuotation: React.FC = () => {
     }
   };
 
+  // const handleSaveFooterLayout = async () => {
+  //   await handleSave();
+  //   await saveFooterToStorage();
+  //   window.location.reload();
+  // };
+
   const handleSaveFooterLayout = async () => {
-    await handleSave();
-    await saveFooterToStorage();
-    window.location.reload();
-  };
+  const footerBlockStorageKey = quotationTemplateId
+    ? FOOTER_STORAGE_KEY_UPDATE
+    : FOOTER_STORAGE_KEY_CREATE;
+
+  try {
+    const editorState = query.getState();
+
+    // 👉 Current footer canvas
+    const currentCanvasId =
+      editorState.nodes[id].data.linkedNodes[`${id}-canvas`];
+
+    if (!currentCanvasId) return;
+
+    const currentCanvasNode = editorState.nodes[currentCanvasId];
+
+    if (!currentCanvasNode.data.nodes.length) return;
+
+    // 👉 Get first content node
+    const firstNodeId = currentCanvasNode.data.nodes[0];
+
+    const serializedNode = query
+      .node(firstNodeId)
+      .toSerializedNode();
+
+    const newLayout = {
+      height: tempHeight,
+      padding: tempPadding,
+      backgroundColor: tempBg,
+    };
+
+    const savedData = {
+      data: serializedNode,
+      props: newLayout,
+    };
+
+    // ✅ 1. Save to localforage
+    await localforage.setItem(
+      footerBlockStorageKey + loginStatus.id,
+      JSON.stringify(savedData)
+    );
+
+    // ✅ 2. Sync ALL Footer Blocks
+    const allNodes = query.getNodes();
+
+    Object.keys(allNodes).forEach((nodeId) => {
+      const node = allNodes[nodeId];
+
+      if (node.data.displayName === "Footer Block") {
+        const canvasId =
+          editorState.nodes[nodeId].data.linkedNodes[
+            `${nodeId}-canvas`
+          ];
+
+        if (!canvasId) return;
+
+        const canvasNode = editorState.nodes[canvasId];
+
+        // 🔥 Remove old content
+        canvasNode.data.nodes.forEach((childId: string) => {
+          actions.delete(childId);
+        });
+
+        // 🔥 Add new content
+        const newNode = query
+          .parseSerializedNode(savedData.data)
+          .toNode();
+
+        actions.add(newNode, canvasId);
+
+        // 🔥 Update props
+        actions.setProp(nodeId, (props: any) => {
+          props.height = newLayout.height;
+          props.padding = newLayout.padding;
+          props.backgroundColor = newLayout.backgroundColor;
+        });
+      }
+    });
+
+    setEditing(false);
+    setIsConfirmationPopupOpen(false);
+  } catch (err) {
+    console.log("Error syncing footer layout:", err);
+  }
+};
 
   useEffect(() => {
     //Local Storage

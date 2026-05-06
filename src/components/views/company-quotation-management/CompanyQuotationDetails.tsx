@@ -1,12 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {
+  Check,
   ChevronRight,
   Download,
   File,
   FileArchive,
   Handshake,
+  LucideLightbulb,
   LucideSubtitles,
   Pencil,
+  RotateCcw,
   Save,
   Send,
   Trash,
@@ -531,6 +534,7 @@ function CompanyQuotationDetails() {
       acc.taxable += item.taxable_value || 0;
       acc.tax += item.total_tax || 0;
       acc.total += item.total_amount || 0;
+      acc.igst += item.igst_amount || 0;
       acc.cess += item.cess_amount || 0;
       acc.adjustment_for_round_off = quotation?.adjustmentForRoundOff || 0;
       return acc;
@@ -804,6 +808,7 @@ function CompanyQuotationDetails() {
     return {
       roundedTotal, // final rounded amount
       roundOff, // adjustment (+/-)
+      isRounded: roundOff === 0, // ✅ true if already rounded
     };
   };
 
@@ -895,8 +900,8 @@ function CompanyQuotationDetails() {
                     onClick={handleCompanyQuotationDownload}
                   >
                     <div className="flex items-center gap-1">
-                      <span className="text-gray-700">Download</span>
                       <Download size={14} className="text-blue-500" />
+                      <span className="text-gray-700">Download</span>
                     </div>
                   </button>
                   <button
@@ -911,8 +916,8 @@ function CompanyQuotationDetails() {
                     onClick={previewCompanyQuotation}
                   >
                     <div className="flex items-center gap-1">
-                      <span className="">Preview</span>
                       <FaFilePdf size={14} className="text-red-500" />
+                      <span className="">Preview</span>
                     </div>
                   </button>
                 </div>
@@ -1058,7 +1063,7 @@ function CompanyQuotationDetails() {
             )}
 
             {/* META */}
-            <div className="bg-gray-100 border rounded py-1 px-2 mb-2">
+            <div className="bg-gray-100 border rounded py-1 px-2 mb-1">
               <div className="grid grid-cols-4 ">
                 <MetaField
                   label="Quotation Number"
@@ -1250,12 +1255,12 @@ function CompanyQuotationDetails() {
           </>
         )}
         {/* ITEMS */}
-        {itemsLoading ? (
+        {itemsLoading || quotationLoading ? (
           <CompanyQuotationItemsSkeleton />
         ) : (
           <>
             {!isCreateMode && userHasAccessToViewCompanyQuotation && (
-              <div className="bg-white border rounded p-2 mb-1">
+              <div className="bg-white border rounded p-1 mb-1">
                 <div className="flex justify-between py-1">
                   <h3 className="font-semibold">Quotation Items</h3>
                   <SearchInput
@@ -1586,7 +1591,7 @@ function CompanyQuotationDetails() {
               <div className="grid grid-cols-2 text-sm mb-2">
                 <div></div>
 
-                <div>
+                <div className="border rounded-lg p-3 bg-white mt-2 space-y-2">
                   <span className="font-medium text-gray-700 text-sm">
                     Quotation Summary
                   </span>
@@ -1594,78 +1599,98 @@ function CompanyQuotationDetails() {
                   <div className="border rounded-lg p-3 bg-white mt-2 space-y-2">
                     {/* Basic + Discount */}
                     <div className="flex justify-between">
-                      <span>Subtotal</span>
+                      <span>A. Basic Value</span>
                       <span>{formatRupee(summary.basic)}</span>
                     </div>
 
                     <div className="flex justify-between">
-                      <span>Discount</span>
+                      <span>B. Total Discount</span>
                       <span>{formatRupee(summary.discount)}</span>
                     </div>
 
                     {/* Taxable */}
                     <div className="flex justify-between text-gray-600 border-t pt-2">
-                      <span>Taxable</span>
+                     <div className="flex"><span className="text-black">C</span> <span>. Taxable Value (A-B)</span></div>
                       <span>{formatRupee(summary.taxable)}</span>
                     </div>
 
                     {/* Tax + Cess in one row */}
                     <div className="flex justify-between text-gray-600">
-                      <span>Total Tax {summary.cess ? "+ Cess" : ""}</span>
-                      <span>
-                        {formatRupee(summary.tax + (summary.cess || 0))}
-                      </span>
+                      <div className="flex"><span className="text-black">D</span><span>. Total Tax ({summary.igst?"IGST":"CGST + SGST"} {summary.cess ? "+ Cess" : ""})</span></div>
+                      <span>{formatRupee(summary.tax)}</span>
                     </div>
 
                     {/* Total */}
                     <div className="flex justify-between font-medium border-t pt-2">
-                      <span>Total</span>
-                      <span>{formatRupee(summary.total)}</span>
+                      <span>E. Total Amount (C+D)</span>
+                      <span>₹{formatRupee(summary.total)}</span>
                     </div>
 
                     {/* Round Off Compact */}
                     <div className="flex items-center justify-between bg-gray-50 border rounded px-2 py-2 text-xs">
                       {/* Left */}
-                      <div className="flex flex-col">
-                        <span className="text-blue-600 font-medium text-xs">
-                          Round Off (Adjustment)
+                      <div className="flex flex-col ">
+                        <span className="flex gap-3 justify-start items-center table-header-custom-blue ">
+                          F. Round Off{" "}
+                          <span className="caption-custom">
+                            Adjust the amount to make the quotation total
+                            rounded.
+                          </span>
                         </span>
-                        <span className="text-gray-500">
-                          Suggested: {roundOffValues.roundOff} to make{" "}
-                          {roundOffValues.roundedTotal}
-                        </span>
+                        {!roundOffValues.isRounded && (
+                          <span className="caption-custom mt-1">
+                            <span className="flex">
+                              {" "}
+                              <LucideLightbulb size={14} />
+                              Suggested: {roundOffValues.roundOff} to make{" "}
+                              {roundOffValues.roundedTotal}
+                            </span>
+                          </span>
+                        )}
                       </div>
 
                       {/* Right */}
                       <div className="flex items-center gap-1">
-                        <input
-                          disabled={disabled}
-                          type="number"
-                          className="border rounded px-1 py-0.5 w-20 text-right text-xs"
-                          value={quotation?.adjustmentForRoundOff}
-                          onChange={(e: any) =>
-                            setQuotation((prev) => ({
-                              ...prev!,
-                              adjustmentForRoundOff: Number(e.target.value),
-                            }))
-                          }
-                        />
+                        <div className="w-20">
+                          <FormInput
+                            disabled={disabled}
+                            type="number"
+                            min={-1}
+                            max={1}
+                            // className="border rounded px-1 py-0.5 w-10 text-right text-xs"
+                            value={quotation?.adjustmentForRoundOff}
+                            onChange={(e: any) =>
+                              setQuotation((prev) => ({
+                                ...prev!,
+                                adjustmentForRoundOff: Number(e.target.value),
+                              }))
+                            }
+                          />
+                        </div>
 
-                        <button
-                          disabled={disabled}
-                          className="text-blue-600 text-xs"
-                          onClick={updateQuotation}
-                        >
-                          Apply
-                        </button>
+                        <div className="flex items-center gap-1">
+                          <button
+                            disabled={disabled}
+                            onClick={updateQuotation}
+                            className="flex items-center gap-1 px-2 py-1 rounded-md text-xs 
+               text-blue-600 border border-blue-200 bg-blue-50 
+               hover:bg-blue-100 disabled:opacity-50"
+                          >
+                            <Check size={14} />
+                            Apply
+                          </button>
 
-                        <button
-                          disabled={disabled}
-                          className="text-gray-500 text-xs"
-                          onClick={handleResetRoundOff}
-                        >
-                          Reset
-                        </button>
+                          <button
+                            disabled={disabled}
+                            onClick={handleResetRoundOff}
+                            className="flex items-center gap-1 px-2 py-1 rounded-md text-xs 
+               text-gray-600 border border-gray-200 bg-gray-50 
+               hover:bg-gray-100 disabled:opacity-50"
+                          >
+                            <RotateCcw size={14} />
+                            Reset
+                          </button>
+                        </div>
                       </div>
                     </div>
 
@@ -1673,10 +1698,12 @@ function CompanyQuotationDetails() {
                     <div className="flex justify-between items-center border-t pt-2">
                       <div className="text-xs text-gray-500 leading-tight">
                         <p className="text-blue-600 font-medium text-sm">
-                          Total Quotation Amount
+                          Total Quotation Amount (E+F)
                         </p>
-                        <p className="caption-custom">
-                          <span className="caption-custom-blue">Amount In Words:</span>
+                        <p className="flex gap-2 ml-3 caption-custom">
+                          <span className="caption-custom text-black">
+                            <p> Amount In Words: </p>
+                          </span>
                           {amountToWords(
                             summary.total +
                               (quotation?.adjustmentForRoundOff || 0),
@@ -1685,13 +1712,18 @@ function CompanyQuotationDetails() {
                       </div>
 
                       <span className="text-lg font-bold text-blue-600">
-                        {formatRupee(
+                        ₹{formatRupee(
                           summary.total +
                             (quotation?.adjustmentForRoundOff || 0),
                         )}
                       </span>
                     </div>
                   </div>
+                  <div className="flex justify-start items-center gap-1 bg-gray-50 border rounded px-3 py-0.5 caption-custom">
+                    <span><LucideSubtitles size={16}/></span>
+                      Round off amount will be shown separately in the printed
+                      quotation.
+                    </div>
                 </div>
               </div>
             )}

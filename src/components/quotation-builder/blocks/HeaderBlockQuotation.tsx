@@ -114,19 +114,109 @@ export const HeaderBlockQuotation: React.FC = () => {
     }
   };
 
+  // const handleSaveHeaderLayout = async () => {
+  //   setProp((p: any) => {
+  //     p.height = tempHeight;
+  //     p.padding = tempPadding;
+  //     p.backgroundColor = tempBg;
+  //   });
+
+  //   await saveHeaderToStorage(); // Save header
+  //   await handleSave(); // Save
+  //   setEditing(false);
+  //   setIsConfirmationPopupOpen(false);
+  //   window.location.reload();
+  // };
+
   const handleSaveHeaderLayout = async () => {
-    setProp((p: any) => {
-      p.height = tempHeight;
-      p.padding = tempPadding;
-      p.backgroundColor = tempBg;
+  const headerBlockStorageKey = quotationTemplateId
+    ? HEADER_STORAGE_KEY_UPDATE
+    : HEADER_STORAGE_KEY_CREATE;
+
+  try {
+    const editorState = query.getState();
+
+    // 👉 Get current header canvas
+    const currentCanvasId =
+      editorState.nodes[id].data.linkedNodes[`${id}-canvas`];
+
+    if (!currentCanvasId) return;
+
+    const currentCanvasNode = editorState.nodes[currentCanvasId];
+
+    if (!currentCanvasNode.data.nodes.length) return;
+
+    // 👉 Take first node (your header content root)
+    const firstNodeId = currentCanvasNode.data.nodes[0];
+
+    const serializedNode = query
+      .node(firstNodeId)
+      .toSerializedNode();
+
+    const newLayout = {
+      height: tempHeight,
+      padding: tempPadding,
+      backgroundColor: tempBg,
+    };
+
+    const savedData = {
+      data: serializedNode,
+      props: newLayout,
+    };
+
+    //  1. Save to localforage
+    await localforage.setItem(
+      headerBlockStorageKey + loginStatus.id,
+      JSON.stringify(savedData)
+    );
+
+    //  2. Sync ALL Header Blocks
+    const allNodes = query.getNodes();
+
+    Object.keys(allNodes).forEach((nodeId) => {
+      const node = allNodes[nodeId];
+
+      if (node.data.displayName === "Header Block") {
+        const canvasId =
+          editorState.nodes[nodeId].data.linkedNodes[
+            `${nodeId}-canvas`
+          ];
+
+        if (!canvasId) return;
+
+        const canvasNode = editorState.nodes[canvasId];
+
+        //  Remove old content
+        canvasNode.data.nodes.forEach((childId: string) => {
+          actions.delete(childId);
+        });
+
+        //  Add new content
+        const newNode = query
+          .parseSerializedNode(savedData.data)
+          .toNode();
+
+        actions.add(newNode, canvasId);
+
+        //  Update props
+        actions.setProp(nodeId, (props: any) => {
+          props.height = newLayout.height;
+          props.padding = newLayout.padding;
+          props.backgroundColor = newLayout.backgroundColor;
+        });
+      }
     });
 
-    await saveHeaderToStorage(); // Save header
-    await handleSave(); // Save
     setEditing(false);
     setIsConfirmationPopupOpen(false);
-    window.location.reload();
-  };
+
+  } catch (err) {
+    console.log("Error syncing header layout:", err);
+  } finally{
+  //  window.location.reload();
+
+  }
+};
 
   useEffect(() => {
 // Local Storage

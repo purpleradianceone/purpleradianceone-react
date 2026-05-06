@@ -274,10 +274,12 @@ export const TableBlockQuotation: React.FC = () => {
             <div
               style={{
                 position: "absolute",
-                left: "27%",
+                left: "35%",
                 transform: "translateX(-50%)",
                 top: 8,
                 zIndex: 10,
+                display: "flex",
+                gap: "8px",
               }}
             >
               {/* CHANGED: Dropdown instead of Button */}
@@ -322,6 +324,34 @@ export const TableBlockQuotation: React.FC = () => {
                 <option value="Noto Sans">Noto Sans</option>
                 <option value="DejaVu Sans">DejaVu Sans</option> */}
               </select>
+              
+              
+              <label
+  style={{
+    display: "flex",
+    alignItems: "center",
+    gap: "8px",
+    height: "34px",
+    padding: "0 10px",
+    border: "1px solid #d1d5db",
+    borderRadius: "6px",
+    background: "#fff",
+    fontSize: "13px",
+    cursor: "pointer",
+  }}
+>
+  <span>Grand Total</span>
+  <input
+    type="checkbox"
+    checked={props.isGrandTotalPresent}
+    onChange={(e) =>
+      setProp((p: any) => {
+        p.isGrandTotalPresent = e.target.checked;
+      })
+    }
+  />
+</label>
+
             </div>
           )}
 
@@ -517,7 +547,7 @@ export const TableBlockQuotation: React.FC = () => {
               </tr>
             ))}
 
-            <tr>
+            {props.isGrandTotalPresent&&<tr>
               <td
                 colSpan={9}
                 style={{
@@ -537,12 +567,12 @@ export const TableBlockQuotation: React.FC = () => {
               >
                 {money(grandTotal)}
               </td>
-            </tr>
+            </tr>}
 
             {/* =====================================================
                CHANGE 3: ADD THIS BELOW GRAND TOTAL ROW
           ===================================================== */}
-            <tr>
+            {props.isGrandTotalPresent&&<tr>
               <td
                 colSpan={10}
                 style={{
@@ -557,7 +587,7 @@ export const TableBlockQuotation: React.FC = () => {
                 <br />
                 {amountInWords}
               </td>
-            </tr>
+            </tr>}
           </tbody>
         </table>
       </div>
@@ -621,6 +651,7 @@ const input: React.CSSProperties = {
       },
     ],
     fontFamily: "Arial",
+    isGrandTotalPresent: false,
   },
   rules: {
     canMoveIn: () => false,
