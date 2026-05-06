@@ -274,7 +274,7 @@ export const TableBlockQuotation: React.FC = () => {
             <div
               style={{
                 position: "absolute",
-                left: "35%",
+                left: "50%",
                 transform: "translateX(-50%)",
                 top: 8,
                 zIndex: 10,
