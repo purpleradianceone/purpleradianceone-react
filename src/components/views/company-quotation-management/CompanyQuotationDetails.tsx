@@ -1296,11 +1296,11 @@ function CompanyQuotationDetails() {
                           Product/Service/Subscription
                         </th>
                         <th style={{ textAlign: "right" }}>Qty</th>
-                        <th style={{ textAlign: "right" }}>Rate</th>
+                        <th style={{ textAlign: "center" }}>Rate</th>
                         <th>HSN/SAC</th>
                         <th style={{ textAlign: "right" }}>Basic Amount</th>
                         <th style={{ textAlign: "right" }}>Discount(%)</th>
-                        <th style={{ textAlign: "right" }}>Taxable Value</th>
+                        <th style={{ textAlign: "right" }}>Taxable Amount</th>
                         <th style={{ textAlign: "right" }}>CGST (%)</th>
                         <th style={{ textAlign: "right" }}>SGST (%)</th>
                         <th style={{ textAlign: "right" }}>IGST (%)</th>
@@ -1348,7 +1348,7 @@ function CompanyQuotationDetails() {
                                   {item.company_product_name}
                                 </td>
                                 <td style={{ textAlign: "right" }}>{formatQuantity(item.quantity)}</td>
-                                <td style={{ textAlign: "right" }}>
+                                <td style={{ textAlign: "center" }}>
                                   {formatQuantity(item.rate)}
                                 </td>
                                 <td>{item.hsn || item.sac}</td>
@@ -1509,7 +1509,7 @@ function CompanyQuotationDetails() {
                   <div className="border rounded-lg p-2 bg-white mt-2 space-y-2">
                     {/* Basic + Discount */}
                     <div className="flex justify-between">
-                      <span>A. Basic Value</span>
+                      <span>A. Basic Amount</span>
                       <span>{formatRupee(summary.basic)}</span>
                     </div>
 
@@ -1520,7 +1520,7 @@ function CompanyQuotationDetails() {
 
                     {/* Taxable */}
                     <div className="flex justify-between text-gray-600 border-t pt-2">
-                     <div className="flex"><span className="text-black">C</span> <span>. Taxable Value (A-B)</span></div>
+                     <div className="flex"><span className="text-black">C</span> <span>. Taxable Amount (A-B)</span></div>
                       <span>{formatRupee(summary.taxable)}</span>
                     </div>
 
