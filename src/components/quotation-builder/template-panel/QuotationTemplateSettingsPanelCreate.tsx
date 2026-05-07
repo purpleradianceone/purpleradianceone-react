@@ -314,6 +314,7 @@ export const QuotationTemplateSettingsPanelCreate: React.FC<
                 placeholder={
                   quotationTemplateNamePlaceholder ?? "Enter template name"
                 }
+                autoFocus={true}
               />
 
               {/* Description */}

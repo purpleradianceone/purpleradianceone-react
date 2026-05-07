@@ -4,11 +4,14 @@ import { createPortal } from "react-dom";
 import { Download, Eye, Trash2 } from "lucide-react";
 import { JSX_CHILDREN_NAME } from "../../../constants/AppConstants";
 import ActionsDropdownButton from "../../ui/ActionsDropdownButton";
+import ConfirmationDialog from "../../dialogue-box/ConfirmationDialogue";
 
 const QuotationActionsDropdown = ({ data, context }: any) => {
   console.log("QuotationActionDropdown data:");
   console.log(data);
   const [open, setOpen] = useState(false);
+  const [isOpenConfirmationDialog, setOpenConfirmationDialog] =
+    useState<boolean>(false);
   const [position, setPosition] = useState({
     top: 0,
     left: 0,
@@ -45,6 +48,12 @@ const QuotationActionsDropdown = ({ data, context }: any) => {
     document.addEventListener("mousedown", handleOutside);
     return () => document.removeEventListener("mousedown", handleOutside);
   }, []);
+
+  const deleteQuotation = () => {
+    context.onDelete?.(data);
+    setOpen(false);
+    // setOpenConfirmationDialog(false);
+  };
 
   return (
     <>
@@ -94,8 +103,9 @@ const QuotationActionsDropdown = ({ data, context }: any) => {
             {data.quotationStatusId === 1 && (
               <ActionsDropdownButton
                 onClick={() => {
-                  context.onDelete?.(data);
-                  setOpen(false);
+                  // context.onDelete?.(data);
+                  // setOpen(false);
+                  setOpenConfirmationDialog(true);
                 }}
               >
                 <div className="flex items-center gap-2 text-red-600">
@@ -107,6 +117,18 @@ const QuotationActionsDropdown = ({ data, context }: any) => {
           </div>,
           document.body,
         )}
+      <ConfirmationDialog
+        icon={Trash2}
+
+        open={isOpenConfirmationDialog}
+        title={`Deleting ${data.quotationNumber}`}
+        message={`You are deleting this quotation: ${data.quotationNumber} `}
+        description={`All the changes related to quotation will be deleted.`}
+        messageDescription=""
+        onCancel={() => setOpenConfirmationDialog(false)}
+        onConfirm={deleteQuotation}
+        // confirmButtonText="Proceed"
+      />
     </>
   );
 };
