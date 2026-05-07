@@ -5,13 +5,14 @@ import { useMemo, useRef } from "react";
 import { INNERHTML, JSX_CHILDREN_NAME } from "../../constants/AppConstants";
 import SupportTicketManagementAgGridProps from "../../@types/ag-grid/SupportTicketManagementAgGridProps";
 import SupportTicketProps from "../../@types/support-ticket-management/SupportTicketProps";
+import { SkeletonRowsAgGrid } from "../ui/SkeletonRowsAgGrid";
 
 function SupportTicketManagementAgGrid({
   supportTickets,
   onRowSelect, 
   handleRowClick,
   isUsedInSupportTicketModule,
-  
+  isDataLoading
 }: SupportTicketManagementAgGridProps) {
   const gridRef = useRef<AgGridReact>(null); // Ref to the AgGridReact component
 
@@ -198,6 +199,9 @@ function SupportTicketManagementAgGrid({
         // autoHeight: true,
         // suppressSizeToFit: true,
         cellRenderer: (params: SupportTicketProps | any) => {
+           if (params.data?.__isSkeleton) {
+                      return <SkeletonRowsAgGrid />;
+                    }
           return (
             <div className="flex items-center justify-center  ">
               <span
@@ -225,9 +229,23 @@ function SupportTicketManagementAgGrid({
       flex: 0.8,
       suppressHeaderMenuButton: true,
       suppressHeaderContextMenu: true,
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  cellRenderer: (params: any) => {
+                    if (params.data?.__isSkeleton) {
+                      return <SkeletonRowsAgGrid />;
+                    }
+                    return params.value;
+                  },
     }),
     []
   );
+
+  const skeletonRows = useMemo(() => {
+      return Array.from({ length: 30 }).map(() => ({
+        __isSkeleton: true,
+      }));
+    }, []);
 
   return (
     <div
@@ -236,7 +254,7 @@ function SupportTicketManagementAgGrid({
     >
       <AgGridReact
         ref={gridRef} // Attach the ref
-        rowData={supportTickets}
+        rowData={isDataLoading ? skeletonRows: supportTickets}
         columnDefs={columnDefs}
         defaultColDef={defaultColDef}
         modules={[AllCommunityModule]}

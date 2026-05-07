@@ -38,7 +38,7 @@ function SupportTicketManagement({
   const [supportTicketData, setSupportTicketData] = useState<
     SupportTicketProps[]
   >([]);
-
+  const [isDataLoading , setIsDataLoading] = useState<boolean>(false)
   const { supportTicketCategory } = useSupportTicketCategory();
   const { supportTicketLifecycle } = useSupportTicketLifecycle();
   const { supportTicketSource } = useSupportTicketSource();
@@ -167,6 +167,7 @@ function SupportTicketManagement({
     try {
       if (postDataToGetSupportTickets.company_id === 0 || pageSize === 10)
         return;
+      setIsDataLoading(true)
       const response = await axiosClient.post(
         POST_API.GET_SUPPORT_TICKET,
         postDataToGetSupportTickets,
@@ -240,6 +241,8 @@ function SupportTicketManagement({
           getSupportTicketData(signal);
         }
       }
+    }finally{
+      setIsDataLoading(false)
     }
   };
 
@@ -441,6 +444,7 @@ function SupportTicketManagement({
             handleSupportSelectedLifecycle={handleSupportSelectedLifecycle}
             supportTicketSource={supportTicketSource!}
             handleSupportSelectedSource={handleSupportTicketSelectedSource}
+            isDataLoading={isDataLoading}
           />
         ) : (
           <div className="flex-none mx-96 mt-14">
