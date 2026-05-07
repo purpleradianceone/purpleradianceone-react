@@ -43,6 +43,8 @@ function AccountInvoiceManagementList({
   handleSelectedInvoiceStatus,
   handleAddInvoice,
   isUsedForSidebar = false,
+  gridLoading,
+  isNavigateFrom,
 }: AccountInvoiceManagementListProps) {
   const navigate = useNavigate();
   const { position } = usePanel();
@@ -78,7 +80,7 @@ function AccountInvoiceManagementList({
       String(rowData?.id),
     );
 
-    navigate(path);
+    navigate(path + `?${"isNavigateFrom"}=${isNavigateFrom || "Invoice"}`);
   };
   const handleRowClicked = (event: any) => {
     const rowData: AccountInvoiceProps = event.data;
@@ -427,6 +429,7 @@ function AccountInvoiceManagementList({
               onDownloadInvoice={handleInvoiceDownload}
               invoices={invoiceData}
               isUsedInInvoiceModule={false}
+              isDataLoading={gridLoading}
             />
           </div>
 

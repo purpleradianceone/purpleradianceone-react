@@ -25,15 +25,17 @@ import MESSAGE from "../../../../constants/Messages";
 function AccountInvoice({
   account,
   isUsedForSidebar = false,
+  isNavigateFrom = "Invoice",
 }: {
   account: any | null;
   isUsedForSidebar?: boolean;
+  isNavigateFrom?: string;
 }) {
   //   console.log(account);
 
   const { userHasAccessToViewCompanyInvoiceDraft } = useUserAccessModules();
   const { invoiceStatus } = useInvoiceStatus();
-  // const [accessDeniedPopUpOpen, setAccessDeniedPopUpOpen] = useState(false);
+  const [gridLoading, setGridLoading] = useState(true);
 
   const [invoiceData, setInvoiceData] = useState<AccountInvoiceProps[]>([]);
   const { loginStatus } = useLoggedInUserContext();
@@ -71,7 +73,12 @@ function AccountInvoice({
   // 🔥 API CALL
   const getInvoices = async (signal: AbortSignal) => {
     if (!userHasAccessToViewCompanyInvoiceDraft) return;
-    if (dateRangeId === customDateRangeId && concatDate.trim() === "") return;
+    setGridLoading(true);
+    setInvoiceData([]); // Clear data to show skeleton
+    if (dateRangeId === customDateRangeId && concatDate.trim() === "") {
+      setGridLoading(false);
+      return;
+    }
 
     const offset = (currentPage - 1) * pageSize;
 
@@ -89,7 +96,10 @@ function AccountInvoice({
     };
 
     try {
-      if (postData.company_id === 0 || pageSize === 10) return;
+      if (postData.company_id === 0 || pageSize === 10) {
+        setGridLoading(false);
+        return;
+      }
 
       const response = await axiosClient.post(POST_API.GET_INVOICE, postData, {
         signal,
@@ -134,6 +144,7 @@ function AccountInvoice({
         );
 
         setInvoiceData(formattedData);
+        setGridLoading(false);
       }
     } catch (error: any) {
       handleApiError(error);
@@ -159,13 +170,6 @@ function AccountInvoice({
     concatDate,
     selectedInvoiceStatus,
   ]);
-
-  //   🔒 Access Control
-  // useEffect(() => {
-  //   if (!userHasAccessToViewCompanyInvoice) {
-  //     setAccessDeniedPopUpOpen(true);
-  //   }
-  // }, [userHasAccessToViewCompanyInvoice]);
 
   // 💾 Save filters
   useEffect(() => {
@@ -242,6 +246,8 @@ function AccountInvoice({
               setselectedInvoiceStatus(selectedStatus)
             }
             isUsedForSidebar={isUsedForSidebar}
+            gridLoading={gridLoading}
+            isNavigateFrom={isNavigateFrom}
           />
         ) : (
           <div

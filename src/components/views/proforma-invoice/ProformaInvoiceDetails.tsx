@@ -14,8 +14,24 @@ import axiosClient from "../../../axios-client/AxiosClient";
 import POST_API from "../../../constants/PostApi";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
 import toast from "react-hot-toast";
-import { formatRupee } from "../../../utils/helperMethods/formatFunctions";
-import { ChevronRight, Download, Pencil, Trash, User, X } from "lucide-react";
+import {
+  formatQuantity,
+  formatRupee,
+} from "../../../utils/helperMethods/formatFunctions";
+import {
+  Check,
+  ChevronRight,
+  Download,
+  LucideLightbulb,
+  LucideSubtitles,
+  Pencil,
+  RotateCcw,
+  Save,
+  Send,
+  Trash,
+  User,
+  X,
+} from "lucide-react";
 import CompanyInvoiceItemProps from "../../../@types/invoice/CompanyInvoiceItemProps";
 import InvoiceStatusChip from "../../ui/InvoiceStatusChip";
 import CustomDocumentPreviewComponent from "../../custom-document-preview-component/CustomDocumentPreviewComponent";
@@ -32,6 +48,7 @@ import {
 } from "../invoice/CompanyInvoiceDetailSkeleton";
 import { amountToWords } from "../../../utils/helperMethods/amountToWords";
 import AccountProformaInvoiceProps from "../../../@types/account/AccountProformaInvoiceProps";
+import FormInput from "../../ui/FormInput";
 
 function ProformaInvoiceDetails() {
   const { invoiceId, accountId } = useParams();
@@ -327,12 +344,17 @@ function ProformaInvoiceDetails() {
     return {
       roundedTotal, // final rounded amount
       roundOff, // adjustment (+/-)
+      isRounded: roundOff === 0, // ✅ true if already rounded
     };
   };
 
   const [roundOffValues, setRoundOffValues] = useState(
     getRoundOffValues(invoice?.totalAmount ?? 0),
   );
+
+  useEffect(() => {
+    setRoundOffValues(getRoundOffValues(invoice?.totalAmount ?? 0));
+  }, [invoice?.adjustmentForRoundOff, invoice?.totalAmount, invoice]);
 
   const updateInvoice = async () => {
     if (!invoice) return;
@@ -569,9 +591,10 @@ function ProformaInvoiceDetails() {
       acc.tax += item.totalTax || 0;
       acc.total += item.totalAmount || 0;
       acc.cess += item.cessAmount || 0;
+      acc.igst += item.igstAmount || 0;
       return acc;
     },
-    { basic: 0, discount: 0, taxable: 0, tax: 0, total: 0, cess: 0 },
+    { basic: 0, discount: 0, taxable: 0, tax: 0, total: 0, cess: 0, igst: 0 },
   );
 
   const hasCess = tempItems.some(
@@ -703,9 +726,6 @@ function ProformaInvoiceDetails() {
   };
 
   useEffect(() => {
-    setRoundOffValues(getRoundOffValues(invoice?.totalAmount ?? 0));
-  }, [invoice?.adjustmentForRoundOff, invoice?.totalAmount, invoice]);
-  useEffect(() => {
     if (!invoiceId || Number(invoiceId) === 0) return;
 
     const controller = new AbortController();
@@ -780,8 +800,8 @@ function ProformaInvoiceDetails() {
                     onClick={handleInvoiceDownload}
                   >
                     <div className="flex items-center gap-1">
-                      <span className="text-gray-700">Download</span>
                       <Download size={14} className="text-blue-500" />
+                      <span className="text-gray-700">Download</span>
                     </div>
                   </button>
                   <button
@@ -796,8 +816,8 @@ function ProformaInvoiceDetails() {
                     onClick={previewInvoice}
                   >
                     <div className="flex items-center gap-1">
-                      <span className="">Preview</span>
                       <FaFilePdf size={14} className="text-red-500" />
+                      <span className="">Preview</span>
                     </div>
                   </button>
                 </div>
@@ -935,7 +955,10 @@ function ProformaInvoiceDetails() {
                       }
                       onClick={updateInvoice}
                     >
-                      Update
+                      <div className="flex items-center gap-1">
+                        <Save size={16} />
+                        <span>Update</span>
+                      </div>
                     </Button>
                   )}
                   {!isCreateMode && (
@@ -945,7 +968,10 @@ function ProformaInvoiceDetails() {
                       }
                       onClick={SubmitInvoice}
                     >
-                      Submit
+                      <div className="flex items-center gap-1">
+                        <Send size={16} />
+                        <span>Submit</span>
+                      </div>
                     </Button>
                   )}
                 </div>
@@ -999,16 +1025,16 @@ function ProformaInvoiceDetails() {
                           Product/Service/Subscription
                         </th>
                         <th>Qty</th>
-                        <th>Price</th>
+                        <th>Rate</th>
                         <th>HSN/SAC</th>
-                        <th>Amount</th>
+                        <th>Basic Amount</th>
                         <th>Discount(%)</th>
                         <th>Taxable Value</th>
                         <th>CGST (%)</th>
                         <th>SGST (%)</th>
                         <th>IGST (%)</th>
                         {hasCess && <th>Cess (%)</th>}
-                        <th>Total Item Amount</th>
+                        <th>Total </th>
                         {!disabled && <th>Action</th>}
                       </tr>
                     </thead>
@@ -1049,7 +1075,7 @@ function ProformaInvoiceDetails() {
                                   <input
                                     type="number"
                                     className={`${editingItemId !== item.id ? "" : "border"} rounded p-1 text-center w-20`}
-                                    value={item.quantity}
+                                    value={formatQuantity(item.quantity)}
                                     disabled={
                                       disabled || editingItemId !== item.id
                                     }
@@ -1065,7 +1091,7 @@ function ProformaInvoiceDetails() {
                                   <input
                                     type="number"
                                     className={`${editingItemId !== item.id ? "" : "border"} rounded p-1 text-center w-24`}
-                                    value={item.rate}
+                                    value={formatQuantity(item.rate)}
                                     disabled={
                                       disabled || editingItemId !== item.id
                                     }
@@ -1080,22 +1106,30 @@ function ProformaInvoiceDetails() {
                                 {/* <td>{formatRupee(item.rate)}</td> */}
                                 <td>{item.hsn || item.sac}</td>
                                 <td>{formatRupee(item.basicValue)}</td>
-                                <td>
-                                  <input
-                                    type="number"
-                                    className={`${editingItemId !== item.id ? "" : "border"} rounded p-1 text-center w-16`}
-                                    value={item.discountPercent}
-                                    disabled={
-                                      disabled || editingItemId !== item.id
-                                    }
-                                    onChange={(e) =>
-                                      handleDiscountChange(
-                                        item.id,
-                                        Number(e.target.value),
-                                      )
-                                    }
-                                  />
-                                </td>
+                                {editingItemId === item.id ? (
+                                  <td>
+                                    {formatRupee(item.discountAmount)}
+                                    <input
+                                      type="number"
+                                      className={`${editingItemId !== item.id ? "" : "border"} rounded p-1 mx-1 text-center w-16`}
+                                      value={item.discountPercent}
+                                      disabled={
+                                        disabled || editingItemId !== item.id
+                                      }
+                                      onChange={(e) =>
+                                        handleDiscountChange(
+                                          item.id,
+                                          Number(e.target.value),
+                                        )
+                                      }
+                                    />
+                                  </td>
+                                ) : (
+                                  <td>
+                                    {formatRupee(item.discountAmount)} (
+                                    {item.discountPercent}%)
+                                  </td>
+                                )}
                                 <td>{formatRupee(item.taxableValue)}</td>
                                 <td>
                                   {formatRupee(item.cgstAmount)} (
@@ -1203,139 +1237,130 @@ function ProformaInvoiceDetails() {
               </div>
             )}
             {/* BOTTOM */}
-            {/* {!isCreateMode && (
-              <div className="grid grid-cols-2 text-sm mb-2">
-                <div className="space-y-2"></div>
-                <div>
-                  <span className="font-medium text-gray-700 text-sm ">
-                    Summary
-                  </span>
-                  <div className="border rounded-lg p-4 bg-gray-50 space-y-2">
-                    <div className="flex justify-between">
-                      <span>Basic Amount</span>
-                      <span>{formatRupee(summary.basic)}</span>
-                    </div>
-
-                    <div className="flex justify-between">
-                      <span>Total Discount</span>
-                      <span>{formatRupee(summary.discount)}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Total Amount</span>
-                      <span>{formatRupee(summary.taxable)}</span>
-                    </div>
-
-                    <div className="flex justify-between">
-                      <span>Total Cess</span>
-                      <span>{formatRupee(summary.cess)}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Total Tax</span>
-                      <span>{formatRupee(summary.tax)}</span>
-                    </div>
-
-                    <div className="border-t pt-2 flex justify-between text-base font-semibold text-blue-600">
-                      <span>Total Invoice Amount</span>
-                      <span>{formatRupee(summary.total)}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )} */}
             {!isCreateMode && (
               <div className="grid grid-cols-2 text-sm mb-2">
                 <div></div>
 
-                <div>
+                <div className="border rounded-lg p-2 bg-white mt-2 space-y-2">
                   <span className="font-medium text-gray-700 text-sm">
                     Invoice Summary
                   </span>
 
-                  <div className="border rounded-lg p-3 bg-white mt-2 space-y-2">
+                  <div className="border rounded-lg p-2 bg-white mt-2 space-y-2">
                     {/* Basic + Discount */}
                     <div className="flex justify-between">
-                      <span>Subtotal</span>
+                      <span>A. Basic Value</span>
                       <span>{formatRupee(summary.basic)}</span>
                     </div>
 
                     <div className="flex justify-between">
-                      <span>Discount</span>
+                      <span>B. Total Discount</span>
                       <span>{formatRupee(summary.discount)}</span>
                     </div>
 
                     {/* Taxable */}
                     <div className="flex justify-between text-gray-600 border-t pt-2">
-                      <span>Taxable</span>
+                      <div className="flex">
+                        <span className="text-black">C</span>{" "}
+                        <span>. Taxable Value (A-B)</span>
+                      </div>
                       <span>{formatRupee(summary.taxable)}</span>
                     </div>
 
                     {/* Tax + Cess in one row */}
                     <div className="flex justify-between text-gray-600">
-                      <span>Total Tax {summary.cess ? "+ Cess" : ""}</span>
+                      <div className="flex">
+                        <span className="text-black">D</span>
+                        <span>
+                          . Total Tax ({summary.igst ? "IGST" : "CGST + SGST"}{" "}
+                          {summary.cess ? "+ Cess" : ""})
+                        </span>
+                      </div>
                       <span>{formatRupee(summary.tax)}</span>
                     </div>
 
                     {/* Total */}
                     <div className="flex justify-between font-medium border-t pt-2">
-                      <span>Total</span>
-                      <span>{formatRupee(summary.total)}</span>
+                      <span>E. Total Amount (C+D)</span>
+                      <span>₹{formatRupee(summary.total)}</span>
                     </div>
 
                     {/* Round Off Compact */}
                     <div className="flex items-center justify-between bg-gray-50 border rounded px-2 py-2 text-xs">
                       {/* Left */}
-                      <div className="flex flex-col">
-                        <span className="text-blue-600 font-medium text-xs">
-                          Round Off (Adjustment)
+                      <div className="flex flex-col ">
+                        <span className="flex gap-3 justify-start items-center table-header-custom-blue ">
+                          F. Round Off{" "}
+                          <span className="caption-custom">
+                            Adjust the amount to make the invoice total rounded.
+                          </span>
                         </span>
-                        <span className="text-gray-500">
-                          Suggested: {roundOffValues.roundOff} to make{" "}
-                          {roundOffValues.roundedTotal}
-                        </span>
+                        {!roundOffValues.isRounded && (
+                          <span className="caption-custom mt-1">
+                            <span className="flex">
+                              {" "}
+                              <LucideLightbulb size={14} />
+                              Suggested: {roundOffValues.roundOff} to make{" "}
+                              {roundOffValues.roundedTotal}
+                            </span>
+                          </span>
+                        )}
                       </div>
 
                       {/* Right */}
                       <div className="flex items-center gap-1">
-                        <input
-                          disabled={disabled}
-                          type="number"
-                          className="border rounded px-1 py-0.5 w-20 text-right text-xs"
-                          value={invoice?.adjustmentForRoundOff}
-                          onChange={(e: any) =>
-                            setInvoice((prev) => ({
-                              ...prev!,
-                              adjustmentForRoundOff: Number(e.target.value),
-                            }))
-                          }
-                        />
+                        <div className="w-20">
+                          <FormInput
+                            disabled={disabled}
+                            type="number"
+                            min={-1}
+                            max={1}
+                            // className="border rounded px-1 py-0.5 w-10 text-right text-xs"
+                            value={invoice?.adjustmentForRoundOff}
+                            onChange={(e: any) =>
+                              setInvoice((prev) => ({
+                                ...prev!,
+                                adjustmentForRoundOff: Number(e.target.value),
+                              }))
+                            }
+                          />
+                        </div>
 
-                        <button
-                          disabled={disabled}
-                          className="text-blue-600 text-xs"
-                          onClick={updateInvoice}
-                        >
-                          Apply
-                        </button>
+                        <div className="flex items-center gap-1">
+                          <button
+                            disabled={disabled}
+                            onClick={updateInvoice}
+                            className="flex items-center gap-1 px-2 py-1 rounded-md text-xs 
+               text-blue-600 border border-blue-200 bg-blue-50 
+               hover:bg-blue-100 disabled:opacity-50"
+                          >
+                            <Check size={14} />
+                            Apply
+                          </button>
 
-                        <button
-                          disabled={disabled}
-                          className="text-gray-500 text-xs"
-                          onClick={handleResetRoundOff}
-                        >
-                          Reset
-                        </button>
+                          <button
+                            disabled={disabled}
+                            onClick={handleResetRoundOff}
+                            className="flex items-center gap-1 px-2 py-1 rounded-md text-xs 
+               text-gray-600 border border-gray-200 bg-gray-50 
+               hover:bg-gray-100 disabled:opacity-50"
+                          >
+                            <RotateCcw size={14} />
+                            Reset
+                          </button>
+                        </div>
                       </div>
                     </div>
 
                     {/* Final Total */}
                     <div className="flex justify-between items-center border-t pt-2">
                       <div className="text-xs text-gray-500 leading-tight">
-                        <p className="text-blue-600 font-medium text-sm">
-                          Total Invoice Amount
+                        <p className="text-blue-600 font-medium text-sm mb-1">
+                          Total Invoice Amount (E+F)
                         </p>
-                        <p className="caption-custom">
-                          <span className="caption-custom-blue">
-                            Amount In Words:
+                        <p className="flex gap-2 caption-custom">
+                          <span className="caption-custom text-black">
+                            <p> Amount In Words: </p>
                           </span>
                           {amountToWords(
                             summary.total +
@@ -1345,11 +1370,19 @@ function ProformaInvoiceDetails() {
                       </div>
 
                       <span className="text-lg font-bold text-blue-600">
+                        ₹
                         {formatRupee(
                           summary.total + (invoice?.adjustmentForRoundOff || 0),
                         )}
                       </span>
                     </div>
+                  </div>
+                  <div className="flex justify-start items-center gap-1 bg-gray-50 border rounded px-2 py-0.5 caption-custom">
+                    <span>
+                      <LucideSubtitles size={16} />
+                    </span>
+                    Round off amount will be shown separately in the printed
+                    invoice.
                   </div>
                 </div>
               </div>

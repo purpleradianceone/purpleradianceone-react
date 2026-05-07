@@ -398,7 +398,7 @@ export const router = createBrowserRouter([
         <PrivateRoute>
           <div>
             <Navbar>
-              <AccountInvoice account={null} isUsedForSidebar={true} />
+              <AccountInvoice isNavigateFrom="Invoice" account={null} isUsedForSidebar={true} />
             </Navbar>
           </div>
         </PrivateRoute>

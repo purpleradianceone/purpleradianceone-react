@@ -10,6 +10,7 @@ type AccountInvoiceManagementGridProps = {
   handleRowClick?: (event: any) => void;
 
   isUsedInInvoiceModule?: boolean;
+  isDataLoading?: boolean;
 };
 
 export default AccountInvoiceManagementGridProps;

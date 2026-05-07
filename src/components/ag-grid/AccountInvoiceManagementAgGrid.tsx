@@ -3,18 +3,20 @@
 import { AllCommunityModule, ColDef, themeBalham } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 import { useMemo, useRef } from "react";
-import { INNERHTML, JSX_CHILDREN_NAME } from "../../constants/AppConstants";
+import { JSX_CHILDREN_NAME } from "../../constants/AppConstants";
 import StatusIndicator from "../ui/StatusIndicator";
 import AccountInvoiceManagementGridProps from "../../@types/ag-grid/AccountInvoiceManagementGridProps";
 import InvoiceActionsDropdown from "../views/invoice/InvoiceActionsDropdown";
 import InvoiceStatusChip from "../ui/InvoiceStatusChip";
 import { useUserAccessModules } from "../../config/hooks/useAccessModules";
+import { SkeletonRowsAgGrid } from "../ui/SkeletonRowsAgGrid";
 
 function AccountInvoiceManagementAgGrid({
   invoices,
   onRowSelect,
   onDeleteInvoice,
   onDownloadInvoice,
+  isDataLoading,
 }: AccountInvoiceManagementGridProps) {
   const gridRef = useRef<AgGridReact>(null);
   const { userHasAccessToUpdateCompanyInvoiceDraft } = useUserAccessModules();
@@ -25,6 +27,9 @@ function AccountInvoiceManagementAgGrid({
         headerName: "Invoice No",
         minWidth: 140,
         cellRenderer: (params: any) => {
+          if (params.data?.__isSkeleton) {
+            return <SkeletonRowsAgGrid />;
+          }
           return (
             <div className="flex items-center font-bold gap-2">
               <span>{params.value || "[Auto-generated]"}</span>
@@ -38,6 +43,12 @@ function AccountInvoiceManagementAgGrid({
         headerName: "Account Name",
         sortable: true,
         filter: true,
+        cellRenderer: (params: any) => {
+          if (params.data?.__isSkeleton) {
+            return <SkeletonRowsAgGrid />;
+          }
+          return <span>{params.value || "[Auto-generated]"}</span>;
+        },
       },
 
       {
@@ -46,6 +57,9 @@ function AccountInvoiceManagementAgGrid({
         sortable: true,
         filter: true,
         cellRenderer: (params: any) => {
+          if (params.data?.__isSkeleton) {
+            return <SkeletonRowsAgGrid />;
+          }
           return (
             <div className="flex items-center font-bold gap-2">
               <span>{params.value || "[Auto-generated]"}</span>
@@ -59,6 +73,9 @@ function AccountInvoiceManagementAgGrid({
         sortable: true,
         filter: true,
         cellRenderer: (params: any) => {
+          if (params.data?.__isSkeleton) {
+            return <SkeletonRowsAgGrid />;
+          }
           return (
             <div className="flex items-center gap-2">
               <InvoiceStatusChip statusId={params.data.statusId} />
@@ -124,6 +141,9 @@ function AccountInvoiceManagementAgGrid({
         sortable: true,
         filter: true,
         cellRenderer: (params: any) => {
+          if (params.data?.__isSkeleton) {
+            return <SkeletonRowsAgGrid />;
+          }
           return (
             <div className="flex items-center text-sm gap-1 mt-1">
               <StatusIndicator isActive={params.value} />
@@ -176,9 +196,17 @@ function AccountInvoiceManagementAgGrid({
         field: "view",
         pinned: "right",
         maxWidth: 90,
-        cellRenderer: (params: any) => (
-          <InvoiceActionsDropdown data={params.data} context={params.context} />
-        ),
+        cellRenderer: (params: any) => {
+          if (params.data?.__isSkeleton) {
+            return <SkeletonRowsAgGrid />;
+          }
+          return (
+            <InvoiceActionsDropdown
+              data={params.data}
+              context={params.context}
+            />
+          );
+        },
       },
     ],
     [],
@@ -191,29 +219,47 @@ function AccountInvoiceManagementAgGrid({
       flex: 0.8,
       suppressHeaderMenuButton: true,
       suppressHeaderContextMenu: true,
+      cellRenderer: (params: any) => {
+        if (params.data?.__isSkeleton) {
+          return <SkeletonRowsAgGrid />;
+        }
+        return params.value;
+      },
     }),
     [],
   );
+  const length = 30;
+  const skeletonRows = useMemo(() => {
+    return Array.from({ length: length }).map(() => ({
+      __isSkeleton: true,
+    }));
+  }, []);
 
   return (
     <div
-      className="ag-theme-balham w-full"
+      // className="ag-theme-balham w-full"
       style={{ height: "100%", width: "100%" }}
     >
       <AgGridReact
         ref={gridRef}
-        rowData={invoices}
+        rowData={isDataLoading ? skeletonRows : invoices}
         columnDefs={columnDefs}
         defaultColDef={defaultColDef}
         modules={[AllCommunityModule]}
         theme={themeBalham}
-        overlayNoRowsTemplate={INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
+        // overlayNoRowsTemplate={INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
         context={{
           handleRowSelect: onRowSelect, // ✅ correct
           onDelete: onDeleteInvoice,
           onDownloadInvoice,
           userHasAccessToUpdateCompanyInvoiceDraft,
           gridRef, // ✅ correct
+        }}
+        onCellClicked={(params) => {
+          //Ignore clicks on Actions column
+          if (params.colDef.field === "view") return;
+          //Call row select handler
+          params.context.handleRowSelect?.(params.data);
         }}
         // onRowClicked={handleRowClick}
       />
