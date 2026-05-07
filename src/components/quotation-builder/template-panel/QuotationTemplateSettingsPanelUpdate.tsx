@@ -239,6 +239,7 @@ export const QuotationTemplateSettingsPanelUpdate: React.FC<
                 placeholder={
                   editQuotationTemplateJson?.name ?? "Enter template name"
                 }
+                // autoFocus={true}
               />
 
               {/* Description */}

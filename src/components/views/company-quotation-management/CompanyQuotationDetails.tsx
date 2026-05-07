@@ -26,7 +26,7 @@ import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
 import { STATUS_CODE } from "../../../constants/AppConstants";
 import POST_API from "../../../constants/PostApi";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
-import { formatRupee } from "../../../utils/helperMethods/formatFunctions";
+import { formatQuantity, formatRupee } from "../../../utils/helperMethods/formatFunctions";
 import CustomDocumentPreviewComponent from "../../custom-document-preview-component/CustomDocumentPreviewComponent";
 import Button from "../../ui/Button";
 import FormInput from "../../ui/FormInput";
@@ -73,6 +73,7 @@ function CompanyQuotationDetails() {
   const [searchTerm, setSearchTerm] = useState("");
   const [editingItemId, setEditingItemId] = useState<number | null>(null);
   const [refreshCount, setRefreshCount] = useState<number>(0);
+  const [refreshLocalUiCount, setRefreshLocalUiCount] = useState<number>(0);
   const [refreshCountItem, setRefreshCountItem] = useState<number>(0);
 
   const [tempItems, setTempItems] = useState<any[]>([]);
@@ -93,6 +94,9 @@ function CompanyQuotationDetails() {
     name: "Lead",
   });
   const [selectedLead, setSelectedLead] = useState<any>(null);
+
+  const [selectedPreviousQuotationTemplate, setSelectedPreviousQuotationTemplate] =
+    useState<any>(null);
   const [selectedQuotationTemplate, setSelectedQuotationTemplate] =
     useState<any>(null);
 
@@ -199,6 +203,7 @@ function CompanyQuotationDetails() {
         const res = await getLookupQuotationTemplate(postData);
         console.error(res.data[0]);
         setSelectedQuotationTemplate(res.data[0]);
+        setSelectedPreviousQuotationTemplate(res.data[0]);
         setQuotation(formattedData);
         setPreviousQuotation(formattedData);
       }
@@ -410,13 +415,22 @@ function CompanyQuotationDetails() {
         setRefreshCount((prev) => prev + 1);
       } else {
         toast.error(res.data.message);
+        await handlePreviousState();
       }
     } catch (error) {
       handleApiError(error);
+      await handlePreviousState();
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  const handlePreviousState= async ()=>{
+        setQuotation(previousQuotation);
+        handleResetRoundOff();
+        setRefreshLocalUiCount((prev)=>prev+1);
+        setSelectedQuotationTemplate(selectedPreviousQuotationTemplate);
+  }
 
   const handleCompanyQuotationDownload = async () => {
     if (!disabled) return;
@@ -539,7 +553,7 @@ function CompanyQuotationDetails() {
       acc.adjustment_for_round_off = quotation?.adjustmentForRoundOff || 0;
       return acc;
     },
-    { basic: 0, discount: 0, taxable: 0, tax: 0, total: 0, cess: 0 },
+    { basic: 0, discount: 0, taxable: 0, tax: 0, total: 0, cess: 0, igst: 0 },
   );
 
   const hasCess = tempItems.some(
@@ -570,6 +584,7 @@ function CompanyQuotationDetails() {
 
       if (res.data.status) {
         toast.success(res.data.message);
+        setRefreshCount((prev)=>prev+1);
         setRefreshCountItem((prev) => prev + 1);
         setEditingItemId(null);
       } else {
@@ -818,11 +833,14 @@ function CompanyQuotationDetails() {
 
   useEffect(() => {
     setRoundOffValues(getRoundOffValues(quotation?.totalAmount ?? 0));
-  }, [quotation?.adjustmentForRoundOff, quotation?.totalAmount, quotation]);
+    // setRoundOffValues(getRoundOffValues(summary.total ?? 0));
+  }, [quotation?.adjustmentForRoundOff, quotation?.totalAmount, quotation, items, tempItems, summary]);
 
   return (
     <PageLayout onScrollChange={setShowAccountName} scrollTopValue={80}>
-      <div className="p-1 font-roboto">
+      <div className="p-1 font-roboto"
+      id={refreshLocalUiCount+""}
+      >
         {isSubmitting && <LoadingPopUpAnimation show={isSubmitting} />}
         {/* HEADER */}
 
@@ -1277,11 +1295,11 @@ function CompanyQuotationDetails() {
                         <th className="p-2 text-left">
                           Product/Service/Subscription
                         </th>
-                        <th>Qty</th>
-                        <th style={{ textAlign: "right" }}>Price</th>
+                        <th style={{ textAlign: "right" }}>Qty</th>
+                        <th style={{ textAlign: "right" }}>Rate</th>
                         <th>HSN/SAC</th>
-                        <th style={{ textAlign: "right" }}>Amount</th>
-                        <th>Discount(%)</th>
+                        <th style={{ textAlign: "right" }}>Basic Amount</th>
+                        <th style={{ textAlign: "right" }}>Discount(%)</th>
                         <th style={{ textAlign: "right" }}>Taxable Value</th>
                         <th style={{ textAlign: "right" }}>CGST (%)</th>
                         <th style={{ textAlign: "right" }}>SGST (%)</th>
@@ -1290,7 +1308,7 @@ function CompanyQuotationDetails() {
                         <th
                           style={{ textAlign: "right", paddingRight: "10px" }}
                         >
-                          Total Item Amount
+                          Total
                         </th>
                         {!disabled && (
                           <th style={{ textAlign: "center" }}>Action</th>
@@ -1329,18 +1347,22 @@ function CompanyQuotationDetails() {
                                 <td className="p-2 text-left">
                                   {item.company_product_name}
                                 </td>
-                                <td>{item.quantity}</td>
+                                <td style={{ textAlign: "right" }}>{formatQuantity(item.quantity)}</td>
                                 <td style={{ textAlign: "right" }}>
-                                  {item.rate}
+                                  {formatQuantity(item.rate)}
                                 </td>
                                 <td>{item.hsn || item.sac}</td>
                                 <td style={{ textAlign: "right" }}>
-                                  {item.basic_value}
+                                  {formatRupee(item.basic_value)}
                                 </td>
-                                <td>
+                                {editingItemId === item.id?(<td style={{ justifyContent:"end", textAlign: "right" }}>
+                                  {formatRupee(item.discount_amount)}
                                   <input
                                     type="number"
-                                    className={`${editingItemId !== item.id ? "" : "border"} rounded p-1 text-center w-16`}
+                                    min={0}
+                                    max={100}
+                                    step={"0.1"}
+                                    className={`${editingItemId !== item.id ? "" : "border"} rounded p-1 ml-1 text-center w-12 min-w-12 max-w-16`}
                                     value={item.discount_percent}
                                     disabled={
                                       disabled || editingItemId !== item.id
@@ -1352,22 +1374,26 @@ function CompanyQuotationDetails() {
                                       )
                                     }
                                   />
+                                </td>):
+                                 (<td style={{ textAlign: "right" }}>
+                                  {formatRupee(item.discount_amount)} ({item.discount_percent}%)
+                                </td>)
+                                }
+                                <td style={{ textAlign: "right" }}>
+                                  {formatRupee(item.taxable_value)}
                                 </td>
                                 <td style={{ textAlign: "right" }}>
-                                  {item.taxable_value}
+                                  {formatRupee(item.cgst_amount)} ({item.cgst_percent}%)
                                 </td>
                                 <td style={{ textAlign: "right" }}>
-                                  {item.cgst_amount} ({item.cgst_percent}%)
+                                  {formatRupee(item.sgst_amount)} ({item.sgst_percent}%)
                                 </td>
                                 <td style={{ textAlign: "right" }}>
-                                  {item.sgst_amount} ({item.sgst_percent}%)
-                                </td>
-                                <td style={{ textAlign: "right" }}>
-                                  {item.igst_amount} ({item.igst_percent}%)
+                                  {formatRupee(item.igst_amount)} ({item.igst_percent}%)
                                 </td>
                                 {hasCess && (
                                   <td>
-                                    {item.cess_amount} ({item.cess_percent}%)
+                                    {formatRupee(item.cess_amount)} ({item.cess_percent}%)
                                   </td>
                                 )}
                                 <td
@@ -1376,7 +1402,7 @@ function CompanyQuotationDetails() {
                                     paddingRight: "10px",
                                   }}
                                 >
-                                  {item.total_amount}
+                                  {formatRupee(item.total_amount)}
                                 </td>
 
                                 {!disabled && (
@@ -1470,133 +1496,17 @@ function CompanyQuotationDetails() {
             )}
 
             {/* BOTTOM */}
-
-            {/* {!isCreateMode && (
-              <div className="grid grid-cols-2 text-sm mb-2">
-                <div></div>
-
-                <div>
-                  <span className="font-medium text-gray-700 text-sm">
-                    Summary
-                  </span>
-
-                  <div className="border rounded-lg p-4 bg-white space-y-3 mt-2">
-                    <div className="flex justify-between">
-                      <span>Basic Amount</span>
-                      <span>{formatRupee(summary.basic)}</span>
-                    </div>
-
-                    <div className="flex justify-between">
-                      <span>Total Discount</span>
-                      <span>{formatRupee(summary.discount)}</span>
-                    </div>
-
-                    <hr />
-
-                    <div className="flex justify-between">
-                      <span>Taxable Value</span>
-                      <span>{formatRupee(summary.taxable)}</span>
-                    </div>
-
-
-
-                    <hr />
-                    {summary.cess && (
-                      <div className="flex justify-between">
-                        <span>Total Cess</span>
-                        <span>{formatRupee(summary.cess)}</span>
-                      </div>
-                    )}
-                    <div className="flex justify-between">
-                      <span>Total Tax</span>
-                      <span>{formatRupee(summary.tax)}</span>
-                    </div>
-                    <hr />
-                     <div className="flex justify-between">
-                      <span>Total Amount</span>
-                      <span>₹{formatRupee(summary.total)}</span>
-                    </div>
-
-                    <div className="bg-gray-50 border rounded-lg p-3 space-y-3">
-                      <div className="flex items-start justify-between gap-2">
-                        <div>
-                          <p className="text-blue-600 font-medium">Round Off</p>
-                          <p className="caption-custom">
-                            Adjust the amount to make the invoice total rounded.
-                          </p>
-                        </div>
-
-                        <div className="flex items-center gap-2">
-                          <input
-                            type="number"
-                            className="border rounded px-2 py-1 w-24 text-right"
-                            value={quotation?.adjustmentForRoundOff}
-                            onChange={(e: any) =>
-                              setQuotation((prev) => ({
-                                ...prev!,
-                                adjustmentForRoundOff: Number(e.target.value),
-                              }))
-                            }
-                          />
-
-                          <button className="border rounded px-3 py-1 text-blue-600 flex items-center gap-1"
-                          onClick={updateQuotation}
-                          >
-                            Apply
-                          </button>
-                        </div>
-                      </div>
-
-                      <div className="flex justify-between items-center bg-blue-50 border rounded px-3 py-2 text-sm">
-                        <span className="caption-custom">
-                          Suggested: {roundOffValues.roundOff} to make{" "}
-                          {roundOffValues.roundedTotal}
-                        </span>
-
-                        <button
-                          className="caption-custom-blue"
-                          onClick={handleResetRoundOff}
-                        >
-                          Reset
-                        </button>
-                      </div>
-                    </div>
-
-                    <div className="border-t pt-3 flex justify-between items-center">
-                      <div>
-                        <p className="text-blue-600 font-semibold">
-                          Total Quotation Amount
-                        </p>
-                        <p className="caption-custom">
-                          <span className="caption-custom-blue mt-5">Amount in words:</span> {amountToWords(summary.total+quotation?.adjustmentForRoundOff)}
-                        </p>
-                      </div>
-
-                      <span className="text-xl font-bold text-blue-600">
-                        ₹{formatRupee(summary.total+quotation?.adjustmentForRoundOff)}
-                      </span>
-                    </div>
-
-                    <div className="bg-gray-50 border rounded px-3 py-2 caption-custom">
-                      Round off amount will be shown separately in the printed
-                      invoice.
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )} */}
-
             {/** Summery Block */}
             {!isCreateMode && (
               <div className="grid grid-cols-2 text-sm mb-2">
                 <div></div>
 
-                <div className="border rounded-lg p-3 bg-white mt-2 space-y-2">
+                <div className="border rounded-lg p-2 bg-white mt-2 space-y-2">
                   <span className="font-medium text-gray-700 text-sm">
                     Quotation Summary
                   </span>
 
-                  <div className="border rounded-lg p-3 bg-white mt-2 space-y-2">
+                  <div className="border rounded-lg p-2 bg-white mt-2 space-y-2">
                     {/* Basic + Discount */}
                     <div className="flex justify-between">
                       <span>A. Basic Value</span>
@@ -1651,12 +1561,13 @@ function CompanyQuotationDetails() {
 
                       {/* Right */}
                       <div className="flex items-center gap-1">
-                        <div className="w-20">
+                        <div className="w-16">
                           <FormInput
                             disabled={disabled}
                             type="number"
                             min={-1}
                             max={1}
+                            step={"0.1"}
                             // className="border rounded px-1 py-0.5 w-10 text-right text-xs"
                             value={quotation?.adjustmentForRoundOff}
                             onChange={(e: any) =>
