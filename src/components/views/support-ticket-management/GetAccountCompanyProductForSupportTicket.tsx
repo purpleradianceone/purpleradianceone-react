@@ -24,6 +24,7 @@ function GetAccountCompanyProductForSupportTicket({
   const [accountsCompanyProductForSupportTicke, setAccountsCompanyProductForSupportTicke] = useState<
     AccountCompanyProductForSupportTicket[]
   >([]);
+  const [isDataLoading, setIsDataLoading] = useState<boolean>(false);  
   const [ref, inView] = useInView({ fallbackInView: true, threshold: 0.1 });
   const { loginStatus } = useLoggedInUserContext();
   const [accessDeniedPopUpOpen, setAccessDeniedPopUpOpen] = useState(false);
@@ -61,7 +62,7 @@ function GetAccountCompanyProductForSupportTicket({
     if(loginStatus.companyId === 0) return;
     if (dateRangeId === customDateRangeId && concatDate.trim() === "") return;
     const offset = (currentPage - 1) * pageSize;
-
+    setIsDataLoading(true)
     const effectiveDateRangeId =
       dateRangeId === customDateRangeId && !concatDate ? 0 : dateRangeId;
 
@@ -124,6 +125,8 @@ function GetAccountCompanyProductForSupportTicket({
           fetchAccountCompanyProductForSupportTicket();
         }
       }
+    }finally{
+      setIsDataLoading(false);
     }
   };
 
@@ -217,6 +220,7 @@ function GetAccountCompanyProductForSupportTicket({
                   
                 }}
                 handleRowSelect={handleRowSelect}
+                isDataLaoding={isDataLoading}
               />
             </motion.section>
           </div>

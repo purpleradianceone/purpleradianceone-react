@@ -60,6 +60,7 @@ function SupportTicketManagementList({
   handleSupportSelectedSource,
   isUsedInSupportTicketModule,
   handleRowSelectedForShowSupportTicket,
+  isDataLoading
 }: SupportTicketManagementListProps) {
   const [searchParams] = useSearchParams();
 
@@ -490,6 +491,7 @@ function SupportTicketManagementList({
                 handleSupportTicketDataFormChange
               }
               supportTickets={supportTicketData}
+              isDataLoading={isDataLoading}
             />
           </div>
           <CreateSupportTicketModal
