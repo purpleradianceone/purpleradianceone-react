@@ -157,18 +157,6 @@ export default function UpdateSubscription({
         [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full p-4"
           >
             {/* Header */}
-            {/* <div className="flex items-center gap-2 bg-white py-2">
-              <EditIcon className="text-blue-500" size={SIZE.TWENTY} />
-              <h2 className="text-base font-semibold text-gray-800">
-                Subscription for {startDate} - {endDate}
-              </h2>
-              <button
-                onClick={onClose}
-                className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
-              >
-                <X size={16} />
-              </button>
-            </div> */}
             <FormHeader
               icon={EditIcon}
               onClose={onClose}
@@ -201,7 +189,8 @@ export default function UpdateSubscription({
                     logo={Users}
                     label="Users to Add in Subscription :"
                     type="number"
-                    required
+                    required={true}
+                    autoFocus={true}
                     value={createUpdateSubscriptionFormData.companyUserCountForUpdateSubscription.toString()}
                     placeholder="Number of users to add in subscription"
                     name="companyUserCountForUpdateSubscription"

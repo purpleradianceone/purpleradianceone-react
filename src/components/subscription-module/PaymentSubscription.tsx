@@ -228,7 +228,7 @@ export default function PaymentSubscription({
   };
 
   const handlePaymentProceed = async (
-    event: React.FormEvent<HTMLButtonElement>
+    event: React.FormEvent<HTMLFormElement>
   ) => {
     event.preventDefault();
     await axios
@@ -300,7 +300,7 @@ export default function PaymentSubscription({
           </div>
           <hr className="my-3 border-gray-300" /> {/* Divider */}
           {/* Action Buttons */}
-          <div className="flex justify-end gap-3">
+          <form className="flex justify-end gap-3" onSubmit={handlePaymentProceed}>
             <div>
               <Button type="button" onClick={onCancel}>
                 <div className="flex items-center gap-0.5">
@@ -311,12 +311,12 @@ export default function PaymentSubscription({
             </div>
 
             <div>
-              <Button type="submit" onClick={handlePaymentProceed}>
+              <Button type="submit" autoFocus={true} >
                 <CheckCircle2 className="h-5 w-5" />
                 <span>Confirm Payment</span>
               </Button>
             </div>
-          </div>
+          </form>
         </div>
       )}
 
