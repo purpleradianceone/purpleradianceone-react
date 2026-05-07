@@ -18,6 +18,8 @@ import FormInput from "../../ui/FormInput";
 import POST_API from "../../../constants/PostApi";
 import { BsPlusCircle, BsTagFill } from "react-icons/bs";
 import LoadingPopUpAnimation from "../../views/card/LoadingPopUpAnimation";
+import { useNavigate } from "react-router-dom";
+import ROUTES_URL from "../../../constants/Routes";
 
 // 🔥 row generator
 const createRow = () => ({
@@ -44,6 +46,7 @@ function CreateProformaInvoiceModal({
   const [items, setItems] = useState<any[]>([createRow()]);
   console.log(account);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const navigate = useNavigate();
   // ================= HANDLERS =================
 
   const addRow = () => setItems((prev) => [...prev, createRow()]);
@@ -115,10 +118,6 @@ function CreateProformaInvoiceModal({
       const discountAmt = (base * item.discount) / 100;
       const taxable = base - discountAmt;
 
-      // let tax = 0;
-      // if (item.igst > 0) tax = (taxable * item.igst) / 100;
-      // else tax = (taxable * (item.cgst + item.sgst)) / 100;
-
       acc.basic += base;
       acc.discount += discountAmt;
       // acc.tax += tax;
@@ -164,6 +163,12 @@ function CreateProformaInvoiceModal({
       if (res.data.status) {
         toast.success(res.data.message);
         handleAddInvoice();
+        navigate(
+          ROUTES_URL.PROFORMA_INVOICE_DETAILS.replace(
+            ":invoiceId",
+            res.data.newid,
+          ).replace(":accountId", String(account?.id)),
+        );
         onClose();
       } else {
         toast.error(res.data.message);

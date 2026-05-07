@@ -12,15 +12,18 @@ import AccountInvoice from "./account-invoice/AccountInvoice";
 import Tabs from "../../ui/Tabs";
 import { AccountContactLeadTypeConjuction } from "./AccountContactLeadTypeConjuctionComponent";
 import AccountProformaInvoice from "./account-proforma-invoice/AccountProformaInvoice";
+import { LocalStorageTabKeys } from "../../../enums/LocalStorageKeys";
 
 const AccountManagement: React.FC = () => {
   const { accountId } = useParams();
   const { accountDetails: company, loading: accountDetailsLoading } =
     useAccountDetails(parseInt(accountId!));
   const navigate = useNavigate();
-  const TAB_STORAGE_KEY = "account_active_tab";
+
   const [activeTab, setActiveTab] = useState(() => {
-    return localStorage.getItem(TAB_STORAGE_KEY) || "product";
+    return (
+      localStorage.getItem(LocalStorageTabKeys.TAB_STORAGE_KEY) || "product"
+    );
   });
   const tabList = [
     { key: "product", label: "Product" },
@@ -32,7 +35,7 @@ const AccountManagement: React.FC = () => {
   const parsedAccountId = Number(accountId);
 
   useEffect(() => {
-    localStorage.setItem(TAB_STORAGE_KEY, activeTab);
+    localStorage.setItem(LocalStorageTabKeys.TAB_STORAGE_KEY, activeTab);
   }, [activeTab]);
   useEffect(() => {
     if (!accountId || Number.isNaN(parsedAccountId)) {
@@ -71,7 +74,6 @@ const AccountManagement: React.FC = () => {
 
         {/* Right Card - Empty for future use */}
         <div className="bg-white rounded-md border  border-slate-200">
-
           <AccountContactLeadTypeConjuction account={company} />
         </div>
 
@@ -135,7 +137,9 @@ const AccountManagement: React.FC = () => {
           <AccountSubscription accountId={company!.id} />
         )}
 
-        {activeTab === "invoice" && <AccountInvoice account={company} />}
+        {activeTab === "invoice" && (
+          <AccountInvoice isNavigateFrom="accountInvoice" account={company} />
+        )}
         {activeTab === "proforma-invoice" && (
           <AccountProformaInvoice account={company} />
         )}

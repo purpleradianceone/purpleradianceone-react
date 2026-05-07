@@ -20,6 +20,8 @@ type AccountInvoiceManagementListProps = {
   invoiceStatus?: PostDataTypeForInvoiceStatus[];
   handleSelectedInvoiceStatus: (selectedPriority: number | undefined) => void;
   isUsedForSidebar?: boolean;
+  gridLoading: boolean;
+  isNavigateFrom?: string;
 };
 
 export default AccountInvoiceManagementListProps;
