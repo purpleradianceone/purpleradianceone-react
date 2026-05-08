@@ -21,6 +21,7 @@ type CompanyQuotationManagementListProps = {
   };
   handleAddQuotation: () => void;
   quotaionData: CompanyQuotationProps[];
+  isDataLoading?: boolean
   otherData: any;
   quotationStatus?: PostDataTypeForInvoiceStatus[];
   handleSelectedQuotationStatus: (selectedPriority: number | undefined) => void;

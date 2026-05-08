@@ -31,7 +31,7 @@ function CompanyQuotationManagement({
   const { userHasAccessToViewCompanyQuotation } = useUserAccessModules();
   const { invoiceStatus } = useInvoiceStatus();
   const [accessDeniedPopUpOpen, setAccessDeniedPopUpOpen] = useState(false);
-
+  const [isLoadingForCompanyQuotation, setIsLoadingForCompanyQuotation] = useState<boolean>(false);
   const [companyQuotationData, setCompanyQuotationeData] = useState<CompanyQuotationProps[]>([]);
   const { loginStatus } = useLoggedInUserContext();
 
@@ -83,7 +83,7 @@ function CompanyQuotationManagement({
 
     try {
       if (postData.company_id === 0 || pageSize === 10) return;
-
+      setIsLoadingForCompanyQuotation(true);
       const response = await axiosClient.post(POST_API.GET_COMPANY_QUOTATION, postData, {
         signal,
         withCredentials: true,
@@ -135,6 +135,8 @@ function CompanyQuotationManagement({
       }
     } catch (error: any) {
       handleApiError(error);
+    } finally {
+      setIsLoadingForCompanyQuotation(false);
     }
   };
 
@@ -222,6 +224,7 @@ function CompanyQuotationManagement({
               selectedCompanyQuotationStatus,
             }}
             quotaionData={companyQuotationData}
+            isDataLoading={isLoadingForCompanyQuotation}
             onEndDateChange={handleEndDateChange}
             onStartDateChange={handleStartDateChange}
             paginationData={{

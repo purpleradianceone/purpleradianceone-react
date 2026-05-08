@@ -5,16 +5,17 @@ import { AgGridReact } from "ag-grid-react";
 import { useMemo, useRef } from "react";
 import CompanyQuotationManagementAgGridProps from "../../@types/ag-grid/CompanyQuotationManagementAgGridProps";
 import { useUserAccessModules } from "../../config/hooks/useAccessModules";
-import { INNERHTML, } from "../../constants/AppConstants";
 import QuotationStatusChip from "../ui/QuotationStatusChip";
 import StatusIndicator from "../ui/StatusIndicator";
 import QuotationActionsDropdown from "../views/company-quotation-management/QuotationActionsDropdown";
+import { SkeletonRowsAgGrid } from "../ui/SkeletonRowsAgGrid";
 
 function CompanyQuotationManagementAgGrid({
   quotations,
   onRowSelect,
   onDeleteQuotation,
   onDownloadQuotation,
+  isDataLoading = false,
 }: CompanyQuotationManagementAgGridProps) {
   const gridRef = useRef<AgGridReact>(null);
   const { userHasAccessToUpdateCompanyQuotation } = useUserAccessModules();
@@ -25,6 +26,9 @@ function CompanyQuotationManagementAgGrid({
         headerName: "Quotation No",
         minWidth: 140,
         cellRenderer: (params: any) => {
+           if (params.data?.__isSkeleton) {
+            return <SkeletonRowsAgGrid />;
+          }
           return (
             <div className="flex items-center font-bold gap-2">
               <span>{params.value || "[Auto-generated]"}</span>
@@ -46,6 +50,9 @@ function CompanyQuotationManagementAgGrid({
         sortable: true,
         filter: true,
         cellRenderer: (params: any) => {
+           if (params.data?.__isSkeleton) {
+            return <SkeletonRowsAgGrid />;
+          }
           return (
             <div className="flex items-center gap-2">
               <QuotationStatusChip statusId={params.data.quotationStatusId} />
@@ -111,6 +118,9 @@ function CompanyQuotationManagementAgGrid({
         sortable: true,
         filter: true,
         cellRenderer: (params: any) => {
+           if (params.data?.__isSkeleton) {
+            return <SkeletonRowsAgGrid />;
+          }
           return (
             <div className="flex items-center text-sm gap-1 mt-1">
               <StatusIndicator isActive={params.value} />
@@ -148,24 +158,39 @@ function CompanyQuotationManagementAgGrid({
         field: "actions",
         pinned: "right",
         maxWidth: 90,
-        cellRenderer: (params: any) => (
-          <QuotationActionsDropdown data={params.data} context={params.context} />
-        ),
+        cellRenderer: (params: any) => {
+           if (params.data?.__isSkeleton) {
+            return <SkeletonRowsAgGrid />;
+          }
+          return <QuotationActionsDropdown data={params.data} context={params.context} />
+        },
       },
     ],
     [],
   );
 
-  const defaultColDef = useMemo(
-    () => ({
-      filter: "agTextColumnFilter",
-      minWidth: 150,
-      flex: 0.8,
-      suppressHeaderMenuButton: true,
-      suppressHeaderContextMenu: true,
-    }),
-    [],
-  );
+    const defaultColDef = useMemo(
+      () => ({
+        filter: "agTextColumnFilter",
+        minWidth: 150,
+        flex: 0.8,
+        suppressHeaderMenuButton: true,
+        suppressHeaderContextMenu: true,
+        cellRenderer: (params: any) => {
+          if (params.data?.__isSkeleton) {
+            return <SkeletonRowsAgGrid />;
+          }
+          return params.value;
+        },
+      }),
+      [],
+    );
+    const length = 30;
+    const skeletonRows = useMemo(() => {
+      return Array.from({ length: length }).map(() => ({
+        __isSkeleton: true,
+      }));
+    }, []);
 
   return (
     <div
@@ -174,12 +199,13 @@ function CompanyQuotationManagementAgGrid({
     >
       <AgGridReact
         ref={gridRef}
-        rowData={quotations}
+        // rowData={quotations}
+        rowData={isDataLoading ? skeletonRows : quotations}
         columnDefs={columnDefs}
         defaultColDef={defaultColDef}
         modules={[AllCommunityModule]}
         theme={themeBalham}
-        overlayNoRowsTemplate={INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
+        // overlayNoRowsTemplate={INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
         context={{
           handleRowSelect: onRowSelect, 
           onDelete: onDeleteQuotation,
