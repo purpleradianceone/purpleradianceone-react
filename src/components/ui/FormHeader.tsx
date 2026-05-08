@@ -8,7 +8,7 @@ const FormHeader = ({
   onClose,
   userName,
   icon: Icon,
-  iconColour = COLORS.FORM_HEADER_ICONS_COLOR,
+  iconColour = COLORS.FORM_HEADER_ICONS_COLOR ,
   preText,
   postText,
   description,

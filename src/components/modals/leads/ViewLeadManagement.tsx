@@ -61,6 +61,7 @@ import { ModuleGuard } from "../../../config/guard/ModuleGuard";
 import { Popover } from "../../ui/PopOver";
 import LeadQuotationDetails from "./LeadQuotationDetails";
 import TextAreaInput from "../../ui/TextAreaInput";
+import { LeadWhatsappConversation } from "./lead-whatsapp-conversation/LeadWhatsappConversation";
 
 const ViewLeadManagement = () => {
   const navigate = useNavigate();
@@ -649,7 +650,9 @@ const ViewLeadManagement = () => {
     | "contact"
     | "LeadTeams"
     | "leadUsers"
-    | "LeadNotes";
+    | "LeadNotes"
+    | "conversation"
+    ;
   const [activeTab, setActiveTab] = useState<ActiveCard>("contact");
 
   const handleClickCards = (event: React.MouseEvent<HTMLElement>) => {
@@ -1203,13 +1206,6 @@ const ViewLeadManagement = () => {
                   }}
                 >
                   <div className="flex relative ">
-                    {/* <Detail
-                      label="Lead owner"
-                      hasBorder={true}
-                      type={userHasAccessToUpdateLead ? "select" : "none"}
-                      value={selectedLeadData?.leadOwner}
-                      handleClickLeadOwnerChange={handleClickLeadOwnerChange}
-                    /> */}
                     <CompanyUserSearchFieldInput
                       key={refreshkeyForLeadOwnerChange}
                       label="Lead Owner"
@@ -1237,16 +1233,9 @@ const ViewLeadManagement = () => {
                 </div>
               </div>
               {reasonInputBoxOpenForLeadOwner && (
-                // <div className="fixed inset-0 bg-black bg-opacity-5 flex items-center justify-center z-50">
-                //   <div className="bg-white rounded-xl shadow-lg p-2 w-full max-w-md mx-2">
                 <FormLayout width={2} padding={2}>
                   <form onSubmit={ handleLeadOwnerChange}>
-
-                  
                   <div className="flex flex-col gap-1">
-                    {/* <label className="table-header-custom">
-                      Reason (Optional)
-                    </label> */}
                     <TextAreaInput
                     cols={2}
                     label="Reason (Optional)"
@@ -1263,10 +1252,6 @@ const ViewLeadManagement = () => {
                       <div className="flex gap-1">
                         <Button
                           type="submit"
-                          // onClick={(e) => {
-                          //   e.preventDefault();
-                          //  ();
-                          // }}
                         >
                           <div className="flex items-center gap-1">
                             <Save size={16} />
@@ -1287,8 +1272,6 @@ const ViewLeadManagement = () => {
                   </div>
                   </form>
                 </FormLayout>
-                // </div>
-                // </div>
               )}
             </div>
             {/* Lead Details */}
@@ -1369,6 +1352,22 @@ const ViewLeadManagement = () => {
               >
                 Notes
               </span>
+
+                {
+                  selectedLeadData?.leadSourceId === 2 && 
+              <span
+                id="conversation"
+                className={`cursor-pointer ${
+                  activeTab === "conversation"
+                    ? "border-b-2 border-blue-500 caption-custom-blue"
+                    : "hover:text-blue-500"
+                }`}
+                onClick={handleClickCards}
+              >
+                Conversation
+              </span>
+                }
+              
               {/* <span
                 id="leadUsers" 
                 className={`cursor-pointer ${
@@ -1485,6 +1484,12 @@ const ViewLeadManagement = () => {
                 {activeTab === "LeadNotes" && (
                   <ModuleGuard permissionKey="userHasAccessToViewLeadNote">
                     <LeadNotes selectedLeadData={selectedLeadData} />
+                  </ModuleGuard>
+                )}
+
+                 {activeTab === "conversation" && (
+                  <ModuleGuard permissionKey="userHasAccessToViewLeadWhatsAppConversation">
+                    <LeadWhatsappConversation selectedLeadData={selectedLeadData}/>
                   </ModuleGuard>
                 )}
 
