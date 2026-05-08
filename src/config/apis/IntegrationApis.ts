@@ -118,3 +118,25 @@ export const getGoogleAdsIntegration  = async (payload: object
     const response = await axiosClient.post(POST_API.GET_GOOGLE_ADS_INTEGRATION, payload, { withCredentials: true })
     return response;
 }
+
+/**
+ * GET CONVERSATION HAPPENED ON WHATSAPP FOR LEAD
+ * @param payload 
+ * @returns 
+ */
+export const getLeadWhatsappConversation  = async (payload: object
+) => {
+    const response = await axiosClient.post(POST_API.GET_LEAD_WHATSAPP_CONVERSATION, payload, { withCredentials: true })
+    return response;
+}
+
+/**
+ * GET CONVERSATION HAPPENED ON WHATSAPP FOR SUPPORT TICKET
+ * @param payload 
+ * @returns 
+ */
+export const getSupportTicketWhatsappConversation  = async (payload: object
+) => {
+    const response = await axiosClient.post(POST_API.GET_SUPPORT_TICKET_WHATSAPP_CONVERSATION, payload, { withCredentials: true })
+    return response;
+}

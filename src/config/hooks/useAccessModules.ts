@@ -840,9 +840,32 @@ export const useUserAccessModules = () => {
   const userHasAccessToUpdateAccountProformaInvoice = accessModules.some(
     (accessModule) => accessModule.crm_module_id === 65 && accessModule.update,
   );
-  
 
+  //Lead - WhatsApp Conversation
+    const userHasAccessToAddLeadWhatsAppConversation = accessModules.some(
+    (accessModules) => accessModules.crm_module_id === 66 && accessModules.add,
+  );
 
+  const userHasAccessToViewLeadWhatsAppConversation = accessModules.some(
+    (accessModule) => accessModule.crm_module_id === 66 && accessModule.view,
+  );
+
+  const userHasAccessToUpdateLeadWhatsAppConversation = accessModules.some(
+    (accessModule) => accessModule.crm_module_id === 66 && accessModule.update,
+  );
+
+  //Support - WhatsApp Conversation
+    const userHasAccessToAddSupportWhatsAppConversation = accessModules.some(
+    (accessModules) => accessModules.crm_module_id === 67 && accessModules.add,
+  );
+
+  const userHasAccessToViewSupportWhatsAppConversation = accessModules.some(
+    (accessModule) => accessModule.crm_module_id === 67 && accessModule.view,
+  );
+
+  const userHasAccessToUpdateSupportWhatsAppConversation = accessModules.some(
+    (accessModule) => accessModule.crm_module_id === 67 && accessModule.update,
+  );
   return {
     userHasAccessToAddUser,
     userHasAccessToViewUser,
@@ -1097,5 +1120,13 @@ export const useUserAccessModules = () => {
     userHasAccessToAddAccountProformaInvoice,
     userHasAccessToViewAccountProformaInvoice,
     userHasAccessToUpdateAccountProformaInvoice,
+
+    userHasAccessToAddLeadWhatsAppConversation,
+    userHasAccessToViewLeadWhatsAppConversation,
+    userHasAccessToUpdateLeadWhatsAppConversation,
+
+    userHasAccessToAddSupportWhatsAppConversation,
+    userHasAccessToViewSupportWhatsAppConversation,
+    userHasAccessToUpdateSupportWhatsAppConversation,
   };
 };
