@@ -38,6 +38,7 @@ function CompanyQuotationManagementList({
   onEndDateChange,
   paginationData,
   quotaionData,
+  isDataLoading = false,
   otherData,
   quotationStatus,
   handleSelectedQuotationStatus,
@@ -403,6 +404,7 @@ function CompanyQuotationManagementList({
               onDownloadQuotation={handleQuotationDownload}
               quotations={quotaionData}
               isUsedInQuotationModule={false}
+              isDataLoading={isDataLoading}
             />
           </div>
 

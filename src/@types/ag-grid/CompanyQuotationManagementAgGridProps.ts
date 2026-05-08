@@ -8,6 +8,7 @@ type CompanyQuotationManagementAgGridProps = {
   onDownloadQuotation?: (data: CompanyQuotationProps) => void;
   handleRowClick?: (event: any) => void;
   isUsedInQuotationModule?: boolean;
+  isDataLoading?: boolean;
 };
 
 export default CompanyQuotationManagementAgGridProps;
