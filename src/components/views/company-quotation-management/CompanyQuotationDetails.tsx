@@ -26,7 +26,10 @@ import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
 import { STATUS_CODE } from "../../../constants/AppConstants";
 import POST_API from "../../../constants/PostApi";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
-import { formatQuantity, formatRupee } from "../../../utils/helperMethods/formatFunctions";
+import {
+  formatQuantity,
+  formatRupee,
+} from "../../../utils/helperMethods/formatFunctions";
 import CustomDocumentPreviewComponent from "../../custom-document-preview-component/CustomDocumentPreviewComponent";
 import Button from "../../ui/Button";
 import FormInput from "../../ui/FormInput";
@@ -95,8 +98,10 @@ function CompanyQuotationDetails() {
   });
   const [selectedLead, setSelectedLead] = useState<any>(null);
 
-  const [selectedPreviousQuotationTemplate, setSelectedPreviousQuotationTemplate] =
-    useState<any>(null);
+  const [
+    selectedPreviousQuotationTemplate,
+    setSelectedPreviousQuotationTemplate,
+  ] = useState<any>(null);
   const [selectedQuotationTemplate, setSelectedQuotationTemplate] =
     useState<any>(null);
 
@@ -114,6 +119,7 @@ function CompanyQuotationDetails() {
   } = useUserAccessModules();
 
   useEffect(() => {
+    console.log("use effect 1");
     if (searchParams.has("account_company_product")) {
       const accountCompanyProduct = JSON.parse(
         searchParams.get("account_company_product") ?? "{}",
@@ -425,12 +431,12 @@ function CompanyQuotationDetails() {
     }
   };
 
-  const handlePreviousState= async ()=>{
-        setQuotation(previousQuotation);
-        handleResetRoundOff();
-        setRefreshLocalUiCount((prev)=>prev+1);
-        setSelectedQuotationTemplate(selectedPreviousQuotationTemplate);
-  }
+  const handlePreviousState = async () => {
+    setQuotation(previousQuotation);
+    handleResetRoundOff();
+    setRefreshLocalUiCount((prev) => prev + 1);
+    setSelectedQuotationTemplate(selectedPreviousQuotationTemplate);
+  };
 
   const handleCompanyQuotationDownload = async () => {
     if (!disabled) return;
@@ -584,7 +590,7 @@ function CompanyQuotationDetails() {
 
       if (res.data.status) {
         toast.success(res.data.message);
-        setRefreshCount((prev)=>prev+1);
+        setRefreshCount((prev) => prev + 1);
         setRefreshCountItem((prev) => prev + 1);
         setEditingItemId(null);
       } else {
@@ -739,6 +745,8 @@ function CompanyQuotationDetails() {
   };
 
   useEffect(() => {
+        console.log("use effect 2");
+
     if (!quotationId || Number(quotationId) === 0) return;
     const controller = new AbortController();
     getCompanyQuotations(controller.signal);
@@ -749,6 +757,8 @@ function CompanyQuotationDetails() {
   }, [quotationId, refreshCount]);
 
   useEffect(() => {
+        console.log("use effect 3");
+
     if (!quotationId || Number(quotationId) === 0) return;
     const controller = new AbortController();
     getCompanyQuotationItems(controller.signal);
@@ -783,6 +793,8 @@ function CompanyQuotationDetails() {
   }
 
   useEffect(() => {
+        console.log("use effect 4");
+
     if (
       otherIdSearchParams !== null &&
       otherIdSearchParams !== "0" &&
@@ -799,6 +811,8 @@ function CompanyQuotationDetails() {
   }, []);
 
   useEffect(() => {
+        console.log("use effect 5");
+
     if (quotationTypeIdSearchParams && quotationTypeIdSearchParams !== "0") {
       setSelectedQuotationType({
         id: Number(quotationTypeIdSearchParams),
@@ -806,10 +820,6 @@ function CompanyQuotationDetails() {
       });
     }
   }, [quotationTypeIdSearchParams]);
-
-  function navigatePreviousPage() {
-    navigate(-1);
-  }
 
   const handleResetRoundOff = () => {
     setQuotation((prev: any) => ({
@@ -832,18 +842,21 @@ function CompanyQuotationDetails() {
   );
 
   useEffect(() => {
+        console.log("use effect 6");
+
     setRoundOffValues(getRoundOffValues(quotation?.totalAmount ?? 0));
     // setRoundOffValues(getRoundOffValues(summary.total ?? 0));
-  }, [quotation?.adjustmentForRoundOff, quotation?.totalAmount, quotation, items, tempItems, summary]);
+  }, [
+    quotation, quotation?.totalAmount, quotation?.adjustmentForRoundOff
+  ]);
 
   return (
     <PageLayout onScrollChange={setShowAccountName} scrollTopValue={80}>
-      <div className="p-1 font-roboto"
-      id={refreshLocalUiCount+""}
+      <div className="p-1 font-roboto" 
+      key={refreshLocalUiCount + ""}
       >
         {isSubmitting && <LoadingPopUpAnimation show={isSubmitting} />}
         {/* HEADER */}
-
         {quotationLoading ? (
           <CompanyQuotationHeaderSkeleton />
         ) : (
@@ -851,6 +864,7 @@ function CompanyQuotationDetails() {
             <div className=" sticky top-0 z-10 bg-slate-100 flex text-center justify-start items-center gap-3 ml-0.5 ">
               {/* <Link to={ROUTES_URL.QUOTATION_MANAGEMENT}> */}
               <Button
+              // type="submit"
                 className="caption-custom flex items-center justify-center hover:text-gray-800"
                 onClick={() => {
                   if (isUsedForSearchParams === Modules.QUOTATION_MODULE)
@@ -1347,7 +1361,9 @@ function CompanyQuotationDetails() {
                                 <td className="p-2 text-left">
                                   {item.company_product_name}
                                 </td>
-                                <td style={{ textAlign: "right" }}>{formatQuantity(item.quantity)}</td>
+                                <td style={{ textAlign: "right" }}>
+                                  {formatQuantity(item.quantity)}
+                                </td>
                                 <td style={{ textAlign: "center" }}>
                                   {formatQuantity(item.rate)}
                                 </td>
@@ -1355,45 +1371,57 @@ function CompanyQuotationDetails() {
                                 <td style={{ textAlign: "right" }}>
                                   {formatRupee(item.basic_value)}
                                 </td>
-                                {editingItemId === item.id?(<td style={{ justifyContent:"end", textAlign: "right" }}>
-                                  {formatRupee(item.discount_amount)}
-                                  <input
-                                    type="number"
-                                    min={0}
-                                    max={100}
-                                    step={"0.1"}
-                                    className={`${editingItemId !== item.id ? "" : "border"} rounded p-1 ml-1 text-center w-12 min-w-12 max-w-16`}
-                                    value={item.discount_percent}
-                                    disabled={
-                                      disabled || editingItemId !== item.id
-                                    }
-                                    onChange={(e) =>
-                                      handleDiscountChange(
-                                        item.id,
-                                        Number(e.target.value),
-                                      )
-                                    }
-                                  />
-                                </td>):
-                                 (<td style={{ textAlign: "right" }}>
-                                  {formatRupee(item.discount_amount)} ({item.discount_percent}%)
-                                </td>)
-                                }
+                                {editingItemId === item.id ? (
+                                  <td
+                                    style={{
+                                      justifyContent: "end",
+                                      textAlign: "right",
+                                    }}
+                                  >
+                                    {formatRupee(item.discount_amount)}
+                                    <input
+                                      type="number"
+                                      min={0}
+                                      max={100}
+                                      step={"0.1"}
+                                      className={`${editingItemId !== item.id ? "" : "border"} rounded p-1 ml-1 text-center w-12 min-w-12 max-w-16`}
+                                      value={item.discount_percent}
+                                      disabled={
+                                        disabled || editingItemId !== item.id
+                                      }
+                                      onChange={(e) =>
+                                        handleDiscountChange(
+                                          item.id,
+                                          Number(e.target.value),
+                                        )
+                                      }
+                                    />
+                                  </td>
+                                ) : (
+                                  <td style={{ textAlign: "right" }}>
+                                    {formatRupee(item.discount_amount)} (
+                                    {item.discount_percent}%)
+                                  </td>
+                                )}
                                 <td style={{ textAlign: "right" }}>
                                   {formatRupee(item.taxable_value)}
                                 </td>
                                 <td style={{ textAlign: "right" }}>
-                                  {formatRupee(item.cgst_amount)} ({item.cgst_percent}%)
+                                  {formatRupee(item.cgst_amount)} (
+                                  {item.cgst_percent}%)
                                 </td>
                                 <td style={{ textAlign: "right" }}>
-                                  {formatRupee(item.sgst_amount)} ({item.sgst_percent}%)
+                                  {formatRupee(item.sgst_amount)} (
+                                  {item.sgst_percent}%)
                                 </td>
                                 <td style={{ textAlign: "right" }}>
-                                  {formatRupee(item.igst_amount)} ({item.igst_percent}%)
+                                  {formatRupee(item.igst_amount)} (
+                                  {item.igst_percent}%)
                                 </td>
                                 {hasCess && (
                                   <td>
-                                    {formatRupee(item.cess_amount)} ({item.cess_percent}%)
+                                    {formatRupee(item.cess_amount)} (
+                                    {item.cess_percent}%)
                                   </td>
                                 )}
                                 <td
@@ -1520,13 +1548,22 @@ function CompanyQuotationDetails() {
 
                     {/* Taxable */}
                     <div className="flex justify-between text-gray-600 border-t pt-2">
-                     <div className="flex"><span className="text-black">C</span> <span>. Taxable Amount (A-B)</span></div>
+                      <div className="flex">
+                        <span className="text-black">C</span>{" "}
+                        <span>. Taxable Amount (A-B)</span>
+                      </div>
                       <span>{formatRupee(summary.taxable)}</span>
                     </div>
 
                     {/* Tax + Cess in one row */}
                     <div className="flex justify-between text-gray-600">
-                      <div className="flex"><span className="text-black">D</span><span>. Total Tax ({summary.igst?"IGST":"CGST + SGST"} {summary.cess ? "+ Cess" : ""})</span></div>
+                      <div className="flex">
+                        <span className="text-black">D</span>
+                        <span>
+                          . Total Tax ({summary.igst ? "IGST" : "CGST + SGST"}{" "}
+                          {summary.cess ? "+ Cess" : ""})
+                        </span>
+                      </div>
                       <span>{formatRupee(summary.tax)}</span>
                     </div>
 
@@ -1623,7 +1660,8 @@ function CompanyQuotationDetails() {
                       </div>
 
                       <span className="text-lg font-bold text-blue-600">
-                        ₹{formatRupee(
+                        ₹
+                        {formatRupee(
                           summary.total +
                             (quotation?.adjustmentForRoundOff || 0),
                         )}
@@ -1631,10 +1669,12 @@ function CompanyQuotationDetails() {
                     </div>
                   </div>
                   <div className="flex justify-start items-center gap-1 bg-gray-50 border rounded px-3 py-0.5 caption-custom">
-                    <span><LucideSubtitles size={16}/></span>
-                      Round off amount will be shown separately in the printed
-                      quotation.
-                    </div>
+                    <span>
+                      <LucideSubtitles size={16} />
+                    </span>
+                    Round off amount will be shown separately in the printed
+                    quotation.
+                  </div>
                 </div>
               </div>
             )}
@@ -1655,7 +1695,9 @@ function CompanyQuotationDetails() {
           description="This quotation has been automatically deleted."
           message={`Since the last item was removed, this ${quotation?.quotationTypeName ? quotation?.quotationTypeName.toLowerCase() + " quotation" : "quotation"} is no longer valid. \nPlease create a new one to proceed.`}
           open={showConfirmationDialogeForNewQuotationCreation}
-          onConfirm={navigatePreviousPage}
+          onConfirm={() => {
+            navigate(-1);
+          }}
           confirmButtonText="OK"
           showCancelButton={false}
           onCancel={() =>
