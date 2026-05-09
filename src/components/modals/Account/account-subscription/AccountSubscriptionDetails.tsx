@@ -2,7 +2,18 @@
 
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Calendar, IndianRupee, Trash } from "lucide-react";
+import {
+  Calendar,
+  CheckCircle2,
+  FileCode,
+  IndianRupee,
+  Package,
+  Repeat,
+  Save,
+  Trash,
+  User,
+  XCircle,
+} from "lucide-react";
 
 import Button from "../../../ui/Button";
 import DatePickerInput from "../../../ui/DatePickerInput";
@@ -12,11 +23,9 @@ import POST_API from "../../../../constants/PostApi";
 import toast from "react-hot-toast";
 
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
-import RefreshToken from "../../../../config/validations/RefreshToken";
 
 import {
   SIZE,
-  STATUS_CODE,
   VALIDATIONS,
 } from "../../../../constants/AppConstants";
 import { handleApiError } from "../../../../config/error/handleApiError";
@@ -25,10 +34,10 @@ import axiosClient from "../../../../axios-client/AxiosClient";
 
 import AccountSubscriptionProps from "../../../../@types/account/AccountSubscriptionProps";
 import ShimmerEffect from "../account-service/ShimerEffect";
-import MetaField from "../../../ui/MetaField";
 import COLORS from "../../../../constants/Colors";
 import { useUserAccessModules } from "../../../../config/hooks/useAccessModules";
 import FormInput from "../../../ui/FormInput";
+import { DisplayComponent } from "../account-company-product/account-company-product-details/AccountCompanyProductDetailsCard";
 
 interface CustomField {
   id: string;
@@ -211,7 +220,11 @@ const AccountSubscriptionDetails = () => {
     return flag;
   };
 
-  const handleUpdate = async (activeValue?: boolean) => {
+  const handleUpdate = async (
+    event?: React.FormEvent<HTMLFormElement> | React.ChangeEvent,
+    activeValue?: boolean,
+  ) => {
+    event?.preventDefault();
     if (!userHasAccessToUpdateAccountSubscription) {
       toast.error("You are not authorized user");
       return;
@@ -252,18 +265,19 @@ const AccountSubscriptionDetails = () => {
         toast.error(response.data.message);
       }
     } catch (error: any) {
-      if (error.status === STATUS_CODE.UNATHORISED) {
-        const refreshTokenResponse = await RefreshToken({
-          callFunction: handleUpdate,
-        });
+      handleApiError(error);
+    //   if (error.status === STATUS_CODE.UNATHORISED) {
+    //     const refreshTokenResponse = await RefreshToken({
+    //       callFunction: handleUpdate,
+    //     });
 
-        if (refreshTokenResponse) {
-          await handleUpdate();
-        }
-      } else {
-        toast.error(error.response?.data || "Error updating subscription");
-      }
-    } finally {
+    //     if (refreshTokenResponse) {
+    //       await handleUpdate();
+    //     }
+    //   } else {
+    //     toast.error(error.response?.data || "Error updating subscription");
+    //   }
+     } finally {
       setIsSaving(false);
     }
   };
@@ -406,51 +420,95 @@ const AccountSubscriptionDetails = () => {
   }
 
   return (
-    <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-6 w-full">
-      {/* Header */}
+    <form onSubmit={handleUpdate}>
+      <div className="p-1 shadow-sm w-full">
+        {/* Header */}
 
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="table-header-custom">Account Subscription Details</h2>
-      </div>
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-4">
+            {/* Logo */}
+            <div
+              className="w-14 h-14 rounded-full flex items-center justify-center
+      text-2xl font-semibold text-white bg-blue-500 shrink-0"
+            >
+              {accountSubscriptionDetail?.companyProductName
+                ? accountSubscriptionDetail.companyProductName
+                    .charAt(0)
+                    .toUpperCase()
+                : "?"}
+            </div>
 
-      {/* Top Details */}
+            {/* Product + Account Name */}
+            <div className="flex flex-col">
+              <h2 className="table-header-custom">
+                {accountSubscriptionDetail?.companyProductName ||
+                  "Unnamed Product"}
+              </h2>
 
-      <div className="grid grid-cols-4 gap-6 mb-3 text-sm">
-        <MetaField
+              <span className="caption-custom">
+                Account Name :{" "}
+                <span className="caption-custom">
+                  {accountSubscriptionDetail?.accountName || "-"}
+                </span>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Top Details */}
+
+        <div className="grid grid-cols-4 gap-1">
+          {/* <MetaField
           label="Account Subscription Code"
           value={accountSubscriptionDetail?.accountSubscriptionCode || "-"}
-        ></MetaField>
+        ></MetaField> */}
 
-        <MetaField
+          <DisplayComponent
+            icon={FileCode}
+            title="Account Subscription Code"
+            value={String(
+              accountSubscriptionDetail?.accountSubscriptionCode || "-",
+            )}
+            penLogo={false}
+          />
+
+          {/* <MetaField
           label="Account Name"
           value={accountSubscriptionDetail?.accountName || "-"}
-        ></MetaField>
+        ></MetaField> */}
 
-        <MetaField
+          {/* <MetaField
           label="Company Product"
           value={accountSubscriptionDetail?.companyProductName || "-"}
-        ></MetaField>
+        ></MetaField> */}
 
-        <MetaField
+          {/* <MetaField
           label="Start Date"
           value={accountSubscriptionDetail?.startDate || "-"}
         ></MetaField>
         <MetaField
           label="End Date"
           value={accountSubscriptionDetail?.endDate || "-"}
-        ></MetaField>
+        ></MetaField> */}
 
-        <MetaField
+          {/* <MetaField
           label="Is Renewal"
           value={accountSubscriptionDetail?.isRenewal ? "Yes" : "No"}
-        ></MetaField>
+        ></MetaField> */}
 
-        <MetaField
+          <DisplayComponent
+            icon={Repeat}
+            title="Is Renewal"
+            value={accountSubscriptionDetail?.isRenewal ? "Yes" : "No"}
+            penLogo={false}
+          />
+
+          {/* <MetaField
           label="Total Cost"
           value={accountSubscriptionDetail?.totalCost || "-"}
-        ></MetaField>
+        ></MetaField> */}
 
-        <MetaField
+          {/* <MetaField
           label="Createdby"
           value={accountSubscriptionDetail?.createdBy || "-"}
         ></MetaField>
@@ -458,183 +516,207 @@ const AccountSubscriptionDetails = () => {
         <MetaField
           label="Createdon"
           value={accountSubscriptionDetail?.createdOn || "-"}
-        ></MetaField>
-      </div>
-
-      <div className="flex justify-between items-center mb-3 border-t-2  mt-3 p-2">
-        <h2 className="table-header-custom">
-          Update Account Subscription Details
-        </h2>
-      </div>
-
-      {/* Form Section */}
-
-      <div className="grid grid-cols-4 mb-4 gap-4 ">
-        <div>
-          <DatePickerInput
-            label="Start Date"
-            name="start_date"
-            onChange={handleChange}
-            logo={Calendar}
-            required
-            value={formData.start_date}
+        ></MetaField> */}
+          <DisplayComponent
+            icon={User}
+            title="Createdby"
+            value={accountSubscriptionDetail?.createdBy || "-"}
+            penLogo={false}
           />
 
-          {showStartDateError && (
-            <div className="text-red-500 text-xs">Please select Start Date</div>
-          )}
-        </div>
-
-        <div>
-          <DatePickerInput
-            label="End Date"
-            name="end_date"
-            onChange={handleChange}
-            logo={Calendar}
-            required
-            value={formData.end_date}
+          <DisplayComponent
+            icon={Calendar}
+            title="Createdon"
+            value={accountSubscriptionDetail?.createdOn || "-"}
+            penLogo={false}
           />
-          {showEndDateError && (
-            <div className="text-red-500 text-xs">Please select End Date</div>
-          )}
         </div>
 
-        <div className="flex flex-col gap-1">
-          <FormInput
-            required
-            type="number"
-            label="Total Cost"
-            placeholder="Enter total cost"
-            logo={IndianRupee}
-            defaultValue={totalCost}
-            value={totalCost === "" ? "" : totalCost}
-            onChange={handleCostChange}
-          />
-          {totalCostError && (
-            <p className="text-xs  text-red-600 ">{totalCostError}</p>
-          )}
-        </div>
-        <div className="flex gap-2 items-center">
-          <ToggleButton
-            checked={formData.is_active}
-            name="is_active"
-            onToggle={(e) => {
-              const checked = e.target.checked;
+        {/* Form Section */}
 
-              setFormData((prev) => ({
-                ...prev,
-                is_active: checked,
-              }));
+        <div className="grid grid-cols-4 gap-1 items-start my-1">
+          <div>
+            <DatePickerInput
+              label="Start Date"
+              name="start_date"
+              onChange={handleChange}
+              logo={Calendar}
+              required
+              value={formData.start_date}
+            />
 
-              handleUpdate(checked);
-            }}
-          />
-
-          <span
-            className={`text-sm ${
-              formData.is_active ? "text-green-600" : "text-red-600"
-            }`}
-          >
-            {formData.is_active ? "Active" : "Inactive"}
-          </span>
-        </div>
-      </div>
-
-      <div className="p-6 bg-white border   rounded-lg shadow-sm col-span-2">
-        <div className=" justify-between flex items-center mb-3">
-          <h3 className="font-semibold">Package Details</h3>
-
-          <button
-            type="button"
-            onClick={addPackage}
-            className="px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-          >
-            + Add Package
-          </button>
-        </div>
-
-        {/* Packages */}
-        <div className="grid grid-cols-3 gap-4">
-          {packages.map((pkg) => (
-            <div
-              key={pkg.id}
-              className="border p-4 rounded-md mb-3  bg-gray-50"
-            >
-              {/* Package Name + Remove */}
-              <div className="flex items-center gap-2 mb-3">
-                <input
-                  value={pkg.packageName}
-                  placeholder="Package Name"
-                  onChange={(e) => updatePackageName(pkg.id, e.target.value)}
-                  className="border px-2 py-1 rounded w-64"
-                />
-                {pkg.isNew && (
-                  <button type="button" onClick={() => removePackage(pkg.id)}>
-                    <Trash
-                      size={SIZE.ICON_DELETE_BUTTON_SIZE}
-                      className={COLORS.ICON_DELETE_BUTTON}
-                    ></Trash>
-                  </button>
-                )}
+            {showStartDateError && (
+              <div className="text-red-500 text-xs">
+                Please select Start Date
               </div>
+            )}
+          </div>
 
-              {/* Package Fields */}
-              {pkg.field.map((f) => (
-                <div key={f.id} className="flex gap-2 mb-2 items-center">
-                  {/* Key */}
+          <div>
+            <DatePickerInput
+              label="End Date"
+              name="end_date"
+              onChange={handleChange}
+              logo={Calendar}
+              required
+              value={formData.end_date}
+            />
+            {showEndDateError && (
+              <div className="text-red-500 text-xs">Please select End Date</div>
+            )}
+          </div>
+
+          <div>
+            <FormInput
+              required
+              type="number"
+              label="Total Cost"
+              placeholder="Enter total cost"
+              logo={IndianRupee}
+              defaultValue={totalCost}
+              value={totalCost === "" ? "" : totalCost}
+              onChange={handleCostChange}
+            />
+            {totalCostError && (
+              <p className="text-xs  text-red-600 ">{totalCostError}</p>
+            )}
+          </div>
+
+          <div className="flex flex-col justify-start pt-1 ">
+            <label className="flex items-center gap-1 text-sm text-gray-700">
+              {formData.is_active ? (
+                <CheckCircle2 size={14} className="text-blue-500" />
+              ) : (
+                <XCircle size={14} className="text-blue-500" />
+              )}
+              Status
+            </label>
+
+            <div className="flex gap-2 items-center">
+              <ToggleButton
+                checked={formData.is_active}
+                name="is_active"
+                onToggle={(e) => {
+                  const checked = e.target.checked;
+
+                  setFormData((prev) => ({
+                    ...prev,
+                    is_active: checked,
+                  }));
+
+                  handleUpdate(e, checked);
+                }}
+              />
+
+              <span
+                className={`text-sm ${
+                  formData.is_active ? "text-green-600" : "text-red-600"
+                }`}
+              >
+                {formData.is_active ? "Active" : "Inactive"}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div className="p-1 bg-white border rounded-lg shadow-sm col-span-2  min-h-[180px]">
+          <div className="flex justify-between mb-1 items-center ">
+            <div className="flex items-center gap-1">
+              <Package size={14} className="text-blue-500" />
+              <h3 className="flex gap-1 input-label-custom">Package Details</h3>
+            </div>
+            <Button
+              type="button"
+              onClick={addPackage}
+              className={COLORS.ADD_BUTTON}
+            >
+              + Add Package
+            </Button>
+          </div>
+
+          {/* Packages */}
+          <div className="grid grid-cols-4 gap-3 p-1 ">
+            {packages.map((pkg) => (
+              <div
+                key={pkg.id}
+                className="border p-2 rounded-md gap-1 bg-gray-50 "
+              >
+                {/* Package Name + Remove */}
+                <div className="flex items-center mb-2 gap-5 pr-2 justify-between ">
                   <input
-                    value={f.key}
-                    readOnly
-                    className="border px-2 py-1 rounded bg-gray-100 w-40"
+                    value={pkg.packageName}
+                    placeholder="Package Name"
+                    onChange={(e) => updatePackageName(pkg.id, e.target.value)}
+                    className=" input-label-custom border px-2 py-1 rounded flex-1 items-center justify-between focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                   />
-
-                  {/* Value */}
-                  {f.key === "Active" ? (
-                    <>
-                      <ToggleButton
-                        checked={f.value === "true"}
-                        onToggle={(e) => {
-                          handlePackageChange(
-                            pkg.id,
-                            f.id,
-                            e.target.checked ? "true" : "false",
-                          );
-                        }}
-                        name={""}
-                      />
-                    </>
-                  ) : (
-                    <input
-                      value={f.value}
-                      onChange={(e) =>
-                        handlePackageChange(pkg.id, f.id, e.target.value)
-                      }
-                      className="border px-2 py-1 rounded flex-1"
-                    />
+                  {pkg.isNew && (
+                    <button type="button" onClick={() => removePackage(pkg.id)}>
+                      <Trash
+                        size={SIZE.ICON_DELETE_BUTTON_SIZE}
+                        className={COLORS.ICON_DELETE_BUTTON}
+                      ></Trash>
+                    </button>
                   )}
                 </div>
-              ))}
-            </div>
-          ))}
+
+                {/* Package Fields */}
+                {pkg.field.map((f) => (
+                  <div key={f.id} className="flex gap-2 mb-2 items-center ">
+                    {/* Key */}
+                    <input
+                      value={f.key}
+                      readOnly
+                      className=" input-label-custom border rounded bg-gray-100 px-2 py-1 w-[140px] shrink-0 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    />
+
+                    {/* Value */}
+                    {f.key === "Active" ? (
+                      <>
+                        <ToggleButton
+                          checked={f.value === "true"}
+                          onToggle={(e) => {
+                            handlePackageChange(
+                              pkg.id,
+                              f.id,
+                              e.target.checked ? "true" : "false",
+                            );
+                          }}
+                          name={""}
+                        />
+                      </>
+                    ) : (
+                      <input
+                        value={f.value}
+                        onChange={(e) =>
+                          handlePackageChange(pkg.id, f.id, e.target.value)
+                        }
+                        className=" input-label-custom border rounded bg-gray-100 px-2 py-1 w-[140px] shrink-0 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                      />
+                    )}
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Buttons */}
+
+        <div className="flex items-center justify-end gap-2 mt-6">
+          <div>
+            <Button
+              type="submit"
+              disabled={!userHasAccessToUpdateAccountSubscription}
+            >
+              <div className="flex items-center gap-1">
+                <Save size={SIZE.SIXTEEN} />
+                <span>Save</span>
+              </div>
+            </Button>
+          </div>
         </div>
       </div>
-
-      {/* Buttons */}
-
-      <div className="flex items-center justify-end gap-2 mt-6">
-        <div>
-          <Button
-            disabled={!userHasAccessToUpdateAccountSubscription}
-            onClick={(e) => {
-              e.preventDefault();
-              handleUpdate();
-            }}
-          >
-            Save
-          </Button>
-        </div>
-      </div>
-    </div>
+    </form>
   );
 };
 

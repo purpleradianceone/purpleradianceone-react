@@ -484,7 +484,7 @@ export const AccountCompanyProductDetailsCard = ({
   );
 };
 
-function DisplayComponent({
+export function DisplayComponent({
   value,
   penLogo,
   title,
@@ -498,11 +498,11 @@ function DisplayComponent({
   return (
     <div className="flex w-full h-fit items-start gap-1  bg-white ">
       <div className="">
-        <Logo className={`${COLORS.FORM_HEADER_ICONS_COLOR}`} size={16} />
+        <Logo className={`${COLORS.FORM_HEADER_ICONS_COLOR}`} size={14} />
       </div>
 
       <div className="flex flex-col w-full">
-        <h4 className="card-header">{title}</h4>
+        <h4 className="input-label-custom ">{title}</h4>
 
         <div className="flex items-center justify-between   ">
           <p className="input-label-custom">
