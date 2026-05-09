@@ -61,6 +61,8 @@ import {
 import { amountToWords } from "../../../utils/helperMethods/amountToWords";
 
 function CompanyQuotationDetails() {
+  const itemsAlighnment = "right";
+  const tableBorder = "border border-gray-200 pr-1";
   const { quotationId } = useParams();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -129,6 +131,7 @@ function CompanyQuotationDetails() {
   }, [searchParams]);
 
   const getCompanyQuotations = async (signal: AbortSignal) => {
+    if(loginStatus.companyId == 0)return;
     if (!quotationId || Number(quotationId) === 0) return;
     setQuotationLoading(true);
     const postData = {
@@ -222,6 +225,9 @@ function CompanyQuotationDetails() {
   console.log(disabled);
 
   const getCompanyQuotationItems = async (signal: AbortSignal) => {
+    if(loginStatus.companyId == 0)return;
+    if (!quotationId || Number(quotationId) === 0) return;
+
     setItemsLoading(true);
     const postData = {
       id: null,
@@ -565,6 +571,9 @@ function CompanyQuotationDetails() {
   const hasCess = tempItems.some(
     (i) => i.cess_amount != null && i.cess_amount > 0,
   );
+
+  const isInterState = tempItems.some((i)=> i.igst_percent != null && i.igst_percent > 0.0);
+
   const saveSingleItem = async (item: any) => {
     // if (!userHasAccessToUpdateCompanyQuotation) {
     //   return;
@@ -745,7 +754,7 @@ function CompanyQuotationDetails() {
   };
 
   useEffect(() => {
-        console.log("use effect 2");
+    console.log("use effect 2");
 
     if (!quotationId || Number(quotationId) === 0) return;
     const controller = new AbortController();
@@ -757,7 +766,7 @@ function CompanyQuotationDetails() {
   }, [quotationId, refreshCount]);
 
   useEffect(() => {
-        console.log("use effect 3");
+    console.log("use effect 3");
 
     if (!quotationId || Number(quotationId) === 0) return;
     const controller = new AbortController();
@@ -793,7 +802,7 @@ function CompanyQuotationDetails() {
   }
 
   useEffect(() => {
-        console.log("use effect 4");
+    console.log("use effect 4");
 
     if (
       otherIdSearchParams !== null &&
@@ -811,7 +820,7 @@ function CompanyQuotationDetails() {
   }, []);
 
   useEffect(() => {
-        console.log("use effect 5");
+    console.log("use effect 5");
 
     if (quotationTypeIdSearchParams && quotationTypeIdSearchParams !== "0") {
       setSelectedQuotationType({
@@ -842,29 +851,25 @@ function CompanyQuotationDetails() {
   );
 
   useEffect(() => {
-        console.log("use effect 6");
+    console.log("use effect 6");
 
     setRoundOffValues(getRoundOffValues(quotation?.totalAmount ?? 0));
     // setRoundOffValues(getRoundOffValues(summary.total ?? 0));
-  }, [
-    quotation, quotation?.totalAmount, quotation?.adjustmentForRoundOff
-  ]);
+  }, [quotation, quotation?.totalAmount, quotation?.adjustmentForRoundOff]);
 
   return (
     <PageLayout onScrollChange={setShowAccountName} scrollTopValue={80}>
-      <div className="p-1 font-roboto" 
-      key={refreshLocalUiCount + ""}
-      >
+      <div className=" font-roboto" key={refreshLocalUiCount + ""}>
         {isSubmitting && <LoadingPopUpAnimation show={isSubmitting} />}
         {/* HEADER */}
         {quotationLoading ? (
           <CompanyQuotationHeaderSkeleton />
         ) : (
           <>
-            <div className=" sticky top-0 z-10 bg-slate-100 flex text-center justify-start items-center gap-3 ml-0.5 ">
+            <div className=" sticky top-0 z-10 bg-slate-100 flex text-center justify-start items-center gap-3  py-1">
               {/* <Link to={ROUTES_URL.QUOTATION_MANAGEMENT}> */}
               <Button
-              // type="submit"
+                // type="submit"
                 className="caption-custom flex items-center justify-center hover:text-gray-800"
                 onClick={() => {
                   if (isUsedForSearchParams === Modules.QUOTATION_MODULE)
@@ -895,8 +900,8 @@ function CompanyQuotationDetails() {
                 } `}
                 >
                   (
-                  <span>{`${Number(quotationTypeIdSearchParams) === 1 ? "Lead:" : Number(quotationTypeIdSearchParams) === 2 ? "AMC:" : "Other:"}`}</span>{" "}
-                  <span className="table-data-custom">{`  ${otherIdSearchParams},  `}</span>
+                  {/* <span>{`${Number(quotationTypeIdSearchParams) === 1 ? "Lead:" : Number(quotationTypeIdSearchParams) === 2 ? "AMC:" : ""}`}</span>{" "} */}
+                  {/* <span className="table-data-custom">{`  ${otherIdSearchParams}  `}</span> */}
                   <span>Quotation:</span>{" "}
                   <span className="table-data-custom">{`  ${quotation?.quotationNumber}`}</span>
                   )
@@ -919,7 +924,7 @@ function CompanyQuotationDetails() {
                 )}
               </div>
               {!isCreateMode && (
-                <div className="flex gap-x-2">
+                <div className="flex gap-x-2 mr-2">
                   <button
                     className={`text-sm border p-2 rounded-md flex items-center gap-1 border-blue-300
                        focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-1
@@ -1195,7 +1200,7 @@ function CompanyQuotationDetails() {
               </div>
 
               {!isCreateMode && (
-                <div className="col-span-2 flex items-center justify-end p-1">
+                <div className="col-span-2 flex items-center justify-end ">
                   <div className="flex gap-2">
                     {showCompanyLogoPreview && (
                       <div
@@ -1301,31 +1306,31 @@ function CompanyQuotationDetails() {
                     placeholder="Search product..."
                   />
                 </div>
-                <div className="w-full overflow-y-auto border rounded">
+                <div className="w-full max-h-[50vh] overflow-y-auto border rounded">
                   <table className="w-full text-sm font-semibold ">
-                    <thead className="sticky top-0 bg-gray-50 z-10 border">
+                    <thead className="sticky top-0 bg-gray-50 z-9 border">
                       <tr className="bg-gray-100 border-b">
-                        <th>#</th>
-                        <th className="p-2 text-left">
+                        <th className={tableBorder}>#</th>
+                        <th className={`p-2 text-left ${tableBorder}`}>
                           Product/Service/Subscription
                         </th>
-                        <th style={{ textAlign: "right" }}>Qty</th>
-                        <th style={{ textAlign: "center" }}>Rate</th>
-                        <th>HSN/SAC</th>
-                        <th style={{ textAlign: "right" }}>Basic Amount</th>
-                        <th style={{ textAlign: "right" }}>Discount(%)</th>
-                        <th style={{ textAlign: "right" }}>Taxable Amount</th>
-                        <th style={{ textAlign: "right" }}>CGST (%)</th>
-                        <th style={{ textAlign: "right" }}>SGST (%)</th>
-                        <th style={{ textAlign: "right" }}>IGST (%)</th>
-                        {hasCess && <th>Cess (%)</th>}
+                        <th style={{ textAlign: itemsAlighnment }} className={tableBorder}>Qty</th>
+                        <th style={{ textAlign: itemsAlighnment }} className={tableBorder}>Rate</th>
+                        <th style={{ textAlign: itemsAlighnment }} className={tableBorder}>HSN/SAC</th>
+                        <th style={{ textAlign: itemsAlighnment }} className={tableBorder}>Basic Amount</th>
+                        <th style={{ textAlign: itemsAlighnment }} className={tableBorder}>Discount(%)</th>
+                        <th style={{ textAlign: itemsAlighnment }} className={tableBorder}>Taxable Amount</th>
+                        {!isInterState&&<th style={{ textAlign: itemsAlighnment }} className={tableBorder}>CGST (%)</th>}
+                        {!isInterState&&<th style={{ textAlign: itemsAlighnment }} className={tableBorder}>SGST (%)</th>}
+                        {isInterState&&<th style={{ textAlign: itemsAlighnment }} className={tableBorder}>IGST (%)</th>}
+                        {hasCess && <th style={{ textAlign: itemsAlighnment }} className={tableBorder}>Cess (%)</th>}
                         <th
-                          style={{ textAlign: "right", paddingRight: "10px" }}
+                          style={{ textAlign: itemsAlighnment,  }} className={tableBorder}
                         >
                           Total
                         </th>
                         {!disabled && (
-                          <th style={{ textAlign: "center" }}>Action</th>
+                          <th style={{ textAlign: "center" }} className={tableBorder}>Action</th>
                         )}
                       </tr>
                     </thead>
@@ -1339,9 +1344,9 @@ function CompanyQuotationDetails() {
                         <tr>
                           <td
                             colSpan={disabled ? 12 : 13}
-                            className="text-center py-4 text-gray-500"
+                            className={`text-center py-4 text-gray-500 ${tableBorder}`}
                           >
-                            No rows found
+                             Items Not found
                           </td>
                         </tr>
                       ) : (
@@ -1357,26 +1362,27 @@ function CompanyQuotationDetails() {
                                 key={item.id}
                                 className="border-t font-normal text-xs hover:bg-blue-100 text-center"
                               >
-                                <td>{i + 1}</td>
-                                <td className="p-2 text-left">
+                                <td className={tableBorder}>{i + 1}</td>
+                                <td className={`p-2 text-left ${tableBorder}`}>
                                   {item.company_product_name}
                                 </td>
-                                <td style={{ textAlign: "right" }}>
+                                <td style={{ textAlign: itemsAlighnment }} className={tableBorder}>
                                   {formatQuantity(item.quantity)}
                                 </td>
-                                <td style={{ textAlign: "center" }}>
+                                <td style={{ textAlign: itemsAlighnment }} className={tableBorder}>
                                   {formatQuantity(item.rate)}
                                 </td>
-                                <td>{item.hsn || item.sac}</td>
-                                <td style={{ textAlign: "right" }}>
+                                <td style={{ textAlign: itemsAlighnment }} className={tableBorder}>{item.hsn || item.sac}</td>
+                                <td style={{ textAlign: itemsAlighnment }} className={tableBorder}>
                                   {formatRupee(item.basic_value)}
                                 </td>
                                 {editingItemId === item.id ? (
                                   <td
                                     style={{
                                       justifyContent: "end",
-                                      textAlign: "right",
+                                      textAlign: itemsAlighnment,
                                     }}
+                                    className={tableBorder}
                                   >
                                     {formatRupee(item.discount_amount)}
                                     <input
@@ -1398,43 +1404,43 @@ function CompanyQuotationDetails() {
                                     />
                                   </td>
                                 ) : (
-                                  <td style={{ textAlign: "right" }}>
+                                  <td style={{ textAlign: itemsAlighnment }} className={tableBorder}>
                                     {formatRupee(item.discount_amount)} (
                                     {item.discount_percent}%)
                                   </td>
                                 )}
-                                <td style={{ textAlign: "right" }}>
+                                <td style={{ textAlign: itemsAlighnment }} className={tableBorder}>
                                   {formatRupee(item.taxable_value)}
                                 </td>
-                                <td style={{ textAlign: "right" }}>
+                                {!isInterState&&<td style={{ textAlign: itemsAlighnment }} className={tableBorder}>
                                   {formatRupee(item.cgst_amount)} (
                                   {item.cgst_percent}%)
-                                </td>
-                                <td style={{ textAlign: "right" }}>
+                                </td>}
+                                {!isInterState&&<td style={{ textAlign: itemsAlighnment }} className={tableBorder}>
                                   {formatRupee(item.sgst_amount)} (
                                   {item.sgst_percent}%)
-                                </td>
-                                <td style={{ textAlign: "right" }}>
+                                </td>}
+                                {isInterState&&<td style={{ textAlign: itemsAlighnment }} className={tableBorder}>
                                   {formatRupee(item.igst_amount)} (
                                   {item.igst_percent}%)
-                                </td>
+                                </td>}
                                 {hasCess && (
-                                  <td>
+                                  <td style={{ textAlign: itemsAlighnment }} className={tableBorder}>
                                     {formatRupee(item.cess_amount)} (
                                     {item.cess_percent}%)
                                   </td>
                                 )}
                                 <td
                                   style={{
-                                    textAlign: "right",
-                                    paddingRight: "10px",
+                                    textAlign: itemsAlighnment,
                                   }}
+                                  className={tableBorder}
                                 >
                                   {formatRupee(item.total_amount)}
                                 </td>
 
                                 {!disabled && (
-                                  <td style={{ textAlign: "right" }}>
+                                  <td style={{ textAlign: itemsAlighnment }} className={tableBorder}>
                                     <div className="flex gap-2 justify-end">
                                       {editingItemId !== item.id ? (
                                         <button
@@ -1495,7 +1501,7 @@ function CompanyQuotationDetails() {
                   </table>
                 </div>
                 <div className="w-full items-center justify-center  flex-1">
-                  <span className="text-xs flex items-center justify-center font-medium text-gray-500 border rounded-lg px-2 py-1  bg-blue-100">
+                  <span className="text-xs flex items-center justify-center font-medium text-gray-500 border rounded-lg px-2 py-1 mt-0.5  bg-blue-100">
                     You can modify quotation items while it's in draft state.
                   </span>
                 </div>
@@ -1607,12 +1613,18 @@ function CompanyQuotationDetails() {
                             step={"0.1"}
                             // className="border rounded px-1 py-0.5 w-10 text-right text-xs"
                             value={quotation?.adjustmentForRoundOff}
-                            onChange={(e: any) =>
+                            onChange={(e: any) => {
+                              let value = Number(e.target.value);
+
+                              // clamp value between -1 and 1
+                              if (value > 1) value = 1;
+                              if (value < -1) value = -1;
+
                               setQuotation((prev) => ({
                                 ...prev!,
-                                adjustmentForRoundOff: Number(e.target.value),
-                              }))
-                            }
+                                adjustmentForRoundOff: value,
+                              }));
+                            }}
                           />
                         </div>
 
