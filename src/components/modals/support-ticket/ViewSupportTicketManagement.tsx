@@ -727,8 +727,8 @@ const ViewSupportTicketManagement = () => {
                     {selectedSupportTicket.supportTicketSourceId === 5 && (
                       <Popover
                         trigger={
-                          <button className="text-blue-600" type="button">
-                            Conversation
+                          <button className="text-green-500 flex items-center gap-1" type="button">
+                           <FaWhatsapp /> Conversation
                           </button>
                         }
                         padding={3}
