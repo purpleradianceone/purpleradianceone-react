@@ -18,6 +18,7 @@ import {
   User,
   Trash,
   IndianRupee,
+  SlidersHorizontal,
 } from "lucide-react";
 import FormLayout from "../../../ui/FormLayout";
 import React, { useEffect, useState, useMemo } from "react";
@@ -43,7 +44,6 @@ import CustomSelectForAccountService, {
 } from "./CustomSelectForAccountService";
 import axiosClient from "../../../../axios-client/AxiosClient";
 import { handleApiError } from "../../../../config/error/handleApiError";
-import CustomDropdown from "../../leads/CustomDropdown";
 import { useServiceStatus } from "../../../../config/hooks/useServiceStatus";
 import { useServiceLocationType } from "../../../../config/hooks/useServiceLocationType";
 import { useServiceBookingSource } from "../../../../config/hooks/useServiceBookingSource";
@@ -58,6 +58,8 @@ import CompanyUserSearchFieldInput from "../../../ui/CompanyUserSearchFieldInput
 import AddAccountServiceModalProps from "../../../../@types/modal/AddAccountServiceModalProps";
 import COLORS from "../../../../constants/Colors";
 import FormInput from "../../../ui/FormInput";
+import CustomSelect from "../../../ui/CustomSelect";
+import { toSelectOptions } from "../../../../utils/toSelectOption";
 
 interface CustomField {
   id: string;
@@ -139,11 +141,21 @@ const AddStock = ({
     return options;
   };
 
-  const timeOptions = useMemo(() => generateTimeOptions(), []);
+   const timeOptions = useMemo(
+      () =>
+        generateTimeOptions().map((time, index) => ({
+          id: index,
+          name: time,
+        })),
+      [],
+    );
+  
+    const bookingTimeOptions = toSelectOptions(timeOptions, "id", "name");
+
 
   const intialCreateServiceDetailFormData: CreateServiceDetail = {
     service_booking_date: "",
-    service_booking_time: `${timeOptions[0]}`,
+    service_booking_time: timeOptions[0].name,
     location_address: "",
     service_notes: "",
     cancellation_reason: "",
@@ -201,6 +213,36 @@ const AddStock = ({
 
     setTotalCost(Number(value));
   };
+  
+  const handleBookingTimeChange = (value: number | undefined) => {
+  if (value === undefined) {
+    handleCreateServiceDetailFormChange({
+      target: {
+        name: "service_booking_time",
+        value: "",
+      },
+    } as React.ChangeEvent<HTMLInputElement>);
+
+    return;
+  }
+
+  const selectedTime = timeOptions.find((t) => t.id === value);
+
+  if (!selectedTime) return;
+
+  handleCreateServiceDetailFormChange({
+    target: {
+      name: "service_booking_time",
+      value: selectedTime.name,
+    },
+  } as React.ChangeEvent<HTMLInputElement>);
+
+  setError((prev) => ({
+    ...prev,
+    service_booking_time_error: "",
+  }));
+};
+
 
   // Note : on close Clear the states
   const handleCloseForm = () => {
@@ -482,6 +524,24 @@ const AddStock = ({
     );
   };
 
+  const serviceBookingSourceOptions = toSelectOptions(
+      serviceBookingSource,
+      "id",
+      "name",
+    );
+const serviceLocationTypeOptions = toSelectOptions(
+      serviceLocationType,
+      "id",
+      "name",
+    );
+
+    const serviceStatusOptions = toSelectOptions(
+      serviceStatus,
+      "id",
+      "name",
+    );
+    
+
   // const productOptions = toSelectOptions(productList, 'id', 'name');
   // if isOpen is false then return null
   if (!isOpen) return null;
@@ -568,14 +628,23 @@ const AddStock = ({
 
               {!isLoadingForServiceBookingSource ? (
                 <div className="">
-                  <CustomDropdown
-                    logo={Share2}
-                    preselectedOption={selectedServiceBookingSource}
-                    requiredRedDot
-                    labelName="Source"
-                    options={serviceBookingSource!}
-                    onSelect={handleSelectedServiceBookingSource}
+                  <CustomSelect
+                    label="Source"
+                    icon={Share2}
+                    isRequired
+                    options={serviceBookingSourceOptions}
+                    value={selectedServiceBookingSource}
+                    onChange={handleSelectedServiceBookingSource}
                   />
+
+                   {/* <CustomSelect
+                label="Source"
+                value={selectedServiceBookingSource}
+                onChange={setSelectedServiceBookingSource}
+                options={serviceBookingSourceOptions}
+                icon={Share2}
+                isRequired
+              /> */}
                   {showErrorAtServiceBookingSource &&
                     !selectedServiceBookingSource && (
                       <div className="text-red-500 text-xs">
@@ -594,13 +663,21 @@ const AddStock = ({
               )}
               {!isLoadingForServiceLocationType ? (
                 <div className="">
-                  <CustomDropdown
+                  {/* <CustomDropdown
                     logo={MapPin}
                     preselectedOption={selectedServiceLocationType}
                     requiredRedDot
                     labelName="Location"
                     options={serviceLocationType!}
                     onSelect={handleSelectedServiceLocationType}
+                  /> */}
+                  <CustomSelect
+                    label="Location"
+                    icon={MapPin}
+                    isRequired
+                    options={serviceLocationTypeOptions}
+                    value={selectedServiceLocationType}
+                    onChange={handleSelectedServiceLocationType}
                   />
                   {showErrorAtServiceLocationType &&
                     !selectedServiceLocationType && (
@@ -620,13 +697,21 @@ const AddStock = ({
               )}
               {!isLoadingForServiceStatus ? (
                 <div className="">
-                  <CustomDropdown
+                  {/* <CustomDropdown
                     logo={Activity}
                     preselectedOption={selectedServiceStatus}
                     requiredRedDot
                     labelName="Status"
                     options={serviceStatus!}
                     onSelect={handleSelectedServiceStatus}
+                  /> */}
+                  <CustomSelect
+                    label="Status"
+                    icon={Activity}
+                    isRequired
+                    options={serviceStatusOptions}
+                    value={selectedServiceStatus}
+                    onChange={handleSelectedServiceStatus}
                   />
                   {showErrorAtServiceStatus && !selectedServiceStatus && (
                     <div className="text-red-500 text-xs">
@@ -666,21 +751,20 @@ const AddStock = ({
                     <span>Booking Time</span>
                   </div>
                 </label>
-                <select
-                  id="service_booking_time"
-                  name="service_booking_time"
-                  value={addCreateServiceDetailFormData.service_booking_time}
-                  className=" w-full pl-3 pr-10 py-1 border border-gray-300 focus:outline-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
-                  onChange={handleCreateServiceDetailFormChange}
-                  required={true}
-                >
-                  <option value="">Select Service Booking Time</option>
-                  {timeOptions.map((option) => (
-                    <option key={option} value={option}>
-                      {option}
-                    </option>
-                  ))}
-                </select>
+                <CustomSelect
+              placeholder="Select Service Booking Time"
+              label=""
+              value={
+                  timeOptions.find(
+                    (t) =>
+                      t.name ===
+                      addCreateServiceDetailFormData.service_booking_time,
+                  )?.id
+                }
+               onChange={handleBookingTimeChange}
+               options={bookingTimeOptions}
+               isClearable
+            />
                 {error.service_booking_time_error && (
                   <div className="caption-custom-inactive">
                     {error.service_booking_time_error}
@@ -737,9 +821,13 @@ const AddStock = ({
 
               <div className="p-2 bg-white border rounded-lg shadow-sm col-span-2">
                 <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-lg font-semibold text-gray-800">
-                    Customizations
-                  </h3>
+                 <div className="flex items-center gap-1">
+                <SlidersHorizontal size={14} className="text-blue-500" />
+                <h3 className="flex  gap-1 input-label-custom">
+                  Customizations
+                </h3>
+              </div>
+
 
                   <Button
                     type="button"
@@ -776,7 +864,7 @@ const AddStock = ({
                           onChange={(e) =>
                             handleChange(field.id, "value", e.target.value)
                           }
-                          className="w-full px-3 py-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 outline-none"
+                          className="w-full px-1 py-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 outline-none"
                         />
                       </div>
 
@@ -793,9 +881,11 @@ const AddStock = ({
                   ))}
 
                   {fields.length === 0 && (
-                    <p className="text-center text-gray-400 py-4 italic">
-                      No customization fields added yet.
+                     <div className="flex items-center justify-center w-full bg-slate-00">
+                     <p className="caption-custom italic ">
+                       No customization fields added yet.
                     </p>
+                </div>
                   )}
                 </div>
               </div>
