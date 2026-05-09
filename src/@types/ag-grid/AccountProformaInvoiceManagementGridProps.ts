@@ -9,6 +9,7 @@ type AccountProformaInvoiceManagementGridProps = {
   onDownloadInvoice?: (data: AccountProformaInvoiceProps) => void;
   handleRowClick?: (event: any) => void;
   isUsedInInvoiceModule?: boolean;
+  gridLoading?: boolean;
 };
 
 export default AccountProformaInvoiceManagementGridProps;

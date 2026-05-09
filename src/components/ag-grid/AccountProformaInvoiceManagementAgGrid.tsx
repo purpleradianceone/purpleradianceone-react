@@ -3,21 +3,24 @@
 import { AllCommunityModule, ColDef, themeBalham } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 import { useMemo, useRef } from "react";
-import { INNERHTML, JSX_CHILDREN_NAME } from "../../constants/AppConstants";
+import { JSX_CHILDREN_NAME } from "../../constants/AppConstants";
 import StatusIndicator from "../ui/StatusIndicator";
 import InvoiceActionsDropdown from "../views/invoice/InvoiceActionsDropdown";
 import InvoiceStatusChip from "../ui/InvoiceStatusChip";
 import { useUserAccessModules } from "../../config/hooks/useAccessModules";
 import AccountProformaInvoiceManagementGridProps from "../../@types/ag-grid/AccountProformaInvoiceManagementGridProps";
+import { SkeletonRowsAgGrid } from "../ui/SkeletonRowsAgGrid";
 
 function AccountProformaInvoiceManagementAgGrid({
   proformaInvoices,
   onRowSelect,
   onDeleteInvoice,
   onDownloadInvoice,
+  gridLoading,
 }: AccountProformaInvoiceManagementGridProps) {
   const gridRef = useRef<AgGridReact>(null);
-  const { userHasAccessToUpdateCompanyInvoiceDraft } = useUserAccessModules();
+  const { userHasAccessToUpdateAccountProformaInvoice } =
+    useUserAccessModules();
   const columnDefs = useMemo<ColDef[]>(
     () => [
       {
@@ -25,6 +28,9 @@ function AccountProformaInvoiceManagementAgGrid({
         headerName: "Invoice No",
         minWidth: 140,
         cellRenderer: (params: any) => {
+          if (params.data?.__isSkeleton) {
+            return <SkeletonRowsAgGrid />;
+          }
           return (
             <div className="flex items-center font-bold gap-2">
               <span>{params.value || "[Auto-generated]"}</span>
@@ -46,6 +52,9 @@ function AccountProformaInvoiceManagementAgGrid({
         sortable: true,
         filter: true,
         cellRenderer: (params: any) => {
+          if (params.data?.__isSkeleton) {
+            return <SkeletonRowsAgGrid />;
+          }
           return (
             <div className="flex items-center font-bold gap-2">
               <span>{params.value || "[Auto-generated]"}</span>
@@ -59,6 +68,9 @@ function AccountProformaInvoiceManagementAgGrid({
         sortable: true,
         filter: true,
         cellRenderer: (params: any) => {
+          if (params.data?.__isSkeleton) {
+            return <SkeletonRowsAgGrid />;
+          }
           return (
             <div className="flex items-center gap-2">
               <InvoiceStatusChip statusId={params.data.statusId} />
@@ -118,6 +130,9 @@ function AccountProformaInvoiceManagementAgGrid({
         sortable: true,
         filter: true,
         cellRenderer: (params: any) => {
+          if (params.data?.__isSkeleton) {
+            return <SkeletonRowsAgGrid />;
+          }
           return (
             <div className="flex items-center text-sm gap-1 mt-1">
               <StatusIndicator isActive={params.value} />
@@ -170,9 +185,17 @@ function AccountProformaInvoiceManagementAgGrid({
         field: "view",
         pinned: "right",
         maxWidth: 90,
-        cellRenderer: (params: any) => (
-          <InvoiceActionsDropdown data={params.data} context={params.context} />
-        ),
+        cellRenderer: (params: any) => {
+          if (params.data?.__isSkeleton) {
+            return <SkeletonRowsAgGrid />;
+          }
+          return (
+            <InvoiceActionsDropdown
+              data={params.data}
+              context={params.context}
+            />
+          );
+        },
       },
     ],
     [],
@@ -185,9 +208,22 @@ function AccountProformaInvoiceManagementAgGrid({
       flex: 0.8,
       suppressHeaderMenuButton: true,
       suppressHeaderContextMenu: true,
+      cellRenderer: (params: any) => {
+        if (params.data?.__isSkeleton) {
+          return <SkeletonRowsAgGrid />;
+        }
+        return params.value;
+      },
     }),
     [],
   );
+
+  const length = 30;
+  const skeletonRows = useMemo(() => {
+    return Array.from({ length: length }).map(() => ({
+      __isSkeleton: true,
+    }));
+  }, []);
 
   return (
     <div
@@ -196,18 +232,24 @@ function AccountProformaInvoiceManagementAgGrid({
     >
       <AgGridReact
         ref={gridRef}
-        rowData={proformaInvoices}
+        rowData={gridLoading ? skeletonRows : proformaInvoices}
         columnDefs={columnDefs}
         defaultColDef={defaultColDef}
         modules={[AllCommunityModule]}
         theme={themeBalham}
-        overlayNoRowsTemplate={INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
+        // overlayNoRowsTemplate={INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
         context={{
           handleRowSelect: onRowSelect, // ✅ correct
           onDelete: onDeleteInvoice,
           onDownloadInvoice,
-          userHasAccessToUpdateCompanyInvoiceDraft,
+          access: userHasAccessToUpdateAccountProformaInvoice,
           gridRef, // ✅ correct
+        }}
+        onCellClicked={(params) => {
+          //Ignore clicks on Actions column
+          if (params.colDef.field === "view") return;
+          //Call row select handler
+          params.context.handleRowSelect?.(params.data);
         }}
         // onRowClicked={handleRowClick}
       />

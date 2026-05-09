@@ -20,6 +20,7 @@ type AccountProformaInvoiceManagementListProps = {
   invoiceStatus?: PostDataTypeForInvoiceStatus[];
   handleSelectedInvoiceStatus: (selectedPriority: number | undefined) => void;
   isUsedForSidebar?: boolean;
+  gridLoading: boolean;
 };
 
 export default AccountProformaInvoiceManagementListProps;

@@ -600,6 +600,9 @@ function ProformaInvoiceDetails() {
   const hasCess = tempItems.some(
     (i) => i.cessAmount != null && i.cessAmount > 0,
   );
+  const isIGST = tempItems.some(
+    (i) => i.cessAmount != null && i.cessAmount > 0,
+  );
   const saveSingleItem = async (item: any) => {
     if (!userHasAccessToUpdateAccountProformaInvoice) {
       return;
@@ -746,7 +749,7 @@ function ProformaInvoiceDetails() {
           <InvoiceHeaderSkeleton />
         ) : (
           <>
-            <div className=" sticky top-0 z-10  bg-slate-100 flex text-center justify-start items-center gap-3 ml-0.5 ">
+            <div className=" sticky top-0 z-10  bg-slate-100 flex text-center justify-start items-center gap-3 ml-0.5 py-1 ">
               <Link to={`${ROUTES_URL.ACCOUNT_DETAILS}`}>
                 <Button className="caption-custom flex items-center justify-center hover:text-gray-800">
                   Account
@@ -945,6 +948,7 @@ function ProformaInvoiceDetails() {
                         width={"50%"}
                         height={"85%"}
                         enableDownload={true}
+                        fileName={`${invoice?.invoiceNumber}`}
                       />
                     </div>
                   )}
@@ -1020,22 +1024,22 @@ function ProformaInvoiceDetails() {
                   <table className="w-full text-sm font-semibold ">
                     <thead className="sticky top-0 bg-gray-50 z-10 border">
                       <tr className="bg-gray-100 border-b">
-                        <th>#</th>
-                        <th className="p-2 text-left">
+                        <th className="border-r">#</th>
+                        <th className="p-2 text-left border-r">
                           Product/Service/Subscription
                         </th>
-                        <th>Qty</th>
-                        <th>Rate</th>
-                        <th>HSN/SAC</th>
-                        <th>Basic Amount</th>
-                        <th>Discount(%)</th>
-                        <th>Taxable Value</th>
-                        <th>CGST (%)</th>
-                        <th>SGST (%)</th>
-                        <th>IGST (%)</th>
-                        {hasCess && <th>Cess (%)</th>}
-                        <th>Total </th>
-                        {!disabled && <th>Action</th>}
+                        <th className="border-r">Qty</th>
+                        <th className="border-r">Rate</th>
+                        <th className="border-r">HSN/SAC</th>
+                        <th className="border-r">Basic Amount</th>
+                        <th className="border-r">Discount(%)</th>
+                        <th className="border-r">Taxable Value</th>
+                        {!isIGST && <th className="border-r">CGST (%)</th>}
+                        {!isIGST && <th className="border-r">SGST (%)</th>}
+                        {isIGST && <th className="border-r">IGST (%)</th>}
+                        {hasCess && <th className="border-r">Cess (%)</th>}
+                        <th className="border-r">Total </th>
+                        {!disabled && <th className="border-r">Action</th>}
                       </tr>
                     </thead>
 
@@ -1066,48 +1070,66 @@ function ProformaInvoiceDetails() {
                                 key={item.id}
                                 className="border-t font-normal text-xs hover:bg-blue-100 text-center"
                               >
-                                <td>{i + 1}</td>
-                                <td className="p-2 text-left">
+                                <td className="border-r">{i + 1}</td>
+                                <td className="p-2 text-left border-r">
                                   {item.companyProductName}
                                 </td>
                                 {/* <td>{item.quantity}</td> */}
-                                <td>
-                                  <input
-                                    type="number"
-                                    className={`${editingItemId !== item.id ? "" : "border"} rounded p-1 text-center w-20`}
-                                    value={formatQuantity(item.quantity)}
-                                    disabled={
-                                      disabled || editingItemId !== item.id
-                                    }
-                                    onChange={(e) =>
-                                      handleQuantityChange(
-                                        item.id,
-                                        Number(e.target.value),
-                                      )
-                                    }
-                                  />
-                                </td>
-                                <td>
-                                  <input
-                                    type="number"
-                                    className={`${editingItemId !== item.id ? "" : "border"} rounded p-1 text-center w-24`}
-                                    value={formatQuantity(item.rate)}
-                                    disabled={
-                                      disabled || editingItemId !== item.id
-                                    }
-                                    onChange={(e) =>
-                                      handleRateChange(
-                                        item.id,
-                                        Number(e.target.value),
-                                      )
-                                    }
-                                  />
-                                </td>
-                                {/* <td>{formatRupee(item.rate)}</td> */}
-                                <td>{item.hsn || item.sac}</td>
-                                <td>{formatRupee(item.basicValue)}</td>
                                 {editingItemId === item.id ? (
-                                  <td>
+                                  <td className="border-r">
+                                    <input
+                                      type="number"
+                                      className={`${editingItemId !== item.id ? "" : "border"} rounded p-1 text-center w-20`}
+                                      value={item.quantity}
+                                      disabled={
+                                        disabled || editingItemId !== item.id
+                                      }
+                                      onChange={(e) =>
+                                        handleQuantityChange(
+                                          item.id,
+                                          Number(e.target.value),
+                                        )
+                                      }
+                                      step={"0.0001"}
+                                    />
+                                  </td>
+                                ) : (
+                                  <td className="border-r">
+                                    {formatQuantity(item.quantity)}
+                                  </td>
+                                )}
+                                {editingItemId === item.id ? (
+                                  <td className="border-r">
+                                    <input
+                                      type="number"
+                                      className={`${editingItemId !== item.id ? "" : "border"} rounded p-1 text-center w-24`}
+                                      value={item.rate}
+                                      disabled={
+                                        disabled || editingItemId !== item.id
+                                      }
+                                      onChange={(e) =>
+                                        handleRateChange(
+                                          item.id,
+                                          Number(e.target.value),
+                                        )
+                                      }
+                                      step={"0.0000"}
+                                    />
+                                  </td>
+                                ) : (
+                                  <td className="border-r">
+                                    {formatRupee(item.rate)}
+                                  </td>
+                                )}
+                                {/* <td>{formatRupee(item.rate)}</td> */}
+                                <td className="border-r">
+                                  {item.hsn || item.sac}
+                                </td>
+                                <td className="border-r">
+                                  {formatRupee(item.basicValue)}
+                                </td>
+                                {editingItemId === item.id ? (
+                                  <td className="border-r">
                                     {formatRupee(item.discountAmount)}
                                     <input
                                       type="number"
@@ -1125,34 +1147,44 @@ function ProformaInvoiceDetails() {
                                     />
                                   </td>
                                 ) : (
-                                  <td>
+                                  <td className="border-r">
                                     {formatRupee(item.discountAmount)} (
                                     {item.discountPercent}%)
                                   </td>
                                 )}
-                                <td>{formatRupee(item.taxableValue)}</td>
-                                <td>
-                                  {formatRupee(item.cgstAmount)} (
-                                  {item.cgstPercent}%)
+                                <td className="border-r">
+                                  {formatRupee(item.taxableValue)}
                                 </td>
-                                <td>
-                                  {formatRupee(item.sgstAmount)} (
-                                  {item.sgstPercent}%)
-                                </td>
-                                <td>
-                                  {formatRupee(item.igstAmount)} (
-                                  {item.igstPercent}%)
-                                </td>
+                                {!isIGST && (
+                                  <td className="border-r">
+                                    {formatRupee(item.cgstAmount)} (
+                                    {item.cgstPercent}%)
+                                  </td>
+                                )}
+                                {!isIGST && (
+                                  <td className="border-r">
+                                    {formatRupee(item.sgstAmount)} (
+                                    {item.sgstPercent}%)
+                                  </td>
+                                )}
+                                {isIGST && (
+                                  <td className="border-r">
+                                    {formatRupee(item.igstAmount)} (
+                                    {item.igstPercent}%)
+                                  </td>
+                                )}
                                 {hasCess && (
-                                  <td>
+                                  <td className="border-r">
                                     {formatRupee(item.cessAmount)} (
                                     {item.cessPercent}%)
                                   </td>
                                 )}
-                                <td>{formatRupee(item.totalAmount)}</td>
+                                <td className="border-r">
+                                  {formatRupee(item.totalAmount)}
+                                </td>
 
                                 {!disabled && (
-                                  <td>
+                                  <td className="border-r">
                                     <div className="flex gap-2 justify-center">
                                       {editingItemId !== item.id ? (
                                         <button

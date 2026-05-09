@@ -43,6 +43,7 @@ function AccountProformaInvoiceManagementList({
   handleSelectedInvoiceStatus,
   handleAddProformaInvoice,
   isUsedForSidebar = false,
+  gridLoading
 }: AccountProformaInvoiceManagementListProps) {
   const navigate = useNavigate();
   const { position } = usePanel();
@@ -414,6 +415,7 @@ function AccountProformaInvoiceManagementList({
               onDownloadInvoice={handleInvoiceDownload}
               proformaInvoices={invoiceData}
               isUsedInInvoiceModule={false}
+              gridLoading={gridLoading}
             />
           </div>
 
