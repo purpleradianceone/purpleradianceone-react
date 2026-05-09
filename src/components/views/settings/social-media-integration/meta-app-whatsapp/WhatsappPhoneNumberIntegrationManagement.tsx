@@ -22,6 +22,7 @@ import { FaWhatsapp } from "react-icons/fa";
 import LoadingSpinner from "../../../../../assets/animations/LoadingSpinner";
 import { useUserAccessModules } from "../../../../../config/hooks/useAccessModules";
 import MESSAGE from "../../../../../constants/Messages";
+import WhatsAppAutomationInstructions from "./WhatsAppAutomationInstructions";
 
 export type WhatsappPhone = {
   companyId: number;
@@ -285,8 +286,9 @@ export const WhatsappPhoneNumberIntegrationManagement = () => {
   }
 
   return (
-    <div className="min-h-72 h-fit my-5 w-full flex items-center justify-center">
-      <div className="bg-white rounded-xl shadow-lg max-w-4xl w-full md:p-3 border border-gray-200">
+    <div className="min-h-72 h-fit px-4 my-5 w-full flex items-start justify-center">
+      <WhatsAppAutomationInstructions/>
+      <div className="bg-slate-50 rounded-xl shadow-lg max-w-4xl w-full md:p-3 border border-gray-200">
         <FormHeader
           icon={FaWhatsapp}
           iconColour="text-green-500"
