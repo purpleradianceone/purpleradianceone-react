@@ -142,6 +142,7 @@ function CreateProformaInvoiceModal({
       company_product_id: item.product.id,
       quantity: item.quantity,
       rate: item.rate,
+      details: item.details,
       discount: item.discount ?? 0,
     }));
 
@@ -193,7 +194,7 @@ function CreateProformaInvoiceModal({
       {isSubmitting && <LoadingPopUpAnimation show={isSubmitting} />}
       <div className="py-2 font-roboto bg-gray-50 h-[80vh] flex flex-col gap-2">
         {/* MAIN GRID */}
-        <div className="grid grid-cols-12 gap-6 flex-1 overflow-hidden">
+        <div className="grid grid-cols-12 gap-4 flex-1 overflow-hidden">
           {/* TABLE */}
           <div className="col-span-9 bg-white overflow-auto ">
             <div className="flex justify-between items-center mb-4">
@@ -218,6 +219,7 @@ function CreateProformaInvoiceModal({
                   <col className="w-[300px]" />
                   <col className="w-[100px]" />
                   <col className="w-[100px]" />
+                  <col className="w-[100px]" />
                   <col className="w-[80px]" />
                   <col className="w-[100px]" />
                   <col className="w-[50px]" />
@@ -228,6 +230,7 @@ function CreateProformaInvoiceModal({
                     <th className="text-left p-2">
                       Product / Service / Subscription
                     </th>
+                    <th>Details/Billing Period</th>
                     <th>Rate</th>
                     <th>Quantity</th>
                     <th>Discount %</th>
@@ -242,6 +245,7 @@ function CreateProformaInvoiceModal({
                 <table className="w-full text-sm border-collapse table-fixed">
                   <colgroup>
                     <col className="w-[300px]" />
+                    <col className="w-[100px]" />
                     <col className="w-[100px]" />
                     <col className="w-[100px]" />
                     <col className="w-[80px]" />
@@ -274,6 +278,22 @@ function CreateProformaInvoiceModal({
 
                           <td className="px-1">
                             <FormInput
+                              type="text"
+                              value={item.details || ""}
+                              placeholder="Enter Details"
+                              onChange={(e) =>
+                                updateItem(
+                                  item.rowId,
+                                  "details",
+                                  e.target.value,
+                                )
+                              }
+                              // className="w-full border px-1 rounded"
+                              className="w-full border border-gray-200 px-2 py-1 rounded-md focus:ring-2 focus:ring-blue-500 outline-none"
+                            />
+                          </td>
+                          <td className="px-1">
+                            <FormInput
                               type="number"
                               value={item.rate}
                               onChange={(e) =>
@@ -292,6 +312,7 @@ function CreateProformaInvoiceModal({
                             <FormInput
                               type="number"
                               value={item.quantity}
+                              placeholder="Entry Quantity"
                               onChange={(e) =>
                                 updateItem(
                                   item.rowId,
@@ -307,6 +328,7 @@ function CreateProformaInvoiceModal({
                             <FormInput
                               type="number"
                               value={item.discount}
+                              placeholder="Entry Discount %"
                               min={0}
                               max={100}
                               onChange={(e) => {
@@ -396,7 +418,7 @@ function CreateProformaInvoiceModal({
 
               <div>
                 <p className="text-sm font-semibold text-yellow-700">
-                  Tax is inclusive
+                  Tax is exclusive
                 </p>
                 <p className="text-xs text-gray-500">
                   Calculated based on item tax configuration

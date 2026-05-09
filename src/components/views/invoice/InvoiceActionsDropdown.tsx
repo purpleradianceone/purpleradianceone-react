@@ -110,7 +110,7 @@ const InvoiceActionsDropdown = ({ data, context }: any) => {
               </ActionsDropdownButton>
             )}
 
-            {!context.userHasAccessToUpdateCompanyInvoiceDraft ||
+            {!context.access ||
               (data.statusId === 1 && (
                 <ActionsDropdownButton
                   // onClick={() => {

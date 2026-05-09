@@ -252,7 +252,7 @@ function AccountInvoiceManagementAgGrid({
           handleRowSelect: onRowSelect, // ✅ correct
           onDelete: onDeleteInvoice,
           onDownloadInvoice,
-          userHasAccessToUpdateCompanyInvoiceDraft,
+          access: userHasAccessToUpdateCompanyInvoiceDraft,
           gridRef, // ✅ correct
         }}
         onCellClicked={(params) => {

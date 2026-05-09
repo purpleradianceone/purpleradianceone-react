@@ -32,13 +32,17 @@ function AccountProformaInvoice({
 
   const { userHasAccessToViewAccountProformaInvoice } = useUserAccessModules();
   const { invoiceStatus } = useInvoiceStatus();
-  const [invoiceData, setInvoiceData] = useState<AccountProformaInvoiceProps[]>([]);
+  const [invoiceData, setInvoiceData] = useState<AccountProformaInvoiceProps[]>(
+    [],
+  );
   const { loginStatus } = useLoggedInUserContext();
   const [invoiceUpdateCount, setInvoiceUpdateCount] = useState<number>(0);
-
+  const [gridLoading, setGridLoading] = useState(true);
   // Load filters
   const savedFilters = JSON.parse(
-    localStorage.getItem(LocalStorageKeys.ACCOUNT_PROFORMA_INVOICE_MANAGEMENT_FILTERS) || "{}",
+    localStorage.getItem(
+      LocalStorageKeys.ACCOUNT_PROFORMA_INVOICE_MANAGEMENT_FILTERS,
+    ) || "{}",
   );
   const [selectedInvoiceStatus, setselectedInvoiceStatus] = useState<
     number | undefined
@@ -67,7 +71,12 @@ function AccountProformaInvoice({
   // 🔥 API CALL
   const getProformaInvoice = async (signal: AbortSignal) => {
     if (!userHasAccessToViewAccountProformaInvoice) return;
-    if (dateRangeId === customDateRangeId && concatDate.trim() === "") return;
+    setGridLoading(true);
+    setInvoiceData([]);
+    if (dateRangeId === customDateRangeId && concatDate.trim() === "") {
+      setGridLoading(false);
+      return;
+    }
 
     const offset = (currentPage - 1) * pageSize;
 
@@ -85,12 +94,19 @@ function AccountProformaInvoice({
     };
 
     try {
-      if (postData.company_id === 0 || pageSize === 10) return;
+      if (postData.company_id === 0 || pageSize === 10) {
+        setGridLoading(false);
+        return;
+      }
 
-      const response = await axiosClient.post(POST_API.GET_COMPANY_PROFORMA_INVOICE, postData, {
-        signal,
-        withCredentials: true,
-      });
+      const response = await axiosClient.post(
+        POST_API.GET_COMPANY_PROFORMA_INVOICE,
+        postData,
+        {
+          signal,
+          withCredentials: true,
+        },
+      );
 
       if (response.status === STATUS_CODE.OK) {
         const responseData = response.data;
@@ -129,6 +145,7 @@ function AccountProformaInvoice({
         );
 
         setInvoiceData(formattedData);
+        setGridLoading(false);
       }
     } catch (error: any) {
       handleApiError(error);
@@ -188,7 +205,9 @@ function AccountProformaInvoice({
     window.addEventListener("beforeunload", clearFilters);
 
     function clearFilters() {
-      localStorage.removeItem(LocalStorageKeys.ACCOUNT_PROFORMA_INVOICE_MANAGEMENT_FILTERS);
+      localStorage.removeItem(
+        LocalStorageKeys.ACCOUNT_PROFORMA_INVOICE_MANAGEMENT_FILTERS,
+      );
     }
 
     return () => window.removeEventListener("beforeunload", clearFilters);
@@ -230,13 +249,17 @@ function AccountProformaInvoice({
               setselectedInvoiceStatus(selectedStatus)
             }
             isUsedForSidebar={isUsedForSidebar}
+            gridLoading={gridLoading}
           />
         ) : (
           <div
             className={`flex  ${isUsedForSidebar ? "h-[85vh]" : "h-[40vh]"} justify-center items-center`}
           >
             <AccessDeniedMessagePage
-              message={MESSAGE.MODULE_ACCESS.ACCOUNT_PROFORMA_INVOICE.DENIED_VIEW_ACCESS}
+              message={
+                MESSAGE.MODULE_ACCESS.ACCOUNT_PROFORMA_INVOICE
+                  .DENIED_VIEW_ACCESS
+              }
             ></AccessDeniedMessagePage>
           </div>
         )}

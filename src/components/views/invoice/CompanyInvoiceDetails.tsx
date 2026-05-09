@@ -538,6 +538,9 @@ function CompanyInvoiceDetails() {
   const hasCess = tempItems.some(
     (i) => i.cessAmount != null && i.cessAmount > 0,
   );
+  const isIGST = tempItems.some(
+    (i) => i.igstAmount != null && i.igstAmount > 0,
+  );
   const saveSingleItem = async (item: any) => {
     if (!userHasAccessToUpdateCompanyInvoiceItem) {
       return;
@@ -682,7 +685,7 @@ function CompanyInvoiceDetails() {
           <InvoiceHeaderSkeleton />
         ) : (
           <>
-            <div className=" sticky top-0 z-10  bg-slate-100 flex text-center justify-start items-center gap-3 ml-0.5 ">
+            <div className=" sticky top-0 z-10  bg-slate-100 flex text-center justify-start items-center gap-3 ml-0.5 py-1">
               {/* <Link to={ROUTES_URL.INVOICE_MANAGEMENT}> */}
               {isUsedForSearchParams == "Invoice" ? (
                 <Button
@@ -906,7 +909,7 @@ function CompanyInvoiceDetails() {
 
               <TextAreaInput
                 label="Terms & Conditions"
-                maxLength={500}
+                // maxLength={}
                 disabled={isCreateMode || disabled}
                 value={invoice?.termAndConditions}
                 onChange={(e: any) =>
@@ -1021,21 +1024,21 @@ function CompanyInvoiceDetails() {
                     <thead className="sticky top-0 bg-gray-50 z-10 border">
                       <tr className="bg-gray-100 border-b">
                         <th>#</th>
-                        <th className="p-2 text-left">
+                        <th className="p-2 text-left border-r">
                           Product/Service/Subscription
                         </th>
-                        <th>Qty</th>
-                        <th>Rate</th>
-                        <th>HSN/SAC</th>
-                        <th>Basic Amount</th>
-                        <th>Discount(%)</th>
-                        <th>Taxable Value</th>
-                        <th>CGST (%)</th>
-                        <th>SGST (%)</th>
-                        <th>IGST (%)</th>
-                        {hasCess && <th>Cess (%)</th>}
-                        <th>Total </th>
-                        {!disabled && <th>Action</th>}
+                        <th className="border-r">Qty</th>
+                        <th className="border-r">Rate</th>
+                        <th className="border-r">HSN/SAC</th>
+                        <th className="border-r">Basic Amount</th>
+                        <th className="border-r">Discount(%)</th>
+                        <th className="border-r">Taxable Value</th>
+                        {!isIGST && <th className="border-r">CGST (%)</th>}
+                        {!isIGST && <th className="border-r">SGST (%)</th>}
+                        {isIGST && <th className="border-r">IGST (%)</th>}
+                        {hasCess && <th className="border-r">Cess (%)</th>}
+                        <th className="border-r">Total </th>
+                        {!disabled && <th className="border-r">Action</th>}
                       </tr>
                     </thead>
 
@@ -1064,18 +1067,18 @@ function CompanyInvoiceDetails() {
                             return (
                               <tr
                                 key={item.id}
-                                className="border-t font-normal text-xs hover:bg-blue-100 text-center"
+                                className="border-t font-normal text-xs hover:bg-blue-100 text-center "
                               >
-                                <td>{i + 1}</td>
-                                <td className="p-2 text-left">
+                                <td className="border-r">{i + 1}</td>
+                                <td className="p-2 text-left border-r">
                                   {item.companyProductName}
                                 </td>
-                                <td>{formatQuantity(item.quantity)}</td>
-                                <td>{formatQuantity(item.rate)}</td>
-                                <td>{item.hsn || item.sac}</td>
-                                <td>{formatRupee(item.basicValue)}</td>
+                                <td className="border-r">{formatQuantity(item.quantity)}</td>
+                                <td className="border-r">{formatQuantity(item.rate)}</td>
+                                <td className="border-r">{item.hsn || item.sac}</td>
+                                <td className="border-r">{formatRupee(item.basicValue)}</td>
                                 {editingItemId === item.id ? (
-                                  <td>
+                                  <td className="border-r">
                                     <input
                                       type="number"
                                       className={`${editingItemId !== item.id ? "" : "border"} rounded p-1 text-center w-16`}
@@ -1092,34 +1095,40 @@ function CompanyInvoiceDetails() {
                                     />
                                   </td>
                                 ) : (
-                                  <td>
+                                  <td className="border-r">
                                     {formatRupee(item.discountAmount)} (
                                     {item.discountPercent}%)
                                   </td>
                                 )}
-                                <td>{formatRupee(item.taxableValue)}</td>
-                                <td>
-                                  {formatRupee(item.cgstAmount)} (
-                                  {item.cgstPercent}%)
-                                </td>
-                                <td>
-                                  {formatRupee(item.sgstAmount)} (
-                                  {item.sgstPercent}%)
-                                </td>
-                                <td>
-                                  {formatRupee(item.igstAmount)} (
-                                  {item.igstPercent}%)
-                                </td>
+                                <td className="border-r">{formatRupee(item.taxableValue)}</td>
+                                {!isIGST && (
+                                  <td className="border-r">
+                                    {formatRupee(item.cgstAmount)} (
+                                    {item.cgstPercent}%)
+                                  </td>
+                                )}
+                                {!isIGST && (
+                                  <td className="border-r">
+                                    {formatRupee(item.sgstAmount)} (
+                                    {item.sgstPercent}%)
+                                  </td>
+                                )}
+                                {isIGST && (
+                                  <td className="border-r">
+                                    {formatRupee(item.igstAmount)} (
+                                    {item.igstPercent}%)
+                                  </td>
+                                )}
                                 {hasCess && (
-                                  <td>
+                                  <td className="border-r">
                                     {formatRupee(item.cessAmount)} (
                                     {item.cessPercent}%)
                                   </td>
                                 )}
-                                <td>{formatRupee(item.totalAmount)}</td>
+                                <td className="border-r">{formatRupee(item.totalAmount)}</td>
 
                                 {!disabled && (
-                                  <td>
+                                  <td className="">
                                     <div className="flex gap-2 justify-center">
                                       {editingItemId !== item.id ? (
                                         <button
