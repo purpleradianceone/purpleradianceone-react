@@ -49,6 +49,7 @@ import {
 import { amountToWords } from "../../../utils/helperMethods/amountToWords";
 import AccountProformaInvoiceProps from "../../../@types/account/AccountProformaInvoiceProps";
 import FormInput from "../../ui/FormInput";
+import ConfirmationDialog from "../../dialogue-box/ConfirmationDialogue";
 
 function ProformaInvoiceDetails() {
   const { invoiceId, accountId } = useParams();
@@ -69,6 +70,8 @@ function ProformaInvoiceDetails() {
   const [itemsLoading, setItemsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [InvoicePreview, setInvoicePreview] = useState<string | null>(null);
+  const [showConfirmationDialoge, setShowConfirmationDialoge] =
+    useState<boolean>(false);
   const [showCompanyInvoicePreview, setShowCompanyInvoicePreview] =
     useState(false);
   const [selectedAccount, setSelectedAccount] = useState<any>(null);
@@ -970,7 +973,8 @@ function ProformaInvoiceDetails() {
                       disabled={
                         !userHasAccessToUpdateAccountProformaInvoice || disabled
                       }
-                      onClick={SubmitInvoice}
+                      // onClick={SubmitInvoice}
+                      onClick={() => setShowConfirmationDialoge(true)}
                     >
                       <div className="flex items-center gap-1">
                         <Send size={16} />
@@ -1421,6 +1425,16 @@ function ProformaInvoiceDetails() {
             )}
           </>
         )}
+        <ConfirmationDialog
+          title="Confirm Submission of Invoice"
+          description="Once submitted, this invoice cannot be edited."
+          message="After submission, this invoice will be locked and no further changes or edits will be allowed. Please review all details carefully before submitting."
+          open={showConfirmationDialoge}
+          onConfirm={() => {
+            SubmitInvoice();
+          }}
+          onCancel={() => setShowConfirmationDialoge(false)}
+        />
       </div>
     </PageLayout>
   );
