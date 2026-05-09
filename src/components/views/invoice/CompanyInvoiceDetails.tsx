@@ -948,6 +948,7 @@ function CompanyInvoiceDetails() {
                         width={"50%"}
                         height={"85%"}
                         enableDownload={true}
+                        fileName={`${invoice?.invoiceNumber}`}
                       />
                     </div>
                   )}
@@ -1073,10 +1074,18 @@ function CompanyInvoiceDetails() {
                                 <td className="p-2 text-left border-r">
                                   {item.companyProductName}
                                 </td>
-                                <td className="border-r">{formatQuantity(item.quantity)}</td>
-                                <td className="border-r">{formatQuantity(item.rate)}</td>
-                                <td className="border-r">{item.hsn || item.sac}</td>
-                                <td className="border-r">{formatRupee(item.basicValue)}</td>
+                                <td className="border-r">
+                                  {formatQuantity(item.quantity)}
+                                </td>
+                                <td className="border-r">
+                                  {formatQuantity(item.rate)}
+                                </td>
+                                <td className="border-r">
+                                  {item.hsn || item.sac}
+                                </td>
+                                <td className="border-r">
+                                  {formatRupee(item.basicValue)}
+                                </td>
                                 {editingItemId === item.id ? (
                                   <td className="border-r">
                                     <input
@@ -1100,7 +1109,9 @@ function CompanyInvoiceDetails() {
                                     {item.discountPercent}%)
                                   </td>
                                 )}
-                                <td className="border-r">{formatRupee(item.taxableValue)}</td>
+                                <td className="border-r">
+                                  {formatRupee(item.taxableValue)}
+                                </td>
                                 {!isIGST && (
                                   <td className="border-r">
                                     {formatRupee(item.cgstAmount)} (
@@ -1125,7 +1136,9 @@ function CompanyInvoiceDetails() {
                                     {item.cessPercent}%)
                                   </td>
                                 )}
-                                <td className="border-r">{formatRupee(item.totalAmount)}</td>
+                                <td className="border-r">
+                                  {formatRupee(item.totalAmount)}
+                                </td>
 
                                 {!disabled && (
                                   <td className="">
