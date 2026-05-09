@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { Download, Eye, Trash2 } from "lucide-react";
+import { Download, Eye, Trash2, X } from "lucide-react";
 import { JSX_CHILDREN_NAME } from "../../../constants/AppConstants";
 import ActionsDropdownButton from "../../ui/ActionsDropdownButton";
 import ConfirmationDialog from "../../dialogue-box/ConfirmationDialogue";
@@ -117,17 +117,23 @@ const QuotationActionsDropdown = ({ data, context }: any) => {
           </div>,
           document.body,
         )}
-      <ConfirmationDialog
-        icon={Trash2}
 
+      <ConfirmationDialog
         open={isOpenConfirmationDialog}
-        title={`Deleting ${data.quotationNumber}`}
-        message={`You are deleting this quotation: ${data.quotationNumber} `}
-        description={`All the changes related to quotation will be deleted.`}
-        messageDescription=""
-        onCancel={() => setOpenConfirmationDialog(false)}
+        icon={Trash2}
+        title="Delete Quotation"
+        description="This will permanently remove the quotation and its records."
+        message={`Are you sure you want to delete quotation: ${data.quotationNumber}?`}
+        messageDescription="This action cannot be undone."
+        confirmButtonText="Delete"
+        cancelButtonText="Keep"
+        confirmButtonIcon={Trash2}
+        cancelButtonIcon={X}
+        // confirmButtonClassName=" border border-transparent rounded-md shadow-sm bg-red-600 hover:bg-red-700 text-white"
+        // cancelButtonClassName=" border border-transparent rounded-md shadow-sm bg-gray-100 hover:bg-gray-200 text-black"
+
         onConfirm={deleteQuotation}
-        // confirmButtonText="Proceed"
+        onCancel={() => setOpenConfirmationDialog(false)}
       />
     </>
   );
