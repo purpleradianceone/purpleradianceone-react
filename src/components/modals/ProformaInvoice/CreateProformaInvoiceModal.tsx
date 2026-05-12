@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
-import { FileText, Save, X, Plus, Trash2 } from "lucide-react";
+import { FileText, Save, X, Plus, Trash2, User } from "lucide-react";
 import toast from "react-hot-toast";
 
 import { formatRupee } from "../../../utils/helperMethods/formatFunctions";
@@ -18,15 +18,15 @@ import FormInput from "../../ui/FormInput";
 import POST_API from "../../../constants/PostApi";
 import { BsPlusCircle, BsTagFill } from "react-icons/bs";
 import LoadingPopUpAnimation from "../../views/card/LoadingPopUpAnimation";
-import { useNavigate } from "react-router-dom";
-import ROUTES_URL from "../../../constants/Routes";
+import { LookupAccountDropdown } from "../../views/lookups/lookup-account/LookupAccountDropdown";
+
 
 // 🔥 row generator
 const createRow = () => ({
   rowId: Date.now() + Math.random(),
   product: null,
   name: "",
-  rate: 0,
+  cost: 0,
   quantity: 1,
   discount: 0,
 });
@@ -44,9 +44,11 @@ function CreateProformaInvoiceModal({
 }) {
   const { loginStatus } = useLoggedInUserContext();
   const [items, setItems] = useState<any[]>([createRow()]);
+  const [selectedAccount, setSelectedAccount] = useState<any>(null);
+  const hasAccount = !!account;
   console.log(account);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const navigate = useNavigate();
+
   // ================= HANDLERS =================
 
   const addRow = () => setItems((prev) => [...prev, createRow()]);
@@ -83,7 +85,7 @@ function CreateProformaInvoiceModal({
               ...item,
               product,
               name: product.name,
-              rate: product.rate || product.unit_price || 0,
+              cost: product.cost || 0,
             }
           : item,
       ),
@@ -114,7 +116,7 @@ function CreateProformaInvoiceModal({
     (acc, item) => {
       if (!item.product) return acc;
 
-      const base = item.rate * item.quantity;
+      const base = item.cost * item.quantity;
       const discountAmt = (base * item.discount) / 100;
       const taxable = base - discountAmt;
 
@@ -127,12 +129,18 @@ function CreateProformaInvoiceModal({
     },
     { basic: 0, discount: 0, tax: 0, total: 0 },
   );
-
+  const handleAccountSelect = (account: any) => {
+    setSelectedAccount(account);
+  };
   // ================= SUBMIT =================
 
   const handleCreateInvoice = async () => {
     if (!isValid) {
       toast.error("Please fix invalid rows");
+      return;
+    }
+    if (!hasAccount && !selectedAccount) {
+      toast.error("Please select an account");
       return;
     }
 
@@ -141,14 +149,14 @@ function CreateProformaInvoiceModal({
     const item_data = validItems.map((item) => ({
       company_product_id: item.product.id,
       quantity: item.quantity,
-      rate: item.rate,
+      rate: item.cost,
       details: item.details,
       discount: item.discount ?? 0,
     }));
 
     const payload = {
       company_id: loginStatus.companyId,
-      account_id: account?.id, // ✅ REQUIRED
+      account_id: hasAccount ? account?.id : selectedAccount?.id,
       createdby_id: loginStatus.id, // ✅ FIXED KEY
       item_data: JSON.stringify(item_data), // ✅ CRITICAL FIX
     };
@@ -164,12 +172,12 @@ function CreateProformaInvoiceModal({
       if (res.data.status) {
         toast.success(res.data.message);
         handleAddInvoice();
-        navigate(
-          ROUTES_URL.PROFORMA_INVOICE_DETAILS.replace(
-            ":invoiceId",
-            res.data.newid,
-          ).replace(":accountId", String(account?.id)),
-        );
+        // navigate(
+        //   ROUTES_URL.PROFORMA_INVOICE_DETAILS.replace(
+        //     ":invoiceId",
+        //     res.data.newid,
+        //   ).replace(":accountId", String(account?.id)),
+        // );
         onClose();
       } else {
         toast.error(res.data.message);
@@ -188,14 +196,31 @@ function CreateProformaInvoiceModal({
       <FormHeader
         icon={FileText}
         preText="Create Proforma Invoice"
-        description={`Account: ${account.name}`}
+        description={
+          account
+            ? `Account: ${account.name}`
+            : "Select the account for this invoice"
+        }
         onClose={onClose}
       />
       {isSubmitting && <LoadingPopUpAnimation show={isSubmitting} />}
       <div className="py-2 font-roboto bg-gray-50 h-[80vh] flex flex-col gap-2">
         {/* MAIN GRID */}
+        {!hasAccount && (
+          <>
+            <div className="w-6/12">
+              <LookupAccountDropdown
+                icon={<User size={14} />}
+                value={selectedAccount}
+                label="Select Account"
+                handleAccountSelection={handleAccountSelect}
+              />
+            </div>
+          </>
+        )}
         <div className="grid grid-cols-12 gap-4 flex-1 overflow-hidden">
           {/* TABLE */}
+
           <div className="col-span-9 bg-white overflow-auto ">
             <div className="flex justify-between items-center mb-4">
               <div>
@@ -295,11 +320,11 @@ function CreateProformaInvoiceModal({
                           <td className="px-1">
                             <FormInput
                               type="number"
-                              value={item.rate}
+                              value={item.cost}
                               onChange={(e) =>
                                 updateItem(
                                   item.rowId,
-                                  "rate",
+                                  "cost",
                                   Number(e.target.value),
                                 )
                               }
@@ -347,8 +372,8 @@ function CreateProformaInvoiceModal({
                           <td className="text-right font-medium px-2">
                             {formatRupee(
                               item.product
-                                ? item.rate * item.quantity -
-                                    (item.rate *
+                                ? item.cost * item.quantity -
+                                    (item.cost *
                                       item.quantity *
                                       item.discount) /
                                       100

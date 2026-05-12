@@ -43,7 +43,7 @@ function AccountProformaInvoiceManagementList({
   handleSelectedInvoiceStatus,
   handleAddProformaInvoice,
   isUsedForSidebar = false,
-  gridLoading
+  gridLoading,
 }: AccountProformaInvoiceManagementListProps) {
   const navigate = useNavigate();
   const { position } = usePanel();
@@ -230,7 +230,7 @@ function AccountProformaInvoiceManagementList({
               {/* 🔹 Title */}
               <ComponentHeaderAndLogo
                 logo={FaRegFileAlt}
-                headerText="Invoices"
+                headerText=" Proforma Invoices"
               />
               {/* 🔹 Search */}
               <div className="w-fit min-w-[120px]">
@@ -285,17 +285,12 @@ function AccountProformaInvoiceManagementList({
                     );
                     return;
                   }
-
-                  // setIsCreateInvoiceModalOpen(true);
-                  const path = ROUTES_URL.INVOICE_DETAILS.replace(
-                    ":invoiceId",
-                    String(0),
-                  );
-                  navigate(path);
+                  //   handleSaveHeader();
+                  setIsCreateInvoiceModalOpen(true);
                 }}
                 // className={COLORS.ADD_BUTTON}
               >
-                + Add Invoice
+                + Add Proforma Invoice
               </Button>
             </div>
           </div>
