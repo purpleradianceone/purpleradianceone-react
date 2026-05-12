@@ -52,7 +52,7 @@ export const AccountCompanyProductWarrantyDetails: React.FC<
     <div className="bg-white rounded-xl border p-1 grid gap-1 border-slate-200">
       <h3 className="flex items-center justify-between bg-gray-100 table-header-custom rounded-t-md px-2">
         <span>Warranty Details</span>
-        <div className="hidden justify-end items-center text-xs gap-x-2 py-0.5 text-gray-500">
+        <div className="justify-end items-center text-xs gap-x-2 py-0.5 text-gray-500">
           <Button
             disabled={!userHasAccessToAddAccountProductsWarranty}
             onClick={() => {

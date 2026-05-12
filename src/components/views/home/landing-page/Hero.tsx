@@ -671,14 +671,14 @@ function Hero() {
             </button>
           </div>
         </section>
-        <div className="fixed bottom-0 left-0 w-full bg-white border-t shadow-md font-dm p-2 flex gap-3 z-50 ">
+        {/* <div className="fixed bottom-0 left-0 w-full bg-white border-t shadow-md font-dm p-2 flex gap-3 z-50 ">
           <button className="flex-1 bg-purple text-white py-3 rounded-full text-sm font-medium hover:bg-purple-dark">
             Start free trial
           </button>
           <button className="flex-1 border border-purple text-purple py-3 rounded-full text-sm font-medium hover:bg-purple-light">
             See demo
           </button>
-        </div>
+        </div> */}
       </div>
     </motion.section>
   );

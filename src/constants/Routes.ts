@@ -123,7 +123,8 @@ const ROUTES_URL = {
   INVOICE_MANAGEMENT: "/home/manage-invoices/company-invoice",
   INVOICE_DETAILS:
     "/home/manage-invoices/company-invoice/invoice-details/:invoiceId",
-
+  ACCOUNT_PROFORMA_INVOICE_MANAGEMENT:
+    "/home/manage-invoices/company-proforma-invoice",
   PROFORMA_INVOICE_DETAILS:
     "/home/manage-invoices/company-proforma-invoice/proforma-invoice-details/:invoiceId/:accountId",
 
