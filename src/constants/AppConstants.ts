@@ -288,6 +288,8 @@ export const INNERHTML = {
 
 export const AGGRID = {
   THEME_ALPINE: "themeAlpine",
+   ROW_HEIGHT: 46,
+  HEADER_HEIGHT: 40,
 };
 
 export const MOBILE_NUMBER_VALIDATION = {
