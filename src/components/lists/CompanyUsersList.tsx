@@ -30,6 +30,7 @@ import RefreshToken from "../../config/validations/RefreshToken";
 import PaginationWithoutCount from "../ag-grid/PaginationWithoutCount";
 import CompanyUserAccessManagementModalNew from "../modals/company-user/CompanyUserAccessManagementModalNew";
 import { customDateRangeId } from "../../config/hooks/usePaginationHandler";
+import { ComponentHeaderAndLogo } from "../ui/ComponentHeaderAndLogo";
 
 function GetCompanyUsersList({
   users,
@@ -40,7 +41,7 @@ function GetCompanyUsersList({
   handleCompanyUserChangeOnEdit,
   isUsedInAccountProductForAssingingInstalledBy,
   onRowSelect,
-  isDataLoading
+  isDataLoading,
 }: GetCompanyUsersListProps) {
   const { userPreference } = useUserPreference();
   const [isAccessModalOpen, setIsAccessModalOpen] = useState<boolean>(false);
@@ -228,7 +229,7 @@ function GetCompanyUsersList({
   };
   const selectedDateName =
     dateRangeDropdownOptions.find(
-      (o) => o.search_date_range_id === handleSearchOption.dateRangeId
+      (o) => o.search_date_range_id === handleSearchOption.dateRangeId,
     )?.date_range || "Date Filter";
 
   useEffect(() => {
@@ -259,14 +260,15 @@ function GetCompanyUsersList({
           )}
 
       <div
-        className={`sticky z-10 top-9 py-0.5 flex items-center justify-between ${COLORS.GRID_HEADER_SECTION_BG_COLOR} rounded-lg shadow-sm  mb-1.5 w-full`}
+        className={`sticky z-10 top-9 py-0.5 flex items-center justify-between ${COLORS.GRID_HEADER_SECTION_BG_COLOR} rounded-sm w-full`}
       >
         <div className="flex justify-center items-center gap-5">
-          <div className="flex gap-1">
+          {/* <div className="flex gap-1">
             <Users className={COLORS.GRID_HEADER_ICONS_COLOR_AND_SIZE} />
             <span className="section-header-custom">Company Users</span>
-          </div>
+          </div> */}
 
+          <ComponentHeaderAndLogo headerText="Company Users" logo={Users} />
           <div className="flex gap-1">
             {/* search box flex div */}
 
@@ -361,14 +363,14 @@ function GetCompanyUsersList({
         </>
       </div>
 
-      <div className="bg-white overflow-y-auto rounded-lg shadow-sm p-0">
+      <div className="bg-white overflow-y-auto  p-0">
         <div
           className={
             isUsedInAccountProductForAssingingInstalledBy
-              ? `ag-theme-balham w-full h-[calc(70vh-122px)]`
+              ? ` w-full h-[calc(70vh-122px)]`
               : userPreference.isLeftMenu
-                ? `ag-theme-balham w-full h-[calc(100vh-116px)]`
-                : "ag-theme-balham w-full h-[calc(100vh-120px)]"
+                ? ` w-full h-[calc(100vh-110px)]`
+                : " w-full h-[calc(100vh-120px)]"
           }
         >
           <CompanyUserAgGrid

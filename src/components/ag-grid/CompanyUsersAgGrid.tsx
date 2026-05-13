@@ -1,21 +1,42 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-import { AllCommunityModule, ColDef, themeBalham } from "ag-grid-community";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
+import { AllCommunityModule, ColDef} from "ag-grid-community";
+
 import { AgGridReact } from "ag-grid-react";
+
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Edit, LucideLayoutDashboard, UserCheck } from "lucide-react";
+
+import {
+  Edit,
+  LucideLayoutDashboard,
+  UserCheck,
+} from "lucide-react";
+
 import { createPortal } from "react-dom";
-import {  JSX_CHILDREN_NAME } from "../../constants/AppConstants";
+
+import { AGGRID, JSX_CHILDREN_NAME } from "../../constants/AppConstants";
+
 import { CLASS_NAMES } from "../../constants/ClassNames";
+
 import ActionsDropdownButton from "../ui/ActionsDropdownButton";
+
 import { useUserAccessModules } from "../../config/hooks/useAccessModules";
+
 import CompanyUserAgGridProps from "../../@types/ag-grid/CompanyUserAgGridProps";
+
 import toast from "react-hot-toast";
+
 import MESSAGE from "../../constants/Messages";
-import StatusIndicator from "../ui/StatusIndicator";
+
 import AppTutorailManager from "../views/tutorails/AppTutorailManager";
+
 import { CompanyUsersGridActionsButtonStep } from "../../constants/AppTutorailsSteps";
+
 import { SkeletonRowsAgGrid } from "../ui/SkeletonRowsAgGrid";
-// import "ag-grid-community/styles/ag-theme-balham.css";
+import { avatarColors } from "../../utils/colourSpecifierForNameInAggrid";
+
+
 function CompanyUserAgGrid({
   users,
   handleSelectedCompanyUserChange,
@@ -26,7 +47,7 @@ function CompanyUserAgGrid({
   isActionsTourEnded,
   isUsedInAccountProductForAssingingInstalledBy,
   onRowSelect,
-   isDataLoading
+  isDataLoading
 }: CompanyUserAgGridProps) {
   const {
     userHasAccessToViewAccess,
@@ -37,93 +58,179 @@ function CompanyUserAgGrid({
   const columnDefs = useMemo<ColDef[]>(
     () => [
       {
+        hide: true,
+        headerName: "",
+        checkboxSelection: true,
+        headerCheckboxSelection: true,
+        width: 60,
+        maxWidth: 60,
+        pinned: "left",
+        sortable: false,
+        filter: false,
+        suppressMenu: true,
+
+        cellStyle: {
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        },
+      },
+      {
         field: "fullname",
         headerName: "Name",
         sortable: true,
         filter: "agTextColumnFilter",
-        flex: 1,
+        flex: 1.8,
 
         comparator: (valueA, valueB) => {
           if (!valueA) return -1;
           if (!valueB) return 1;
+
           return valueA.toLowerCase().localeCompare(valueB.toLowerCase());
         },
+
+        cellRenderer: (params: any) => {
+          if (params.data?.__isSkeleton) {
+            return <SkeletonRowsAgGrid />;
+          }
+
+          const name =
+            params.data?.fullname?.trim() ||
+            params.data?.email?.trim() ||
+            "User";
+
+          const initials =
+            name
+              .trim()
+              .split(/\s+/)
+              .filter(Boolean)
+              .map((word: string) => word.charAt(0))
+              .join("")
+              .substring(0, 2)
+              .toUpperCase() || "U";
+
+          const colorIndex = name.length % avatarColors.length;
+
+          return (
+            <div className="flex items-center  gap-3 h-full overflow-visible  px-2">
+              <div
+                className={`w-8 h-8  rounded-full text-white text-xs font-semibold flex items-center justify-center flex-shrink-0 overflow-hidden ${avatarColors[colorIndex]}`}
+              >
+                {initials}
+              </div>
+
+              <div className="flex flex-col justify-center">
+                <span className="text-sm font-semibold text-gray-800">
+                  {params.data?.fullname}
+                </span>
+
+                <span className="text-xs text-gray-500">
+                  {params.data?.email}
+                </span>
+              </div>
+            </div>
+          );
+        },
       },
+
       {
+        hide: true,
         field: "email",
         headerName: "Email",
         sortable: true,
         filter: true,
         flex: 1.5,
+
       },
+
       {
         field: "mobilenumber",
         headerName: "Mobile Number",
-
         sortable: true,
         filter: true,
-      },
-      {
-        field: "createdby",
-        headerName: "Created By",
-        sortable: true,
-        filter: true,
-      },
-      {
-        field: "createdon",
-        headerName: "Created On",
-        sortable: true,
-        filter: true,
+        flex: 1,
       },
       {
         field: "isactive",
         headerName: "Status",
         sortable: true,
+        filter: false,
+        flex: 1,
+
+cellRenderer: (params: any) => {
+  if (params.data?.__isSkeleton) {
+    return <SkeletonRowsAgGrid />;
+  }
+
+  return (
+    <div className="h-full flex items-center">
+      <div
+        className={`font-sans-status-card ${
+          params.value
+            ? "bg-green-100 text-green-900"
+            : "bg-red-100 text-red-700"
+        }`}
+      >
+        <div
+          className={`w-1.5 h-1.5 rounded-full ${
+            params.value ? "bg-green-900" : "bg-red-600"
+          }`}
+        />
+
+        {params.value ? "Active" : "Inactive"}
+      </div>
+    </div>
+  );
+},
+    },
+
+      {
+        field: "createdby",
+        headerName: "Created By",
+        sortable: true,
         filter: true,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        cellRenderer: (params: any) => {
-           if (params.data?.__isSkeleton) {
-                return <SkeletonRowsAgGrid />;
-              }
-          return (
-            <div className="flex items-center text-sm gap-1 mt-1">
-              <StatusIndicator isActive={params.value} />
-            </div>
-          );
-        },
+        flex: 1,
+
       },
-       {
+
+      {
+        field: "createdon",
+        headerName: "Created On",
+        sortable: true,
+        filter: true,
+        flex: 1,
+
+        
+      },
+
+      {
         hide: !isUsedInAccountProductForAssingingInstalledBy,
-        headerName: "Actions",
-        // hide: !isUsedInLeadModule,
+        headerName: "ACTIONS",
         field: "view",
         pinned: "right",
-        maxWidth: 80,
-        // minWidth:80,
-        // autoHeight: true,
-        // suppressSizeToFit: true,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        cellRenderer: (params:   any) => {
-           if (params.data?.__isSkeleton) {
-                return <SkeletonRowsAgGrid />;
-              }
+        maxWidth: 100,
+        cellRenderer: (params: any) => {
+          if (params.data?.__isSkeleton) {
+            return <SkeletonRowsAgGrid />;
+          }
 
           return (
-            <div className="flex items-center justify-center  ">
+            <div className="flex items-center justify-center h-full">
               <span
-                className="lead-details cursor-pointer text-blue-600  "
+                className="cursor-pointer text-blue-600  text-sm font-medium hover:underline"
                 onClick={(e) => {
-                    e.preventDefault();
+                  e.preventDefault();
+
                   params.context.handleRowSelect(params.data);
                 }}
               >
-                
                 Select
               </span>
             </div>
           );
         },
       },
+
       {
         hide: isUsedInAccountProductForAssingingInstalledBy,
         headerName: "Actions",
@@ -131,12 +238,12 @@ function CompanyUserAgGrid({
         maxWidth: 100,
         pinned: "right",
         headerClass: "company-users-actions-column",
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        cellRenderer: (params: any) => {
+        filter: false,
 
-           if (params.data?.__isSkeleton) {
-                return <SkeletonRowsAgGrid />;
-              }
+        cellRenderer: (params: any) => {
+          if (params.data?.__isSkeleton) {
+            return <SkeletonRowsAgGrid />;
+          }
 
           const [isActionsDropDownOpen, setIsActionsDropDownOpen] =
             useState(false);
@@ -157,16 +264,22 @@ function CompanyUserAgGrid({
             const rect = (
               event.currentTarget as HTMLButtonElement
             ).getBoundingClientRect();
-            const dropdownHeight = 80; // Approximate height of dropdown
+
+            const dropdownHeight = 80;
+
             const windowHeight = window.innerHeight;
+
             const spaceBelow = windowHeight - rect.bottom;
+
             const isUpward = spaceBelow < dropdownHeight;
 
             setPosition({
               top: isUpward
-                ? rect.top + window.scrollY - dropdownHeight + 10 // Position above button
-                : rect.bottom + window.scrollY - 10, // Position below button
+                ? rect.top + window.scrollY - dropdownHeight + 10
+                : rect.bottom + window.scrollY - 10,
+
               left: rect.left + window.scrollX - 50,
+
               isUpward,
             });
           };
@@ -184,83 +297,118 @@ function CompanyUserAgGrid({
 
             document.addEventListener(
               "mousedown",
-              handleClickOutsideActionsDropDown
+              handleClickOutsideActionsDropDown,
             );
+
             return () =>
               document.removeEventListener(
                 "mousedown",
-                handleClickOutsideActionsDropDown
+                handleClickOutsideActionsDropDown,
               );
           }, []);
 
           return (
             <>
-              <button
-                id="actions-button"
-                className="text-blue-600"
-                onClick={handleActionsButtonClick}
-              >
-                {JSX_CHILDREN_NAME.ACTIONS}
-              </button>
+              <div className="flex items-center justify-center h-full">
+                <button
+                  id="actions-button"
+                  className="text-slate-800    flex  items-center hover:text-slate-900"
+                  onClick={handleActionsButtonClick}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="18"
+                    height="18"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M12 5h.01M12 12h.01M12 19h.01"
+                    />
+                  </svg>
+                  {/* Actions <ArrowDown size={12} /> */}
+                </button>
+              </div>
 
               {isActionsDropDownOpen &&
                 createPortal(
                   <div
                     ref={dropdownRef}
-                    className="absolute bg-white border rounded-md shadow-lg w-32 ml-1 z-50"
-                    style={{ top: position.top, left: position.left }}
+                    className="absolute bg-white border rounded-xl shadow-xl w-36 ml-1 z-50"
+                    style={{
+                      top: position.top,
+                      left: position.left,
+                    }}
                   >
                     {isActionsTourEnded && (
                       <AppTutorailManager
                         steps={CompanyUsersGridActionsButtonStep}
                         handleTourEnd={() => {
                           setIsActionsDropDownOpen(false);
+
                           handleActionsTourEnd!();
+
                           handleIsAccessModalOpen(false);
-                           handleIdIsEditModalOpen(false);
-                            handleIsDashboardModalOpen(false);
+
+                          handleIdIsEditModalOpen(false);
+
+                          handleIsDashboardModalOpen(false);
                         }}
                         modalOpenTriggerIndices={[0, 2, 4, 5]}
                         isModalOpen={(index) => {
                           if (index === 0) {
-                            handleSelectedCompanyUserChange(params.data)
+                            handleSelectedCompanyUserChange(params.data);
+
                             handleIsAccessModalOpen(true);
-                            
                           }
+
                           if (index === 2) {
-                            handleSelectedCompanyUserChange(params.data)
+                            handleSelectedCompanyUserChange(params.data);
+
                             handleIsAccessModalOpen(false);
+
                             handleIdIsEditModalOpen(true);
                           }
-                           if (index === 4) {
-                            handleSelectedCompanyUserChange(params.data)
+
+                          if (index === 4) {
+                            handleSelectedCompanyUserChange(params.data);
+
                             handleIsAccessModalOpen(false);
+
                             handleIdIsEditModalOpen(false);
+
                             handleIsDashboardModalOpen(true);
                           }
-                          
                         }}
                       />
                     )}
+
                     <ActionsDropdownButton
                       id="company-user-access-management-action-btn"
                       disabled={!userHasAccessToViewAccess}
                       onClick={() => {
                         if (userHasAccessToViewAccess) {
                           handleSelectedCompanyUserChange(params.data);
+
                           handleIsAccessModalOpen(true);
+
                           setIsActionsDropDownOpen(false);
                         } else {
                           toast.error(
                             MESSAGE.MODULE_ACCESS.MODULE_ACCESS
-                              .DENIED_VIEW_ACCESS_MODULE_ACCESS
+                              .DENIED_VIEW_ACCESS_MODULE_ACCESS,
                           );
                         }
                       }}
                     >
                       <UserCheck
                         className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR}
-                      />{" "}
+                      />
+
                       {JSX_CHILDREN_NAME.ACCESS}
                     </ActionsDropdownButton>
 
@@ -270,17 +418,20 @@ function CompanyUserAgGrid({
                       onClick={() => {
                         if (userHasAccessToUpdateUser) {
                           handleSelectedCompanyUserChange(params.data);
+
                           handleIdIsEditModalOpen(true);
+
                           setIsActionsDropDownOpen(false);
                         } else {
                           toast.error(
                             MESSAGE.MODULE_ACCESS.COMPANY_USER
-                              .DENIED_UPDATE_ACCESS_COMPANY_USER
+                              .DENIED_UPDATE_ACCESS_COMPANY_USER,
                           );
                         }
                       }}
                     >
-                      <Edit className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR} />{" "}
+                      <Edit className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR} />
+
                       {JSX_CHILDREN_NAME.EDIT}
                     </ActionsDropdownButton>
 
@@ -290,12 +441,14 @@ function CompanyUserAgGrid({
                       onClick={() => {
                         if (userHasAccessToViewDashboard) {
                           handleSelectedCompanyUserChange(params.data);
+
                           handleIsDashboardModalOpen(true);
+
                           setIsActionsDropDownOpen(false);
                         } else {
                           toast.error(
                             MESSAGE.MODULE_ACCESS.DASHBOARD
-                              .DENIED_VIEW_ACCESS_DASHBOARD
+                              .DENIED_VIEW_ACCESS_DASHBOARD,
                           );
                         }
                       }}
@@ -303,11 +456,11 @@ function CompanyUserAgGrid({
                       <span className="flex gap-1">
                         <LucideLayoutDashboard
                           className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR}
-                        />{" "}
+                        />
+
                         {JSX_CHILDREN_NAME.DASHBOARD}
                       </span>
                     </ActionsDropdownButton>
-
                     {/* {!userHasAccessToViewAccess && (
                       <ActionsDropdownButton disabled>
                         <UserCheck
@@ -324,17 +477,17 @@ function CompanyUserAgGrid({
                       </ActionsDropdownButton>
                     )} */}
                   </div>,
-                  document.body // Render dropdown in body to avoid clipping
+                  document.body,
                 )}
             </>
           );
         },
       },
     ],
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
-  );
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  );
 
   const skeletonRows = useMemo(() => {
     return Array.from({ length: 30 }).map(() => ({
@@ -350,29 +503,38 @@ function CompanyUserAgGrid({
       suppressHeaderMenuButton: true,
       suppressHeaderContextMenu: true,
 
-       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            cellRenderer: (params: any) => {
-              if (params.data?.__isSkeleton) {
-                return <SkeletonRowsAgGrid />;
-              }
-              return params.value;
-            },
+      cellRenderer: (params: any) => {
+        if (params.data?.__isSkeleton) {
+          return <SkeletonRowsAgGrid />;
+        }
+
+        return params.value;
+      },
     };
   }, []);
 
   return (
     <div
-      className="ag-theme-balham w-full "
-      style={{ height: "100%", width: "100%" }}
+      className="modern-user-grid w-full"
+      style={{
+        height: "100%",
+        width: "100%",
+      }}
     >
       <AgGridReact
-        rowData={ isDataLoading ? skeletonRows : users}
+        rowData={isDataLoading ? skeletonRows : users}
         columnDefs={columnDefs}
         defaultColDef={defaultColDef}
         modules={[AllCommunityModule]}
-        // overlayNoRowsTemplate={INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
-        theme={themeBalham}
-        context={{ handleRowSelect: isDataLoading ? undefined: onRowSelect }}
+        // theme={themeBalham}
+        rowHeight={AGGRID.ROW_HEIGHT}
+        headerHeight={AGGRID.HEADER_HEIGHT}
+        suppressCellFocus={true}
+        rowSelection="multiple"
+        suppressRowClickSelection={true}
+        context={{
+          handleRowSelect: isDataLoading ? undefined : onRowSelect,
+        }}
       />
     </div>
   );
