@@ -42,6 +42,7 @@ function CompanyQuotationManagement({
     localStorage.getItem(LocalStorageKeys.COMPANY_QUOTATION_MANAGEMENT_FILTERS) || "{}",
   );
   const [selectedCompanyQuotationStatus, setSelectedCompanyQuotationStatus] = useState<number | undefined>(savedFilters.selectedCompanyQuotationStatus);
+  const [selectedCompanyQuotationType, setSelectedCompanyQuotationType] = useState<any | undefined>(savedFilters.selectedCompanyQuotationType);
 
   const {
     currentPage,
@@ -71,7 +72,7 @@ function CompanyQuotationManagement({
     const postData = {
       company_id: loginStatus.companyId,
       id: null,
-      quotation_type_id: isUsedFor === Modules.LEAD_QUOTATION?1:(isUsedFor === Modules.AMC_QUOTATION?2:null ),
+      quotation_type_id: isUsedFor === Modules.LEAD_QUOTATION?1:(isUsedFor === Modules.AMC_QUOTATION?2:selectedCompanyQuotationType?selectedCompanyQuotationType.id:null ),
       other_id: otherData?otherData.id:null,
       search_company_specific_date_range_id: dateRangeId === 0 ? null : dateRangeId,
       limit: pageSize,
@@ -158,6 +159,7 @@ function CompanyQuotationManagement({
     searchParameter,
     concatDate,
     selectedCompanyQuotationStatus,
+    selectedCompanyQuotationType,
   ]);
 
   useEffect(() => {
@@ -176,6 +178,7 @@ function CompanyQuotationManagement({
       customStartDate: startDate,
       customEndDate: endDate,
       selectedCompanyQuotationStatus,
+      selectedCompanyQuotationType,
     };
 
     localStorage.setItem(
@@ -222,6 +225,7 @@ function CompanyQuotationManagement({
               endDate,
               searchParameter,
               selectedCompanyQuotationStatus,
+              selectedCompanyQuotationType,
             }}
             quotaionData={companyQuotationData}
             isDataLoading={isLoadingForCompanyQuotation}
@@ -238,6 +242,9 @@ function CompanyQuotationManagement({
             quotationStatus={invoiceStatus}
             handleSelectedQuotationStatus={(selectedStatus: number | undefined) =>
               setSelectedCompanyQuotationStatus(selectedStatus)
+            }
+            handleSelectedQuotationType={(value)=>
+              setSelectedCompanyQuotationType(value)
             }
             isUsedFor={isUsedFor}
             leadStatusId={otherData?otherData.leadStatusId:0}

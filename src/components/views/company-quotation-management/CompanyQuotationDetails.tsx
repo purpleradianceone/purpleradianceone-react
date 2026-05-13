@@ -1051,6 +1051,7 @@ function CompanyQuotationDetails() {
                               value={selectedAccount}
                               label="Select Account"
                               handleAccountSelection={handleAccountSelect}
+
                             />
                           )}
                         </div>
@@ -1062,6 +1063,7 @@ function CompanyQuotationDetails() {
                         handleQuotationTemplateSelection={
                           handleQuotationTemplateSelect
                         }
+                        
                       />
                     </div>
                   )}

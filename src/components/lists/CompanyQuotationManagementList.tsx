@@ -28,6 +28,7 @@ import DateRangePicker from "../ui/DateRangePicker";
 import SearchInput from "../ui/SearchInput";
 import LoadingPopUpAnimation from "../views/card/LoadingPopUpAnimation";
 import QuotationIconSvg from "../quotation-builder/svg/QuotationIconSvg";
+import { QuotationTypeDropdown } from "../views/lookups/company-quotation/QuotationTypeDropdown";
 
 export const companyQuotationDataUrlSearchParamKey: string =
   "companyQuotationData";
@@ -42,6 +43,7 @@ function CompanyQuotationManagementList({
   otherData,
   quotationStatus,
   handleSelectedQuotationStatus,
+  handleSelectedQuotationType,
   handleAddQuotation,
   isUsedFor = Modules.QUOTATION_MODULE,
   leadStatusId,
@@ -234,11 +236,21 @@ function CompanyQuotationManagementList({
               </div>
 
               <div className="min-w-[150px]">
+                <QuotationTypeDropdown
+                value={handleSearchOption.selectedCompanyQuotationType}
+                handleQuotationTypeSelection={handleSelectedQuotationType!}
+                isClearButton={true}
+                heightInPx="33px"
+                />
+              </div>
+
+              <div className="min-w-[150px]">
                 <CustomDropdown
                   preselectedOption={handleSearchOption.selectedInvoiceStatus}
                   labelName="status"
                   options={quotationStatus!}
                   onSelect={handleSelectedQuotationStatus}
+                  height="h-8"
                 />
               </div>
               {/* 🔹 Date Filter + Picker (Grouped) */}
@@ -247,6 +259,8 @@ function CompanyQuotationManagementList({
                   dropdownOptions={dateRangeDropdownOptions}
                   handleDateIdChange={handleDateRangeIdChange}
                   selectedOption={selectedDateName}
+                  height="h-8"
+
                 />
 
                 {isCustomDateOptionSelected && (

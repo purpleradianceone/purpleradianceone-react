@@ -1,3 +1,4 @@
+import { Save, X } from "lucide-react";
 import Button from "../ui/Button";
 
 interface EditableSectionProps {
@@ -65,7 +66,10 @@ const EditableSection = ({
                   Saving...
                 </span>
               ) : (
-                "Save"
+                <div className="flex items-center gap-1">
+                  <Save size={16} />
+                  <span>Save</span>
+                </div>
               )}
             </Button>
 
@@ -75,7 +79,10 @@ const EditableSection = ({
               disabled={isLoadingForUpdate}
               className="px-3 py-1 bg-gray-400 text-white rounded"
             >
-              Cancel
+              <div className="flex items-center gap-1">
+                <X size={16} />
+                <span>Cancel</span>
+              </div>
             </Button>
           </div>
         )}

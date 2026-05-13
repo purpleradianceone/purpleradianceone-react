@@ -18,6 +18,7 @@ import {
   Menu,
   MessageCircle,
   Network,
+  PackageCheck,
   Settings,
   SettingsIcon,
   Store,
@@ -78,6 +79,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
     userHasAccessToViewTasks,
     userHasAccessToViewCompanyInvoice,
     userHasAccessToViewCompanyQuotation,
+    userHasAccessToViewCompanyProductSale,
   } = useUserAccessModules();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [accessDeniedPopUpView, setAccessDeniedPopUpView] =
@@ -667,6 +669,13 @@ function Navbar({ children }: { children: React.ReactNode }) {
                           to={ROUTES_URL.INVOICE_MANAGEMENT}
                           icon={<FaRegFileAlt size={SIZE.TWENTY} />}
                           label="Invoices"
+                        />
+
+                        <NavItem
+                          disable={!userHasAccessToViewCompanyProductSale}
+                          to={ROUTES_URL.COMPANY_PRODUCT_SALE_MANAGEMENT}
+                          icon={<PackageCheck size={SIZE.TWENTY} />}
+                          label="Sales"
                         />
 
                         {/* )} */}

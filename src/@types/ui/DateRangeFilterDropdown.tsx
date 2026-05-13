@@ -4,6 +4,7 @@ import SearchDropDownOptions from "../ag-grid/SearchDropDownOptions";
 type DateRangeFilterDropdownProps =  {
   dropdownOptions: SearchDropDownOptions[];
   handleDateIdChange? : (dateId : number) => void;
-  selectedOption ?: string 
+  selectedOption ?: string ;
+  height?: string;
 }
  export default DateRangeFilterDropdownProps;

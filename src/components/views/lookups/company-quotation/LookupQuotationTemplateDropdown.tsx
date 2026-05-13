@@ -6,7 +6,7 @@ import Select, { components } from "react-select";
 import { getLookupQuotationTemplate } from "../../../../config/apis/CompanyQuotationApis";
 import { handleApiError } from "../../../../config/error/handleApiError";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
-import { FileText } from "lucide-react";
+import { Delete, FileText } from "lucide-react";
 
 export const LookupQuotationTemplateDropdown = ({
   icon,
@@ -14,12 +14,16 @@ export const LookupQuotationTemplateDropdown = ({
   value,
   handleQuotationTemplateSelection,
   isDisabled = false,
+  heightInPx = "34px",
+  isClearButton = false,
 }: {
   icon?: React.ReactNode;
   label?: string;
   value?: any;
   handleQuotationTemplateSelection: (data: any) => void;
   isDisabled?: boolean;
+  heightInPx?: string;
+  isClearButton?: boolean;
 }) => {
   const { loginStatus } = useLoggedInUserContext();
 
@@ -28,6 +32,13 @@ export const LookupQuotationTemplateDropdown = ({
   const [inputValue, setInputValue] = useState("");
 
   const selectRef = useRef<any>(null);
+
+  const CLEAR_OPTION = {
+    value: "__clear__",
+    label: "Clear Selection",
+    // data: {name:"❌ Clear Selection"},
+    data: null,
+  };
 
   /* ================= FETCH ================= */
   useEffect(() => {
@@ -63,7 +74,16 @@ export const LookupQuotationTemplateDropdown = ({
         data: item,
       }));
 
-      setOptions(formatted);
+      // Add clear option at top
+      const updatedOptions = isClearButton
+        ? [CLEAR_OPTION, ...formatted]
+        : formatted;
+
+      if (searchText) {
+        setOptions(formatted);
+      } else {
+        setOptions(updatedOptions);
+      }      
       setLoading(false);
     } catch (error) {
       handleApiError(error);
@@ -93,11 +113,20 @@ export const LookupQuotationTemplateDropdown = ({
               color: isSelected ? "#ffffff" : "#0f172a",
             }}
           >
-            {data.data.name || "Unnamed"}
+             {data.label == "Clear Selection" ? (
+              <div className="flex gap-1 justify-start items-center">
+                <Delete size={18} />
+                Clear Selection
+              </div>
+            ) : data.data ? (
+              data.data.name
+            ) : (
+              "Unnamed"
+            )}
           </div>
 
           {/* DESCRIPTION WITH ICON */}
-          {data.data.description && (
+          {data.datra && data.data.description && (
             <div
               style={{
                 display: "flex",
@@ -165,72 +194,13 @@ export const LookupQuotationTemplateDropdown = ({
     }
   }, [value]);
 
-  /* ================= RENDER ================= */
-  return (
-    <div className="w-full">
-      <div className="flex gap-1">
-        {icon && <span className="text-blue-500">{icon}</span>}
-        <label className="block input-label-custom">{label}</label>
-      </div>
-
-      <Select
-        ref={selectRef}
-        styles={customStyles}
-        placeholder="Search Template..."
-        options={options}
-        isLoading={loading}
-        isDisabled={isDisabled}
-        filterOption={() => true}
-        components={{
-          Option: CustomOption,
-          SingleValue: CustomSingleValue,
-        }}
-        inputValue={inputValue}
-        onInputChange={(value, { action }) => {
-          if (action === "input-change") {
-            setInputValue(value);
-          }
-
-          if (action === "menu-close") {
-            setInputValue("");
-          }
-
-          if (action === "set-value") {
-            return "";
-          }
-        }}
-        value={
-          value
-            ? {
-                value: value.id,
-                label: value.name,
-                data: value,
-              }
-            : null
-        }
-        onChange={(selected: any) => {
-          if (selected) {
-            handleQuotationTemplateSelection(selected.data);
-            setInputValue("");
-          } else {
-            handleQuotationTemplateSelection(null);
-          }
-        }}
-        noOptionsMessage={() =>
-          inputValue ? "No template found" : "Start typing to search"
-        }
-      />
-    </div>
-  );
-};
-
-/* ================= SAME GLOBAL STYLE (MATCHED) ================= */
+  /* ================= SAME GLOBAL STYLE (MATCHED) ================= */
 
 const customStyles = {
   control: (base: any, state: any) => ({
     ...base,
-    minHeight: "34px",
-    height: "34px",
+    minHeight: "30px",
+    height: heightInPx,
     borderRadius: "6px",
     borderColor: state.isFocused ? "#2563eb" : "#d1d5db",
     boxShadow: state.isFocused ? "0 0 0 1px #2563eb" : "none",
@@ -298,4 +268,65 @@ const customStyles = {
     padding: "4px",
   }),
 };
+
+
+  /* ================= RENDER ================= */
+  return (
+    <div className="w-full">
+      <div className="flex gap-1">
+        {icon && <span className="text-blue-500">{icon}</span>}
+        <label className="block input-label-custom">{label}</label>
+      </div>
+
+      <Select
+        ref={selectRef}
+        styles={customStyles}
+        placeholder="Search Template..."
+        options={options}
+        isLoading={loading}
+        isDisabled={isDisabled}
+        filterOption={() => true}
+        components={{
+          Option: CustomOption,
+          SingleValue: CustomSingleValue,
+        }}
+        inputValue={inputValue}
+        onInputChange={(value, { action }) => {
+          if (action === "input-change") {
+            setInputValue(value);
+          }
+
+          if (action === "menu-close") {
+            setInputValue("");
+          }
+
+          if (action === "set-value") {
+            return "";
+          }
+        }}
+        value={
+          value
+            ? {
+                value: value.id,
+                label: value.name,
+                data: value,
+              }
+            : null
+        }
+        onChange={(selected: any) => {
+          if (selected) {
+            handleQuotationTemplateSelection(selected.data);
+            setInputValue("");
+          } else {
+            handleQuotationTemplateSelection(null);
+          }
+        }}
+        noOptionsMessage={() =>
+          inputValue ? "No template found" : "Start typing to search"
+        }
+      />
+    </div>
+  );
+};
+
 

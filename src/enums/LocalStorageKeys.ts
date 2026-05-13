@@ -15,6 +15,8 @@ export enum LocalStorageKeys {
   INVOICE_MANAGEMENT_FILTERS = "invoice_management_filters",
   ACCOUNT_PROFORMA_INVOICE_MANAGEMENT_FILTERS = "account_proforma_invoice_management_filters",
   COMPANY_QUOTATION_MANAGEMENT_FILTERS = "company_quotation_management_filters",
+  COMPANY_PRODUCT_SALE_MANAGEMENT_FILTERS = "company_product_sale_management_filters",
+
 }
 
 export enum LocalStorageTabKeys {

@@ -160,6 +160,8 @@ export const JSX_CHILDREN_NAME = {
   TRANSACRTIONS: "Trans...",
   ADD_STOCK: "Stock",
   ADD_GENERAL_TASK: "Add Task",
+  COMPANY_PRODUCT_SALE: "Sale Product",
+
 };
 
 export const SIZE = {

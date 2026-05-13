@@ -13,12 +13,16 @@ export const QuotationTypeDropdown = ({
   value,
   handleQuotationTypeSelection,
   isDisabled = false,
+  heightInPx = "34px",
+  isClearButton = false,
 }: {
   icon?: React.ReactNode;
   label?: string;
   value?: any;
   handleQuotationTypeSelection: (data: any) => void;
   isDisabled?: boolean;
+  heightInPx?: string;
+  isClearButton?: boolean;
 }) => {
   const { loginStatus } = useLoggedInUserContext();
 
@@ -29,6 +33,12 @@ export const QuotationTypeDropdown = ({
 
   const selectRef = useRef<any>(null);
 
+  const CLEAR_OPTION = {
+    value: "__clear__",
+    label: "Clear Selection",
+    data: null,
+  };
+
   /* ================= FETCH ONLY ONCE ================= */
   useEffect(() => {
     if (isDisabled || loginStatus.companyId === 0) return;
@@ -37,7 +47,7 @@ export const QuotationTypeDropdown = ({
   }, []);
 
   const fetchQuotationType = async () => {
-    if(loginStatus.companyId === 0)return;
+    if (loginStatus.companyId === 0) return;
     setLoading(true);
 
     const postData = {
@@ -59,8 +69,13 @@ export const QuotationTypeDropdown = ({
         }))
         .sort((a: any, b: any) => a.label.localeCompare(b.label));
 
-      setAllOptions(formatted);
-      setFilteredOptions(formatted);
+      // ✅ Add clear option at top
+      const updatedOptions = isClearButton
+        ? [CLEAR_OPTION, ...formatted]
+        : formatted;
+
+      setAllOptions(updatedOptions);
+      setFilteredOptions(updatedOptions);
     } catch (error) {
       handleApiError(error);
     } finally {
@@ -81,6 +96,11 @@ export const QuotationTypeDropdown = ({
       opt.label.toLowerCase().includes(search),
     );
 
+    // // ✅ Add clear option at top
+    // const updatedOptions = isClearButton
+    //   ? [CLEAR_OPTION, ...filtered]
+    //   : filtered;
+
     setFilteredOptions(filtered);
 
     const exactMatch = allOptions.find(
@@ -96,7 +116,80 @@ export const QuotationTypeDropdown = ({
       handleQuotationTypeSelection(filtered[0].data);
     }
   }, [inputValue, allOptions]);
+  /* ================= SAME STYLE ================= */
 
+  const customStyles = {
+    control: (base: any, state: any) => ({
+      ...base,
+      minHeight: "30px",
+      height: heightInPx,
+      borderRadius: "6px",
+      borderColor: state.isFocused ? "#2563eb" : "#d1d5db",
+      boxShadow: state.isFocused ? "0 0 0 1px #2563eb" : "none",
+      "&:hover": {
+        borderColor: "#3b82f6",
+      },
+      fontSize: "14px",
+      marginTop: "0px",
+    }),
+
+    valueContainer: (base: any) => ({
+      ...base,
+      padding: "0 8px",
+      height: "32px",
+    }),
+
+    input: (base: any) => ({
+      ...base,
+      margin: 0,
+      padding: 0,
+    }),
+
+    indicatorsContainer: (base: any) => ({
+      ...base,
+      height: "32px",
+    }),
+
+    placeholder: (base: any) => ({
+      ...base,
+      color: "#9ca3af",
+      fontSize: "13px",
+    }),
+
+    singleValue: (base: any) => ({
+      ...base,
+      fontSize: "13px",
+      fontWeight: 500,
+    }),
+
+    menu: (base: any) => ({
+      ...base,
+      zIndex: 9999,
+      borderRadius: "6px",
+      overflow: "hidden",
+    }),
+
+    option: (base: any, state: any) => ({
+      ...base,
+      fontSize: "13px",
+      padding: "8px 10px",
+      backgroundColor: state.isSelected
+        ? "#2563eb"
+        : state.isFocused
+          ? "#f3f4f6"
+          : "#fff",
+      color: state.isSelected ? "#fff" : "#111827",
+    }),
+
+    indicatorSeparator: () => ({
+      display: "none",
+    }),
+
+    dropdownIndicator: (base: any) => ({
+      ...base,
+      padding: "4px",
+    }),
+  };
   /* ================= RENDER ================= */
   return (
     <div className="w-full">
@@ -152,79 +245,4 @@ export const QuotationTypeDropdown = ({
       />
     </div>
   );
-};
-
-/* ================= SAME STYLE ================= */
-
-const customStyles = {
-  control: (base: any, state: any) => ({
-    ...base,
-    minHeight: "34px",
-    height: "34px",
-    borderRadius: "6px",
-    borderColor: state.isFocused ? "#2563eb" : "#d1d5db",
-    boxShadow: state.isFocused ? "0 0 0 1px #2563eb" : "none",
-    "&:hover": {
-      borderColor: "#3b82f6",
-    },
-    fontSize: "14px",
-    marginTop: "0px",
-  }),
-
-  valueContainer: (base: any) => ({
-    ...base,
-    padding: "0 8px",
-    height: "32px",
-  }),
-
-  input: (base: any) => ({
-    ...base,
-    margin: 0,
-    padding: 0,
-  }),
-
-  indicatorsContainer: (base: any) => ({
-    ...base,
-    height: "32px",
-  }),
-
-  placeholder: (base: any) => ({
-    ...base,
-    color: "#9ca3af",
-    fontSize: "13px",
-  }),
-
-  singleValue: (base: any) => ({
-    ...base,
-    fontSize: "13px",
-    fontWeight: 500,
-  }),
-
-  menu: (base: any) => ({
-    ...base,
-    zIndex: 9999,
-    borderRadius: "6px",
-    overflow: "hidden",
-  }),
-
-  option: (base: any, state: any) => ({
-    ...base,
-    fontSize: "13px",
-    padding: "8px 10px",
-    backgroundColor: state.isSelected
-      ? "#2563eb"
-      : state.isFocused
-        ? "#f3f4f6"
-        : "#fff",
-    color: state.isSelected ? "#fff" : "#111827",
-  }),
-
-  indicatorSeparator: () => ({
-    display: "none",
-  }),
-
-  dropdownIndicator: (base: any) => ({
-    ...base,
-    padding: "4px",
-  }),
 };

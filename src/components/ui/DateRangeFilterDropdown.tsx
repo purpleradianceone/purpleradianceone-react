@@ -51,6 +51,7 @@ function DateRangeFilterDropdown(props: DateRangeFilterDropdownProps) {
             transition-colors
             hover:border-gray-400
             flex items-center justify-between
+            ${props.height||""}
           `}
         onClick={() => setIsOpen(!isOpen)}
         disabled={props.dropdownOptions.length === 0}
