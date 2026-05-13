@@ -130,7 +130,10 @@ const ROUTES_URL = {
 
   //Quotation Module
   QUOTATION_MANAGEMENT: "/home/manage-company-quotation/company-quotations",
-  QUOTATION_CREATE_AND_DETAILS:
-    "/home/manage-company-quotation/company-quotations/company-quotation-details/:quotationId",
+  QUOTATION_CREATE_AND_DETAILS:"/home/manage-company-quotation/company-quotations/company-quotation-details/:quotationId",
+
+  //Product Sale
+  COMPANY_PRODUCT_SALE_MANAGEMENT: "/home/manage-company-product-sale/product-sale",
+
 };
 export default ROUTES_URL;

@@ -1,12 +1,12 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { useEffect, useState, useRef } from "react";
+import { Delete, Mail, Phone } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import Select, { components } from "react-select";
-import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
 import { getLookupAccounts } from "../../../../config/apis/AccountApis";
 import { handleApiError } from "../../../../config/error/handleApiError";
-import { Mail, Phone } from "lucide-react";
+import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
 
 export const LookupAccountDropdown = ({
   icon,
@@ -14,12 +14,16 @@ export const LookupAccountDropdown = ({
   value,
   handleAccountSelection,
   isDisabled = false,
+  heightInPx = "34px",
+  isClearButton = false,
 }: {
   icon?: React.ReactNode;
   label?: string;
   value?: any;
   handleAccountSelection: (data: any) => void;
   isDisabled?: boolean;
+  heightInPx?: string;
+  isClearButton?: boolean;
 }) => {
   const { loginStatus } = useLoggedInUserContext();
 
@@ -28,6 +32,13 @@ export const LookupAccountDropdown = ({
   const [inputValue, setInputValue] = useState("");
 
   const selectRef = useRef<any>(null);
+
+  const CLEAR_OPTION = {
+    value: "__clear__",
+    label: "Clear Selection",
+    // data: {name:"❌ Clear Selection"},
+    data: null,
+  };
 
   /* ================= FETCH ================= */
   useEffect(() => {
@@ -41,7 +52,7 @@ export const LookupAccountDropdown = ({
   }, [inputValue, isDisabled]);
 
   const fetchAccounts = async (searchText: string) => {
-    if(loginStatus.companyId === 0)return;
+    if (loginStatus.companyId === 0) return;
     setLoading(true);
 
     const postData = {
@@ -63,7 +74,16 @@ export const LookupAccountDropdown = ({
         data: item,
       }));
 
-      setOptions(formatted);
+      // Add clear option at top
+      const updatedOptions = isClearButton
+        ? [CLEAR_OPTION, ...formatted]
+        : formatted;
+
+      if (searchText) {
+        setOptions(formatted);
+      } else {
+        setOptions(updatedOptions);
+      }
       setLoading(false);
     } catch (error) {
       handleApiError(error);
@@ -81,9 +101,7 @@ export const LookupAccountDropdown = ({
           style={{
             padding: "6px 1px",
             fontFamily: "Inter, sans-serif",
-            borderBottom: `1px solid ${
-              isSelected ? "#2563eb" : "#f1f5f9"
-            }`,
+            borderBottom: `1px solid ${isSelected ? "#2563eb" : "#f1f5f9"}`,
             transition: "all 0.15s ease",
           }}
         >
@@ -91,15 +109,24 @@ export const LookupAccountDropdown = ({
           <div
             style={{
               fontSize: "13px",
-              fontWeight: 500,
+              fontWeight: data.label === "Clear Selection" ? 500 : 500,
               color: isSelected ? "#ffffff" : "#0f172a",
             }}
           >
-            {data.data.name || "Unnamed"}
+            {data.label === "Clear Selection" ? (
+              <div className="flex gap-1 justify-start items-center">
+                <Delete size={18} />
+                Clear Selection
+              </div>
+            ) : data.data ? (
+              data.data.name
+            ) : (
+              "Unnamed"
+            )}
           </div>
 
           {/* CONTACT INFO */}
-          {(data.data.email || data.data.mobilenumber) && (
+          {data.data && (data.data.email || data.data.mobilenumber) && (
             <div
               style={{
                 display: "flex",
@@ -111,7 +138,7 @@ export const LookupAccountDropdown = ({
                 color: isSelected ? "#dbeafe" : "#64748b",
               }}
             >
-              {data.data.email && (
+              {data.data && data.data.email && (
                 <div
                   style={{
                     display: "flex",
@@ -124,7 +151,7 @@ export const LookupAccountDropdown = ({
                 </div>
               )}
 
-              {data.data.mobilenumber && (
+              {data.data && data.data.mobilenumber && (
                 <div
                   style={{
                     display: "flex",
@@ -177,6 +204,81 @@ export const LookupAccountDropdown = ({
       }, 0);
     }
   }, [value]);
+
+  /* ================= SAME GLOBAL STYLE ================= */
+
+  const customStyles = {
+    control: (base: any, state: any) => ({
+      ...base,
+      minHeight: "30px",
+      height: `${heightInPx}`,
+      borderRadius: "6px",
+      borderColor: state.isFocused ? "#2563eb" : "#d1d5db",
+      boxShadow: state.isFocused ? "0 0 0 1px #2563eb" : "none",
+      "&:hover": {
+        borderColor: "#3b82f6",
+      },
+      fontSize: "14px",
+      marginTop: "0px",
+    }),
+
+    valueContainer: (base: any) => ({
+      ...base,
+      padding: "0 8px",
+      height: "32px",
+    }),
+
+    input: (base: any) => ({
+      ...base,
+      margin: 0,
+      padding: 0,
+    }),
+
+    indicatorsContainer: (base: any) => ({
+      ...base,
+      height: "32px",
+    }),
+
+    placeholder: (base: any) => ({
+      ...base,
+      color: "#9ca3af",
+      fontSize: "13px",
+    }),
+
+    singleValue: (base: any) => ({
+      ...base,
+      fontSize: "13px",
+      fontWeight: 500,
+    }),
+
+    menu: (base: any) => ({
+      ...base,
+      zIndex: 9999,
+      borderRadius: "6px",
+      overflow: "hidden",
+    }),
+
+    option: (base: any, state: any) => ({
+      ...base,
+      fontSize: "13px",
+      padding: "8px 10px",
+      backgroundColor: state.isSelected
+        ? "#2563eb"
+        : state.isFocused
+          ? "#f3f4f6"
+          : "#fff",
+      color: state.isSelected ? "#fff" : "#111827",
+    }),
+
+    indicatorSeparator: () => ({
+      display: "none",
+    }),
+
+    dropdownIndicator: (base: any) => ({
+      ...base,
+      padding: "4px",
+    }),
+  };
 
   /* ================= RENDER ================= */
   return (
@@ -235,79 +337,4 @@ export const LookupAccountDropdown = ({
       />
     </div>
   );
-};
-
-/* ================= SAME GLOBAL STYLE ================= */
-
-const customStyles = {
-  control: (base: any, state: any) => ({
-    ...base,
-    minHeight: "34px",
-    height: "34px",
-    borderRadius: "6px",
-    borderColor: state.isFocused ? "#2563eb" : "#d1d5db",
-    boxShadow: state.isFocused ? "0 0 0 1px #2563eb" : "none",
-    "&:hover": {
-      borderColor: "#3b82f6",
-    },
-    fontSize: "14px",
-    marginTop: "0px",
-  }),
-
-  valueContainer: (base: any) => ({
-    ...base,
-    padding: "0 8px",
-    height: "32px",
-  }),
-
-  input: (base: any) => ({
-    ...base,
-    margin: 0,
-    padding: 0,
-  }),
-
-  indicatorsContainer: (base: any) => ({
-    ...base,
-    height: "32px",
-  }),
-
-  placeholder: (base: any) => ({
-    ...base,
-    color: "#9ca3af",
-    fontSize: "13px",
-  }),
-
-  singleValue: (base: any) => ({
-    ...base,
-    fontSize: "13px",
-    fontWeight: 500,
-  }),
-
-  menu: (base: any) => ({
-    ...base,
-    zIndex: 9999,
-    borderRadius: "6px",
-    overflow: "hidden",
-  }),
-
-  option: (base: any, state: any) => ({
-    ...base,
-    fontSize: "13px",
-    padding: "8px 10px",
-    backgroundColor: state.isSelected
-      ? "#2563eb"
-      : state.isFocused
-      ? "#f3f4f6"
-      : "#fff",
-    color: state.isSelected ? "#fff" : "#111827",
-  }),
-
-  indicatorSeparator: () => ({
-    display: "none",
-  }),
-
-  dropdownIndicator: (base: any) => ({
-    ...base,
-    padding: "4px",
-  }),
 };

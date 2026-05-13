@@ -323,8 +323,13 @@ const MESSAGE = {
             DENIED_VIEW_ACCESS: "You do not have permission to view invoice items.",
             DENIED_ADD_ACCESS: "You do not have permission to add invoice item.",
             DENIED_UPDATE_ACCESS: "You do not have permission to update invoice item.",
-        }
-
+        },
+        COMPANY_PRODUCT_SALE_MODULE: {
+            DENIED_VIEW_ACCESS: "You do not have permission to view product sale.",
+            DENIED_ADD_ACCESS: "You do not have permission to sale product.",
+            UPDATE_ACCESS_DENIED_MESSAGE: "You do not have permission to update sale product details.",
+            
+        },
     }
 }
 

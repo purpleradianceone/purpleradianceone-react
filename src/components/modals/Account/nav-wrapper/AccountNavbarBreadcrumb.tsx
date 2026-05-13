@@ -4,6 +4,7 @@ import {
   useLocation,
   useParams,
   useMatch,
+  useSearchParams,
 } from "react-router-dom";
 import { ChevronRight } from "lucide-react";
 import ROUTES_URL from "../../../../constants/Routes";
@@ -23,6 +24,11 @@ export default function AccountNavbarBreadcrumb() {
     accountServiceId?: string;
     accountSubscriptionId?: string;
   }>();
+    const [searchParams] = useSearchParams();
+
+
+  const [navigatingFromOtherPage, setNavigatingfromOtherPage] = useState<string|null>(null);
+
 
   // Data passed via navigation state
   const { assignProducts } = location.state || {};
@@ -33,7 +39,21 @@ export default function AccountNavbarBreadcrumb() {
     if (location.state?.accountName) {
       setAccountName(location.state?.accountName);
     }
+    
+    if(searchParams.has("navigatingFrom")){
+      setNavigatingfromOtherPage(searchParams.get("navigatingFrom"));
+    }else{
+      setNavigatingfromOtherPage(null);
+    }
   }, [location.state]);
+
+  useEffect(()=>{
+    if(searchParams.has("navigatingFrom")){
+      setNavigatingfromOtherPage(searchParams.get("navigatingFrom"));
+    }else{
+      setNavigatingfromOtherPage(null);
+    }
+  },[searchParams]);
 
   const [productNameState, setProductNameState] = useState<string>("");
 
@@ -137,6 +157,7 @@ export default function AccountNavbarBreadcrumb() {
 
 if (data && data.length > 0) {
   const item = data.find(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (i: any) => i.id === Number(accountSubscriptionId)
   );
 
@@ -207,6 +228,19 @@ if (data && data.length > 0) {
                       )}
                 </h1>
               </Link>
+
+              {navigatingFromOtherPage&&(
+                <>
+                  <ChevronRight size={16} className="text-gray-500" />
+                  <Link to={`${ROUTES_URL.COMPANY_PRODUCT_SALE_MANAGEMENT}`} className="">
+                  <span className="max-w-fit caption-custom truncate flex gap-x-2 items-center hover:text-gray-700 hover:font-medium">
+                    Sales
+                  </span>
+                  </Link>
+                </>
+              )
+              
+              }
 
               {productId && (
                 <>

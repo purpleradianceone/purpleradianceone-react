@@ -89,7 +89,7 @@ export default function LookupCompanyProductDropdown({
       setHasMore(true);
       fetchProducts(txt, 0);
     }, 400),
-    [],
+    [productTypeId, query],
   );
 
   useEffect(() => {
@@ -97,7 +97,7 @@ export default function LookupCompanyProductDropdown({
       debouncedSearch(query);
       setShowDropdown(true);
     }
-  }, [query, debouncedSearch, selectedProduct]);
+  }, [query, debouncedSearch, selectedProduct, productTypeId]);
   // ----------- scroll pagination -----------
   const handleScroll = () => {
     if (!dropdownRef.current || !hasMore || loading) return;

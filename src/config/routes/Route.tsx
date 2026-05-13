@@ -104,6 +104,7 @@ import CompanyQuotationDetails from "../../components/views/company-quotation-ma
 import { FacebookPageIntegrationManagement } from "../../components/views/settings/social-media-integration/meta-app-facebook/FacebookPageIntegrationManagement";
 import Features from "../../components/views/home/landing-page/Features";
 import ProformaInvoiceDetails from "../../components/views/proforma-invoice/ProformaInvoiceDetails";
+import CompanyProductSaleManagement from "../../components/views/company-product-sale-management/CompanyProductSaleManagement";
 import AccountProformaInvoice from "../../components/modals/Account/account-proforma-invoice/AccountProformaInvoice";
 
 export const router = createBrowserRouter([
@@ -450,6 +451,20 @@ export const router = createBrowserRouter([
           <div>
             <Navbar>
               <ProformaInvoiceDetails />
+            </Navbar>
+          </div>
+        </PrivateRoute>
+      </MobileRedirectWrapper>
+    ),
+  },
+   {
+    path: ROUTES_URL.COMPANY_PRODUCT_SALE_MANAGEMENT,
+    element: (
+      <MobileRedirectWrapper>
+        <PrivateRoute>
+          <div>
+            <Navbar>
+              <CompanyProductSaleManagement isUsedForProductSaleModule={true} />
             </Navbar>
           </div>
         </PrivateRoute>

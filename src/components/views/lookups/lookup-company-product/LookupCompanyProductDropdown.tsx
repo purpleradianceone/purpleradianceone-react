@@ -6,7 +6,7 @@ import Select, { components } from "react-select";
 import { getLookupCompanyProduct } from "../../../../config/apis/Lookups";
 import { handleApiError } from "../../../../config/error/handleApiError";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
-import { ScanBarcode } from "lucide-react";
+import { Delete, ScanBarcode } from "lucide-react";
 
 export const LookupCompanyProductDropdown = ({
   icon,
@@ -15,6 +15,8 @@ export const LookupCompanyProductDropdown = ({
   productTypeId,
   handleCompanyProductSelection,
   isDisabled = false,
+  heightInPx = "34px",
+  isClearButton = false,
 }: {
   icon?: React.ReactNode;
   label?: string;
@@ -22,6 +24,8 @@ export const LookupCompanyProductDropdown = ({
   productTypeId?: number[];
   handleCompanyProductSelection: (data: any) => void;
   isDisabled?: boolean;
+  heightInPx?: string;
+  isClearButton?: boolean;
 }) => {
   const { loginStatus } = useLoggedInUserContext();
 
@@ -30,6 +34,13 @@ export const LookupCompanyProductDropdown = ({
   const [inputValue, setInputValue] = useState("");
 
   const selectRef = useRef<any>(null);
+
+  const CLEAR_OPTION = {
+    value: "__clear__",
+    label: "Clear Selection",
+    // data: {name:"❌ Clear Selection"},
+    data: null,
+  };
 
   /* ================= FETCH ================= */
   useEffect(() => {
@@ -43,7 +54,7 @@ export const LookupCompanyProductDropdown = ({
   }, [inputValue, productTypeId, isDisabled]);
 
   const fetchLookupCompanyProductByProductType = async (searchText: string) => {
-    if(loginStatus.companyId === 0)return;
+    if (loginStatus.companyId === 0) return;
     setLoading(true);
 
     const postData = {
@@ -66,7 +77,16 @@ export const LookupCompanyProductDropdown = ({
         data: item,
       }));
 
-      setOptions(formatted);
+      // ✅ Add clear option at top
+      const updatedOptions = isClearButton
+        ? [CLEAR_OPTION, ...formatted]
+        : formatted;
+
+      if (searchText) {
+        setOptions(formatted);
+      } else {
+        setOptions(updatedOptions);
+      }
       setLoading(false);
     } catch (error) {
       handleApiError(error);
@@ -91,15 +111,25 @@ export const LookupCompanyProductDropdown = ({
           <div
             style={{
               fontSize: "13px",
-              fontWeight: 500,
+              fontWeight: data.label === "Clear Selection" ? 500 : 500,
               color: isSelected ? "#ffffff" : "#0f172a",
             }}
           >
-            {data.data.name || "Unnamed"}
+            {data.label === "Clear Selection" ? (
+              <div className="flex gap-1 justify-start items-center">
+                <Delete size={18} />
+                Clear Selection
+              </div>
+            ) : data.data ? (
+              data.data.name
+            ) : (
+              "Unnamed"
+            )}
+            {/* {data.data.name || "Unnamed"} */}
           </div>
 
           {/* BARCODE */}
-          {data.data.barcode && (
+          {data.data && data.data.barcode && (
             <div
               style={{
                 display: "flex",
@@ -110,7 +140,10 @@ export const LookupCompanyProductDropdown = ({
                 color: isSelected ? "#dbeafe" : "#64748b",
               }}
             >
-              <ScanBarcode size={13} style={{ flexShrink: 0, marginTop: "2px" }} />
+              <ScanBarcode
+                size={13}
+                style={{ flexShrink: 0, marginTop: "2px" }}
+              />
               <span
                 style={{
                   wordBreak: "break-word",
@@ -159,9 +192,84 @@ export const LookupCompanyProductDropdown = ({
     }
   }, [value]);
 
+  /* ================= SAME GLOBAL STYLE ================= */
+
+  const customStyles = {
+    control: (base: any, state: any) => ({
+      ...base,
+      minHeight: "30px",
+      height: `${heightInPx}`,
+      borderRadius: "6px",
+      borderColor: state.isFocused ? "#2563eb" : "#d1d5db",
+      boxShadow: state.isFocused ? "0 0 0 1px #2563eb" : "none",
+      "&:hover": {
+        borderColor: "#3b82f6",
+      },
+      fontSize: "14px",
+      marginTop: "0px",
+    }),
+
+    valueContainer: (base: any) => ({
+      ...base,
+      padding: "0 8px",
+      height: "32px",
+    }),
+
+    input: (base: any) => ({
+      ...base,
+      margin: 0,
+      padding: 0,
+    }),
+
+    indicatorsContainer: (base: any) => ({
+      ...base,
+      height: "32px",
+    }),
+
+    placeholder: (base: any) => ({
+      ...base,
+      color: "#9ca3af",
+      fontSize: "13px",
+    }),
+
+    singleValue: (base: any) => ({
+      ...base,
+      fontSize: "13px",
+      fontWeight: 500,
+    }),
+
+    menu: (base: any) => ({
+      ...base,
+      zIndex: 9999,
+      borderRadius: "6px",
+      overflow: "hidden",
+    }),
+
+    option: (base: any, state: any) => ({
+      ...base,
+      fontSize: "13px",
+      padding: "8px 10px",
+      backgroundColor: state.isSelected
+        ? "#2563eb"
+        : state.isFocused
+          ? "#f3f4f6"
+          : "#fff",
+      color: state.isSelected ? "#fff" : "#111827",
+    }),
+
+    indicatorSeparator: () => ({
+      display: "none",
+    }),
+
+    dropdownIndicator: (base: any) => ({
+      ...base,
+      padding: "4px",
+    }),
+  };
+
   /* ================= RENDER ================= */
   return (
-    <div className="w-full">
+    <div className={`w-full `}>
       <div className="flex gap-1">
         {icon && <span className="text-blue-500">{icon}</span>}
         <label className="block input-label-custom">{label}</label>
@@ -216,79 +324,4 @@ export const LookupCompanyProductDropdown = ({
       />
     </div>
   );
-};
-
-/* ================= SAME GLOBAL STYLE ================= */
-
-const customStyles = {
-  control: (base: any, state: any) => ({
-    ...base,
-    minHeight: "34px",
-    height: "34px",
-    borderRadius: "6px",
-    borderColor: state.isFocused ? "#2563eb" : "#d1d5db",
-    boxShadow: state.isFocused ? "0 0 0 1px #2563eb" : "none",
-    "&:hover": {
-      borderColor: "#3b82f6",
-    },
-    fontSize: "14px",
-    marginTop: "0px",
-  }),
-
-  valueContainer: (base: any) => ({
-    ...base,
-    padding: "0 8px",
-    height: "32px",
-  }),
-
-  input: (base: any) => ({
-    ...base,
-    margin: 0,
-    padding: 0,
-  }),
-
-  indicatorsContainer: (base: any) => ({
-    ...base,
-    height: "32px",
-  }),
-
-  placeholder: (base: any) => ({
-    ...base,
-    color: "#9ca3af",
-    fontSize: "13px",
-  }),
-
-  singleValue: (base: any) => ({
-    ...base,
-    fontSize: "13px",
-    fontWeight: 500,
-  }),
-
-  menu: (base: any) => ({
-    ...base,
-    zIndex: 9999,
-    borderRadius: "6px",
-    overflow: "hidden",
-  }),
-
-  option: (base: any, state: any) => ({
-    ...base,
-    fontSize: "13px",
-    padding: "8px 10px",
-    backgroundColor: state.isSelected
-      ? "#2563eb"
-      : state.isFocused
-        ? "#f3f4f6"
-        : "#fff",
-    color: state.isSelected ? "#fff" : "#111827",
-  }),
-
-  indicatorSeparator: () => ({
-    display: "none",
-  }),
-
-  dropdownIndicator: (base: any) => ({
-    ...base,
-    padding: "4px",
-  }),
 };

@@ -866,6 +866,21 @@ export const useUserAccessModules = () => {
   const userHasAccessToUpdateSupportWhatsAppConversation = accessModules.some(
     (accessModule) => accessModule.crm_module_id === 67 && accessModule.update,
   );
+
+  //Company product Sale
+  const userHasAccessToAddCompanyProductSale = accessModules.some(
+    (accessModules) => accessModules.crm_module_id === 68 && accessModules.add,
+  );
+
+  const userHasAccessToViewCompanyProductSale = accessModules.some(
+    (accessModule) => accessModule.crm_module_id === 68 && accessModule.view,
+  );
+
+  const userHasAccessToUpdateCompanyProductSale = accessModules.some(
+    (accessModule) => accessModule.crm_module_id === 68 && accessModule.update,
+  );
+
+
   return {
     userHasAccessToAddUser,
     userHasAccessToViewUser,
@@ -1128,5 +1143,9 @@ export const useUserAccessModules = () => {
     userHasAccessToAddSupportWhatsAppConversation,
     userHasAccessToViewSupportWhatsAppConversation,
     userHasAccessToUpdateSupportWhatsAppConversation,
+
+    userHasAccessToAddCompanyProductSale,
+    userHasAccessToViewCompanyProductSale,
+    userHasAccessToUpdateCompanyProductSale,
   };
 };

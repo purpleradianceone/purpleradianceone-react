@@ -6,7 +6,7 @@ import Select, { components } from "react-select";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
 import { handleApiError } from "../../../../config/error/handleApiError";
 import { getLookupLeadsWithSignal } from "../../../../config/apis/LeadsApi";
-import { Mail, Phone } from "lucide-react";
+import { Delete, Mail, Phone } from "lucide-react";
 
 export const LookupLeadDropdown = ({
   icon,
@@ -14,12 +14,16 @@ export const LookupLeadDropdown = ({
   value,
   handleLeadSelection,
   isDisabled = false,
+  heightInPx = "34px",
+  isClearButton = false,
 }: {
   icon?: React.ReactNode;
   label?: string;
   value?: any;
   handleLeadSelection: (data: any) => void;
   isDisabled?: boolean;
+  heightInPx?: string;
+  isClearButton?: boolean;
 }) => {
   const { loginStatus } = useLoggedInUserContext();
 
@@ -28,7 +32,12 @@ export const LookupLeadDropdown = ({
   const [inputValue, setInputValue] = useState("");
 
   const selectRef = useRef<any>(null);
-
+  const CLEAR_OPTION = {
+    value: "__clear__",
+    label: "Clear Selection",
+    // data: {name:"❌ Clear Selection"},
+    data: null,
+  };
   /* ================= FETCH ================= */
   useEffect(() => {
     if (isDisabled) return;
@@ -41,7 +50,7 @@ export const LookupLeadDropdown = ({
   }, [inputValue, isDisabled]);
 
   const fetchLeads = async (searchText: string) => {
-    if(loginStatus.companyId === 0)return;
+    if (loginStatus.companyId === 0) return;
     setLoading(true);
 
     const postData = {
@@ -63,7 +72,16 @@ export const LookupLeadDropdown = ({
         data: item,
       }));
 
-      setOptions(formatted);
+      // ✅ Add clear option at top
+      const updatedOptions = isClearButton
+        ? [CLEAR_OPTION, ...formatted]
+        : formatted;
+
+      if (searchText) {
+        setOptions(formatted);
+      } else {
+        setOptions(updatedOptions);
+      }
       setLoading(false);
     } catch (error) {
       handleApiError(error);
@@ -95,11 +113,21 @@ export const LookupLeadDropdown = ({
               color: isSelected ? "#ffffff" : "#0f172a",
             }}
           >
-            {data.data.name || "Unnamed"}
+            {data.label === "Clear Selection" ? (
+              <div className="flex gap-1 justify-start items-center">
+                <Delete size={18} />
+                Clear Selection
+              </div>
+            ) : data.data ? (
+              data.data.name
+            ) : (
+              "Unnamed"
+            )}
+            {/* {data.data.name || "Unnamed"} */}
           </div>
 
           {/* CONTACT INFO */}
-          {(data.data.email || data.data.mobilenumber) && (
+          {data.data && (data.data.email || data.data.mobilenumber) && (
             <div
               style={{
                 display: "flex",
@@ -170,6 +198,81 @@ export const LookupLeadDropdown = ({
     }
   }, [value]);
 
+  /* ================= YOUR ORIGINAL STYLES (UNCHANGED) ================= */
+
+  const customStyles = {
+    control: (base: any, state: any) => ({
+      ...base,
+      minHeight: "34px",
+      height: heightInPx,
+      borderRadius: "6px",
+      borderColor: state.isFocused ? "#2563eb" : "#d1d5db",
+      boxShadow: state.isFocused ? "0 0 0 1px #2563eb" : "none",
+      "&:hover": {
+        borderColor: "#3b82f6",
+      },
+      fontSize: "14px",
+      marginTop: "0px",
+    }),
+
+    valueContainer: (base: any) => ({
+      ...base,
+      padding: "0 8px",
+      height: "32px",
+    }),
+
+    input: (base: any) => ({
+      ...base,
+      margin: 0,
+      padding: 0,
+    }),
+
+    indicatorsContainer: (base: any) => ({
+      ...base,
+      height: "32px",
+    }),
+
+    placeholder: (base: any) => ({
+      ...base,
+      color: "#9ca3af",
+      fontSize: "13px",
+    }),
+
+    singleValue: (base: any) => ({
+      ...base,
+      fontSize: "13px",
+      fontWeight: 500,
+    }),
+
+    menu: (base: any) => ({
+      ...base,
+      zIndex: 9999,
+      borderRadius: "6px",
+      overflow: "hidden",
+    }),
+
+    option: (base: any, state: any) => ({
+      ...base,
+      fontSize: "13px",
+      padding: "8px 10px",
+      backgroundColor: state.isSelected
+        ? "#2563eb"
+        : state.isFocused
+          ? "#f3f4f6"
+          : "#fff",
+      color: state.isSelected ? "#fff" : "#111827",
+    }),
+
+    indicatorSeparator: () => ({
+      display: "none",
+    }),
+
+    dropdownIndicator: (base: any) => ({
+      ...base,
+      padding: "4px",
+    }),
+  };
+
   /* ================= RENDER ================= */
   return (
     <div className="w-full">
@@ -185,7 +288,7 @@ export const LookupLeadDropdown = ({
         options={options}
         isLoading={loading}
         isDisabled={isDisabled}
-        filterOption={() => true}  //fixed
+        filterOption={() => true} //fixed
         components={{
           Option: CustomOption,
           SingleValue: CustomSingleValue,
@@ -228,79 +331,3 @@ export const LookupLeadDropdown = ({
     </div>
   );
 };
-
-/* ================= YOUR ORIGINAL STYLES (UNCHANGED) ================= */
-
-const customStyles = {
-  control: (base: any, state: any) => ({
-    ...base,
-    minHeight: "34px",
-    height: "34px",
-    borderRadius: "6px",
-    borderColor: state.isFocused ? "#2563eb" : "#d1d5db",
-    boxShadow: state.isFocused ? "0 0 0 1px #2563eb" : "none",
-    "&:hover": {
-      borderColor: "#3b82f6",
-    },
-    fontSize: "14px",
-    marginTop: "0px",
-  }),
-
-  valueContainer: (base: any) => ({
-    ...base,
-    padding: "0 8px",
-    height: "32px",
-  }),
-
-  input: (base: any) => ({
-    ...base,
-    margin: 0,
-    padding: 0,
-  }),
-
-  indicatorsContainer: (base: any) => ({
-    ...base,
-    height: "32px",
-  }),
-
-  placeholder: (base: any) => ({
-    ...base,
-    color: "#9ca3af",
-    fontSize: "13px",
-  }),
-
-  singleValue: (base: any) => ({
-    ...base,
-    fontSize: "13px",
-    fontWeight: 500,
-  }),
-
-  menu: (base: any) => ({
-    ...base,
-    zIndex: 9999,
-    borderRadius: "6px",
-    overflow: "hidden",
-  }),
-
-  option: (base: any, state: any) => ({
-    ...base,
-    fontSize: "13px",
-    padding: "8px 10px",
-    backgroundColor: state.isSelected
-      ? "#2563eb"
-      : state.isFocused
-        ? "#f3f4f6"
-        : "#fff",
-    color: state.isSelected ? "#fff" : "#111827",
-  }),
-
-  indicatorSeparator: () => ({
-    display: "none",
-  }),
-
-  dropdownIndicator: (base: any) => ({
-    ...base,
-    padding: "4px",
-  }),
-};
-

@@ -9,17 +9,18 @@ import {
   LucideFileArchive,
   Menu,
   Network,
+  PackageCheck,
   Settings,
   Store,
   UserCogIcon,
-  X,
+  X
 } from "lucide-react";
-import SideBarProps from "../../../../@types/home/navbar/SideBarProps";
-import SideNavBarItem from "./SideNavBarItem";
 import { NavLink } from "react-router-dom";
-import ROUTES_URL from "../../../../constants/Routes";
+import SideBarProps from "../../../../@types/home/navbar/SideBarProps";
 import { useUserAccessModules } from "../../../../config/hooks/useAccessModules";
 import { SIZE } from "../../../../constants/AppConstants";
+import ROUTES_URL from "../../../../constants/Routes";
+import SideNavBarItem from "./SideNavBarItem";
 import { FaRegFileAlt, FaRegFileArchive } from "react-icons/fa";
 
 function SideNavBar({ isOpen, onToggle }: SideBarProps) {
@@ -36,6 +37,7 @@ function SideNavBar({ isOpen, onToggle }: SideBarProps) {
     userHasAccessToViewCompanyInvoice,
     userHasAccessToViewAccountProformaInvoice,
     userHasAccessToViewCompanyQuotation,
+    userHasAccessToViewCompanyProductSale,
   } = useUserAccessModules();
 
   return (
@@ -147,6 +149,18 @@ function SideNavBar({ isOpen, onToggle }: SideBarProps) {
               isOpen={isOpen}
               isActive={isActive}
               disabled={!userHasAccessToViewAccountProformaInvoice}
+            />
+          )}
+        </NavLink>
+
+        <NavLink to={ROUTES_URL.COMPANY_PRODUCT_SALE_MANAGEMENT}>
+          {({ isActive }) => (
+            <SideNavBarItem
+              icon={PackageCheck}
+              label="Sales"
+              isOpen={isOpen}
+              isActive={isActive}
+              disabled={!userHasAccessToViewCompanyProductSale}
             />
           )}
         </NavLink>
