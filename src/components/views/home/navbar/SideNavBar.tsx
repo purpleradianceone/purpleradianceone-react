@@ -15,13 +15,13 @@ import {
   UserCogIcon,
   X
 } from "lucide-react";
-import { FaRegFileAlt } from "react-icons/fa";
 import { NavLink } from "react-router-dom";
 import SideBarProps from "../../../../@types/home/navbar/SideBarProps";
 import { useUserAccessModules } from "../../../../config/hooks/useAccessModules";
 import { SIZE } from "../../../../constants/AppConstants";
 import ROUTES_URL from "../../../../constants/Routes";
 import SideNavBarItem from "./SideNavBarItem";
+import { FaRegFileAlt, FaRegFileArchive } from "react-icons/fa";
 
 function SideNavBar({ isOpen, onToggle }: SideBarProps) {
   const {
@@ -35,6 +35,7 @@ function SideNavBar({ isOpen, onToggle }: SideBarProps) {
     userHasAccessToViewSupportTicket,
     userHasAccessToViewTasks,
     userHasAccessToViewCompanyInvoice,
+    userHasAccessToViewAccountProformaInvoice,
     userHasAccessToViewCompanyQuotation,
     userHasAccessToViewCompanyProductSale,
   } = useUserAccessModules();
@@ -137,6 +138,17 @@ function SideNavBar({ isOpen, onToggle }: SideBarProps) {
               isOpen={isOpen}
               isActive={isActive}
               disabled={!userHasAccessToViewCompanyInvoice}
+            />
+          )}
+        </NavLink>
+        <NavLink to={ROUTES_URL.ACCOUNT_PROFORMA_INVOICE_MANAGEMENT}>
+          {({ isActive }) => (
+            <SideNavBarItem
+              icon={FaRegFileArchive}
+              label="Proforma Invoices"
+              isOpen={isOpen}
+              isActive={isActive}
+              disabled={!userHasAccessToViewAccountProformaInvoice}
             />
           )}
         </NavLink>

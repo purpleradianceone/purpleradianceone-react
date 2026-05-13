@@ -105,6 +105,7 @@ import { FacebookPageIntegrationManagement } from "../../components/views/settin
 import Features from "../../components/views/home/landing-page/Features";
 import ProformaInvoiceDetails from "../../components/views/proforma-invoice/ProformaInvoiceDetails";
 import CompanyProductSaleManagement from "../../components/views/company-product-sale-management/CompanyProductSaleManagement";
+import AccountProformaInvoice from "../../components/modals/Account/account-proforma-invoice/AccountProformaInvoice";
 
 export const router = createBrowserRouter([
   {
@@ -399,7 +400,29 @@ export const router = createBrowserRouter([
         <PrivateRoute>
           <div>
             <Navbar>
-              <AccountInvoice isNavigateFrom="Invoice" account={null} isUsedForSidebar={true} />
+              <AccountInvoice
+                isNavigateFrom="Invoice"
+                account={null}
+                isUsedForSidebar={true}
+              />
+            </Navbar>
+          </div>
+        </PrivateRoute>
+      </MobileRedirectWrapper>
+    ),
+  },
+  {
+    path: ROUTES_URL.ACCOUNT_PROFORMA_INVOICE_MANAGEMENT,
+    element: (
+      <MobileRedirectWrapper>
+        <PrivateRoute>
+          <div>
+            <Navbar>
+              <AccountProformaInvoice
+                // isNavigateFrom="Proforma Invoice"
+                account={null}
+                isUsedForSidebar={true}
+              />
             </Navbar>
           </div>
         </PrivateRoute>
