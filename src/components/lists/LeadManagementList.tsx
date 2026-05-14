@@ -3,7 +3,6 @@ import {
   Calendar,
   ClipboardPlus,
   Handshake,
-  Plus,
   User,
   X,
 } from "lucide-react";
@@ -36,6 +35,7 @@ import { createPortal } from "react-dom";
 import PaginationWithoutCount from "../ag-grid/PaginationWithoutCount";
 import { customDateRangeId } from "../../config/hooks/usePaginationHandler";
 import { ComponentHeaderAndLogo } from "../ui/ComponentHeaderAndLogo";
+import { CiImport } from "react-icons/ci";
 function LeadManagementList({
   handleSearchOption,
   onStartDateChange,
@@ -56,6 +56,7 @@ function LeadManagementList({
 }: LeadManagementListProps) {
   const navigate = useNavigate();
   const { position } = usePanel();
+  
   const { userPreference } = useUserPreference();
   const { isLargeScreen, isSmallScreen } = useScreenSize();
   const { userHasAccessToViewLead, userHasAccessToAddLead } =
@@ -191,7 +192,7 @@ function LeadManagementList({
             <div className="flex gap-2  px-1 justify-center items-center">
               {/* search box flex div */}
               <div
-                className={`relative flex items-start ${isCustomDateOptionSelected ? "w-56" : "w-80"}`}
+                className={`relative flex items-start ${isCustomDateOptionSelected ||  userPreference.sidebarOpen?  "w-56": "w-80"}`}
               >
                 <SearchInput
                   value={handleSearchOption.searchParameter}
@@ -321,7 +322,9 @@ function LeadManagementList({
           {isUsedInLeadModule && (
             <div className="flex  gap-1">
               <Button
-                type="submit"
+                type="button"
+                className="button-import "
+
                 disabled={!userHasAccessToAddLead}
                 onClick={(e) => {
                   e.preventDefault();
@@ -335,10 +338,9 @@ function LeadManagementList({
                   }
                 }}
               >
-                <span className="flex items-center">
-                  <Plus size={SIZE.SIXTEEN} />
+                  <CiImport size={SIZE.SIXTEEN}  />
                   <span>Import </span>
-                </span>
+                {/* </span> */}
               </Button>
               <Button
                 type="submit"

@@ -186,6 +186,40 @@
   cursor: pointer;
 }
 
+.button-import {
+  font-family: "Inter", sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: #1f2937; /* dark gray */
+  cursor: pointer;
+  
+  background-color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  border: 1px solid #d1d5db;
+  border-radius: 7px;
+  padding: 6px 14px;
+
+  transition: all 0.2s ease-in-out;
+}
+
+/* Hover state */
+.button-import:hover {
+  background-color: #f3f4f6;
+  border-color: #9ca3af;
+}
+
+/* Active (click) state */
+.button-import:active {
+  transform: scale(0.98);
+}
+
+/* Optional: subtle shadow on hover */
+/* .button-import:hover {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+} */
 .action-btn-custom.disabled-btn {
   font-family: "Inter", sans-serif;
   font-size: 14px;
@@ -282,6 +316,21 @@
   color: #eb9225;
 }
 
+
+/* Input Labels */
+.dashboard-card-headers {
+  font-family: "Roboto", sans-serif;
+  font-size: 13px;
+  font-weight: 600; /* Maps to Regular */
+  color: #5e5e5e;
+}
+
+.dashboard-card-headers-value {
+  font-family: "Roboto", sans-serif;
+  font-size: 18px;
+  font-weight: 600; /* Maps to Regular */
+  color: #1f1e1e;
+}
 /* Input Labels */
 .input-label-custom {
   font-family: "Roboto", sans-serif;

@@ -284,6 +284,14 @@
   border-radius: 6px;
 }
 
+.custom-scrollbar-invinsible::-webkit-scrollbar {
+  width: 0px;
+}
+.custom-scrollbar-invinsible::-webkit-scrollbar-thumb {
+  background: #cbd5e0;
+  border-radius: 6px;
+}
+
 .custom-scrollbar-black::-webkit-scrollbar {
   width: 6px;
 }
