@@ -232,28 +232,10 @@ function CompanyQuotationManagementList({
                       e.target.value,
                     )
                   }
-                />
-              </div>
-
-              <div className="min-w-[150px]">
-                <QuotationTypeDropdown
-                value={handleSearchOption.selectedCompanyQuotationType}
-                handleQuotationTypeSelection={handleSelectedQuotationType!}
-                isClearButton={true}
-                heightInPx="33px"
-                />
-              </div>
-
-              <div className="min-w-[150px]">
-                <CustomDropdown
-                  preselectedOption={handleSearchOption.selectedInvoiceStatus}
-                  labelName="status"
-                  options={quotationStatus!}
-                  onSelect={handleSelectedQuotationStatus}
                   height="h-8"
                 />
               </div>
-              {/* 🔹 Date Filter + Picker (Grouped) */}
+                  {/* 🔹 Date Filter + Picker (Grouped) */}
               <div className="flex   items-center gap-2">
                 <DateRangeFilterDropdown
                   dropdownOptions={dateRangeDropdownOptions}
@@ -274,6 +256,26 @@ function CompanyQuotationManagementList({
                   </div>
                 )}
               </div>
+
+              <div className="min-w-[150px]">
+                <QuotationTypeDropdown
+                value={handleSearchOption.selectedCompanyQuotationType}
+                handleQuotationTypeSelection={handleSelectedQuotationType!}
+                isClearButton={true}
+                heightInPx="33px"
+                />
+              </div>
+
+              <div className="min-w-[150px]">
+                <CustomDropdown
+                  preselectedOption={handleSearchOption.selectedInvoiceStatus}
+                  labelName="status"
+                  options={quotationStatus!}
+                  onSelect={handleSelectedQuotationStatus}
+                  height="h-8"
+                />
+              </div>
+          
             </div>
 
             {/* RIGHT */}
@@ -390,7 +392,7 @@ function CompanyQuotationManagementList({
             />
           </div>
         )}
-        {/* 🔹 Grid */}
+        {/* Grid */}
         <div className="bg-white overflow-y-auto rounded-lg shadow-sm">
           <div
             className={
@@ -422,16 +424,9 @@ function CompanyQuotationManagementList({
             />
           </div>
 
-          {/* 🔹 Create Modal
-          <GenerateInvoiceModal
-            isOpen={isCreateInvoiceModalOpen}
-            onClose={() => setIsCreateInvoiceModalOpen(false)}
-            account={otherData}
-            handleAddInvoice={handleAddQuotation}
-          /> */}
         </div>
 
-        {/* 🔹 Pagination */}
+        {/* Pagination */}
         <div className="flex items-center justify-end col-span-1">
           <PaginationWithoutCount
             pageSize={paginationData.pageSize}

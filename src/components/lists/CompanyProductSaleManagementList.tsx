@@ -35,13 +35,10 @@ function CompanyProductSaleManagementList({
   companyProductSoldData,
   paginationData,
 
-  selectedAccount,
   handleSelectedAccountChange,
 
-  selectedCompanyProduct,
   handleSelectedCompanyProductChange,
 
-  selectedProductTypeId,
   handleSelectedProductTypeChange,
 
   isUsedInProductSaleModule,
@@ -175,7 +172,7 @@ function CompanyProductSaleManagementList({
                 {/* Search Box */}
                 <div
                   className={`relative flex items-start ${
-                    isCustomDateOptionSelected ? "w-40 " : "w-72"
+                    isCustomDateOptionSelected ? "w-40 mr-2" : "w-72"
                   }`}
                 >
                   <SearchInput
@@ -185,7 +182,7 @@ function CompanyProductSaleManagementList({
                         e.target.value,
                       );
                     }}
-                    height="h-9"
+                    height="h-8"
                   ></SearchInput>
                 </div>
 
@@ -198,7 +195,7 @@ function CompanyProductSaleManagementList({
                           dropdownOptions={dateRangeDropdownOptions}
                           handleDateIdChange={handleDateRangeIdChange}
                           selectedOption={selectedDateName}
-                          height="h-9"
+                          height="h-8"
                         />
                         {isCustomDateOptionSelected && (
                           <div className="mt-1 ml-1 w-fit">
@@ -217,13 +214,13 @@ function CompanyProductSaleManagementList({
                 {isUsedInProductSaleModule && (
                   <div className="flex flex-wrap gap-2 w-full md:w-auto">
                     {/* Account  */}
-                    <div className="min-w-52 max-w-52">
+                    <div className="min-w-60 max-w-60">
                       <LookupAccountDropdown
                         // label="Account"
-                        value={selectedAccount}
+                        value={handleSearchOption.companyProductSaleState.selectedAccount}
                         handleAccountSelection={handleSelectedAccountChange}
                         isDisabled={!userHasAccessToViewCompanyProductSale}
-                        heightInPx={"36px"}
+                        heightInPx={"33px"}
                         isClearButton={true}
                       />
                     </div>
@@ -232,15 +229,15 @@ function CompanyProductSaleManagementList({
                     <div className="min-w-[110px]">
                       <CustomDropdown
                         labelName="type"
-                        preselectedOption={selectedProductTypeId}
+                        preselectedOption={handleSearchOption.companyProductSaleState.selectedProductTypeId}
                         options={productTypeData!}
                         onSelect={(value) => {
                           handleSelectedProductTypeChange(value);
-                          if (!value || selectedProductTypeId !== value) {
+                          if (!value || handleSearchOption.companyProductSaleState.selectedProductTypeId !== value) {
                             handleSelectedCompanyProductChange(null);
                           }
                         }}
-                        height="h-9"
+                        height="h-8"
                       />
                     </div>
 
@@ -248,16 +245,16 @@ function CompanyProductSaleManagementList({
                     <div className="relative flex justify-center min-w-52 max-w-52">
                       {
                         <LookupCompanyProductDropdown
-                          value={selectedCompanyProduct}
+                          value={handleSearchOption.companyProductSaleState.selectedCompanyProduct}
                           handleCompanyProductSelection={
                             handleSelectedCompanyProductChange
                           }
                           productTypeId={
-                            selectedProductTypeId
-                              ? [selectedProductTypeId]
+                            handleSearchOption.companyProductSaleState.selectedProductTypeId
+                              ? [handleSearchOption.companyProductSaleState.selectedProductTypeId]
                               : undefined
                           }
-                          heightInPx="35px"
+                          heightInPx="33px"
                           isClearButton={true}
                         />
                       }

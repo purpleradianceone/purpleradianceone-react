@@ -194,6 +194,7 @@ function CompanyQuotationManagement({
     startDate,
     endDate,
     selectedCompanyQuotationStatus,
+    selectedCompanyQuotationType,
   ]);
 
   useEffect(() => {

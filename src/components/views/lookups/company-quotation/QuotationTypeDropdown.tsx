@@ -131,6 +131,7 @@ export const QuotationTypeDropdown = ({
       },
       fontSize: "14px",
       marginTop: "0px",
+
     }),
 
     valueContainer: (base: any) => ({
@@ -160,6 +161,7 @@ export const QuotationTypeDropdown = ({
       ...base,
       fontSize: "13px",
       fontWeight: 500,
+
     }),
 
     menu: (base: any) => ({
