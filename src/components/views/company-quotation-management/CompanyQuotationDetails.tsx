@@ -121,7 +121,6 @@ function CompanyQuotationDetails() {
   } = useUserAccessModules();
 
   useEffect(() => {
-    console.log("use effect 1");
     if (searchParams.has("account_company_product")) {
       const accountCompanyProduct = JSON.parse(
         searchParams.get("account_company_product") ?? "{}",
@@ -161,7 +160,10 @@ function CompanyQuotationDetails() {
           ? responseData[0]
           : responseData;
 
-        if (!item) return;
+        if (!item){
+          window.history.back();
+          return;
+        }
 
         setDisabled(
           item.quotation_status_name?.trim().toUpperCase() !== "DRAFT",
@@ -754,8 +756,6 @@ function CompanyQuotationDetails() {
   };
 
   useEffect(() => {
-    console.log("use effect 2");
-
     if (!quotationId || Number(quotationId) === 0) return;
     const controller = new AbortController();
     getCompanyQuotations(controller.signal);
@@ -766,8 +766,6 @@ function CompanyQuotationDetails() {
   }, [quotationId, refreshCount]);
 
   useEffect(() => {
-    console.log("use effect 3");
-
     if (!quotationId || Number(quotationId) === 0) return;
     const controller = new AbortController();
     getCompanyQuotationItems(controller.signal);
@@ -802,7 +800,6 @@ function CompanyQuotationDetails() {
   }
 
   useEffect(() => {
-    console.log("use effect 4");
 
     if (
       otherIdSearchParams !== null &&
@@ -820,7 +817,6 @@ function CompanyQuotationDetails() {
   }, []);
 
   useEffect(() => {
-    console.log("use effect 5");
 
     if (quotationTypeIdSearchParams && quotationTypeIdSearchParams !== "0") {
       setSelectedQuotationType({
@@ -910,7 +906,7 @@ function CompanyQuotationDetails() {
             </div>
             <div className="flex justify-between items-center my-2">
               <div>
-                <h1 className="table-header-custom">
+                <h1 className="section-header-custom">
                   {isCreateMode
                     ? "Create Quotation"
                     : `Quotation #${quotation?.quotationNumber || "[Auto-generated]"} (${quotation?.quotationTypeName})`}
@@ -1300,8 +1296,8 @@ function CompanyQuotationDetails() {
           <>
             {!isCreateMode && userHasAccessToViewCompanyQuotation && (
               <div className="bg-white border rounded p-1 mb-1">
-                <div className="flex justify-between py-1">
-                  <h3 className="font-semibold">Quotation Items</h3>
+                <div className="flex justify-start items-center py-1">
+                  <h3 className="section-header-custom mr-3">Quotation Items</h3>
                   <SearchInput
                     value={searchTerm}
                     onChange={(e: any) => setSearchTerm(e.target.value)}

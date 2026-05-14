@@ -6,21 +6,19 @@ import LookupCompanyProduct from "../lookup/LookupCompanyProduct";
 import CompanyProductSaleProps from "../products/CompanyProductSaleProps";
 
 type CompanyProductSaleManagementListProps = {
-    handleSearchOption: HandleSearchOptionProps;
+    handleSearchOption: HandleSearchOptionProps & {
+    [key: string]: any;
+  };
     onStartDateChange: (date: Date) => void;
     onEndDateChange: (date: Date) => void;
     companyProductSoldData : CompanyProductSaleProps[];
     paginationData: PaginationDataWithoutCountProps;
 
-    selectedAccount : LookupAccount | null;
     handleSelectedAccountChange : (params: LookupAccount | null) => void;
 
-    selectedCompanyProduct : LookupCompanyProduct | null;
     handleSelectedCompanyProductChange: ( params: LookupCompanyProduct | null) => void;
 
-    selectedProductTypeId : number  | undefined;
     handleSelectedProductTypeChange : (params: number  | undefined) => void;
-   
    
     isUsedInProductSaleModule : boolean,
     handleRowSelect? : (rowData: CompanyProductSaleProps | any) => void;

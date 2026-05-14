@@ -11,8 +11,8 @@ import axiosClient from "../../../axios-client/AxiosClient";
 import { handleApiError } from "../../../config/error/handleApiError";
 import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
 import {
-    customDateRangeId,
-    useSearchFilterPaginationDateHandlers,
+  customDateRangeId,
+  useSearchFilterPaginationDateHandlers,
 } from "../../../config/hooks/usePaginationHandler";
 import { STATUS_CODE } from "../../../constants/AppConstants";
 import POST_API from "../../../constants/PostApi";
@@ -40,21 +40,23 @@ function CompanyProductSaleManagement({
   //   const [companyQuotationUpdateCount, setCompanyQuotationUpdateCount] =
   //     useState<number>(0);
 
-  const [companyProductSaleState, setCompanyProductSaleState] = useState<{
-    selectedAccount: LookupAccount | null;
-    selectedCompanyProduct: LookupCompanyProduct | null;
-    selectedProductTypeId: number | undefined;
-  }>({
-    selectedAccount: null,
-    selectedCompanyProduct: null,
-    selectedProductTypeId: undefined,
-  });
-
   // Load filters
   const savedFilters = JSON.parse(
     localStorage.getItem(
       LocalStorageKeys.COMPANY_PRODUCT_SALE_MANAGEMENT_FILTERS,
     ) || "{}",
+  );
+
+  const [companyProductSaleState, setCompanyProductSaleState] = useState<{
+    selectedAccount: LookupAccount | null;
+    selectedCompanyProduct: LookupCompanyProduct | null;
+    selectedProductTypeId: number | undefined;
+  }>(
+    savedFilters.companyProductSaleState || {
+      selectedAccount: null,
+      selectedCompanyProduct: null,
+      selectedProductTypeId: undefined,
+    },
   );
 
   const {
@@ -88,7 +90,8 @@ function CompanyProductSaleManagement({
       account_id: companyProductSaleState.selectedAccount?.id,
       company_product_id: companyProductSaleState.selectedCompanyProduct?.id,
       product_type_id: companyProductSaleState.selectedProductTypeId,
-      search_company_specific_date_range_id: dateRangeId === 0 ? null : dateRangeId,
+      search_company_specific_date_range_id:
+        dateRangeId === 0 ? null : dateRangeId,
       limit: pageSize,
       offset,
       search_parameter: searchParameter.trim() || null,
@@ -155,13 +158,18 @@ function CompanyProductSaleManagement({
   //     setCompanyQuotationUpdateCount(companyQuotationUpdateCount + 1);
   //   };
 
-  // 🔁 API TRIGGER
   useEffect(() => {
     const controller = new AbortController();
     getCompanyProductSale(controller.signal);
-
     return () => controller.abort();
-  }, [pageSize, currentPage, dateRangeId, searchParameter, concatDate, companyProductSaleState]);
+  }, [
+    pageSize,
+    currentPage,
+    dateRangeId,
+    searchParameter,
+    concatDate,
+    companyProductSaleState,
+  ]);
 
   useEffect(() => {
     if (!userHasAccessToViewCompanyProductSale) {
@@ -218,31 +226,6 @@ function CompanyProductSaleManagement({
       >
         {userHasAccessToViewCompanyProductSale ? (
           <CompanyProductSaleManagementList
-            selectedAccount={companyProductSaleState.selectedAccount}
-            handleSelectedAccountChange={(param) => {
-              setCompanyProductSaleState((prev) => ({
-                ...prev,
-                selectedAccount: param,
-              }));
-            }}
-            selectedCompanyProduct={
-              companyProductSaleState.selectedCompanyProduct
-            }
-            handleSelectedCompanyProductChange={(param) => {
-              setCompanyProductSaleState((prev) => ({
-                ...prev,
-                selectedCompanyProduct: param,
-              }));
-            }}
-            selectedProductTypeId={companyProductSaleState.selectedProductTypeId}
-            handleSelectedProductTypeChange={(param) => {
-                setCompanyProductSaleState((prev) => ({
-                  ...prev,
-                  selectedProductTypeId: param,
-                }));
-              
-            }}
-            handleRowSelect={() => {}}
             handleSearchOption={{
               handleSearchParameterChange,
               handleDateRangeIdChange: handleDatePageIdChange,
@@ -250,7 +233,27 @@ function CompanyProductSaleManagement({
               startDate,
               endDate,
               searchParameter,
+              companyProductSaleState,
             }}
+            handleSelectedAccountChange={(param) => {
+              setCompanyProductSaleState((prev) => ({
+                ...prev,
+                selectedAccount: param,
+              }));
+            }}
+            handleSelectedCompanyProductChange={(param) => {
+              setCompanyProductSaleState((prev) => ({
+                ...prev,
+                selectedCompanyProduct: param,
+              }));
+            }}
+            handleSelectedProductTypeChange={(param) => {
+              setCompanyProductSaleState((prev) => ({
+                ...prev,
+                selectedProductTypeId: param,
+              }));
+            }}
+            handleRowSelect={() => {}}
             companyProductSoldData={companyProductSaleData}
             isDataLoading={isLoadingForCompanyProductSale}
             onEndDateChange={handleEndDateChange}
