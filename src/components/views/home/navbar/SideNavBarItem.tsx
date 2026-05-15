@@ -171,6 +171,7 @@ function SideNavBarItem({
         >
           {isOpen ? (
             <button
+             ref={buttonRef}
               onClick={() => (children ? setExpanded(!expanded) : onClick?.())}
               className={`${baseClasses} ${hoverClasses} text-gray-700 ${isActive ? "bg-blue-100 font-semibold" : ""}`}
             >
