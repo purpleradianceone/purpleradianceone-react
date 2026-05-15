@@ -214,7 +214,7 @@ function CompanyProductSaleManagementList({
                 {isUsedInProductSaleModule && (
                   <div className="flex flex-wrap gap-2 w-full md:w-auto">
                     {/* Account  */}
-                    <div className="min-w-60 max-w-60">
+                    <div className={`${userPreference.sidebarOpen?"w-30":"w-56"} min-w-30 ${userPreference.sidebarOpen?"max-w-40":"max-w-60"}`}>
                       <LookupAccountDropdown
                         // label="Account"
                         value={handleSearchOption.companyProductSaleState.selectedAccount}
@@ -242,7 +242,7 @@ function CompanyProductSaleManagementList({
                     </div>
 
                     {/* Product */}
-                    <div className="relative flex justify-center min-w-52 max-w-52">
+                    <div className={`relative flex justify-center ${userPreference.sidebarOpen?"w-30":"w-52"} min-w-30 ${userPreference.sidebarOpen?"max-w-40":"max-w-52"}`}>
                       {
                         <LookupCompanyProductDropdown
                           value={handleSearchOption.companyProductSaleState.selectedCompanyProduct}
@@ -258,10 +258,6 @@ function CompanyProductSaleManagementList({
                           isClearButton={true}
                         />
                       }
-                      {/* <LookupCompanyProductDropdown
-                        placeholder="Product"
-                        onProductSelected={handleSelectedCompanyProductCheckBoxChange}
-                        /> */}
                     </div>
                   </div>
                 )}

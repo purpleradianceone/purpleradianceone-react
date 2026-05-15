@@ -74,6 +74,7 @@ function CompanyQuotationManagement({
       id: null,
       quotation_type_id: isUsedFor === Modules.LEAD_QUOTATION?1:(isUsedFor === Modules.AMC_QUOTATION?2:selectedCompanyQuotationType?selectedCompanyQuotationType.id:null ),
       other_id: otherData?otherData.id:null,
+      quotation_status_id: selectedCompanyQuotationStatus,
       search_company_specific_date_range_id: dateRangeId === 0 ? null : dateRangeId,
       limit: pageSize,
       offset,
