@@ -170,7 +170,7 @@ const CustomDropdown: React.FC<DropdownProps> = ({
             onKeyDown={(e) => {
               if (e.key === "Enter") handleSelect(undefined);
             }}
-            className="px-4 py-0.5 flex gap-2 items-center caption-custom hover:bg-gray-200 cursor-pointer text-gray-800 border-b"
+            className="px-2 py-0.5 flex gap-2 items-center caption-custom hover:bg-gray-200 cursor-pointer text-gray-800 border-b"
           >
             <Delete size={18} /> <span className="caption-custom"> Clear</span>
           </div>
@@ -184,7 +184,7 @@ const CustomDropdown: React.FC<DropdownProps> = ({
                 onKeyDown={(e) => {
                   if (e.key === "Enter") handleSelect(option.id!);
                 }}
-                className="px-4 py-0.5 caption-custom border-b hover:bg-blue-600 hover:text-white cursor-pointer focus:bg-blue-600 focus:text-white"
+                className="px-2 py-0.5 caption-custom border-b hover:bg-blue-600 hover:text-white cursor-pointer focus:bg-blue-600 focus:text-white"
               >
                 {option.name}
               </div>

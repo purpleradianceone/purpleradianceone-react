@@ -47,6 +47,7 @@ type FormInputProps = {
     penLogo? : LucideIcon;
     disabled? : boolean;
     height?: string;
+    width?: string;
   }
 
   /**

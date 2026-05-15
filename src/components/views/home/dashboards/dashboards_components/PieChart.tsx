@@ -248,7 +248,7 @@ const PieChart = ({
                 <circle
                   cx="150"
                   cy="150"
-                  r="50"
+                  r="60"
                   fill="white"
                   className="drop-shadow-sm"
                 />

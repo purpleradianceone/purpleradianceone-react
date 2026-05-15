@@ -229,7 +229,7 @@ function SupportTicketManagementList({
                 {/* Search Box */}
                 <div
                   className={`relative flex items-start ${
-                    isCustomDateOptionSelected ? "w-44 " : "w-48"
+                    isCustomDateOptionSelected ?(userPreference.sidebarOpen?"w-24": "w-28 ") : (userPreference.sidebarOpen?"w-32":"w-52")
                   }`}
                 >
                   <SearchInput
@@ -248,7 +248,7 @@ function SupportTicketManagementList({
                   <div className="grid grid-cols-1 justify-center gap-1 w-full">
                     {/* Shared width wrapper */}
                     <div className="relative w-fit flex justify-center gap-1">
-                      <div className="flex col-span-2 w-fit">
+                      <div className={`flex ${userPreference.sidebarOpen?"flex-col col-span-1":"col-span-2"} w-fit`}>
                         <DateRangeFilterDropdown
                           dropdownOptions={dateRangeDropdownOptions}
                           handleDateIdChange={handleDateRangeIdChange}
