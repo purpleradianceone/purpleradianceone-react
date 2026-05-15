@@ -260,7 +260,7 @@ function GetCompanyUsersList({
           )}
 
       <div
-        className={`sticky z-10 top-9 py-0.5 flex items-center justify-between ${COLORS.GRID_HEADER_SECTION_BG_COLOR} rounded-sm w-full`}
+        className={`sticky z-10 top-9 py-0.5 flex items-center justify-between ${COLORS.GRID_HEADER_SECTION_BG_COLOR} rounded-sm mb-0.5 w-full`}
       >
         <div className="flex justify-center items-center gap-5">
           {/* <div className="flex gap-1">
@@ -369,7 +369,7 @@ function GetCompanyUsersList({
             isUsedInAccountProductForAssingingInstalledBy
               ? ` w-full h-[calc(70vh-122px)]`
               : userPreference.isLeftMenu
-                ? ` w-full h-[calc(100vh-110px)]`
+                ? ` w-full h-[calc(100vh-112px)]`
                 : " w-full h-[calc(100vh-120px)]"
           }
         >
