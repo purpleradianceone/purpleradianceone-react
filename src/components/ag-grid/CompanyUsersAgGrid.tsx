@@ -312,23 +312,34 @@ cellRenderer: (params: any) => {
               <div className="flex items-center justify-center h-full">
                 <button
                   id="actions-button"
-                  className="text-slate-800    flex  items-center hover:text-slate-900"
+                  className="
+          w-7 h-7
+          flex items-center justify-center
+          rounded-lg
+          border border-slate-200
+          bg-white
+          text-slate-500
+          hover:bg-slate-50
+          hover:text-slate-700
+          transition-all duration-150
+          shadow-sm
+        "
                   onClick={handleActionsButtonClick}
                 >
                   <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="18"
-                    height="18"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M12 5h.01M12 12h.01M12 19h.01"
-                    />
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          strokeWidth="2.2"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M5 12h.01M12 12h.01M19 12h.01"
+          />
                   </svg>
                   {/* Actions <ArrowDown size={12} /> */}
                 </button>
@@ -338,7 +349,7 @@ cellRenderer: (params: any) => {
                 createPortal(
                   <div
                     ref={dropdownRef}
-                    className="absolute bg-white border rounded-xl shadow-xl w-36 ml-1 z-50"
+                    className="absolute bg-white border rounded-xl shadow-xl w-32 ml-1 z-50"
                     style={{
                       top: position.top,
                       left: position.left,
@@ -515,7 +526,7 @@ cellRenderer: (params: any) => {
 
   return (
     <div
-      className="modern-user-grid w-full"
+      className="modern-user-grid custom-height-scrollbar w-full"
       style={{
         height: "100%",
         width: "100%",

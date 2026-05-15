@@ -13,6 +13,7 @@ import Tabs from "../../ui/Tabs";
 import { AccountContactLeadTypeConjuction } from "./AccountContactLeadTypeConjuctionComponent";
 import AccountProformaInvoice from "./account-proforma-invoice/AccountProformaInvoice";
 import { LocalStorageTabKeys } from "../../../enums/LocalStorageKeys";
+import AccountQuotationDetails from "./account-quotation/AccountQuotationDetails";
 
 const AccountManagement: React.FC = () => {
   const { accountId } = useParams();
@@ -31,6 +32,7 @@ const AccountManagement: React.FC = () => {
     { key: "subscription", label: "Subscription" },
     { key: "invoice", label: "Invoice" },
     { key: "proforma-invoice", label: "Proforma Invoice" },
+    { key: "quotation", label: "Quotation" },
   ];
   const parsedAccountId = Number(accountId);
 
@@ -142,6 +144,10 @@ const AccountManagement: React.FC = () => {
         )}
         {activeTab === "proforma-invoice" && (
           <AccountProformaInvoice account={company} />
+        )}
+
+         {activeTab === "quotation" && (
+          <AccountQuotationDetails account={company} />
         )}
       </div>
     </div>
