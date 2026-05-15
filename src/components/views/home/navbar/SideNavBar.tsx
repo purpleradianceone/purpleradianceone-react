@@ -25,6 +25,8 @@ import { SIZE } from "../../../../constants/AppConstants";
 import ROUTES_URL from "../../../../constants/Routes";
 import SideNavBarItem from "./SideNavBarItem";
 import { FaRegFileAlt, FaRegFileArchive } from "react-icons/fa";
+import toast from "react-hot-toast";
+import MESSAGE from "../../../../constants/Messages";
 
 function SideNavBar({ isOpen, onToggle }: SideBarProps) {
   const {
@@ -41,6 +43,7 @@ function SideNavBar({ isOpen, onToggle }: SideBarProps) {
     userHasAccessToViewAccountProformaInvoice,
     userHasAccessToViewCompanyQuotation,
     userHasAccessToViewCompanyProductSale,
+    userHasAccessToViewSettingGeneral,
   } = useUserAccessModules();
 
   return (
@@ -278,45 +281,51 @@ function SideNavBar({ isOpen, onToggle }: SideBarProps) {
         ]}
       />
       {/* alksd */}
-      <div
-        className={`flex items-center    justify-center pt-1`}
-      >
+      <div className={`flex items-center    justify-center pt-1`}>
         {/* {isOpen && (
           <span className="section-header-custom-blue">PurpleRadiance One</span>
         )} */}
         <div className="flex justify-between  w-full">
-
-
-        <button
-          onClick={onToggle}
-          title="Open Sidebar"
-          className="table-header-custom hover:text-blue-800 pl-4 w-full bg-pink-00"
+          <button
+            onClick={onToggle}
+            title="Open Sidebar"
+            className="table-header-custom hover:text-blue-800 pl-4 w-full bg-pink-00"
           >
-          {isOpen ? (
-            <div className="  flex gap-1 items-center w-full ">
-              {" "}
-              <PanelLeftClose size={20} />{" "}
-              
-            Close
-            </div>
-          ) : (
-            <PanelRightClose size={20} />
-          )}
-        </button>
+            {isOpen ? (
+              <div className="  flex gap-1 items-center w-full ">
+                {" "}
+                <PanelLeftClose size={20} /> Close
+              </div>
+            ) : (
+              <PanelRightClose size={20} />
+            )}
+          </button>
 
-        {
-          isOpen && (
+          {isOpen && (
             <Link
-            to={ROUTES_URL.USER_PROFILE_SETTING}
-
-          title="User Profile"
-          className="table-header-custom hover:text-blue-800 pl-4 w-full bg-pink-00 flex items-center justify-center gap-1"
-          >
-          <CircleUser size={20}/> Profile
-        </Link>
-          )
-        }
-          </div>
+              to={
+                userHasAccessToViewSettingGeneral
+                  ? ROUTES_URL.USER_PROFILE_SETTING
+                  : "#"
+              }
+              onClick={(e) => {
+                if (!userHasAccessToViewSettingGeneral) {
+                  e.preventDefault();
+                  toast.error(
+                    MESSAGE.MODULE_ACCESS.SETTING.GENERAL_USER_SETTING
+                      .DENIED_VIEW_ACCESS,
+                  );
+                  return;
+                }
+              }}
+              className={`table-header-custom pl-4 w-full flex items-center justify-center gap-1
+    ${!userHasAccessToViewSettingGeneral ? "opacity-50 cursor-not-allowed" : "hover:text-blue-800"}`}
+            >
+              <CircleUser size={20} />
+              Profile
+            </Link>
+          )}
+        </div>
       </div>
     </aside>
   );
