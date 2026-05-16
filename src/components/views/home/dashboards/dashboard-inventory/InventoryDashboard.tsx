@@ -21,6 +21,9 @@ import {
 } from "lucide-react";
 import { DashboardLoadingSpinner } from "../dashboards_components/DashboardLoadingSpinner";
 import PipelineChart from "../dashboards_components/PipeLineChart";
+import PieChart from "../dashboards_components/PieChart";
+import RecentStockMovement from "./RecentStockMovement";
+import RecentStockMovementProps from "../../../../../@types/inventory/RecentStockMovementProps";
 type DashboardDataType = Record<string, Array<Record<string, any>>>;
 
 interface DashboardInventoryProp {
@@ -44,6 +47,7 @@ const InventoryDashboard: React.FC<DashboardInventoryProp> = ({
   >([]);
 
   const [stockOverview, setStockOverview] = useState<any>();
+  const [recentStockMovement, setRecentStockMovement] = useState<RecentStockMovementProps[]>([]);
 
 
 
@@ -102,6 +106,8 @@ const InventoryDashboard: React.FC<DashboardInventoryProp> = ({
           data.my_fixed_cursor_stock_overview
         );
 
+        setRecentStockMovement(data.my_fixed_cursor_recent_stock_movement);
+
         setDashboardData(data);
       }
     } catch (error: any) {
@@ -113,6 +119,8 @@ const InventoryDashboard: React.FC<DashboardInventoryProp> = ({
 
   const getVisibility = (key: string): boolean =>
     dashboardVisiblity.find((v) => v.key.trim() === key.trim())?.value ?? false;
+
+  const isPieChart = (key: string): boolean => dashboardVisiblity.find((v)=> v.key.trim() === key.trim())?.chartType === "Pie";
 
   const TOTAL_TICKET_ROW_COMPONENT_KEYS = [
     "Total Products",
@@ -259,6 +267,20 @@ const InventoryDashboard: React.FC<DashboardInventoryProp> = ({
         />
       </div>
     ),
+    [DashboardComponentJsxKey.Recent_Stock_Movement]: (
+      <div
+      id="recentStockMovement"
+        key="Recent Stock Movement"
+        className="flex col-span-2 w-full gap-4 justify-around"
+      >
+        <div className="flex sm:gap-1 md:gap-2 lg:gap-11 w-full">
+          <RecentStockMovement
+            isLoading={isDashboardDataLoading}
+            recentStockMovement={recentStockMovement}
+          />
+        </div>
+      </div>
+    ),
     [DashboardComponentJsxKey.Stock_Overview]: (
       <div
         id="stockOverview"
@@ -272,6 +294,22 @@ const InventoryDashboard: React.FC<DashboardInventoryProp> = ({
           pipelineData={stockOverview}
           chartFor="stockOverview"
         ></PipelineChart>
+      </div>
+    ),
+    
+  };
+
+  const componentMapPieChart: { [key: string]: JSX.Element } = {
+    "Stpck Overview": (
+      <div
+        key="Stpck Overview"
+        id="stockOverview"
+        className="h-full overflow-y-auto max-h-[700px] [&::-webkit-scrollbar]:w-2
+  [&::-webkit-scrollbar-track]:bg-gray-50
+  [&::-webkit-scrollbar-thumb]:bg-gray-50
+   [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full"
+      >
+        <PieChart data={stockOverview} chartFor="stockOverview" />
       </div>
     ),
   };
@@ -296,6 +334,12 @@ const InventoryDashboard: React.FC<DashboardInventoryProp> = ({
         } else return null;
       }
 
+      if(isPieChart(key)){
+        console.log("inside pie chart inventory:"+key)
+      return componentMapPieChart[key];
+      // return null;
+      }
+      console.log("key:"+key)
       return componentMapDefault[key] || null;
     });
   };

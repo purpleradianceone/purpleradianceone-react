@@ -24,6 +24,7 @@ export enum DashboardComponentJsxKey {
   Todays_Outward_Value = "Today's Outward Value",
   //for Stock_Overview pie chart
   Stock_Overview = "Stock Overview",
+  Recent_Stock_Movement = "Recent Stock Movement",
 
 
 

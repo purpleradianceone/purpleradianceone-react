@@ -26,7 +26,7 @@ const PieChart = ({
   chartFor,
 }: {
   data: LeadSummaryReportType[];
-  chartFor: "leadByStatus" | "leadBySource";
+  chartFor: "leadByStatus" | "leadBySource" | "stockOverview";
 }) => {
   const [hoveredSlice, setHoveredSlice] = useState<number | null>(null);
 
@@ -201,12 +201,12 @@ const PieChart = ({
         <div className="flex items-center justify-between mb-8">
           <div>
             <h3 className="section-header-custom mb-2">
-              {chartFor === "leadByStatus" ? "Lead Status" : "Lead Sources"}
+              {chartFor === "leadByStatus" ? "Lead Status" : chartFor === "leadBySource"?"Lead Sources":chartFor==="stockOverview"?"Stock Overview":""}
             </h3>
             <p className="table-header-custom">
               {chartFor === "leadByStatus"
                 ? "Distribution of leads by current status"
-                : "Distribution of leads by acquisition source"}
+                : (chartFor === "leadBySource"?"Distribution of leads by acquisition source":(chartFor === "stockOverview"?"Stocks availability.":""))}
             </p>
           </div>
         </div>
@@ -260,7 +260,7 @@ const PieChart = ({
                   textAnchor="middle"
                   className="input-label-custom fill-current"
                 >
-                  Total Leads
+                  {chartFor!=="stockOverview"?"Total Leads":"Stock Overview"}
                 </text>
                 <text
                   x="150"
