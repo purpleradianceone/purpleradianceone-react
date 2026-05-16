@@ -312,6 +312,7 @@ cellRenderer: (params: any) => {
             <>
               <div className="flex items-center justify-center h-full">
                 <button
+                
                   id="actions-button"
                  className="
                   w-7 h-7
@@ -325,7 +326,8 @@ cellRenderer: (params: any) => {
                   transition-all duration-150
                   shadow-sm
                 "
-              >
+              
+              onClick={handleActionsButtonClick}>
                 <MoreHorizontal
                   size={16}
                   strokeWidth={1.2}
