@@ -224,7 +224,7 @@ function CompanyQuotationManagementList({
                 <span className="section-header-custom">Quotation</span>
               </div>
               {/* 🔹 Search */}
-              <div className="w-fit min-w-[120px]">
+              <div className={`relative flex items-start ${userPreference.sidebarOpen?(isCustomDateOptionSelected?"w-28":""):(isCustomDateOptionSelected?"w-72":"")}`}>
                 <SearchInput
                   value={handleSearchOption.searchParameter}
                   onChange={(e) =>
@@ -268,7 +268,7 @@ function CompanyQuotationManagementList({
 
               <div className="min-w-[150px]">
                 <CustomDropdown
-                  preselectedOption={handleSearchOption.selectedInvoiceStatus}
+                  preselectedOption={handleSearchOption.selectedCompanyQuotationStatus}
                   labelName="status"
                   options={quotationStatus!}
                   onSelect={handleSelectedQuotationStatus}

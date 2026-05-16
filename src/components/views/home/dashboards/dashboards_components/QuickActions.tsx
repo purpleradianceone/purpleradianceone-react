@@ -207,7 +207,7 @@ const QuickActions: React.FC<QuickActionsProp> = ({
   ];
 
   return (
-    <div className="bg-white min-h-full rounded-2xl shadow-lg border border-gray-100 p-8 ">
+    <div className="bg-white min-h-full h-full rounded-2xl shadow-lg border border-gray-100 p-8 ">
       <div className="mb-8">
         <h3 className="section-header-custom mb-2">Quick Actions</h3>
         <p className="table-header-custom">Frequently used CRM functions</p>
