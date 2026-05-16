@@ -7,7 +7,7 @@ const PipelineChart = ({
   chartFor,
 }: {
   pipelineData: LeadSummaryReportType[];
-  chartFor : "leadByStatus" | "leadBySource" ;
+  chartFor : "leadByStatus" | "leadBySource" |"stockOverview" ;
 }) => {
     const [ref, inView] = useInView({ fallbackInView: false, threshold: 0.1 });
 
@@ -38,10 +38,10 @@ const PipelineChart = ({
       <div className="flex items-center justify-between mb-8">
         <div>
           <h3 className="section-header-custom mb-2">
-            Leads Pipeline
+            {chartFor!=="stockOverview"?"Leads Pipeline":"Stock"}
           </h3>
           <p className="table-header-custom">
-            {chartFor === "leadByStatus" ? "Current pipeline by Lead Status" : "Current pipeline by Lead Source" }
+            {chartFor === "leadByStatus" ? "Current pipeline by Lead Status" : (chartFor === "leadBySource"?"Current pipeline by Lead Source" :(chartFor === "stockOverview"?"Stock Overview":""))}
           </p>
         </div>
       </div>

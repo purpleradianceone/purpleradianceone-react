@@ -22,7 +22,9 @@ export enum DashboardComponentJsxKey {
   Out_of_Stock_Products = "Out of Stock Products",
   Todays_Inward_Value = "Today's Inward Value",
   Todays_Outward_Value = "Today's Outward Value",
-  
+  //for Stock_Overview pie chart
+  Stock_Overview = "Stock Overview",
+
 
 
   //For all Dashboards

@@ -220,9 +220,9 @@ function SupportTicketManagementList({
                         isCustomDateOptionSelected
                           ? "text-xs"
                           : "section-header-custom"
-                      } mr-2`}
+                      } ${userPreference.sidebarOpen?"":"mr-2"}`}
                     >
-                      Support
+                      {userPreference.sidebarOpen?"":"Support"}
                     </span>
                   )}
                 </div>
@@ -369,7 +369,7 @@ function SupportTicketManagementList({
                             <span>ResolvedBy</span>
                           </Button>
                         ) : (
-                          <div className="border rounded-md border-gray-400 p-0.5 max-w-[150px]">
+                          <div className={`border rounded-md border-gray-400 p-0.5 max-w-[150px]`}>
                             <div
                               title={selectedResolvedBy.fullname}
                               className="relative max-h-8 rounded flex justify-between gap-x-0.5 bg-blue-600 caption-custom white-text p-0.5"

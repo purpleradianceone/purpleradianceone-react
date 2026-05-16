@@ -10,14 +10,16 @@ import axiosClient from "../../../axios-client/AxiosClient";
 import { handleApiError } from "../../../config/error/handleApiError";
 import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
 import useInvoiceStatus from "../../../config/hooks/useInvoiceStatus";
-import { customDateRangeId, useSearchFilterPaginationDateHandlers } from "../../../config/hooks/usePaginationHandler";
+import {
+  customDateRangeId,
+  useSearchFilterPaginationDateHandlers,
+} from "../../../config/hooks/usePaginationHandler";
 import { STATUS_CODE } from "../../../constants/AppConstants";
 import POST_API from "../../../constants/PostApi";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
 import { LocalStorageKeys } from "../../../enums/LocalStorageKeys";
 import CompanyQuotationManagementList from "../../lists/CompanyQuotationManagementList";
 import AccessDeniedPopup from "../not-found/AccessDeniedPage";
-
 
 function CompanyQuotationManagement({
   otherData,
@@ -31,18 +33,29 @@ function CompanyQuotationManagement({
   const { userHasAccessToViewCompanyQuotation } = useUserAccessModules();
   const { invoiceStatus } = useInvoiceStatus();
   const [accessDeniedPopUpOpen, setAccessDeniedPopUpOpen] = useState(false);
-  const [isLoadingForCompanyQuotation, setIsLoadingForCompanyQuotation] = useState<boolean>(false);
-  const [companyQuotationData, setCompanyQuotationeData] = useState<CompanyQuotationProps[]>([]);
+  const [isLoadingForCompanyQuotation, setIsLoadingForCompanyQuotation] =
+    useState<boolean>(false);
+  const [companyQuotationData, setCompanyQuotationeData] = useState<
+    CompanyQuotationProps[]
+  >([]);
   const { loginStatus } = useLoggedInUserContext();
 
-  const [companyQuotationUpdateCount, setCompanyQuotationUpdateCount] = useState<number>(0);
+  const [companyQuotationUpdateCount, setCompanyQuotationUpdateCount] =
+    useState<number>(0);
 
   // Load filters
-  const savedFilters = JSON.parse(
-    localStorage.getItem(LocalStorageKeys.COMPANY_QUOTATION_MANAGEMENT_FILTERS) || "{}",
-  );
-  const [selectedCompanyQuotationStatus, setSelectedCompanyQuotationStatus] = useState<number | undefined>(savedFilters.selectedCompanyQuotationStatus);
-  const [selectedCompanyQuotationType, setSelectedCompanyQuotationType] = useState<any | undefined>(savedFilters.selectedCompanyQuotationType);
+  const savedFilters =
+    isUsedFor === Modules.QUOTATION_MODULE
+      ? JSON.parse(
+          localStorage.getItem(
+            LocalStorageKeys.COMPANY_QUOTATION_MANAGEMENT_FILTERS,
+          ) || "{}",
+        )
+      : undefined;
+  const [selectedCompanyQuotationStatus, setSelectedCompanyQuotationStatus] =
+    useState<number | undefined>(savedFilters?savedFilters.selectedCompanyQuotationStatus:undefined);
+  const [selectedCompanyQuotationType, setSelectedCompanyQuotationType] =
+    useState<any | undefined>(savedFilters?savedFilters.selectedCompanyQuotationType:undefined);
 
   const {
     currentPage,
@@ -60,7 +73,7 @@ function CompanyQuotationManagement({
     handlePageSizeChange,
     handleSearchParameterChange,
     handleStartDateChange,
-  } = useSearchFilterPaginationDateHandlers(savedFilters);
+  } = useSearchFilterPaginationDateHandlers(savedFilters?savedFilters:undefined);
 
   const [ref, inView] = useInView({ fallbackInView: true, threshold: 0.1 });
 
@@ -72,10 +85,18 @@ function CompanyQuotationManagement({
     const postData = {
       company_id: loginStatus.companyId,
       id: null,
-      quotation_type_id: isUsedFor === Modules.LEAD_QUOTATION?1:(isUsedFor === Modules.AMC_QUOTATION?2:selectedCompanyQuotationType?selectedCompanyQuotationType.id:null ),
-      other_id: otherData?otherData.id:null,
+      quotation_type_id:
+        isUsedFor === Modules.LEAD_QUOTATION
+          ? 1
+          : isUsedFor === Modules.AMC_QUOTATION
+            ? 2
+            : selectedCompanyQuotationType
+              ? selectedCompanyQuotationType.id
+              : null,
+      other_id: otherData ? otherData.id : null,
       quotation_status_id: selectedCompanyQuotationStatus,
-      search_company_specific_date_range_id: dateRangeId === 0 ? null : dateRangeId,
+      search_company_specific_date_range_id:
+        dateRangeId === 0 ? null : dateRangeId,
       limit: pageSize,
       offset,
       search_parameter: searchParameter.trim() || null,
@@ -86,10 +107,14 @@ function CompanyQuotationManagement({
     try {
       if (postData.company_id === 0 || pageSize === 10) return;
       setIsLoadingForCompanyQuotation(true);
-      const response = await axiosClient.post(POST_API.GET_COMPANY_QUOTATION, postData, {
-        signal,
-        withCredentials: true,
-      });
+      const response = await axiosClient.post(
+        POST_API.GET_COMPANY_QUOTATION,
+        postData,
+        {
+          signal,
+          withCredentials: true,
+        },
+      );
 
       if (response.status === STATUS_CODE.OK) {
         const responseData = response.data;
@@ -113,18 +138,22 @@ function CompanyQuotationManagement({
             otherDetail: item.other_detail,
             quotationDate: item.quotation_date,
             validTillDate: item.valid_till_date,
-           
+
             basicValue: item.basic_value,
             discountAmount: item.discount_amount,
             taxableValue: item.taxable_value,
             totalTax: item.total_tax,
             totalAmount: item.total_amount,
             adjustmentForRoundOff: item.adjustment_for_round_off,
-            companyQuotationFileExtension: item.company_quotation_file_extension,
+            companyQuotationFileExtension:
+              item.company_quotation_file_extension,
             companyQuotationOriginUrl: item.company_quotation_origin_url,
             companyQuotationCdnUrl: item.company_quotation_cdn_url,
 
-            templateSnapshot: JSON.parse( item.template_snapshot) as Record<string, string | null>,
+            templateSnapshot: JSON.parse(item.template_snapshot) as Record<
+              string,
+              string | null
+            >,
 
             isActive: item.isactive,
             createdBy: item.createdby,
@@ -181,11 +210,12 @@ function CompanyQuotationManagement({
       selectedCompanyQuotationStatus,
       selectedCompanyQuotationType,
     };
-
-    localStorage.setItem(
-      LocalStorageKeys.COMPANY_QUOTATION_MANAGEMENT_FILTERS,
-      JSON.stringify(filters),
-    );
+    if (isUsedFor === Modules.QUOTATION_MODULE) {
+      localStorage.setItem(
+        LocalStorageKeys.COMPANY_QUOTATION_MANAGEMENT_FILTERS,
+        JSON.stringify(filters),
+      );
+    }
   }, [
     currentPage,
     pageSize,
@@ -202,7 +232,11 @@ function CompanyQuotationManagement({
     window.addEventListener("beforeunload", clearFilters);
 
     function clearFilters() {
-      localStorage.removeItem(LocalStorageKeys.COMPANY_QUOTATION_MANAGEMENT_FILTERS);
+      if(isUsedFor === Modules.QUOTATION_MODULE){
+        localStorage.removeItem(
+          LocalStorageKeys.COMPANY_QUOTATION_MANAGEMENT_FILTERS,
+        );
+      }
     }
 
     return () => window.removeEventListener("beforeunload", clearFilters);
@@ -242,14 +276,14 @@ function CompanyQuotationManagement({
             }}
             otherData={otherData}
             quotationStatus={invoiceStatus}
-            handleSelectedQuotationStatus={(selectedStatus: number | undefined) =>
-              setSelectedCompanyQuotationStatus(selectedStatus)
-            }
-            handleSelectedQuotationType={(value)=>
+            handleSelectedQuotationStatus={(
+              selectedStatus: number | undefined,
+            ) => setSelectedCompanyQuotationStatus(selectedStatus)}
+            handleSelectedQuotationType={(value) =>
               setSelectedCompanyQuotationType(value)
             }
             isUsedFor={isUsedFor}
-            leadStatusId={otherData?otherData.leadStatusId:0}
+            leadStatusId={otherData ? otherData.leadStatusId : 0}
           />
         ) : (
           <div className="flex-none mx-96 mt-14">

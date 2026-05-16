@@ -879,7 +879,7 @@ function CompanyQuotationDetails() {
                   }
                 }}
               >
-                {`${isUsedForSearchParams === Modules.QUOTATION_MODULE ? "Quotation" : isUsedForSearchParams === Modules.LEAD_QUOTATION ? "Lead Detail" : isUsedForSearchParams === Modules.AMC_QUOTATION ? "AMC Detail" : "Quotation"}`}
+                {`${isUsedForSearchParams === Modules.QUOTATION_MODULE ? "Quotation" : isUsedForSearchParams === Modules.LEAD_QUOTATION ? "Lead Detail" : isUsedForSearchParams === Modules.AMC_QUOTATION ? "Account Detail" : "Quotation"}`}
               </Button>
               {/* </Link> */}
               <ChevronRight size={16} />
@@ -995,7 +995,7 @@ function CompanyQuotationDetails() {
                             handleAccountCompanyProductSelection={
                               handleAccountCompanyProductSelection
                             }
-                            isDisabled={true}
+                            isDisabled={searchParams.has("account_company_product")}
                           />
                         )}
                       {/** =================For Account Product AMC(subscription)================= */}

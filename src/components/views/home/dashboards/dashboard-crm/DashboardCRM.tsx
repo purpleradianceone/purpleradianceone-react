@@ -471,7 +471,7 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
       <div
         id="quickActions"
         key="Quick Actions"
-        className="h-full col-span-1 overflow-y-auto max-h-[700px] [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-thumb]:rounded-full"
+        className="h-full col-span-1 overflow-y-auto  [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-thumb]:rounded-full"
       >
         <QuickActions
           companyUserId={companyUserId}

@@ -20,6 +20,7 @@ import {
   WarehouseIcon,
 } from "lucide-react";
 import { DashboardLoadingSpinner } from "../dashboards_components/DashboardLoadingSpinner";
+import PipelineChart from "../dashboards_components/PipeLineChart";
 type DashboardDataType = Record<string, Array<Record<string, any>>>;
 
 interface DashboardInventoryProp {
@@ -41,6 +42,8 @@ const InventoryDashboard: React.FC<DashboardInventoryProp> = ({
   const [dashboardVisiblity, setDasboardVisibility] = useState<
     { key: string; value: boolean; chartType: string }[]
   >([]);
+
+  const [stockOverview, setStockOverview] = useState<any>();
 
 
 
@@ -93,6 +96,10 @@ const InventoryDashboard: React.FC<DashboardInventoryProp> = ({
             value: true,
             chartType: w.chart_type_name,
           })) ?? [],
+        );
+
+        setStockOverview(
+          data.my_fixed_cursor_stock_overview
         );
 
         setDashboardData(data);
@@ -193,10 +200,22 @@ const InventoryDashboard: React.FC<DashboardInventoryProp> = ({
                 REFCURSOR_KEY.MY_FIXED_CURSOR_TODAYS_INWARD_VALUE
               ]?.[0]?.today_inward_value_of_products ?? 0
             }
+        
             icon={LucideShoppingCart}
             color="bg-gradient-to-r from-teal-500 to-teal-600"
             gradient="bg-gradient-to-r from-teal-500 to-teal-600"
             visibility={getVisibility(TOTAL_TICKET_ROW_COMPONENT_KEYS[4])}
+            currentValue={(dashboardData?.[
+                REFCURSOR_KEY.MY_FIXED_CURSOR_TODAYS_INWARD_VALUE
+              ]?.[0]?.today_inward_value_of_products ?? 0)}
+            previousValue={(dashboardData?.[
+                REFCURSOR_KEY.MY_FIXED_CURSOR_TODAYS_INWARD_VALUE
+              ]?.[0]?.yesterday_inward_value_of_products ?? 0)}
+
+            isTrend={true}
+            trendLabel="from yesterday"
+            
+            isSparkline={true}
           />
 
           <MetricCard
@@ -211,6 +230,17 @@ const InventoryDashboard: React.FC<DashboardInventoryProp> = ({
             color="bg-gradient-to-r from-green-500 to-green-600"
             gradient="bg-gradient-to-r from-green-500 to-green-600"
             visibility={getVisibility(TOTAL_TICKET_ROW_COMPONENT_KEYS[5])}
+            currentValue={(dashboardData?.[
+                REFCURSOR_KEY.MY_FIXED_CURSOR_TODAYS_OUTWARD_VALUE
+              ]?.[0]?.today_outward_value_of_products ?? 0)}
+            previousValue={(dashboardData?.[
+                REFCURSOR_KEY.MY_FIXED_CURSOR_TODAYS_OUTWARD_VALUE
+              ]?.[0]?.yesterday_outward_value_of_products ?? 0)}
+
+            isTrend={true}  
+            trendLabel="from yesterday"
+            
+            isSparkline={true}
           />
         </div>
       </div>
@@ -221,12 +251,27 @@ const InventoryDashboard: React.FC<DashboardInventoryProp> = ({
       <div
         id="quickActions"
         key="Quick Actions"
-        className="h-full col-span-1 overflow-y-auto max-h-[700px] [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-thumb]:rounded-full"
+        className="h-full col-span-1 overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-thumb]:rounded-full"
       >
         <QuickActions
           companyUserId={companyUserId}
           moduleAccessCompanyUser={accessModuleCompanyUser}
         />
+      </div>
+    ),
+    [DashboardComponentJsxKey.Stock_Overview]: (
+      <div
+        id="stockOverview"
+        key="Stpck Overview"
+        className="h-full col-span-1 overflow-y-auto max-h-[700px] [&::-webkit-scrollbar]:w-2
+  [&::-webkit-scrollbar-track]:bg-gray-50
+  [&::-webkit-scrollbar-thumb]:bg-gray-50
+   [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full"
+      >
+        <PipelineChart
+          pipelineData={stockOverview}
+          chartFor="stockOverview"
+        ></PipelineChart>
       </div>
     ),
   };
