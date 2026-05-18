@@ -3,10 +3,10 @@ import { useState } from 'react';
 import { useInView } from "react-intersection-observer";
 import { motion } from "framer-motion";
 
-const SalesChart = ({
-  leadsData
+const BarGraphChart = ({
+  graphData
 } : {
-  leadsData:  MonthlyAverageLeads[];
+  graphData:  MonthlyAverageLeads[];
 }) => {
  const [hoveredBar, setHoveredBar] = useState<{
     monthIndex: number;
@@ -17,10 +17,10 @@ const SalesChart = ({
 
       const [ref, inView] = useInView({ fallbackInView: false, threshold: 0.1 });
 
-  const months = leadsData.map((data) => data.month);
+  const months = graphData.map((data) => data.month);
 
-  const salesData = leadsData.map((data) => data.createdLeads);
-  const revenueData = leadsData.map((data) => data.convertedLeads);
+  const salesData = graphData.map((data) => data.createdLeads);
+  const revenueData = graphData.map((data) => data.convertedLeads);
 
   const maxValue = Math.max(...salesData, ...revenueData);
 
@@ -57,10 +57,8 @@ const SalesChart = ({
   };
 
   const getFormatedMonth = (month : string) => {
-    // const formattedMonthArray = month.split(" ");
-    const formattedMonthArray = month.split(/[\s_]+/);
-
-    const formattedMonth = formattedMonthArray[0] + " " +formattedMonthArray[1].substring(formattedMonthArray[1].length-2,formattedMonthArray[1].length);
+    const formattedMonthArray = month.split(" ");
+    const formattedMonth = formattedMonthArray[0] + " " +formattedMonthArray[1].substring(2,4);
     return formattedMonth;
   }
   return (
@@ -155,4 +153,4 @@ const SalesChart = ({
 
 };
 
-export default SalesChart;
+export default BarGraphChart;
