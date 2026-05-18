@@ -25,6 +25,8 @@ export enum DashboardComponentJsxKey {
   //for Stock_Overview pie chart
   Stock_Overview = "Stock Overview",
   Recent_Stock_Movement = "Recent Stock Movement",
+  Top_Low_Stock_Products = "Top Low Stock Products",
+  Stock_Value_Trend = "Stock Value Trend",
 
 
 

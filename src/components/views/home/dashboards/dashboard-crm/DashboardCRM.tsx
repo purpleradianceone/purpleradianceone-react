@@ -403,7 +403,8 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
           {leadSummaryReportData && (
             <PipelineChart
               pipelineData={leadSummaryReportData}
-              chartFor="leadByStatus"
+              header="Leads Pipeline"
+              headerDescription="Current pipeline by Lead Status"
             />
           )}
         </div>
@@ -463,7 +464,8 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
       >
         <PipelineChart
           pipelineData={leadBySource}
-          chartFor="leadBySource"
+          header="Leads Pipeline"
+          headerDescription="Current pipeline by Lead Source"
         ></PipelineChart>
       </div>
     ),
@@ -576,7 +578,11 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
       >
         <div id="leadByStatusPipeline" className="min-h-[500px]">
           {leadSummaryReportData && (
-            <PieChart data={leadSummaryReportData} chartFor="leadByStatus" />
+            <PieChart data={leadSummaryReportData} 
+            totalLable="Total Leads"
+            headerText="Lead Status"
+            headerDescription="Distribution of leads by current status"
+            />
           )}
         </div>
       </div>
@@ -590,7 +596,11 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
   [&::-webkit-scrollbar-thumb]:bg-gray-50
    [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full"
       >
-        <PieChart data={leadBySource} chartFor="leadBySource" />
+        <PieChart data={leadBySource} 
+        totalLable={"Total Leads"}
+        headerText="Lead Sources"
+        headerDescription="Distribution of leads by acquisition source"
+        />
       </div>
     ),
   };

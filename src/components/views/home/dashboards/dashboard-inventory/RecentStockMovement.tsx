@@ -5,7 +5,9 @@ import { useInView } from "react-intersection-observer";
 
 import LoadingSpinner from "../../../../../assets/animations/LoadingSpinner";
 
-import RecentStockMovementProps from "../../../../../@types/inventory/RecentStockMovementProps";
+import RecentStockMovementProps from "../../../../../@types/home/dashboard/inventory/RecentStockMovementProps";
+import { Link } from "react-router-dom";
+import ROUTES_URL from "../../../../../constants/Routes";
 
 interface Props {
   isLoading: boolean;
@@ -51,14 +53,21 @@ function RecentStockMovement({ isLoading, recentStockMovement = [] }: Props) {
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
         <div>
-          <h2 className="text-sm font-semibold text-gray-900">
+          <div className="table-header-custom">
             Recent Stock Movements
-          </h2>
+          </div>
 
-          <p className="text-xs text-gray-500 mt-0.5">
+          <p className="caption-custom">
             Latest inventory transactions
           </p>
         </div>
+
+         <Link to={ROUTES_URL.STOCK_MANAGEMENT+"/"+ROUTES_URL.STOCK_LEDGER}
+         className="caption-custom-blue transition-colors"
+         onClick={()=>{}}
+          >
+          View All
+        </Link>
       </div>
 
       {/* Content */}
@@ -72,148 +81,163 @@ function RecentStockMovement({ isLoading, recentStockMovement = [] }: Props) {
             No recent stock movement found
           </div>
         ) : (
-         <div className="overflow-hidden rounded-xl border border-gray-100 bg-white">
-  {/* Header Table */}
-  <table className="w-full min-w-[950px] table-fixed border-collapse">
-    <colgroup>
-      <col className="w-[140px]" />
-      <col className="w-[120px]" />
-      <col className="w-[220px]" />
-      <col className="w-[200px]" />
-      <col className="w-[80px]" />
-      <col className="w-[120px]" />
-      <col className="w-[200px]" />
-    </colgroup>
+          <div className="col-span-3 w-full min-w-0">
+            {/* Horizontal Scroll */}
+            <div className="w-full overflow-x-auto">
+              {/* Main Container */}
+              <div className="min-w-[900px] overflow-hidden rounded-lg border border-gray-100 bg-white shadow-sm">
+                {/* Header */}
+                <div className="bg-gray-50 border-b border-gray-100">
+                  <table className="w-full table-fixed border-collapse">
+                    <colgroup>
+                      <col style={{ width: "125px" }} />
+                      <col style={{ width: "110px" }} />
+                      <col style={{ width: "150px" }} />
+                      <col style={{ width: "100px" }} />
+                      <col style={{ width: "50px" }} />
+                      <col style={{ width: "110px" }} />
+                      <col style={{ width: "200px" }} />
+                    </colgroup>
 
-    <thead className="bg-gray-50 border-b border-gray-100">
-      <tr>
-        <th className="px-3 py-2 text-left text-[10px] font-semibold uppercase tracking-wide text-gray-500">
-          Date
-        </th>
+                    <thead>
+                      <tr className="h-9">
+                        <th className="px-3 py-2 text-left align-middle text-[10px] font-semibold uppercase tracking-wide text-gray-500">
+                          Date
+                        </th>
 
-        <th className="px-3 py-2 text-left text-[10px] font-semibold uppercase tracking-wide text-gray-500">
-          Type
-        </th>
+                        <th className="px-3 py-2 text-left align-middle text-[10px] font-semibold uppercase tracking-wide text-gray-500">
+                          Type
+                        </th>
 
-        <th className="px-3 py-2 text-left text-[10px] font-semibold uppercase tracking-wide text-gray-500">
-          Product
-        </th>
+                        <th className="px-3 py-2 text-left align-middle text-[10px] font-semibold uppercase tracking-wide text-gray-500">
+                          Product
+                        </th>
 
-        <th className="px-3 py-2 text-left text-[10px] font-semibold uppercase tracking-wide text-gray-500">
-          Transaction
-        </th>
+                        <th className="px-3 py-2 text-left align-middle text-[10px] font-semibold uppercase tracking-wide text-gray-500">
+                          Transaction
+                        </th>
 
-        <th className="px-3 py-2 text-center text-[10px] font-semibold uppercase tracking-wide text-gray-500">
-          Qty
-        </th>
+                        <th className="px-2 py-2 text-center align-middle text-[10px] font-semibold uppercase tracking-wide text-gray-500">
+                          Qty
+                        </th>
 
-        <th className="px-3 py-2 text-right text-[10px] font-semibold uppercase tracking-wide text-gray-500">
-          Value
-        </th>
+                        <th className="px-3 py-2 text-right align-middle text-[10px] font-semibold uppercase tracking-wide text-gray-500">
+                          Value
+                        </th>
 
-        <th className="px-6 py-2 text-left text-[10px] font-semibold uppercase tracking-wide text-gray-500">
-          Performed By
-        </th>
-      </tr>
-    </thead>
-  </table>
+                        <th className="px-4 py-2 text-left align-middle text-[10px] font-semibold uppercase tracking-wide text-gray-500">
+                          Performed By
+                        </th>
+                      </tr>
+                    </thead>
+                  </table>
+                </div>
 
-  {/* Scrollable Body */}
-  <div className="max-h-[420px] overflow-y-auto overflow-x-hidden">
-    <table className="w-full min-w-[950px] table-fixed border-collapse">
-      <colgroup>
-        <col className="w-[140px]" />
-        <col className="w-[120px]" />
-        <col className="w-[220px]" />
-        <col className="w-[180px]" />
-        <col className="w-[80px]" />
-        <col className="w-[120px]" />
-        <col className="w-[200px]" />
-      </colgroup>
+                {/* Body */}
+                <div className="max-h-[340px] overflow-y-auto overflow-x-hidden">
+                  <table className="w-full table-fixed border-collapse">
+                    <colgroup>
+                      <col style={{ width: "125px" }} />
+                      <col style={{ width: "110px" }} />
+                      <col style={{ width: "150px" }} />
+                      <col style={{ width: "100px" }} />
+                      <col style={{ width: "50px" }} />
+                      <col style={{ width: "110px" }} />
+                      <col style={{ width: "200px" }} />
+                    </colgroup>
 
-      <tbody className="divide-y divide-gray-100">
-        {recentStockMovement.map(
-          (ticket: RecentStockMovementProps, index: number) => {
-            const {
-              icon: TransactionIcon,
-              badgeClass,
-              label,
-            } = getTransactionTypeStyles(
-              ticket?.transaction_type_name || ""
-            );
+                    <tbody className="divide-y divide-gray-100">
+                      {recentStockMovement.map(
+                        (ticket: RecentStockMovementProps, index: number) => {
+                          const {
+                            icon: TransactionIcon,
+                            badgeClass,
+                            label,
+                          } = getTransactionTypeStyles(
+                            ticket?.transaction_type_name || "",
+                          );
 
-            return (
-              <tr
-                key={index}
-                className="hover:bg-gray-50 transition-colors"
-              >
-                {/* Date */}
-                <td className="px-3 py-3 text-xs text-gray-700">
-                  {ticket?.transaction_date || "-"}
-                </td>
+                          return (
+                            <tr
+                              key={index}
+                              className="h-[46px] hover:bg-gray-50 transition-colors"
+                            >
+                              {/* Date */}
+                              <td className="px-3 py-1.5 align-middle">
+                                <div className="text-[11px] text-gray-700 whitespace-nowrap">
+                                  {ticket?.transaction_date || "-"}
+                                </div>
+                              </td>
 
-                {/* Type */}
-                <td className="px-3 py-3">
-                  <span
-                    className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium whitespace-nowrap ${badgeClass}`}
-                  >
-                    <TransactionIcon className="w-3 h-3" />
+                              {/* Type */}
+                              <td className="px-3 py-1.5 align-middle">
+                                <span
+                                  className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-medium whitespace-nowrap ${badgeClass}`}
+                                >
+                                  <TransactionIcon className="w-3 h-3" />
+                                  {label}
+                                </span>
+                              </td>
 
-                    {label}
-                  </span>
-                </td>
+                              {/* Product */}
+                              <td className="px-3 py-1.5 align-middle">
+                                <div className="truncate text-[11px] font-semibold text-gray-900">
+                                  {ticket?.company_product_name || "-"}
+                                </div>
+                              </td>
 
-                {/* Product */}
-                <td className="px-3 py-3">
-                  <div className="truncate text-xs font-semibold text-gray-900">
-                    {ticket?.company_product_name || "-"}
-                  </div>
-                </td>
+                              {/* Transaction */}
+                              <td className="px-3 py-1.5 align-middle">
+                                <div className="truncate text-[11px] text-gray-600">
+                                  {ticket?.transaction_type_name || "-"}
+                                </div>
+                              </td>
 
-                {/* Transaction */}
-                <td className="px-3 py-3">
-                  <div className="truncate text-xs text-gray-600">
-                    {ticket?.transaction_type_name || "-"}
-                  </div>
-                </td>
+                              {/* Qty */}
+                              <td className="px-2 py-1.5 align-middle text-center">
+                                <span className="text-[11px] font-medium text-gray-700">
+                                  {ticket?.abs || 0}
+                                </span>
+                              </td>
 
-                {/* Qty */}
-                <td className="px-3 py-3 text-center text-xs font-medium text-gray-700">
-                  {ticket?.abs || 0}
-                </td>
+                              {/* Value */}
+                              <td className="px-3 py-1.5 align-middle text-right">
+                                <span className="text-[11px] font-semibold text-gray-900 whitespace-nowrap">
+                                  ₹
+                                  {ticket?.total_cost
+                                    ? Number(ticket.total_cost).toLocaleString()
+                                    : "0"}
+                                </span>
+                              </td>
 
-                {/* Value */}
-                <td className="px-3 py-3 text-right text-xs font-semibold text-gray-900">
-                  ₹
-                  {ticket?.total_cost
-                    ? Number(ticket.total_cost).toLocaleString()
-                    : "0"}
-                </td>
+                              {/* User */}
+                              <td className="px-4 py-1.5 align-middle">
+                                <div className="flex items-center gap-2 min-w-0">
+                                  {/* Avatar */}
+                                  <div className="w-5 h-5 rounded-full bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center text-white text-[9px] font-semibold flex-shrink-0">
+                                    {ticket?.createdby
+                                      ?.charAt(0)
+                                      ?.toUpperCase() || "U"}
+                                  </div>
 
-                {/* Performed By */}
-                <td className="px-6 py-3">
-                  <div className="flex items-center gap-2 min-w-0">
-                    {/* Avatar */}
-                    <div className="w-6 h-6 rounded-full bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center text-white text-[10px] font-semibold flex-shrink-0">
-                      {ticket?.createdby
-                        ?.charAt(0)
-                        ?.toUpperCase() || "U"}
-                    </div>
-
-                    {/* Name */}
-                    <span className="truncate text-xs font-medium text-gray-700">
-                      {ticket?.createdby || "Unknown"}
-                    </span>
-                  </div>
-                </td>
-              </tr>
-            );
-          }
-        )}
-      </tbody>
-    </table>
-  </div>
-</div>
+                                  {/* Name */}
+                                  <div className="min-w-0">
+                                    <p className="truncate text-[11px] font-medium text-gray-700">
+                                      {ticket?.createdby || "Unknown"}
+                                    </p>
+                                  </div>
+                                </div>
+                              </td>
+                            </tr>
+                          );
+                        },
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
         )}
       </div>
     </motion.div>
