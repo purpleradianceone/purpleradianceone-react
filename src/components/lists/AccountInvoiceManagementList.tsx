@@ -231,7 +231,7 @@ function AccountInvoiceManagementList({
 
     return (
       <div
-        className={`w-full ${position === "left"} ${isUsedForSidebar ? "pl-5" : ""} gap-1`}
+        className={`w-full ${position === "left"} ${isUsedForSidebar ? (userPreference.isLeftMenu ? "pl-5" : "pl-1") : ""} gap-1`}
       >
         {isSubmitting && <LoadingPopUpAnimation show={isSubmitting} />}
         {/* 🔹 Header */}
@@ -415,7 +415,7 @@ function AccountInvoiceManagementList({
                   }`
                 : `ag-theme-balham w-full ${
                     isUsedForSidebar
-                      ? "h-[calc(100vh-192px)]"
+                      ? "h-[calc(100vh-122px)]"
                       : isUsedForSidebar
                         ? "h-[calc(40vh-100px)]"
                         : "h-[calc(50vh-122px)]"

@@ -56,7 +56,7 @@ import { LocalStorageKeys } from "../../../../enums/LocalStorageKeys";
 import { AppVersionViewCard } from "../../card/AppVersionViewCard";
 import { useUserPreference } from "../../../../context/user/UserPreference";
 import QuotationIconSvg from "../../../quotation-builder/svg/QuotationIconSvg";
-import { FaRegFileAlt } from "react-icons/fa";
+import { FaRegFileAlt, FaRegFileArchive } from "react-icons/fa";
 
 function Navbar({ children }: { children: React.ReactNode }) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -78,6 +78,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
     userHasAccessToViewSupportTicket,
     userHasAccessToViewTasks,
     userHasAccessToViewCompanyInvoice,
+    userHasAccessToAddAccountProformaInvoice,
     userHasAccessToViewCompanyQuotation,
     userHasAccessToViewCompanyProductSale,
   } = useUserAccessModules();
@@ -669,6 +670,12 @@ function Navbar({ children }: { children: React.ReactNode }) {
                           to={ROUTES_URL.INVOICE_MANAGEMENT}
                           icon={<FaRegFileAlt size={SIZE.TWENTY} />}
                           label="Invoices"
+                        />
+                        <NavItem
+                          disable={!userHasAccessToAddAccountProformaInvoice}
+                          to={ROUTES_URL.ACCOUNT_PROFORMA_INVOICE_MANAGEMENT}
+                          icon={<FaRegFileArchive size={SIZE.TWENTY} />}
+                          label="Proforma"
                         />
 
                         <NavItem
