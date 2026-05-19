@@ -110,8 +110,13 @@ import { motion } from "framer-motion";
 import { BsChatLeftTextFill, BsPersonCheckFill } from "react-icons/bs";
 import { CiCalendar } from "react-icons/ci";
 import { LuFileText } from "react-icons/lu";
+import { NavLink } from "react-router-dom";
 function Hero() {
-  const [ref, inView] = useInView({ fallbackInView: true, threshold: 0.1 });
+  const [ref, inView] = useInView({
+    fallbackInView: true,
+    threshold: 0.1,
+    triggerOnce: true,
+  });
   return (
     <motion.section
       ref={ref}
@@ -140,12 +145,15 @@ function Hero() {
           </p>
 
           <div className="flex justify-center gap-4 mt-8 font-dm flex-wrap">
-            <button className="bg-purple text-white px-6 py-3 rounded-full hover:bg-purple-dark transition">
+            <button className="hidden bg-purple text-white px-6 py-3 rounded-full hover:bg-purple-dark transition">
               Start free trial
             </button>
-            <button className="border border-purple text-purple px-6 py-3 rounded-full hover:bg-purple-light transition">
-              See demo
-            </button>
+
+            <NavLink to="/contactUs">
+              <button className="border border-purple text-purple px-6 py-3 rounded-full hover:bg-purple-light transition">
+                See demo
+              </button>
+            </NavLink>
           </div>
 
           <div className="flex flex-wrap justify-center gap-2 mt-6">
@@ -663,12 +671,15 @@ function Hero() {
 
           {/* Buttons */}
           <div className="mt-10 flex flex-col sm:flex-row justify-center font-dm gap-4">
-            <button className="bg-purple hover:bg-purple-dark text-white font-medium px-8 py-4 rounded-full transition-all text-[15px]">
+            <button className="hidden bg-purple hover:bg-purple-dark text-white font-medium px-8 py-4 rounded-full transition-all text-[15px]">
               Start your free trial
             </button>
-            <button className="border border-gray-700 hover:border-white text-white font-medium px-8 py-4 rounded-full transition-all text-[15px]">
-              Book a demo
-            </button>
+
+            <NavLink to="/contactUs">
+              <button className="border border-gray-700 hover:border-white text-white font-medium px-8 py-4 rounded-full transition-all text-[15px]">
+                Book a demo
+              </button>
+            </NavLink>
           </div>
         </section>
         {/* <div className="fixed bottom-0 left-0 w-full bg-white border-t shadow-md font-dm p-2 flex gap-3 z-50 ">

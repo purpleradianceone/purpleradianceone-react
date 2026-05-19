@@ -103,7 +103,11 @@ import { CiCalendar } from "react-icons/ci";
 import { LuFileText } from "react-icons/lu";
 
 function AboutUs() {
-  const [ref, inView] = useInView({ fallbackInView: true, threshold: 0.1 });
+  const [ref, inView] = useInView({
+    fallbackInView: true,
+    threshold: 0.1,
+    triggerOnce: true,
+  });
   return (
     <motion.section
       ref={ref}

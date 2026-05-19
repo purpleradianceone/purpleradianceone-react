@@ -115,6 +115,7 @@ import { useInView } from "react-intersection-observer";
 import { BsWhatsapp, BsPersonCheckFill, BsBoxSeam } from "react-icons/bs";
 
 import { LuUsers, LuFileText, LuReceipt, LuTicket } from "react-icons/lu";
+import { NavLink } from "react-router-dom";
 
 const features = [
   {
@@ -248,6 +249,7 @@ export default function FeaturesPage() {
   const [ref, inView] = useInView({
     threshold: 0.1,
     fallbackInView: true,
+    triggerOnce: true,
   });
 
   return (
@@ -430,7 +432,7 @@ export default function FeaturesPage() {
                 <div className="bg-[#d9fdd3] rounded-2xl rounded-br-sm p-4 max-w-sm ml-auto">
                   <p className="text-sm font-dm">
                     Sure! Here's your invoice 🧾 Amount: ₹2,500 Pay here →
-                    pay.purpleradiance.in/inv001 
+                    pay.purpleradiance.in/inv001
                     <br />
                     <br />
                     Valid for 3 days.
@@ -540,13 +542,14 @@ export default function FeaturesPage() {
         </p>
 
         <div className="flex flex-wrap justify-center gap-4 mt-10">
-          <button className="bg-white text-purple px-8 py-4 rounded-full font-semibold hover:scale-105 transition-all">
+          <button className="hidden bg-white text-purple px-8 py-4 rounded-full font-semibold hover:scale-105 transition-all">
             Start Free Trial
           </button>
-
-          <button className="border border-white/30 px-8 py-4 rounded-full font-semibold hover:bg-white/10 transition-all">
-            Book a Demo
-          </button>
+          <NavLink to="/contactUs">
+            <button className="border border-white/30 px-8 py-4 rounded-full font-semibold hover:bg-white/10 transition-all">
+              Book a Demo
+            </button>
+          </NavLink>
         </div>
       </section>
 
