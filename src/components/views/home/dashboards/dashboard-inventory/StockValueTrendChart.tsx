@@ -98,16 +98,16 @@ const StockValueTrendChart = ({
           duration: 0.35,
           ease: "easeOut",
         }}
-        className="flex flex-col flex-1 min-h-0"
+        className="flex flex-col h-full min-h-0"
       >
         {/* Header */}
-        <div className="flex items-center justify-between mb-4 flex-shrink-0">
+        <div className="flex items-center justify-between mb-4 flex-shrink-0 border-b border-gray-100 ">
           <div>
-            <h3 className="text-sm font-semibold text-gray-900">
+            <h3 className="table-header-custom">
               Stock Value Trend
             </h3>
 
-            <p className="text-xs text-gray-500 mt-0.5">
+            <p className="caption-custom mb-2">
               Daily inward & outward values
             </p>
           </div>
