@@ -94,13 +94,13 @@ function RecentStockMovement({ isLoading, recentStockMovement = [] }: Props) {
                       <col style={{ width: "110px" }} />
                       <col style={{ width: "150px" }} />
                       <col style={{ width: "100px" }} />
-                      <col style={{ width: "50px" }} />
-                      <col style={{ width: "110px" }} />
-                      <col style={{ width: "200px" }} />
+                      <col style={{ width: "45px" }} />
+                      <col style={{ width: "115px", alignContent:"start" }} />
+                      <col style={{ width: "128px" }} />
                     </colgroup>
 
                     <thead>
-                      <tr className="h-9">
+                      <tr className="h-9 table-header-custom">
                         <th className="px-3 py-2 text-left align-middle text-[10px] font-semibold uppercase tracking-wide text-gray-500">
                           Date
                         </th>
@@ -135,7 +135,7 @@ function RecentStockMovement({ isLoading, recentStockMovement = [] }: Props) {
 
                 {/* Body */}
                 <div className="max-h-[340px] overflow-y-auto overflow-x-hidden">
-                  <table className="w-full table-fixed border-collapse">
+                  <table className="w-full table-fixed border-collapse table-data-custom">
                     <colgroup>
                       <col style={{ width: "125px" }} />
                       <col style={{ width: "110px" }} />
@@ -143,7 +143,7 @@ function RecentStockMovement({ isLoading, recentStockMovement = [] }: Props) {
                       <col style={{ width: "100px" }} />
                       <col style={{ width: "50px" }} />
                       <col style={{ width: "110px" }} />
-                      <col style={{ width: "200px" }} />
+                      <col style={{ width: "120px" }} />
                     </colgroup>
 
                     <tbody className="divide-y divide-gray-100">

@@ -298,7 +298,7 @@ const InventoryDashboard: React.FC<DashboardInventoryProp> = ({
       <div
       id="topLowStockProducts"
         key="Top Low Stock Products"
-        className="flex col-span-1 w-full gap-4 justify-around"
+        className="flex col-span-1 w-full h-full gap-4 justify-around"
       >
         <div className="flex sm:gap-1 md:gap-2 lg:gap-11 w-full">
           <TopLowStockProducts
@@ -328,7 +328,7 @@ const InventoryDashboard: React.FC<DashboardInventoryProp> = ({
       <div
         id="stockValueTrend"
         key="Stock Value Trend"
-        className="min-h-[200px] col-span-1"
+        className="min-h-[200px] h-full col-span-1"
       >
         {/* <SalesChart leadsData={stockValueTrend} /> */}
         <StockValueTrendChart stockValueTrend={stockValueTrend}/>
