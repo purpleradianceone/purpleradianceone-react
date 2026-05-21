@@ -18,6 +18,7 @@ import {
   MapPin,
   Pen,
   ReceiptText,
+  Save,
   ShoppingBag,
   User,
 } from "lucide-react";
@@ -32,6 +33,8 @@ import AccessDeniedMessagePage from "../../../../views/not-found/AccessDeniedMes
 import MESSAGE from "../../../../../constants/Messages";
 import FormInput from "../../../../ui/FormInput";
 import { updateAccountCompanyProductSerialNumberApiCall } from "../../../../../config/apis/AccountApis";
+import Button from "../../../../ui/Button";
+import LoadingSpinner from "../../../../../assets/animations/LoadingSpinner";
 
 export const AccountCompanyProductDetailsCard = ({
   selectedProductCard,
@@ -49,6 +52,7 @@ export const AccountCompanyProductDetailsCard = ({
   );
   const [originalProductData, setOriginalProductData] =
     useState<AccountProduct | null>(selectedProductCard);
+  const [isSaving, setIsSaving] = useState<boolean>(false);
 
   //  Fix: Update productData whenever selectedProductCard changes
   useEffect(() => {
@@ -80,7 +84,7 @@ export const AccountCompanyProductDetailsCard = ({
     purchaseDate: "purchase_date",
     deliveryDate: "delivery_date",
     installationDate: "installation_date",
-    totalCost: "total_cost"
+    totalCost: "total_cost",
     // add mappings only where API differs
   };
 
@@ -102,13 +106,14 @@ export const AccountCompanyProductDetailsCard = ({
     const apiField = ACCOUNT_PRODUCT_API_FIELD_MAP[field] ?? field;
 
     try {
+      setIsSaving(true);
       const postData = {
         id: productData.id,
         [apiField]: value,
         total_cost:
           field === "totalCost"
             ? value
-            : productData.totalCost ?? originalProductData.totalCost,
+            : (productData.totalCost ?? originalProductData.totalCost),
         company_id: loginStatus.companyId,
         updatedby_id: loginStatus.id,
       };
@@ -139,6 +144,8 @@ export const AccountCompanyProductDetailsCard = ({
       setProductData((prev) =>
         prev ? { ...prev, [field]: originalProductData[field] } : prev,
       );
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -169,14 +176,16 @@ export const AccountCompanyProductDetailsCard = ({
 
   // Note : this useeffect will run when user will update the serial number
   useEffect(() => {
-
     if (productSerialNumber === originalProductSerialNumber) return;
     if (timeoutRefForProductSerialNumber.current) {
       clearTimeout(timeoutRefForProductSerialNumber.current);
     }
 
     timeoutRefForProductSerialNumber.current = window.setTimeout(() => {
-      updateAccountCompanyProductSerialNumber(productData?.id, productSerialNumber);
+      updateAccountCompanyProductSerialNumber(
+        productData?.id,
+        productSerialNumber,
+      );
     }, 1000);
 
     return () => {
@@ -189,7 +198,7 @@ export const AccountCompanyProductDetailsCard = ({
   // Note : update api call for account-company-product-serial-number
   const updateAccountCompanyProductSerialNumber = async (
     id: number | undefined,
-    value: string | null
+    value: string | null,
   ) => {
     if (!id) return;
     try {
@@ -256,11 +265,27 @@ export const AccountCompanyProductDetailsCard = ({
     "installationDate",
     "purchaseDate",
     "deliveryDate",
-    "totalCost"
+    "totalCost",
     // add only backend fields here
   ];
 
-  useEffect(() => {
+  // useEffect(() => {
+  //   if (!productData || !originalProductData) return;
+  //   const changedField = API_UPDATABLE_FIELDS.find(
+  //     (key) => productData[key] !== originalProductData[key],
+  //   );
+
+  //   if (!changedField) return;
+
+  //   const timer = setTimeout(() => {
+  //     updateAccountCompanyProduct(changedField, productData[changedField]);
+  //   }, 1000);
+
+  //   return () => clearTimeout(timer);
+  // }, [productData]);
+
+  const handleUpdate = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
     if (!productData || !originalProductData) return;
 
     // const changedField = (
@@ -274,12 +299,8 @@ export const AccountCompanyProductDetailsCard = ({
 
     if (!changedField) return;
 
-    const timer = setTimeout(() => {
-      updateAccountCompanyProduct(changedField, productData[changedField]);
-    }, 1000);
-
-    return () => clearTimeout(timer);
-  }, [productData]);
+    await updateAccountCompanyProduct(changedField, productData[changedField]);
+  };
 
   if (selectedProductCard === null) return null;
   if (!userHasAccessToViewAccountProducts)
@@ -292,11 +313,11 @@ export const AccountCompanyProductDetailsCard = ({
     );
 
   return (
-    <div className="px-1  py-0.5">
+    <form onSubmit={handleUpdate} className="px-1  py-0.5">
       {/* user access : {userHasAccessToUpdateAccount ? "true" : "false"} */}
       {/* Header */}
       <div className="grid  w-full grid-cols-4 md:grid-cols-4 gap-1    rounded p-0.5 pt-1">
-        <div className=" col-span-4 flex items-center">
+        <div className=" col-span-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
             {/* Logo */}
             <div
@@ -334,6 +355,24 @@ export const AccountCompanyProductDetailsCard = ({
               </span>
             </div>
           </div>
+          <div>
+            <Button
+              className={`flex action-btn-custom items-center gap-1 border px-2 rounded-md py-1 ${isSaving ? "opacity-30" : " "} bg-blue-600 text-white`}
+              disabled={isSaving}
+              autoFocus
+              type="submit"
+            >
+               {isSaving ? <>
+               <LoadingSpinner colour="white"  height={20} width={20}/>
+                Saving 
+               </>
+               : <>
+               
+                <Save size={16} /> Save
+               </>
+               }
+            </Button>
+          </div>
         </div>
         <DisplayComponent
           icon={ShoppingBag}
@@ -341,8 +380,8 @@ export const AccountCompanyProductDetailsCard = ({
           value={
             productData?.quantity
               ? productData.quantity
-                .toLocaleString()
-                .concat(" " + productData!.unitNameInStock)
+                  .toLocaleString()
+                  .concat(" " + productData!.unitNameInStock)
               : ""
           }
           penLogo={false}
@@ -356,7 +395,6 @@ export const AccountCompanyProductDetailsCard = ({
           />
         )}
         {productData?.serialNumber && (
-
           <FormInput
             logo={FileDigit}
             label="Serial Number"
@@ -480,7 +518,7 @@ export const AccountCompanyProductDetailsCard = ({
         accountCompanyProductId={selectedProductCard.id}
       />
       {/* </div> */}
-    </div>
+    </form>
   );
 };
 
@@ -509,8 +547,8 @@ export function DisplayComponent({
             {value.length > 30
               ? value.substring(0, 29).concat("...")
               : value || (
-                <span className="text-gray-400 italic">Not provided</span>
-              )}
+                  <span className="text-gray-400 italic">Not provided</span>
+                )}
           </p>
           {penLogo && <Pen className="text-blue-500 " size={14} />}
         </div>
