@@ -13,7 +13,7 @@ import {
   ICellRendererParams,
   themeBalham,
   GridApi,
-    GridReadyEvent,
+  GridReadyEvent,
 } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 import { CheckCircle2, XCircle } from "lucide-react";
@@ -27,7 +27,7 @@ const ProductsManagementGridLead: React.FC<LeadProductsManagementGridProps> = ({
   interestTypeData,
   handleProductCheckboxChange,
   alreadyAssignedCompanyProduct = [],
-  isDataLoading
+  isDataLoading,
 }) => {
   const [gridApi, setGridApi] = useState<GridApi | null>(null);
   const [rowData, setRowData] = useState<Product[]>(products); // State for row data
@@ -38,12 +38,11 @@ const ProductsManagementGridLead: React.FC<LeadProductsManagementGridProps> = ({
     setRowData(products);
   }, [products]);
 
-  
   const actionCellRenderer = useCallback(
     (params: ICellRendererParams) => {
       if (params.data?.__isSkeleton) {
-                            return <SkeletonRowsAgGrid />;
-                          }
+        return <SkeletonRowsAgGrid />;
+      }
       const currentId = params.data.id;
       const alreadyAssignedIds =
         alreadyAssignedCompanyProduct?.map((p) => p.companyProductId) || [];
@@ -58,22 +57,22 @@ const ProductsManagementGridLead: React.FC<LeadProductsManagementGridProps> = ({
         params.data.expectedCost != null && params.data.expectedCost !== "";
 
       // const allFieldsFilled = isInterestFilled && isQtyFilled && isCostFilled;
-      const allFieldsFilled =   isQtyFilled && isCostFilled;
+      const allFieldsFilled = isQtyFilled && isCostFilled;
 
       const isBlocked = !allFieldsFilled && !isAlreadyAssigned;
       const isChecked = isAlreadyAssigned || params.data.checked;
       const title = isAlreadyAssigned
         ? "Already Assigned to Lead"
         : isBlocked
-        ? "Please fill Required Quantity and Expected Cost."
-        : "";
-      const handleShowToaster = () =>{
-        if(isBlocked){
+          ? "Please fill Required Quantity and Expected Cost."
+          : "";
+      const handleShowToaster = () => {
+        if (isBlocked) {
           toast.error("Please fill Required Quantity and Expected Cost.");
         }
-  }
+      };
       const handleCheckboxChangeLocal = (
-        event: React.ChangeEvent<HTMLInputElement>
+        event: React.ChangeEvent<HTMLInputElement>,
       ) => {
         if (isBlocked || isAlreadyAssigned) {
           event.preventDefault();
@@ -83,34 +82,37 @@ const ProductsManagementGridLead: React.FC<LeadProductsManagementGridProps> = ({
           handleProductCheckboxChange(params.data, event);
         }
 
-         if (gridApi) {
-                    // Safely access params.node.id
-                    const rowNodeId = params.node.id;
-                    if (rowNodeId) {
-                        const rowNode = params.api.getRowNode(rowNodeId);
-                        if (rowNode) {
-                            // Directly update the data in the grid
-                            rowNode.setDataValue("checked", event.target.checked);
-                            // No need to update the entire rowData state here.  Ag-Grid knows about the change.
-                            params.data.checked = event.target.checked; // Keep data in cellRenderer consistent
-                            params.api.refreshCells({
-                                rowNodes: [rowNode],
-                                columns: ["Action"],
-                                force: true,
-                            });
-                        }
-                    }
-                }
+        if (gridApi) {
+          // Safely access params.node.id
+          const rowNodeId = params.node.id;
+          if (rowNodeId) {
+            const rowNode = params.api.getRowNode(rowNodeId);
+            if (rowNode) {
+              // Directly update the data in the grid
+              rowNode.setDataValue("checked", event.target.checked);
+              // No need to update the entire rowData state here.  Ag-Grid knows about the change.
+              params.data.checked = event.target.checked; // Keep data in cellRenderer consistent
+              params.api.refreshCells({
+                rowNodes: [rowNode],
+                columns: ["Action"],
+                force: true,
+              });
+            }
+          }
+        }
       };
 
       return (
-
-        <div className="flex items-center justify-center mt-1" title={title} onClick={handleShowToaster}>
+        <div
+          className="flex items-center justify-center mt-1"
+          title={title}
+          onClick={handleShowToaster}
+        >
           <input
             type="checkbox"
             onChange={handleCheckboxChangeLocal}
             checked={isChecked}
-            disabled={isChecked && isAlreadyAssigned }
+            disabled={isChecked && isAlreadyAssigned}
             className={`accent-blue-500 ${
               isBlocked || isAlreadyAssigned
                 ? "cursor-not-allowed"
@@ -120,7 +122,7 @@ const ProductsManagementGridLead: React.FC<LeadProductsManagementGridProps> = ({
         </div>
       );
     },
-    [alreadyAssignedCompanyProduct, handleProductCheckboxChange, gridApi]
+    [alreadyAssignedCompanyProduct, handleProductCheckboxChange, gridApi],
   );
 
   const columnDefs = useMemo<ColDef[]>(
@@ -140,44 +142,100 @@ const ProductsManagementGridLead: React.FC<LeadProductsManagementGridProps> = ({
         maxWidth: 60,
         cellRenderer: actionCellRenderer,
       },
+      // {
+      //   field: "interest",
+      //   headerName: "Interest",
+      //   editable: true,
+      //   cellEditor: "agSelectCellEditor",
+      //   cellEditorParams: {
+      //     values:
+      //       Array.isArray(interestTypeData) &&
+      //       interestTypeData.map((item) => item.id),
+      //   },
+      //   flex: 1,
+
+      //   valueGetter : (params ) =>{
+      //     return params.data.interest  ?? 2;
+      //   },
+      //   valueFormatter: (params) => {
+      //     if (params.value == null || params.value === "")
+      //       return "Select Interest";
+      //     const interestObj = interestTypeData.find(
+      //       (i) => i.id === params.value
+      //     );
+      //     return interestObj ? interestObj.name : "Unknown Interest";
+      //   },
+      //   valueParser: (params) => {
+      //     const selectedId = params.newValue;
+      //     return selectedId;
+      //   },
+      // },
+
       {
-        field: "interest",
-        headerName: "Interest",
-        editable: true,
-        cellEditor: "agSelectCellEditor",
-        cellEditorParams: {
-          values:
-            Array.isArray(interestTypeData) &&
-            interestTypeData.map((item) => item.id),
-        },
-        flex: 1,
-        
-        valueGetter : (params ) =>{
-          return params.data.interest  ?? 2;
-        },
-        valueFormatter: (params) => {
-          if (params.value == null || params.value === "")
-            return "Select Interest";
-          const interestObj = interestTypeData.find(
-            (i) => i.id === params.value
-          );
-          return interestObj ? interestObj.name : "Unknown Interest";
-        },
-        valueParser: (params) => {
-          const selectedId = params.newValue;
-          return selectedId;
-        },
-      },
+  field: "interest",
+  headerName: "Interest",
+  editable: true,
+  flex: 1,
+
+  cellEditor: "agSelectCellEditor",
+
+  cellEditorParams: {
+    values: Array.isArray(interestTypeData)
+      ? interestTypeData.map((item) => item.id)
+      : [],
+  },
+
+  valueGetter: (params) => {
+    return params.data.interest ?? 2;
+  },
+
+  valueParser: (params) => {
+    return params.newValue;
+  },
+
+  valueFormatter: (params) => {
+    if (
+      params.value === null ||
+      params.value === undefined ||
+      params.value === ""
+    ) {
+      return "Select Interest";
+    }
+
+    const interestObj = interestTypeData.find(
+      (i) => String(i.id) === String(params.value)
+    );
+
+    return interestObj ? interestObj.name : "Select Interest";
+  },
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  cellRenderer: (params : any) => {
+    if (
+      params.value === null ||
+      params.value === undefined ||
+      params.value === ""
+    ) {
+      return "Select Interest";
+    }
+
+    const interestObj = interestTypeData.find(
+      (i) => String(i.id) === String(params.value)
+    );
+
+    return interestObj ? interestObj.name : "Select Interest";
+  },
+},
       {
         field: "requiredQuantity",
         headerName: "Req. Quantity",
         flex: 1,
         cellRenderer: (params: ICellRendererParams) => {
           if (params.data?.__isSkeleton) {
-                            return <SkeletonRowsAgGrid />;
-                          }
+            return <SkeletonRowsAgGrid />;
+          }
           const [value, setValue] = useState<string | number>(
-            params.value ?? ""
+            params.value ?? "",
           );
 
           const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -224,10 +282,10 @@ const ProductsManagementGridLead: React.FC<LeadProductsManagementGridProps> = ({
         flex: 1,
         cellRenderer: (params: ICellRendererParams) => {
           if (params.data?.__isSkeleton) {
-                            return <SkeletonRowsAgGrid />;
-                          }
+            return <SkeletonRowsAgGrid />;
+          }
           const [value, setValue] = useState<string | number>(
-            params.value ?? ""
+            params.value ?? "",
           );
           const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
             const val = e.target.value;
@@ -314,8 +372,8 @@ const ProductsManagementGridLead: React.FC<LeadProductsManagementGridProps> = ({
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         cellRenderer: (params: ICellRendererParams<Product | any>) => {
           if (params.data?.__isSkeleton) {
-                            return <SkeletonRowsAgGrid />;
-                          }
+            return <SkeletonRowsAgGrid />;
+          }
           return (
             <div className="flex items-center gap-1 mt-1">
               {params.value ? (
@@ -389,7 +447,7 @@ const ProductsManagementGridLead: React.FC<LeadProductsManagementGridProps> = ({
         flex: 1,
       },
     ],
-    [interestTypeData, alreadyAssignedCompanyProduct, actionCellRenderer ]
+    [interestTypeData, alreadyAssignedCompanyProduct, actionCellRenderer],
   );
 
   const defaultColDef = useMemo(() => {
@@ -399,12 +457,12 @@ const ProductsManagementGridLead: React.FC<LeadProductsManagementGridProps> = ({
       suppressHeaderMenuButton: true,
       suppressHeaderContextMenu: true,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                        cellRenderer: (params: any) => {
-                          if (params.data?.__isSkeleton) {
-                            return <SkeletonRowsAgGrid />;
-                          }
-                          return params.value;
-                        },
+      cellRenderer: (params: any) => {
+        if (params.data?.__isSkeleton) {
+          return <SkeletonRowsAgGrid />;
+        }
+        return params.value;
+      },
     };
   }, []);
 
@@ -417,7 +475,7 @@ const ProductsManagementGridLead: React.FC<LeadProductsManagementGridProps> = ({
       const initialRowData = products.map((product) => ({
         ...product,
         checked: alreadyAssignedCompanyProduct.some(
-          (p) => p.companyProductId === product.id
+          (p) => p.companyProductId === product.id,
         ),
       }));
       setRowData(initialRowData);
@@ -425,10 +483,10 @@ const ProductsManagementGridLead: React.FC<LeadProductsManagementGridProps> = ({
   }, [gridApi, products, alreadyAssignedCompanyProduct]);
 
   const skeletonRows = useMemo(() => {
-      return Array.from({ length: 30 }).map(() => ({
-        __isSkeleton: true,
-      }));
-    }, []);
+    return Array.from({ length: 30 }).map(() => ({
+      __isSkeleton: true,
+    }));
+  }, []);
   return (
     <div
       className="ag-theme-balham w-full"
@@ -436,7 +494,7 @@ const ProductsManagementGridLead: React.FC<LeadProductsManagementGridProps> = ({
     >
       <AgGridReact
         ref={gridRef}
-        rowData={isDataLoading ? skeletonRows: rowData}
+        rowData={isDataLoading ? skeletonRows : rowData}
         columnDefs={columnDefs}
         defaultColDef={defaultColDef}
         modules={[AllCommunityModule]}
