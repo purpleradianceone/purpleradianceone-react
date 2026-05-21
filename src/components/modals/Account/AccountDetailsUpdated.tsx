@@ -208,7 +208,8 @@ const AccountDetailsUpdated: React.FC = () => {
   };
 
   //Note : handle api sublit logic here
-  const handleSaveAccountDetails = async () => {
+  const handleSaveAccountDetails = async (event : React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
     const normalize = (obj: any) =>
       JSON.stringify(
         Object.fromEntries(Object.entries(obj).map(([k, v]) => [k, v ?? ""])),
@@ -1251,15 +1252,16 @@ const AccountDetailsUpdated: React.FC = () => {
 
   return (
     // Note: Min height given
-    <div className="min-h-56 mt-0.5">
+    <form onSubmit={handleSaveAccountDetails} className="min-h-56 mt-0.5">
       {/* Header Section */}
       {/* Main Content Grid */}
       <div className="grid sm:grid-cols-1 md:grid-cols-1    gap-1">
         {/* Left Card with Tabs */}
         <div className="bg-white rounded-xl  border-slate-200">
-          <div className="col-span-2 bg-white rounded-lg  p-1  mb-1 border">
-            {/* Main header */}
-            <div className="flex items-start justify-between p-1">
+          <div className="col-span-2 bg-white  flex items-center justify-between rounded-lg  p-1  mb-1 border">
+           
+                 {/* header name and logo */}
+            <div className="flex items-start w-[70%]  justify-between p-1">
               <div className="flex w-full items-center space-x-3">
                 <div
                   className={`p-2 rounded-md ${
@@ -1303,7 +1305,15 @@ const AccountDetailsUpdated: React.FC = () => {
                     </>
                   )}
                   {/* </h/1> */}
-                 <div className="flex justify-end">
+                 
+                </div>
+              </div>
+
+              {/* Right side */}
+              {/* Note : metadata */}
+            </div>
+             {/* Save and cancel button */}
+              <div className="flex justify-end items-start h-12 bg-pink-00 ">
                    {!isEditing && (
                     <div 
                     title="Update Account details, primary contact, legal information, address."
@@ -1319,7 +1329,7 @@ const AccountDetailsUpdated: React.FC = () => {
                         }
                       }}
                     >
-                      <span className="bg-blue-500 p-0.5 flex items-center h-[20px] px-1  rounded text-white">  Edit</span>
+                      <button className="bg-blue-500  flex items-center h-[20px] px-1  rounded text-white">  Edit</button>
                     </div>
                   )}
                   {isEditing && (
@@ -1330,27 +1340,22 @@ const AccountDetailsUpdated: React.FC = () => {
                         className="cursor-pointer caption-custom-blue "
                         onClick={handleCancelAccountDetails}
                       >
-                        <span className="bg-gray-400  flex items-center h-[20px] px-1  rounded text-white">Cancel</span>
+                        <button type="button" className="bg-gray-400  flex items-center h-[20px] px-1  rounded text-white">Cancel</button>
                       </div>
                       <div
                         className="cursor-pointer caption-custom-blue "
-                        onClick={handleSaveAccountDetails}
+                        // onClick={handleSaveAccountDetails}
                       >
-                        <span className="bg-blue-600  flex items-center h-[20px] px-1  rounded text-white">Save</span>
+                        <button type="submit" className="bg-blue-600  flex items-center h-[20px] px-1  rounded text-white">Save</button>
                       </div>
                     </div>
                   )}
                  </div>
-                </div>
-              </div>
-
-              {/* Right side */}
-              {/* Note : metadata */}
-            </div>
           </div>
           {/* Tab Navigation */}
           <div className="flex border-b  border-gray-200 ">
             <button
+            type="button"
               onClick={() => setActiveTab("details")}
               className={`flex items-center px-4  rounded-t-lg border-b-2 ${
                 activeTab === "details"
@@ -1362,6 +1367,7 @@ const AccountDetailsUpdated: React.FC = () => {
               Details
             </button>
             <button
+            type="button"
               onClick={() => setActiveTab("primary contact")}
               className={`flex items-center px-2 rounded-t-lg border-b-2 ${
                 activeTab === "primary contact"
@@ -1373,6 +1379,7 @@ const AccountDetailsUpdated: React.FC = () => {
               Primary Contact
             </button>
             <button
+            type="button"
               onClick={() => setActiveTab("legal")}
               className={`flex items-center px-4  p-0.5 rounded-t-lg border-b-2 ${
                 activeTab === "legal"
@@ -1384,6 +1391,7 @@ const AccountDetailsUpdated: React.FC = () => {
               Legal
             </button>
             <button
+            type="button"
               onClick={() => setActiveTab("address")}
               className={`flex items-center px-4 py-0.5 rounded-t-lg border-b-2 ${
                 activeTab === "address"
@@ -1400,7 +1408,7 @@ const AccountDetailsUpdated: React.FC = () => {
           {renderTabContent()}
         </div>
       </div>
-    </div>
+    </form>
   );
 };
 

@@ -4,7 +4,7 @@ import { Loader2 } from "lucide-react";
 interface LoadingSpinnerProps {
   width?: number;
   height?: number;
-  colour? : "blue" | "gray" | "red"
+  colour? : "blue" | "gray" | "red"| "white"
 }
 
 // Note : Can give custom hieght , width and colour also.
@@ -18,7 +18,7 @@ const LoadingSpinner = ({
     <div className="w-full h-full flex items-center justify-center">
       <Loader2
         style={{ width, height }}
-        className={`text-${colour}-600 animate-spin`}
+        className={`${colour ==="white" ? `text-white`: `text-${colour}-600`}  animate-spin`}
       />
     </div>
   );
