@@ -6,5 +6,6 @@ type DateRangeFilterDropdownProps =  {
   handleDateIdChange? : (dateId : number) => void;
   selectedOption ?: string ;
   height?: string;
+  showBorder?: boolean;
 }
  export default DateRangeFilterDropdownProps;

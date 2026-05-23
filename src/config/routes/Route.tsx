@@ -457,7 +457,7 @@ export const router = createBrowserRouter([
       </MobileRedirectWrapper>
     ),
   },
-   {
+  {
     path: ROUTES_URL.COMPANY_PRODUCT_SALE_MANAGEMENT,
     element: (
       <MobileRedirectWrapper>
@@ -971,6 +971,7 @@ export const router = createBrowserRouter([
                 onClose={() => {
                   window.history.back();
                 }}
+                onUserAdded={() => {}}
               ></AddCompanyUserModal>
             </Navbar>
           </div>

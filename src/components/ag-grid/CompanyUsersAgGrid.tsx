@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { AllCommunityModule, ColDef} from "ag-grid-community";
+import { AllCommunityModule, ColDef } from "ag-grid-community";
 
 import { AgGridReact } from "ag-grid-react";
 
@@ -10,7 +10,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Edit,
   LucideLayoutDashboard,
-  MoreHorizontal,
+  
   UserCheck,
 } from "lucide-react";
 
@@ -36,7 +36,9 @@ import { CompanyUsersGridActionsButtonStep } from "../../constants/AppTutorailsS
 
 import { SkeletonRowsAgGrid } from "../ui/SkeletonRowsAgGrid";
 import { avatarColors } from "../../utils/colourSpecifierForNameInAggrid";
-
+import GridActionButton from "../ui/GridActionButton";
+import StatusBadge from "../ui/StatusBadge";
+import RenderUserWithIcon from "../ui/UserAgGridCellRenderer";
 
 function CompanyUserAgGrid({
   users,
@@ -48,7 +50,7 @@ function CompanyUserAgGrid({
   isActionsTourEnded,
   isUsedInAccountProductForAssingingInstalledBy,
   onRowSelect,
-  isDataLoading
+  isDataLoading,
 }: CompanyUserAgGridProps) {
   const {
     userHasAccessToViewAccess,
@@ -94,7 +96,6 @@ function CompanyUserAgGrid({
           if (params.data?.__isSkeleton) {
             return <SkeletonRowsAgGrid />;
           }
-
           const name =
             params.data?.fullname?.trim() ||
             params.data?.email?.trim() ||
@@ -115,7 +116,7 @@ function CompanyUserAgGrid({
           return (
             <div className="flex items-center  gap-3 h-full overflow-visible  px-2">
               <div
-                className={`w-8 h-8  rounded-full text-white text-xs font-semibold flex items-center justify-center flex-shrink-0 overflow-hidden ${avatarColors[colorIndex]}`}
+                className={`w-7 h-7  rounded-full text-white text-xs font-semibold flex items-center justify-center flex-shrink-0 overflow-hidden ${avatarColors[colorIndex]}`}
               >
                 {initials}
               </div>
@@ -141,7 +142,6 @@ function CompanyUserAgGrid({
         sortable: true,
         filter: true,
         flex: 1.5,
-
       },
 
       {
@@ -158,40 +158,26 @@ function CompanyUserAgGrid({
         filter: false,
         flex: 1,
 
-cellRenderer: (params: any) => {
-  if (params.data?.__isSkeleton) {
-    return <SkeletonRowsAgGrid />;
-  }
+        cellRenderer: (params: any) => {
+          if (params.data?.__isSkeleton) {
+            return <SkeletonRowsAgGrid />;
+          }
 
-  return (
-    <div className="h-full flex items-center">
-      <div
-        className={`font-sans-status-card ${
-          params.value
-            ? "bg-green-100 text-green-900"
-            : "bg-red-100 text-red-700"
-        }`}
-      >
-        <div
-          className={`w-1.5 h-1.5 rounded-full ${
-            params.value ? "bg-green-900" : "bg-red-600"
-          }`}
-        />
-
-        {params.value ? "Active" : "Inactive"}
-      </div>
-    </div>
-  );
-},
-    },
+          return (
+            <div className="h-full flex items-center">
+              <StatusBadge isActive={params.value} />
+            </div>
+          );
+        },
+      },
 
       {
         field: "createdby",
+        cellRenderer: RenderUserWithIcon,
         headerName: "Created By",
         sortable: true,
         filter: true,
         flex: 1,
-
       },
 
       {
@@ -200,8 +186,6 @@ cellRenderer: (params: any) => {
         sortable: true,
         filter: true,
         flex: 1,
-
-        
       },
 
       {
@@ -310,29 +294,11 @@ cellRenderer: (params: any) => {
 
           return (
             <>
-              <div className="flex items-center justify-center h-full">
-                <button
-                
+              <div>
+                <GridActionButton
                   id="actions-button"
-                 className="
-                  w-7 h-7
-                  flex items-center justify-center
-                  rounded-lg
-                  border border-slate-300
-                  bg-white
-                  text-slate-500
-                  hover:bg-slate-50
-                  hover:text-slate-600
-                  transition-all duration-150
-                  shadow-sm
-                "
-              
-              onClick={handleActionsButtonClick}>
-                <MoreHorizontal
-                  size={16}
-                  strokeWidth={1.2}
+                  onClick={handleActionsButtonClick}
                 />
-              </button>
               </div>
 
               {isActionsDropDownOpen &&
@@ -528,7 +494,7 @@ cellRenderer: (params: any) => {
         defaultColDef={defaultColDef}
         modules={[AllCommunityModule]}
         // theme={themeBalham}
-        rowHeight={AGGRID.ROW_HEIGHT}
+        // rowHeight={AGGRID.ROW_HEIGHT}
         headerHeight={AGGRID.HEADER_HEIGHT}
         suppressCellFocus={true}
         rowSelection="multiple"

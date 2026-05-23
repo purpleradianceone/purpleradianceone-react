@@ -1,4 +1,12 @@
-import { Users, UserPlus, Calendar } from "lucide-react";
+import {
+  Users,
+  UserPlus,
+  Calendar,
+  Clock3,
+  UserCheck,
+  RotateCcw,
+  Search,
+} from "lucide-react";
 import Button from "../ui/Button";
 import { useEffect, useState } from "react";
 import EditCompanyUserModal from "../modals/company-user/EditCompanyUserModal";
@@ -12,13 +20,11 @@ import { useUserAccessModules } from "../../config/hooks/useAccessModules";
 import { useComapanySpecificSearchDateRange } from "../../config/hooks/useCompanySpecificDateRange";
 import { useDateRangeIdChange } from "../../config/hooks/useDateRangeIdChange";
 import GetCompanyUsersListProps from "../../@types/List/GetCompanyUsersListProps";
-
 import CompanyUserDashboardModal from "../modals/company-user/CompanyUserDashboardModal";
 import { useUserPreference } from "../../context/user/UserPreference";
 import toast from "react-hot-toast";
 import MESSAGE from "../../constants/Messages";
 import { SIZE, STATUS_CODE } from "../../constants/AppConstants";
-import COLORS from "../../constants/Colors";
 import AppTutorailManager from "../views/tutorails/AppTutorailManager";
 import { CompanyUsersModuleSteps } from "../../constants/AppTutorailsSteps";
 import POST_API from "../../constants/PostApi";
@@ -30,7 +36,9 @@ import RefreshToken from "../../config/validations/RefreshToken";
 import PaginationWithoutCount from "../ag-grid/PaginationWithoutCount";
 import CompanyUserAccessManagementModalNew from "../modals/company-user/CompanyUserAccessManagementModalNew";
 import { customDateRangeId } from "../../config/hooks/usePaginationHandler";
-import { ComponentHeaderAndLogo } from "../ui/ComponentHeaderAndLogo";
+
+import CustomDropdown from "../modals/leads/CustomDropdown";
+import SummaryCards from "../ui/SummaryCards";
 
 function GetCompanyUsersList({
   users,
@@ -39,6 +47,7 @@ function GetCompanyUsersList({
   onStartDateChange,
   onEndDateChange,
   handleCompanyUserChangeOnEdit,
+  onRefreshUsers,
   isUsedInAccountProductForAssingingInstalledBy,
   onRowSelect,
   isDataLoading,
@@ -242,6 +251,79 @@ function GetCompanyUsersList({
     setIsCustomDateOptionSelected,
   ]);
 
+  //all card data
+  const totalUsers = users?.length || 0;
+
+  const activeUsers =
+    users?.filter((user) => user.isactive === true).length || 0;
+
+  const inactiveUsers =
+    users?.filter((user) => user.isactive === false).length || 0;
+
+  const currentMonthUsers =
+    users?.filter((user) => {
+      if (!user.createdon) return false;
+
+      const createdDate = new Date(user.createdon);
+      const today = new Date();
+
+      return (
+        createdDate.getMonth() === today.getMonth() &&
+        createdDate.getFullYear() === today.getFullYear()
+      );
+    }).length || 0;
+
+  //Reset
+  const handleResetFilters = () => {
+    // reset search
+    handleSearchOption.handleSearchParameterChange("");
+
+    // reset status
+    setSelectedStatus("ALL");
+
+    // reset date filter
+    handleDateRangeIdChange(0);
+
+    // reset custom date picker
+    setIsCustomDateOptionSelected(false);
+  };
+
+  //STATUS FILTER
+
+  const [selectedStatus, setSelectedStatus] = useState<
+    "ALL" | "ACTIVE" | "INACTIVE"
+  >("ALL");
+
+  const filteredUsers = users?.filter((user) => {
+    if (selectedStatus === "ACTIVE") {
+      return user.isactive;
+    }
+
+    if (selectedStatus === "INACTIVE") {
+      return !user.isactive;
+    }
+
+    return true;
+  });
+
+  const statusOptions = [
+    {
+      id: 1,
+      name: "All Status",
+      value: "ALL",
+    },
+    {
+      id: 2,
+      name: "Active",
+      value: "ACTIVE",
+    },
+    {
+      id: 3,
+      name: "Inactive",
+      value: "INACTIVE",
+    },
+  ];
+
   return (
     <div
       className={`w-full   pt-1  ${
@@ -259,117 +341,296 @@ function GetCompanyUsersList({
             />
           )}
 
-      <div
-        className={`sticky z-10 top-9 py-0.5 flex items-center justify-between ${COLORS.GRID_HEADER_SECTION_BG_COLOR} rounded-sm mb-0.5 w-full`}
-      >
-        <div className="flex justify-center items-center gap-5">
-          {/* <div className="flex gap-1">
-            <Users className={COLORS.GRID_HEADER_ICONS_COLOR_AND_SIZE} />
-            <span className="section-header-custom">Company Users</span>
-          </div> */}
+      {/* ================= HEADER + STATS SECTION ================= */}
 
-          <ComponentHeaderAndLogo headerText="Company Users" logo={Users} />
-          <div className="flex gap-1">
-            {/* search box flex div */}
+      <div className="w-full bg-white  px-2 mb-2 ">
+        {/* Top Header */}
+        <div className="flex items-start justify-between mt-1">
+          <div>
+            <h1 className="page-header-custom tracking-tight pb-0.5">
+              Company Users
+            </h1>
 
-            <div className="relative flex justify-start items-start w-80">
-              <SearchInput
-                id="company-user-module-search-box"
-                onChange={(e) => {
-                  handleSearchOption.handleSearchParameterChange(
-                    e.target.value,
-                  );
-                }}
-                value={handleSearchOption.searchParameter}
-              ></SearchInput>
+            <p className="page-subtitle-custom ">
+              Manage your organization users, permissions and activities
+            </p>
+          </div>
+        </div>
+
+        {/* Status Cards */}
+        <SummaryCards
+          cardGap={0.5}
+          width="70"
+          cards={[
+            {
+              title: "Total Users",
+              count: totalUsers,
+              subtitle: "Organization users",
+              icon: Users,
+              iconBg: "bg-violet-100",
+              iconColor: "text-violet-600",
+            },
+
+            {
+              title: "Active Users",
+              count: activeUsers,
+              subtitle: "Currently active",
+              icon: UserCheck,
+              iconBg: "bg-green-100",
+              iconColor: "text-green-600",
+            },
+
+            {
+              title: "Inactive Users",
+              count: inactiveUsers,
+              subtitle: "Awaiting activation",
+              icon: Clock3,
+              iconBg: "bg-orange-100",
+              iconColor: "text-orange-500",
+            },
+
+            {
+              title: "New This Month",
+              count: `+${currentMonthUsers}`,
+              subtitle: "Recently added users",
+              icon: UserPlus,
+              iconBg: "bg-white/20 backdrop-blur-sm",
+              iconColor: "text-white",
+              isGradient: true,
+            },
+          ]}
+        />
+
+        {/* SEARCH + FILTER BAR */}
+        <div
+          className="
+    w-full
+    bg-white
+    border border-slate-200
+    rounded-xl
+    py-2
+    px-3
+    flex items-center justify-between
+    gap-3
+    flex-wrap
+    shadow-sm
+  "
+        >
+          {/* LEFT */}
+          <div className="flex items-center gap-3 flex-wrap">
+            {/* SEARCH */}
+            <div className=" relative w-[350px] ">
+              <Search
+                size={16}
+                className="absolute left-3  top-1/2 -translate-y-1/2 text-gray-400 "
+              />
+              <div className="[&>input]:pl-10">
+                <SearchInput
+                  id="company-user-module-search-box"
+                  onChange={(e) => {
+                    handleSearchOption.handleSearchParameterChange(
+                      e.target.value,
+                    );
+                  }}
+                  value={handleSearchOption.searchParameter}
+                  placeholder="Search by name, email or mobile number..."
+                  height="h-9"
+                />
+              </div>
             </div>
 
-            {/* Date FIlters Dropdown */}
+            {/* DATE FILTER */}
             <div
-              id="company-users-module-date-range-filter"
-              className="flex mx-3 gap-1"
+              className="
+        h-9
+        px-2
+      
+        border border-slate-200
+        rounded-lg
+        bg-white
+        flex items-center 
+        
+        shadow-sm
+      "
             >
-              <div className="flex">
-                <div className="flex items-center size-4 justify-center mt-1 mr-2 gap-2 input-label-custom">
-                  <Calendar className="input-label-custom mt-1" />
-                </div>
+              <div className="bg-violet-100 h-6 w-6 rounded-md flex justify-center items-center ">
+                <Calendar className="text-violet-600 " size={16} />
+              </div>
+              <div className="flex flex-col leading-none">
+                {/* <span className="text-[11px] text-slate-400">
+          Date Filter
+        </span> */}
 
                 <DateRangeFilterDropdown
                   dropdownOptions={dateRangeDropdownOptions}
                   handleDateIdChange={handleDateRangeIdChange}
                   selectedOption={selectedDateName}
-                ></DateRangeFilterDropdown>
+                  showBorder={false}
+                />
               </div>
-              {/* Custom Date Picker Div Flex Box*/}
-              {isCustomDateOptionSelected && (
-                <div
-                  style={
-                    isCustomDateOptionSelected
-                      ? { visibility: "visible" }
-                      : { visibility: "hidden" }
-                  }
-                >
-                  <DateRangePicker
-                    onStartDateChange={onStartDateChange}
-                    onEndDateChange={onEndDateChange}
-                    initialStartDate={handleSearchOption.startDate}
-                    initialEndDate={handleSearchOption.endDate}
-                  />
-                </div>
-              )}
             </div>
-          </div>
-        </div>
 
-        <>
-          {/* {userHasAccessToAddUser ? ( */}
-          {/* <> */}
-          {!isUsedInAccountProductForAssingingInstalledBy && (
-            <>
-              <div id="company-users-module-add-button" className="flex gap-1">
-                <Button
-                  type="submit"
-                  disabled={!userHasAccessToAddUser}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    if (!userHasAccessToAddUser) {
-                      toast.error(
-                        MESSAGE.MODULE_ACCESS.COMPANY_USER
-                          .DENIED_ADD_ACCESS_COMPANY_USER,
+            {/* CUSTOM DATE RANGE */}
+            {isCustomDateOptionSelected && (
+              <DateRangePicker
+                onStartDateChange={onStartDateChange}
+                onEndDateChange={onEndDateChange}
+                initialStartDate={handleSearchOption.startDate}
+                initialEndDate={handleSearchOption.endDate}
+              />
+            )}
+          </div>
+
+          {/* RIGHT SECTION */}
+          <div className="flex items-center gap-5 flex-wrap">
+            {/* STATUS */}
+            {/* STATUS */}
+            <div
+              className="
+  
+        h-9
+        px-2
+      
+        border border-slate-200
+        rounded-lg
+        bg-white
+        flex items-center gap-3
+        shadow-sm
+    
+    
+  "
+            >
+              {/* Status Dot */}
+              <div
+                className={`h-6 w-6 rounded-md flex justify-center items-center ${
+                  selectedStatus === "ACTIVE"
+                    ? "bg-green-100"
+                    : selectedStatus === "INACTIVE"
+                      ? "bg-red-100"
+                      : "bg-violet-100"
+                }`}
+              >
+                <div
+                  className={`w-2 h-2 rounded-full flex-shrink-0 ${
+                    selectedStatus === "ACTIVE"
+                      ? "bg-green-500"
+                      : selectedStatus === "INACTIVE"
+                        ? "bg-red-500"
+                        : "bg-violet-500"
+                  }`}
+                />
+              </div>
+
+              {/* Dropdown */}
+              <div className="flex-1 flex items-center ">
+                <CustomDropdown
+                  labelName=""
+                  showBorder={false}
+                  options={statusOptions}
+                  preselectedOption={
+                    statusOptions.find((item) => item.value === selectedStatus)
+                      ?.id
+                  }
+                  onSelect={(selectedId) => {
+                    const selected = statusOptions.find(
+                      (item) => item.id === selectedId,
+                    );
+
+                    if (selected) {
+                      setSelectedStatus(
+                        selected.value as "ALL" | "ACTIVE" | "INACTIVE",
                       );
-                      return;
-                    } else {
-                      setIsAddCompanyUserModalOpen(true);
                     }
                   }}
-                  // onClick={() => setIsAddCompanyUserModalOpen(true)}
-                >
-                  {/* {!isSmallScreen && <UserPlus size={SIZE.TWENTY} />}
-                {isSmallScreen && <UserPlus size={SIZE.EIGHT} />}
-                {isLargeScreen && JSX_CHILDREN_NAME.ADD_USER} */}
-                  <div className="flex items-center gap-1">
-                    <UserPlus size={SIZE.SIXTEEN} />
-                    Add
-                  </div>
-                </Button>
+                />
               </div>
+            </div>
 
-              <AddCompanyUserModal
-                isOpen={isAddCompanyUserModalOpen}
-                onClose={() => setIsAddCompanyUserModalOpen(false)}
-              />
-            </>
-          )}
-        </>
+            {/* RESET */}
+            <button
+              className="
+        h-9
+        in-w-[110px]
+        px-4
+        rounded-lg
+        border border-slate-200
+        bg-white
+        flex items-center gap-2
+        text-sm font-medium
+        text-slate-600
+        hover:bg-slate-50
+        transition-all duration-200
+        shadow-sm
+      "
+              onClick={handleResetFilters}
+            >
+              <RotateCcw size={15} />
+              Reset
+            </button>
+
+            {/* ADD USER */}
+            {!isUsedInAccountProductForAssingingInstalledBy && (
+              <>
+                <div
+                  id="company-users-module-add-button"
+                  className="flex gap-2"
+                >
+                  <Button
+                    type="submit"
+                    disabled={!userHasAccessToAddUser}
+                    onClick={(e) => {
+                      e.preventDefault();
+
+                      if (!userHasAccessToAddUser) {
+                        toast.error(
+                          MESSAGE.MODULE_ACCESS.COMPANY_USER
+                            .DENIED_ADD_ACCESS_COMPANY_USER,
+                        );
+
+                        return;
+                      }
+
+                      setIsAddCompanyUserModalOpen(true);
+                    }}
+                    // className="
+                    //   h-10
+                    //   px-5
+                    //   rounded-lg
+                    //   bg-violet-600
+                    //   hover:bg-violet-700
+                    //   text-white
+                    //   text-sm
+                    //   font-semibold
+                    //   flex items-center gap-2
+                    //   shadow-sm
+                    //   transition-all duration-200
+                    // "
+                  >
+                    <div className="flex items-center gap-1">
+                      <UserPlus size={SIZE.SIXTEEN} />
+                      Add User
+                    </div>
+                  </Button>
+                </div>
+
+                <AddCompanyUserModal
+                  isOpen={isAddCompanyUserModalOpen}
+                  onClose={() => setIsAddCompanyUserModalOpen(false)}
+                  onUserAdded={onRefreshUsers}
+                />
+              </>
+            )}
+          </div>
+        </div>
       </div>
 
-      <div className="bg-white overflow-y-auto  p-0">
+      <div className="bg-white overflow-y-auto px-2 pt-1">
         <div
           className={
             isUsedInAccountProductForAssingingInstalledBy
               ? ` w-full h-[calc(70vh-122px)]`
               : userPreference.isLeftMenu
-                ? ` w-full h-[calc(100vh-112px)]`
+                ? ` w-full h-[calc(100vh-283px)]`
                 : " w-full h-[calc(100vh-120px)]"
           }
         >
@@ -379,7 +640,7 @@ function GetCompanyUsersList({
               isUsedInAccountProductForAssingingInstalledBy
             }
             handleSelectedCompanyUserChange={handleSelectedCompanyUserChange}
-            users={users}
+            users={filteredUsers}
             handleIdIsEditModalOpen={handleIdIsEditModalOpen}
             handleIsAccessModalOpen={handleIsAccessModalOpen}
             handleIsDashboardModalOpen={handleIsDashboardModalOpen}

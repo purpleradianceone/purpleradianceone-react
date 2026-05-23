@@ -9,6 +9,7 @@ type GetCompanyUsersListProps = {
     handleSearchOption: HandleSearchOptionProps;
     onStartDateChange: (date: Date) => void;
     onEndDateChange: (date: Date) => void;
+    onRefreshUsers: () => void;
     handleCompanyUserChangeOnEdit: (companyUser: CompanyUser) => void;
     isTourFinished? : boolean;
     isUsedInAccountProductForAssingingInstalledBy? : boolean

@@ -1,5 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { ListTodo } from "lucide-react";
+import {
+  AlertCircle,
+  CalendarClock,
+  CheckCircle2,
+  ListTodo,
+} from "lucide-react";
 import qs from "query-string";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
@@ -31,6 +36,7 @@ import DateRangeFilterDropdown from "../ui/DateRangeFilterDropdown";
 import DateRangePicker from "../ui/DateRangePicker";
 import SearchInput from "../ui/SearchInput";
 import { supportTicketDataUrlSearchParamKey } from "./SupportTicketManagementList";
+import SummaryCards from "../ui/SummaryCards";
 
 export const MytaskQueryKey = "task";
 
@@ -266,16 +272,101 @@ function MyAllTaskManagementList({
       console.log(data);
     };
 
+    const totalTasks = allTaskData?.length || 0;
+
+    const completedTasks =
+      allTaskData?.filter((task) => task.completedAtDateTime)?.length || 0;
+
+    const overdueTasks =
+      allTaskData?.filter(
+        (task) =>
+          !task.completedAtDateTime &&
+          task.dueDateTime &&
+          new Date(task.dueDateTime) < new Date(),
+      )?.length || 0;
+
+    // const pendingTasks =
+    //   allTaskData?.filter(
+    //     (task) =>
+    //       !task.completedAtDateTime &&
+    //       task.dueDateTime &&
+    //       new Date(task.dueDateTime) >= new Date()
+    //   )?.length || 0;
+
+    const dueTodayTasks =
+      allTaskData?.filter((task) => {
+        if (!task.dueDateTime || task.completedAtDateTime) {
+          return false;
+        }
+
+        const dueDate = new Date(task.dueDateTime);
+        const today = new Date();
+
+        return (
+          dueDate.getDate() === today.getDate() &&
+          dueDate.getMonth() === today.getMonth() &&
+          dueDate.getFullYear() === today.getFullYear()
+        );
+      })?.length || 0;
+
     return (
       <div
         className={`w-full ${
-          position === "left" && isUsedInAllTasksModule ? "" : "pl-1"
-        } pr-1 gap-1 ${isLoadingForNavigate ? "cursor-wait" : ""}`}
+          position === "left" && isUsedInAllTasksModule ? "" : "pr-1 "
+        }  gap-1 ${isLoadingForNavigate ? "cursor-wait" : ""} px-2 `}
       >
+        {/* Task Overview Cards */}
+        {/* My Task Overview Cards */}
+        <SummaryCards
+          cardCss="bg-white border border-slate-200 rounded-2xl px-5 py-1.5  shadow-sm flex items-center justify-between gap-2 over:shadow-md transition-all"
+          showGraph
+          cardGap={10}
+          cards={[
+            {
+              title: "My Tasks",
+              count: totalTasks,
+              subtitle: "Tasks assigned to you",
+              icon: ListTodo,
+              iconBg: "bg-violet-100",
+              iconColor: "text-violet-600",
+              graphColor: "bg-violet-500",
+            },
+
+            {
+              title: "Overdue",
+              count: overdueTasks,
+              subtitle: "Tasks need attention",
+              icon: AlertCircle,
+              iconBg: "bg-red-100",
+              iconColor: "text-red-500",
+              graphColor: "bg-red-500",
+            },
+
+            {
+              title: "Due Today",
+              count: dueTodayTasks,
+              subtitle: "Tasks due today",
+              icon: CalendarClock,
+              iconBg: "bg-orange-100",
+              iconColor: "text-orange-500",
+              graphColor: "bg-orange-500",
+            },
+
+            {
+              title: "Completed",
+              count: completedTasks,
+              subtitle: "This month",
+              icon: CheckCircle2,
+              iconBg: "bg-emerald-100",
+              iconColor: "text-emerald-500",
+              graphColor: "bg-emerald-500",
+            },
+          ]}
+        />
         {/* sticky */}
         {
           <div
-            className={`sticky z-10 ${userHasAccessToViewMasterTasks ? "top-12" : "top-0"}  mt-1 p-1 flex flex-wrap items-center justify-between gap-3 text-sm ${COLORS.GRID_HEADER_SECTION_BG_COLOR} rounded-lg shadow-sm mb-1.5 
+            className={`sticky z-10 ${userHasAccessToViewMasterTasks ? "top-12" : "top-0"}  px-3 py-2  flex flex-wrap items-center justify-between gap-3 text-sm ${COLORS.GRID_HEADER_SECTION_BG_COLOR}  mb-3 border rounded-lg
                       w-full
                     `}
           >
@@ -303,7 +394,7 @@ function MyAllTaskManagementList({
                     My Tasks
                   </span>
                 )}
-                <div className="flex items-start justify-start gap-2">
+                <div className="flex items-start justify-start gap-4">
                   {/* Search Box */}
                   <div
                     className={`relative flex items-start ${
@@ -312,6 +403,7 @@ function MyAllTaskManagementList({
                   >
                     <SearchInput
                       value={handleSearchOption.searchParameter}
+                      placeholder="Search Task ..."
                       onChange={(e) => {
                         handleSearchOption.handleSearchParameterChange(
                           e.target.value,
@@ -319,10 +411,10 @@ function MyAllTaskManagementList({
                       }}
                     ></SearchInput>
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex gap-4">
                     <div>
                       {dateRangeDropdownOptions ? (
-                        <div className="grid grid-cols-1 justify-center gap-1 w-full">
+                        <div className="grid grid-cols-1 justify-center gap-4 w-full">
                           {/* Shared width wrapper */}
                           <div className="relative w-fit flex justify-center gap-1">
                             <div className="flex col-span-2 w-fit">
@@ -353,7 +445,7 @@ function MyAllTaskManagementList({
 
                     {/* All Task FILTERS */}
                     {isUsedInAllTasksModule && (
-                      <div className="flex flex-wrap gap-2 w-full md:w-auto">
+                      <div className="flex flex-wrap gap-4 w-full md:w-auto">
                         {/* Source */}
                         <div className="min-w-[150px]">
                           <CustomDropdown
@@ -401,12 +493,12 @@ function MyAllTaskManagementList({
           </div>
         }
 
-        <div className="bg-white  overflow-y-auto rounded-lg">
+        <div className="bg-white overflow-y-auto ">
           <div
             className={
               userPreference.isLeftMenu
-                ? `ag-theme-balham w-full ${userHasAccessToViewMasterTasks ? "h-[calc(100vh-190px)]" : "h-[calc(100vh-120px)]"}`
-                : `ag-theme-balham w-full  ${userHasAccessToViewMasterTasks ? "h-[calc(100vh-192px)]" : "h-[calc(100vh-124px)]"}`
+                ? `w-full ${userHasAccessToViewMasterTasks ? "h-[calc(100vh-317px)]" : "h-[calc(100vh-120px)]"}`
+                : `w-full  ${userHasAccessToViewMasterTasks ? "h-[calc(100vh-192px)]" : "h-[calc(100vh-124px)]"}`
             }
           >
             <MyTaskManagementAgGrid
