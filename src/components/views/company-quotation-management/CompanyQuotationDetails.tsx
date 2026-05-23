@@ -217,6 +217,7 @@ function CompanyQuotationDetails() {
         setSelectedPreviousQuotationTemplate(res.data[0]);
         setQuotation(formattedData);
         setPreviousQuotation(formattedData);
+        console.log(formattedData.templateSnapshot);
       }
     } catch (error: any) {
       handleApiError(error);
@@ -909,7 +910,7 @@ function CompanyQuotationDetails() {
                 <h1 className="section-header-custom">
                   {isCreateMode
                     ? "Create Quotation"
-                    : `Quotation #${quotation?.quotationNumber || "[Auto-generated]"} (${quotation?.quotationTypeName})`}
+                    : `Quotation #${quotation?.quotationNumber || "[Auto-generated]"} (${quotation?.quotationTypeName} : ${quotation?.templateSnapshot?quotation?.templateSnapshot["{{customer_name}}"] ?.trim()?.slice(0, 50):""})`}
                 </h1>
                 {!otherIdSearchParams && (
                   <p className="text-sm text-gray-500">

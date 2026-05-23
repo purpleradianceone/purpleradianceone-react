@@ -42,6 +42,10 @@ import { toSelectOptions } from "../../utils/toSelectOption";
 import CustomSelect from "../ui/CustomSelect";
 import CustomDocumentPreviewComponent from "../custom-document-preview-component/CustomDocumentPreviewComponent";
 import CompanyBankAccountSection from "./CompanyBankAccountSection";
+import {
+  CompanySignature,
+  isCompanySignatureEqual,
+} from "../../@types/company-detail/CompanySignature";
 
 const UserAndCompanyProfile = () => {
   const { countries } = useCountries();
@@ -72,6 +76,7 @@ const UserAndCompanyProfile = () => {
 
   const [isLodingForCompanyDetailData, setIsLoadingForCompanDetailData] =
     useState<boolean>(true);
+
 
   const [
     isLoadingForCompanyDetailsUpdate,
@@ -166,6 +171,56 @@ const UserAndCompanyProfile = () => {
       createdon: "",
       updatedon: "",
     });
+
+  const [companySignature, setCompanySignature] = useState<CompanySignature>({
+    id: 0,
+
+    company_id: 0,
+
+    signatory_name: "",
+
+    signature_file_extension: "",
+    signature_origin_url: "",
+    signature_cdn_url: "",
+
+    isactive: false,
+
+    createdby: "",
+    updatedby: "",
+
+    createdon: "",
+    updatedon: "",
+  });
+
+  const [previousCompanySignature, setPreviousCompanySignature] =
+    useState<CompanySignature>({
+      id: 0,
+
+      company_id: 0,
+
+      signatory_name: "",
+
+      signature_file_extension: "",
+      signature_origin_url: "",
+      signature_cdn_url: "",
+
+      isactive: false,
+
+      createdby: "",
+      updatedby: "",
+
+      createdon: "",
+      updatedon: "",
+    });
+
+   const [isLodingForCompanySignatureData, setIsLoadingForCompanSignatureData] =
+    useState<boolean>(true);
+  const [
+    isLoadingForCompanySignatureUpdate,
+    setIsLoadingForCompanySignatureUpdate,
+  ] = useState<boolean>(false);
+  const [showCompanySignaturePreview, setShowCompanySignaturePreview] =
+    useState(false);
 
   const { states } = useStates(userPreference.countryId);
   const { districts } = useDistricts(companyDetail.state_id);
@@ -601,10 +656,22 @@ const UserAndCompanyProfile = () => {
     null,
   );
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
+  const [isLoadingForCompanyLogo, setIsLoadingForCompanyLogo] =
+    useState<boolean>(true);
 
-  useEffect(() => {
-    console.log("Company logo file: " + logoPreview?.toString());
-  }, [logoPreview]);
+  //For company Signature
+  const [signatureFile, setSignatureFile] = useState<File | null>(null);
+  const [signaturePreviousPreview, setSignaturePreviousPreview] = useState<
+    string | null
+  >(null);
+  const [isLoadingForCompanySignature, setIsLoadingForCompanySignature] =
+    useState<boolean>(true);
+  const [signaturePreview, setSignaturePreview] = useState<string | null>(null);
+  //
+
+  // useEffect(() => {
+  //   console.log("Company logo file: " + logoPreview?.toString());
+  // }, [logoPreview]);
 
   const getCompanyDetail = async () => {
     if (loginStatus.companyId === 0) return;
@@ -640,6 +707,16 @@ const UserAndCompanyProfile = () => {
     const { name, value } = e.target;
     const updatedCompanyDetail = { ...companyDetail, [name]: value };
     setCompanyDetail(updatedCompanyDetail);
+  };
+
+  const handleCompanySignatureChange = (
+    e:
+      | React.ChangeEvent<HTMLInputElement>
+      | React.ChangeEvent<HTMLTextAreaElement>,
+  ) => {
+    const { name, value } = e.target;
+    const updatedCompanySignature = { ...companySignature, [name]: value };
+    setCompanySignature(updatedCompanySignature);
   };
 
   const handleCompanyLogoUpload = async () => {
@@ -763,11 +840,9 @@ const UserAndCompanyProfile = () => {
   useEffect(() => {
     if (userHasAccessToViewCompanyDetail) {
       getCompanyDetail();
+      getCompanySignature();
     }
   }, [loginStatus.companyId]);
-
-  const [isLoadingForCompanyLogo, setIsLoadingForCompanyLogo] =
-    useState<boolean>(true);
 
   const getCompanyLogo = () => {
     if (loginStatus.companyId === 0) return;
@@ -804,6 +879,177 @@ const UserAndCompanyProfile = () => {
       });
   };
 
+  const getCompanySignature = async () => {
+    if (loginStatus.companyId === 0) return;
+    try {
+      setIsLoadingForCompanSignatureData(true);
+      await axiosClient
+        .post(POST_API.GET_COMPANY_SIGNATURE, {
+          company_id: loginStatus.companyId,
+          requestedby_id: loginStatus.id,
+        })
+        .then((response) => {
+          console.log(response.data);
+          if (response.status === STATUS_CODE.OK) {
+            setCompanySignature(response.data[0]);
+            setPreviousCompanySignature(response.data[0]);
+          }
+        })
+        .catch((e) => {
+          handleApiError(e);
+        });
+    } catch (ex) {
+      handleApiError(ex);
+    } finally {
+      setIsLoadingForCompanSignatureData(false);
+    }
+  };
+
+  const getCompanySignatureFile = () => {
+    if (loginStatus.companyId === 0) return;
+    setIsLoadingForCompanySignature(true);
+    axios
+      .post(
+        POST_API.GET_COMPANY_SIGNATURE_DOCUMENT,
+        {
+          company_id: loginStatus.companyId,
+          id: companySignature.id,
+          signature_file_extension: companySignature.signature_file_extension,
+          requestedby_id: loginStatus.id,
+        },
+        {
+          responseType: "arraybuffer",
+          withCredentials: true,
+        },
+      )
+      .then((response) => {
+        const blob = new Blob([response.data], {
+          type: companyDetail.logo_file_extension,
+        });
+
+        const imageUrl = URL.createObjectURL(blob);
+        setSignaturePreview(imageUrl);
+        setSignaturePreviousPreview(imageUrl);
+        console.log("inside get Company Signature File");
+      })
+      .catch((e) => {
+        console.log("inside get Company Signature File" + e);
+      })
+      .finally(() => {
+        setIsLoadingForCompanySignature(false);
+      });
+  };
+
+  const updateCompanySignature = async () => {
+    if (loginStatus.companyId === 0) return;
+
+    if (!isCompanySignatureEqual(previousCompanySignature, companySignature)) {
+      setIsLoadingForCompanySignatureUpdate(true);
+      try {
+        await axiosClient
+          .post(POST_API.UPDATE_COMPANY_SIGNATURE, {
+            company_id: loginStatus.companyId,
+            signatory_name: companySignature.signatory_name,
+            isactive: companySignature?.isactive,
+            updatedby_id: loginStatus.id,
+          })
+          .then((response) => {
+            if (response.data.status) {
+              toast.success(response.data.message);
+              getCompanySignature();
+              setEditingSection(null);
+            } else {
+              toast.error(response.data.message);
+            }
+          })
+          .catch((e) => {
+            handleApiError(e);
+          });
+      } catch (ex) {
+        console.log(ex);
+        handleApiError(ex);
+      } finally {
+        setIsLoadingForCompanySignatureUpdate(false);
+      }
+    } else {
+      toast("No Details Changed", {
+        style: {
+          color: "#991b1b",
+          border: "1px solid #fca5a5",
+          borderRadius: "8px",
+          fontSize: "14px",
+        },
+        icon: "⚠️",
+      });
+    }
+  };
+
+  const handleCompanySignatureUpload = async () => {
+    if (loginStatus.companyId === 0) return;
+    const data = {
+      company_id: loginStatus.companyId,
+      id: companySignature.id,
+      requestedby_id: loginStatus.id,
+      updatedby_id: loginStatus.id,
+      createdby_id: loginStatus.id,
+    };
+    if (signatureFile) {
+      try {
+        const formData = new FormData();
+        formData.append("file", signatureFile);
+        // formData.append("data", JSON.stringify(data));
+        formData.append(
+          "data",
+          new Blob([JSON.stringify(data)], {
+            type: "application/json",
+          }),
+        );
+
+        console.log(formData);
+
+        await axiosClient
+          .post(POST_API.UPLOAD_COMPANY_SIGNATURE_DOCUMENT, formData, {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+            maxContentLength: Infinity,
+            maxBodyLength: Infinity,
+            withCredentials: true,
+          })
+          .then((response) => {
+            const data = response.data;
+
+            if (data.status) {
+              toast.success(data.message);
+            } else {
+              toast.error(data.message);
+            }
+          })
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          .catch(async (error: any) => {
+            handleApiError(error);
+            setSignaturePreview(signaturePreviousPreview);
+          })
+          .finally(() => {
+            setIsLogoChange(false);
+          });
+      } catch (ex) {
+        console.log(ex);
+        handleApiError(ex);
+      }
+    } else {
+      toast("No File Selected For Upload", {
+        style: {
+          color: "#991b1b",
+          border: "1px solid #fca5a5",
+          borderRadius: "8px",
+          fontSize: "14px",
+        },
+        icon: "⚠️",
+      });
+    }
+  };
+
   useEffect(() => {
     if (
       companyDetail.logo_file_extension &&
@@ -812,6 +1058,15 @@ const UserAndCompanyProfile = () => {
       getCompanyLogo();
     }
   }, [companyDetail.logo_file_extension]);
+
+  useEffect(() => {
+    if (
+      companySignature.signature_file_extension &&
+      companySignature.signature_file_extension !== ""
+    ) {
+      getCompanySignatureFile();
+    }
+  }, [companySignature.signature_file_extension]);
 
   const [isLogoChange, setIsLogoChange] = useState<boolean>(false);
 
@@ -827,6 +1082,18 @@ const UserAndCompanyProfile = () => {
     setLogoPreview(previewUrl);
   };
 
+  const [isSignatureChange, setIsSignatureChange] = useState<boolean>(false);
+
+  const handleSignatureChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setSignatureFile(file);
+    // preview
+    const previewUrl = URL.createObjectURL(file);
+    setSignaturePreview(previewUrl);
+  };
+
   useEffect(() => {
     if (logoPreview !== logoPreviousPreview) {
       setIsLogoChange(true);
@@ -834,6 +1101,14 @@ const UserAndCompanyProfile = () => {
       setIsLogoChange(false);
     }
   }, [logoPreview]);
+
+  useEffect(() => {
+    if (signaturePreview !== signaturePreviousPreview) {
+      setIsSignatureChange(true);
+    } else {
+      setIsSignatureChange(false);
+    }
+  }, [signaturePreview]);
 
   const [editingSection, setEditingSection] = useState<string | null>(null);
 
@@ -886,11 +1161,11 @@ const UserAndCompanyProfile = () => {
   // },[companyDetail.state_id,companyDetail.district_id]);
 
   const formatUrl = (url?: string) => {
-  if (!url) return "#";
-  return url.startsWith("http://") || url.startsWith("https://")
-    ? url
-    : `https://${url}`;
-};
+    if (!url) return "#";
+    return url.startsWith("http://") || url.startsWith("https://")
+      ? url
+      : `https://${url}`;
+  };
 
   return (
     <div className="w-full mx-24 min-h-screen bg-gray-100 py-8 px-2 space-y-10">
@@ -1577,6 +1852,141 @@ const UserAndCompanyProfile = () => {
               </EditableSection>
             </div>
           </div>
+
+          {/* Company Signature */}
+          <div className=" pt-4">
+            {/* Left aligned container */}
+            {!isLoadingForCompanySignature ? (
+              <div className="flex flex-col items-start">
+                {/* Image */}
+                <div className="w-32 h-32 border rounded-lg overflow-hidden flex items-center justify-center bg-gray-50">
+                  {signaturePreview ||
+                  companySignature?.signature_file_extension ? (
+                    <img
+                      src={
+                        signaturePreview ??
+                        companySignature?.signature_file_extension
+                      }
+                      alt="Company Signature"
+                      className="w-full h-full object-contain"
+                      onDoubleClick={() => setShowCompanySignaturePreview(true)}
+                    />
+                  ) : (
+                    <span className="caption-custom">No Signature</span>
+                  )}
+                  {showCompanySignaturePreview && (
+                    <div
+                      className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50"
+                      onClick={() => setShowCompanySignaturePreview(false)}
+                    >
+                      {/* <img
+                      src={logoPreview ?? companyDetail?.logo_cdn_url}
+                      alt="Company Logo"
+                      className="max-w-[80%] max-h-[80%] object-contain rounded-lg shadow-lg"
+                    /> */}
+                      <CustomDocumentPreviewComponent
+                        fileUrl={
+                          signaturePreview ??
+                          companySignature?.signature_file_extension
+                        }
+                        fileExtension={
+                          companySignature?.signature_file_extension
+                        }
+                        width={"50%"}
+                        enableDownload={false}
+                      />
+                    </div>
+                  )}
+                </div>
+
+                {/* Button centered under image */}
+                {userHasAccessToUpdateCompanyDetail &&
+                  (!isSignatureChange ? (
+                    <div className="w-40 flex justify-center mt-2">
+                      <label className="cursor-pointer px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                        {logoPreview || companyDetail?.logo_file_extension
+                          ? "Change Signature"
+                          : "Upload Signature"}
+
+                        <input
+                          type="file"
+                          accept="image/*"
+                          hidden
+                          onChange={handleSignatureChange}
+                        />
+                      </label>
+                    </div>
+                  ) : (
+                    <div className="w-55 flex justify-center mt-2 gap-2">
+                      <div>
+                        <Button
+                          type="button"
+                          onClick={() =>
+                            setSignaturePreview(signaturePreviousPreview)
+                          }
+                        >
+                          Cancel
+                        </Button>
+                      </div>
+                      <div>
+                        <Button
+                          className="cursor-pointer px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                          onClick={handleCompanySignatureUpload}
+                        >
+                          Save Signature
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            ) : (
+              <div className="flex flex-col items-start animate-pulse">
+                {/* Image Skeleton */}
+                <div className="w-40 h-40 border rounded-lg overflow-hidden flex items-center justify-center bg-gray-100">
+                  <div className="w-32 h-32 bg-gray-300 rounded-md"></div>
+                </div>
+
+                {/* Button Skeleton */}
+                <div className="w-40 flex justify-center mt-2">
+                  <div className="h-8 w-28 bg-gray-300 rounded-md"></div>
+                </div>
+              </div>
+            )}
+          </div>
+          <div>
+              <EditableSection
+                hasAccess={userHasAccessToUpdateCompanyDetail}
+                onEdit={() => handleEditableSectionEdit("companySignature")}
+                isEditing={editingSection === "companySignature"}
+                onCancel={handleEditableSectionCancel}
+                sectionKey="companySignature"
+                onSave={() => {
+                  updateCompanySignature();
+                }}
+                isLoadingForUpdate={isLoadingForCompanySignatureUpdate}
+                isLoadingForData={isLodingForCompanySignatureData}
+              >
+                {editingSection === "companySignature" ? (
+                  <div className="grid grid-cols-2">
+                  <FormInput
+                    label="Signatory Name:"
+                    name="signatory_name"
+                    value={companySignature?.signatory_name ?? ""}
+                    onChange={handleCompanySignatureChange}
+                    className="input-custom"
+                    placeholder="Authorized Person Name"
+                  />
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-2 items-start border-b pb-1">
+                    <div className="flex gap-4">
+                      <div className="input-label-custom py-1">Signatory Name:</div>
+                        {companySignature?.signatory_name ?? ""}
+                    </div>
+                  </div>
+                )}
+              </EditableSection>
+            </div>
         </div>
 
         {/* PREFERENCE CARD */}

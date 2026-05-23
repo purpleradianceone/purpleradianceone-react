@@ -126,6 +126,7 @@ function AccountProformaInvoiceManagementList({
   //   };
 
   const onDeleteInvoice = async (rowData: AccountProformaInvoiceProps) => {
+    if(loginStatus.companyId === 0)return;
     console.log("Delete Invoice:", rowData);
     const postData = {
       id: rowData.id,
@@ -160,6 +161,7 @@ function AccountProformaInvoiceManagementList({
   const handleInvoiceDownload = async (
     rowData: AccountProformaInvoiceProps,
   ) => {
+    if(loginStatus.companyId === 0)return;
     setIsSubmitting(true);
 
     try {
