@@ -98,6 +98,7 @@ function CompanyInvoiceDetails() {
   } = useUserAccessModules();
 
   const getInvoices = async (signal: AbortSignal) => {
+    if(loginStatus.companyId === 0)return;
     if (!userHasAccessToViewCompanyInvoiceDraft) return;
     setInvoiceLoading(true);
     const postData = {
@@ -169,6 +170,7 @@ function CompanyInvoiceDetails() {
   console.log(disabled);
 
   const getInvoiceItems = async (signal: AbortSignal) => {
+    if(loginStatus.companyId === 0)return;
     if (
       !invoiceId ||
       Number(invoiceId) === 0 ||
@@ -267,6 +269,7 @@ function CompanyInvoiceDetails() {
   };
 
   const SubmitInvoice = async () => {
+    if(loginStatus.companyId === 0)return;
     if (!invoice) return;
     if (disabled) {
       return;
@@ -306,6 +309,7 @@ function CompanyInvoiceDetails() {
   };
 
   const previewInvoice = async () => {
+    if(loginStatus.companyId === 0)return;
     if (!userHasAccessToViewCompanyInvoice) return;
     setIsSubmitting(true);
 
@@ -369,6 +373,7 @@ function CompanyInvoiceDetails() {
   }, [invoice?.adjustmentForRoundOff, invoice?.totalAmount, invoice]);
 
   const updateInvoice = async () => {
+    if(loginStatus.companyId === 0)return;
     if (!invoice) return;
     if (disabled) {
       return;
@@ -412,6 +417,7 @@ function CompanyInvoiceDetails() {
   };
 
   const handleInvoiceDownload = async (invoiceTypeId: number | null) => {
+    if(loginStatus.companyId === 0)return;
     if (!disabled) return;
     if (!userHasAccessToViewCompanyInvoice) return;
     setIsSubmitting(true);
@@ -450,6 +456,7 @@ function CompanyInvoiceDetails() {
   };
 
   const handleDeleteItem = async (item: any) => {
+    if(loginStatus.companyId === 0)return;
     console.log("Delete item with id:", item.id);
     console.log(disabled);
 
@@ -542,6 +549,7 @@ function CompanyInvoiceDetails() {
     (i) => i.igstAmount != null && i.igstAmount > 0,
   );
   const saveSingleItem = async (item: any) => {
+    if(loginStatus.companyId === 0)return;
     if (!userHasAccessToUpdateCompanyInvoiceItem) {
       return;
     }
@@ -584,6 +592,7 @@ function CompanyInvoiceDetails() {
   };
 
   const handleSaveInvoice = async () => {
+    if(loginStatus.companyId === 0)return;
     if (!userHasAccessToAddCompanyInvoiceDraft) return;
     if (!selectedAccount) {
       toast.error("Please select an account");
@@ -628,6 +637,7 @@ function CompanyInvoiceDetails() {
   };
 
   const handleAddToInvoice = async () => {
+    if(loginStatus.companyId === 0)return;
     if (disabled) {
       return;
     }

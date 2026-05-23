@@ -6,18 +6,18 @@ import toast from "react-hot-toast";
 import POST_API from "../../constants/PostApi";
 import axiosClient from "../../axios-client/AxiosClient";
 import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
-import PostDataTypeForInvoiceType from "../../@types/invoice/PostDataTypeForInvoiceType";
+import PostDataTypeForInvoiceStatus from "../../@types/invoice/PostDataTypeForInvoiceStatus";
 
-function useInvoiceType() {
+function useQuotationStatus() {
   const { loginStatus } = useLoggedInUserContext();
 
-  const [invoiceType, setInvoiceType] = useState<PostDataTypeForInvoiceType[]>(
-    [],
-  );
+  const [quotationStatus, setQuotationStatus] = useState<
+    PostDataTypeForInvoiceStatus[]
+  >([]);
 
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  const getInvoiceType = async () => {
+  const getInvoiceStatus = async () => {
     if(loginStatus.companyId === 0)return;
     const postData = {
       company_id: loginStatus.companyId,
@@ -29,7 +29,7 @@ function useInvoiceType() {
 
     try {
       const response = await axiosClient.post(
-        POST_API.GET_COMPANY_INVOICE_TYPE, 
+        POST_API.GET_COMPANY_QUOTATION_STATUS,
         postData,
         {
           withCredentials: true,
@@ -37,13 +37,11 @@ function useInvoiceType() {
       );
 
       if (response.status === STATUS_CODE.OK) {
-        setInvoiceType(response.data);
+        setQuotationStatus(response.data);
       }
     } catch (error: any) {
-      if (error.response?.status === STATUS_CODE.INTERNAL_SERVER_ERROR) {
+      if (error.status === STATUS_CODE.INTERNAL_SERVER_ERROR) {
         toast.error(error.response?.data);
-      } else if (error.response?.status === 403) {
-        toast.error("Unauthorized access");
       }
     } finally {
       setIsLoading(false);
@@ -51,14 +49,14 @@ function useInvoiceType() {
   };
 
   useEffect(() => {
-    getInvoiceType();
+    getInvoiceStatus();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return {
     isLoading,
-    invoiceType,
+    quotationStatus,
   };
 }
 
-export default useInvoiceType;
+export default useQuotationStatus;

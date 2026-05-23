@@ -84,6 +84,7 @@ function ProformaInvoiceDetails() {
   } = useUserAccessModules();
 
   const getProformaInvoices = async (signal: AbortSignal) => {
+    if(loginStatus.companyId === 0)return;
     if (!userHasAccessToViewAccountProformaInvoice) return;
     setInvoiceLoading(true);
     const postData = {
@@ -260,6 +261,7 @@ function ProformaInvoiceDetails() {
   };
 
   const SubmitInvoice = async () => {
+    if(loginStatus.companyId === 0)return;
     if (!invoice) return;
     if (disabled) {
       return;
@@ -299,6 +301,7 @@ function ProformaInvoiceDetails() {
   };
 
   const previewInvoice = async () => {
+    if(loginStatus.companyId === 0)return;
     if (!userHasAccessToViewAccountProformaInvoice) return;
     setIsSubmitting(true);
 
@@ -360,6 +363,7 @@ function ProformaInvoiceDetails() {
   }, [invoice?.adjustmentForRoundOff, invoice?.totalAmount, invoice]);
 
   const updateInvoice = async () => {
+    if(loginStatus.companyId === 0)return;
     if (!invoice) return;
     if (disabled) {
       return;
@@ -402,6 +406,7 @@ function ProformaInvoiceDetails() {
   };
 
   const handleInvoiceDownload = async () => {
+    if(loginStatus.companyId === 0)return;
     if (!disabled) return;
     if (!userHasAccessToViewAccountProformaInvoice) return;
     setIsSubmitting(true);
@@ -439,6 +444,7 @@ function ProformaInvoiceDetails() {
   };
 
   const handleDeleteItem = async (item: any) => {
+    if(loginStatus.companyId === 0)return;
     console.log("Delete item with id:", item.id);
     console.log(disabled);
 
@@ -607,6 +613,7 @@ function ProformaInvoiceDetails() {
     (i) => i.cessAmount != null && i.cessAmount > 0,
   );
   const saveSingleItem = async (item: any) => {
+    if(loginStatus.companyId === 0)return;
     if (!userHasAccessToUpdateAccountProformaInvoice) {
       return;
     }
@@ -651,6 +658,7 @@ function ProformaInvoiceDetails() {
   };
 
   const handleSaveInvoice = async () => {
+    if(loginStatus.companyId === 0)return;
     if (!userHasAccessToAddAccountProformaInvoice) return;
     if (!selectedAccount) {
       toast.error("Please select an account");
@@ -732,6 +740,7 @@ function ProformaInvoiceDetails() {
   };
 
   useEffect(() => {
+    if(loginStatus.companyId === 0)return;
     if (!invoiceId || Number(invoiceId) === 0) return;
 
     const controller = new AbortController();

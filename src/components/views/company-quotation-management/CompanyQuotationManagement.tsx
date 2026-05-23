@@ -9,11 +9,11 @@ import { Modules } from "../../../@types/List/CompanyQuotationManagementListProp
 import axiosClient from "../../../axios-client/AxiosClient";
 import { handleApiError } from "../../../config/error/handleApiError";
 import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
-import useInvoiceStatus from "../../../config/hooks/useInvoiceStatus";
 import {
   customDateRangeId,
   useSearchFilterPaginationDateHandlers,
 } from "../../../config/hooks/usePaginationHandler";
+import useQuotationStatus from "../../../config/hooks/useQuotationStatus";
 import { STATUS_CODE } from "../../../constants/AppConstants";
 import POST_API from "../../../constants/PostApi";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
@@ -31,7 +31,7 @@ function CompanyQuotationManagement({
   //   console.log(account);
 
   const { userHasAccessToViewCompanyQuotation } = useUserAccessModules();
-  const { invoiceStatus } = useInvoiceStatus();
+  const { quotationStatus } = useQuotationStatus();
   const [accessDeniedPopUpOpen, setAccessDeniedPopUpOpen] = useState(false);
   const [isLoadingForCompanyQuotation, setIsLoadingForCompanyQuotation] =
     useState<boolean>(false);
@@ -275,7 +275,7 @@ function CompanyQuotationManagement({
               onPageSizeChange: handlePageSizeChange,
             }}
             otherData={otherData}
-            quotationStatus={invoiceStatus}
+            quotationStatus={quotationStatus}
             handleSelectedQuotationStatus={(
               selectedStatus: number | undefined,
             ) => setSelectedCompanyQuotationStatus(selectedStatus)}

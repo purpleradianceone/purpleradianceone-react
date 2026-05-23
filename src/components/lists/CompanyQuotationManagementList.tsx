@@ -104,6 +104,7 @@ function CompanyQuotationManagementList({
   };
 
   const onDeleteQuotation = async (rowData: CompanyQuotationProps) => {
+    if(loginStatus.companyId === 0)return;
     console.log("Delete Quotation:", rowData);
     const postData = {
       company_id: loginStatus.companyId,
@@ -140,6 +141,7 @@ function CompanyQuotationManagementList({
   };
 
   const handleQuotationDownload = async (rowData: CompanyQuotationProps) => {
+    if(loginStatus.companyId === 0)return;
     setIsSubmitting(true);
     setQuotationFileName(rowData.quotationNumber);
 

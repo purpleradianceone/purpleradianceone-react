@@ -88,6 +88,8 @@ function AccountInvoiceManagementList({
   };
 
   const handleSaveHeader = async () => {
+    if(loginStatus.companyId === 0)return;
+
     // if (!dueDate) {
     //   toast.error("Please select due date");
     //   return;
@@ -140,6 +142,7 @@ function AccountInvoiceManagementList({
   };
 
   const onDeleteInvoice = async (rowData: AccountInvoiceProps) => {
+    if(loginStatus.companyId === 0)return;
     console.log("Delete Invoice:", rowData);
     const postData = {
       id: rowData.id,
@@ -174,6 +177,7 @@ function AccountInvoiceManagementList({
   };
 
   const handleInvoiceDownload = async (rowData: AccountInvoiceProps) => {
+    if(loginStatus.companyId === 0)return;
     setIsSubmitting(true);
 
     try {

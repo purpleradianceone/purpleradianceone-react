@@ -18,6 +18,7 @@ function useInvoiceStatus() {
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const getInvoiceStatus = async () => {
+    if(loginStatus.companyId === 0)return;
     const postData = {
       company_id: loginStatus.companyId,
       id: null,

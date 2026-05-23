@@ -72,6 +72,7 @@ function AccountInvoice({
 
   // 🔥 API CALL
   const getInvoices = async (signal: AbortSignal) => {
+    if(loginStatus.companyId === 0)return;
     if (!userHasAccessToViewCompanyInvoiceDraft) return;
     setGridLoading(true);
     setInvoiceData([]); // Clear data to show skeleton

@@ -70,6 +70,7 @@ function AccountProformaInvoice({
 
   // 🔥 API CALL
   const getProformaInvoice = async (signal: AbortSignal) => {
+    if(loginStatus.companyId === 0)return;
     if (!userHasAccessToViewAccountProformaInvoice) return;
     setGridLoading(true);
     setInvoiceData([]);
