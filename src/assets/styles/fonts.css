@@ -23,6 +23,22 @@
 }
 
 
+/* page header */
+.page-header-custom {
+  font-family: "Inter", sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: #334155; /* slate-700 */
+}
+
+.page-subtitle-custom {
+  font-family: "Inter", sans-serif;
+  font-size: 12px; 
+  font-weight: 400;
+  color: #64748b; 
+}
+
+
 /* Section Headers */
 .section-header-custom {
   font-family: "Inter", sans-serif;

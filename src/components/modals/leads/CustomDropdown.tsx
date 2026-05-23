@@ -16,6 +16,7 @@ interface DropdownProps {
   paddingy?: number;
   errorMessage?: string;
   height?: string;
+  showBorder?: boolean;
 }
 
 const CustomDropdown: React.FC<DropdownProps> = ({
@@ -28,6 +29,7 @@ const CustomDropdown: React.FC<DropdownProps> = ({
   requiredRedDot,
   logo: Icon,
   paddingy = 1,
+  showBorder = true,
   errorMessage,
   height = "",
 }) => {
@@ -100,7 +102,7 @@ const CustomDropdown: React.FC<DropdownProps> = ({
       <div
         role="button"
         tabIndex={0}
-        className={`w-full flex justify-between items-center py-${paddingy} px-1 ${height} border-2 rounded-md cursor-pointer text-gray-700 
+        className={`w-full flex justify-between items-center py-${paddingy} px-1 ${height}   ${showBorder ? "border-2" : ""} rounded-md cursor-pointer text-gray-700 
           ${readOnly ? "bg-gray-100" : "bg-white"}`}
         onClick={() => {
           if (!readOnly) {

@@ -336,9 +336,23 @@
   }
 }
 
+.custom-scrollbar .ag-body-viewport::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.custom-scrollbar .ag-body-viewport::-webkit-scrollbar-thumb {
+  background: #94a3b8;
+  border-radius: 10px;
+}
+
 .modern-user-grid .ag-root-wrapper {
-  border: 1px solid #dee0e4 !important;
+ 
+  /* border-radius: 1px; */
+  
   overflow: hidden;
+  border: 1px solid #dee0e4 !important;
+ 
 }
 
 .modern-user-grid .ag-header {
@@ -352,6 +366,13 @@
   color: #4d596b;
   letter-spacing: 0.05em;
   font-family: "Roboto", sans-serif;
+  border-bottom: 1px solid #ddd;
+  /* background: linear-gradient(to bottom, #f8f9fa, #e9ecef); */
+  text-transform: capitalize;
+  top: 0;
+  transition: background 0.2s ease-in-out;
+  color: #333333;
+  
 }
 
 .modern-user-grid .ag-row {
@@ -362,42 +383,47 @@
   border: none !important;
   color: #5e6168;
   font-size: 12px;
-  font-weight: 400;  
+  font-weight: 400;
 }
 .modern-user-grid .ag-cell-value {
-  
   display: flex;
-  align-items: center;      /* vertical center */
+  align-items: center; /* vertical center */
 }
 
 .modern-user-grid .ag-cell-value .lead-details {
-  font-size: 12px;
-  border-radius: 4px;
   height: 25px;
-  background: #2563eb;
-  padding: 2px 4px;
-  color: #fff;
-  border: none;
-  box-shadow: 0 2px 6px rgba(0, 123, 255, 0.25);
-  cursor: pointer;
-  transition:
-    transform 0.15s ease,
-    box-shadow 0.2s ease;
+ 
+  padding: 0 5px;
 
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
+  gap: 3px;
+  border-radius: 8px;
+  border: 1px solid #dbe3f0;
+  background: #ffffff;
+  color: #6d6e70;
+  font-size: 12px;
+  font-weight: 400;
+  font-family: "Roboto", sans-serif;
+  cursor: pointer;
 
-  white-space: nowrap;   /* prevent text wrap */      /* optional */
+  white-space: nowrap;
+
+  transition: all 0.18s ease;
+
+  box-shadow:
+    0 1px 2px rgba(15, 23, 42, 0.06),
+    0 2px 6px rgba(37, 99, 235, 0.08);
 }
 
 .modern-user-grid .ag-cell-value .lead-details:hover {
-  background: #1d4ed8;
-  transform: translateY(-1px);
-  /* box-shadow: 0 4px 10px rgba(0, 123, 255, 0.35); */
-}
-  
+  background: #eff6ff;
 
+  border-color: #469fff;
+  color: #007bff;
+  transform: translateY(-1px);
+}
 
 .modern-user-grid .ag-row:hover {
   background-color: #f8fafc;
@@ -425,9 +451,3 @@
 .modern-user-grid .ag-root-wrapper ::-webkit-scrollbar-thumb:hover {
   background: #adb5bd;
 }
-
-
-
-
-
-

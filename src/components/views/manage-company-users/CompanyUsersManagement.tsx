@@ -64,6 +64,14 @@ function GetCompanyUsers({
   const { userHasAccessToViewUser } = useUserAccessModules();
   const [userUpdateCount, setUserUpdateCount] = useState(0);
 
+   const [refreshUsers, setRefreshUsers] = useState(0);
+
+  const handleRefreshUsers = () => {
+  setRefreshUsers((prev) => prev + 1);
+};
+
+
+
   // Read filters from LocalStorage (before hook initializes)
 const savedFilters = JSON.parse(
   localStorage.getItem(LocalStorageKeys.COMPANY_MANAGEMEMNT_FILTERS) || "{}"
@@ -162,6 +170,7 @@ const savedFilters = JSON.parse(
     endDate,
     concatDate,
     userUpdateCount,
+    refreshUsers,
   ]);
 
   useEffect(() => {
@@ -216,6 +225,7 @@ const savedFilters = JSON.parse(
               transition={{ duration: 0.4, ease: "easeOut" }}
             >
               <GetCompanyUsersList
+                onRefreshUsers={handleRefreshUsers}
                 handleCompanyUserChangeOnEdit={handleCompanyUserChangeOnEdit}
                 onEndDateChange={handleEndDateChange}
                 onStartDateChange={handleStartDateChange}
