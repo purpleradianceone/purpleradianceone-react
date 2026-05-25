@@ -9,6 +9,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 
 import {
   Edit,
+  FileBarChart,
   LucideLayoutDashboard,
   
   UserCheck,
@@ -46,6 +47,7 @@ function CompanyUserAgGrid({
   handleIdIsEditModalOpen,
   handleIsAccessModalOpen,
   handleIsDashboardModalOpen,
+  handleUserReportModalOpen,
   handleActionsTourEnd,
   isActionsTourEnded,
   isUsedInAccountProductForAssingingInstalledBy,
@@ -56,6 +58,7 @@ function CompanyUserAgGrid({
     userHasAccessToViewAccess,
     userHasAccessToUpdateUser,
     userHasAccessToViewDashboard,
+    userHasAccessToViewCompanyUserReportType,
   } = useUserAccessModules();
 
   const columnDefs = useMemo<ColDef[]>(
@@ -324,6 +327,8 @@ function CompanyUserAgGrid({
                           handleIdIsEditModalOpen(false);
 
                           handleIsDashboardModalOpen(false);
+
+                          handleUserReportModalOpen(false);
                         }}
                         modalOpenTriggerIndices={[0, 2, 4, 5]}
                         isModalOpen={(index) => {
@@ -428,21 +433,31 @@ function CompanyUserAgGrid({
                         {JSX_CHILDREN_NAME.DASHBOARD}
                       </span>
                     </ActionsDropdownButton>
-                    {/* {!userHasAccessToViewAccess && (
-                      <ActionsDropdownButton disabled>
-                        <UserCheck
-                          className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR}
-                        />{" "}
-                        {JSX_CHILDREN_NAME.ACCESS}
-                      </ActionsDropdownButton>
-                    )} */}
 
-                    {/* {!userHasAccessToUpdateUser && (
-                      <ActionsDropdownButton disabled>
-                        <Edit className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR} />{" "}
-                        {JSX_CHILDREN_NAME.EDIT}
-                      </ActionsDropdownButton>
-                    )} */}
+                    <ActionsDropdownButton
+                      id="company-user-edit-action-btn"
+                      disabled={!userHasAccessToViewCompanyUserReportType}
+                      onClick={() => {
+                        if (userHasAccessToViewCompanyUserReportType) {
+                          handleSelectedCompanyUserChange(params.data);
+
+                          handleIdIsEditModalOpen(false);
+
+                          setIsActionsDropDownOpen(false);
+
+                          handleUserReportModalOpen(true);
+                        } else {
+                          toast.error(
+                            MESSAGE.MODULE_ACCESS.REPORT.USER_REPORT.DENIED_VIEW_ACCESS
+                          );
+                        }
+                      }}
+                    >
+                      <FileBarChart className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR} />
+
+                      {JSX_CHILDREN_NAME.REPORT}
+                    </ActionsDropdownButton>
+
                   </div>,
                   document.body,
                 )}

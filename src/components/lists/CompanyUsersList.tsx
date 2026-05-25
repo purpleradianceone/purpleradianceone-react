@@ -39,6 +39,7 @@ import { customDateRangeId } from "../../config/hooks/usePaginationHandler";
 
 import CustomDropdown from "../modals/leads/CustomDropdown";
 import SummaryCards from "../ui/SummaryCards";
+import CompanyUserReportModal from "../modals/company-user/CompanyUserReportModal";
 
 function GetCompanyUsersList({
   users,
@@ -58,6 +59,9 @@ function GetCompanyUsersList({
   const [isActionsTourEnded, setIsActionsTourEnded] = useState<boolean>(false);
 
   const [isDashboardModalOpen, setIsDashboardModalOpen] =
+    useState<boolean>(false);
+
+    const [isUserReportModalOpen, setIsUserReportModalOpen] =
     useState<boolean>(false);
 
   const [isEditCompanyUserModalOpen, setIsEditModalOpen] =
@@ -127,6 +131,10 @@ function GetCompanyUsersList({
   const handleIsDashboardModalOpen = (status: boolean) => {
     setIsDashboardModalOpen(status);
   };
+
+  const handleUserReportModalOpen = (status: boolean) => {
+    setIsUserReportModalOpen(status);
+  }
 
   const handleTourModalOpen = (index: number) => {
     if (index === 2) {
@@ -644,6 +652,7 @@ function GetCompanyUsersList({
             handleIdIsEditModalOpen={handleIdIsEditModalOpen}
             handleIsAccessModalOpen={handleIsAccessModalOpen}
             handleIsDashboardModalOpen={handleIsDashboardModalOpen}
+            handleUserReportModalOpen={handleUserReportModalOpen}
             isActionsTourEnded={isActionsTourEnded}
             handleActionsTourEnd={handleActionsTourEnd}
             isDataLoading={isDataLoading}
@@ -670,6 +679,16 @@ function GetCompanyUsersList({
           }}
           users={selectedCompanyUser}
         />
+
+        <CompanyUserReportModal
+        isOpen={isUserReportModalOpen}
+        onClose={()=>{
+          setIsUserReportModalOpen(false);
+        }}
+        companyUser={selectedCompanyUser}
+        />
+
+
       </div>
       {/* pagination component */}
       <div className="flex items-center justify-end ">
