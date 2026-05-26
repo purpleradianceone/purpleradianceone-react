@@ -1,5 +1,4 @@
 import { motion } from "framer-motion";
-import { ListChecks } from "lucide-react";
 import { useState } from "react";
 import { useInView } from "react-intersection-observer";
 import { Outlet } from "react-router-dom";
@@ -25,21 +24,23 @@ function TaskPage() {
             animate={inView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.4, ease: "easeOut" }}
           >
-            <div className="sticky top-0 z-50  py-1  flex items-center justify-between bg-gray-50 rounded-sm shadow-sm   w-full">
+
+            {/* //Task Tab */}
+            {/* <div className="sticky top-0 z-50  py-1  flex items-center justify-between bg-gray-50 rounded-sm shadow-sm   w-full">
               <div className="flex w-full gap-2 justify-start pl-1">
                 <div className="flex items-center gap-1">
                   <ListChecks className="w-5 h-5 text-blue-600" />
                   <span className="section-header-custom">Tasks</span>
                 </div>
               </div>
-            </div>
+            </div> */}
             {
               <div className="sticky top-1 left-0 z-20">
                 <TaskTab />
               </div>
             }
             <div className="">
-              <div className="border rounded-md  bg-gray-50">
+              <div className="">
                 <Outlet />
               </div>
             </div>

@@ -37,3 +37,7 @@ export const updateAccount  = async (payload: object
     const response = await axiosClient.post(POST_API.UPDATE_ACCOUNT, payload, { withCredentials: true })
     return response;
 }
+
+
+
+

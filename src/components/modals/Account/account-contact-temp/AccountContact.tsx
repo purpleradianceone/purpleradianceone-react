@@ -209,7 +209,7 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
     setAccountContactForm({ ...accountContactForm, [name]: value.trim() });
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const { name, email, mobileNumber } = accountContactForm;
     let isValid = true;
@@ -440,7 +440,7 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
   if (userHasAccessToViewAccountContacts && showLoadingSpinner)
     return (
       <>
-        <div className="w-full h-full  flex justify-center items-center">
+        <div className="w-full h-full min-h-[280px] flex justify-center items-center">
           <LoadingSpinner />
         </div>
       </>
@@ -452,11 +452,12 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
       />
     );
   return (
-    <>
+    <div className="h-full min-h-[280px]  w-full">
       {accountContact.length === 0 ? (
-        <div className=" w-full h-full bg-slate-0">
+        <div className=" w-full h-full min-h-[280px] bg-slate-0 flex  justify-center items-center">
           <div className="flex gap-1 w-full text-xs h-full bg-green-0 items-center justify-center">
             <Button
+            type="button"
               disabled={!userHasAccessToAddAccountContacts}
               onClick={() => {
                 if (userHasAccessToAddAccountContacts) {
@@ -477,10 +478,11 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
           </div>
         </div>
       ) : (
-        <>
+        <div>
           {/* Header */}
-          <div className="flex justify-end items-center text-xs gap-x-2 py-1 text-gray-500">
+          <div className="flex justify-end items-center text-xs gap-x-2 py-1  text-gray-500">
             <Button
+            type="button"
               disabled={!userHasAccessToAddAccountContacts}
               onClick={() => {
                 if (userHasAccessToAddAccountContacts) {
@@ -806,7 +808,7 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
               </div>,
               document.body,
             )}
-        </>
+        </div>
       )}
       {/* Add Contact Form Modal */}
       {isOpenAddAccountContactForm &&
@@ -833,11 +835,12 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
               </div>
 
               {/* Form Grid */}
-              <form>
+              <form onSubmit={handleSubmit}>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 text-sm text-gray-500">
                   {/* name */}
                   <div>
                     <FormInput
+                    autoFocus={true}
                       logo={User}
                       label="Full Name: "
                       required
@@ -985,8 +988,7 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
                     />
                   </div>
                 </div>
-              </form>
-              {/* Footer Buttons */}
+                {/* Footer Buttons */}
               <div className="flex items-center justify-end gap-4 mt-3 ">
                 <div className="flex gap-2">
                   <Button
@@ -1002,7 +1004,7 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
                   <Button
                     // className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 text-sm rounded"
                     type="submit"
-                    onClick={handleSubmit}
+                    // onClick={}
                   >
                     <div className="flex items-center gap-1">
                       <Save size={SIZE.SIXTEEN} />
@@ -1011,12 +1013,14 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
                   </Button>
                 </div>
               </div>
+              </form>
+              
             </div>
           </div>,
           document.body,
         )}
       {isSaving && <LoadingPopUpAnimation show={isSaving} />}
-    </>
+    </div>
   );
 };
 export default AccountContact;

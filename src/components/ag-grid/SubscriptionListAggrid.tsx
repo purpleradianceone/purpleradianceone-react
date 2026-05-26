@@ -11,15 +11,18 @@ import { createPortal } from "react-dom";
 import ActionsDropdownButton from "../ui/ActionsDropdownButton";
 import { CLASS_NAMES } from "../../constants/ClassNames";
 import { useUserAccessModules } from "../../config/hooks/useAccessModules";
+import { SkeletonRowsAgGrid } from "../ui/SkeletonRowsAgGrid";
 
 function SubscriptionListAggrid({
   subscriptionList,
   handleUpdateSubscriptionModalOpen,
   handleSelectedSubscription,
+  isDataLoading
 }: {
   subscriptionList: SubscriptionListProps[];
   handleUpdateSubscriptionModalOpen: (status: boolean) => void;
   handleSelectedSubscription: (params: SubscriptionListProps) => void;
+  isDataLoading : boolean
 }) {
   const isCurrentDateInRange = (startDateStr: string, endDateStr: string) => {
     const startDate = new Date(startDateStr);
@@ -51,6 +54,9 @@ function SubscriptionListAggrid({
         field: "subscriptionStatus",
         headerName: "Status",
         cellRenderer: (params: any) => {
+           if (params.data?.__isSkeleton) {
+                return <SkeletonRowsAgGrid />;
+              }
           if (params.value === "Ongoing") {
             return (
               <div className="flex items-center gap-1 mt-1">
@@ -92,6 +98,9 @@ function SubscriptionListAggrid({
         sortable: true,
         filter: true,
         cellRenderer: (params: any) => {
+           if (params.data?.__isSkeleton) {
+                return <SkeletonRowsAgGrid />;
+              }
           const [statusOfSubscription] = useState<string>(() => {
             return isCurrentDateInRange(
               params.data.startDate,
@@ -175,6 +184,9 @@ function SubscriptionListAggrid({
         pinned: "right",
 
         cellRenderer: (params: any) => {
+           if (params.data?.__isSkeleton) {
+                return <SkeletonRowsAgGrid />;
+              }
           const [isActionsDropDownOpen, setIsActionsDropDownOpen] =
             useState(false);
           const [position, setPosition] = useState({
@@ -297,7 +309,21 @@ function SubscriptionListAggrid({
       suppressHeaderMenuButton: true,
       suppressHeaderContextMenu: true,
       enablePivot: true,
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            cellRenderer: (params: any) => {
+              if (params.data?.__isSkeleton) {
+                return <SkeletonRowsAgGrid />;
+              }
+              return params.value;
+            },
     };
+  }, []);
+
+  const skeletonRows = useMemo(() => {
+    return Array.from({ length: 30 }).map(() => ({
+      __isSkeleton: true,
+    }));
   }, []);
   return (
     <>
@@ -306,7 +332,7 @@ function SubscriptionListAggrid({
         style={{ height: "100%", width: "100%" }}
       >
         <AgGridReact
-          rowData={subscriptionList}
+          rowData={isDataLoading ? skeletonRows: subscriptionList}
           columnDefs={columnDefs}
           defaultColDef={defaultColDef}
           modules={[AllCommunityModule]}

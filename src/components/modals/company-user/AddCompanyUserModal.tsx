@@ -11,7 +11,7 @@ import POST_API from "../../../constants/PostApi";
 import { useFormChange } from "../../../config/hooks/useFormChange";
 import { useFormValidation } from "../../../config/hooks/useFormValidation";
 import {  SIZE, STATUS_CODE, VALIDATIONS } from "../../../constants/AppConstants";
-import ROUTES_URL from "../../../constants/Routes";
+// import ROUTES_URL from "../../../constants/Routes";
 import MESSAGE from "../../../constants/Messages";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import ApiError from "../../../@types/error/ApiError";
@@ -23,7 +23,7 @@ import FormHeader from "../../ui/FormHeader";
 import { createPortal } from "react-dom";
 import LoadingPopUpAnimation from "../../views/card/LoadingPopUpAnimation";
 
-function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
+function AddCompanyUserModal({ isOpen, onClose, onUserAdded, }: AddCompanyUserModalProps) {
   const { loginStatus } = useLoggedInUserContext();
 
   const initialAddCompanyUserFormData: AddCompanyUserStateType = {
@@ -43,7 +43,7 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
     addCompanyUserFormData,
     "registration"
   );
-  const handleAddUserSubmit = async (event: React.FormEvent) => {
+  const handleAddUserSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if(isSaving) return;
     const mobileRegex = REGEX.MOBILE_NUMBER;
@@ -92,8 +92,11 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
             mobilenumber: "",
             email: "",
           });
+          // get call
+          onUserAdded();
+          
           onClose();
-          window.location.href = ROUTES_URL.GET_COMPANY_USERS;
+          // window.location.href = ROUTES_URL.GET_COMPANY_USERS;
         } else {
           toast.error(response.data.message);
         }
@@ -160,6 +163,7 @@ function AddCompanyUserModal({ isOpen, onClose }: AddCompanyUserModalProps) {
               <form className="space-y-3" onSubmit={handleAddUserSubmit}>
                 <FormInput
                 logo={User}
+                autoFocus={true}
                   id="company-user-module-add-name"
                   label="Name"
                   type="text"

@@ -7,6 +7,7 @@ pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/$
 type Props = {
   fileUrl: string;
   fileExtension?: string;
+  fileName?: string;
   height?: string | number;
   width?: string | number;
   enableDownload?: boolean;
@@ -15,6 +16,7 @@ type Props = {
 const CustomDocumentPreviewComponent: React.FC<Props> = ({
   fileUrl,
   fileExtension,
+  fileName,
   height = "80%",
   width = "80%",
   enableDownload = false,
@@ -61,11 +63,60 @@ const CustomDocumentPreviewComponent: React.FC<Props> = ({
     fileUrl.includes("127.0.0.1") ||
     fileUrl.startsWith("blob:");
 
-  const downloadFile = () => {
-    const link = document.createElement("a");
-    link.href = fileUrl;
-    link.download = "";
-    link.click();
+  // const downloadFile = () => {
+  //   const link = document.createElement("a");
+  //   link.href = fileUrl;
+  //   link.download = "";
+  //   link.click();
+  // };
+
+  const downloadFile = async () => {
+    try {
+      // If blob/local → direct download works
+      if (fileUrl.startsWith("blob:") || fileUrl.startsWith("data:")) {
+        const link = document.createElement("a");
+        link.href = fileUrl;
+
+        if (fileName) {
+          const hasExt = fileName.includes(".");
+          link.download = hasExt ? fileName : `${fileName}.${ext}`;
+        } else {
+          link.download = "";
+        }
+
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        return;
+      }
+
+      // 🔥 For external URLs (S3/CDN) → fetch as blob
+      const response = await fetch(fileUrl);
+      const blob = await response.blob();
+
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+
+      link.href = url;
+
+      if (fileName) {
+        const hasExt = fileName.includes(".");
+        link.download = hasExt ? fileName : `${fileName}.${ext}`;
+      } else {
+        // fallback from URL
+        const defaultName =
+          fileUrl.split("/").pop()?.split("?")[0] || "download";
+        link.download = defaultName;
+      }
+
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error("Download failed", err);
+    }
   };
 
   return (
@@ -154,7 +205,6 @@ const CustomDocumentPreviewComponent: React.FC<Props> = ({
             title="PDF Preview"
             className="w-full h-full"
             onLoad={() => setLoading(false)}
-
           />
         )}
 

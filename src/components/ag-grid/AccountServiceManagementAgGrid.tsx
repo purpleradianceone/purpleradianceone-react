@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-
 import { AllCommunityModule, ColDef, themeBalham } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 import { useMemo, useRef } from "react";
@@ -7,11 +6,14 @@ import { INNERHTML, JSX_CHILDREN_NAME } from "../../constants/AppConstants";
 import AccountServiceManagementGridProps from "../../@types/ag-grid/AccountServiceManagementAgGridProps";
 import AccountServiceProps from "../../@types/account/AccountServiceProps";
 import StatusIndicator from "../ui/StatusIndicator";
+import COLORS from "../../constants/Colors";
+import Button from "../ui/Button";
 
 function AccountServiceManagementAgGrid({
   accountServices,
   onRowSelect,
-  handleRowClick,
+  handleAddToInvoice,
+  // handleRowClick,
 
   isUsedInSupportTicketModule,
 }: AccountServiceManagementGridProps) {
@@ -52,17 +54,45 @@ function AccountServiceManagementAgGrid({
         filter: true,
         minWidth: 100,
       },
-
       {
         field: "isActive",
         headerName: "Status",
         sortable: true,
         filter: true,
-
         cellRenderer: (params: any) => {
           return (
             <div className="flex items-center text-sm gap-1 mt-1">
               <StatusIndicator isActive={params.value} />
+            </div>
+          );
+        },
+      },
+      {
+        field: "isAddedToInvoiceDraft",
+        headerName: "InvoiceStatus",
+        sortable: true,
+        filter: true,
+        cellRenderer: (params: any) => {
+          const isAdded = params.value;
+
+          return (
+            <div className="flex items-center justify-center">
+              {isAdded ? (
+                <span className="text-green-600 font-medium">
+                  Added to Invoice
+                </span>
+              ) : (
+                <Button
+                  type="button"
+                  className={COLORS.ADD_BUTTON}
+                  onClick={(e) => {
+                    e.stopPropagation(); // ✅ prevent row click
+                    params.context.handleAddToInvoice(params.data);
+                  }}
+                >
+                  Add to Invoice
+                </Button>
+              )}
             </div>
           );
         },
@@ -145,8 +175,11 @@ function AccountServiceManagementAgGrid({
         modules={[AllCommunityModule]}
         theme={themeBalham}
         overlayNoRowsTemplate={INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
-        context={{ handleRowSelect: onRowSelect }}
-        onRowClicked={handleRowClick}
+        context={{
+          handleRowSelect: onRowSelect,
+          handleAddToInvoice: handleAddToInvoice,
+        }}
+        // onRowClicked={handleRowClick}
       />
     </div>
   );

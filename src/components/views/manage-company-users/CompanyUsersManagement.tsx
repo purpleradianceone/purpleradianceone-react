@@ -56,12 +56,21 @@ function GetCompanyUsers({
   const [companyUsers, setCompanyUsers] = useState<CompanyUsersSearchProps[]>(
     []
   );
+  const [isDataLoading , setIsDataLoading] = useState<boolean>(false);
   const [ref, inView] = useInView({ fallbackInView: true, threshold: 0.1 });
   const { loginStatus } = useLoggedInUserContext();
   const [accessDeniedPopUpOpen, setAccessDeniedPopUpOpen] = useState(false);
 
   const { userHasAccessToViewUser } = useUserAccessModules();
   const [userUpdateCount, setUserUpdateCount] = useState(0);
+
+   const [refreshUsers, setRefreshUsers] = useState(0);
+
+  const handleRefreshUsers = () => {
+  setRefreshUsers((prev) => prev + 1);
+};
+
+
 
   // Read filters from LocalStorage (before hook initializes)
 const savedFilters = JSON.parse(
@@ -114,6 +123,7 @@ const savedFilters = JSON.parse(
     };
 
     try {
+      setIsDataLoading(true)
       const response = await axiosClient.post(POST_API.GET_COMPANY_USERS, postData, {
         signal,
         withCredentials: true,
@@ -131,6 +141,8 @@ const savedFilters = JSON.parse(
           fetchCompanyUsers(signal);
         }
       }
+    }finally{
+      setIsDataLoading(false)
     }
   };
 
@@ -158,6 +170,7 @@ const savedFilters = JSON.parse(
     endDate,
     concatDate,
     userUpdateCount,
+    refreshUsers,
   ]);
 
   useEffect(() => {
@@ -212,6 +225,7 @@ const savedFilters = JSON.parse(
               transition={{ duration: 0.4, ease: "easeOut" }}
             >
               <GetCompanyUsersList
+                onRefreshUsers={handleRefreshUsers}
                 handleCompanyUserChangeOnEdit={handleCompanyUserChangeOnEdit}
                 onEndDateChange={handleEndDateChange}
                 onStartDateChange={handleStartDateChange}
@@ -235,6 +249,7 @@ const savedFilters = JSON.parse(
                   isUsedInAccountProductForAssingingInstalledBy
                 }
                 onRowSelect={onRowSelect}
+                isDataLoading={isDataLoading}
               />
             </motion.section>
           </div>

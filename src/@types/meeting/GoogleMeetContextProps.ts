@@ -1,12 +1,10 @@
-
-
 export type GoogleMeetContextState = {
-    isConnected : boolean
-}
+  isConnected: boolean;
+  email?: string;
+};
 export type GoogleMeetContextProps = {
-    googleMeetStatus : GoogleMeetContextState;
-    setGoogleMeetStatus : (googleMeetStatusState: GoogleMeetContextState) => void;
-
+  googleMeetStatus: GoogleMeetContextState;
+  setGoogleMeetStatus: (googleMeetStatusState: GoogleMeetContextState) => void;
 };
 
 export default GoogleMeetContextProps;

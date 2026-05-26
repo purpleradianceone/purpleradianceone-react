@@ -2,7 +2,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Settings } from "lucide-react";
 import {  STATUS_CODE } from "../../../../constants/AppConstants";
-import { createPortal } from "react-dom";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
 import { useEffect, useState } from "react";
 import CompanyLeadSettingType from "../../../../@types/settings/CompanyLeadSettings";
@@ -145,28 +144,8 @@ function LeadSettingForLead({
   }, [isOpen]);
 
   if (!isOpen) return null;
-  return createPortal(
-    <div className="fixed inset-0 z-20 p-4 flex items-center justify-center bg-black bg-opacity-5  animate-fadeIn">
-      <div
-        className="relative w-full p-4 max-w-lg max-h-[90vh] overflow-y-auto bg-white rounded-xl shadow-2xl animate-scaleUp
-        [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-thumb]:rounded-full"
-      >
-        {/* <div className="sticky top-0 bg-white px-6 py-4 border-b border-gray-200 flex items-center justify-between z-10">
-          <div className="flex items-center gap-3">
-            <Settings className="text-blue-600" size={SIZE.TWENTY_FOUR} />
-            <h2 className="text-xl font-bold text-gray-800">
-              Manage Settings for{" "}
-              <span className="text-blue-600">{lead.name}</span>
-            </h2>
-          </div>
-          <button
-            onClick={onClose}
-            className="text-gray-500 hover:text-gray-700 transition-colors duration-200"
-            aria-label="Close settings"
-          >
-            <X size={SIZE.TWENTY_FOUR} />
-          </button>
-        </div> */}
+  return(
+  <div className="">
         <FormHeader
           icon={Settings}
           onClose={onClose}
@@ -175,9 +154,9 @@ function LeadSettingForLead({
           description="Update and manage the settings associated with this lead."
         />
 
-        <div className="p-1">
-          <div className="bg-gray-50 rounded-lg p-2 mb-1">
-            <div className="flex justify-between items-center mb-4 table-header-custom border-b pb-2">
+        <div className="">
+          <div className="bg-gray-0  px-1 pb-1 ">
+            <div className="flex justify-between items-center mb-1 py-1 table-header-custom border-b ">
               <span className="ml-2">Setting Name</span>
               <span className="mr-2">Status</span>
             </div>
@@ -195,41 +174,12 @@ function LeadSettingForLead({
                   leadSetting.map((per) => (
                     <div
                       key={per.id}
-                      // className={`
-                      //   relative flex items-center justify-between p-2 rounded-lg border
-                      //   ${
-                      //     per.isActive
-                      //       ? "bg-green-50 border-green-200 shadow-sm"
-                      //       : "bg-red-50 border-red-200 shadow-sm"
-                      //   }
-                      //   hover:shadow-md transition-all duration-200 transform hover:-translate-y-0.5
-                      // `}
-                      className="relative flex items-center justify-between p-2 rounded-lg border hover:shadow-md transition-all duration-200 transform hover:-translate-y-0.5"
+                      className="relative flex items-center justify-between p-1 rounded-md border hover:shadow-md hover:bg-gray-50 hover:p-2 transition-all duration-900 transform hover:-translate-y-0.2"
                     >
                       <div className="table-data-custom flex items-center gap-2">
-                        {/* {per.isActive ? (
-                          <span className="h-2 w-2 rounded-full bg-green-500 animate-pulse"></span>
-                        ) : (
-                          <span className="h-2 w-2 rounded-full bg-red-500 animate-pulse"></span>
-                        )} */}
                         {per.name}
                       </div>
-
-                     
-                        {/* toggel button */}
-                      {/* <label className="inline-flex items-center cursor-pointer relative self-end">
-                        <input
-                          type="checkbox"
-                          className="sr-only peer"
-                          checked={per.isActive}
-                          id={per.id.toString()}
-                          onChange={handleLeadSettingCheckBoxChange}
-                        />
-                        <div className="w-10 h-5 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:bg-green-500 transition-all duration-300" />{" "}
-                        <div className="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transform peer-checked:translate-x-5 transition-all duration-300" />{" "}
-                      </label> */}
                       <ToggleButton
-
                       checked={per.isActive}
                       name={per.id.toString()}
                       onToggle={handleLeadSettingCheckBoxChange}
@@ -241,10 +191,8 @@ function LeadSettingForLead({
             )}
           </div>
         </div>
-      </div>
-    </div>,
-    document.body
-  );
+        </div>
+  )
 }
 
 export default LeadSettingForLead;

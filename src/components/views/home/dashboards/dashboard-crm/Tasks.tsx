@@ -181,14 +181,14 @@ function Tasks({
     >
       <div className="flex items-center justify-between mb-4 flex-shrink-0">
         <div>
-          <h3 className="section-header-custom mb-1">
+          <h3 className="table-header-custom">
             {taskType === "upcoming"
               ? "Upcoming Tasks"
               : taskType === "pending"
               ? "Pending Tasks"
               : "Completed Tasks"}
           </h3>
-          <p className="table-header-custom">
+          <p className="caption-custom">
             {taskType === "upcoming"
               ? "Your scheduled activities and deadlines"
               : taskType === "pending"
@@ -203,7 +203,7 @@ function Tasks({
         {!isLoading && (
           <div className="space-y-4">
             {leadTasks.length === 0 && (
-              <h3 className="input-label-custom mb-2">
+              <h3 className="flex justify-center items-center input-label-custom mb-2">
                 {taskType === "upcoming"
                   ? "No Upcoming Tasks"
                   : taskType === "pending"
@@ -256,7 +256,7 @@ function Tasks({
                           onClick={() => {
                             // getLeadDetails(task.leadId);
                           }}
-                          className={`table-header-custom ${isLoadingForNavigate ? "cursor-wait" : "cursor-pointer"} group-hover:text-blue-600 transition-colors`}
+                          className={`table-data-custom ${isLoadingForNavigate ? "cursor-wait" : "cursor-pointer"} group-hover:text-blue-600 transition-colors`}
                         >
                            {task.leadTaskActivityName} - {task.subject}
                         </h4>
@@ -264,7 +264,7 @@ function Tasks({
                           onClick={() => {
                             // getLeadDetails(task.leadId);
                           }}
-                          className={`table-header-custom ${isLoadingForNavigate ? "cursor-wait" : "cursor-pointer"} group-hover:text-blue-600 transition-colors`}
+                          className={`table-data-custom ${isLoadingForNavigate ? "cursor-wait" : "cursor-pointer"} group-hover:text-blue-600 transition-colors`}
                         >
                           Lead Name: {task.leadName} ({task.leadStatusName})
                         </h4>
@@ -286,7 +286,7 @@ function Tasks({
                         </p>
                       </div>
                       <span
-                        className={`px-2 py-0.5 rounded-full input-label-custom border ${getPriorityColor(
+                        className={`px-2 py-0.5 rounded-full table-data-custom border ${getPriorityColor(
                           task
                         )} flex-shrink-0`}
                       >
@@ -296,7 +296,7 @@ function Tasks({
 
                     <div className="flex-1 items-center justify-between mt-2">
                       <div className="flex items-center space-x-3">
-                        <div className="flex items-center space-x-1 input-label-custom">
+                        <div className="flex items-center space-x-1 table-data-custom">
                           <Clock className="w-3 h-3" />
                           <span className="input-label-custom">
                             {task.dueDateTime}

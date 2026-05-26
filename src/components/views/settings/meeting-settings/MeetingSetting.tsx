@@ -1,4 +1,4 @@
-import { useGoogleMeetContext } from "../../../../context/meeting/GoogleMeetContext";
+// import { useGoogleMeetContext } from "../../../../context/meeting/GoogleMeetContext";
 import { useZoomMeetingContext } from "../../../../context/meeting/ZoomMeetingContext";
 import { useNavigate } from "react-router-dom";
 import ROUTES_URL from "../../../../constants/Routes";
@@ -6,16 +6,25 @@ import Button from "../../../ui/Button";
 import GoogleMeetIcon from "../../../../assets/svg/GoogleMeetIcon";
 import ZoomMeetingsIcon from "../../../../assets/svg/ZoomMeetingsIcon";
 import TeamsIcon from "../../../../assets/svg/TeamsIcon";
+import { useGoogleMeetContext } from "../../../../context/meeting/GoogleMeetContext";
+import { useGoogleMeetStatus } from "../../../../config/hooks/useGoogleMeetStatus";
+import { useZoomMeetingsStatus } from "../../../../config/hooks/useZoomMeetingsStatus";
+import { Mail } from "lucide-react";
 
 function MeetingSettings() {
+  useGoogleMeetStatus();
+  useZoomMeetingsStatus();
+
   const { googleMeetStatus } = useGoogleMeetContext();
   const { zoomMeetingStatus } = useZoomMeetingContext();
   const navigate = useNavigate();
+  console.log(googleMeetStatus, zoomMeetingStatus);
 
   const meetingSettings = [
     {
       id: 1,
       name: "Connect to Google Meet",
+      mail: googleMeetStatus.email,
       isConnected: googleMeetStatus.isConnected,
       icon: <GoogleMeetIcon className="w-6 h-6 text-green-500" />,
       iconBg: "bg-green-50",
@@ -23,6 +32,7 @@ function MeetingSettings() {
     {
       id: 2,
       name: "Connect to Zoom Meetings",
+      mail: zoomMeetingStatus.email,
       isConnected: zoomMeetingStatus.isConnected,
       icon: <ZoomMeetingsIcon className="w-6 h-6 text-blue-500" />,
       iconBg: "bg-blue-50",
@@ -30,6 +40,7 @@ function MeetingSettings() {
     {
       id: 3,
       name: "Connect to Microsoft Teams",
+      mail: zoomMeetingStatus.email,
       isConnected: false,
       icon: <TeamsIcon className="w-6 h-6 text-purple-500" />,
       iconBg: "bg-purple-50",
@@ -47,17 +58,22 @@ function MeetingSettings() {
             <div className={`${platform.iconBg} p-3 rounded-full`}>
               {platform.icon}
             </div>
-            <div>
-              <h3 className="table-header-custom">
-                {platform.name}
-              </h3>
+            <div className="flex flex-col">
+              <h3 className="table-header-custom">{platform.name}</h3>
+              {platform.isConnected && platform.mail && (
+                <p className="text-xs flex items-center gap-1 text-gray-500 mt-1">
+                  <Mail size={12} color="red" />
+                  Connected as:{" "}
+                  <span className="font-medium">{platform.mail}</span>
+                </p>
+              )}
             </div>
           </div>
 
           <div className="min-w-32">
             {platform.id !== 3 ? (
               <Button
-              type="submit"
+                type="submit"
                 disabled={platform.isConnected}
                 onClick={(e) => {
                   e.preventDefault();

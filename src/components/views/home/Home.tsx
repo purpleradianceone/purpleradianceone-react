@@ -202,7 +202,7 @@ const Home: React.FC = () => {
   }, [selectedUser]);
 
   return (
-    <div className="flex flex-col h-screen w-screen bg-gray-100">
+    <div className="flex flex-col h-screen w-[100%] bg-gray-100">
       {!tourFinished && (
         <AppTutorailManager
           steps={DashboardTabsSteps}

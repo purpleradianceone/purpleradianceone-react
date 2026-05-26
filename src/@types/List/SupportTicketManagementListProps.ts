@@ -33,6 +33,7 @@ type SupportTicketManagementListProps = {
     handleSupportSelectedSource : (selectedValue: number | undefined) => void;
     isUsedInSupportTicketModule : boolean,
     handleRowSelectedForShowSupportTicket? : (rowData: SupportTicketProps | any) => void;
+    isDataLoading:boolean
 }
 
 export default SupportTicketManagementListProps;

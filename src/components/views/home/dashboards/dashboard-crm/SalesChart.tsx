@@ -57,8 +57,10 @@ const SalesChart = ({
   };
 
   const getFormatedMonth = (month : string) => {
-    const formattedMonthArray = month.split(" ");
-    const formattedMonth = formattedMonthArray[0] + " " +formattedMonthArray[1].substring(2,4);
+    // const formattedMonthArray = month.split(" ");
+    const formattedMonthArray = month.split(/[\s_]+/);
+
+    const formattedMonth = formattedMonthArray[0] + " " +formattedMonthArray[1].substring(formattedMonthArray[1].length-2,formattedMonthArray[1].length);
     return formattedMonth;
   }
   return (
@@ -73,18 +75,18 @@ const SalesChart = ({
     >
       <div className="flex items-center justify-between mb-5">
         <div>
-          <h3 className="section-header-custom mb-2">Annual Performance</h3>
-          <p className="table-header-custom">Monthly Leads Trend</p>
+          <h3 className="table-header-custom">Annual Performance</h3>
+          <p className="caption-custom">Monthly Leads Trend</p>
         </div>
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full"></div>
-              <span className="input-label-custom">Created Leads</span>
+              <span className="caption-custom">Created Leads</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-full"></div>
-              <span className="input-label-custom">Converted Leads</span>
+              <span className="caption-custom">Converted Leads</span>
             </div>
           </div>
         </div>

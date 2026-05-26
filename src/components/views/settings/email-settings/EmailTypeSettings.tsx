@@ -12,6 +12,7 @@ import AccessDeniedMessagePage from '../../not-found/AccessDeniedMessagePage';
 import toast from 'react-hot-toast';
 import SettingToggleCard from '../../../ui/SettingToggleCard';
 import MESSAGE from '../../../../constants/Messages';
+import FacebookPageSkeleton from '../social-media-integration/meta-app-facebook/PafeIdListCardPopUp';
 
 
 
@@ -150,9 +151,20 @@ function EmailTypeSettings() {
       </div>
 
       {isLoading ? (
-        <div className="flex justify-center items-center mt-20 bg-white">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-blue-500" />
-        </div>
+         <div className="grid md:grid-cols-3 sm:grid-cols-2 gap-4">
+        <FacebookPageSkeleton />
+        <FacebookPageSkeleton />
+        <FacebookPageSkeleton />
+        <FacebookPageSkeleton />
+        <FacebookPageSkeleton />
+        <FacebookPageSkeleton />
+        <FacebookPageSkeleton />
+        <FacebookPageSkeleton />
+        <FacebookPageSkeleton />
+        <FacebookPageSkeleton />
+        <FacebookPageSkeleton />
+        <FacebookPageSkeleton />
+      </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {emailTypeSettings.map((setting) => (

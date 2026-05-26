@@ -53,6 +53,9 @@ import { QuotationTemplateSettingsPanelCreate } from "../../template-panel/Quota
 import QuotationIconSvg from "../../svg/QuotationIconSvg";
 import { STORAGE_KEY_CREATE } from "../../local-storage/LocalStorageKeys";
 import { QuotationEditorSkeleton } from "../../utils/QuotationEditorSkeleton";
+import { QuotationSummeryBlock } from "../../blocks/QuotationSummeryBlock";
+import { EmptyLineBlockQuotation } from "../../blocks/EmptyLineBlockQuotation";
+import localforage from "localforage";
 
 export const EditorCanvasForQuotation: React.FC = () => {
   const canvasBgColor = "#f9f9f9";
@@ -63,22 +66,40 @@ export const EditorCanvasForQuotation: React.FC = () => {
   const parsedFields: DynamicFieldOption[] =
     convertPlaceholdersToFields(placeHolderData);
 
-  const [editorStateData, setEditorStateData] = useState(() => {
-    const jsonEditorState = localStorage.getItem(
-      STORAGE_KEY_CREATE + loginStatus.id,
-    );
-    return jsonEditorState;
-  });
-
   const [isLoadingForData, setIsLogingForData] = useState<boolean>(true);
+  //Local Storage
+  //   const [editorStateData, setEditorStateData] = useState(() => {
+  //     const jsonEditorState = localStorage.getItem(
+  //       STORAGE_KEY_CREATE + loginStatus.id,
+  //     );
+  //     return jsonEditorState;
+  //   });
+  // useEffect(() => {
+  //   const jsonEditorState = localStorage.getItem(STORAGE_KEY_CREATE + loginStatus.id);
+  //   if (jsonEditorState) {
+  //     setEditorStateData(jsonEditorState);
+  //     console.log("stored Local storage editor json state:");
+  //     console.log(jsonEditorState);
+  //   }
+  // }, []);
 
+  // Local Forage
+  const [editorStateData, setEditorStateData] = useState<string | null>(null);
   useEffect(() => {
-    const jsonEditorState = localStorage.getItem(STORAGE_KEY_CREATE);
-    if (jsonEditorState) {
-      setEditorStateData(jsonEditorState);
-      console.log("stored Local storage editor json state:");
-      console.log(jsonEditorState);
-    }
+    const loadEditorState = async () => {
+      const jsonEditorState = await localforage.getItem<string>(
+        STORAGE_KEY_CREATE + loginStatus.id,
+      );
+
+      if (jsonEditorState) {
+        setEditorStateData(jsonEditorState);
+
+        console.log("stored IndexedDB editor json state:");
+        console.log(jsonEditorState);
+      }
+    };
+
+    loadEditorState();
   }, []);
 
   const getPlaceholderForQuotation = () => {
@@ -147,6 +168,8 @@ export const EditorCanvasForQuotation: React.FC = () => {
             FooterBlockQuotation,
             ContentBlockQuotation,
             TableBlockQuotation,
+            QuotationSummeryBlock,
+            EmptyLineBlockQuotation,
           }}
         >
           {/* ROOT WRAPPER */}
@@ -170,7 +193,7 @@ export const EditorCanvasForQuotation: React.FC = () => {
               </main>
             </AutoScrollWrapper>
           </div>
-          <QuotationTemplateSettingsPanelCreate quotationTemplateNamePlaceholder="Enter quotation name. (ex: Quotation 1)"/>
+          <QuotationTemplateSettingsPanelCreate quotationTemplateNamePlaceholder="Enter quotation name. (ex: Quotation 1)" />
         </Editor>
       </DynamicFieldsContext.Provider>
     </div>

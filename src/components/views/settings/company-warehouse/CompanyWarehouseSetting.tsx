@@ -16,10 +16,10 @@ import CreateCompanyWarehouse from "./CreateCompanyWarehouse";
 import ToggleButton from "../../../ui/ToggleButton";
 import { useWarehouseType } from "../../../../config/hooks/useWarehouseType";
 import CompanyWarehouseType from "../../../../@types/warehouse/CompanyWarehouse";
-import LoadingSpinner from "../../../../assets/animations/LoadingSpinner";
 import validateName from "../../../../config/validations/ValidateName";
 import validateDescription from "../../../../config/validations/ValidateDescription";
 import validateLocation from "../../../../config/validations/ValidateLocation";
+import FacebookPageSkeleton from "../social-media-integration/meta-app-facebook/PafeIdListCardPopUp";
 
 const CompanyWarehouseSetting: React.FC = () => {
   const { warehouseTypeData } = useWarehouseType();
@@ -190,11 +190,19 @@ const CompanyWarehouseSetting: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="h-screen flex items-center justify-center">
-        <div className="flex items-center justify-between gap-3">
-          {/* <span>Loading...</span> */}
-          <LoadingSpinner />
-        </div>
+       <div className="grid md:grid-cols-3 sm:grid-cols-2 gap-4">
+        <FacebookPageSkeleton />
+        <FacebookPageSkeleton />
+        <FacebookPageSkeleton />
+        <FacebookPageSkeleton />
+        <FacebookPageSkeleton />
+        <FacebookPageSkeleton />
+        <FacebookPageSkeleton />
+        <FacebookPageSkeleton />
+        <FacebookPageSkeleton />
+        <FacebookPageSkeleton />
+        <FacebookPageSkeleton />
+        <FacebookPageSkeleton />
       </div>
     );
   }

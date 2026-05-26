@@ -3,20 +3,22 @@ import { AllCommunityModule, ColDef, themeBalham } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 import {
   ActionTypeForStockMOdule,
-  INNERHTML,
 } from "../../constants/AppConstants";
 import LiveStockForCompanyProduct from "../../@types/stock/LiveStockForCompanyProduct";
 import { useMemo, useRef } from "react";
 import { useUserAccessModules } from "../../config/hooks/useAccessModules";
+import { SkeletonRowsAgGrid } from "../ui/SkeletonRowsAgGrid";
 
 const StockLiveForCompanyProductAgGrid = ({
   data,
   handleRowClick,
   onRowSelect,
+  isDataLoading 
 }: {
   data: LiveStockForCompanyProduct[];
   handleRowClick?: (event: any) => void;
   onRowSelect?: (data: LiveStockForCompanyProduct | any) => void;
+  isDataLoading : boolean
 }) => {
   const gridRef = useRef<AgGridReact>(null); // Ref to the AgGridReact component
   const { userHasAccessToAddStock } = useUserAccessModules();
@@ -29,6 +31,10 @@ const StockLiveForCompanyProductAgGrid = ({
         filter: true,
         flex: 1.5,
         minWidth: 150,
+        cellStyle:{
+          color : "black",
+          fontWeight: "bold",
+        }
       },
       {
         hide: true,
@@ -103,6 +109,9 @@ const StockLiveForCompanyProductAgGrid = ({
         pinned: "right",
         maxWidth: 80,
         cellRenderer: (params: LiveStockForCompanyProduct | any) => {
+           if (params.data?.__isSkeleton) {
+                return <SkeletonRowsAgGrid />;
+              }
           return (
             <div className="flex items-center justify-center">
               <button
@@ -130,12 +139,27 @@ const StockLiveForCompanyProductAgGrid = ({
     [userHasAccessToAddStock],
   );
 
+
+   const skeletonRows = useMemo(() => {
+    return Array.from({ length: 30 }).map(() => ({
+      __isSkeleton: true,
+    }));
+  }, []);
+
   const defaultColDef = useMemo(
     () => ({
       filter: "agTextColumnFilter",
       flex: 0.8,
       suppressHeaderMenuButton: true,
       suppressHeaderContextMenu: true,
+
+       // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            cellRenderer: (params: any) => {
+              if (params.data?.__isSkeleton) {
+                return <SkeletonRowsAgGrid />;
+              }
+              return params.value;
+            },
     }),
     [],
   );
@@ -147,14 +171,14 @@ const StockLiveForCompanyProductAgGrid = ({
     >
       <AgGridReact
         ref={gridRef}
-        rowData={data}
+        rowData={isDataLoading ? skeletonRows : data}
         columnDefs={columnDefs}
         defaultColDef={defaultColDef}
         modules={[AllCommunityModule]}
         theme={themeBalham}
-        overlayNoRowsTemplate={INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
-        context={{ handleRowSelect: onRowSelect }}
-        onRowClicked={handleRowClick}
+        // overlayNoRowsTemplate={INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
+        context={{ handleRowSelect: isDataLoading ? undefined : onRowSelect }}
+        onRowClicked={ isDataLoading ? undefined : handleRowClick}
       />
     </div>
   );

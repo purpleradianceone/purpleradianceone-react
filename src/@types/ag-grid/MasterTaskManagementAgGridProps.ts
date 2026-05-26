@@ -8,5 +8,6 @@ type MasterTaskManagementAgGridProps = {
   handleRowClick: (event: any) => void;
   isUsedInAllTasksModule: boolean;
   downloadTaskDocument: (taskId: number) => void;
+  isDataLoading : boolean
 };
 export default MasterTaskManagementAgGridProps;

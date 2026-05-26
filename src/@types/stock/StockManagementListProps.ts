@@ -6,6 +6,7 @@ type StockManagementListProps = {
     liveStockForCompanyProduct: LiveStockForCompanyProduct[],
     paginationData: PaginationDataWithoutCountProps;
     handleSearchParameterChange: (value: string) => void;
+    isDataLoading : boolean
 }
 
 export default StockManagementListProps;

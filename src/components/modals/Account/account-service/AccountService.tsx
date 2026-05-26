@@ -21,6 +21,9 @@ import { useUserAccessModules } from "../../../../config/hooks/useAccessModules"
 import RefreshToken from "../../../../config/validations/RefreshToken";
 import AccessDeniedPopup from "../../../views/not-found/AccessDeniedPage";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
+import toast from "react-hot-toast";
+import { handleApiError } from "../../../../config/error/handleApiError";
+import LoadingPopUpAnimation from "../../../views/card/LoadingPopUpAnimation";
 
 function AccountService({
   accountId,
@@ -38,7 +41,7 @@ function AccountService({
   >([]);
 
   const { serviceStatus } = useServiceStatus();
-
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { loginStatus } = useLoggedInUserContext();
 
   const [accountServiceUpdateCount, setAccountServiceUpdateCount] =
@@ -47,7 +50,7 @@ function AccountService({
   // Read filters from LocalStorage (before hook initializes)
   const savedFilters = JSON.parse(
     localStorage.getItem(LocalStorageKeys.SUPPORT_TICKET_MANAGEMENT_FILTERS) ||
-    "{}",
+      "{}",
   );
 
   const {
@@ -125,6 +128,8 @@ function AccountService({
       );
       if (response.status === STATUS_CODE.OK) {
         const responseData = response.data;
+        console.log(responseData);
+
         // if (response.data.length > 0) {
         //   setTotalPages(Math.ceil(response.data[0].count / pageSize));
         // }
@@ -145,6 +150,7 @@ function AccountService({
             serviceDateTime: item.service_date_time,
             serviceStatusId: item.service_status_id,
             serviceStatus: item.service_status,
+            isAddedToInvoiceDraft: item.is_added_to_invoice_draft,
             isActive: item.isactive,
             createdBy: item.createdby,
             createdOn: item.createdon,
@@ -186,6 +192,38 @@ function AccountService({
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleAddSupportTicket = () => {
     setAccountServiceUpdateCount(accountServiceUpdateCount + 1);
+  };
+
+  const handleAddToInvoice = async (rowData: AccountServiceProps) => {
+    console.log(rowData);
+    const postData = {
+      company_id: loginStatus.companyId,
+      account_id: rowData.accountId,
+      account_service_id: rowData.id,
+      createdby_id: loginStatus.id,
+    };
+    console.log(postData);
+    setIsSubmitting(true);
+    try {
+      const res = await axiosClient.post(
+        POST_API.CREATE_COMPANY_INVOICE_ITEM,
+        postData,
+        {
+          withCredentials: true,
+        },
+      );
+
+      if (res.data.status) {
+        toast.success(res.data.message);
+        handleAddSupportTicket();
+      } else {
+        toast.error(res.data.message);
+      }
+    } catch (error) {
+      handleApiError(error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   useEffect(() => {
@@ -264,11 +302,13 @@ function AccountService({
         animate={inView ? { opacity: 1, y: 0 } : {}}
         transition={{ duration: 0.4, ease: "easeOut" }}
       >
+        {isSubmitting && <LoadingPopUpAnimation show={isSubmitting} />}
         {userHasAccessToViewAccountService ? (
           <AccountServiceManagementList
-            handleRowSelectedForShowAccountService={(data: any) =>
-              console.log(data)
-            }
+            // handleRowSelectedForShowAccountService={(data: any) =>
+            //   console.log(data)
+            // }
+            handleAddToInvoice={handleAddToInvoice}
             handleAddAccountService={handleAddSupportTicket}
             handleSearchOption={{
               handleSearchParameterChange,

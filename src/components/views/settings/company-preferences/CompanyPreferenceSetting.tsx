@@ -15,9 +15,9 @@ import CompanyPreferencesType from "../../../../@types/settings/CompanyPreferenc
 import toast from "react-hot-toast";
 import { useUserAccessModules } from "../../../../config/hooks/useAccessModules";
 import MESSAGE from "../../../../constants/Messages";
-import LoadingSpinner from "../../../../assets/animations/LoadingSpinner";
 import FormHeader from "../../../ui/FormHeader";
 import { Bell } from "lucide-react";
+import FacebookPageSkeleton from "../social-media-integration/meta-app-facebook/PafeIdListCardPopUp";
 
 // New, reusable card component for each company preference
 interface PreferenceCardProps {
@@ -208,7 +208,12 @@ function CompanyPreferenceSetting() {
       {/* </div> */}
       {isLoading ? (
         <>
-          <LoadingSpinner />
+         <div className="grid md:grid-cols-3 sm:grid-cols-2 gap-4">
+                <FacebookPageSkeleton />
+                <FacebookPageSkeleton />
+                <FacebookPageSkeleton />
+              </div>
+          {/* <LoadingSpinner /> */}
         </>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-1">

@@ -20,6 +20,7 @@ function WareHouseWiseStock() {
   const { loginStatus } = useLoggedInUserContext();
   const [ref, inView] = useInView({ fallbackInView: true, threshold: 0.1 });
 
+  const [isDataLoading, setIsDataLoading] = useState<boolean>(false);
   const [liveStock, setLiveStock] = useState<LiveStock[]>([]);
   const [accessDeniedPopUpOpen, setAccessDeniedPopUpOpen] =
     useState<boolean>(false);
@@ -55,6 +56,7 @@ function WareHouseWiseStock() {
       requestedby_id: loginStatus.id,
     };
 
+    setIsDataLoading(true)
     await axiosClient
       .post(POST_API.GET_STOCK_LIVE, postData, {
         signal: signal,
@@ -84,6 +86,9 @@ function WareHouseWiseStock() {
       })
       .catch(async (error: ApiError | any) => {
         handleApiError(error);
+      })
+      .finally(()=>{
+        setIsDataLoading(false)
       });
   };
 
@@ -148,6 +153,7 @@ function WareHouseWiseStock() {
               }}
               handleSearchParameterChange={handleSearchParameterChange}
               searchParameter={searchParameter}
+              isDataLoading ={isDataLoading}
             />
           </>
         ) : (

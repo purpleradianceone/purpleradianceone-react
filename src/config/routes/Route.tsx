@@ -7,9 +7,9 @@ import ForgotPasswordRequestPage from "../../assets/animations/EmailSentAnimatio
 import CreatePasswordForm from "../../components/forms/CreatePasswordForm";
 import Navbar from "../../components/views/home/navbar/Navbar";
 import Hero from "../../components/views/home/landing-page/Hero";
-import Features from "../../components/views/home/landing-page/Features";
+// import Features from "../../components/views/home/landing-page/Features";
 import CallToAction from "../../components/views/home/landing-page/CallToAction";
-import Testimonials from "../../components/views/home/landing-page/Testimonials";
+// import Testimonials from "../../components/views/home/landing-page/Testimonials";
 import EmailVerificationLayout from "../../components/views/auth/EmailVerificationLayout";
 import GetCompanyUsers from "../../components/views/manage-company-users/CompanyUsersManagement";
 import PrivateRoute from "./PrivateRoute";
@@ -27,7 +27,6 @@ import ViewLeadManagement from "../../components/modals/leads/ViewLeadManagement
 import MeetingScheduler from "../../components/modals/meetings/MeetingScheduler";
 import { EditorCanvas } from "../../components/email-template/template-editors/EditorCanvas";
 import { TemplatesPage } from "../../components/email-template/TemplatesPage";
-import UserPrerefenceManagement from "../../components/user-profile/UserPreferenceManagement";
 import GoogleOAuthConsent from "../../components/dialogue-box/GoogleOAuthConsent";
 import ZoomMeetingsOAuthConsent from "../../components/dialogue-box/ZoomOAuthConsent";
 import GoogleOAuthConsentAndroid from "../../components/android-page/GoogleOAuthConsentAndroid";
@@ -91,13 +90,22 @@ import StockAgeingManagement from "../../components/views/stock-management/Stock
 import ReminderSetting from "../../components/views/settings/reminder/ReminderSetting";
 import { MetaAppsIntegrationTabsBreadcrumb } from "../../components/views/settings/social-media-integration/MetaAppsIntergrationTabsBreadcrumb";
 import { FacebookBreadCrumb } from "../../components/views/settings/social-media-integration/meta-app-facebook/FacebookBreadcrumb";
-import { PageIdIntegrationManagement } from "../../components/views/settings/social-media-integration/meta-app-facebook/PageIdIntegrationManagement";
 import AccountServiceDetails from "../../components/modals/Account/account-service/AccountServiceDetails";
 import AccountSubscriptionDetails from "../../components/modals/Account/account-subscription/AccountSubscriptionDetails";
 import WhatsappOAuthConsent from "../../components/dialogue-box/WhatsappOAuthConsent";
 import { WhatsappPhoneNumberIntegrationManagement } from "../../components/views/settings/social-media-integration/meta-app-whatsapp/WhatsappPhoneNumberIntegrationManagement";
 import { EditorCanvasForQuotationEdit } from "../../components/quotation-builder/builder/editor-canvas/EditorCanvasForQuotationEdit";
-
+import AccountInvoice from "../../components/modals/Account/account-invoice/AccountInvoice";
+import CompanyInvoiceDetails from "../../components/views/invoice/CompanyInvoiceDetails";
+import UserAndCompanyProfileManagement from "../../components/user-profile/UserPreferenceManagement";
+import CompanyQuotationManagement from "../../components/views/company-quotation-management/CompanyQuotationManagement";
+import { Modules } from "../../@types/List/CompanyQuotationManagementListProps";
+import CompanyQuotationDetails from "../../components/views/company-quotation-management/CompanyQuotationDetails";
+import { FacebookPageIntegrationManagement } from "../../components/views/settings/social-media-integration/meta-app-facebook/FacebookPageIntegrationManagement";
+import Features from "../../components/views/home/landing-page/Features";
+import ProformaInvoiceDetails from "../../components/views/proforma-invoice/ProformaInvoiceDetails";
+import CompanyProductSaleManagement from "../../components/views/company-product-sale-management/CompanyProductSaleManagement";
+import AccountProformaInvoice from "../../components/modals/Account/account-proforma-invoice/AccountProformaInvoice";
 
 export const router = createBrowserRouter([
   {
@@ -123,10 +131,10 @@ export const router = createBrowserRouter([
         <div className="min-h-screen">
           <Navbar>
             <Hero />
-            <AboutUs />
-            <Features />
-            <Testimonials />
-            <ContactUs />
+            {/* <AboutUs /> */}
+            {/* <Features /> */}
+            {/* <Testimonials /> */}
+            {/* <ContactUs /> */}
             <CallToAction />
             <Footer />
           </Navbar>
@@ -154,6 +162,45 @@ export const router = createBrowserRouter([
         <div className="min-h-screen">
           <Navbar>
             <Pricing />
+            <Footer />
+          </Navbar>
+        </div>
+      </LoggedInRoute>
+    ),
+  },
+  {
+    path: ROUTES_URL.ABOUT_US,
+    element: (
+      <LoggedInRoute>
+        <div className="min-h-screen">
+          <Navbar>
+            <AboutUs />
+            <Footer />
+          </Navbar>
+        </div>
+      </LoggedInRoute>
+    ),
+  },
+  {
+    path: ROUTES_URL.FEATURES,
+    element: (
+      <LoggedInRoute>
+        <div className="min-h-screen">
+          <Navbar>
+            <Features />
+            <Footer />
+          </Navbar>
+        </div>
+      </LoggedInRoute>
+    ),
+  },
+  {
+    path: ROUTES_URL.CONTACT_US,
+    element: (
+      <LoggedInRoute>
+        <div className="min-h-screen">
+          <Navbar>
+            <ContactUs />
             <Footer />
           </Navbar>
         </div>
@@ -286,6 +333,39 @@ export const router = createBrowserRouter([
   },
 
   {
+    path: ROUTES_URL.QUOTATION_MANAGEMENT,
+    element: (
+      <MobileRedirectWrapper>
+        <PrivateRoute>
+          <div>
+            <Navbar>
+              <CompanyQuotationManagement
+                otherData={null}
+                isUsedFor={Modules.QUOTATION_MODULE}
+              />
+            </Navbar>
+          </div>
+        </PrivateRoute>
+      </MobileRedirectWrapper>
+    ),
+  },
+
+  {
+    path: ROUTES_URL.QUOTATION_CREATE_AND_DETAILS,
+    element: (
+      <MobileRedirectWrapper>
+        <PrivateRoute>
+          <div>
+            <Navbar>
+              <CompanyQuotationDetails />
+            </Navbar>
+          </div>
+        </PrivateRoute>
+      </MobileRedirectWrapper>
+    ),
+  },
+
+  {
     path: ROUTES_URL.PRODUCT_MANAGEMENT,
     element: (
       <MobileRedirectWrapper>
@@ -307,6 +387,84 @@ export const router = createBrowserRouter([
           <div>
             <Navbar>
               <GeneralTask />
+            </Navbar>
+          </div>
+        </PrivateRoute>
+      </MobileRedirectWrapper>
+    ),
+  },
+  {
+    path: ROUTES_URL.INVOICE_MANAGEMENT,
+    element: (
+      <MobileRedirectWrapper>
+        <PrivateRoute>
+          <div>
+            <Navbar>
+              <AccountInvoice
+                isNavigateFrom="Invoice"
+                account={null}
+                isUsedForSidebar={true}
+              />
+            </Navbar>
+          </div>
+        </PrivateRoute>
+      </MobileRedirectWrapper>
+    ),
+  },
+  {
+    path: ROUTES_URL.ACCOUNT_PROFORMA_INVOICE_MANAGEMENT,
+    element: (
+      <MobileRedirectWrapper>
+        <PrivateRoute>
+          <div>
+            <Navbar>
+              <AccountProformaInvoice
+                // isNavigateFrom="Proforma Invoice"
+                account={null}
+                isUsedForSidebar={true}
+              />
+            </Navbar>
+          </div>
+        </PrivateRoute>
+      </MobileRedirectWrapper>
+    ),
+  },
+  {
+    path: ROUTES_URL.INVOICE_DETAILS,
+    element: (
+      <MobileRedirectWrapper>
+        <PrivateRoute>
+          <div>
+            <Navbar>
+              <CompanyInvoiceDetails />
+            </Navbar>
+          </div>
+        </PrivateRoute>
+      </MobileRedirectWrapper>
+    ),
+  },
+  {
+    path: ROUTES_URL.PROFORMA_INVOICE_DETAILS,
+    element: (
+      <MobileRedirectWrapper>
+        <PrivateRoute>
+          <div>
+            <Navbar>
+              <ProformaInvoiceDetails />
+            </Navbar>
+          </div>
+        </PrivateRoute>
+      </MobileRedirectWrapper>
+    ),
+  },
+  {
+    path: ROUTES_URL.COMPANY_PRODUCT_SALE_MANAGEMENT,
+    element: (
+      <MobileRedirectWrapper>
+        <PrivateRoute>
+          <div>
+            <Navbar>
+              <CompanyProductSaleManagement isUsedForProductSaleModule={true} />
             </Navbar>
           </div>
         </PrivateRoute>
@@ -462,7 +620,7 @@ export const router = createBrowserRouter([
                 .DENIED_VIEW_ACCESS
             }
           >
-            <UserPrerefenceManagement />,
+            <UserAndCompanyProfileManagement />,
           </ModuleGuard>
         ),
       },
@@ -533,7 +691,7 @@ export const router = createBrowserRouter([
           <div>
             <AuthLayout
               title="Activate Subscription!"
-            // subtitle="Enter the number of users and subscription duration to proceed"
+              // subtitle="Enter the number of users and subscription duration to proceed"
             >
               <CreateSubscription
                 isOpen={true}
@@ -706,7 +864,7 @@ export const router = createBrowserRouter([
         <PrivateRoute>
           <div>
             <Navbar>
-              <UserPrerefenceManagement />
+              <UserAndCompanyProfileManagement />
             </Navbar>
           </div>
         </PrivateRoute>
@@ -813,6 +971,7 @@ export const router = createBrowserRouter([
                 onClose={() => {
                   window.history.back();
                 }}
+                onUserAdded={() => {}}
               ></AddCompanyUserModal>
             </Navbar>
           </div>
@@ -832,7 +991,7 @@ export const router = createBrowserRouter([
                 onClose={() => {
                   window.history.back();
                 }}
-                handleProductChangeOnAdd={() => { }}
+                handleProductChangeOnAdd={() => {}}
               ></AddProductModal>
             </Navbar>
           </div>
@@ -852,7 +1011,7 @@ export const router = createBrowserRouter([
                 onClose={() => {
                   window.history.back();
                 }}
-                handleCompanyTeamChangeOnAdd={() => { }}
+                handleCompanyTeamChangeOnAdd={() => {}}
               ></AddTeamModal>
             </Navbar>
           </div>
@@ -903,12 +1062,12 @@ export const router = createBrowserRouter([
       },
       {
         path: "account-service-details/:accountServiceId",
-        element: <AccountServiceDetails></AccountServiceDetails>
+        element: <AccountServiceDetails></AccountServiceDetails>,
       },
       {
         path: "account-subscription-details/:accountSubscriptionId",
-        element: <AccountSubscriptionDetails></AccountSubscriptionDetails>
-      }
+        element: <AccountSubscriptionDetails></AccountSubscriptionDetails>,
+      },
     ],
   },
   {
@@ -916,13 +1075,13 @@ export const router = createBrowserRouter([
     element: (
       <MobileRedirectWrapper>
         <PrivateRoute>
-          <WhatsappOAuthConsent/>
+          <WhatsappOAuthConsent />
           {/* <FacebookOAuthConsent /> */}
         </PrivateRoute>
       </MobileRedirectWrapper>
     ),
   },
-   {
+  {
     path: ROUTES_URL.FACEBOOK_OAUTH,
     element: (
       <MobileRedirectWrapper>
@@ -969,24 +1128,8 @@ export const router = createBrowserRouter([
             }
           >
             <MetaAppsIntegrationTabsBreadcrumb />
-            {/* <MetaAppsIntegration /> */}
           </ModuleGuard>
         ),
-        // children: [
-        //   {
-        //     index: true,
-        //     element: (
-        //       <ModuleGuard
-        //         permissionKey="userHasAccessToViewIntegrationSetting"
-        //         deniedMessage={
-        //           MESSAGE.MODULE_ACCESS.SETTING.INTEGRATION.DENIED_VIEW_ACCESS
-        //         }
-        //       >
-        //         <MetaAppsIntegration />
-        //       </ModuleGuard>
-        //     ),
-        //   },
-        // ],
       },
       {
         path: ROUTES_URL.SETTING_INDIAMART,
@@ -1023,20 +1166,21 @@ export const router = createBrowserRouter([
               MESSAGE.MODULE_ACCESS.SETTING.INTEGRATION.DENIED_VIEW_ACCESS
             }
           >
-            <>GOOGLE ADS</>
+            <>GOOGLEADS</>
+            {/* <GoogleAdsIntegrationManagement/> */}
           </ModuleGuard>
         ),
       },
     ],
   },
-   {
+  {
     path: ROUTES_URL.SETTING_META_APP_INTEGRATION_WHATSAPP,
     element: (
       <MobileRedirectWrapper>
         <PrivateRoute>
           <div>
             <Navbar>
-              <WhatsappPhoneNumberIntegrationManagement/>
+              <WhatsappPhoneNumberIntegrationManagement />
               {/* <WhatsappPhoneNumberAddition /> */}
               {/* <WhatsappBreadCrumb/> */}
             </Navbar>
@@ -1112,7 +1256,21 @@ export const router = createBrowserRouter([
               MESSAGE.MODULE_ACCESS.SETTING.INTEGRATION.DENIED_VIEW_ACCESS
             }
           >
-            <PageIdIntegrationManagement />
+            <FacebookPageIntegrationManagement />
+            {/* <PageIdIntegrationManagement /> */}
+          </ModuleGuard>
+        ),
+      },
+      {
+        path: ROUTES_URL.SETTING_META_APP_INTEGRATION_WHATSAPP,
+        element: (
+          <ModuleGuard
+            permissionKey="userHasAccessToViewIntegrationSetting"
+            deniedMessage={
+              MESSAGE.MODULE_ACCESS.SETTING.INTEGRATION.DENIED_VIEW_ACCESS
+            }
+          >
+            <WhatsappPhoneNumberIntegrationManagement />
           </ModuleGuard>
         ),
       },

@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState } from "react";
 import Account from "../../../../@types/account/Account";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
 import Button from "../../../ui/Button";
@@ -11,11 +10,10 @@ import toast from "react-hot-toast";
 import FormHeader from "../../../ui/FormHeader";
 import { Handshake } from "lucide-react";
 import { useUserAccessModules } from "../../../../config/hooks/useAccessModules";
-import MESSAGE from "../../../../constants/Messages";
 import axiosClient from "../../../../axios-client/AxiosClient";
 import { LookupLeadManagement } from "../../../views/lookups/lookup-lead/LookupLeadManagement";
 import { LookupLead } from "../../../../@types/lookup/LookupLead";
-import FormLayout from "../../../ui/FormLayout";
+import { Popover } from "../../../ui/PopOver";
 
 const CreateAccountLead = ({
   account,
@@ -28,7 +26,7 @@ const CreateAccountLead = ({
   const { loginStatus } = useLoggedInUserContext();
   const { userHasAccessToAddAccountLeads } = useUserAccessModules();
 
-  const [showLeadsData, setShowLeadsData] = useState<boolean>(false);
+  // const [showLeadsData, setShowLeadsData] = useState<boolean>(false);
 
   const handleRowSelectedForShowAccountLead = (rowData: LookupLead) => {
     // calling the api
@@ -53,7 +51,7 @@ const CreateAccountLead = ({
       .then((response) => {
         if (response.data.status) {
           toast.success(response.data.message);
-          setShowLeadsData(false);
+          // setShowLeadsData(false);
         } else {
           toast.error(response.data.message);
         }
@@ -74,46 +72,57 @@ const CreateAccountLead = ({
     <div className="  flex  justify-end ">
       {/* Header */}
       <div className="flex justify-end items-center text-xs gap-x-2 py-0.5 text-gray-500">
-        <Button
-          disabled={!userHasAccessToAddAccountLeads}
-          onClick={() => {
-            if (userHasAccessToAddAccountLeads) {
-              setShowLeadsData(!showLeadsData);
-            } else {
-              toast.error(
-                MESSAGE.MODULE_ACCESS.ACCOUNT_LEADS.DENIED_ADD_ACCESS
-              );
-            }
-          }}
-          className="bg-blue-600 hover:bg-blue-700 caption-custom white-text px-1 py-0.5 rounded-md flex items-center gap-1"
+        <Popover
+          accessRight={userHasAccessToAddAccountLeads}
+          width={700}
+          align="left"
+          trigger={
+            <Button
+              disabled={!userHasAccessToAddAccountLeads}
+              // onClick={() => {
+              //   if (userHasAccessToAddAccountLeads) {
+              //     setShowLeadsData(!showLeadsData);
+              //   } else {
+              //     toast.error(
+              //       MESSAGE.MODULE_ACCESS.ACCOUNT_LEADS.DENIED_ADD_ACCESS
+              //     );
+              //   }
+              // }}
+              className="bg-blue-600 hover:bg-blue-700 caption-custom white-text px-1 py-0.5 rounded-md flex items-center gap-1"
+            >
+              <span>+Add</span>
+            </Button>
+          }
         >
-          <span>+Add</span>
-        </Button>
-      </div>
-      {showLeadsData && (
-        <FormLayout width={6} padding={2}>
-          <FormHeader
-            icon={Handshake}
-            onClose={() => {
-              setShowLeadsData(false);
-            }}
-            preText="Leads"
-            description="Choose the lead that is linked to this account."
-          />
-          {/* Lead Management Content */}
-          {/* <LeadManagement
+          {(onClose) => (
+            <>
+            {/* <FormLayout width={6} padding={2}> */}
+              <FormHeader
+                icon={Handshake}
+                onClose={() => {
+                  onClose();
+                  // setShowLeadsData(false);
+                }}
+                preText="Leads"
+                description="Choose the lead that is linked to this account."
+                />
+              {/* Lead Management Content */}
+              {/* <LeadManagement
               isUsedInLeadModule={false}
               handleRowSelectedForShowAccountLead={
                 handleRowSelectedForShowAccountLead
                 }
                 /> */}
-          <LookupLeadManagement
-            handleRowSelectedForShowAccountLead={
-              handleRowSelectedForShowAccountLead
-            }
-          />
-        </FormLayout>
-      )}
+              <LookupLeadManagement
+                handleRowSelectedForShowAccountLead={
+                  handleRowSelectedForShowAccountLead
+                }
+                />
+            {/* </FormLayout> */}
+                </>
+          )}
+        </Popover>
+      </div>
     </div>
   );
 };

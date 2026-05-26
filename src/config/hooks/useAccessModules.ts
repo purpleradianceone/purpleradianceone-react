@@ -610,6 +610,19 @@ export const useUserAccessModules = () => {
     (accessModule) => accessModule.crm_module_id === 44 && accessModule.update,
   );
 
+  //lead-quotation
+  const userHasAccessToAddLeadQuotation = accessModules.some(
+    (accessModules) => accessModules.crm_module_id === 62 && accessModules.add,
+  );
+
+  const userHasAccessToViewLeadQuotation = accessModules.some(
+    (accessModule) => accessModule.crm_module_id === 62 && accessModule.view,
+  );
+
+  const userHasAccessToUpdateLeadQuotation = accessModules.some(
+    (accessModule) => accessModule.crm_module_id === 62 && accessModule.update,
+  );
+
   //setting-company-detail
   const userHasAccessToAddCompanyDetail = accessModules.some(
     (accessModules) => accessModules.crm_module_id === 48 && accessModules.add,
@@ -723,6 +736,164 @@ export const useUserAccessModules = () => {
     (accessModule) => accessModule.crm_module_id === 55 && accessModule.update,
   );
 
+  //Company invoice
+  const userHasAccessToAddCompanyInvoice = accessModules.some(
+    (accessModules) => accessModules.crm_module_id === 57 && accessModules.add,
+  );
+
+  const userHasAccessToViewCompanyInvoice = accessModules.some(
+    (accessModule) => accessModule.crm_module_id === 57 && accessModule.view,
+  );
+
+  const userHasAccessToUpdateCompanyInvoice = accessModules.some(
+    (accessModule) => accessModule.crm_module_id === 57 && accessModule.update,
+  );
+
+    //Company Quotation
+  const userHasAccessToAddCompanyQuotation = accessModules.some(
+    (accessModules) => accessModules.crm_module_id === 63 && accessModules.add,
+  );
+
+  const userHasAccessToViewCompanyQuotation = accessModules.some(
+    (accessModule) => accessModule.crm_module_id === 63 && accessModule.view,
+  );
+
+  const userHasAccessToUpdateCompanyQuotation = accessModules.some(
+    (accessModule) => accessModule.crm_module_id === 63 && accessModule.update,
+  );
+
+
+  //Invoice Company Product/Item
+  const userHasAccessToAddCompanyInvoiceItem = accessModules.some(
+    (accessModules) => accessModules.crm_module_id === 58 && accessModules.add,
+  );
+
+  const userHasAccessToViewCompanyInvoiceItem = accessModules.some(
+    (accessModule) => accessModule.crm_module_id === 58 && accessModule.view,
+  );
+
+  const userHasAccessToUpdateCompanyInvoiceItem = accessModules.some(
+    (accessModule) => accessModule.crm_module_id === 58 && accessModule.update,
+  );
+
+  //Invoice Draft
+  const userHasAccessToAddCompanyInvoiceDraft = accessModules.some(
+    (accessModules) => accessModules.crm_module_id === 59 && accessModules.add,
+  );
+
+  const userHasAccessToViewCompanyInvoiceDraft = accessModules.some(
+    (accessModule) => accessModule.crm_module_id === 59 && accessModule.view,
+  );
+
+  const userHasAccessToUpdateCompanyInvoiceDraft = accessModules.some(
+    (accessModule) => accessModule.crm_module_id === 59 && accessModule.update,
+  );
+
+  //Invoice Approval
+  const userHasAccessToAddCompanyInvoiceApproval = accessModules.some(
+    (accessModules) => accessModules.crm_module_id === 60 && accessModules.add,
+  );
+
+  const userHasAccessToViewCompanyInvoiceApproval = accessModules.some(
+    (accessModule) => accessModule.crm_module_id === 60 && accessModule.view,
+  );
+
+  const userHasAccessToUpdateCompanyInvoiceApproval = accessModules.some(
+    (accessModule) => accessModule.crm_module_id === 60 && accessModule.update,
+  );
+
+  //Invoice Cancel
+  const userHasAccessToAddCompanyInvoiceCancel = accessModules.some(
+    (accessModules) => accessModules.crm_module_id === 61 && accessModules.add,
+  );
+
+  const userHasAccessToViewCompanyInvoiceCancel = accessModules.some(
+    (accessModule) => accessModule.crm_module_id === 61 && accessModule.view,
+  );
+
+  const userHasAccessToUpdateCompanyInvoiceCancel = accessModules.some(
+    (accessModule) => accessModule.crm_module_id === 61 && accessModule.update,
+  );
+
+
+  const userHasAccessToAddAccountQuotation = accessModules.some(
+    (accessModules) => accessModules.crm_module_id === 64 && accessModules.add,
+  );
+
+  const userHasAccessToViewAccountQuotation = accessModules.some(
+    (accessModule) => accessModule.crm_module_id === 64 && accessModule.view,
+  );
+
+  const userHasAccessToUpdateAccountQuotation = accessModules.some(
+    (accessModule) => accessModule.crm_module_id === 64 && accessModule.update,
+  );
+
+  //proforma invoice
+    const userHasAccessToAddAccountProformaInvoice = accessModules.some(
+    (accessModules) => accessModules.crm_module_id === 65 && accessModules.add,
+  );
+
+  const userHasAccessToViewAccountProformaInvoice = accessModules.some(
+    (accessModule) => accessModule.crm_module_id === 65 && accessModule.view,
+  );
+
+  const userHasAccessToUpdateAccountProformaInvoice = accessModules.some(
+    (accessModule) => accessModule.crm_module_id === 65 && accessModule.update,
+  );
+
+  //Lead - WhatsApp Conversation
+    const userHasAccessToAddLeadWhatsAppConversation = accessModules.some(
+    (accessModules) => accessModules.crm_module_id === 66 && accessModules.add,
+  );
+
+  const userHasAccessToViewLeadWhatsAppConversation = accessModules.some(
+    (accessModule) => accessModule.crm_module_id === 66 && accessModule.view,
+  );
+
+  const userHasAccessToUpdateLeadWhatsAppConversation = accessModules.some(
+    (accessModule) => accessModule.crm_module_id === 66 && accessModule.update,
+  );
+
+  //Support - WhatsApp Conversation
+    const userHasAccessToAddSupportWhatsAppConversation = accessModules.some(
+    (accessModules) => accessModules.crm_module_id === 67 && accessModules.add,
+  );
+
+  const userHasAccessToViewSupportWhatsAppConversation = accessModules.some(
+    (accessModule) => accessModule.crm_module_id === 67 && accessModule.view,
+  );
+
+  const userHasAccessToUpdateSupportWhatsAppConversation = accessModules.some(
+    (accessModule) => accessModule.crm_module_id === 67 && accessModule.update,
+  );
+
+  //Company product Sale
+  const userHasAccessToAddCompanyProductSale = accessModules.some(
+    (accessModules) => accessModules.crm_module_id === 68 && accessModules.add,
+  );
+
+  const userHasAccessToViewCompanyProductSale = accessModules.some(
+    (accessModule) => accessModule.crm_module_id === 68 && accessModule.view,
+  );
+
+  const userHasAccessToUpdateCompanyProductSale = accessModules.some(
+    (accessModule) => accessModule.crm_module_id === 68 && accessModule.update,
+  );
+
+  //Report 
+    const userHasAccessToAddCompanyUserReportType = accessModules.some(
+    (accessModules) => accessModules.crm_module_id === 69 && accessModules.add,
+  );
+
+  const userHasAccessToViewCompanyUserReportType = accessModules.some(
+    (accessModule) => accessModule.crm_module_id === 69 && accessModule.view,
+  );
+
+  const userHasAccessToUpdateCompanyUserReportType = accessModules.some(
+    (accessModule) => accessModule.crm_module_id === 69 && accessModule.update,
+  );
+
+
   return {
     userHasAccessToAddUser,
     userHasAccessToViewUser,
@@ -779,6 +950,10 @@ export const useUserAccessModules = () => {
     userHasAccessToAddSettingLead,
     userHasAccessToViewSettingLead,
     userHasAccessToUpdateSettingLead,
+
+    userHasAccessToAddLeadQuotation,
+    userHasAccessToViewLeadQuotation,
+    userHasAccessToUpdateLeadQuotation,
 
     userHasAccessToAddEmailTemplateSetting,
     userHasAccessToViewEmailTemplateSetting,
@@ -946,5 +1121,48 @@ export const useUserAccessModules = () => {
     userHasAccessToViewAccountSubscription,
     userHasAccessToUpdateAccountSubscription,
 
+    userHasAccessToAddCompanyInvoice,
+    userHasAccessToViewCompanyInvoice,
+    userHasAccessToUpdateCompanyInvoice,
+    userHasAccessToAddCompanyInvoiceItem,
+    userHasAccessToViewCompanyInvoiceItem,
+    userHasAccessToUpdateCompanyInvoiceItem,
+    userHasAccessToAddCompanyInvoiceDraft,
+    userHasAccessToViewCompanyInvoiceDraft,
+    userHasAccessToUpdateCompanyInvoiceDraft,
+    userHasAccessToAddCompanyInvoiceApproval,
+    userHasAccessToViewCompanyInvoiceApproval,
+    userHasAccessToUpdateCompanyInvoiceApproval,
+    userHasAccessToAddCompanyInvoiceCancel,
+    userHasAccessToViewCompanyInvoiceCancel,
+    userHasAccessToUpdateCompanyInvoiceCancel,
+
+    userHasAccessToAddCompanyQuotation,
+    userHasAccessToViewCompanyQuotation,
+    userHasAccessToUpdateCompanyQuotation,
+
+    userHasAccessToAddAccountQuotation,
+    userHasAccessToViewAccountQuotation,
+    userHasAccessToUpdateAccountQuotation,
+
+    userHasAccessToAddAccountProformaInvoice,
+    userHasAccessToViewAccountProformaInvoice,
+    userHasAccessToUpdateAccountProformaInvoice,
+
+    userHasAccessToAddLeadWhatsAppConversation,
+    userHasAccessToViewLeadWhatsAppConversation,
+    userHasAccessToUpdateLeadWhatsAppConversation,
+
+    userHasAccessToAddSupportWhatsAppConversation,
+    userHasAccessToViewSupportWhatsAppConversation,
+    userHasAccessToUpdateSupportWhatsAppConversation,
+
+    userHasAccessToAddCompanyProductSale,
+    userHasAccessToViewCompanyProductSale,
+    userHasAccessToUpdateCompanyProductSale,
+
+    userHasAccessToAddCompanyUserReportType,
+    userHasAccessToViewCompanyUserReportType,
+    userHasAccessToUpdateCompanyUserReportType,
   };
 };

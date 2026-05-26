@@ -12,6 +12,7 @@ import {
   XCircle,
   Scale,
   Pen,
+  User
 } from "lucide-react";
 import Account from "../../../@types/account/Account";
 import POST_API from "../../../constants/PostApi";
@@ -117,7 +118,6 @@ const AccountDetailsUpdated: React.FC = () => {
   const districtTypeOption = toSelectOptions(districts, "id", "name");
   const businessTypeOption = toSelectOptions(businessType, "id", "name");
 
-
   const newErrors = {
     mobilenumber: "",
     gst: "",
@@ -136,7 +136,6 @@ const AccountDetailsUpdated: React.FC = () => {
     email: string;
     registrationNumber: string;
   }>(newErrors);
-  
 
   //Note : Validation before the api submit call
   const validateData = () => {
@@ -171,8 +170,7 @@ const AccountDetailsUpdated: React.FC = () => {
 
     // Mobile
     if (
-      mobile &&
-      mobile.length === 0 ||
+      (mobile && mobile.length === 0) ||
       !MOBILE_NUMBER_VALIDATION.MOBILE_NUMBER_PATTERN_INDIAN.test(mobile)
     ) {
       toast.error("Please enter a valid Mobile Number.");
@@ -210,7 +208,8 @@ const AccountDetailsUpdated: React.FC = () => {
   };
 
   //Note : handle api sublit logic here
-  const handleSaveAccountDetails = async () => {
+  const handleSaveAccountDetails = async (event : React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
     const normalize = (obj: any) =>
       JSON.stringify(
         Object.fromEntries(Object.entries(obj).map(([k, v]) => [k, v ?? ""])),
@@ -337,7 +336,6 @@ const AccountDetailsUpdated: React.FC = () => {
     await axiosClient
       .post(POST_API.UPDATE_ACCOUNT, postData, { withCredentials: true })
       .then((response) => {
-
         if (response.data.status) {
           toast.success(response.data.message);
 
@@ -391,7 +389,7 @@ const AccountDetailsUpdated: React.FC = () => {
     console.log(name + "value  : " + value);
 
     if (name === "name") {
-      if ( value && !value.trim()) {
+      if (value && !value.trim()) {
         setErrors((prev) => ({ ...prev, name: "Name is required" }));
       } else {
         setErrors((prev) => ({ ...prev, name: "" }));
@@ -404,7 +402,7 @@ const AccountDetailsUpdated: React.FC = () => {
           ...prev,
           email: "Email is required",
         }));
-      } else if (value !== "" && !VALIDATIONS.EMAIL.test(value)  ) {
+      } else if (value !== "" && !VALIDATIONS.EMAIL.test(value)) {
         setErrors((prev) => ({
           ...prev,
           email: "Please enter valid email address.",
@@ -439,7 +437,7 @@ const AccountDetailsUpdated: React.FC = () => {
       }
     }
     if (name === "pan") {
-      if ( value && value.trim() && !/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(value)) {
+      if (value && value.trim() && !/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(value)) {
         setErrors((prev) => ({
           ...prev,
           pan: "Please enter the valid pan.",
@@ -466,7 +464,8 @@ const AccountDetailsUpdated: React.FC = () => {
     }
     if (name === "gst") {
       if (
-       value && value.trim() &&
+        value &&
+        value.trim() &&
         !/^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/.test(value)
       ) {
         setErrors((prev) => ({
@@ -557,13 +556,13 @@ const AccountDetailsUpdated: React.FC = () => {
                   )} */}
                   {!isEditing ? (
                     <>
-                      <span className="input-label-custom">
+                      <span className="input-label-custom" >
                         {formData.countryName ? (
                           formData.countryName
                         ) : (
                           <>
-                            <span className="caption-custom italic">
-                              Enter country Name
+                            <span  className="caption-custom italic">
+                              No country given
                             </span>
                           </>
                         )}
@@ -1180,7 +1179,7 @@ const AccountDetailsUpdated: React.FC = () => {
                       formData.shippingAddress
                     ) : (
                       <span className="caption-custom italic">
-                        No shilling address 
+                        No shilling address
                       </span>
                     )}
                   </span>
@@ -1217,7 +1216,7 @@ const AccountDetailsUpdated: React.FC = () => {
                       formData.registeredOfficeAddress
                     ) : (
                       <span className="caption-custom italic">
-                        No registered office address
+                        No registered office address 
                       </span>
                     )}
                   </span>
@@ -1253,15 +1252,16 @@ const AccountDetailsUpdated: React.FC = () => {
 
   return (
     // Note: Min height given
-    <div className="min-h-56 mt-0.5">
+    <form onSubmit={handleSaveAccountDetails} className="min-h-56 mt-0.5">
       {/* Header Section */}
       {/* Main Content Grid */}
       <div className="grid sm:grid-cols-1 md:grid-cols-1    gap-1">
         {/* Left Card with Tabs */}
         <div className="bg-white rounded-xl  border-slate-200">
-          <div className="col-span-2 bg-white rounded-lg  p-1  mb-1 border">
-            {/* Main header */}
-            <div className="flex items-start justify-between p-1">
+          <div className="col-span-2 bg-white  flex items-center justify-between rounded-lg  p-1  mb-1 border">
+           
+                 {/* header name and logo */}
+            <div className="flex items-start w-[70%]  justify-between p-1">
               <div className="flex w-full items-center space-x-3">
                 <div
                   className={`p-2 rounded-md ${
@@ -1272,12 +1272,12 @@ const AccountDetailsUpdated: React.FC = () => {
                 >
                   <Building2 className="h-6 w-6 text-white" />
                 </div>
-                <div className="w-full bg-pink-00">
+                <div className="w-full bg-pink-00  justify-between items-center gap-1">
                   {isEditing ? (
                     <div className="w-full">
                       <FormInput
                         required
-                        logo={Mail}
+                        logo={User}
                         type="text"
                         label="Name:"
                         name="name"
@@ -1305,48 +1305,57 @@ const AccountDetailsUpdated: React.FC = () => {
                     </>
                   )}
                   {/* </h/1> */}
-                  {!isEditing && (
-                    <div
-                      className="cursor-pointer caption-custom-blue "
-                      onClick={() => {
-                        if(userHasAccessToUpdateAccount){
-                            setIsEditing(true);
-                        }else{
-                            toast.error(MESSAGE.MODULE_ACCESS.ACCOUNT_ACCESS.DENIED_UPDATE_ACCESS)
-
-                        }
-                      }}
-                    >
-                      <span>Edit</span>
-                    </div>
-                  )}
-                  {isEditing && (
-                    <div className="flex gap-2">
-                      <div
-                        className="cursor-pointer caption-custom-blue "
-                        onClick={handleSaveAccountDetails}
-                      >
-                        <span>Save</span>
-                      </div>
-
-                      <div
-                        className="cursor-pointer caption-custom-blue "
-                        onClick={handleCancelAccountDetails}
-                      >
-                        <span>Cancel</span>
-                      </div>
-                    </div>
-                  )}
+                 
                 </div>
               </div>
 
               {/* Right side */}
               {/* Note : metadata */}
             </div>
+             {/* Save and cancel button */}
+              <div className="flex justify-end items-start h-12 bg-pink-00 ">
+                   {!isEditing && (
+                    <div 
+                    title="Update Account details, primary contact, legal information, address."
+                      className="cursor-pointer caption-custom-blue "
+                      onClick={() => {
+                        if (userHasAccessToUpdateAccount) {
+                          setIsEditing(true);
+                        } else {
+                          toast.error(
+                            MESSAGE.MODULE_ACCESS.ACCOUNT_ACCESS
+                              .DENIED_UPDATE_ACCESS,
+                          );
+                        }
+                      }}
+                    >
+                      <button className="bg-blue-500  flex items-center h-[20px] px-1  rounded text-white">  Edit</button>
+                    </div>
+                  )}
+                  {isEditing && (
+                    <div className="flex gap-2 pt-1">
+                      
+
+                      <div
+                        className="cursor-pointer caption-custom-blue "
+                        onClick={handleCancelAccountDetails}
+                      >
+                        <button type="button" className="bg-gray-400  flex items-center h-[20px] px-1  rounded text-white">Cancel</button>
+                      </div>
+                      <div
+                        className="cursor-pointer caption-custom-blue "
+                        // onClick={handleSaveAccountDetails}
+                      >
+                        <button type="submit" className="bg-blue-600  flex items-center h-[20px] px-1  rounded text-white">Save</button>
+                      </div>
+                    </div>
+                  )}
+                 </div>
           </div>
           {/* Tab Navigation */}
           <div className="flex border-b  border-gray-200 ">
             <button
+            type="button"
               onClick={() => setActiveTab("details")}
               className={`flex items-center px-4  rounded-t-lg border-b-2 ${
                 activeTab === "details"
@@ -1358,6 +1367,7 @@ const AccountDetailsUpdated: React.FC = () => {
               Details
             </button>
             <button
+            type="button"
               onClick={() => setActiveTab("primary contact")}
               className={`flex items-center px-2 rounded-t-lg border-b-2 ${
                 activeTab === "primary contact"
@@ -1369,6 +1379,7 @@ const AccountDetailsUpdated: React.FC = () => {
               Primary Contact
             </button>
             <button
+            type="button"
               onClick={() => setActiveTab("legal")}
               className={`flex items-center px-4  p-0.5 rounded-t-lg border-b-2 ${
                 activeTab === "legal"
@@ -1380,6 +1391,7 @@ const AccountDetailsUpdated: React.FC = () => {
               Legal
             </button>
             <button
+            type="button"
               onClick={() => setActiveTab("address")}
               className={`flex items-center px-4 py-0.5 rounded-t-lg border-b-2 ${
                 activeTab === "address"
@@ -1396,10 +1408,9 @@ const AccountDetailsUpdated: React.FC = () => {
           {renderTabContent()}
         </div>
       </div>
-    </div>
+    </form>
   );
 };
-
 
 const AccountDetailsSkeleton = () => {
   return (
@@ -1447,7 +1458,7 @@ const SkeletonField = () => {
       {/* Input box */}
       <div className="h-5 w-full bg-gray-200 rounded-lg" />
     </div>
-  )
+  );
 };
 
 export default AccountDetailsUpdated;

@@ -1,112 +1,127 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import axios from "axios";
 import POST_API from "../../../constants/PostApi";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
 import NotificationListForWeb from "../../../@types/notification/NotificationListForWeb";
-import LoadingSpinner from "../../../assets/animations/LoadingSpinner";
 import { useUserPreference } from "../../../context/user/UserPreference";
 import toast from "react-hot-toast";
 import ApiError from "../../../@types/error/ApiError";
 import { STATUS_CODE } from "../../../constants/AppConstants";
 import RefreshToken from "../../../config/validations/RefreshToken";
 import { Loader2Icon } from "lucide-react";
+import NotificationSkeleton from "./NotificationSkeleton";
 type NotificationPopupProps = {
   onClose?: () => void;
 };
 
 const NotificationPopup: React.FC<NotificationPopupProps> = ({ onClose }) => {
-  const { userPreference } = useUserPreference();
+   const { userPreference } = useUserPreference();
   const { loginStatus } = useLoggedInUserContext();
+  const [loadingId, setLoadingId] = useState<number | null>(null);
+  const popupRef = useRef<HTMLDivElement | null>(null);
   const lastNotificationRef = useRef<HTMLDivElement | null>(null);
 
-  const popupRef = useRef<HTMLDivElement>(null);
-  const [showLoadingSpinner, setShowLoadingSpinner] = useState<boolean>(false);
-  const [totalCount, setTotalCount] = useState<number>(0);
-  const [offset, setOffset] = useState<number>(0);
-  const [limit] = useState<number>(userPreference.rowsInGrid || 30);
   const [notificationList, setNotificationList] = useState<
     NotificationListForWeb[]
   >([]);
-  const [loadingId, setLoadingId] = useState<number | null>(null);
-  //   const [pageFetched , setPageFetched] = useState<Set<number>>(new Set())
+  const [offset, setOffset] = useState<number>(0);
+  const [limit] = useState<number>(userPreference.rowsInGrid || 25);
+  const [showLoadingSpinner, setShowLoadingSpinner] =
+    useState<boolean>(false);
+  const [hasMore, setHasMore] = useState<boolean>(true);
 
-  // Close when clicked outside
+  /*Close On Outside Click */
+
   useEffect(() => {
+    setHasMore(true)
+    setNotificationList([])
+    setOffset(0)
+
     const handleClickOutside = (event: MouseEvent) => {
       if (
         popupRef.current &&
         !popupRef.current.contains(event.target as Node)
       ) {
-        onClose!();
+        onClose?.();
       }
     };
+
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    return () =>
+      document.removeEventListener("mousedown", handleClickOutside);
   }, [onClose]);
 
-  //   api call to get notifications
+ 
 
-  const getNotificationListForWeb = async (currentOffset: number = 0) => {
-    setShowLoadingSpinner(true);
-    if(loginStatus.companyId === 0)return;
-    const postDataToGetNotificationListForWeb = {
-      company_id: loginStatus.companyId,
-      id: null,
-      company_user_id: loginStatus.id,
-      notification_status_id: null,
-      notification_type_id: null,
-      offset: currentOffset,
-      limit: limit,
-      requestedby: loginStatus.id,
-    };
-    await axios
-      .post(
-        POST_API.GET_NOTIFICATION_LIST_FOR_WEB,
-        postDataToGetNotificationListForWeb,
-        {
-          withCredentials: true,
-        }
-      )
-      .then((response) => {
-        setShowLoadingSpinner(false);
+  const getNotificationListForWeb = useCallback(
+    async (currentOffset: number) => {
+      if (loginStatus.companyId === 0) return;
+      if (showLoadingSpinner) return;
 
-        const fetchedData = response.data;
+      setShowLoadingSpinner(true);
+
+      try {
+        const postData = {
+          company_id: loginStatus.companyId,
+          id: null,
+          company_user_id: loginStatus.id,
+          notification_status_id: null,
+          notification_type_id: null,
+          offset: currentOffset,
+          limit: limit,
+          requestedby: loginStatus.id,
+        };
+
+        const response = await axios.post(
+          POST_API.GET_NOTIFICATION_LIST_FOR_WEB,
+          postData,
+          { withCredentials: true }
+        );
+
+        const fetchedData = response.data || [];
 
         setNotificationList((prev) => [...prev, ...fetchedData]);
 
-        // set the count only on forst round
-        if (currentOffset === 0 && fetchedData.length > 0) {
-          setTotalCount(fetchedData[0].count);
+        //  Key Logic: If returned records < limit → no more data
+        if (fetchedData.length < limit) {
+          setHasMore(false);
         }
-      })
-      .catch(async (error: ApiError | any) => {
-        //if exception occurs then rollback to previous state
-        setShowLoadingSpinner(false);
-        if (error.status === STATUS_CODE.UNATHORISED) {
+      } catch (error: any) {
+        if (error?.status === STATUS_CODE.UNATHORISED) {
           const refreshTokenResponse = await RefreshToken({
             callFunctionWithParamsNotEvent: getNotificationListForWeb,
           });
+
           if (refreshTokenResponse) {
             getNotificationListForWeb(currentOffset);
           }
-        } else if (error.response.status === 503) {
+        } else if (error?.response?.status === 503) {
           toast.error("Service is down.");
-        } else if (error.response.status === 500) {
+        } else if (error?.response?.status === 500) {
           toast.error("Internal Server Error");
         }
-      });
-  };
+      } finally {
+        setShowLoadingSpinner(false);
+      }
+    },
+    [loginStatus, limit, showLoadingSpinner]
+  );
 
-  //Note : api call to get notifications
+  /*Initial Load */
+
   useEffect(() => {
     setNotificationList([]);
+    setOffset(0);
+    setHasMore(true);
+
     getNotificationListForWeb(0);
   }, []);
 
+  /* Infinite Scroll*/
+
   useEffect(() => {
-    if (showLoadingSpinner) return; // Prevent triggering while loading
-    if (notificationList.length >= totalCount) return; // All data fetched
+    if (showLoadingSpinner || !hasMore) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -124,65 +139,61 @@ const NotificationPopup: React.FC<NotificationPopupProps> = ({ onClose }) => {
     }
 
     return () => {
-      if (lastNotificationRef.current)
+      if (lastNotificationRef.current) {
         observer.unobserve(lastNotificationRef.current);
+      }
     };
-  }, [notificationList, offset, showLoadingSpinner, totalCount]);
+  }, [offset, hasMore, showLoadingSpinner, limit, getNotificationListForWeb]);
+
+  /* Clear Notifications*/
 
   const handleUpdateNotificationListWebClear = async (
     event: React.MouseEvent<HTMLButtonElement>
   ) => {
-    console.log(notificationList.length);
+    event.preventDefault();
 
     if (notificationList.length === 0) {
       toast.error("No notification found");
       return;
     }
-    event.preventDefault();
-    const postDataToClearNotificationListWeb = {
-      company_id: loginStatus.companyId,
-      company_user_id: loginStatus.id,
-      updatedby: loginStatus.id,
-    };
 
-    await axios
-      .post(
+    try {
+      const postData = {
+        company_id: loginStatus.companyId,
+        company_user_id: loginStatus.id,
+        updatedby: loginStatus.id,
+      };
+
+      const response = await axios.post(
         POST_API.UPDATE_NOTIFICATION_LIST_FOR_WEB_CLEAR,
-        postDataToClearNotificationListWeb,
-        {
-          withCredentials: true,
-        }
-      )
-      .then((response) => {
-        toast.success(response.data.message);
-        if (response.data.status) {
-          setNotificationList([]);
-          setOffset(0);
-          setTotalCount(0);
-        }
-      })
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      // .catch((error: any) => {
-      // console.log(error);
+        postData,
+        { withCredentials: true }
+      );
 
-      .catch(async (error: ApiError | any) => {
-        //if exception occurs then rollback to previous state
-        if (error.status === STATUS_CODE.UNATHORISED) {
-          const refreshTokenResponse = await RefreshToken({
-            callFunctionWithEvent: handleUpdateNotificationListWebClear,
-          });
-          if (refreshTokenResponse) {
-            handleUpdateNotificationListWebClear(event);
-          }
-        } else if (error.response.status === 503) {
-          toast.error("Service is down.");
-        } else if (error.response.status === 500) {
-          toast.error("Internal Server Error");
+      toast.success(response.data.message);
+
+      if (response.data.status) {
+        setNotificationList([]);
+        setOffset(0);
+        setHasMore(true);
+      }
+    } catch (error: any) {
+      if (error?.status === STATUS_CODE.UNATHORISED) {
+        const refreshTokenResponse = await RefreshToken({
+          callFunctionWithEvent: handleUpdateNotificationListWebClear,
+        });
+
+        if (refreshTokenResponse) {
+          handleUpdateNotificationListWebClear(event);
         }
-      });
-    // });
+      } else if (error?.response?.status === 503) {
+        toast.error("Service is down.");
+      } else if (error?.response?.status === 500) {
+        toast.error("Internal Server Error");
+      }
+    }
   };
-
+  
   const handleUpdateNotificationListWeb = async (id: number) => {
     setLoadingId(id);
 
@@ -242,29 +253,27 @@ const NotificationPopup: React.FC<NotificationPopupProps> = ({ onClose }) => {
       className="absolute -right-72 mt-1 w-96 bg-white border border-gray-300 rounded-2xl shadow-2xl z-50"
     >
       {/* Header with Clear All */}
-      <div className="flex justify-between items-center p-3 border-b table-header-custom bg-gray-100 rounded-t-2xl">
+      <div className="flex justify-between items-center p-2 border-b table-header-custom bg-gray-100 rounded-t-2xl">
         <span>Notifications!</span>
         <button
           type="button"
           onClick={handleUpdateNotificationListWebClear}
-          className="input-label-custom-inactive hover:text-red-700"
+          className="caption-custom-inactive hover:text-red-600"
         >
-          Clear All
+          Clear all
         </button>
       </div>
 
       {/* Notifications List */}
-      <div className="max-h-[500px]  overflow-y-auto custom-scrollbar">
+      <div className="max-h-[500px] rounded-b-2xl  overflow-y-auto custom-scrollbar">
         {notificationList.length === 0 && !showLoadingSpinner ? (
           <div className="p-6 text-center caption-custom">
             No notifications to display
           </div>
         ) : showLoadingSpinner && notificationList.length === 0 ? (
-          <div className="p-5 flex justify-center">
-            <LoadingSpinner />
-          </div>
+          <NotificationSkeleton count={4}/>
         ) : (
-          <div className="border-b">
+          <div className="border-b ">
             {notificationList.map((notification, index) => (
               <div
                 key={notification.id}
@@ -315,9 +324,7 @@ const NotificationPopup: React.FC<NotificationPopupProps> = ({ onClose }) => {
 
             {/* Bottom Loader */}
             {showLoadingSpinner && (
-              <div className="p-4 flex justify-center caption-custom animate-pulse">
-                <span>Loading more data...</span>
-              </div>
+              <NotificationSkeleton count={4}/>
             )}
           </div>
         )}

@@ -1,0 +1,23 @@
+export type LeadWhatsappConversationType = {
+  id: number;
+  companyId: number;
+  pageOffset: number | null;
+  phoneNumberId: string | null;
+  accountCompanyProductId: number | null;
+  accountCompanyProductName: string | null;
+  companyProductId: number | null;
+  companyProductName: string | null;
+  leadId: number | null;
+  supportTicketId: number | null;
+  senderPhone: string | null;
+  senderName: string | null;
+  currentStep: string | null;
+  email: string | null;
+  intent: string | null;
+  mobileNumber: string | null;
+  issue: string | null;
+  createdOn: string;
+  updatedOn: string;
+  requestedById: number;
+  isCompleted: boolean;
+};

@@ -12,7 +12,14 @@ import Button from "../../../../ui/Button";
 import { Trash } from "lucide-react";
 import toast from "react-hot-toast";
 import FacebookPageSkeleton from "./PafeIdListCardPopUp";
+import LoadingSpinner from "../../../../../assets/animations/LoadingSpinner";
 
+/**
+ * FACEBOOK PAGE DETAILS SHOWING LIST 
+ * 
+ * @param refreshCount for calling the api in the parent component
+ * @returns TSX
+ */
 export const PageIdList = ({
     refreshCount
 }:{
@@ -20,10 +27,11 @@ export const PageIdList = ({
 }) => {
   const { loginStatus } = useLoggedInUserContext();
   const [loadingPageList, setLoadingPageList] = useState<boolean>(false);
-
+  const [deletePageLoading , setDeletePageLoading] = useState<boolean>(false);
   const [facebookPageDetailsList, setFacebookPageDetailsList] = useState<
     FacebookPageDetails[]
   >([]);
+  
   const getFacebookPageListApiCall = async () => {
     try {
         //Note : make it null before the api call
@@ -35,7 +43,7 @@ export const PageIdList = ({
       const response = await getFacebookPageDetails({
         company_id: loginStatus.companyId,
         id: null, //Note : we are showing all the data
-        facebook_company_token_id: 1,
+        // facebook_company_token_id: 1
         isactive: true,
         requestedby: loginStatus.id,
       });
@@ -65,13 +73,9 @@ export const PageIdList = ({
   useEffect(()=>{
         getFacebookPageListApiCall();
   },[refreshCount])
-  // Note : call on the first render
-  useEffect(() => {
-    getFacebookPageListApiCall();
-  }, []);
 
   const handleDeleteButtonClick = async (item: FacebookPageDetails) => {
-    console.log(item);
+    setDeletePageLoading(true)
 
     try {
       const response = await disconnectFacebookPage({
@@ -84,10 +88,13 @@ export const PageIdList = ({
 
       if (response.status === STATUS_CODE.OK) {
         if (response.data.status) {
+                setDeletePageLoading(false);
+
           toast.success(response.data.message);
         } else {
           toast.error(response.data.message);
         }
+
       }
     } catch (error) {
       handleApiError(error);
@@ -135,6 +142,7 @@ export const PageIdList = ({
                 <span className="table-header-custom">{item.pageName}</span>
               </div>
               <Button
+              disabled={deletePageLoading}
               title="Delete"
                 className="bg-red-0 hover:bg-red-50 p-1 rounded text-rose-600 flex items-center"
                 onClick={() => {
@@ -142,8 +150,7 @@ export const PageIdList = ({
                 }}
                 type="button"
               >
-                {" "}
-                <Trash size={14} />{" "}
+                {deletePageLoading ? <LoadingSpinner height={16} width={16} colour={"blue"}/> :  <Trash size={14} />}
               </Button>
             </div>
 
@@ -165,15 +172,6 @@ export const PageIdList = ({
             <div>
               <span className="caption-custom text-gray-600">Status: </span>
               <StatusChip isActive={item.isActive} />
-              {/* <span
-              className={`px-2 py-1 rounded text-sm ${
-                item.isActive
-                  ? "bg-green-100 text-green-700"
-                  : "bg-red-100 text-red-700"
-              }`}
-            >
-              {item.isActive ? "Active" : "Inactive"}
-            </span> */}
             </div>
           </div>
         ))}

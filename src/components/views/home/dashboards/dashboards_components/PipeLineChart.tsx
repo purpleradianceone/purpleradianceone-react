@@ -4,10 +4,13 @@ import { motion } from "framer-motion";
 
 const PipelineChart = ({
   pipelineData,
-  chartFor,
+  header,
+  headerDescription,
 }: {
   pipelineData: LeadSummaryReportType[];
-  chartFor : "leadByStatus" | "leadBySource" ;
+  header?: string;
+  headerDescription?: string;
+
 }) => {
     const [ref, inView] = useInView({ fallbackInView: false, threshold: 0.1 });
 
@@ -34,14 +37,14 @@ const PipelineChart = ({
       transition={{ duration: 0.4, ease: "easeOut" }}
       
     >
-    <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-4">
+    <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h3 className="section-header-custom mb-2">
-            Leads Pipeline
+          <h3 className="table-header-custom">
+            {header}
           </h3>
-          <p className="table-header-custom">
-            {chartFor === "leadByStatus" ? "Current pipeline by Lead Status" : "Current pipeline by Lead Source" }
+          <p className="caption-custom">
+            {headerDescription}
           </p>
         </div>
       </div>

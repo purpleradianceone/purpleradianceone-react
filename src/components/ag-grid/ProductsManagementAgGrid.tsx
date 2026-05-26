@@ -3,7 +3,7 @@ import { AllCommunityModule, ColDef, themeBalham } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { INNERHTML, JSX_CHILDREN_NAME } from "../../constants/AppConstants";
+import { JSX_CHILDREN_NAME } from "../../constants/AppConstants";
 import { CLASS_NAMES } from "../../constants/ClassNames";
 import ActionsDropdownButton from "../ui/ActionsDropdownButton";
 import { Edit, Network, Plus, UserPlus } from "lucide-react";
@@ -13,6 +13,7 @@ import toast from "react-hot-toast";
 import MESSAGE from "../../constants/Messages";
 import StatusIndicator from "../ui/StatusIndicator";
 import { Product } from "../../@types/products/ProductsManagementProps";
+import { SkeletonRowsAgGrid } from "../ui/SkeletonRowsAgGrid";
 
 function ProductsManagementGrid({
   products,
@@ -24,6 +25,7 @@ function ProductsManagementGrid({
   isGridForAccountProduct,
   onRowSelect, //selected user for view lead details
   handleCreateStockModalOpen,
+  isDataLoading,
 }: ProductsManagementGridProps) {
   const {
     userHasAccessToViewProduct,
@@ -114,6 +116,9 @@ function ProductsManagementGrid({
         maxWidth: 100,
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         cellRenderer: (params: any) => {
+          if (params.data?.__isSkeleton) {
+            return <SkeletonRowsAgGrid />;
+          }
           return (
             <div className="flex items-center gap-1">
               <StatusIndicator isActive={params.value} />
@@ -131,6 +136,9 @@ function ProductsManagementGrid({
         maxWidth: 160,
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         cellRenderer: (params: any) => {
+          if (params.data?.__isSkeleton) {
+            return <SkeletonRowsAgGrid />;
+          }
           return (
             <div className="flex items-center gap-1">
               <StatusIndicator
@@ -229,6 +237,21 @@ function ProductsManagementGrid({
         },
       },
       {
+        field: "cess",
+        headerName: "Cess",
+        sortable: true,
+        filter: true,
+        flex: 1,
+        hide: !userHasAccessToViewProductTax || isGridForAccountProduct,
+        valueFormatter: (params) => {
+          if (params.value === 0) {
+            return "";
+          }
+          return params.value;
+        },
+      },
+
+      {
         field: "validFrom",
         headerName: "Effective From",
         sortable: true,
@@ -283,17 +306,21 @@ function ProductsManagementGrid({
       },
       {
         headerName: "Actions",
-        hide: !isGridForAccountProduct,
+        hide: isDataLoading || !isGridForAccountProduct,
         sortable: false,
         maxWidth: 100,
         pinned: "right",
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         cellRenderer: (params: Product | any) => {
+          if (params.data?.__isSkeleton) {
+            return <SkeletonRowsAgGrid />;
+          }
           return (
             <div className="flex items-center justify-center  ">
               <span
                 className="lead-details cursor-pointer text-blue-600  "
                 onClick={() => {
+                  if (isDataLoading) return;
                   params.context.handleRowSelect(params.data);
                 }}
               >
@@ -305,12 +332,15 @@ function ProductsManagementGrid({
       },
       {
         headerName: "Actions",
-        hide: isGridForAccountProduct,
+        hide: isDataLoading || isGridForAccountProduct,
         sortable: false,
         maxWidth: 100,
         pinned: "right",
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         cellRenderer: (params: any) => {
+          if (params.data?.__isSkeleton) {
+            return <SkeletonRowsAgGrid />;
+          }
           const [isActionsDropDownOpen, setIsActionsDropDownOpen] =
             useState(false);
           const [position, setPosition] = useState({
@@ -322,6 +352,7 @@ function ProductsManagementGrid({
 
           const handleActionsButtonClick = (event: React.MouseEvent) => {
             event.stopPropagation();
+
             setIsActionsDropDownOpen((prev) => !prev);
 
             const rect = (
@@ -365,6 +396,7 @@ function ProductsManagementGrid({
           return (
             <>
               <button
+                hidden={isDataLoading}
                 className="text-blue-600"
                 onClick={handleActionsButtonClick}
               >
@@ -380,9 +412,13 @@ function ProductsManagementGrid({
                   >
                     <>
                       <ActionsDropdownButton
-                        disabled={!userHasAccessToUpdateProduct}
+                        disabled={
+                          isDataLoading || !userHasAccessToUpdateProduct
+                        }
                         onClick={() => {
-                          if (userHasAccessToUpdateProduct) {
+                          if (isDataLoading) {
+                            return;
+                          } else if (userHasAccessToUpdateProduct) {
                             setIsActionsDropDownOpen(false);
                             handleEditCompanyProductModalOpen(true);
                             handleSelectedProductChange(params.data);
@@ -481,6 +517,12 @@ function ProductsManagementGrid({
     [],
   );
 
+  const skeletonRows = useMemo(() => {
+    return Array.from({ length: 30 }).map(() => ({
+      __isSkeleton: true,
+    }));
+  }, []);
+
   const defaultColDef = useMemo(() => {
     return {
       filter: "agTextColumnFilter",
@@ -488,6 +530,14 @@ function ProductsManagementGrid({
       flex: 0.8,
       suppressHeaderMenuButton: true,
       suppressHeaderContextMenu: true,
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      cellRenderer: (params: any) => {
+        if (params.data?.__isSkeleton) {
+          return <SkeletonRowsAgGrid />;
+        }
+        return params.value;
+      },
     };
   }, []);
 
@@ -497,13 +547,13 @@ function ProductsManagementGrid({
       style={{ height: "100%", width: "100%" }}
     >
       <AgGridReact
-        rowData={products}
+        rowData={isDataLoading ? skeletonRows : products}
         columnDefs={columnDefs}
         defaultColDef={defaultColDef}
         modules={[AllCommunityModule]}
-        overlayNoRowsTemplate={INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
+        // overlayNoRowsTemplate={INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
         theme={themeBalham}
-        context={{ handleRowSelect: onRowSelect }}
+        context={{ handleRowSelect: isDataLoading ? undefined : onRowSelect }}
       />
     </div>
   );

@@ -49,6 +49,7 @@ function TeamManagement() {
     CompanyTeamSearchProps[]
   >([]);
 
+  const [isDataLoading, setIsDataLoading] = useState<boolean>(false);
   // Read filters from LocalStorage (before hook initializes)
 const savedFilters = JSON.parse(
   localStorage.getItem(LocalStorageKeys.TEAMS_MANAGEMEMNT_FILTERS) || "{}"
@@ -89,6 +90,7 @@ const savedFilters = JSON.parse(
         search_parameter_date: concatDate,
       };
 
+      setIsDataLoading(true)
       await axios
         .post(POST_API.GET_COMPANY_TEAM, getCompanyTeamPostData, {
           signal,
@@ -122,6 +124,8 @@ const savedFilters = JSON.parse(
               fetchCompanyTeam(signal);
             }
           }
+        }).finally(()=>{
+          setIsDataLoading(false)
         });
     }
   };
@@ -230,6 +234,7 @@ const savedFilters = JSON.parse(
                 onPageChange: handlePageChange,
                 pageSize,
               }}
+              isDataLoading={isDataLoading}
             ></TeamManagementList>
           </div>
         </>

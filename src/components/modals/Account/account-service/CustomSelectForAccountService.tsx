@@ -92,7 +92,7 @@ const CustomSelectForAccountService: React.FC<AppSelectProps> = ({
         onInputChange={onInputChange}
         onMenuOpen={onMenuOpen}
         onMenuScrollToBottom={onMenuScrollToBottom}
-        // above props are used for the search and scroll api call
+        autoFocus        // above props are used for the search and scroll api call
         classNames={{
           placeholder: () => "input-label-custom placeholder-gray-400",
           input: () => "input-label-custom",

@@ -98,72 +98,72 @@ export const QuotationTemplateList: React.FC<QuotationTemplateListProps> = ({
     try {
       setisLoadingForGenerateTemplate(true);
       const payload = {
-        quotationId: "QT-2026-0001",
+        // quotationId: "QT-2026-0001",
         quotation_template_id: templateId,
         company_id: loginStatus.companyId,
         generatedby_id: loginStatus.id,
-        quotation_account: {
-          id: 101,
-          company_id: 1,
-          name: "TechNova Solutions Pvt Ltd",
-          email: "contact@technova.com",
-          mobilenumber: "9876543210",
-          industry_type_id: 3,
-          industry_type_name: "Information Technology",
-          business_type_id: 2,
-          business_type_name: "Private Limited",
-          country_id: 101,
-          state_id: 27,
-          district_id: 501,
-          country_name: "India",
-          state_name: "Maharashtra",
-          district_name: "Pune",
-          pan: "ABCDE1234F",
-          gst: "27ABCDE1234F1Z5",
-          tan: "PNEA12345B",
-          billing_address: "Office No. 12, Hinjewadi Phase 1, Pune - 411057",
-          shipping_address: "Warehouse 5, MIDC, Pune - 411018",
-          registered_office_address: "TechNova HQ, Baner Road, Pune - 411045",
-          business_registration_number: "U12345MH2020PTC123456",
-          website: "https://www.technova.com",
-          isactive: true,
-          createdby: "admin@technova.com",
-          createdon: "2026-03-23T10:30:00",
-          requestedby: 45,
-          lead_id: 789,
-          company_account_type_id_array: [1, 2, 4],
-          createdby_id: 10,
-          updatedby_id: 12,
-        },
-        quotation_items: [
-          {
-            productName: "Laptop Dell Inspiron 15",
-            quantity: 2,
-            unitPrice: 55000.0,
-            discountPercent: 10.0,
-            gstPercent: 18.0,
-            cgstPercent: 9.0,
-            lineSubTotal: 99000.0,
-          },
-          {
-            productName: "Wireless Mouse Logitech M235",
-            quantity: 5,
-            unitPrice: 800.0,
-            discountPercent: 5.0,
-            gstPercent: 18.0,
-            cgstPercent: 9.0,
-            lineSubTotal: 3800.0,
-          },
-          {
-            productName: "Office Chair Ergonomic",
-            quantity: 3,
-            unitPrice: 7000.0,
-            discountPercent: 15.0,
-            gstPercent: 18.0,
-            cgstPercent: 9.0,
-            lineSubTotal: 17850.0,
-          },
-        ],
+        // quotation_account: {
+        //   id: 101,
+        //   company_id: 1,
+        //   name: "PurpleRadiance Pvt Ltd",
+        //   email: "contact@purpleradiance.com",
+        //   mobilenumber: "9876543210",
+        //   industry_type_id: 3,
+        //   industry_type_name: "Information Technology",
+        //   business_type_id: 2,
+        //   business_type_name: "Private Limited",
+        //   country_id: 101,
+        //   state_id: 27,
+        //   district_id: 501,
+        //   country_name: "India",
+        //   state_name: "Maharashtra",
+        //   district_name: "Pune",
+        //   pan: "ABCDE1234F",
+        //   gst: "27ABCDE1234F1Z5",
+        //   tan: "PNEA12345B",
+        //   billing_address: "PurpleRadiance, Office No. 07, Chandhere Complex, Viman Nagar, Pune - 411057",
+        //   shipping_address: "Warehouse 5, Chandan Nagar, Pune - 411018",
+        //   registered_office_address: "PurpleRadiance, Office No. 07, Chandhere Complex, Viman Nagar, Pune - 411045",
+        //   business_registration_number: "U12345MH2020PTC123456",
+        //   website: "https://www.technova.com",
+        //   isactive: true,
+        //   createdby: "admin@purpleradiance.com",
+        //   createdon: "2026-03-23T10:30:00",
+        //   requestedby: 45,
+        //   lead_id: 789,
+        //   company_account_type_id_array: [1, 2, 3],
+        //   createdby_id: 10,
+        //   updatedby_id: 12,
+        // },
+        // quotation_items: [
+        //   {
+        //     productName: "Laptop Dell Inspiron 15 : Laptop Dell Inspiron 15 Laptop Dell Inspiron 15 ",
+        //     quantity: 2,
+        //     unitPrice: 55000.0,
+        //     discountPercent: 10.0,
+        //     gstPercent: 18.0,
+        //     cgstPercent: 9.0,
+        //     lineSubTotal: 99000.0,
+        //   },
+        //   {
+        //     productName: "Wireless Mouse Logitech M235",
+        //     quantity: 5,
+        //     unitPrice: 800.0,
+        //     discountPercent: 5.0,
+        //     gstPercent: 18.0,
+        //     cgstPercent: 9.0,
+        //     lineSubTotal: 3800.0,
+        //   },
+        //   {
+        //     productName: "Office Chair Ergonomic",
+        //     quantity: 3,
+        //     unitPrice: 7000.0,
+        //     discountPercent: 15.0,
+        //     gstPercent: 18.0,
+        //     cgstPercent: 9.0,
+        //     lineSubTotal: 17850.0,
+        //   },
+        // ],
       };
 
       const response = await axiosClient.post(
@@ -181,10 +181,10 @@ export const QuotationTemplateList: React.FC<QuotationTemplateListProps> = ({
       });
 
       const url = window.URL.createObjectURL(pdfBlob);
-      // window.open(url);
       setPdfPreviewUrl(url);
       setisLoadingForGenerateTemplate(false);
-
+      
+      // window.open(url);
       // const a = document.createElement("a");
       // a.href = url;
       // a.download = `${payload.quotationId}.pdf`;
@@ -206,7 +206,7 @@ export const QuotationTemplateList: React.FC<QuotationTemplateListProps> = ({
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 transition-all duration-200 ease-in-out">
         {templates.map((template) => (
           <div
             key={template.id}
@@ -335,7 +335,7 @@ export const QuotationTemplateList: React.FC<QuotationTemplateListProps> = ({
       </div>
 
       {loading && hasmore && (
-        <div className="flex justify-center h-full items-center">
+        <div className="flex justify-center h-[7vh] items-center transition duration-200 ease-in-out">
           <Loader2 className="animate-spin text-blue-600" size={30} />
         </div>
       )}

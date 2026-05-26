@@ -4,7 +4,7 @@ import toast from "react-hot-toast";
 import { Product } from "../../@types/products/ProductsManagementProps";
 import LiveStockForCompanyProduct from "../../@types/stock/LiveStockForCompanyProduct";
 import StockManagementListProps from "../../@types/stock/StockManagementListProps";
-import { fetchCompanyProduct } from "../../config/apis/api";
+// import { fetchCompanyProduct } from "../../config/apis/api";
 import { handleApiError } from "../../config/error/handleApiError";
 import { useUserAccessModules } from "../../config/hooks/useAccessModules";
 import { ActionTypeForStockMOdule } from "../../constants/AppConstants";
@@ -16,6 +16,8 @@ import PaginationWithoutCount from "../ag-grid/PaginationWithoutCount";
 import StockLiveForCompanyProductAgGrid from "../ag-grid/StockLiveForCompanyProductAgGrid";
 import AddStock from "../modals/stock/AddStock";
 import SearchInput from "../ui/SearchInput";
+import { getLookupCompanyProduct } from "../../config/apis/Lookups";
+import { ComponentHeaderAndLogo } from "../ui/ComponentHeaderAndLogo";
 
 type StockView = ActionTypeForStockMOdule | null;
 
@@ -24,6 +26,7 @@ const StockManagementList = ({
   paginationData,
   searchParameter,
   handleSearchParameterChange,
+  isDataLoading
 }: StockManagementListProps) => {
   const { userPreference } = useUserPreference();
   const { userHasAccessToAddStock } = useUserAccessModules();
@@ -59,9 +62,10 @@ const StockManagementList = ({
         search_company_specific_date_range_id: null,
         search_parameter: null,
         search_parameter_date: null,
-        requestedby_id: loginStatus.id,
+        requestedby: loginStatus.id,
+        product_type_id: null,
       };
-      const response = await fetchCompanyProduct(postData);
+      const response = await getLookupCompanyProduct(postData);
       const product = response?.data?.[0] ?? response?.data;
 
       if (!product) return;
@@ -127,15 +131,20 @@ const StockManagementList = ({
         className={`sticky z-10 top-9 py-0.5 flex items-center justify-between ${COLORS.GRID_HEADER_SECTION_BG_COLOR} rounded-lg shadow-sm  mb-1.5 w-full`}
       >
         <div className="flex items-center pl-1 gap-5">
-          <div className="flex gap-1">
+          {/* <div className="flex gap-1">
             <Package className={COLORS.GRID_HEADER_ICONS_COLOR_AND_SIZE} />
             <span className="section-header-custom">Product Stock</span>
-          </div>
+          </div> */}
+          <ComponentHeaderAndLogo
+            headerText="Product Stock"
+            logo={Package}
+          />
 
           <div className="flex justify-center items-center  gap-1">
             {/* search box flex div */}
             <div className="flex items-start w-80">
               <SearchInput
+              autoFocus={true}
                 id="company-user-module-search-box"
                 onChange={(e) => {
                   handleSearchParameterChange(e.target.value);
@@ -157,6 +166,7 @@ const StockManagementList = ({
           <StockLiveForCompanyProductAgGrid
             data={liveStockForCompanyProduct}
             onRowSelect={handleSelectedStockLiveForCompanyProduct}
+            isDataLoading={isDataLoading}
             // handleRowClick={}
           />
         </div>

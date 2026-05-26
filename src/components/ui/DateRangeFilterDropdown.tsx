@@ -3,6 +3,7 @@ import { ChevronDown, Delete } from "lucide-react";
 import DateRangeFilterDropdownProps from "../../@types/ui/DateRangeFilterDropdown";
 
 function DateRangeFilterDropdown(props: DateRangeFilterDropdownProps) {
+  const showBorder = props.showBorder ?? true;
   const [isOpen, setIsOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState("Date Filter");
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -38,20 +39,20 @@ function DateRangeFilterDropdown(props: DateRangeFilterDropdownProps) {
       <button
         type="button"
         className={`
-            bg-white
-            border border-gray-300
-            input-label-custom
-            py-1 px-4
-            rounded-lg
-            shadow-sm
-            cursor-pointer
-            focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-            disabled:opacity-50 disabled:cursor-not-allowed
-            min-w-[160px]
-            transition-colors
-            hover:border-gray-400
-            flex items-center justify-between
-          `}
+        bg-white
+        input-label-custom
+        py-1 px-4
+        rounded-lg
+        ${showBorder ? "border border-gray-300" : ""}
+        cursor-pointer
+        focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+        disabled:opacity-50 disabled:cursor-not-allowed
+        min-w-[120px]
+        transition-colors
+        hover:border-gray-400
+        flex items-center justify-between
+        ${props.height || ""}
+      `}
         onClick={() => setIsOpen(!isOpen)}
         disabled={props.dropdownOptions.length === 0}
       >
@@ -68,7 +69,7 @@ function DateRangeFilterDropdown(props: DateRangeFilterDropdownProps) {
           <div className="py-1 max-h-60 overflow-auto">
             <button
               id="0"
-              className="w-full px-4 py-1 text-left input-label-custom hover:bg-gray-50 focus:bg-gray-50 focus:outline-none"
+              className="w-full px-2 py-1 text-left input-label-custom hover:bg-gray-50 focus:bg-gray-50 focus:outline-none"
               onClick={() => handleOptionClick(0, "Date Filter")}
             >
               <div className="flex gap-2 text-center caption-custom items-center">
@@ -81,7 +82,7 @@ function DateRangeFilterDropdown(props: DateRangeFilterDropdownProps) {
                 key={option.id}
                 id={option.search_date_range_id?.toString()}
                 className={`
-                    w-full px-4 py-1 text-left border-t
+                    w-full px-2 py-1 text-left border-t
                     ${
                       selectedOption === option.date_range
                         ? "bg-blue-50 text-blue-700"

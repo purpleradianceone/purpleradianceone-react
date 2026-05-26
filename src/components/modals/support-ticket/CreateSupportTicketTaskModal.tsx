@@ -162,7 +162,7 @@ function CreateSupportTicketTaskModal({
     return flagVariable;
   }
 
-  const createSupportTicketTask = async (event: React.FormEvent) => {
+  const createSupportTicketTask = async (event: React.FormEvent<HTMLFormElement>) => {
     // console.log(assignedTo);
     if (isSaving) return;
     if (handleFormChange()) return;
@@ -247,6 +247,7 @@ function CreateSupportTicketTaskModal({
 
       {/* Form Grid */}
       <form
+      onSubmit={createSupportTicketTask}
         className={`space-y-2 mt-2 ${
           isSaving ? "cursor-wait" : "cursor-default"
         }`}
@@ -304,6 +305,16 @@ function CreateSupportTicketTaskModal({
                   setDueTime(e.target.value);
                 }}
                 required={true}
+                 onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault(); // prevents dropdown open
+                    e.stopPropagation();
+
+                    // submit form manually
+                    const form = (e.target as HTMLElement).closest("form");
+                    form?.requestSubmit();
+                  }
+                }}
               >
                 <option value="">Select End Time</option>
                 {timeOptions.map((option) => (
@@ -319,6 +330,7 @@ function CreateSupportTicketTaskModal({
           {/* Description */}
           <div>
             <TextAreaInput
+            autoFocus={true}
               name="description"
               logo={FileText}
               cols={5}
@@ -393,9 +405,7 @@ function CreateSupportTicketTaskModal({
             </span>
           </div>
         </div>
-      </form>
-
-      {/* Footer Buttons */}
+        {/* Footer Buttons */}
       <div className="flex w-full justify-center gap-4 mt-6">
         <div className=" flex w-full justify-end ">
           <div className="flex items-center gap-1 ">
@@ -410,10 +420,10 @@ function CreateSupportTicketTaskModal({
             <Button
               type="submit"
               disabled={isSaving || !userHasAccessToAddSupportTicketTask}
-              onClick={(event: React.FormEvent<HTMLButtonElement>) => {
-                if (isSaving) return;
-                createSupportTicketTask(event);
-              }}
+              // onClick={(event: React.FormEvent<HTMLButtonElement>) => {
+              //   if (isSaving) return;
+              //   createSupportTicketTask(event);
+              // }}
             >
               <div className="flex items-center gap-1">
                 <Save size={16} />
@@ -423,6 +433,9 @@ function CreateSupportTicketTaskModal({
           </div>
         </div>
       </div>
+      </form>
+
+      
     </FormLayout>
   );
 }

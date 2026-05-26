@@ -28,6 +28,7 @@ type GetCompanyUsersListForLeadProps = {
   //added
   selectedUserId: number | null;
   handleUpdateLeadUser?: (params: CompanyUser | null) => boolean;
+  isDataLoading : boolean
 };
 
 function GetCompanyUserListForLeadAssignment({
@@ -40,6 +41,7 @@ function GetCompanyUserListForLeadAssignment({
   handleSelectedCompanyUserChange,
   isUsedForSettings,
   handleUpdateLeadUser,
+  isDataLoading
 }: GetCompanyUsersListForLeadProps) {
   const { dateRangeDropdownOptions } = useComapanySpecificSearchDateRange();
 
@@ -259,6 +261,7 @@ function GetCompanyUserListForLeadAssignment({
             users={users}
             isUsedForSettings={isUsedForSettings}
             handleUpdateLeadUser={handleUpdateLeadUser}
+            isDataLoading={isDataLoading}
           />
         </div>
 

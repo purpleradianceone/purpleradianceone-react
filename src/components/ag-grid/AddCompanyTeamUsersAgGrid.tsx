@@ -11,7 +11,7 @@ import {
   ViewportChangedEvent,
 } from "ag-grid-community";
 import { useMemo, useState, useRef } from "react";
-import { INNERHTML, STATUS_CODE } from "../../constants/AppConstants";
+import {  STATUS_CODE } from "../../constants/AppConstants";
 import { AgGridReact } from "ag-grid-react";
 import companyUsersSearchProps from "../../@types/company-users/CompanyUserProps";
 import { CheckCircle2, XCircle } from "lucide-react";
@@ -23,6 +23,7 @@ import ApiError from "../../@types/error/ApiError";
 import RefreshToken from "../../config/validations/RefreshToken";
 import toast from "react-hot-toast";
 import MESSAGE from "../../constants/Messages";
+import { SkeletonRowsAgGrid } from "../ui/SkeletonRowsAgGrid";
 
 function AddCompanyTeamUsersAgGrid({
   companyUsers,
@@ -35,6 +36,7 @@ function AddCompanyTeamUsersAgGrid({
   handleCompanyUserStatusChange,
   isGridForSubscription,
   handleCompanyUserToggleChange,
+  isDataLoading 
 }: {
   companyUsers: companyUsersSearchProps[];
   handleViewPortChanged: (params: ViewportChangedEvent) => void;
@@ -48,6 +50,7 @@ function AddCompanyTeamUsersAgGrid({
   handleCompanyUserStatusChange?: (statusChangeCount: number) => void;
   isGridForSubscription: boolean;
   handleCompanyUserToggleChange?: (message: string, status: boolean) => void;
+  isDataLoading : boolean
 }) {
   const { userHasAccessToUpdateUser } = useUserAccessModules();
   const { loginStatus } = useLoggedInUserContext();
@@ -106,6 +109,9 @@ function AddCompanyTeamUsersAgGrid({
         hide: !isGridForUpdateCompanyUser,
         // Render the active/inactive badge
         cellRenderer: (params: any) => {
+           if (params.data?.__isSkeleton) {
+                      return <SkeletonRowsAgGrid />;
+                    }
           return (
             <div className="flex items-center gap-1 mt-3">
               {params.value ? (
@@ -130,6 +136,9 @@ function AddCompanyTeamUsersAgGrid({
         pinned: "right",
         width: 100,
         cellRenderer: (params: any) => {
+           if (params.data?.__isSkeleton) {
+                      return <SkeletonRowsAgGrid />;
+                    }
           // For non-update grids, simply render a checkbox.
           if (!isGridForUpdateCompanyUser) {
             const isChecked = addCompanyTeamUserArray
@@ -140,6 +149,7 @@ function AddCompanyTeamUsersAgGrid({
               <div className="flex justify-center mt-2 items-center">
                 <input
                   type="checkbox"
+                  // autoFocus
                   checked={isChecked}
                   className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
                   onChange={(event) => {
@@ -213,6 +223,7 @@ function AddCompanyTeamUsersAgGrid({
             return (
               <div className="flex justify-center mt-3">
                 <button
+                type="button"
                   id={params.data.id.toString()}
                   onClick={(e)=>{
                     if(userHasAccessToUpdateUser){
@@ -262,8 +273,22 @@ function AddCompanyTeamUsersAgGrid({
       flex: 0.8,
       suppressHeaderMenuButton: true,
       suppressHeaderContextMenu: true,
+
+       // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  cellRenderer: (params: any) => {
+                    if (params.data?.__isSkeleton) {
+                      return <SkeletonRowsAgGrid />;
+                    }
+                    return params.value;
+                  },
     };
   }, []);
+
+   const skeletonRows = useMemo(() => {
+      return Array.from({ length: 30 }).map(() => ({
+        __isSkeleton: true,
+      }));
+    }, []);
 
   return (
     <>
@@ -280,11 +305,11 @@ function AddCompanyTeamUsersAgGrid({
 
       <div className="ag-theme-balham w-full h-full">
         <AgGridReact
-          rowData={companyUsers}
+          rowData={isDataLoading ? skeletonRows : companyUsers}
           columnDefs={companyUserColDefs}
           defaultColDef={defaultColDef}
           modules={[AllCommunityModule]}
-          overlayNoRowsTemplate={INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
+          // overlayNoRowsTemplate={INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
           theme={themeAlpine}
           onViewportChanged={handleViewPortChanged}
           onGridReady={onGridReady}

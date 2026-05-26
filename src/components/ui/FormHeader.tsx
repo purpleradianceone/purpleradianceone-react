@@ -2,12 +2,13 @@ import { LucideIcon, X } from "lucide-react";
 import { SIZE } from "../../constants/AppConstants";
 import COLORS from "../../constants/Colors";
 import { IconType } from "react-icons/lib";
-import { ReactNode } from "react";
+import { ElementType, ReactNode } from "react";
 
 const FormHeader = ({
   onClose,
   userName,
   icon: Icon,
+  iconColour = COLORS.FORM_HEADER_ICONS_COLOR ,
   preText,
   postText,
   description,
@@ -17,13 +18,14 @@ const FormHeader = ({
 }: {
   onClose?: () => void;
   userName?: string;
-  icon: LucideIcon | IconType;
+  icon: LucideIcon | IconType | ElementType;
   preText?: string;
   postText?: string;
   description?: string;
   isModal?: boolean;
   wantBorderBottom?: boolean;
   children?: ReactNode;
+  iconColour?: string 
 }) => {
   return (
     // ${isModal ? 'justify-between' : 'justify-start'}
@@ -32,7 +34,7 @@ const FormHeader = ({
     >
       {/* Left side */}
       <div className="flex items-center gap-3">
-        <Icon className={COLORS.FORM_HEADER_ICONS_COLOR} size={SIZE.TWENTY} />
+        <Icon className={iconColour} size={SIZE.TWENTY} />
 
         <div>
           <h2
@@ -53,6 +55,7 @@ const FormHeader = ({
         {/* Close button */}
         {onClose && (
           <button
+          type="button"
             onClick={onClose}
             className=" right-4 top-4 input-label-custom rounded-xl p-0.5 hover:bg-gray-100"
           >

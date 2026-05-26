@@ -61,7 +61,7 @@ const QuotationIconSvg: React.FC<QuotationIconProps> = ({
   size = 24,
   color = "currentColor",
   strokeWidth = 2,
-  className = "text-blue-600",
+  className = "",
   showCurrency = false,
   currency,
 }) => {

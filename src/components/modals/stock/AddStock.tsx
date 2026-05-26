@@ -38,7 +38,7 @@ import { toSelectOptions } from "../../../utils/toSelectOption";
 import axiosClient from "../../../axios-client/AxiosClient";
 import { handleApiError } from "../../../config/error/handleApiError";
 import { LookupCompanyProductForStockCreation } from "../../../@types/lookup/LookupCompanyProductForStockCreation";
-import { getLookupCompanyProductForStockCreation } from "../../../config/apis/Lookups";
+import { getLookupCompanyProduct } from "../../../config/apis/Lookups";
 
 const AddStock = ({
   // isUsedInProductModal = false,
@@ -414,8 +414,7 @@ const AddStock = ({
           limit: 1,
           requestedby: loginStatus.id,
         };
-        const response =
-          await getLookupCompanyProductForStockCreation(postData);
+        const response = await getLookupCompanyProduct(postData);
 
         if (response) {
           setSelectedUnitId(undefined);
@@ -524,12 +523,14 @@ const AddStock = ({
               {/* Quantity */}
               <div className="">
                 <FormInput
+                autoFocus
                   label="Quantity : "
                   logo={LucideIndianRupee}
                   required
                   readonly={selectedProduct?.isSerialNumber}
                   type="number"
                   name="quantity"
+                  min={1}
                   placeholder="Enter quantity here"
                   defaultValue={
                     selectedProduct?.isSerialNumber
@@ -617,6 +618,7 @@ const AddStock = ({
                     required={true}
                     min={0}
                     name="total_cost"
+                    step={'0.01'}
                     placeholder="Enter total cost"
                     defaultValue={
                       addStockFormData.total_cost == 0
@@ -726,6 +728,7 @@ const AddStock = ({
                   cols={4}
                   label="Description: "
                   name="description"
+                  placeholder="Enter description"
                   rows={3}
                   defaultValue={addStockFormData.description}
                   onChange={handleAddStockFormDataChange}

@@ -13,53 +13,55 @@ import { useInView } from "react-intersection-observer";
 import { motion } from "framer-motion";
 import Account from "../../../@types/account/Account";
 import AccountManagementList from "../../lists/AccountManagementList";
-import { LocalStorageKeys } from "../../../enums/LocalStorageKeys";
+import {
+  LocalStorageKeys,
+  LocalStorageTabKeys,
+} from "../../../enums/LocalStorageKeys";
 import axiosClient from "../../../axios-client/AxiosClient";
 
 function GetAccounts({
   isUsedForAccountLead,
   handleRowSelectedForLead,
-  isUsedForSupportTicketCreation
-} : {
-  isUsedForAccountLead : boolean;
-  handleRowSelectedForLead? : (data: Account | any) => void;
+  isUsedForSupportTicketCreation,
+}: {
+  isUsedForAccountLead: boolean;
+  handleRowSelectedForLead?: (data: Account | any) => void;
   isUsedForSupportTicketCreation?: boolean;
 }) {
-
   // Restore saved filters when opening this module
-      // useEffect(() => {
-      //   const saved = localStorage.getItem(LocalStorageKeys.ACCOUNT_MANAGEMEMNT_FILTERS);
-      //   if (!saved) return;
-    
-      //   const filters = JSON.parse(saved);
-    
-      //   // Ensure URL & hook initialize first before restoring
-      //   requestAnimationFrame(() => {
-      //     if (filters.page) handlePageChange(filters.page);
-      //     if (filters.size) handlePageSizeChange(filters.size);
-      //     if (filters.search) handleSearchParameterChange(filters.search);
-      //     if (filters.dateRangeId) handleDatePageIdChange(filters.dateRangeId);
-    
-      //     // if (filters.leadStatus) setSelectedLeadStatus(filters.leadStatus);
-      //     // if (filters.leadSource) setSelectedLeadSource(filters.leadSource);
-          
-      //     if(filters.customStartDate) handleStartDateChange(filters.customStartDate)
-      //       if(filters.customEndDate) handleEndDateChange(filters.customEndDate)
-      //     // if (filters.userId) {
-      //     //   setSelectedCompanyUser((prev) => ({
-      //     //     ...prev,
-      //     //     id: filters.userId,
-      //     //     fullname : filters.userName
-      //     //   }));
-      //     // }
-      //   });
-      // }, []);
+  // useEffect(() => {
+  //   const saved = localStorage.getItem(LocalStorageKeys.ACCOUNT_MANAGEMEMNT_FILTERS);
+  //   if (!saved) return;
+
+  //   const filters = JSON.parse(saved);
+
+  //   // Ensure URL & hook initialize first before restoring
+  //   requestAnimationFrame(() => {
+  //     if (filters.page) handlePageChange(filters.page);
+  //     if (filters.size) handlePageSizeChange(filters.size);
+  //     if (filters.search) handleSearchParameterChange(filters.search);
+  //     if (filters.dateRangeId) handleDatePageIdChange(filters.dateRangeId);
+
+  //     // if (filters.leadStatus) setSelectedLeadStatus(filters.leadStatus);
+  //     // if (filters.leadSource) setSelectedLeadSource(filters.leadSource);
+
+  //     if(filters.customStartDate) handleStartDateChange(filters.customStartDate)
+  //       if(filters.customEndDate) handleEndDateChange(filters.customEndDate)
+  //     // if (filters.userId) {
+  //     //   setSelectedCompanyUser((prev) => ({
+  //     //     ...prev,
+  //     //     id: filters.userId,
+  //     //     fullname : filters.userName
+  //     //   }));
+  //     // }
+  //   });
+  // }, []);
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [ref, inView] = useInView({ fallbackInView: true, threshold: 0.1 });
   const { loginStatus } = useLoggedInUserContext();
   const [accessDeniedPopUpOpen, setAccessDeniedPopUpOpen] = useState(false);
   const [accountChangeCount, setAccountChangeCount] = useState<number>(0);
-
+  const [isDataLoading, setIsDataLoading] = useState<boolean>(false);
   const handleCreateCompanyAccountType = () => {
     setAccountChangeCount(accountChangeCount + 1);
   };
@@ -67,9 +69,9 @@ function GetAccounts({
   const { userHasAccessToViewAccount } = useUserAccessModules();
 
   // Read filters from LocalStorage (before hook initializes)
-const savedFilters = JSON.parse(
-  localStorage.getItem(LocalStorageKeys.ACCOUNT_MANAGEMEMNT_FILTERS) || "{}"
-);
+  const savedFilters = JSON.parse(
+    localStorage.getItem(LocalStorageKeys.ACCOUNT_MANAGEMEMNT_FILTERS) || "{}",
+  );
   const {
     currentPage,
     currentPageData,
@@ -109,11 +111,15 @@ const savedFilters = JSON.parse(
     };
 
     try {
+      setIsDataLoading(true);
       const response = await axiosClient.post(POST_API.GET_ACCOUNT, postData, {
         withCredentials: true,
       });
 
-      setCurrentPageData({currentPage: currentPage, pageDataLength: response.data.length});
+      setCurrentPageData({
+        currentPage: currentPage,
+        pageDataLength: response.data.length,
+      });
 
       const formattedData: Account[] = response.data.map((res: any) => ({
         count: res.count,
@@ -145,7 +151,6 @@ const savedFilters = JSON.parse(
         createdOn: res.createdon,
       }));
       setAccounts(formattedData);
-      
     } catch (error: ApiError | any) {
       if (error.status === STATUS_CODE.UNATHORISED) {
         const refreshTokenStatus = await RefreshToken({
@@ -155,6 +160,8 @@ const savedFilters = JSON.parse(
           fetchAccounts();
         }
       }
+    } finally {
+      setIsDataLoading(false);
     }
   };
 
@@ -176,7 +183,7 @@ const savedFilters = JSON.parse(
     }
   }, [userHasAccessToViewAccount]);
 
-   // Save all filters to localStorage whenever they change
+  // Save all filters to localStorage whenever they change
   useEffect(() => {
     const filters = {
       page: currentPage,
@@ -190,7 +197,7 @@ const savedFilters = JSON.parse(
 
     localStorage.setItem(
       LocalStorageKeys.ACCOUNT_MANAGEMEMNT_FILTERS,
-      JSON.stringify(filters)
+      JSON.stringify(filters),
     );
   }, [
     currentPage,
@@ -199,7 +206,7 @@ const savedFilters = JSON.parse(
     dateRangeId,
     startDate,
     endDate,
-    concatDate
+    concatDate,
   ]);
 
   // Note : On refresh button click clear the storage
@@ -209,6 +216,9 @@ const savedFilters = JSON.parse(
       localStorage.removeItem(LocalStorageKeys.ACCOUNT_MANAGEMEMNT_FILTERS);
     }
     return () => window.removeEventListener("beforeunload", clearLeadFilters);
+  }, []);
+  useEffect(() => {
+    localStorage.removeItem(LocalStorageTabKeys.TAB_STORAGE_KEY);
   }, []);
   return (
     <div className="w-full">
@@ -239,12 +249,13 @@ const savedFilters = JSON.parse(
                   currentPage,
                   currentPageData,
                   onPageSizeChange: handlePageSizeChange,
-                  onPageChange:handlePageChange,
+                  onPageChange: handlePageChange,
                 }}
                 handleCreateCompanyAccountType={handleCreateCompanyAccountType}
                 isUsedForAccountLead={isUsedForAccountLead}
                 handleRowSelectedForLead={handleRowSelectedForLead}
-                isUsedForSupportTicketCreation = {isUsedForSupportTicketCreation}
+                isUsedForSupportTicketCreation={isUsedForSupportTicketCreation}
+                isDataLoading={isDataLoading}
               />
             </motion.section>
           </div>

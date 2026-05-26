@@ -3,19 +3,21 @@ import { AllCommunityModule, ColDef, themeBalham } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { AgGridReact as AgGridReactType } from "ag-grid-react";
-import { INNERHTML } from "../../../constants/AppConstants";
 import LookupCompanyProduct from "../../../@types/lookup/LookupCompanyProduct";
+import { SkeletonRowsAgGrid } from "../../ui/SkeletonRowsAgGrid";
 
 type LookupCompanyProductAgGridProps = {
   companyProducts: LookupCompanyProduct[];
   handleSelectedCompanyProductChange: (params: LookupCompanyProduct | null) => void;
   selectedProductId: number | null; 
+  isDataLoading : boolean
 };
 
 function LookupCompanyUserAgGrid({
   companyProducts,
   handleSelectedCompanyProductChange,
   selectedProductId,
+  isDataLoading
 }: LookupCompanyProductAgGridProps) {
   const [localSelectedUserId, setLocalSelectedUserId] = useState<number | null>(
     selectedProductId
@@ -56,6 +58,12 @@ function LookupCompanyUserAgGrid({
         filter: false,
         width: 100,
         cellRenderer: (params: any) => {
+          if (params.data?.__isSkeleton) {
+                      return (
+                        <SkeletonRowsAgGrid/>
+                      );
+                    }
+
           const user: LookupCompanyProduct = params.data;
           const isChecked = localSelectedUserId === user.id;
           return (
@@ -86,6 +94,12 @@ function LookupCompanyUserAgGrid({
     [localSelectedUserId] 
   );
 
+   const skeletonRows = useMemo(() => {
+      return Array.from({ length: 30 }).map(() => ({
+        __isSkeleton: true,
+      }));
+    }, []);
+
   const defaultColDef = useMemo(() => {
     return {
       filter: "agTextColumnFilter",
@@ -93,6 +107,15 @@ function LookupCompanyUserAgGrid({
       flex: 0.8,
       suppressHeaderMenuButton: true,
       suppressHeaderContextMenu: true,
+
+      cellRenderer: (params: any) => {
+                    if (params.data?.__isSkeleton) {
+                      return (
+                        <SkeletonRowsAgGrid/>
+                      );
+                    }
+                    return params.value;
+                  },
     };
   }, []);
 
@@ -103,11 +126,11 @@ function LookupCompanyUserAgGrid({
     >
       <AgGridReact
         ref={gridRef}
-        rowData={companyProducts}
+        rowData={isDataLoading ? skeletonRows : companyProducts}
         columnDefs={columnDefs}
         defaultColDef={defaultColDef}
         modules={[AllCommunityModule]}
-        overlayNoRowsTemplate={INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
+        // overlayNoRowsTemplate={INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
         theme={themeBalham}
       />
     </div>

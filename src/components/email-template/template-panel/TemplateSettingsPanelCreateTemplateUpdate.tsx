@@ -184,6 +184,7 @@ export const TemplateSettingsPanelCreateTemplateUpdate: React.FC<
                   defaultValue={templateName}
                   onChange={(e) => setTemplateName(e.target.value)}
                   placeholder={`e.g.,`}
+                  // autoFocus={true}
                 />
               </div>
 

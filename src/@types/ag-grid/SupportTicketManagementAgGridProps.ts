@@ -7,6 +7,7 @@ type SupportTicketManagementAgGridProps = {
     handleSupportTicketDataFormChange : (data: SupportTicketProps) => void,
     handleRowClick : (event : any) => void;
     isUsedInSupportTicketModule : boolean
+    isDataLoading : boolean
 }
 
 export default SupportTicketManagementAgGridProps;

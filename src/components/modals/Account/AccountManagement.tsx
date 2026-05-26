@@ -1,16 +1,19 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
-import AccountCompanyType from "./AccountCompanyType";
 import AccountCompanyProduct from "./account-company-product/AccountCompanyProduct";
 import { useAccountDetails } from "../../../config/hooks/useGetAccountDetails";
 import ROUTES_URL from "../../../constants/Routes";
 import { useNavigate, useParams } from "react-router-dom";
 import { parseInt } from "lodash";
 import AccountDetailsUpdated from "./AccountDetailsUpdated";
-import AccountContact from "./account-contact-temp/AccountContact";
-import AccountLead from "./account-lead/AccountLead";
 import AccountService from "./account-service/AccountService";
 import AccountSubscription from "./account-subscription/AccountSubscription";
+import AccountInvoice from "./account-invoice/AccountInvoice";
+import Tabs from "../../ui/Tabs";
+import { AccountContactLeadTypeConjuction } from "./AccountContactLeadTypeConjuctionComponent";
+import AccountProformaInvoice from "./account-proforma-invoice/AccountProformaInvoice";
+import { LocalStorageTabKeys } from "../../../enums/LocalStorageKeys";
+import AccountQuotationDetails from "./account-quotation/AccountQuotationDetails";
 
 const AccountManagement: React.FC = () => {
   const { accountId } = useParams();
@@ -18,8 +21,24 @@ const AccountManagement: React.FC = () => {
     useAccountDetails(parseInt(accountId!));
   const navigate = useNavigate();
 
+  const [activeTab, setActiveTab] = useState(() => {
+    return (
+      localStorage.getItem(LocalStorageTabKeys.TAB_STORAGE_KEY) || "product"
+    );
+  });
+  const tabList = [
+    { key: "product", label: "Product" },
+    { key: "service", label: "Service" },
+    { key: "subscription", label: "Subscription" },
+    { key: "invoice", label: "Invoice" },
+    { key: "proforma-invoice", label: "Proforma Invoice" },
+    { key: "quotation", label: "Quotation" },
+  ];
   const parsedAccountId = Number(accountId);
 
+  useEffect(() => {
+    localStorage.setItem(LocalStorageTabKeys.TAB_STORAGE_KEY, activeTab);
+  }, [activeTab]);
   useEffect(() => {
     if (!accountId || Number.isNaN(parsedAccountId)) {
       navigate(ROUTES_URL.ACCOUNT_MANAGEMENT);
@@ -47,7 +66,7 @@ const AccountManagement: React.FC = () => {
   return (
     // <>
 
-    <div className="pb-3 mt-0.5">
+    <div className="pb-3 mt-0.5  ">
       {/* Header Section */}
       {/* Main Content Grid */}
       <div className="grid sm:grid-cols-1 md:grid-cols-2    gap-1">
@@ -56,59 +75,80 @@ const AccountManagement: React.FC = () => {
         </div>
 
         {/* Right Card - Empty for future use */}
-
-        <div className="bg-white rounded-md border p-1 border-slate-200">
-          <h3 className="bg-gray-100 table-header-custom rounded-t-md px-2">
-            Account Contacts
-          </h3>
-          <AccountContact accountId={company!.id} />
+        <div className="bg-white rounded-md border  border-slate-200">
+          <AccountContactLeadTypeConjuction account={company} />
         </div>
 
         {/* Account Lead */}
 
-        <div className="bg-white rounded-md border p-1 border-slate-200">
-          {/* Header */}
+        {/* <div className="bg-white rounded-md border p-1 border-slate-200">
+         
           <div className="bg-gray-100 table-header-custom rounded-t-md px-2 ">
             <span>Account Related Leads</span>
           </div>
-          <AccountLead account={company!} />
-        </div>
+          
+        </div> */}
 
         {/* Account company type */}
 
-        <div className="bg-white rounded-md border p-1 border-slate-200">
+        {/* <div className="bg-white rounded-md border p-1 border-slate-200">
           <div className="bg-gray-100 table-header-custom rounded-t-md px-2 ">
             <span>Company Account Type</span>
           </div>
-          <AccountCompanyType accountId={company!.id} />
-        </div>
+         
+        </div> */}
 
         {/* Account company product */}
-        <div className="bg-white col-span-2 rounded-md border p-1 border-slate-200">
+        {/* <div className="bg-white col-span-2 rounded-md border p-1 border-slate-200">
           <h3 className="bg-gray-100 table-header-custom rounded-t-md px-2">
             Product Details
           </h3>
           <AccountCompanyProduct
             accountId={company!.id}
-          // handleShowCompanyProductData={handleShowCompanyProductData}
           />
         </div>
 
         <div className="bg-white col-span-2 rounded-md border p-1 border-slate-200">
-          {/* <h3 className="bg-gray-100 table-header-custom rounded-t-md px-2">
-            Account Service
-          </h3> */}
           <AccountService accountId={company.id} />
         </div>
         <div className="bg-white col-span-2 rounded-md border p-1 border-slate-200">
-          {/* <h3 className="bg-gray-100 table-header-custom rounded-t-md px-2">
-            Account Subscription
-          </h3> */}
           <AccountSubscription
             accountId={company!.id}
-          // handleShowCompanyProductData={handleShowCompanyProductData}
           />
         </div>
+        <div className="bg-white col-span-2 rounded-md border p-1 border-slate-200">
+          <AccountInvoice
+            account={company}
+          />
+        </div> */}
+      </div>
+      <Tabs tabs={tabList} activeTab={activeTab} onChange={setActiveTab} />
+      <div className="bg-white col-span-2 rounded-md border p-1 border-slate-200">
+        {activeTab === "product" && (
+          <>
+            {/* <h3 className="bg-gray-100 table-header-custom rounded-t-md px-2">
+              Product Details
+            </h3> */}
+            <AccountCompanyProduct accountId={company!.id} />
+          </>
+        )}
+
+        {activeTab === "service" && <AccountService accountId={company!.id} />}
+
+        {activeTab === "subscription" && (
+          <AccountSubscription accountId={company!.id} />
+        )}
+
+        {activeTab === "invoice" && (
+          <AccountInvoice isNavigateFrom="accountInvoice" account={company} />
+        )}
+        {activeTab === "proforma-invoice" && (
+          <AccountProformaInvoice account={company} />
+        )}
+
+         {activeTab === "quotation" && (
+          <AccountQuotationDetails account={company} />
+        )}
       </div>
     </div>
   );

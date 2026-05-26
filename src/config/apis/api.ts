@@ -45,3 +45,15 @@ export const getLookupQuantityLive  = async (payload: any
     const response = await axiosClient.post(POST_API.GET_LOOKUP_QUANTITY_LIVE, payload, { withCredentials: true })
     return response;
 }
+
+export const getAccountServiceDetails = async (payload: any
+) => {
+    const response = await axiosClient.post(POST_API.GET_ACCOUNT_SERVICE_DETAIL, payload,  { withCredentials: true })
+    return response;
+}
+
+export const getAccountSubscriptionDetails = async (payload: any
+) => {
+    const response = await axiosClient.post(POST_API.GET_ACCOUNT_SUBSCRIPTION, payload,  { withCredentials: true })
+    return response;
+}

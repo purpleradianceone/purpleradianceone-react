@@ -26,6 +26,7 @@ export type Product = {
   hsn?: string;
   sac?: string;
   taxRate?: number;
+  cess?: number;
   validFrom?: string;
   createdBy?: string;
   createdOn?: string;

@@ -1,13 +1,15 @@
-import { Warehouse } from "lucide-react";
+import { Hourglass } from "lucide-react";
 import StockAgeingListProps from "../../@types/stock/StockAgeingListProps";
 import COLORS from "../../constants/Colors";
 import { useUserPreference } from "../../context/user/UserPreference";
 import PaginationWithoutCount from "../ag-grid/PaginationWithoutCount";
 import StockAgeingAgGrid from "../ag-grid/StockAgeingAgGrid";
+import { ComponentHeaderAndLogo } from "../ui/ComponentHeaderAndLogo";
 
 const StockAgeingList = ({
   stockAgeing,
   paginationData,
+  isDataLoading
 }: StockAgeingListProps) => {
   const { userPreference } = useUserPreference();
 
@@ -20,12 +22,7 @@ const StockAgeingList = ({
       <div
         className={`sticky z-10 top-9 py-0.5 flex items-center justify-between ${COLORS.GRID_HEADER_SECTION_BG_COLOR} rounded-lg shadow-sm  mb-1.5 w-full`}
       >
-        <div className="flex items-center pl-1 gap-5">
-          <div className="flex gap-1">
-            <Warehouse className={COLORS.GRID_HEADER_ICONS_COLOR_AND_SIZE} />
-            <span className="section-header-custom">Warehouse Wise Stock</span>
-          </div>
-        </div>
+        <ComponentHeaderAndLogo headerText="Stock Ageing" logo={Hourglass}/>
       </div>
       <div className="bg-white  overflow-y-auto rounded-lg shadow-sm ">
         <div
@@ -35,7 +32,7 @@ const StockAgeingList = ({
               : "ag-theme-balham w-full h-[calc(100vh-192px)]"
           }
         >
-          <StockAgeingAgGrid data={stockAgeing} />
+          <StockAgeingAgGrid data={stockAgeing} isDataLoading={isDataLoading} />
         </div>
         <div className="flex items-center justify-end ">
           <PaginationWithoutCount

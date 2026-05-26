@@ -6,6 +6,7 @@ type AccountSubscriptionManagementGridProps = {
   accountSubscriptions?: AccountSubscriptionProps[];
 
   onRowSelect: (data: AccountServiceProps | any) => void;
+  handleAddToInvoice: (data: AccountSubscriptionProps | any) => void;
 
   handleAccountSubscriptionDataFormChange: (data: AccountSubscriptionProps) => void;
 

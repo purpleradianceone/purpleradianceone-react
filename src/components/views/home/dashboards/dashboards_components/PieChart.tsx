@@ -1,3 +1,6 @@
+
+
+
 import { useState } from "react";
 import LeadSummaryReportType from "../../../../../@types/home/dashboard/LeadSummaryReportType";
 import { useInView } from "react-intersection-observer";
@@ -23,10 +26,14 @@ interface PieSlice {
 
 const PieChart = ({
   data,
-  chartFor,
+  totalLable,
+  headerText,
+  headerDescription,
 }: {
   data: LeadSummaryReportType[];
-  chartFor: "leadByStatus" | "leadBySource";
+  totalLable:string
+  headerText?: string;
+  headerDescription?: string;
 }) => {
   const [hoveredSlice, setHoveredSlice] = useState<number | null>(null);
 
@@ -55,7 +62,7 @@ const PieChart = ({
   // Transform data with colors and percentages
   const transformedData = data
     ? data.map((item, index) => ({
-        sourceId: item.id,
+        sourceId: index,
         name: item.name,
         count: item.total,
         color: colors[index % colors.length].color,
@@ -200,13 +207,11 @@ const PieChart = ({
       >
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h3 className="section-header-custom mb-2">
-              {chartFor === "leadByStatus" ? "Lead Status" : "Lead Sources"}
+            <h3 className="table-header-custom">
+              {headerText}
             </h3>
-            <p className="table-header-custom">
-              {chartFor === "leadByStatus"
-                ? "Distribution of leads by current status"
-                : "Distribution of leads by acquisition source"}
+            <p className="caption-custom">
+              {headerDescription}
             </p>
           </div>
         </div>
@@ -223,7 +228,7 @@ const PieChart = ({
               <svg width="300" height="300" className="transform rotate-0">
                 {pieSlices.map((slice, index) => (
                   <path
-                    key={slice.sourceId}
+                    key={index}
                     d={createArcPath(
                       150,
                       150,
@@ -248,7 +253,7 @@ const PieChart = ({
                 <circle
                   cx="150"
                   cy="150"
-                  r="50"
+                  r="60"
                   fill="white"
                   className="drop-shadow-sm"
                 />
@@ -260,7 +265,7 @@ const PieChart = ({
                   textAnchor="middle"
                   className="input-label-custom fill-current"
                 >
-                  Total Leads
+                  {totalLable}
                 </text>
                 <text
                   x="150"
@@ -287,7 +292,7 @@ const PieChart = ({
             <div className="space-y-1 grid grid-cols-2 gap-2 max-h-96 overflow-y-auto">
               {filteredData.map((item, index) => (
                 <div
-                  key={item.sourceId}
+                  key={index}
                   className={`flex items-center gap-1  justify-between p-1 rounded-lg transition-all cursor-pointer border ${
                     hoveredSlice === index
                       ? "bg-gray-50 shadow-sm border-gray-400"
@@ -333,7 +338,7 @@ const PieChart = ({
                 </svg>
               </div>
               <p className="input-label-custom">
-                No lead source data available
+                {`No data available`}
               </p>
             </div>
           </div>

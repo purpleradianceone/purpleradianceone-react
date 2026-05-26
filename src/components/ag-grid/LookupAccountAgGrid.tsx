@@ -3,13 +3,14 @@
 import { AllCommunityModule, ColDef, themeBalham } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 import { useMemo, useRef } from "react";
-import { INNERHTML } from "../../constants/AppConstants";
 import { LookupAccountAgGridProps } from "../../@types/ag-grid/LookupAccountAgGridProps";
 import { LookupAccount } from "../../@types/lookup/LookupAccount";
+import { SkeletonRowsAgGrid } from "../ui/SkeletonRowsAgGrid";
 
 function LookupAccountAgGrid({
   accounts,
   onRowSelect, //selected user for view lead details
+  isDataLoading
 //   handleRowClick,
 //   isUsedInLeadModule,
   
@@ -52,6 +53,11 @@ function LookupAccountAgGrid({
         // autoHeight: true,
         // suppressSizeToFit: true,
         cellRenderer: (params: LookupAccount | any) => {
+          if (params.data?.__isSkeleton) {
+                return (
+                  <SkeletonRowsAgGrid/>
+                );
+              }
           return (
             <div className="flex items-center justify-center  ">
               <span
@@ -69,6 +75,11 @@ function LookupAccountAgGrid({
     []
   );
 
+  const skeletonRows = useMemo(() => {
+    return Array.from({ length: 30 }).map(() => ({
+      __isSkeleton: true,
+    }));
+  }, []);
   const defaultColDef = useMemo(
     () => ({
       filter: "agTextColumnFilter",
@@ -76,6 +87,15 @@ function LookupAccountAgGrid({
       flex: 0.8,
       suppressHeaderMenuButton: true,
       suppressHeaderContextMenu: true,
+
+       cellRenderer: (params: any) => {
+              if (params.data?.__isSkeleton) {
+                return (
+                  <SkeletonRowsAgGrid/>
+                );
+              }
+              return params.value;
+            },
     }),
     []
   );
@@ -87,12 +107,12 @@ function LookupAccountAgGrid({
     >
       <AgGridReact
         ref={gridRef} // Attach the ref
-        rowData={accounts}
+        rowData={ isDataLoading ? skeletonRows :accounts}
         columnDefs={columnDefs}
         defaultColDef={defaultColDef}
         modules={[AllCommunityModule]}
         theme={themeBalham}
-        overlayNoRowsTemplate={INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
+        // overlayNoRowsTemplate={INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
         context={{ handleRowSelect: onRowSelect }}
         // onRowClicked={handleRowClick}
       />

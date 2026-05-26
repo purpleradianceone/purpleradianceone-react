@@ -14,14 +14,21 @@ export enum DashboardComponentJsxKey {
   Closed_Tickets = "Closed Tickets",
   Recent_Tickets = "Recent Tickets",
 
-  //Inventory Dashboard
-
+  /*Inventory Dashboard*/
+  //For top horizontal row
   Total_Products = "Total Products",
   Total_Stock_Value = "Total Stock Value",
   Low_Stock_Products = "Low Stock Products",
   Out_of_Stock_Products = "Out of Stock Products",
   Todays_Inward_Value = "Today's Inward Value",
   Todays_Outward_Value = "Today's Outward Value",
+  //for Stock_Overview pie chart
+  Stock_Overview = "Stock Overview",
+  Recent_Stock_Movement = "Recent Stock Movement",
+  Top_Low_Stock_Products = "Top Low Stock Products",
+  Stock_Value_Trend = "Stock Value Trend",
+
+
 
   //For all Dashboards
   TOTAL_PENDING_TASKS = "Total Pending Task",

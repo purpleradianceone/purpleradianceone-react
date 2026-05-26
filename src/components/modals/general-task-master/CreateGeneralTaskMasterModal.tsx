@@ -188,7 +188,9 @@ function CreateGeneralTaskMasterModal({
     setFile(null);
   };
 
-  const createMyTask = async () => {
+  const createMyTask = async (event : React.FormEvent<HTMLFormElement>
+  ) => {
+    event.preventDefault()
     if (!validateForm()) {
       toast.error("Please fix validation errors");
       return;
@@ -266,13 +268,14 @@ function CreateGeneralTaskMasterModal({
           preText="Create General Task"
           description="Create general task."
         />
-        <form className="space-y-0">
+        {/* <form className="space-y-0"> */}
           <div>
             {/* Form */}
-            <form className="space-y-4 mt-2">
+            <form className="space-y-4 mt-2" onSubmit={ createMyTask}>
               <div className="grid grid-cols-4 gap-2">
                 <div>
                   <FormInput
+                  autoFocus={true}
                     label="Subject :"
                     placeholder=" Enter Subject"
                     logo={File}
@@ -608,10 +611,10 @@ function CreateGeneralTaskMasterModal({
                   </Button>
                   <Button
                     type="submit"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      createMyTask();
-                    }}
+                    // onClick={(e) => {
+                    //   e.preventDefault();
+                    //  ();
+                    // }}
                   >
                     <div className="flex items-center gap-1">
                       <Save size={16} />
@@ -622,7 +625,7 @@ function CreateGeneralTaskMasterModal({
               </div>
             </form>
           </div>
-        </form>
+        {/* </form> */}
       </div>
     </FormLayout>
   );

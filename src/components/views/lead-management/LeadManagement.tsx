@@ -93,7 +93,8 @@ useEffect(()=>{
     handleStartDateChange,
   } = useSearchFilterPaginationDateHandlers(savedFilters);
   // Restore saved filters when opening this module
-  
+    const [isLeadsDataLoading , setIsLeadsDataLoading]= useState<boolean>(false);
+
 
   const { userHasAccessToViewLead } = useUserAccessModules();
   const [accessDeniedPopUpOpen, setAccessDeniedPopUpOpen] = useState(false);
@@ -142,6 +143,7 @@ useEffect(()=>{
 
     const effectiveDateRangeId = dateRangeId;
 
+    setIsLeadsDataLoading(true);
     //NOTE : need to work on this
     const postDataToGetLeads: PostDataToGetLeadData = {
       company_id: loginStatus.companyId,
@@ -208,6 +210,8 @@ useEffect(()=>{
           getLeadsData(signal);
         }
       }
+    }finally{
+      setIsLeadsDataLoading(false)
     }
   };
 
@@ -448,6 +452,7 @@ useEffect(()=>{
               handleLeadSelectedSource,
               selectedLeadSource,
             }}
+            isLoading ={isLeadsDataLoading}
           />
         ) : (
           <div className="flex-none mx-96 mt-14">

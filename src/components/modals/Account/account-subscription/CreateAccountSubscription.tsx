@@ -1,24 +1,28 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import FormHeader from "../../../ui/FormHeader";
 
-import { BoxIcon, Plus, Save, X, Calendar, Trash } from "lucide-react";
+import {
+  BoxIcon,
+  Plus,
+  Save,
+  X,
+  Calendar,
+  Trash,
+  IndianRupee,
+} from "lucide-react";
 import FormLayout from "../../../ui/FormLayout";
 import React, { useEffect, useState } from "react";
 import Button from "../../../ui/Button";
 import {
   SIZE,
-  STATUS_CODE,
+  VALIDATIONS,
   //   VALIDATIONS,
 } from "../../../../constants/AppConstants";
-// import FormInput from "../../../ui/FormInput";
 import { useFormChange } from "../../../../config/hooks/useFormChange";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
 
-import axios from "axios";
 import POST_API from "../../../../constants/PostApi";
 import toast from "react-hot-toast";
-import ApiError from "../../../../@types/error/ApiError";
-import RefreshToken from "../../../../config/validations/RefreshToken";
 import LoadingPopUpAnimation from "../../../views/card/LoadingPopUpAnimation";
 // import CustomSelect, { SelectOption } from "../../../ui/CustomSelect";
 import CustomSelectForAccountService, {
@@ -30,13 +34,12 @@ import { handleApiError } from "../../../../config/error/handleApiError";
 
 // import TextAreaInput from "../../../ui/TextAreaInput";
 import DatePickerInput from "../../../ui/DatePickerInput";
-// import FormCheckbox from "../../../ui/FormCheckbox";
 
 // import MESSAGE from "../../../../constants/Messages";
-// import CompanyUserSearchFieldInput from "../../../ui/CompanyUserSearchFieldInput";
 import AddAccountSubscriptionModalProps from "../../../../@types/modal/AddAccountSubscriptionModalProps";
 import CreateAccountSubscriptionProps from "../../../../@types/account/CreateAccountSubscriptionProps";
 import COLORS from "../../../../constants/Colors";
+import FormInput from "../../../ui/FormInput";
 
 interface CustomField {
   id: string;
@@ -56,27 +59,40 @@ const CreateAccountSubscription = ({
   onClose,
   // product,
   accountId,
-  handleAddAccountSubscritption
-
+  handleAddAccountSubscritption,
+  selectedProductForAMC,
 }: AddAccountSubscriptionModalProps) => {
   const { loginStatus } = useLoggedInUserContext();
   const [isSaving, setIsSaving] = useState<boolean>(false);
+
+  const [totalCost, setTotalCost] = useState<number | "">("");
+  const [totalCostError, setTotalCostError] = useState<string>("");
+
+  const [isAMC, setIsAMC] = useState(false);
+
+  const [amcProductOptions, setAmcProductOptions] = useState<SelectOption[]>(
+    [],
+  );
+  const [amcProductSelected, setAmcProductSelected] =
+    useState<SelectOption | null>(null);
 
   const [error, setError] = useState<{
     productId: boolean;
     start_date_error: string;
     end_date_error: string;
+    amc_product_error: string;
   }>({
     productId: false,
     start_date_error: "",
     end_date_error: "",
+    amc_product_error: "",
   });
 
   const intialCreateAccountSubscriptionFormData: CreateAccountSubscriptionProps =
-  {
-    start_date: "",
-    end_date: "",
-  };
+    {
+      start_date: "",
+      end_date: "",
+    };
 
   const {
     handleChange: handleCreateServiceDetailFormChange,
@@ -84,19 +100,20 @@ const CreateAccountSubscription = ({
     resetForm: resetAddAccountSubscriptionForm,
   } = useFormChange(intialCreateAccountSubscriptionFormData);
 
-  //   const [isRenewal, setisRenewal] = useState<boolean>(false);
+  const handleCostChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
 
-  //   function handleIsRenewalRequiredChange(
-  //     event: React.ChangeEvent<HTMLInputElement>,
-  //   ) {
-  //     setisRenewal(event.target.checked);
-  //   }
+    if (value === "") {
+      setTotalCost("");
+      return;
+    }
 
-  // const {
-  //   handleChange: handleAddStockFormDataChange,
-  //   formData: addStockFormData,
-  //   resetForm: resetStockCreateForm,
-  // } = useFormChange(intialAddStockFormData);
+    if (!VALIDATIONS.NUMBER_WITH_DECIMAL.test(value)) {
+      return;
+    }
+
+    setTotalCost(Number(value));
+  };
 
   // Note : on close Clear the states
   const handleCloseForm = () => {
@@ -104,52 +121,45 @@ const CreateAccountSubscription = ({
 
     // here we are setting dropdown
     setProductSelected(null);
+    setPackages([]);
+    setTotalCost("");
 
-    // setCustomerRating(0);
+    setIsAMC(false);
+    setAmcProductSelected(null);
+    setAmcProductOptions([]);
 
     setError({
       productId: false,
       start_date_error: "",
       end_date_error: "",
+      amc_product_error: "",
     });
     onClose();
   };
 
   const validateForm = (): boolean => {
     let flagVariable: boolean = true;
-    if (productSelected === undefined || productSelected === null) {
-      setError((prev) => ({
-        ...prev,
-        productId: true,
-      }));
+    if (!productSelected) {
+      setError((prev) => ({ ...prev, productId: true }));
+      toast.error("Please select Subscription Product");
       flagVariable = false;
-    } else {
-      setError((prev) => ({
-        ...prev,
-        productId: false,
-      }));
     }
 
     if (addCreateAccountSubscriptionFormData.start_date === "") {
       setError((prev) => ({
         ...prev,
-        start_date_error: "Please Start Date ",
+        start_date_error: "Please select Start Date",
       }));
-      toast.error("Please select Start Date  for Account Subsription");
+      toast.error("Please select Start Date for Account Subscription");
       flagVariable = false;
-    } else {
-      setError((prev) => ({
-        ...prev,
-        start_date_error: "",
-      }));
     }
 
     if (addCreateAccountSubscriptionFormData.end_date === "") {
       setError((prev) => ({
         ...prev,
-        end_date_error: "Please Select End Date ",
+        end_date_error: "Please select End Date",
       }));
-      toast.error("Please select End Date for Account Subsription");
+      toast.error("Please select End Date for Account Subscription");
       flagVariable = false;
     } else {
       setError((prev) => ({
@@ -162,7 +172,7 @@ const CreateAccountSubscription = ({
       addCreateAccountSubscriptionFormData.start_date &&
       addCreateAccountSubscriptionFormData.end_date &&
       addCreateAccountSubscriptionFormData.start_date >
-      addCreateAccountSubscriptionFormData.end_date
+        addCreateAccountSubscriptionFormData.end_date
     ) {
       setError((prev) => ({
         ...prev,
@@ -177,6 +187,26 @@ const CreateAccountSubscription = ({
         ...prev,
         end_date_error: "",
       }));
+    }
+    if (isAMC === true) {
+      if (!amcProductSelected) {
+        setError((prev) => ({
+          ...prev,
+          amc_product_error: "Please select AMC Product",
+        }));
+        flagVariable = false;
+      } else {
+        setError((prev) => ({
+          ...prev,
+          amc_product_error: "",
+        }));
+      }
+    }
+    if (totalCost === "" || totalCost < 0) {
+      setTotalCostError("Total Cost is required");
+      flagVariable = false;
+    } else {
+      setTotalCostError("");
     }
 
     return flagVariable;
@@ -209,12 +239,18 @@ const CreateAccountSubscription = ({
       package_detail: JSON.stringify(packageDetailJson),
       is_renewal: false,
       renewal_account_subscription_id: null,
+
+      is_amc: isAMC,
+
+      account_company_product_id: isAMC ? amcProductSelected?.value : null,
+
+      total_cost: totalCost || 0,
       createdby_id: loginStatus.id,
     };
+    console.log(postData);
 
-    // alert(JSON.stringify(postData, null, 2));
     setIsSaving(true);
-    await axios
+    await axiosClient
       .post(POST_API.CREATE_ACCOUNT_SUBSCRIPTION, postData, {
         withCredentials: true,
       })
@@ -229,17 +265,9 @@ const CreateAccountSubscription = ({
         }
       })
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .catch(async (error: ApiError | any) => {
-        if (error.status === STATUS_CODE.UNATHORISED) {
-          const refreshTokenResponse = await RefreshToken({
-            callFunctionWithEvent: handleCreateAccountService,
-          });
-          if (refreshTokenResponse) {
-            handleCreateAccountService(event);
-          }
-        } else {
-          toast.error(error.response.data);
-        }
+      .catch((error) => {
+        console.log(error);
+        handleApiError(error);
       })
       .finally(() => {
         setIsSaving(false);
@@ -267,7 +295,7 @@ const CreateAccountSubscription = ({
       company_id: loginStatus.companyId,
       id: null,
       isactive: true,
-      product_type_id: 4,
+      product_type_id: [4],
       search_parameter: search || null,
       offset: currentOffset,
       limit: PAGE_SIZE,
@@ -276,7 +304,7 @@ const CreateAccountSubscription = ({
 
     try {
       const response = await axiosClient.post(
-        POST_API.GET_LOOKUP_COMPANY_PRODUCT_BY_PRODUCT_TYPE,
+        POST_API.GET_LOOKUP_COMPANY_PRODUCT,
         postData,
         { withCredentials: true },
       );
@@ -299,6 +327,60 @@ const CreateAccountSubscription = ({
     }
   };
 
+  const fetchAccountCompanyProductByProductType = async () => {
+    try {
+      const response = await axiosClient.post(
+        POST_API.GET_LOOKUP_ACCOUNT_COMPANY_PRODUCT_BY_PRODUCT_TYPE,
+        {
+          company_id: loginStatus.companyId,
+          product_type_id: [1, 2],
+          account_id: accountId,
+          requestedby_id: loginStatus.id,
+        },
+      );
+      console.log(response.data);
+
+      const mapped = response.data.map((item: any) => ({
+        value: item.id,
+        label: `${item.company_product_name} 
+    ${item.barcode ? ` | Barcode: ${item.barcode}` : ""} 
+    ${item.serial_number ? ` | Serial: ${item.serial_number}` : ""}`,
+      }));
+
+      setAmcProductOptions(mapped);
+
+      if (selectedProductForAMC) {
+        const found = mapped.find(
+          (opt: any) => opt.value === selectedProductForAMC.id,
+        );
+        if (found) {
+          setAmcProductSelected(found);
+        }
+      }
+    } catch (error) {
+      handleApiError(error);
+    }
+  };
+
+  useEffect(() => {
+    if (!isAMC || !accountId) return;
+
+    setAmcProductSelected(null); // reset first
+    fetchAccountCompanyProductByProductType();
+  }, [isAMC, accountId]);
+
+  useEffect(() => {
+    if (!selectedProductForAMC) return;
+    // ✅ Always enable AMC
+    setIsAMC(true);
+    // ✅ Preselect AMC product
+    setAmcProductSelected({
+      value: selectedProductForAMC.id,
+      label: `${selectedProductForAMC.companyProductName}
+      ${selectedProductForAMC.barcode ? ` | Barcode: ${selectedProductForAMC.barcode}` : ""}
+      ${selectedProductForAMC.serialNumber ? ` | Serial: ${selectedProductForAMC.serialNumber}` : ""}`,
+    });
+  }, [selectedProductForAMC]);
   const handleMenuOpen = () => {
     if (productOptions.length === 0) {
       setOffset(0);
@@ -331,7 +413,6 @@ const CreateAccountSubscription = ({
     console.log(productSelected);
   }, [productSelected]);
 
-
   const [packages, setPackages] = useState<PackageDetail[]>([]);
 
   // Add new package
@@ -359,8 +440,8 @@ const CreateAccountSubscription = ({
   const updatePackageName = (packageId: string, name: string) => {
     setPackages((prev) =>
       prev.map((pkg) =>
-        pkg.id === packageId ? { ...pkg, packageName: name } : pkg
-      )
+        pkg.id === packageId ? { ...pkg, packageName: name } : pkg,
+      ),
     );
   };
 
@@ -368,20 +449,20 @@ const CreateAccountSubscription = ({
   const handleChange = (
     packageId: string,
     name: "key" | "value",
-    val: string
+    val: string,
   ) => {
     setPackages((prev) =>
       prev.map((pkg) =>
         pkg.id === packageId
           ? {
-            ...pkg,
-            field: {
-              ...pkg.field,
-              [name]: val,
-            },
-          }
-          : pkg
-      )
+              ...pkg,
+              field: {
+                ...pkg.field,
+                [name]: val,
+              },
+            }
+          : pkg,
+      ),
     );
   };
 
@@ -394,7 +475,7 @@ const CreateAccountSubscription = ({
         result[pkg.packageName] = {
           [pkg.field.key]: pkg.field.value,
           Completed: "0",
-          IsActive: "true"
+          Active: "true",
         };
       }
     });
@@ -402,7 +483,6 @@ const CreateAccountSubscription = ({
 
     return result;
   };
-
 
   // const productOptions = toSelectOptions(productList, 'id', 'name');
   // if isOpen is false then return null
@@ -425,68 +505,144 @@ const CreateAccountSubscription = ({
                 {productSelected.label}
               </div>
             )}
+
+            {isAMC && amcProductSelected && (
+              <div className="text-sm text-gray-700 font-medium bg-gray-100 px-3 py-1.5 rounded-md">
+                <span className="text-gray-500">AMC Product:</span>{" "}
+                {amcProductSelected.label}
+              </div>
+            )}
           </div>
-
           <form onSubmit={handleCreateAccountService} className="space-y-2 p-1">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-              {
-                <div >
-                  <CustomSelectForAccountService
-                    icon={BoxIcon}
-                    label="Product"
-                    // onChange={(value) => {
-                    //   if (!value) return;
-                    //   setProductSelected(value);
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div className="flex items-center gap-2 pt-2">
+                <input
+                  type="checkbox"
+                  checked={isAMC}
+                  onChange={(e) => {
+                    const checked = e.target.checked;
+                    setIsAMC(checked);
 
-                    //   setError((prev) => ({
-                    //     ...prev,
-                    //     productId: false,
-                    //   }));
-                    // }}
-
-                    onChange={(
-                      option: number | SelectOption | undefined | null,
-                    ) => {
-                      if (!option) return;
-
-                      if (typeof option === "number") {
-                        console.log("Selected ID:", option);
-                        return;
-                      }
-                      console.log("------option-----------");
-                      console.log(option);
-                      console.log("-----------------");
-                      // set the full option as selected
-                      setProductSelected(option);
-
-                      // clear any validation error
+                    if (!checked) {
+                      setAmcProductSelected(null);
                       setError((prev) => ({
                         ...prev,
-                        productId: false,
+                        amc_product_error: "",
                       }));
+                    } else {
+                      setError((prev) => ({
+                        ...prev,
+                        amc_product_error: "",
+                      }));
+                    }
+                  }}
+                />
+                <label className="text-sm font-medium">Is AMC</label>
+              </div>
 
-                      // // now you can access details directly:
-                      console.log("Selected ID:", option.value);
-                      console.log("Selected Name:", option.label);
-                    }}
-                    options={productOptions}
+              {isAMC ? (
+                <div>
+                  <CustomSelectForAccountService
+                    icon={BoxIcon}
+                    label="AMC Product"
+                    options={amcProductOptions}
                     isRequired={true}
-                    placeholder="Select Product"
-                    value={productSelected || 0}
-                    onMenuOpen={handleMenuOpen}
-                    onMenuScrollToBottom={handleMenuScrollToBottom}
-                    onInputChange={handleInputChange}
-                    isLoading={isLoading}
+                    value={amcProductSelected || undefined}
                     isClearable={false}
+                    onChange={(option) => {
+                      if (!option || typeof option === "number") return;
+
+                      setAmcProductSelected(option);
+
+                      setError((prev) => ({
+                        ...prev,
+                        amc_product_error: "",
+                      }));
+                    }}
+                    placeholder="Select AMC Product"
                   />
-                  {error.productId && (
+                  {error.amc_product_error && (
                     <div className="caption-custom-inactive">
-                      Product is required
+                      {error.amc_product_error}
                     </div>
                   )}
                 </div>
-              }
+              ) : (
+                <div />
+              )}
 
+              <div>
+                <CustomSelectForAccountService
+                  icon={BoxIcon}
+                  label="Product"
+                  // onChange={(value) => {
+                  //   if (!value) return;
+                  //   setProductSelected(value);
+
+                  //   setError((prev) => ({
+                  //     ...prev,
+                  //     productId: false,
+                  //   }));
+                  // }}
+
+                  onChange={(
+                    option: number | SelectOption | undefined | null,
+                  ) => {
+                    if (!option) return;
+
+                    if (typeof option === "number") {
+                      console.log("Selected ID:", option);
+                      return;
+                    }
+                    console.log("------option-----------");
+                    console.log(option);
+                    console.log("-----------------");
+                    // set the full option as selected
+                    setProductSelected(option);
+
+                    // clear any validation error
+                    setError((prev) => ({
+                      ...prev,
+                      productId: false,
+                    }));
+
+                    // // now you can access details directly:
+                    console.log("Selected ID:", option.value);
+                    console.log("Selected Name:", option.label);
+                  }}
+                  options={productOptions}
+                  isRequired={true}
+                  placeholder="Select Product"
+                  value={productSelected || 0}
+                  onMenuOpen={handleMenuOpen}
+                  onMenuScrollToBottom={handleMenuScrollToBottom}
+                  onInputChange={handleInputChange}
+                  isLoading={isLoading}
+                  isClearable={false}
+                />
+                {error.productId && (
+                  <div className="caption-custom-inactive">
+                    Product is required
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <FormInput
+                  required
+                  type="number"
+                  label="Total Cost"
+                  placeholder="Enter total cost"
+                  logo={IndianRupee}
+                  value={totalCost === "" ? "" : totalCost}
+                  onChange={handleCostChange}
+                />
+                {totalCostError && (
+                  <p className="text-xs text-red-600">{totalCostError}</p>
+                )}
+              </div>
+
+              {/* Row 3 */}
               <div>
                 <DatePickerInput
                   label="Start Date"
@@ -497,6 +653,7 @@ const CreateAccountSubscription = ({
                   required
                 />
               </div>
+
               <div>
                 <DatePickerInput
                   label="End Date"
@@ -507,97 +664,88 @@ const CreateAccountSubscription = ({
                   required
                 />
               </div>
+            </div>
 
-              <div className="p-6 bg-white border rounded-lg shadow-sm col-span-3">
+            <div className="p-6 bg-white border rounded-lg shadow-sm col-span-3">
+              {/* Header */}
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-lg font-semibold">Package Details</h2>
 
-                {/* Header */}
-                <div className="flex justify-between items-center mb-6">
-                  <h2 className="text-lg font-semibold">Package Details</h2>
-
-                  <button
-                    type="button"
-                    onClick={addPackage}
-                    className="px-2 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-                  >
-                    + Add Package
-                  </button>
-                </div>
-
-                {/* Package List */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-
-                  {packages.map((pkg) => (
-                    <div
-                      key={pkg.id}
-                      className="border border-gray-200 p-4 rounded-md bg-gray-50"
-                    >
-
-                      {/* Package Header */}
-                      <div className="flex gap-3 mb-3">
-
-                        <input
-                          placeholder="Package Name"
-                          value={pkg.packageName}
-                          onChange={(e) =>
-                            updatePackageName(pkg.id, e.target.value)
-                          }
-                          className="border px-3 py-1 rounded-md"
-                        />
-
-                        <button
-                          onClick={() => removePackage(pkg.id)}
-                        >
-                          <Trash size={SIZE.ICON_DELETE_BUTTON_SIZE} className={COLORS.ICON_DELETE_BUTTON}></Trash>
-                        </button>
-
-                      </div>
-
-                      {/* Key Value Field */}
-                      <div className="flex gap-3">
-
-                        <input
-                          placeholder="Key"
-                          value={pkg.field.key}
-                          onChange={(e) =>
-                            handleChange(pkg.id, "key", e.target.value)
-                          }
-                          readOnly
-                          className="border px-3 py-1 rounded-md"
-                        />
-
-                        <input
-                          placeholder="Value"
-                          value={pkg.field.value}
-                          onChange={(e) =>
-                            handleChange(pkg.id, "value", e.target.value)
-                          }
-                          className="border px-3 py-1 rounded-md"
-                        />
-
-                      </div>
-
-                    </div>
-                  ))}
-
-                </div>
-
+                <button
+                  type="button"
+                  onClick={addPackage}
+                  className="px-2 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                >
+                  + Add Package
+                </button>
               </div>
 
-              <div className="sticky bottom-0 flex items-center justify-end bg-pink-00 col-span-3">
-                <div className="flex gap-1">
-                  <Button onClick={handleCloseForm} type="button">
-                    <div className="flex items-center gap-0.5">
-                      <X size={SIZE.SIXTEEN} />
-                      Cancel
+              {/* Package List */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                {packages.map((pkg) => (
+                  <div
+                    key={pkg.id}
+                    className="border border-gray-200 p-4 rounded-md bg-gray-50"
+                  >
+                    {/* Package Header */}
+                    <div className="flex gap-3 mb-3">
+                      <input
+                        placeholder="Package Name"
+                        value={pkg.packageName}
+                        onChange={(e) =>
+                          updatePackageName(pkg.id, e.target.value)
+                        }
+                        className="border px-3 py-1 rounded-md"
+                      />
+
+                      <button onClick={() => removePackage(pkg.id)}>
+                        <Trash
+                          size={SIZE.ICON_DELETE_BUTTON_SIZE}
+                          className={COLORS.ICON_DELETE_BUTTON}
+                        ></Trash>
+                      </button>
                     </div>
-                  </Button>
-                  <Button type="submit">
-                    <div className="flex items-center gap-1">
-                      <Save size={SIZE.SIXTEEN} />
-                      Save
+
+                    {/* Key Value Field */}
+                    <div className="flex gap-3">
+                      <input
+                        placeholder="Key"
+                        value={pkg.field.key}
+                        onChange={(e) =>
+                          handleChange(pkg.id, "key", e.target.value)
+                        }
+                        readOnly
+                        className="border px-3 py-1 rounded-md"
+                      />
+
+                      <input
+                        placeholder="Value"
+                        value={pkg.field.value}
+                        onChange={(e) =>
+                          handleChange(pkg.id, "value", e.target.value)
+                        }
+                        className="border px-3 py-1 rounded-md"
+                      />
                     </div>
-                  </Button>
-                </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="sticky bottom-0 flex items-center justify-end bg-pink-00 col-span-3">
+              <div className="flex gap-1">
+                <Button onClick={handleCloseForm} type="button">
+                  <div className="flex items-center gap-0.5">
+                    <X size={SIZE.SIXTEEN} />
+                    Cancel
+                  </div>
+                </Button>
+                <Button type="submit">
+                  <div className="flex items-center gap-1">
+                    <Save size={SIZE.SIXTEEN} />
+                    Save
+                  </div>
+                </Button>
               </div>
             </div>
           </form>

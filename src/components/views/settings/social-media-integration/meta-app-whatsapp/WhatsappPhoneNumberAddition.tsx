@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useLoggedInUserContext } from "../../../../../context/user/LoggedInUserContext";
 import {  createConnectWhatsappAccount } from "../../../../../config/apis/IntegrationApis";
 import {  MessageCircleIcon } from "lucide-react";
+import { useUserAccessModules } from "../../../../../config/hooks/useAccessModules";
 
 
 type ConnectionStatus = "idle" | "loading" | "success" | "error";
@@ -16,14 +17,16 @@ interface ConnectedPage {
  * 
  * Displays pop up card to add phone number
  * 
- * @param {function} handleRefreshApiCall - method call to refresh to list of phone number 
- * @returns {TSX.Element}  Rendered Component - to add whatsapp phone number
+ * @param {function} handleRefreshApiCall - function call to refresh to list of records, whenever we add new record
+ * @returns  Rendered Component - to add whatsapp phone number
  */
 export default function WhatsappPhoneNumberAddition({
   handleRefreshApiCall,
 }:{
   handleRefreshApiCall : ()=> void;
 }) {
+
+  const {userHasAccessToAddIntegrationSetting} = useUserAccessModules();
   const { loginStatus } = useLoggedInUserContext();
   const [pageId, setPageId] = useState("");
   const [status, setStatus] = useState<ConnectionStatus>("idle");
@@ -33,8 +36,12 @@ export default function WhatsappPhoneNumberAddition({
   );
 
 
-  // api call to add
+  //Note : Add api call
   const handleSubmit = async () => {
+  //Note : if user dont have the access then return from here. 
+    if(!userHasAccessToAddIntegrationSetting){
+      return;
+    }
     if (!pageId.trim()) {
       setStatus("error");
       setMessage("Please enter a Page ID.");

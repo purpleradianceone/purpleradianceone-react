@@ -2,33 +2,40 @@
 import { useMemo, useRef } from "react";
 import MyTaskManagementAgGridProps from "../../@types/ag-grid/MyTaskManagementAgGridProps";
 import { AgGridReact } from "ag-grid-react";
-import {
-  GRIDSKELETON,
-  INNERHTML,
-  JSX_CHILDREN_NAME,
-} from "../../constants/AppConstants";
-import { AllCommunityModule, ColDef, themeBalham } from "ag-grid-community";
+import { AGGRID, JSX_CHILDREN_NAME } from "../../constants/AppConstants";
+import { AllCommunityModule, ColDef } from "ag-grid-community";
 import MyAllTaskProps from "../../@types/my-task-management/MyAlltaskProps";
-import { Flag } from "lucide-react";
-import TaskStageChip from "../ui/TaskStageChip";
-import TaskPriorityChip from "../ui/TaskPriorityChip";
-import StatusIndicator from "../ui/StatusIndicator";
+import { Eye, Flag } from "lucide-react";
+
+import { SkeletonRowsAgGrid } from "../ui/SkeletonRowsAgGrid";
+import {
+  taskPriorityStyles,
+  taskStageStyles,
+} from "../../utils/colourSpecifierForNameInAggrid";
+import StatusBadge from "../ui/StatusBadge";
+import RenderUserWithIcon from "../ui/UserAgGridCellRenderer";
 
 function MyTaskManagementAgGrid({
   allTaskData,
   onRowSelect,
   handleRowClick,
   isUsedInAllTasksModule,
-  gridLoading,
+  isDataLoading,
 }: MyTaskManagementAgGridProps) {
   const gridRef = useRef<AgGridReact>(null); // Ref to the AgGridReact component
   const columnDefs = useMemo<ColDef[]>(
     () => [
       {
         field: "subject",
-        headerName: "subject",
+        headerName: "Subject",
         sortable: true,
         filter: true,
+
+        cellStyle: () => ({
+          fontSize: "14px",
+          fontWeight: 600,
+          color: "#1f2937",
+        }),
       },
       {
         hide: false,
@@ -49,9 +56,20 @@ function MyTaskManagementAgGrid({
         filter: true,
         // cellRenderer: PriorityCellRenderer,
         cellRenderer: (params: any) => {
+          if (params.data?.__isSkeleton) {
+            return <SkeletonRowsAgGrid />;
+          }
+          const priority = params.value || "-";
+
           return (
-            <div className="flex items-center">
-              <TaskPriorityChip priorityName={params.value} />
+            <div className="flex items-center h-full">
+              <span
+                className={`px-3 py-0.5 rounded-full text-xs font-medium whitespace-nowrap ${
+                  taskPriorityStyles[priority] || "bg-slate-100 text-slate-700"
+                }`}
+              >
+                {priority}
+              </span>
             </div>
           );
         },
@@ -63,12 +81,20 @@ function MyTaskManagementAgGrid({
         sortable: true,
         filter: true,
         cellRenderer: (params: MyAllTaskProps | any) => {
+          if (params.data?.__isSkeleton) {
+            return <SkeletonRowsAgGrid />;
+          }
+          const stage = params.value || "-";
+
           return (
-            <div className="flex items-center">
-              <TaskStageChip
-                stageName={params.value}
-                stageId={params.data.taskStageId}
-              />
+            <div className="flex items-center h-full">
+              <span
+                className={`px-3 py-0.5 rounded-full text-xs font-medium whitespace-nowrap ${
+                  taskStageStyles[stage] || "bg-slate-100 text-slate-700"
+                }`}
+              >
+                {stage}
+              </span>
             </div>
           );
         },
@@ -105,9 +131,12 @@ function MyTaskManagementAgGrid({
         filter: true,
         // hide: isUsedForAccountLead,
         cellRenderer: (params: MyAllTaskProps | any) => {
+          if (params.data?.__isSkeleton) {
+            return <SkeletonRowsAgGrid />;
+          }
           return (
-            <div className="flex items-center text-sm gap-1 mt-1">
-              <StatusIndicator isActive={params.value} />
+            <div className="h-full flex items-center">
+              <StatusBadge isActive={params.value} />
             </div>
           );
         },
@@ -131,26 +160,33 @@ function MyTaskManagementAgGrid({
         field: "createdBy",
         headerName: "Created by",
         filter: true,
+        cellRenderer: RenderUserWithIcon,
       },
       {
         headerName: "Actions",
         field: "view",
         pinned: "right",
-        maxWidth: 80,
+        maxWidth: 100,
+        filter: false,
         // minWidth:80,
         // autoHeight: true,
         // suppressSizeToFit: true,
         cellRenderer: (params: MyAllTaskProps | any) => {
+          if (params.data?.__isSkeleton) {
+            return <SkeletonRowsAgGrid />;
+          }
           return (
-            <div className="flex items-center justify-center  ">
-              <span
-                className="lead-details cursor-pointer text-blue-600  "
+            <div className="flex items-center justify-center">
+              <button
+                className="lead-details flex items-center "
                 onClick={() => {
                   params.context.handleRowSelect(params.data);
                 }}
               >
-                {isUsedInAllTasksModule ? "Details" : "Select"}
-              </span>
+                <Eye size={12} strokeWidth={1.5} />
+
+                <span>{isUsedInAllTasksModule ? "Details" : "Select"}</span>
+              </button>
             </div>
           );
         },
@@ -159,32 +195,48 @@ function MyTaskManagementAgGrid({
     [],
   );
 
-  const defaultColDef = useMemo(
+  const defaultColDef = useMemo<ColDef>(
     () => ({
       filter: "agTextColumnFilter",
       minWidth: 150,
       flex: 0.8,
       suppressHeaderMenuButton: true,
       suppressHeaderContextMenu: true,
+
+      cellRenderer: (params: any) => {
+        if (params.data?.__isSkeleton) {
+          return <SkeletonRowsAgGrid />;
+        }
+        return params.value;
+      },
     }),
     [],
   );
 
+  const skeletonRows = useMemo(() => {
+    return Array.from({ length: 30 }).map(() => ({
+      __isSkeleton: true,
+    }));
+  }, []);
+
   return (
     <div
+      className=" w-full modern-user-grid custom-height-scrollbar"
       // className="ag-theme-balham w-full"
       style={{ height: "100%", width: "100%" }}
     >
       <AgGridReact
         ref={gridRef} // Attach the ref
-        rowData={allTaskData}
+        rowData={isDataLoading ? skeletonRows : allTaskData}
         columnDefs={columnDefs}
         defaultColDef={defaultColDef}
         modules={[AllCommunityModule]}
-        theme={themeBalham}
-        loading={gridLoading}
-        overlayLoadingTemplate={GRIDSKELETON.MY_TASK_GRID}
-        overlayNoRowsTemplate={INNERHTML.GRID_NO_DATE_FOUND}
+        // theme={themeBalham}
+        rowHeight={AGGRID.ROW_HEIGHT}
+        headerHeight={AGGRID.HEADER_HEIGHT}
+        // loading={gridLoading}
+        // overlayLoadingTemplate={GRIDSKELETON.MY_TASK_GRID}
+        // overlayNoRowsTemplate={INNERHTML.GRID_NO_DATE_FOUND}
         context={{ handleRowSelect: onRowSelect }}
         onRowClicked={handleRowClick}
       />

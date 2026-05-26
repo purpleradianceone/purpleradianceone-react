@@ -33,6 +33,8 @@ function SubscriptionManagement() {
     SubscriptionListProps[]
   >([]);
 
+  const [isDataLoading, setIsDataLoading] = useState<boolean>(false);
+
   const [subscriptionListUpdateCount, setSubscriptionListUpdateCount] = useState<number>(0);
   const handleSubscriptionListChange=()=>{
     setSubscriptionListUpdateCount(subscriptionListUpdateCount+1);
@@ -40,6 +42,7 @@ function SubscriptionManagement() {
 
   //NOTE : API call to get subscription list
   const fetchCompanySubscription = async () => {
+    setIsDataLoading(true)
     const offset = (currentPage - 1) * pageSize;
 
     const effectiveDateRangeId =
@@ -82,6 +85,9 @@ function SubscriptionManagement() {
             ]);
           });
         }
+      })
+      .finally(()=>{
+        setIsDataLoading(false);
       });
   };
 
@@ -113,6 +119,7 @@ function SubscriptionManagement() {
             pageSize,
           }}
           handleSubscriptionListChange={handleSubscriptionListChange}
+          isDataLoading={isDataLoading}
         />
       </div>
     </div>

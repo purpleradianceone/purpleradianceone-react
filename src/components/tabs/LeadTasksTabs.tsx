@@ -150,7 +150,7 @@ function LeadTaskTabs({
                 
                 }}
                 className={
-                  activeTab === value ? "input-label-custom-active-tab" : "input-label-custom"
+                  activeTab === value ? "input-label-custom-active-tab " : "input-label-custom"
                 }
               >
                 {label}
@@ -160,7 +160,8 @@ function LeadTaskTabs({
         </div>
 
         {/* Scrollable content */}
-        <div className="overflow-y-auto max-h-[calc(100vh-150px)]">
+        <div className="overflow-y-auto  max-h-[calc(100vh-140px)] ">
+
           <TabsBody
             placeholder="Online Lead"
             onPointerEnterCapture={undefined}

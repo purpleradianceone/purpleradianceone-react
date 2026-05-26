@@ -7,6 +7,12 @@ export const getLookupLeads  = async (payload: object
     return response;
 }
 
+export const getLookupLeadsWithSignal  = async (payload: object , signal? : AbortSignal
+) => {
+    const response = await axiosClient.post(POST_API.GET_LOOKUP_LEADS, payload, {signal, withCredentials: true })
+    return response;
+}
+
 export const getLeadNotes  = async (payload: object
 ) => {
     const response = await axiosClient.post(POST_API.GET_LEADS_NOTES, payload, { withCredentials: true })

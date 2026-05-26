@@ -212,6 +212,7 @@ function CreateSubscription({
       <form className="space-y-5" onSubmit={handleCreateSubscription}>
         <FormInput
           logo={Users2}
+          autoFocus={true}
           required
           label="Company users count:"
           placeholder="Count of users (min 1)"

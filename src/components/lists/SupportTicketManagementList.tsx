@@ -60,6 +60,7 @@ function SupportTicketManagementList({
   handleSupportSelectedSource,
   isUsedInSupportTicketModule,
   handleRowSelectedForShowSupportTicket,
+  isDataLoading,
 }: SupportTicketManagementListProps) {
   const [searchParams] = useSearchParams();
 
@@ -201,58 +202,58 @@ function SupportTicketManagementList({
           >
             {/* LEFT SECTION - Support Label */}
             {isUsedInSupportTicketModule && (
-              <div className="flex gap-1 items-center w-fit">
-                {!isSmallScreen && (
-                  <Headset
-                    className={`${
-                      isCustomDateOptionSelected
-                        ? "w-4 h-4 text-blue-600"
-                        : COLORS.GRID_HEADER_ICONS_COLOR_AND_SIZE
-                    } `}
-                  />
-                )}
+              <div className="flex gap-2 items-center w-fit">
+                <div className="flex gap-1 items-center w-fit">
+                  {!isSmallScreen && (
+                    <Headset
+                      className={`${
+                        isCustomDateOptionSelected
+                          ? "w-4 h-4 text-blue-600"
+                          : COLORS.GRID_HEADER_ICONS_COLOR_AND_SIZE
+                      } `}
+                    />
+                  )}
 
-                {(isMediumScreen || isLargeScreen) && (
-                  <span
-                    className={`${
-                      isCustomDateOptionSelected
-                        ? "text-xs"
-                        : "section-header-custom"
-                    } `}
-                  >
-                    Support
-                  </span>
-                )}
-              </div>
-            )}
+                  {(isMediumScreen || isLargeScreen) && (
+                    <span
+                      className={`${
+                        isCustomDateOptionSelected
+                          ? "text-xs"
+                          : "section-header-custom"
+                      } ${userPreference.sidebarOpen?"":"mr-2"}`}
+                    >
+                      {userPreference.sidebarOpen?"":"Support"}
+                    </span>
+                  )}
+                </div>
+                {/* Search Box */}
+                <div
+                  className={`relative flex items-start ${
+                    isCustomDateOptionSelected ?(userPreference.sidebarOpen?"w-24": "w-28 ") : (userPreference.sidebarOpen?"w-32":"w-52")
+                  }`}
+                >
+                  <SearchInput
+                    value={handleSearchOption.searchParameter}
+                    onChange={(e) => {
+                      handleSearchOption.handleSearchParameterChange(
+                        e.target.value,
+                      );
+                    }}
+                    height="h-8"
+                  ></SearchInput>
+                </div>
 
-            <div className="flex flex-wrap items-center gap-2 w-fit">
-              {/* Search Box */}
-              <div
-                className={`relative flex items-start ${
-                  isCustomDateOptionSelected ? "w-44 " : "w-44"
-                }`}
-              >
-                <SearchInput
-                  value={handleSearchOption.searchParameter}
-                  onChange={(e) => {
-                    handleSearchOption.handleSearchParameterChange(
-                      e.target.value,
-                    );
-                  }}
-                ></SearchInput>
-              </div>
-              {/* DATE FILTERS */}
-              <div className="flex flex-wrap items-center gap-2 w-fit">
+                {/* DATE FILTERS */}
                 <div>
                   <div className="grid grid-cols-1 justify-center gap-1 w-full">
                     {/* Shared width wrapper */}
                     <div className="relative w-fit flex justify-center gap-1">
-                      <div className="flex col-span-2 w-fit">
+                      <div className={`flex ${userPreference.sidebarOpen?"flex-col col-span-1":"col-span-2"} w-fit`}>
                         <DateRangeFilterDropdown
                           dropdownOptions={dateRangeDropdownOptions}
                           handleDateIdChange={handleDateRangeIdChange}
                           selectedOption={selectedDateName}
+                          height="h-8"
                         />
                         {isCustomDateOptionSelected && (
                           <div className="mt-1 ml-1 w-fit">
@@ -268,7 +269,6 @@ function SupportTicketManagementList({
                     </div>
                   </div>
                 </div>
-
                 {/* SUPPORT TICKET FILTERS */}
                 {isUsedInSupportTicketModule && (
                   <div className="flex flex-wrap gap-2 w-full md:w-auto">
@@ -282,6 +282,7 @@ function SupportTicketManagementList({
                         labelName="category"
                         options={supportTicketCategory!}
                         onSelect={handleSupportSelectedCategory}
+                        height="h-8"
                       />
                     </div>
 
@@ -295,6 +296,7 @@ function SupportTicketManagementList({
                         }
                         options={supportTicketSource!}
                         onSelect={handleSupportSelectedSource}
+                        height="h-8"
                       />
                     </div>
 
@@ -308,6 +310,7 @@ function SupportTicketManagementList({
                         }
                         options={supportTicketLifecycle!}
                         onSelect={handleSupportSelectedLifecycle}
+                        height="h-8"
                       />
                     </div>
 
@@ -328,7 +331,7 @@ function SupportTicketManagementList({
                           <div className="border rounded-md border-gray-400 p-0.5 max-w-[150px]">
                             <div
                               title={selectedAssignTo.fullname}
-                              className="relative max-h-6 rounded flex justify-between gap-x-0.5 bg-blue-600 caption-custom white-text p-0.5"
+                              className="relative max-h-8 rounded flex justify-between gap-x-0.5 bg-blue-600 caption-custom white-text p-0.5"
                             >
                               <span onClick={handleCompanyUserPopUp}>
                                 {selectedAssignTo.fullname.length > 14
@@ -366,10 +369,10 @@ function SupportTicketManagementList({
                             <span>ResolvedBy</span>
                           </Button>
                         ) : (
-                          <div className="border rounded-md border-gray-400 p-0.5 max-w-[150px]">
+                          <div className={`border rounded-md border-gray-400 p-0.5 max-w-[150px]`}>
                             <div
                               title={selectedResolvedBy.fullname}
-                              className="relative max-h-6 rounded flex justify-between gap-x-0.5 bg-blue-600 caption-custom white-text p-0.5"
+                              className="relative max-h-8 rounded flex justify-between gap-x-0.5 bg-blue-600 caption-custom white-text p-0.5"
                             >
                               <span onClick={handleResolvedByPopUp}>
                                 {selectedResolvedBy.fullname.length > 14
@@ -410,7 +413,7 @@ function SupportTicketManagementList({
                           <div className="border rounded-md border-gray-400 p-0.5 max-w-[150px]">
                             <div
                               title={selectedCompanyProduct.name}
-                              className="relative rounded flex justify-between gap-x-0.5 bg-blue-600 caption-custom white-text p-0.5"
+                              className="relative max-h-8 rounded flex justify-between gap-x-0.5 bg-blue-600 caption-custom white-text p-0.5"
                             >
                               <span onClick={handleCompanyProductPopUp}>
                                 {selectedCompanyProduct.name.length > 14
@@ -441,35 +444,36 @@ function SupportTicketManagementList({
                     </div>
                   </div>
                 )}
-
-                {/* RIGHT SECTION - Create Button */}
-                {isUsedInSupportTicketModule && (
-                  <div className="flex gap-1 justify-end w-fit">
-                    <Button
-                      type="submit"
-                      disabled={!userHasAccessToAddSupportTicket}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        if (!userHasAccessToAddSupportTicket) {
-                          toast.error(
-                            MESSAGE.MODULE_ACCESS.SUPPORT_MODULE
-                              .DENIED_ADD_ACCESS,
-                          );
-                          return;
-                        }
-                        setIsCreateSupportTicketModalOpen(true);
-                      }}
-                    >
-                      <span className="flex items-center gap-1">
-                        {!isSmallScreen && <TicketPlus size={SIZE.SIXTEEN} />}
-                        {isSmallScreen && <TicketPlus size={SIZE.EIGHT} />}
-                        {isLargeScreen &&
-                          JSX_CHILDREN_NAME.CREATE_SUPPORT_TICKET}
-                      </span>
-                    </Button>
-                  </div>
-                )}
               </div>
+            )}
+
+            <div className="flex flex-wrap items-center gap-2 w-fit">
+              {/* RIGHT SECTION - Create Button */}
+              {isUsedInSupportTicketModule && (
+                <div className="flex gap-1 justify-end w-fit">
+                  <Button
+                    type="submit"
+                    disabled={!userHasAccessToAddSupportTicket}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      if (!userHasAccessToAddSupportTicket) {
+                        toast.error(
+                          MESSAGE.MODULE_ACCESS.SUPPORT_MODULE
+                            .DENIED_ADD_ACCESS,
+                        );
+                        return;
+                      }
+                      setIsCreateSupportTicketModalOpen(true);
+                    }}
+                  >
+                    <span className="flex items-center gap-1">
+                      {!isSmallScreen && <TicketPlus size={SIZE.SIXTEEN} />}
+                      {isSmallScreen && <TicketPlus size={SIZE.EIGHT} />}
+                      {isLargeScreen && JSX_CHILDREN_NAME.CREATE_SUPPORT_TICKET}
+                    </span>
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
         }
@@ -490,6 +494,7 @@ function SupportTicketManagementList({
                 handleSupportTicketDataFormChange
               }
               supportTickets={supportTicketData}
+              isDataLoading={isDataLoading}
             />
           </div>
           <CreateSupportTicketModal

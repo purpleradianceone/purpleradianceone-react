@@ -46,3 +46,97 @@ export const disconnectFacebookAccount = async (payload: object
     const response = await axiosClient.post(POST_API.DISCONNECT_FACEBOOK_ACCOUNT, payload, { withCredentials: true })
     return response;
 }
+/**
+ * GET FACEBOOK ACCOUNT RELATED WHATSAPP ACCOUNTS DATA 
+ * @param payload 
+ * @returns 
+ */
+// "http://localhost:8080/api/main/purple-crm-api/get/me-whatsapp-accounts"
+export const getMeWhatsappAccount  = async (payload: object
+) => {
+    const response = await axiosClient.post(POST_API.GET_ME_WHATSAPP_ACCOUNTS , payload, { withCredentials: true })
+    return response;
+}
+
+/**
+ * CREATE WHATSAPP PHONE INTEGRATION 
+ * @param payload 
+ * @returns 
+ */
+// "http://localhost:8080/api/main/purple-crm-api/create/whatsapp-phone-integration"
+export const createWhatsappPhoneIntegration  = async (payload: object
+) => {
+    
+    const response = await axiosClient.post(POST_API.CREATE_WHATSAPP_PHONE_INTEGRATION, payload, { withCredentials: true })
+    return response;
+}
+/**
+ * GET THE COMPANY ASSIGNED WHATSAPP PHONE DETAILS
+ * @param payload 
+ * @returns 
+ */
+// "http://localhost:8080/api/main/purple-crm-api/get/whatsapp-phone-integration"
+
+export const getCompanyWhatsappPhone  = async (payload: object
+) => {
+    const response = await axiosClient.post(POST_API.GET_WHATSAPP_PHONE_INTEGRATION, payload, { withCredentials: true })
+    return response;
+}
+
+/**
+ * INACTIVE THE CONNECTED WHATSAPP PHONE NUMBER 
+ * @param payload 
+ * @returns RESPONSE STATUS RETURNED FROM BACKEND
+ */
+// "http://localhost:8080/api/main/purple-crm-api/update/whatsapp-phone-integration"
+
+export const updateCompanyWhatsappPhone  = async (payload: object
+) => {
+    const response = await axiosClient.post(POST_API.UPDATE_WHATSAPP_PHONE_INTEGRATION, payload, { withCredentials: true })
+    return response;
+}
+
+/**
+ * FECTHES PAGES UNDET THE FACEBOOK ACCOUNT 
+ * "http://localhost:8080/api/main/purple-crm-api/get/me-facebook-pages"
+ * @param payload 
+ * @returns 
+ */
+export const getMeFacebookAccounts  = async (payload: object
+) => {
+    const response = await axiosClient.post(POST_API.GET_ME_FACEBOOK_PAGES, payload, { withCredentials: true })
+    return response;
+}
+
+/**
+ * GET THE STATUS OF GOOGLE ADS INTEGRATION
+ * @param payload 
+ * @returns 
+ */
+export const getGoogleAdsIntegration  = async (payload: object
+) => {
+    const response = await axiosClient.post(POST_API.GET_GOOGLE_ADS_INTEGRATION, payload, { withCredentials: true })
+    return response;
+}
+
+/**
+ * GET CONVERSATION HAPPENED ON WHATSAPP FOR LEAD
+ * @param payload 
+ * @returns 
+ */
+export const getLeadWhatsappConversation  = async (payload: object
+) => {
+    const response = await axiosClient.post(POST_API.GET_LEAD_WHATSAPP_CONVERSATION, payload, { withCredentials: true })
+    return response;
+}
+
+/**
+ * GET CONVERSATION HAPPENED ON WHATSAPP FOR SUPPORT TICKET
+ * @param payload 
+ * @returns 
+ */
+export const getSupportTicketWhatsappConversation  = async (payload: object
+) => {
+    const response = await axiosClient.post(POST_API.GET_SUPPORT_TICKET_WHATSAPP_CONVERSATION, payload, { withCredentials: true })
+    return response;
+}

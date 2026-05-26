@@ -4,10 +4,12 @@ import { useEditor } from "@craftjs/core";
 
 import "./Sidebar.css"; 
 import { PageBlockQuotation } from "../blocks/PageBlockQuotation";
-import { LucideClipboardPlus, LucidePackage, LucideTable, LucideTextSelection } from "lucide-react";
+import { FlipVertical, LucideAlignJustify, LucideClipboardPlus, LucidePackage, LucideTable, LucideTextSelection } from "lucide-react";
 import { ContentBlockQuotation } from "../blocks/ContentBlockQuotation";
 import { SectionBlockQuotation } from "../blocks/SectionBlockQuotation";
 import { TableBlockQuotation } from "../blocks/TableBlockQuotation";
+import { QuotationSummeryBlock } from "../blocks/QuotationSummeryBlock";
+import { EmptyLineBlockQuotation } from "../blocks/EmptyLineBlockQuotation";
 
 
 export const SidebarQuotation: React.FC = () => {
@@ -40,11 +42,27 @@ export const SidebarQuotation: React.FC = () => {
           >i</span>
         </div>
 
+        <div id="dynamicQuotationSummeryBlock" ref={(ref: HTMLDivElement) => { ref && connectors.create(ref, <QuotationSummeryBlock/>); }} className="sidebar-block caption-custom">
+          <span><LucideAlignJustify/></span>
+          <span>Quotation Summery Block</span>
+          <span className="info-icon"
+            title="This block represent the position where the runtime quotation summery is generate."
+          >i</span>
+        </div>
+
         <div id="contentBlock" ref={(ref: HTMLDivElement) => { ref && connectors.create(ref, <ContentBlockQuotation/>); }} className="sidebar-block caption-custom">
           <span><LucideTextSelection/></span>
           <span>Content Block</span>
           <span className="info-icon"
           title="This block is use to add different type of content in quotation."
+          >i</span>
+        </div>
+
+        <div id="emptyLineBlock" ref={(ref: HTMLDivElement) => { ref && connectors.create(ref, <EmptyLineBlockQuotation/>); }} className="sidebar-block caption-custom">
+          <span><FlipVertical/></span>
+          <span>Empty Line Block</span>
+          <span className="info-icon"
+          title="This block is use to add empty line in quotation page."
           >i</span>
         </div>
       </div>

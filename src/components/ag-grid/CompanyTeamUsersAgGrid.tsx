@@ -24,6 +24,7 @@ import CompanyTeamUsersAgGridProps from "../../@types/ag-grid/CompanyTeamUsersAg
 import toast from "react-hot-toast";
 import ToggleButton from "../ui/ToggleButton";
 import MESSAGE from "../../constants/Messages";
+import { SkeletonRowsAgGrid } from "../ui/SkeletonRowsAgGrid";
 function CompanyTeamUsersAgGrid({
   companyTeam,
   isOpen,
@@ -40,6 +41,7 @@ function CompanyTeamUsersAgGrid({
   handleSearchParameterChange,
   isAddUsersCompleted,
   usersUpdateCount,
+  isDataLoadingForCompanyProductUser
 }: CompanyTeamUsersAgGridProps) {
   const {
     userHasAccessToViewUser,
@@ -50,6 +52,8 @@ function CompanyTeamUsersAgGrid({
   const [companyUsersNotAssigned, setCompanyUsersNotAssigned] = useState<
     CompanyUsersSearchProps[]
   >([]);
+
+  const [isDataLoading, setIsDataLoading] = useState<boolean>(false);
 
   const [isCompanyUsersFetchedCount, setIsCompanyUsersFetched] =
     useState<number>(0);
@@ -130,7 +134,7 @@ function CompanyTeamUsersAgGrid({
         search_parameter: companyUserNotAssignedSearchParameter,
         search_parameter_date: "",
       };
-
+      setIsDataLoading(true)
       const response = isGridForProductUser
         ? await axios.post(
             POST_API.GET_COMPANY_PRODUCT_USERS_NOT_ASSIGNED,
@@ -251,6 +255,7 @@ function CompanyTeamUsersAgGrid({
         setIsCompanyUsersLoading(false);
         companyUserFetchingRef.current = false;
       }
+      setIsDataLoading(false)
     }
   };
 
@@ -355,6 +360,9 @@ function CompanyTeamUsersAgGrid({
         pinned: "right",
         width: 100,
         cellRenderer: (params: any) => {
+           if (params.data?.__isSkeleton) {
+                      return <SkeletonRowsAgGrid />;
+                    }
           // eslint-disable-next-line react-hooks/rules-of-hooks
           const [isActive, setIsActive] = useState<boolean>(
             params.data.isActive
@@ -493,6 +501,12 @@ function CompanyTeamUsersAgGrid({
       flex: 0.8,
       suppressHeaderMenuButton: true,
       suppressHeaderContextMenu: true,
+                 cellRenderer: (params: any) => {
+                    if (params.data?.__isSkeleton) {
+                      return <SkeletonRowsAgGrid />;
+                    }
+                    return params.value;
+                  },
     };
   }, []);
 
@@ -504,6 +518,12 @@ function CompanyTeamUsersAgGrid({
       setCompanyUsersNotAssigned(updatedCompanyUsers);
     }
   }, [isAddUsersCompleted]);
+
+  const skeletonRows = useMemo(() => {
+      return Array.from({ length: 30 }).map(() => ({
+        __isSkeleton: true,
+      }));
+    }, []);
 
   return (
     <div className="flex justify-around gap-2 mb-9 py-10">
@@ -522,6 +542,7 @@ function CompanyTeamUsersAgGrid({
         <div className="ag-theme-balham w-full h-full mt-3">
           <AgGridReact
             rowData={
+              isDataLoadingForCompanyProductUser ? skeletonRows:
               isGridForProductUser
                 ? companyProductUsersList!
                 : companyTeamUsersList!
@@ -555,31 +576,36 @@ function CompanyTeamUsersAgGrid({
           </div>
           <div className="justify-self-end mr-3">
             {!isGridForProductUser && (
+              <form onSubmit={handleAddCompanyTeamUsers}>
+
               <Button
                 type="submit"
-                onClick={(e) => {
-                  e.preventDefault();
-                  handleAddCompanyTeamUsers();
-                }}
-              >
+                // onClick={(e) => {
+                //   e.preventDefault();
+                //   handleAddCompanyTeamUsers();
+                // }}
+                >
                 <div className="flex justify-center items-center">
                   <UserPlus2 size={SIZE.SIXTEEN}></UserPlus2>
                   <span>Add</span>
                 </div>
               </Button>
+                </form>
             )}
 
             {isGridForProductUser && (
+              <form onSubmit={handleAddCompanyTeamUsers}>
               <Button
                 type="submit"
-                onClick={(e) => {
-                  e.preventDefault();
-                  handleAddCompanyTeamUsers();
-                }}
-              >
+                // onClick={(e) => {
+                //   e.preventDefault();
+                //   ();
+                // }}
+                >
                 {" "}
                 <UserPlus2 size={SIZE.SIXTEEN}></UserPlus2> Add
               </Button>
+                </form>
             )}
           </div>
         </div>
@@ -591,6 +617,7 @@ function CompanyTeamUsersAgGrid({
           addCompanyTeamUserArray={addCompanyTeamAndProductUserArray}
           handleCompanyUserCheckBoxChange={handleAddCompanyUserCheckBoxChange}
           isGridForSubscription={false}
+          isDataLoading={isDataLoading}
         />
       </div>
     </div>

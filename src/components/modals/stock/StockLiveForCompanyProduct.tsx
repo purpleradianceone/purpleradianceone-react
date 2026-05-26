@@ -175,7 +175,7 @@ const StockLiveForCompanyProduct = ({
             : "h-[calc(100vh-148px)]"
         }`}
       >
-        <StockLiveAgGrid data={liveStock} />
+        <StockLiveAgGrid data={liveStock}  isDataLoading={loading}/>
       </div>
       <div className="flex items-center justify-end ">
         <PaginationWithoutCount

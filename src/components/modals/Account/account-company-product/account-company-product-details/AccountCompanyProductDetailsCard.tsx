@@ -13,10 +13,12 @@ import {
   Barcode,
   Calendar,
   FileDigit,
+  IndianRupee,
   LucideIcon,
   MapPin,
   Pen,
   ReceiptText,
+  Save,
   ShoppingBag,
   User,
 } from "lucide-react";
@@ -31,6 +33,8 @@ import AccessDeniedMessagePage from "../../../../views/not-found/AccessDeniedMes
 import MESSAGE from "../../../../../constants/Messages";
 import FormInput from "../../../../ui/FormInput";
 import { updateAccountCompanyProductSerialNumberApiCall } from "../../../../../config/apis/AccountApis";
+import Button from "../../../../ui/Button";
+import LoadingSpinner from "../../../../../assets/animations/LoadingSpinner";
 
 export const AccountCompanyProductDetailsCard = ({
   selectedProductCard,
@@ -48,6 +52,7 @@ export const AccountCompanyProductDetailsCard = ({
   );
   const [originalProductData, setOriginalProductData] =
     useState<AccountProduct | null>(selectedProductCard);
+  const [isSaving, setIsSaving] = useState<boolean>(false);
 
   //  Fix: Update productData whenever selectedProductCard changes
   useEffect(() => {
@@ -79,6 +84,7 @@ export const AccountCompanyProductDetailsCard = ({
     purchaseDate: "purchase_date",
     deliveryDate: "delivery_date",
     installationDate: "installation_date",
+    totalCost: "total_cost",
     // add mappings only where API differs
   };
 
@@ -100,9 +106,14 @@ export const AccountCompanyProductDetailsCard = ({
     const apiField = ACCOUNT_PRODUCT_API_FIELD_MAP[field] ?? field;
 
     try {
+      setIsSaving(true);
       const postData = {
         id: productData.id,
         [apiField]: value,
+        total_cost:
+          field === "totalCost"
+            ? value
+            : (productData.totalCost ?? originalProductData.totalCost),
         company_id: loginStatus.companyId,
         updatedby_id: loginStatus.id,
       };
@@ -133,6 +144,8 @@ export const AccountCompanyProductDetailsCard = ({
       setProductData((prev) =>
         prev ? { ...prev, [field]: originalProductData[field] } : prev,
       );
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -163,14 +176,16 @@ export const AccountCompanyProductDetailsCard = ({
 
   // Note : this useeffect will run when user will update the serial number
   useEffect(() => {
-
     if (productSerialNumber === originalProductSerialNumber) return;
     if (timeoutRefForProductSerialNumber.current) {
       clearTimeout(timeoutRefForProductSerialNumber.current);
     }
 
     timeoutRefForProductSerialNumber.current = window.setTimeout(() => {
-      updateAccountCompanyProductSerialNumber(productData?.id , productSerialNumber);
+      updateAccountCompanyProductSerialNumber(
+        productData?.id,
+        productSerialNumber,
+      );
     }, 1000);
 
     return () => {
@@ -183,7 +198,7 @@ export const AccountCompanyProductDetailsCard = ({
   // Note : update api call for account-company-product-serial-number
   const updateAccountCompanyProductSerialNumber = async (
     id: number | undefined,
-    value : string | null
+    value: string | null,
   ) => {
     if (!id) return;
     try {
@@ -250,10 +265,27 @@ export const AccountCompanyProductDetailsCard = ({
     "installationDate",
     "purchaseDate",
     "deliveryDate",
+    "totalCost",
     // add only backend fields here
   ];
 
-  useEffect(() => {
+  // useEffect(() => {
+  //   if (!productData || !originalProductData) return;
+  //   const changedField = API_UPDATABLE_FIELDS.find(
+  //     (key) => productData[key] !== originalProductData[key],
+  //   );
+
+  //   if (!changedField) return;
+
+  //   const timer = setTimeout(() => {
+  //     updateAccountCompanyProduct(changedField, productData[changedField]);
+  //   }, 1000);
+
+  //   return () => clearTimeout(timer);
+  // }, [productData]);
+
+  const handleUpdate = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
     if (!productData || !originalProductData) return;
 
     // const changedField = (
@@ -267,12 +299,8 @@ export const AccountCompanyProductDetailsCard = ({
 
     if (!changedField) return;
 
-    const timer = setTimeout(() => {
-      updateAccountCompanyProduct(changedField, productData[changedField]);
-    }, 1000);
-
-    return () => clearTimeout(timer);
-  }, [productData]);
+    await updateAccountCompanyProduct(changedField, productData[changedField]);
+  };
 
   if (selectedProductCard === null) return null;
   if (!userHasAccessToViewAccountProducts)
@@ -285,11 +313,11 @@ export const AccountCompanyProductDetailsCard = ({
     );
 
   return (
-    <div className="px-1  py-0.5">
+    <form onSubmit={handleUpdate} className="px-1  py-0.5">
       {/* user access : {userHasAccessToUpdateAccount ? "true" : "false"} */}
       {/* Header */}
       <div className="grid  w-full grid-cols-4 md:grid-cols-4 gap-1    rounded p-0.5 pt-1">
-        <div className=" col-span-4 flex items-center">
+        <div className=" col-span-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
             {/* Logo */}
             <div
@@ -327,6 +355,24 @@ export const AccountCompanyProductDetailsCard = ({
               </span>
             </div>
           </div>
+          <div>
+            <Button
+              className={`flex action-btn-custom items-center gap-1 border px-2 rounded-md py-1 ${isSaving ? "opacity-30" : " "} bg-blue-600 text-white`}
+              disabled={isSaving}
+              autoFocus
+              type="submit"
+            >
+               {isSaving ? <>
+               <LoadingSpinner colour="white"  height={20} width={20}/>
+                Saving 
+               </>
+               : <>
+               
+                <Save size={16} /> Save
+               </>
+               }
+            </Button>
+          </div>
         </div>
         <DisplayComponent
           icon={ShoppingBag}
@@ -348,24 +394,23 @@ export const AccountCompanyProductDetailsCard = ({
             penLogo={false}
           />
         )}
-         {productData?.serialNumber && (
-
-           <FormInput
-           logo={FileDigit}
-           label="Serial Number"
-           name="serialNumber"
-           placeholder="Enter serial number"
-           value={productSerialNumber ? productSerialNumber : ""}
-           onChange={handleSerialNumberChange}
-          inputMode="text"
-          type="text"
-          penLogo={Pen}
+        {productData?.serialNumber && (
+          <FormInput
+            logo={FileDigit}
+            label="Serial Number"
+            name="serialNumber"
+            placeholder="Enter serial number"
+            value={productSerialNumber ? productSerialNumber : ""}
+            onChange={handleSerialNumberChange}
+            inputMode="text"
+            type="text"
+            penLogo={Pen}
           />
         )}
       </div>
 
       {/* Left Section */}
-      <div className="grid  grid-cols-2 md:grid-cols-4 gap-1   rounded p-0.5 ">
+      <div className="grid  grid-cols-2 md:grid-cols-5 gap-1   rounded p-0.5 ">
         <ControlledDatePicker
           label="Purchase Date"
           onCommit={(date) => {
@@ -410,6 +455,29 @@ export const AccountCompanyProductDetailsCard = ({
           logo={User}
           placeholder="Select User"
         />
+
+        <FormInput
+          required
+          logo={IndianRupee}
+          label="Total Cost"
+          name="totalCost"
+          placeholder="Enter Total Cost"
+          value={productData?.totalCost ?? ""}
+          onChange={(e) => {
+            const value = e.target.value;
+
+            setProductData((prev) => {
+              if (!prev) return prev;
+
+              return {
+                ...prev,
+                totalCost: value === "" ? "" : Number(value), // handle number
+              };
+            });
+          }}
+          type="number"
+          penLogo={Pen}
+        ></FormInput>
       </div>
 
       <div className=" grid grid-cols-2 gap-1 pb-1">
@@ -450,11 +518,11 @@ export const AccountCompanyProductDetailsCard = ({
         accountCompanyProductId={selectedProductCard.id}
       />
       {/* </div> */}
-    </div>
+    </form>
   );
 };
 
-function DisplayComponent({
+export function DisplayComponent({
   value,
   penLogo,
   title,
@@ -468,11 +536,11 @@ function DisplayComponent({
   return (
     <div className="flex w-full h-fit items-start gap-1  bg-white ">
       <div className="">
-        <Logo className={`${COLORS.FORM_HEADER_ICONS_COLOR}`} size={16} />
+        <Logo className={`${COLORS.FORM_HEADER_ICONS_COLOR}`} size={14} />
       </div>
 
       <div className="flex flex-col w-full">
-        <h4 className="card-header">{title}</h4>
+        <h4 className="input-label-custom ">{title}</h4>
 
         <div className="flex items-center justify-between   ">
           <p className="input-label-custom">

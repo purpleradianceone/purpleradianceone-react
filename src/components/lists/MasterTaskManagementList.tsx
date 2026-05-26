@@ -1,5 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { BookCheck, ClipboardList } from "lucide-react";
+import {
+  AlertCircle,
+  BookCheck,
+  CheckCircle2,
+  ClipboardList,
+  Repeat,
+} from "lucide-react";
 import qs from "query-string";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
@@ -27,6 +33,7 @@ import CompanyUserSearchFieldInput from "../ui/CompanyUserSearchFieldInput";
 import DateRangeFilterDropdown from "../ui/DateRangeFilterDropdown";
 import DateRangePicker from "../ui/DateRangePicker";
 import SearchInput from "../ui/SearchInput";
+import SummaryCards from "../ui/SummaryCards";
 
 function MasterTaskManagementList({
   isUsedInAllTasksModule,
@@ -46,6 +53,7 @@ function MasterTaskManagementList({
   selectedCompanyUser,
   handleSelectedCompanyUser,
   downloadTaskDocument,
+  isDataLoading,
   // isActive,
   // setIsActive,
 }: MasterTaskManagementProps) {
@@ -123,12 +131,71 @@ function MasterTaskManagementList({
       <div
         className={`w-full ${
           position === "left" && isUsedInAllTasksModule ? "" : "pl-1"
-        } pr-1 gap-1`}
+        } gap-1 px-2`}
       >
+        {/* Master Task Overview Cards */}
+        <SummaryCards
+          cardCss="bg-white border border-slate-200 rounded-2xl px-5 py-1.5  shadow-sm flex items-center justify-between gap-2 over:shadow-md transition-all  "
+          showGraph
+          cardGap={10}
+          cards={[
+            {
+              title: "Master Tasks",
+              count: MasterTaskData?.length || 0,
+              subtitle: "Total created tasks",
+              icon: ClipboardList,
+              iconBg: "bg-violet-100",
+              iconColor: "text-violet-600",
+              graphColor: "bg-violet-500",
+            },
+
+            {
+              title: "High Priority",
+              count:
+                MasterTaskData?.filter(
+                  (task) =>
+                    task.generalTaskPriorityName?.toLowerCase() === "high",
+                )?.length || 0,
+              subtitle: "Critical tasks",
+              icon: AlertCircle,
+              iconBg: "bg-red-100",
+              iconColor: "text-red-500",
+              graphColor: "bg-red-500",
+            },
+
+            {
+              title: "Recurring",
+              count:
+                MasterTaskData?.filter(
+                  (task) =>
+                    task.frequencyName &&
+                    task.frequencyName.toLowerCase() !== "once",
+                )?.length || 0,
+              subtitle: "Repeating schedules",
+              icon: Repeat,
+              iconBg: "bg-blue-100",
+              iconColor: "text-blue-500",
+              graphColor: "bg-blue-500",
+            },
+
+            {
+              title: "Active",
+              count:
+                MasterTaskData?.filter((task) => task.isActive === true)
+                  ?.length || 0,
+              subtitle: "Currently active",
+              icon: CheckCircle2,
+              iconBg: "bg-emerald-100",
+              iconColor: "text-emerald-500",
+              graphColor: "bg-emerald-500",
+            },
+          ]}
+        />
+
         {/* sticky */}
         {
           <div
-            className={`sticky z-10 top-12 mt-1 p-1 flex flex-wrap items-center justify-between gap-3 text-sm ${COLORS.GRID_HEADER_SECTION_BG_COLOR} rounded-lg shadow-sm mb-1.5 
+            className={`sticky z-10 top-12 mt-1 px-3 py-1 flex flex-wrap items-center justify-between gap-3 text-sm ${COLORS.GRID_HEADER_SECTION_BG_COLOR} mb-3 border rounded-lg
                       w-full
                     `}
           >
@@ -339,12 +406,12 @@ function MasterTaskManagementList({
           </div>
         }
 
-        <div className="bg-white  overflow-y-auto rounded-lg shadow-sm ">
+        <div className="bg-white  overflow-y-auto ">
           <div
             className={
               userPreference.isLeftMenu
-                ? `ag-theme-balham w-full h-[calc(100vh-190px)]`
-                : "ag-theme-balham w-full h-[calc(100vh-192px)]"
+                ? `w-full h-[calc(100vh-310px)]`
+                : "w-full h-[calc(100vh-192px)]"
             }
           >
             <MasterTaskManagementAgGrid
@@ -354,6 +421,7 @@ function MasterTaskManagementList({
               handleAllTaskDataFormChange={handleAllTaskDataFormChange}
               MasterTaskData={MasterTaskData}
               downloadTaskDocument={downloadTaskDocument}
+              isDataLoading={isDataLoading}
             />
           </div>
           <CreateGeneralTaskMasterModal

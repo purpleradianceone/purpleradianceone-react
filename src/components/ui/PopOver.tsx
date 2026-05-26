@@ -21,6 +21,19 @@ interface PopoverProps {
    accessRight?: boolean;
 }
 
+/**
+ * POP OVER - REUSABLE COMPONENT
+ * 
+ * @param trigger - ReactNode, give jsx on action that pop up will show
+ * @param align - where to align popup - right , left
+ * @param width - give required width
+ * @param onOpen - function call if want any data / need to perform any action onOpen of the popup.
+ * @param onClose - function call if want any data / need to perform any action onClose of the popup.
+ * @param onTriggerClick - Same as above 2 functions, function call if want any data / need to perform any action ontriggerClick of the popup.
+ * @param padding - give required padding
+ * @param accessRight - give required access right , if want conditinal opening of popup.
+ * @returns JSX 
+ */
 export function Popover({
   trigger,
   children,
@@ -59,7 +72,7 @@ export function Popover({
 
     const rect = triggerRef.current.getBoundingClientRect();
 
-    const top = rect.bottom + window.scrollY + 8;
+    const top = rect.bottom + window.scrollY ;// +8
 
     const left =
       align === "right"
@@ -69,7 +82,8 @@ export function Popover({
     setPosition({ top, left });
   }, [open, align, width]);
 
-  //  Outside click
+  // WARNING : DO NOT UNCOMMENT THIS CODE  Outside click
+  // FOR LEAD STATUS CHANGE , IF YOU START THIS FUNCTIONALOTY STATUS CHANGING FUNCTIONALITY WILL BREAK!!!
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
       if (
@@ -108,12 +122,63 @@ export function Popover({
     };
   }, [open]);
 
+  //  Calculate position with viewport collision detection
+useEffect(() => {
+  if (!open || !triggerRef.current || !popoverRef.current) return;
+
+  const triggerRect = triggerRef.current.getBoundingClientRect();
+  const popoverRect = popoverRef.current.getBoundingClientRect();
+
+  const viewportHeight = window.innerHeight;
+  const viewportWidth = window.innerWidth;
+
+  const spaceBelow = viewportHeight - triggerRect.bottom;
+  const spaceAbove = triggerRect.top;
+
+  let top: number;
+  let left: number;
+
+  //  Vertical positioning (flip if needed)
+  if (spaceBelow >= popoverRect.height) {
+    // Enough space below
+    top = triggerRect.bottom + window.scrollY;
+  } else if (spaceAbove >= popoverRect.height) {
+    // Flip above
+    top = triggerRect.top + window.scrollY - popoverRect.height;
+  } else {
+    // Not enough space either side → clamp
+    top = Math.max(
+      8,
+      viewportHeight - popoverRect.height - 8
+    ) + window.scrollY;
+  }
+
+  //  Horizontal positioning
+  if (align === "right") {
+    left = triggerRect.right + window.scrollX - width;
+  } else {
+    left = triggerRect.left + window.scrollX;
+  }
+
+  //  Prevent right overflow
+  if (left + popoverRect.width > viewportWidth) {
+    left = viewportWidth - popoverRect.width - 8;
+  }
+
+  //  Prevent left overflow
+  if (left < 8) {
+    left = 8;
+  }
+
+  setPosition({ top, left });
+}, [open, align, width]);
+
   return (
     <>
       <div
         ref={triggerRef}
         onClick={open ? close : openPopover}
-        className="inline-block"
+        className="inline-block  "
       >
         {isValidElement(trigger)
           ? cloneElement(trigger as React.ReactElement)
@@ -130,9 +195,11 @@ export function Popover({
               left: position.left,
               width,
               zIndex: 9999,
-              padding: padding
+              padding: padding,
+              // marginBottom: 40
+
             }}
-            className="bg-white shadow-lg border rounded-lg "
+            className="bg-white shadow-lg border border-gray-300 rounded-lg"
           >
             {children(close)} {/*  Pass close function */}
           </div>,

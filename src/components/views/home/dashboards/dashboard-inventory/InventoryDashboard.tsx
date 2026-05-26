@@ -1,16 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useEffect, useState } from "react";
-import { useLoggedInUserContext } from "../../../../../context/user/LoggedInUserContext";
-import { useUserPreference } from "../../../../../context/user/UserPreference";
-import axiosClient from "../../../../../axios-client/AxiosClient";
-import POST_API from "../../../../../constants/PostApi";
-import { STATUS_CODE } from "../../../../../constants/AppConstants";
-import { AccessManagementType } from "../../../../../@types/company-users/AccessManagementContextType";
-import { handleApiError } from "../../../../../config/error/handleApiError";
-import QuickActions from "../dashboards_components/QuickActions";
-import { DashboardComponentJsxKey } from "../../../../../enums/dashboard/DashboardComponentJsxKey.enum";
-import MetricCard from "../dashboards_components/MetricCard";
-import { REFCURSOR_KEY } from "../../../../../constants/RefcursorConstants";
 import {
   AlertOctagonIcon,
   LucideShoppingCart,
@@ -19,7 +7,26 @@ import {
   Wallet,
   WarehouseIcon,
 } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { AccessManagementType } from "../../../../../@types/company-users/AccessManagementContextType";
+import RecentStockMovementProps from "../../../../../@types/home/dashboard/inventory/RecentStockMovementProps";
+import TopLowStockProducsProp from "../../../../../@types/home/dashboard/inventory/TopLowStockProducts";
+import axiosClient from "../../../../../axios-client/AxiosClient";
+import { handleApiError } from "../../../../../config/error/handleApiError";
+import { STATUS_CODE } from "../../../../../constants/AppConstants";
+import POST_API from "../../../../../constants/PostApi";
+import { REFCURSOR_KEY } from "../../../../../constants/RefcursorConstants";
+import { useLoggedInUserContext } from "../../../../../context/user/LoggedInUserContext";
+import { useUserPreference } from "../../../../../context/user/UserPreference";
+import { DashboardComponentJsxKey } from "../../../../../enums/dashboard/DashboardComponentJsxKey.enum";
 import { DashboardLoadingSpinner } from "../dashboards_components/DashboardLoadingSpinner";
+import MetricCard from "../dashboards_components/MetricCard";
+import PieChartSmall from "../dashboards_components/PieChartSmall";
+import PipelineChart from "../dashboards_components/PipeLineChart";
+import QuickActions from "../dashboards_components/QuickActions";
+import RecentStockMovement from "./RecentStockMovement";
+import StockValueTrendChart from "./StockValueTrendChart";
+import TopLowStockProducts from "./TopLowStockProducts";
 type DashboardDataType = Record<string, Array<Record<string, any>>>;
 
 interface DashboardInventoryProp {
@@ -42,6 +49,12 @@ const InventoryDashboard: React.FC<DashboardInventoryProp> = ({
     { key: string; value: boolean; chartType: string }[]
   >([]);
 
+  const [stockOverview, setStockOverview] = useState<any>();
+    const [stockValueTrend, setStockValueTrend] = useState<any>();
+
+  const [recentStockMovement, setRecentStockMovement] = useState<RecentStockMovementProps[]>([]);
+
+  const [topLowStockProducs, setTopLowStockProducs] = useState<TopLowStockProducsProp[]>([]);
 
 
   const getCrmModuleAccessOfCompanyUser = async () => {
@@ -95,6 +108,19 @@ const InventoryDashboard: React.FC<DashboardInventoryProp> = ({
           })) ?? [],
         );
 
+         setStockOverview(
+          data.my_fixed_cursor_stock_overview
+        );
+
+        
+        setStockValueTrend(
+          data.my_fixed_cursor_stock_value_trend
+        );
+
+        setRecentStockMovement(data.my_fixed_cursor_recent_stock_movement);
+
+        setTopLowStockProducs(data.my_fixed_cursor_top_low_stock_product);
+
         setDashboardData(data);
       }
     } catch (error: any) {
@@ -106,6 +132,8 @@ const InventoryDashboard: React.FC<DashboardInventoryProp> = ({
 
   const getVisibility = (key: string): boolean =>
     dashboardVisiblity.find((v) => v.key.trim() === key.trim())?.value ?? false;
+
+  const isPieChart = (key: string): boolean => dashboardVisiblity.find((v)=> v.key.trim() === key.trim())?.chartType === "Pie";
 
   const TOTAL_TICKET_ROW_COMPONENT_KEYS = [
     "Total Products",
@@ -128,7 +156,7 @@ const InventoryDashboard: React.FC<DashboardInventoryProp> = ({
     ) ? (
       <div
         key={TOTAL_TICKET_ROW_COMPONENT_KEYS[0]}
-        className="flex col-span-2 w-full gap-4 justify-around"
+        className="flex col-span-3 w-full gap-4 justify-around"
       >
         <div
           className={`${userPreference.sidebarOpen && userPreference.isLeftMenu ? "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 w-full items-stretch" : "flex grid-cols-6 sm:gap-1 md:gap-2 lg:gap-4 w-full"}`}
@@ -193,10 +221,22 @@ const InventoryDashboard: React.FC<DashboardInventoryProp> = ({
                 REFCURSOR_KEY.MY_FIXED_CURSOR_TODAYS_INWARD_VALUE
               ]?.[0]?.today_inward_value_of_products ?? 0
             }
+        
             icon={LucideShoppingCart}
             color="bg-gradient-to-r from-teal-500 to-teal-600"
             gradient="bg-gradient-to-r from-teal-500 to-teal-600"
             visibility={getVisibility(TOTAL_TICKET_ROW_COMPONENT_KEYS[4])}
+            currentValue={(dashboardData?.[
+                REFCURSOR_KEY.MY_FIXED_CURSOR_TODAYS_INWARD_VALUE
+              ]?.[0]?.today_inward_value_of_products ?? 0)}
+            previousValue={(dashboardData?.[
+                REFCURSOR_KEY.MY_FIXED_CURSOR_TODAYS_INWARD_VALUE
+              ]?.[0]?.yesterday_inward_value_of_products ?? 0)}
+
+            isTrend={true}
+            trendLabel="from yesterday"
+            
+            isSparkline={true}
           />
 
           <MetricCard
@@ -211,6 +251,17 @@ const InventoryDashboard: React.FC<DashboardInventoryProp> = ({
             color="bg-gradient-to-r from-green-500 to-green-600"
             gradient="bg-gradient-to-r from-green-500 to-green-600"
             visibility={getVisibility(TOTAL_TICKET_ROW_COMPONENT_KEYS[5])}
+            currentValue={(dashboardData?.[
+                REFCURSOR_KEY.MY_FIXED_CURSOR_TODAYS_OUTWARD_VALUE
+              ]?.[0]?.today_outward_value_of_products ?? 0)}
+            previousValue={(dashboardData?.[
+                REFCURSOR_KEY.MY_FIXED_CURSOR_TODAYS_OUTWARD_VALUE
+              ]?.[0]?.yesterday_outward_value_of_products ?? 0)}
+
+            isTrend={true}  
+            trendLabel="from yesterday"
+            
+            isSparkline={true}
           />
         </div>
       </div>
@@ -221,11 +272,85 @@ const InventoryDashboard: React.FC<DashboardInventoryProp> = ({
       <div
         id="quickActions"
         key="Quick Actions"
-        className="h-full col-span-1 overflow-y-auto max-h-[700px] [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-thumb]:rounded-full"
+        className="h-full col-span-2 overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-thumb]:rounded-full"
       >
         <QuickActions
           companyUserId={companyUserId}
           moduleAccessCompanyUser={accessModuleCompanyUser}
+        />
+      </div>
+    ),
+    [DashboardComponentJsxKey.Recent_Stock_Movement]: (
+      <div
+      id="recentStockMovement"
+        key="Recent Stock Movement"
+        className="flex col-span-3 w-full gap-4 justify-around"
+      >
+        <div className="flex sm:gap-1 md:gap-2 lg:gap-11 w-full">
+          <RecentStockMovement
+            isLoading={isDashboardDataLoading}
+            recentStockMovement={recentStockMovement}
+          />
+        </div>
+      </div>
+    ),
+    [DashboardComponentJsxKey.Top_Low_Stock_Products]: (
+      <div
+      id="topLowStockProducts"
+        key="Top Low Stock Products"
+        className="flex col-span-1 w-full h-full gap-4 justify-around"
+      >
+        <div className="flex sm:gap-1 md:gap-2 lg:gap-11 w-full">
+          <TopLowStockProducts
+            isLoading={isDashboardDataLoading}
+            topLowStockProducs={topLowStockProducs}
+          />
+        </div>
+      </div>
+    ),
+    [DashboardComponentJsxKey.Stock_Overview]: (
+      <div
+        id="stockOverview"
+        key="Stock Overview"
+        className="h-full col-span-1 overflow-y-auto max-h-[700px] [&::-webkit-scrollbar]:w-2
+  [&::-webkit-scrollbar-track]:bg-gray-50
+  [&::-webkit-scrollbar-thumb]:bg-gray-50
+   [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full"
+      >
+        <PipelineChart
+          pipelineData={stockOverview}
+          header="Stock Overview"
+          headerDescription="Available quantity of products"
+        ></PipelineChart>
+      </div>
+    ),[DashboardComponentJsxKey.Stock_Value_Trend]: (
+      
+      <div
+        id="stockValueTrend"
+        key="Stock Value Trend"
+        className="min-h-[200px] h-full col-span-1"
+      >
+        {/* <SalesChart leadsData={stockValueTrend} /> */}
+        <StockValueTrendChart stockValueTrend={stockValueTrend}/>
+      </div>
+    ),
+    
+  };
+
+  const componentMapPieChart: { [key: string]: JSX.Element } = {
+    [DashboardComponentJsxKey.Stock_Overview]: (
+      <div
+        key="Stock Overview"
+        id="stockOverview"
+        className="h-full col-span-1 overflow-y-auto max-h-[700px] [&::-webkit-scrollbar]:w-2
+  [&::-webkit-scrollbar-track]:bg-gray-50
+  [&::-webkit-scrollbar-thumb]:bg-gray-50
+   [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full"
+      >
+        <PieChartSmall data={stockOverview} 
+        totalLable="Total Products"
+        headerText="Stock Overview"
+        headerDescription="Products availability by stock."
         />
       </div>
     ),
@@ -251,6 +376,12 @@ const InventoryDashboard: React.FC<DashboardInventoryProp> = ({
         } else return null;
       }
 
+      if(isPieChart(key)){
+        console.log("inside pie chart inventory:"+key)
+      return componentMapPieChart[key];
+      // return null;
+      }
+      console.log("key:"+key)
       return componentMapDefault[key] || null;
     });
   };
@@ -262,7 +393,7 @@ const InventoryDashboard: React.FC<DashboardInventoryProp> = ({
             <DashboardLoadingSpinner/>
           </div>
         ) : (
-          <div className="max-w-full p-6 mx-auto grid gap-3 grid-cols-2 space-y-5">
+          <div className="max-w-full p-6 mx-auto grid gap-3 grid-cols-3 space-y-5">
             {dashboardVisiblity.length > 0 && renderDashboardSections()}
           </div>
         )}

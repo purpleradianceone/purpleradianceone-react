@@ -145,6 +145,7 @@ export const JSX_CHILDREN_NAME = {
   ACCESS: "Access",
   EDIT: "Edit",
   DASHBOARD: "Dashboard",
+  REPORT: "Report",
   ACTIONS: "Actions ▾",
   ADD_USER: "Add User",
   CREATE_LEAD: "Create",
@@ -160,6 +161,8 @@ export const JSX_CHILDREN_NAME = {
   TRANSACRTIONS: "Trans...",
   ADD_STOCK: "Stock",
   ADD_GENERAL_TASK: "Add Task",
+  COMPANY_PRODUCT_SALE: "Sale Product",
+
 };
 
 export const SIZE = {
@@ -248,9 +251,8 @@ export const GRIDSKELETON = {
 };
 
 export const INNERHTML = {
-  // OVERLAY_NO_ROWS_TEMPLATE : '<div class="flex justify-center items-center h-full"><div class="rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-600 animate-spin-once"></div></div>',
-  OVERLAY_NO_ROWS_TEMPLATE:
-    '<div class="flex justify-center items-center h-64 flex-col"><div class="rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-600 animate-spin-once"></div><div class="opacity-0 animate-show-text text-gray-500 mt-4 text-sm">No data to show</div></div>',
+  OVERLAY_NO_ROWS_TEMPLATE : '<div class="flex justify-center items-center h-full"><div class="rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-600 animate-spin-once"></div></div>',
+    // '<div class="flex justify-center items-center h-64 flex-col"><div class="rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-600 animate-spin-once"></div><div class="opacity-0 animate-show-text text-gray-500 mt-4 text-sm">No data to show</div></div>',
   // OVERLAY_NO_ROWS_TEMPLATE : '<div class="relative flex justify-center items-center h-64 flex-col"><div class="absolute rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-600 pointer-events-none"></div><div class="opacity-0 animate-fade-in-delay text-gray-500 text-sm">No data to show</div></div>',
   OVERLAY_NO_ROWS_TEMPLATE_PRODUCT_TAX:
     '<div class = "flex justify-center items-center h-full text-blue-600" >No tax Records to Show! Please Add Tax</div>',
@@ -287,6 +289,8 @@ export const INNERHTML = {
 
 export const AGGRID = {
   THEME_ALPINE: "themeAlpine",
+   ROW_HEIGHT: 40,
+  HEADER_HEIGHT: 35,
 };
 
 export const MOBILE_NUMBER_VALIDATION = {
@@ -308,4 +312,5 @@ export const VALIDATIONS = {
   MAX_PASSWORD_LENGTH: 20,
   MIN_PASSWORD_LENGTH: 8,
   MAX_DESCRIPTION_LENGTH: 400,
+  MOBILE_NUMBER_REGEX: /^[6-9]\d{9}$/
 };

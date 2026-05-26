@@ -26,13 +26,24 @@ export const useZoomMeetingsStatus = () => {
           validateZoomMeetingsConnectionPostData,
           {
             withCredentials: true,
-          }
+          },
         )
         .then((response) => {
           if (response.status === STATUS_CODE.OK) {
-            setZoomMeetingStatus({
-              isConnected: response.data.status,
-            });
+            console.log(response.data);
+            const data = response.data?.[0];
+
+            if (data) {
+              setZoomMeetingStatus({
+                isConnected: data.isactive,
+                email: data.email_address,
+              });
+            } else {
+              setZoomMeetingStatus({
+                isConnected: false,
+                email: undefined,
+              });
+            }
           }
         })
         .catch(async (error: ApiError | any) => {

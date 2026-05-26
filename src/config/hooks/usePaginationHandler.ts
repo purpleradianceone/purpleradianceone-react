@@ -111,7 +111,7 @@ export const useSearchFilterPaginationDateHandlers = (
     }
     const formattedDate = formatDate(date);
     setStartDate(formattedDate);
-    setDateRangeId(8);
+    setDateRangeId(customDateRangeId);
   };
 
   const handleEndDateChange = (date: Date | null) => {
@@ -125,7 +125,7 @@ export const useSearchFilterPaginationDateHandlers = (
     }
     const formattedDate = formatDate(date);
     setEndDate(formattedDate);
-    setDateRangeId(8);
+    setDateRangeId(customDateRangeId);
   };
 
   const handleDatePageIdChange = (newDateRangeId?: number) => {
@@ -133,7 +133,7 @@ export const useSearchFilterPaginationDateHandlers = (
     setCurrentPage(1);
     setDateRangeId(id);
 
-    if (id !== 8) {
+    if (id !== customDateRangeId) {
       setStartDate("");
       setEndDate("");
       setConcatDate("");
@@ -147,14 +147,14 @@ export const useSearchFilterPaginationDateHandlers = (
 
   // Update concatenated date string
   useEffect(() => {
-    if (dateRangeId === 8) {
+    if (dateRangeId === customDateRangeId) {
       if (!startDate && !endDate) {
         const todayDate = new Date();
         const date10DaysAgo = new Date(todayDate);
 
         date10DaysAgo.setDate(todayDate.getDate() - 10);
         setConcatDate(`${formatDate(date10DaysAgo)}@${formatDate(new Date())}`);
-        setDateRangeId(8);
+        setDateRangeId(customDateRangeId);
       } else {
         let effectiveStartDate = startDate;
         const effectiveEndDate = endDate || getCurrentDate();

@@ -13,6 +13,7 @@ type ProductsManagementListProps = {
     handleCreateCompanyProductTax? : () => void;
     isGridForAccountProduct? :boolean ,
      onRowSelect? : (data : Product ) =>void,
+     isDataLoading : boolean
     // isListForProductUser : boolean;
 }
  

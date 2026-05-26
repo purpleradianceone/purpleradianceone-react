@@ -35,6 +35,7 @@ function ProductsManagementList({
   handleCreateCompanyProductTax,
   isGridForAccountProduct,
   onRowSelect,
+  isDataLoading
 }: // isListForProductUser,
 ProductsManagementListProps) {
   const { isLargeScreen, isMediumScreen } = useScreenSize();
@@ -325,6 +326,7 @@ ProductsManagementListProps) {
               }
               handleCreateStockModalOpen={handleCreateStockModalOpen}
               onRowSelect={onRowSelect}
+              isDataLoading={isDataLoading}
             />
           </div>
         </div>

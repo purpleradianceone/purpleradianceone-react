@@ -1,24 +1,32 @@
 import {
   Building2,
   Calendar,
+  CircleUser,
   Handshake,
   Headset,
   Home,
   Layers,
   ListChecks,
+  LucideFileArchive,
   Menu,
   Network,
+  PackageCheck,
+  PanelLeftClose,
+  PanelRightClose,
   Settings,
   Store,
   UserCogIcon,
   X,
 } from "lucide-react";
+import { Link, NavLink } from "react-router-dom";
 import SideBarProps from "../../../../@types/home/navbar/SideBarProps";
-import SideNavBarItem from "./SideNavBarItem";
-import { NavLink } from "react-router-dom";
-import ROUTES_URL from "../../../../constants/Routes";
 import { useUserAccessModules } from "../../../../config/hooks/useAccessModules";
 import { SIZE } from "../../../../constants/AppConstants";
+import ROUTES_URL from "../../../../constants/Routes";
+import SideNavBarItem from "./SideNavBarItem";
+import { FaRegFileAlt, FaRegFileArchive } from "react-icons/fa";
+import toast from "react-hot-toast";
+import MESSAGE from "../../../../constants/Messages";
 
 function SideNavBar({ isOpen, onToggle }: SideBarProps) {
   const {
@@ -31,16 +39,21 @@ function SideNavBar({ isOpen, onToggle }: SideBarProps) {
     userHasAccessToViewStock,
     userHasAccessToViewSupportTicket,
     userHasAccessToViewTasks,
+    userHasAccessToViewCompanyInvoice,
+    userHasAccessToViewAccountProformaInvoice,
+    userHasAccessToViewCompanyQuotation,
+    userHasAccessToViewCompanyProductSale,
+    userHasAccessToViewSettingGeneral,
   } = useUserAccessModules();
 
   return (
     <aside
       id="left-side-navbar"
-      className={`fixed  top-0 left-0 h-full bg-white border-r transition-all duration-300 z-30
-          ${isOpen ? "w-64" : "w-12"}`}
+      className={`fixed  top-0 left-0 h-full  bg-white border-r transition-all duration-300 z-30
+          ${isOpen ? "w-64 custom-scrollbar " : "w-12 "}`}
     >
       <div
-        className={`flex items-center border-b justify-center ${SIZE.NAVBAR.TOP_HEIGHT_USER_PREF_LEFT}`}
+        className={`flex items-center border-b  justify-center ${SIZE.NAVBAR.TOP_HEIGHT_USER_PREF_LEFT}`}
       >
         {isOpen && (
           <span className="section-header-custom-blue">PurpleRadiance One</span>
@@ -52,7 +65,7 @@ function SideNavBar({ isOpen, onToggle }: SideBarProps) {
           {isOpen ? <X size={20} /> : <Menu size={20} />}
         </button>
       </div>
-      <nav className="p-1 space-y-1">
+      <nav className="p-1 space-y-1  bg-pink-00 overflow-auto max-h-[520px] custom-scrollbar-invinsible border-b">
         <NavLink to={ROUTES_URL.HOME}>
           {({ isActive }) => (
             <SideNavBarItem
@@ -100,6 +113,18 @@ function SideNavBar({ isOpen, onToggle }: SideBarProps) {
           )}
         </NavLink>
 
+        <NavLink to={ROUTES_URL.QUOTATION_MANAGEMENT}>
+          {({ isActive }) => (
+            <SideNavBarItem
+              icon={LucideFileArchive}
+              label="Quotation"
+              isOpen={isOpen}
+              isActive={isActive}
+              disabled={!userHasAccessToViewCompanyQuotation}
+            />
+          )}
+        </NavLink>
+
         <NavLink to={ROUTES_URL.ACCOUNT_MANAGEMENT}>
           {({ isActive }) => (
             <SideNavBarItem
@@ -108,6 +133,40 @@ function SideNavBar({ isOpen, onToggle }: SideBarProps) {
               isOpen={isOpen}
               isActive={isActive}
               disabled={!userHasAccessToViewAccount}
+            />
+          )}
+        </NavLink>
+        <NavLink to={ROUTES_URL.INVOICE_MANAGEMENT}>
+          {({ isActive }) => (
+            <SideNavBarItem
+              icon={FaRegFileAlt}
+              label="Invoices"
+              isOpen={isOpen}
+              isActive={isActive}
+              disabled={!userHasAccessToViewCompanyInvoice}
+            />
+          )}
+        </NavLink>
+        <NavLink to={ROUTES_URL.ACCOUNT_PROFORMA_INVOICE_MANAGEMENT}>
+          {({ isActive }) => (
+            <SideNavBarItem
+              icon={FaRegFileArchive}
+              label="Proforma Invoices"
+              isOpen={isOpen}
+              isActive={isActive}
+              disabled={!userHasAccessToViewAccountProformaInvoice}
+            />
+          )}
+        </NavLink>
+
+        <NavLink to={ROUTES_URL.COMPANY_PRODUCT_SALE_MANAGEMENT}>
+          {({ isActive }) => (
+            <SideNavBarItem
+              icon={PackageCheck}
+              label="Sales"
+              isOpen={isOpen}
+              isActive={isActive}
+              disabled={!userHasAccessToViewCompanyProductSale}
             />
           )}
         </NavLink>
@@ -168,60 +227,106 @@ function SideNavBar({ isOpen, onToggle }: SideBarProps) {
             />
           )}
         </NavLink>
-
-        {/* CRM Settings Dropdown */}
-        <SideNavBarItem
-          icon={Settings}
-          label="App Settings"
-          isOpen={isOpen}
-          children={[
-            <NavLink key="company-settings" to={ROUTES_URL.COMPANY_SETTING}>
-              {({ isActive }) => (
-                <div
-                  className={`px-2 py-1 rounded-lg hover:bg-blue-50 ${
-                    isActive ? "input-label-custom-blue" : "input-label-custom"
-                  }`}
-                >
-                  Settings
-                </div>
-              )}
-            </NavLink>,
-            <NavLink key="email-template" to={ROUTES_URL.EMAIL_TEMPLATE}>
-              {({ isActive }) => (
-                <div
-                  className={`px-2 py-1 rounded-lg hover:bg-blue-50 text-nowrap ${
-                    isActive ? "input-label-custom-blue" : "input-label-custom"
-                  }`}
-                >
-                  Email Template
-                </div>
-              )}
-            </NavLink>,
-            <NavLink key="integrations" to={ROUTES_URL.INTEGRATIONS_SETTINGS}>
-              {({ isActive }) => (
-                <div
-                  className={`px-2 py-1 rounded-lg hover:bg-blue-50 ${
-                    isActive ? "input-label-custom-blue" : "input-label-custom"
-                  }`}
-                >
-                  Integration
-                </div>
-              )}
-            </NavLink>,
-            <NavLink key="quotations" to={ROUTES_URL.QUOTATION_SETTINGS}>
-              {({ isActive }) => (
-                <div
-                  className={`px-2 py-1 rounded-lg hover:bg-blue-50 ${
-                    isActive ? "input-label-custom-blue" : "input-label-custom"
-                  }`}
-                >
-                  Quotation
-                </div>
-              )}
-            </NavLink>,
-          ]}
-        />
       </nav>
+      {/* CRM Settings Dropdown */}
+      <SideNavBarItem
+        icon={Settings}
+        label="App Settings"
+        isOpen={isOpen}
+        children={[
+          <NavLink key="company-settings" to={ROUTES_URL.COMPANY_SETTING}>
+            {({ isActive }) => (
+              <div
+                className={`px-2 py-1 rounded-lg hover:bg-blue-50 ${
+                  isActive ? "input-label-custom-blue" : "input-label-custom"
+                }`}
+              >
+                Settings
+              </div>
+            )}
+          </NavLink>,
+          <NavLink key="email-template" to={ROUTES_URL.EMAIL_TEMPLATE}>
+            {({ isActive }) => (
+              <div
+                className={`px-2 py-1 rounded-lg hover:bg-blue-50 text-nowrap ${
+                  isActive ? "input-label-custom-blue" : "input-label-custom"
+                }`}
+              >
+                Email Template
+              </div>
+            )}
+          </NavLink>,
+          <NavLink key="quotations" to={ROUTES_URL.QUOTATION_SETTINGS}>
+            {({ isActive }) => (
+              <div
+                className={`px-2 py-1 rounded-lg hover:bg-blue-50 ${
+                  isActive ? "input-label-custom-blue" : "input-label-custom"
+                }`}
+              >
+                Quotation Template
+              </div>
+            )}
+          </NavLink>,
+          <NavLink key="integrations" to={ROUTES_URL.INTEGRATIONS_SETTINGS}>
+            {({ isActive }) => (
+              <div
+                className={`px-2 py-1 rounded-lg hover:bg-blue-50 ${
+                  isActive ? "input-label-custom-blue" : "input-label-custom"
+                }`}
+              >
+                Integration
+              </div>
+            )}
+          </NavLink>,
+        ]}
+      />
+      {/* alksd */}
+      <div className={`flex items-center    justify-center pt-1`}>
+        {/* {isOpen && (
+          <span className="section-header-custom-blue">PurpleRadiance One</span>
+        )} */}
+        <div className="flex justify-between  w-full">
+          <button
+            onClick={onToggle}
+            title="Open Sidebar"
+            className="table-header-custom hover:text-blue-800 pl-4 w-full bg-pink-00"
+          >
+            {isOpen ? (
+              <div className="  flex gap-1 items-center w-full ">
+                {" "}
+                <PanelLeftClose size={20} /> Close
+              </div>
+            ) : (
+              <PanelRightClose size={20} />
+            )}
+          </button>
+
+          {isOpen && (
+            <Link
+              to={
+                userHasAccessToViewSettingGeneral
+                  ? ROUTES_URL.USER_PROFILE_SETTING
+                  : "#"
+              }
+              onClick={(e) => {
+                if (!userHasAccessToViewSettingGeneral) {
+                  e.preventDefault();
+                  toast.error(
+                    MESSAGE.MODULE_ACCESS.SETTING.GENERAL_USER_SETTING
+                      .DENIED_VIEW_ACCESS,
+                  );
+                  return;
+                }
+              }}
+              className={`table-header-custom pl-4 w-full flex items-center justify-center gap-1
+    ${!userHasAccessToViewSettingGeneral ? "opacity-50 cursor-not-allowed" : "hover:text-blue-800"}`}
+            >
+              <CircleUser size={20} />
+              Profile
+            </Link>
+          )}
+        </div>
+      </div>
     </aside>
   );
 }

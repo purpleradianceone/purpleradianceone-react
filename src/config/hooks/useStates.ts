@@ -8,11 +8,13 @@
 import State from "../../@types/general/State";
 import axiosClient from "../../axios-client/AxiosClient";
   
-  export const useStates = (countryId : number) => {
+  export const useStates = (countryId : number | undefined) => {
 
-      const [states, setStates] = useState<State[]>([]);
-  
+    const [states, setStates] = useState<State[]>([]);
+    
+    
     const getAllStates = async () => {
+      if(countryId ===undefined)return;
     const PostData: State = {
       id: null,
       country_id: countryId,

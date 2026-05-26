@@ -43,6 +43,7 @@ function ProductManagementLead({
   // state to store the products
   const [productsData, setProductsData] = useState<Product[]>([]);
   
+  const [isDataLoading, setIsDataLoading]= useState<boolean>(false)
   // hook to handle pagination and search filters
   const {
     currentPage,
@@ -196,6 +197,7 @@ function ProductManagementLead({
     };
 
     try {
+      setIsDataLoading(true)
        /**
      * API call to fetch products not assigned to the lead
      */
@@ -257,6 +259,8 @@ function ProductManagementLead({
        * Handles network errors, permission issues, and cancellations
        */
       handleApiError(error);
+    }finally{
+      setIsDataLoading(false)
     }
   };
 
@@ -313,6 +317,7 @@ function ProductManagementLead({
               // handleSelectedProductChange={handleSelectedProductChange}
               interestTypeData={interestTypeData}
               alreadyAssignedCompanyProduct={alreadyAssignedCompanyProduct}
+              isDataLoading ={isDataLoading}
             />
           </div>
         </>

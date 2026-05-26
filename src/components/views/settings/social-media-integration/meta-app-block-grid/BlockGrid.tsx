@@ -16,9 +16,9 @@ const BlockGrid: React.FC<BlockGridProps> = ({ blocks }) => {
         case  1 :
             navigate(ROUTES_URL.SETTING_META_APP_INTEGRATION_FACEBOOK)
             break;  
-        case 2 : 
-            navigate(ROUTES_URL.SETTING_META_APP_INTEGRATION_WHATSAPP)
-            break;
+        // case 2 : 
+        //     navigate(ROUTES_URL.SETTING_META_APP_INTEGRATION_WHATSAPP)
+        //     break;
         default : 
             break;          
     }

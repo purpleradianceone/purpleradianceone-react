@@ -24,6 +24,7 @@ function AccountCompanyProductForSupportTicketList({
   onEndDateChange,
   paginationData,
   handleRowSelect,
+  isDataLaoding
 }: {
   accountCompanyProductsForSupportTicket: AccountCompanyProductForSupportTicket[];
   handleSearchOption: HandleSearchOptionProps;
@@ -31,6 +32,7 @@ function AccountCompanyProductForSupportTicketList({
   onEndDateChange: (date: Date) => void;
   paginationData: PaginationDataWithoutCountProps;
   handleRowSelect?: (data: AccountCompanyProductForSupportTicket | any) => void;
+  isDataLaoding : boolean
 }) {
   const { position } = usePanel();
   const { isLargeScreen, isMediumScreen, isSmallScreen } = useScreenSize();
@@ -96,7 +98,7 @@ function AccountCompanyProductForSupportTicketList({
                       e.target.value,
                     );
                   }}
-                  placeholder={"Search by Account's Email, mobilenumber"}
+                  placeholder={"Name, email, mobile, serial number, barcode"}
                   value={handleSearchOption.searchParameter}
                 ></SearchInput>
               </div>
@@ -145,6 +147,7 @@ function AccountCompanyProductForSupportTicketList({
               accountCompanyProductsForSupportTicket
             }
             onRowSelect={handleRowSelectedForSupportTicket}
+            isDataLaoding={isDataLaoding}
           />
         </div>
       </div>

@@ -2,7 +2,6 @@
 
 import { Bell, Mail } from "lucide-react";
 import React, { useEffect, useState } from "react";
-import LoadingSpinner from "../../../../assets/animations/LoadingSpinner";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
 import FormHeader from "../../../ui/FormHeader";
 import GoogleCalendarIcon from "../../../../assets/svg/GoogleCalendarIcon";
@@ -10,6 +9,9 @@ import axiosClient from "../../../../axios-client/AxiosClient";
 // import OutlookCalendarIcon from "../../../../assets/svg/OutlookCalendarIcon";
 import POST_API from "../../../../constants/PostApi";
 import { useUserAccessModules } from "../../../../config/hooks/useAccessModules";
+import AccessDeniedMessagePage from "../../not-found/AccessDeniedMessagePage";
+import MESSAGE from "../../../../constants/Messages";
+import FacebookPageSkeleton from "../social-media-integration/meta-app-facebook/PafeIdListCardPopUp";
 
 interface ProviderCardProps {
   icon: React.ElementType;
@@ -71,12 +73,16 @@ function ReminderSetting() {
   const [isGoogleConnected, setIsGoogleConnected] = useState<boolean>(false);
   const [googleCalendarData, setGoogleCalendarData] = useState<any>({});
   const [isOutlookConnected, setIsoutlookConnected] = useState<boolean>(false);
-  const { userHasAccessToUpdateSettingReminder } = useUserAccessModules();
+  const {
+    userHasAccessToUpdateSettingReminder,
+    userHasAccessToViewSettingReminder,
+  } = useUserAccessModules();
 
   // =============================
   // Fetch provider status
   // =============================
   const fetchProviderStatus = async () => {
+    if (!userHasAccessToViewSettingReminder) return;
     try {
       setIsLoading(true);
 
@@ -188,7 +194,7 @@ function ReminderSetting() {
     //   isEnable: userHasAccessToUpdateSettingReminder,
     // },
   ];
-  return (
+  return userHasAccessToViewSettingReminder ? (
     <div className="w-full min-h-screen lg:p-2">
       <FormHeader
         preText="Manage your company's default settings and services."
@@ -200,7 +206,9 @@ function ReminderSetting() {
       />
 
       {isLoading ? (
-        <LoadingSpinner />
+         <div className="grid md:grid-cols-3 sm:grid-cols-2 gap-4">
+                <FacebookPageSkeleton />
+              </div>
       ) : (
         <div className="grid grid-cols-2 p-5 gap-6 mt-1">
           {/* //  <div className="w-full max-w-2xl min-h-96 mx-auto p-4 space-y-4"> */}
@@ -219,6 +227,12 @@ function ReminderSetting() {
           ))}
         </div>
       )}
+    </div>
+  ) : (
+    <div className="flex-none mx-96 mt-14 h-[77vh] justify-center items-center">
+      <AccessDeniedMessagePage
+        message={MESSAGE.MODULE_ACCESS.SETTING.REMINDER.DENIED_VIEW_ACCESS}
+      ></AccessDeniedMessagePage>
     </div>
   );
 }

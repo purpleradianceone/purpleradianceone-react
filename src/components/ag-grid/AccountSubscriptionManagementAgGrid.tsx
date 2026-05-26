@@ -7,11 +7,14 @@ import { INNERHTML, JSX_CHILDREN_NAME } from "../../constants/AppConstants";
 import AccountServiceProps from "../../@types/account/AccountServiceProps";
 import StatusIndicator from "../ui/StatusIndicator";
 import AccountSubscriptionManagementGridProps from "../../@types/ag-grid/AccountSubscriptionManagementAgGridProps";
+import Button from "../ui/Button";
+import COLORS from "../../constants/Colors";
 
 function AccountSubscriptionManagementAgGrid({
   accountSubscriptions,
   onRowSelect,
-  handleRowClick,
+  handleAddToInvoice,
+  // handleRowClick,
 
   isUsedInSupportTicketModule,
 }: AccountSubscriptionManagementGridProps) {
@@ -52,7 +55,36 @@ function AccountSubscriptionManagementAgGrid({
         sortable: true,
         filter: true,
       },
+      {
+        field: "isAddedToInvoiceDraft",
+        headerName: "InvoiceStatus",
+        sortable: true,
+        filter: true,
+        cellRenderer: (params: any) => {
+          const isAdded = params.value;
 
+          return (
+            <div className="flex items-center justify-center">
+              {isAdded ? (
+                <span className="text-green-600 font-medium">
+                  Added to Invoice
+                </span>
+              ) : (
+                <Button
+                  type="button"
+                  className={COLORS.ADD_BUTTON}
+                  onClick={(e) => {
+                    e.stopPropagation(); // ✅ prevent row click
+                    params.context.handleAddToInvoice(params.data);
+                  }}
+                >
+                  Add to Invoice
+                </Button>
+              )}
+            </div>
+          );
+        },
+      },
       {
         field: "isRenewal",
         headerName: "Is Renewal",
@@ -159,8 +191,11 @@ function AccountSubscriptionManagementAgGrid({
         modules={[AllCommunityModule]}
         theme={themeBalham}
         overlayNoRowsTemplate={INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
-        context={{ handleRowSelect: onRowSelect }}
-        onRowClicked={handleRowClick}
+        context={{
+          handleRowSelect: onRowSelect,
+          handleAddToInvoice: handleAddToInvoice,
+        }}
+        // onRowClicked={handleRowClick}
       />
     </div>
   );

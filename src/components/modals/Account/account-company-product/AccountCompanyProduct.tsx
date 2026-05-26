@@ -18,6 +18,8 @@ import COLORS from "../../../../constants/Colors";
 import axiosClient from "../../../../axios-client/AxiosClient";
 import { handleApiError } from "../../../../config/error/handleApiError";
 import AccessDeniedMessagePage from "../../../views/not-found/AccessDeniedMessagePage";
+import CreateAccountSubscription from "../account-subscription/CreateAccountSubscription";
+import { Modules } from "../../../../@types/List/CompanyQuotationManagementListProps";
 
 const AccountCompanyProduct = ({
   accountId,
@@ -28,6 +30,7 @@ const AccountCompanyProduct = ({
   const {
     userHasAccessToAddAccountProducts,
     userHasAccessToViewAccountProducts,
+    userHasAccessToAddAccountQuotation,
   } = useUserAccessModules();
   const [isLoadingAccountCompanyProduct, setIsLoadingAccountCompanyProduct] =
     useState<boolean>(true);
@@ -39,7 +42,10 @@ const AccountCompanyProduct = ({
   const [accountCompanyProduct, setAccountCompanyProduct] = useState<
     AccountProduct[]
   >([]);
-
+  const [accountCompanyProductCount, setAccountCompanyProductCount] =
+    useState<number>(0);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedProductForAMC, setSelectedProductForAMC] = useState<any>(null);
   // const [refreshKey, setRefreshKey] = useState<number>(0);
 
   // const handleRowSelectAccountProduct = (data: AccountProduct) => {
@@ -50,6 +56,22 @@ const AccountCompanyProduct = ({
   //   handleShowCompanyProductData(data);
 
   // };
+
+  const handleCreateQuotationForAccountProduct = (data: AccountProduct) =>{
+        if (!userHasAccessToAddAccountQuotation){
+          toast.error(MESSAGE.MODULE_ACCESS.ACCOUNT_QUOTATION.DENIED_ADD_ACCESS);
+          return;
+        }
+            const quotationSearchParam=  `?other_id=${accountId}&quotation_type_id=${2}&isUsedFor=${Modules.AMC_QUOTATION}&account_company_product=${JSON.stringify(data)}`;
+
+        const path = ROUTES_URL.QUOTATION_CREATE_AND_DETAILS.replace(
+            ":quotationId",
+            String(0),
+          )+quotationSearchParam;
+          navigate(path);
+
+
+  }
   const handleRowSelectAccountProduct = (data: AccountProduct) => {
     if (!userHasAccessToViewAccountProducts) return;
 
@@ -82,74 +104,44 @@ const AccountCompanyProduct = ({
     );
   }
 
-  // const getAccountCompanyProduct = async () => {
-  //   const postData = {
-  //     company_id: loginStatus.companyId,
-  //     account_id: accountId,
-  //     id: null,
-  //     company_product_id: null,
-  //     requestedby: loginStatus.id,
-  //   };
-
-  //   await axiosClient
-  //     .post(POST_API.GET_ACCOUNT_COMPANY_PRODUCT, postData, {
-  //       withCredentials: true,
-  //     })
-  //     .then((response) => {
-  //       if (response.status === STATUS_CODE.OK) {
-  //         const data = response.data;
-
-  //         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  //         const formattedData: AccountProduct[] = data.map((item: any) => ({
-  //           id: item.id,
-  //           accountId: item.account_id,
-  //           accountName: item.account_name,
-  //           companyProductId: item.company_product_id,
-  //           companyProductName: item.company_product_name,
-  //           quantity: item.quantity,
-  //           quantityReturn: item.quantity_return,
-  //           barcode: item.barcode,
-  //           serialNumber: item.serial_number,
-  //           unitName: item.unit_name,
-  //           unitNameInStock: item.unit_name_in_stock,
-  //           purchaseDate: item.purchase_date,
-  //           deliveryDate: item.delivery_date,
-  //           deliveryAddress: item.delivery_address,
-  //           billingAddress: item.billing_address,
-  //           installationDate: item.installation_date,
-  //           installedByName: item.installed_by_name,
-  //           installedBy: item.installed_by,
-  //           // warrantyIntervalTypeId: item.warranty_interval_type_id,
-  //           // warrantyIntervalName: item.warranty_interval_name,
-  //           // warranty: item.warranty,
-  //           // warrantyStartDate: item.warranty_start_date,
-  //           // warrantyEndDate: item.warranty_end_date,
-  //           // warrantyTerms: item.warranty_terms,
-  //           // amcCycleIntervalTypeId: item.amc_cycle_interval_type_id,
-  //           // amcCycle: item.amc_cycle,
-  //           // amcCycleStartDate: item.amc_cycle_start_date,
-  //           // amcCycleEndDate: item.amc_cycle_end_date,
-  //           // amcIntervalName: item.amc_interval_name,
-  //           updatedBy: item.updatedby,
-  //           createdOn: item.createdon,
-  //           updatedOn: item.updatedon,
-  //           createdBy: item.createdby,
-  //         }));
-  //         setAccountCompanyProduct(formattedData);
-  //         setRefreshKey((prev) => prev + 1);
-  //       }
-  //     })
-  //     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  //     .catch(async (error: ApiError | any) => {
-
-  //        handleApiError(error)
-  //     })
-  //     .finally(() => {
-  //       setIsLoadingAccountCompanyProduct(false);
-  //     });
-  // };
-
+  
+  const openSubscriptionModal = (rowData: any) => {
+    setSelectedProductForAMC(rowData);
+    setIsModalOpen(true);
+  };
   const [hasError, setHasError] = useState(false);
+
+  const handleAddToInvoice = async (rowData: AccountProduct) => {
+    console.log(rowData);
+    const postData = {
+      company_id: loginStatus.companyId,
+      account_id: rowData.accountId,
+      account_company_product_id: rowData.id,
+      createdby_id: loginStatus.id,
+    };
+    console.log(postData);
+    // setIsSubmitting(true);
+    try {
+      const res = await axiosClient.post(
+        POST_API.CREATE_COMPANY_INVOICE_ITEM,
+        postData,
+        {
+          withCredentials: true,
+        },
+      );
+
+      if (res.data.status) {
+        toast.success(res.data.message);
+        setAccountCompanyProductCount((prev) => prev + 1);
+      } else {
+        toast.error(res.data.message);
+      }
+    } catch (error) {
+      handleApiError(error);
+    } finally {
+      // setIsSubmitting(false);s
+    }
+  };
 
   const getAccountCompanyProduct = async () => {
     setIsLoadingAccountCompanyProduct(true);
@@ -169,6 +161,7 @@ const AccountCompanyProduct = ({
         postData,
         { withCredentials: true },
       );
+      console.log(response.data);
 
       const formattedData: AccountProduct[] = response.data.map(
         (item: any) => ({
@@ -177,6 +170,7 @@ const AccountCompanyProduct = ({
           accountName: item.account_name,
           companyProductId: item.company_product_id,
           companyProductName: item.company_product_name,
+          ProductTypeName: item.product_type_name,
           quantity: item.quantity,
           quantityReturn: item.quantity_return,
           barcode: item.barcode,
@@ -190,6 +184,7 @@ const AccountCompanyProduct = ({
           installationDate: item.installation_date,
           installedByName: item.installed_by_name,
           installedBy: item.installed_by,
+          isAddedToInvoiceDraft: item.is_added_to_invoice_draft,
           updatedBy: item.updatedby,
           createdOn: item.createdon,
           updatedOn: item.updatedon,
@@ -211,7 +206,7 @@ const AccountCompanyProduct = ({
     if (userHasAccessToViewAccountProducts) {
       getAccountCompanyProduct();
     }
-  }, [userHasAccessToViewAccountProducts]);
+  }, [userHasAccessToViewAccountProducts, accountCompanyProductCount]);
 
   if (hasError) {
     return (
@@ -234,14 +229,21 @@ const AccountCompanyProduct = ({
       {/* Main Content */}
 
       {isLoadingAccountCompanyProduct ? (
-        <div className="flex justify-center items-center h-full">
+        <div className="flex justify-center items-center h-full min-h-44">
           <LoadingSpinner />
         </div>
       ) : accountCompanyProduct.length === 0 &&
         !isLoadingAccountCompanyProduct &&
         !hasError ? (
+          <>
+           <h3 className="bg-gray-100 table-header-custom rounded-t-md px-2">
+              Product Details
+            </h3>
+         
         <div className="flex items-center justify-center w-full   h-full">
+         
           <div className="flex gap-1 w-full text-xs  h-16 bg-green-0 py-3 items-center justify-center">
+            
             <Link
               to={ROUTES_URL.ACCOUNT_MULTIPLE_COMPANY_PRODUCT}
               state={{
@@ -268,6 +270,7 @@ const AccountCompanyProduct = ({
             >
               {" "}
               <Button
+              type="button"
                 disabled={!userHasAccessToAddAccountProducts}
                 // onClick={() => {
                 //   if (userHasAccessToUpdateAccount) {
@@ -288,10 +291,13 @@ const AccountCompanyProduct = ({
             <span className="italic caption-custom">No data available.</span>
           </div>
         </div>
+         </>
       ) : (
-        <div className="grid grid-cols-2 gap-1 w-full">
-          <div className="col-span-2 flex justify-end p-0.5">
-            <Link
+        <div className="w-full ">
+         <div className="w-full flex justify-between bg-gray-100 table-header-custom  rounded-t-md p-1">
+              Product Details
+
+              <Link
               to={ROUTES_URL.ACCOUNT_MULTIPLE_COMPANY_PRODUCT}
               state={{
                 assignProducts: true,
@@ -313,6 +319,7 @@ const AccountCompanyProduct = ({
               }
             >
               <Button
+               type="button"
                 disabled={!userHasAccessToAddAccountProducts}
                 // onClick={() => {
                 //   if (userHasAccessToUpdateAccountProducts) {
@@ -327,15 +334,36 @@ const AccountCompanyProduct = ({
                 +Add
               </Button>
             </Link>
+            </div>
+       
+        <div className="grid grid-cols-2  w-full">
+         
+          <div className="col-span-2 flex justify-end p-0.5">
+            
+            
           </div>
-          <div className="col-span-2  w-full h-96">
+          <div className="col-span-2  w-full h-56">
             <AccountCompanyProductAgGrid
+              handleAddToInvoice={handleAddToInvoice}
               accountProductData={accountCompanyProduct}
               onRowSelect={handleRowSelectAccountProduct}
               handleRowClick={handleRowClick}
+              openSubscriptionModal={openSubscriptionModal}
+              handleCreateQuotation={handleCreateQuotationForAccountProduct}
             />
           </div>
+          <CreateAccountSubscription
+            isOpen={isModalOpen}
+            onClose={() => {
+              setIsModalOpen(false);
+              setSelectedProductForAMC(null);
+            }}
+            accountId={accountId}
+            handleAddAccountSubscritption={() => {}}
+            selectedProductForAMC={selectedProductForAMC} // 👈 NEW PROP
+          />
         </div>
+         </div>
       )}
 
       {/* {selectedProductCard && (

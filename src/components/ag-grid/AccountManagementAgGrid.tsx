@@ -2,21 +2,24 @@
 import { AgGridReact } from "ag-grid-react";
 import Account from "../../@types/account/Account";
 import { useMemo, useRef } from "react";
-import { INNERHTML, JSX_CHILDREN_NAME } from "../../constants/AppConstants";
+import {  JSX_CHILDREN_NAME } from "../../constants/AppConstants";
 import { AllCommunityModule, ColDef, themeBalham } from "ag-grid-community";
 import StatusIndicator from "../ui/StatusIndicator";
+import { SkeletonRowsAgGrid } from "../ui/SkeletonRowsAgGrid";
 
 function AccountManagementAgGrid({
   accounts,
   handleRowClick,
   onRowSelect,
   isUsedForAccountLead,
+  isDataLoading 
 
 }: {
   accounts: Account[];
   handleRowClick?: (event:  any) => void;
   onRowSelect?: (data: Account | any) => void;
   isUsedForAccountLead : boolean;
+  isDataLoading : boolean
 }) {
   const gridRef = useRef<AgGridReact>(null); // Ref to the AgGridReact component
 
@@ -205,6 +208,11 @@ function AccountManagementAgGrid({
           return params.data.website;
         },
         cellRenderer: (params: any) => {
+          if (params.data?.__isSkeleton) {
+                return (
+                  <SkeletonRowsAgGrid/>
+                );
+              }
           if (!params.value) {
             return null;
           }
@@ -227,6 +235,11 @@ function AccountManagementAgGrid({
         filter: true,
         // hide: isUsedForAccountLead,
         cellRenderer: (params: any) => {
+          if (params.data?.__isSkeleton) {
+                return (
+                  <SkeletonRowsAgGrid/>
+                );
+              }
           return (
             <div className="flex items-center text-sm gap-1 mt-1">
              <StatusIndicator isActive={params.value}/>
@@ -269,7 +282,11 @@ function AccountManagementAgGrid({
         maxWidth: 80,
         // cellRenderer : ()=> "View",
         cellRenderer: (params: Account | any) => {
-          
+          if (params.data?.__isSkeleton) {
+                return (
+                  <SkeletonRowsAgGrid/>
+                );
+              }
           return (
               <div className="flex items-center justify-center">
             <span
@@ -288,6 +305,31 @@ function AccountManagementAgGrid({
     []
   );
 
+  const skeletonRows = useMemo(() => {
+    return Array.from({ length: 30 }).map(() => ({
+      name: "",
+      email: "",
+      mobileNumber: "",
+      industryTypeName: "",
+      businessTypeName: "",
+      countryName: "",
+      stateName: "",
+      districtName: "",
+      pan: "",
+      tan: "",
+      gst: "",
+      billingAddressan: "",
+      shippingAddress: "",
+      registeredOfficeAddress: "",
+      businessResgistrationNumber: "",
+      website: "",
+      isActive: "",
+      createdBy: "",
+      createdOn: "",
+      __isSkeleton: true,
+    }));
+  }, []);
+
   const defaultColDef = useMemo(
     () => ({
       filter: "agTextColumnFilter",
@@ -295,6 +337,14 @@ function AccountManagementAgGrid({
       flex: 0.8,
       suppressHeaderMenuButton: true,
       suppressHeaderContextMenu: true,
+       cellRenderer: (params: any) => {
+              if (params.data?.__isSkeleton) {
+                return (
+                  <SkeletonRowsAgGrid/>
+                );
+              }
+              return params.value;
+            },
     }),
     []
   );
@@ -306,14 +356,14 @@ function AccountManagementAgGrid({
     >
       <AgGridReact
         ref={gridRef} // Attach the ref
-        rowData={accounts}
+        rowData={ isDataLoading ? skeletonRows:  accounts}
         columnDefs={columnDefs}
         defaultColDef={defaultColDef}
         modules={[AllCommunityModule]}
         theme={themeBalham}
-        overlayNoRowsTemplate={INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
-        context={{ handleRowSelect: onRowSelect }}
-        onRowClicked={handleRowClick}
+        // overlayNoRowsTemplate={INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
+        context={{ handleRowSelect:  isDataLoading  ? undefined :  onRowSelect }}
+        onRowClicked={ isDataLoading  ? undefined : handleRowClick}
       />
     </div>
   );

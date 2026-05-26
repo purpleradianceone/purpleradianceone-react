@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import FormHeader from "../../ui/FormHeader";
 import FormLayout from "../../ui/FormLayout";
-import { useState } from "react";
+import React, { useState } from "react";
 import Button from "../../ui/Button";
 import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
 import LoadingPopUpAnimation from "../../views/card/LoadingPopUpAnimation";
@@ -65,6 +65,11 @@ export function SupportTicketLIfecycleChangeModal({
 
   const { userHasAccessToUpdateSupportTicket } = useUserAccessModules();
 
+  async function  handleSubmitCall(event: React.FormEvent<HTMLFormElement>){
+    event.preventDefault()
+   await handleSubmit(formData)
+  }
+
   function handleFormChange(e: any) {
     const { name, value } = e.target;
     setFormData((previous) => {
@@ -82,7 +87,8 @@ export function SupportTicketLIfecycleChangeModal({
           userName={selectedSupportTicketLifecycleName}
           description={`support ticket lifecycle is updating from ${selectedSupportTicketState.supportTicketLifecycleName} to ${selectedSupportTicketLifecycleName} .`}
         />
-        <form
+        <form 
+        onSubmit={ handleSubmitCall }
           className={`mt-2 ${isLoading ? "cursor-wait" : "cursor-default"}`}
         >
           <div className="gap-2">
@@ -221,10 +227,6 @@ export function SupportTicketLIfecycleChangeModal({
               </Button>
               <Button
                 type="submit"
-                onClick={(e) => {
-                  e.preventDefault();
-                  handleSubmit(formData);
-                }}
                 disabled={!userHasAccessToUpdateSupportTicket}
               >
                 <div className="flex items-center  gap-1">

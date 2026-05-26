@@ -1,19 +1,27 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-hooks/rules-of-hooks */
-import { AllCommunityModule, ColDef, themeBalham } from "ag-grid-community";
+import { AllCommunityModule, ColDef } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 import { useMemo, useRef } from "react";
 import MasterTaskManagementAgGridProps from "../../@types/ag-grid/MasterTaskManagementAgGridProps";
-import { INNERHTML, JSX_CHILDREN_NAME } from "../../constants/AppConstants";
-import StatusIndicator from "../ui/StatusIndicator";
-import TaskPriorityChip from "../ui/TaskPriorityChip";
+import {
+  AGGRID,
+  INNERHTML,
+  JSX_CHILDREN_NAME,
+} from "../../constants/AppConstants";
+import { SkeletonRowsAgGrid } from "../ui/SkeletonRowsAgGrid";
+import { taskPriorityStyles } from "../../utils/colourSpecifierForNameInAggrid";
+import { Eye } from "lucide-react";
+import StatusBadge from "../ui/StatusBadge";
+import RenderUserWithIcon from "../ui/UserAgGridCellRenderer";
 
 function MasterTaskManagementAgGrid({
   MasterTaskData,
   onRowSelect,
   handleRowClick,
   isUsedInAllTasksModule,
+  isDataLoading,
 }: MasterTaskManagementAgGridProps) {
   const gridRef = useRef<AgGridReact>(null); // Ref to the AgGridReact component
   const columnDefs = useMemo<ColDef[]>(
@@ -23,6 +31,12 @@ function MasterTaskManagementAgGrid({
         headerName: "subject",
         sortable: true,
         filter: true,
+
+        cellStyle: () => ({
+          fontSize: "14px",
+          fontWeight: 600,
+          color: "#1f2937",
+        }),
       },
       {
         field: "generalTaskTypeName",
@@ -35,13 +49,23 @@ function MasterTaskManagementAgGrid({
         headerName: "Priority",
         sortable: true,
         filter: true,
-        cellRenderer: (params: any) => (
-          <div className="flex items-center">
-            <TaskPriorityChip
-              priorityName={params.data.generalTaskPriorityName}
-            />
-          </div>
-        ),
+        cellRenderer: (params: any) => {
+          if (params.data?.__isSkeleton) {
+            return <SkeletonRowsAgGrid />;
+          }
+          const priority = params.value || "-";
+          return (
+            <div className="flex items-center h-full">
+              <span
+                className={`px-3 py-0.5 rounded-full text-xs font-medium whitespace-nowrap ${
+                  taskPriorityStyles[priority] || "bg-slate-100 text-slate-700"
+                }`}
+              >
+                {priority}
+              </span>
+            </div>
+          );
+        },
       },
       {
         field: "description",
@@ -60,6 +84,25 @@ function MasterTaskManagementAgGrid({
         headerName: "Assigned To",
         sortable: true,
         filter: true,
+        cellRenderer: RenderUserWithIcon,
+      },
+
+      {
+        field: "isActive",
+        headerName: "Status",
+        sortable: true,
+        filter: true,
+        // hide: isUsedForAccountLead,
+        cellRenderer: (params: any) => {
+          if (params.data?.__isSkeleton) {
+            return <SkeletonRowsAgGrid />;
+          }
+          return (
+            <div className="h-full flex items-center">
+              <StatusBadge isActive={params.value} />
+            </div>
+          );
+        },
       },
       {
         field: "startDate",
@@ -79,24 +122,12 @@ function MasterTaskManagementAgGrid({
         sortable: true,
         filter: true,
       },
-      {
-        field: "isActive",
-        headerName: "Status",
-        sortable: true,
-        filter: true,
-        // hide: isUsedForAccountLead,
-        cellRenderer: (params: any) => {
-          return (
-            <div className="flex items-center text-sm gap-1 mt-1">
-              <StatusIndicator isActive={params.value} />
-            </div>
-          );
-        },
-      },
+
       {
         field: "createdBy",
         headerName: "Created by",
         filter: true,
+        cellRenderer: RenderUserWithIcon,
       },
       {
         field: "createdOn",
@@ -109,6 +140,7 @@ function MasterTaskManagementAgGrid({
         headerName: "Updated by",
         sortable: true,
         filter: true,
+        cellRenderer: RenderUserWithIcon,
       },
       {
         field: "updatedOn",
@@ -134,18 +166,24 @@ function MasterTaskManagementAgGrid({
         headerName: "Actions",
         field: "view",
         pinned: "right",
-        maxWidth: 80,
+        maxWidth: 100,
+        filter: false,
         cellRenderer: (params: any) => {
+          if (params.data?.__isSkeleton) {
+            return <SkeletonRowsAgGrid />;
+          }
           return (
             <div className="flex items-center justify-center">
-              <span
-                className="lead-details cursor-pointer text-blue-600"
+              <button
+                className="lead-details flex items-center "
                 onClick={() => {
                   params.context.handleRowSelect(params.data);
                 }}
               >
-                {isUsedInAllTasksModule ? "Details" : "Select"}
-              </span>
+                <Eye size={12} strokeWidth={1.5} />
+
+                <span>{isUsedInAllTasksModule ? "Details" : "Select"}</span>
+              </button>
             </div>
           );
         },
@@ -266,22 +304,37 @@ function MasterTaskManagementAgGrid({
       flex: 0.8,
       suppressHeaderMenuButton: true,
       suppressHeaderContextMenu: true,
+
+      cellRenderer: (params: any) => {
+        if (params.data?.__isSkeleton) {
+          return <SkeletonRowsAgGrid />;
+        }
+        return params.value;
+      },
     }),
     [],
   );
 
+  const skeletonRows = useMemo(() => {
+    return Array.from({ length: 30 }).map(() => ({
+      __isSkeleton: true,
+    }));
+  }, []);
+
   return (
     <div
-      className="ag-theme-balham w-full"
+      className="w-full modern-user-grid custom-height-scrollbar"
       style={{ height: "100%", width: "100%" }}
     >
       <AgGridReact
         ref={gridRef} // Attach the ref
-        rowData={MasterTaskData}
+        rowData={isDataLoading ? skeletonRows : MasterTaskData}
         columnDefs={columnDefs}
         defaultColDef={defaultColDef}
         modules={[AllCommunityModule]}
-        theme={themeBalham}
+        rowHeight={AGGRID.ROW_HEIGHT}
+        headerHeight={AGGRID.HEADER_HEIGHT}
+        // theme={themeBalham}
         overlayNoRowsTemplate={INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
         context={{
           handleRowSelect: onRowSelect,

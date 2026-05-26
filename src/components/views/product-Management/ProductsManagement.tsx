@@ -20,36 +20,36 @@ function ProductManagement({
   isGridForAccountProduct,
   onRowSelect
 }: {
-  isGridForAccountProduct? : boolean;
-   onRowSelect? : (data : any ) =>void,
+  isGridForAccountProduct?: boolean;
+  onRowSelect?: (data: any) => void,
 }) {
 
-   // Read filters from LocalStorage (before hook initializes)
-const savedFilters = JSON.parse(
-  localStorage.getItem(LocalStorageKeys.PRODUCT_MANAGEMEMNT_FILTERS) || "{}"
-);
+  // Read filters from LocalStorage (before hook initializes)
+  const savedFilters = JSON.parse(
+    localStorage.getItem(LocalStorageKeys.PRODUCT_MANAGEMEMNT_FILTERS) || "{}"
+  );
   // Restore saved filters when opening this module
-      // useEffect(() => {
-      //   const saved = localStorage.getItem(LocalStorageKeys.PRODUCT_MANAGEMEMNT_FILTERS);
-      //   if (!saved) return;
-    
-      //   const filters = JSON.parse(saved);
-    
-      //   // Ensure URL & hook initialize first before restoring
-      //   requestAnimationFrame(() => {
-      //     if (filters.page) handlePageChange(filters.page);
-      //     if (filters.size) handlePageSizeChange(filters.size);
-      //     if (filters.search) handleSearchParameterChange(filters.search);
-      //     if (filters.dateRangeId) handleDatePageIdChange(filters.dateRangeId);
-      //     if(filters.customStartDate) handleStartDateChange(filters.customStartDate)
-      //       if(filters.customEndDate) handleEndDateChange(filters.customEndDate)
-         
-      //   });
-      // }, []);
+  // useEffect(() => {
+  //   const saved = localStorage.getItem(LocalStorageKeys.PRODUCT_MANAGEMEMNT_FILTERS);
+  //   if (!saved) return;
+
+  //   const filters = JSON.parse(saved);
+
+  //   // Ensure URL & hook initialize first before restoring
+  //   requestAnimationFrame(() => {
+  //     if (filters.page) handlePageChange(filters.page);
+  //     if (filters.size) handlePageSizeChange(filters.size);
+  //     if (filters.search) handleSearchParameterChange(filters.search);
+  //     if (filters.dateRangeId) handleDatePageIdChange(filters.dateRangeId);
+  //     if(filters.customStartDate) handleStartDateChange(filters.customStartDate)
+  //       if(filters.customEndDate) handleEndDateChange(filters.customEndDate)
+
+  //   });
+  // }, []);
   const { userHasAccessToViewProduct } = useUserAccessModules();
   const { loginStatus } = useLoggedInUserContext();
   const [ref, inView] = useInView({ fallbackInView: true, threshold: 0.1 });
-
+  const [isDataLoading , setIsDataLoading] = useState<boolean>(false);
   const [accessDeniedPopUpOpen, setAccessDeniedPopUpOpen] = useState(false);
 
   const [productsData, setProductsData] = useState<Product[]>([]);
@@ -74,19 +74,19 @@ const savedFilters = JSON.parse(
   } = useSearchFilterPaginationDateHandlers(savedFilters);
 
   const handleProductChangeOnAdd = () => {
-      setProductUpdateCount((prev) => prev + 1);    
+    setProductUpdateCount((prev) => prev + 1);
   };
 
   const handleEditProductChange = () => {
-      setProductUpdateCount((prev) => prev + 1);
+    setProductUpdateCount((prev) => prev + 1);
 
   };
 
   const handleCreateCompanyProductTax = () => {
-      setProductUpdateCount((prev) => prev + 1);
+    setProductUpdateCount((prev) => prev + 1);
   };
 
-  const fetchCompanyProducts = async (signal : AbortSignal) => {
+  const fetchCompanyProducts = async (signal: AbortSignal) => {
     if (dateRangeId === customDateRangeId && concatDate.trim() === "") return;
     if (userHasAccessToViewProduct || isGridForAccountProduct) {
       const offset = (currentPage - 1) * pageSize;
@@ -109,8 +109,9 @@ const savedFilters = JSON.parse(
       };
 
       try {
+        setIsDataLoading(true)
         const response = await axios.post(
-          isGridForAccountProduct?POST_API.GET_LOOKUP_COMPANY_PRODUCT:POST_API.GET_PRODUCTS,
+          isGridForAccountProduct ? POST_API.GET_LOOKUP_COMPANY_PRODUCT : POST_API.GET_PRODUCTS,
           getProductPostData,
           {
             signal,
@@ -119,25 +120,25 @@ const savedFilters = JSON.parse(
         );
 
         if (response.data && response.status === STATUS_CODE.OK) {
-          setCurrentPageData({currentPage: currentPage, pageDataLength: response.data.length});
+          setCurrentPageData({ currentPage: currentPage, pageDataLength: response.data.length });
           const formattedData: Product[] = response.data.map((res: any) => ({
             count: res.count,
             id: res.id,
             companyId: res.company_id,
-            productTypeId:res.product_type_id,
-            productTypeName:res.product_type_name,
+            productTypeId: res.product_type_id,
+            productTypeName: res.product_type_name,
             unitName: res.unit_name,
-            unitId : res.unit_id,
-            unitNameInStock : res.unit_name_in_stock,
-            defaultWarrantyIntervalTypeId:res.default_warranty_interval_type_id,
-            defaultWarranty:res.default_warranty,
-            defaultWarrantyName:res.default_warranty_name,
-            defaultAmcCycleIntervalTypeId:res.default_amc_cycle_interval_type_id,
-            defaultAmcCycle:res.default_amc_cycle,
-            defaultAmcCycleName:res.default_amc_cycle_name,
+            unitId: res.unit_id,
+            unitNameInStock: res.unit_name_in_stock,
+            defaultWarrantyIntervalTypeId: res.default_warranty_interval_type_id,
+            defaultWarranty: res.default_warranty,
+            defaultWarrantyName: res.default_warranty_name,
+            defaultAmcCycleIntervalTypeId: res.default_amc_cycle_interval_type_id,
+            defaultAmcCycle: res.default_amc_cycle,
+            defaultAmcCycleName: res.default_amc_cycle_name,
             name: res.name,
             barcode: res.barcode,
-            parentUnitId : res.parent_unit_id,
+            parentUnitId: res.parent_unit_id,
             isSerialNumber: res.is_serial_number,
             cost: res.cost,
             description: res.description,
@@ -147,6 +148,7 @@ const savedFilters = JSON.parse(
             hsn: res.hsn,
             sac: res.sac,
             taxRate: res.tax_rate,
+            cess: res.cess,
             validFrom: res.valid_from,
             createdBy: res.createdby,
             createdOn: res.createdon,
@@ -164,9 +166,11 @@ const savedFilters = JSON.parse(
           if (refreshTokenStatus) {
             fetchCompanyProducts(signal);
           }
-        }else{
+        } else {
           // toast.error(MESSAGE.ERROR.SOMETHING_WENT_WRONG_TRY_AGAIN)
         }
+      }finally{
+        setIsDataLoading(false)
       }
     }
   };
@@ -174,7 +178,7 @@ const savedFilters = JSON.parse(
   useEffect(() => {
 
     const controller = new AbortController();
-    const {signal} = controller;
+    const { signal } = controller;
     setTimeout(() => {
       setProductsData([]);
       // console.log("Product Data is cleared");
@@ -183,7 +187,7 @@ const savedFilters = JSON.parse(
     }, 200);
 
 
-    return () =>{
+    return () => {
       controller.abort();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -202,7 +206,7 @@ const savedFilters = JSON.parse(
     }
   }, [userHasAccessToViewProduct]);
 
-  
+
   // Save all filters to localStorage whenever they change
   useEffect(() => {
     const filters = {
@@ -271,9 +275,10 @@ const savedFilters = JSON.parse(
                   onPageSizeChange: handlePageSizeChange,
                 }}
                 products={productsData}
-                isGridForAccountProduct ={isGridForAccountProduct}
+                isGridForAccountProduct={isGridForAccountProduct}
                 onRowSelect={onRowSelect}
-                // isListForProductUser={false}
+                isDataLoading={isDataLoading}
+              // isListForProductUser={false}
               />
             </div>
           </>
