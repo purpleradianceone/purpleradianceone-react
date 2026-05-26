@@ -7,6 +7,7 @@ type CompanyUserAgGridProps = {
   handleIdIsEditModalOpen: (params: boolean) => void;
   handleIsAccessModalOpen: (params: boolean) => void;
   handleIsDashboardModalOpen: (params: boolean) => void;
+  handleUserReportModalOpen: (params: boolean) => void;
   handleActionsTourEnd? : () => void;
   isActionsTourEnded? : boolean;
   isUsedInAccountProductForAssingingInstalledBy? : boolean;

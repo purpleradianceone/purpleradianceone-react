@@ -880,6 +880,19 @@ export const useUserAccessModules = () => {
     (accessModule) => accessModule.crm_module_id === 68 && accessModule.update,
   );
 
+  //Report 
+    const userHasAccessToAddCompanyUserReportType = accessModules.some(
+    (accessModules) => accessModules.crm_module_id === 69 && accessModules.add,
+  );
+
+  const userHasAccessToViewCompanyUserReportType = accessModules.some(
+    (accessModule) => accessModule.crm_module_id === 69 && accessModule.view,
+  );
+
+  const userHasAccessToUpdateCompanyUserReportType = accessModules.some(
+    (accessModule) => accessModule.crm_module_id === 69 && accessModule.update,
+  );
+
 
   return {
     userHasAccessToAddUser,
@@ -1147,5 +1160,9 @@ export const useUserAccessModules = () => {
     userHasAccessToAddCompanyProductSale,
     userHasAccessToViewCompanyProductSale,
     userHasAccessToUpdateCompanyProductSale,
+
+    userHasAccessToAddCompanyUserReportType,
+    userHasAccessToViewCompanyUserReportType,
+    userHasAccessToUpdateCompanyUserReportType,
   };
 };

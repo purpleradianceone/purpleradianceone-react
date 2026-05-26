@@ -330,6 +330,13 @@ const MESSAGE = {
             UPDATE_ACCESS_DENIED_MESSAGE: "You do not have permission to update sale product details.",
             
         },
+        REPORT:{
+            USER_REPORT:{
+            DENIED_VIEW_ACCESS: "You do not have permission to view user report.",
+            DENIED_ADD_ACCESS: "You do not have permission to add user report.",
+            UPDATE_ACCESS_DENIED_MESSAGE: "You do not have permission to update user report.",
+            }
+        },
     }
 }
 

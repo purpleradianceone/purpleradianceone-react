@@ -145,6 +145,7 @@ export const JSX_CHILDREN_NAME = {
   ACCESS: "Access",
   EDIT: "Edit",
   DASHBOARD: "Dashboard",
+  REPORT: "Report",
   ACTIONS: "Actions ▾",
   ADD_USER: "Add User",
   CREATE_LEAD: "Create",
