@@ -100,13 +100,13 @@ function EditCompanyUserModal({
             .put(POST_API.UPDATE_COMPANY_USER, postUpdateUserData, {
               withCredentials: true,
             })
-            .then((response) => {
+            .then(async (response) => {
               if (response.data.status) {
                 toast.success(response.data.message);
               } else if (!response.data.status) {
                 toast.error(response.data.message);
               }
-              handleCompanyUserChange(user);
+              await handleCompanyUserChange();
               setTimeout(() => {
                 onClose();
               }, 100);
@@ -165,14 +165,14 @@ function EditCompanyUserModal({
       .put(POST_API.UPDATE_COMPANY_USER, postUpdateUserData, {
         withCredentials: true,
       })
-      .then((response) => {
+      .then(async (response) => {
         if (response.data.status) {
           toast.success(response.data.message);
           setUserIsActive(checked);
         } else if (!response.data.status) {
           toast.error(response.data.message);
         }
-        handleCompanyUserChange(user);
+        await handleCompanyUserChange();
       })
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .catch(async (error: ApiError | any) => {

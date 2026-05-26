@@ -66,9 +66,6 @@ function GetCompanyUsers({
 
    const [refreshUsers, setRefreshUsers] = useState(0);
 
-  const handleRefreshUsers = () => {
-  setRefreshUsers((prev) => prev + 1);
-};
 
 
 
@@ -102,6 +99,15 @@ const savedFilters = JSON.parse(
       setUserUpdateCount((prev) => prev + 1);
     }
   };
+
+    const [selectedStatus, setSelectedStatus] = useState<
+  "ALL" | "ACTIVE" | "INACTIVE"
+>(
+  savedFilters.selectedStatus || "ALL"
+);
+  const handleRefreshUsers = () => {
+  setRefreshUsers((prev) => prev + 1);
+};
 
   // Fetch data function
   const fetchCompanyUsers = async (signal: AbortSignal) => {
@@ -189,6 +195,7 @@ const savedFilters = JSON.parse(
       concatDate,
       customStartDate: startDate,
       customEndDate: endDate,
+      selectedStatus,
     };
 
     localStorage.setItem(
@@ -203,6 +210,7 @@ const savedFilters = JSON.parse(
     concatDate,
     startDate,
     endDate,
+    selectedStatus,
   ]);
 
   // Note : On refresh button click clear the storage
@@ -225,6 +233,8 @@ const savedFilters = JSON.parse(
               transition={{ duration: 0.4, ease: "easeOut" }}
             >
               <GetCompanyUsersList
+               selectedStatus={selectedStatus}
+               setSelectedStatus={setSelectedStatus}
                 onRefreshUsers={handleRefreshUsers}
                 handleCompanyUserChangeOnEdit={handleCompanyUserChangeOnEdit}
                 onEndDateChange={handleEndDateChange}

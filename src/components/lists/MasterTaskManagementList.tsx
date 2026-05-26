@@ -7,7 +7,7 @@ import {
   Repeat,
 } from "lucide-react";
 import qs from "query-string";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import MasterTaskManagementProps from "../../@types/List/MasterTaskManagementProps";
@@ -34,6 +34,10 @@ import DateRangeFilterDropdown from "../ui/DateRangeFilterDropdown";
 import DateRangePicker from "../ui/DateRangePicker";
 import SearchInput from "../ui/SearchInput";
 import SummaryCards from "../ui/SummaryCards";
+import GeneralTaskMasterSummary from "../../@types/my-task-management/GeneralTaskMasterSummary";
+import axiosClient from "../../axios-client/AxiosClient";
+import POST_API from "../../constants/PostApi";
+import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
 
 function MasterTaskManagementList({
   isUsedInAllTasksModule,
@@ -73,6 +77,15 @@ function MasterTaskManagementList({
   const [isCreateTaskMasterModalOpen, setIsCreateTaskMasterModalOpen] =
     useState<boolean>(searchParams.get("fromDashboard") === "true");
   // const [selectedRowData, setSelectedRowData] = useState<MasterTaskProps>()
+   const { loginStatus } = useLoggedInUserContext();
+
+const [summaryData, setSummaryData] =
+  useState<GeneralTaskMasterSummary>({
+    total_master_task_created: 0,
+    total_master_task_high_priority: 0,
+    total_master_task_recurring: 0,
+    total_master_task_active: 0,
+  });
 
   useEffect(() => {
     if (handleSearchOption.dateRangeId === customDateRangeId) {
@@ -83,6 +96,38 @@ function MasterTaskManagementList({
     handleSearchOption.dateRangeId,
     setIsCustomDateOptionSelected,
   ]);
+
+  const fetchSummaryGeneralTaskMaster = useCallback(async () => {
+  try {
+    const postData = {
+      company_id: loginStatus.companyId,
+      requestedby_id: loginStatus.id,
+    };
+
+    const response = await axiosClient.post(
+      POST_API.SUMMARY_GENERAL_TASK_MASTER,
+      postData,
+      {
+        withCredentials: true,
+      }
+    );
+
+    if (Array.isArray(response.data) && response.data.length > 0) {
+  setSummaryData(response.data[0]);
+}
+  } catch (error) {
+    console.log(error);
+  }
+}, [loginStatus.companyId, loginStatus.id]);
+
+
+useEffect(() => {
+  if (loginStatus.companyId && loginStatus.id) {
+    fetchSummaryGeneralTaskMaster();
+  }
+}, [fetchSummaryGeneralTaskMaster]);
+    
+
   if (userHasAccessToViewAllTasks) {
     const handleCreateTaskMasterModalClose = () => {
       setIsCreateTaskMasterModalOpen(false);
@@ -141,7 +186,7 @@ function MasterTaskManagementList({
           cards={[
             {
               title: "Master Tasks",
-              count: MasterTaskData?.length || 0,
+              count: summaryData.total_master_task_created,
               subtitle: "Total created tasks",
               icon: ClipboardList,
               iconBg: "bg-violet-100",
@@ -151,11 +196,8 @@ function MasterTaskManagementList({
 
             {
               title: "High Priority",
-              count:
-                MasterTaskData?.filter(
-                  (task) =>
-                    task.generalTaskPriorityName?.toLowerCase() === "high",
-                )?.length || 0,
+              
+               count: summaryData.total_master_task_high_priority,
               subtitle: "Critical tasks",
               icon: AlertCircle,
               iconBg: "bg-red-100",
@@ -165,12 +207,7 @@ function MasterTaskManagementList({
 
             {
               title: "Recurring",
-              count:
-                MasterTaskData?.filter(
-                  (task) =>
-                    task.frequencyName &&
-                    task.frequencyName.toLowerCase() !== "once",
-                )?.length || 0,
+              count: summaryData.total_master_task_recurring,
               subtitle: "Repeating schedules",
               icon: Repeat,
               iconBg: "bg-blue-100",
@@ -180,9 +217,7 @@ function MasterTaskManagementList({
 
             {
               title: "Active",
-              count:
-                MasterTaskData?.filter((task) => task.isActive === true)
-                  ?.length || 0,
+              count: summaryData.total_master_task_active,
               subtitle: "Currently active",
               icon: CheckCircle2,
               iconBg: "bg-emerald-100",
@@ -230,6 +265,7 @@ function MasterTaskManagementList({
                     }`}
                   >
                     <SearchInput
+                      placeholder="Search by subject or description "
                       value={handleSearchOption.searchParameter}
                       onChange={(e) => {
                         handleSearchOption.handleSearchParameterChange(
@@ -428,6 +464,7 @@ function MasterTaskManagementList({
             isOpen={isCreateTaskMasterModalOpen}
             handleClose={handleCreateTaskMasterModalClose}
             handleTaskMasterCreate={handleAddAllTask}
+            refreshSummary={fetchSummaryGeneralTaskMaster}
           ></CreateGeneralTaskMasterModal>
         </div>
 

@@ -16,6 +16,13 @@ type GetCompanyUsersListProps = {
      // eslint-disable-next-line @typescript-eslint/no-explicit-any
      onRowSelect? : (data : any ) =>void,
      isDataLoading : boolean
+       selectedStatus: "ALL" | "ACTIVE" | "INACTIVE";
+
+  setSelectedStatus: React.Dispatch<
+    React.SetStateAction<
+      "ALL" | "ACTIVE" | "INACTIVE"
+    >
+  >;
 }
 
 export default GetCompanyUsersListProps;
