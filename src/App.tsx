@@ -3,6 +3,7 @@
  * @import AuthLayout for AuthLayout component from components/views/auth/AuthLayout
  * @import SignInForm for SignInForm component from components/forms/SignInForm
  */
+
 import { RouterProvider } from "react-router-dom";
 import { router } from "./config/routes/Route";
 import { LoggedInUserContextProvider } from "./context/user/LoggedInUserContext";
