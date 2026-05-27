@@ -144,7 +144,7 @@ const LeadContact = ({
     ) {
       setErrors((prev) => ({
         ...prev,
-        mobileNumber: "Please enter a valid mobile number.",
+        mobileNumber: "Please enter a valid 10-digit mobile number without country code or spaces.",
       }));
     } else {
       setErrors((prev) => ({
@@ -920,7 +920,7 @@ const LeadContact = ({
                   type="text"
                   name="mobileNumber"
                   minLength={10}
-                  maxLength={10}
+                  // maxLength={10}
                   placeholder="Enter mobile number"
                   // className={inputClass}
                   onChange={handleFormInputChange}

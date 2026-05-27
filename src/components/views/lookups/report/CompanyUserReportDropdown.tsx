@@ -1,28 +1,36 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Select from "react-select";
-import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
+import { getCompanyUserReport } from "../../../../config/apis/ReportsApis";
 import { handleApiError } from "../../../../config/error/handleApiError";
-import { getQuotationType } from "../../../../config/apis/CompanyQuotationApis";
+import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
 
-export const QuotationTypeDropdown = ({
+export const CompanyUserReportDropdown = ({
   icon,
   label,
   value,
-  handleQuotationTypeSelection,
+  searchParams,
+  handleCompanyUserReportSelection,
   isDisabled = false,
   heightInPx = "34px",
   isClearButton = false,
+  selectFirstValue = false,
 }: {
   icon?: React.ReactNode;
   label?: string;
   value?: any;
-  handleQuotationTypeSelection: (data: any) => void;
+  searchParams: {
+    companyUserId: number;
+    reportTypeId?: number;
+    isActive: boolean;
+  };
+  handleCompanyUserReportSelection: (data: any) => void;
   isDisabled?: boolean;
   heightInPx?: string;
   isClearButton?: boolean;
+  selectFirstValue?: boolean;
 }) => {
   const { loginStatus } = useLoggedInUserContext();
 
@@ -42,46 +50,64 @@ export const QuotationTypeDropdown = ({
   /* ================= FETCH ONLY ONCE ================= */
   useEffect(() => {
     if (isDisabled || loginStatus.companyId === 0) return;
+    if(!searchParams.reportTypeId)return;
 
-    fetchQuotationType();
-  }, []);
+    fetchCompanyUserReport();
+  }, [searchParams.reportTypeId]);
 
-  const fetchQuotationType = async () => {
+  const fetchCompanyUserReport = async () => {
     if (loginStatus.companyId === 0) return;
     setLoading(true);
 
     const postData = {
       company_id: loginStatus.companyId,
-      id: null,
-      name: "",
-      isactive: true,
+      company_user_id: searchParams.companyUserId,
+      report_type_id: searchParams.reportTypeId,
+      isactive: searchParams.isActive,
       requestedby_id: loginStatus.id,
     };
 
     try {
-      const res = await getQuotationType(postData);
+      const res = await getCompanyUserReport(postData);
 
       const formatted = res.data
         .map((item: any) => ({
           value: item.id,
-          label: item.name || "Unnamed",
+          label: item.report_name || "Unnamed",
           data: item,
         }))
         .sort((a: any, b: any) => a.label.localeCompare(b.label));
 
-      // ✅ Add clear option at top
       const updatedOptions = isClearButton
         ? [CLEAR_OPTION, ...formatted]
         : formatted;
 
+   
+
       setAllOptions(updatedOptions);
       setFilteredOptions(updatedOptions);
+
+    
     } catch (error) {
       handleApiError(error);
     } finally {
       setLoading(false);
     }
   };
+
+ useEffect(() => {
+  if (!selectFirstValue) return;
+
+  if (filteredOptions.length === 0) return;
+
+  const selectedOption = isClearButton
+    ? filteredOptions[1]
+    : filteredOptions[0];
+
+  if (selectedOption) {
+    handleCompanyUserReportSelection(selectedOption.data);
+  }
+}, [filteredOptions, selectFirstValue]);
 
   /* ================= LOCAL FILTER ================= */
   useEffect(() => {
@@ -96,11 +122,6 @@ export const QuotationTypeDropdown = ({
       opt.label.toLowerCase().includes(search),
     );
 
-    // // ✅ Add clear option at top
-    // const updatedOptions = isClearButton
-    //   ? [CLEAR_OPTION, ...filtered]
-    //   : filtered;
-
     setFilteredOptions(filtered);
 
     const exactMatch = allOptions.find(
@@ -108,12 +129,12 @@ export const QuotationTypeDropdown = ({
     );
 
     if (exactMatch) {
-      handleQuotationTypeSelection(exactMatch.data);
+      handleCompanyUserReportSelection(exactMatch.data);
       return;
     }
 
     if (filtered.length > 0) {
-      handleQuotationTypeSelection(filtered[0].data);
+      handleCompanyUserReportSelection(filtered[0].data);
     }
   }, [inputValue, allOptions]);
   /* ================= SAME STYLE ================= */
@@ -131,7 +152,6 @@ export const QuotationTypeDropdown = ({
       },
       fontSize: "14px",
       marginTop: "0px",
-
     }),
 
     valueContainer: (base: any) => ({
@@ -161,7 +181,6 @@ export const QuotationTypeDropdown = ({
       ...base,
       fontSize: "13px",
       fontWeight: 500,
-
     }),
 
     menu: (base: any) => ({
@@ -207,7 +226,7 @@ export const QuotationTypeDropdown = ({
         options={filteredOptions}
         isLoading={loading}
         isDisabled={isDisabled}
-        filterOption={() => true} 
+        filterOption={() => true} // no internal filtering
         inputValue={inputValue}
         isClearable={isClearButton}
         onInputChange={(value, { action }) => {
@@ -227,17 +246,17 @@ export const QuotationTypeDropdown = ({
           value
             ? {
                 value: value.id,
-                label: value.name,
+                label: value.report_name,
                 data: value,
               }
             : null
         }
         onChange={(selected: any) => {
           if (selected) {
-            handleQuotationTypeSelection(selected.data);
+            handleCompanyUserReportSelection(selected.data);
             setInputValue("");
           } else {
-            handleQuotationTypeSelection(null);
+            handleCompanyUserReportSelection(null);
           }
         }}
         noOptionsMessage={() => {

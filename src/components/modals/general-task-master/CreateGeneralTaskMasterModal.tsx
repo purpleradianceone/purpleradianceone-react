@@ -17,7 +17,7 @@ import {
   User,
   X,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import CompanyUser from "../../../@types/company-users/CompanyUser";
 import ApiError from "../../../@types/error/ApiError";
@@ -94,10 +94,30 @@ function CreateGeneralTaskMasterModal({
         options.push(`${formattedHour}:${formattedMinute}`);
       }
     }
+
     return options;
   };
 
   const timeOptions = generateTimeOptions();
+
+  useEffect(() => {
+    const time = (() => {
+      const d = new Date();
+      d.setMinutes(Math.ceil(d.getMinutes() / 15) * 15, 0, 0);
+      return d.toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false,
+      });
+    })();
+    setFormData((prev) => {
+      return {
+        ...prev,
+        taskTime: time,
+      };
+    });
+    console.log(time);
+  }, [isOpen]);
   // Generic dropdown handler
   const handleDropdownChange = (field: string, value: number | undefined) => {
     setFormData((prev) => ({
@@ -190,9 +210,8 @@ function CreateGeneralTaskMasterModal({
     setFile(null);
   };
 
-  const createMyTask = async (event : React.FormEvent<HTMLFormElement>
-  ) => {
-    event.preventDefault()
+  const createMyTask = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
     if (!validateForm()) {
       toast.error("Please fix validation errors");
       return;
@@ -205,7 +224,8 @@ function CreateGeneralTaskMasterModal({
       general_task_type_id: formData.taskType,
       general_task_priority_id: formData.taskPriority,
       frequency_id: formData.frequency,
-      frequency_interval: formData.frequency === 1 ? 1 :formData.frequencyInterval,
+      frequency_interval:
+        formData.frequency === 1 ? 1 : formData.frequencyInterval,
       description: formData.description,
       assignedto:
         selectedCompanyUser.id === 0 ? loginStatus.id : selectedCompanyUser.id,
@@ -215,7 +235,6 @@ function CreateGeneralTaskMasterModal({
       task_time: formData.taskTime,
       createdby_id: loginStatus.id,
     };
-    console.log(postData);
 
     const formPayload = new FormData();
     formPayload.append(
@@ -272,362 +291,352 @@ function CreateGeneralTaskMasterModal({
           description="Create general task."
         />
         {/* <form className="space-y-0"> */}
-          <div>
-            {/* Form */}
-            <form className="space-y-4 mt-2" onSubmit={ createMyTask}>
-              <div className="grid grid-cols-4 gap-2">
-                <div>
-                  <FormInput
+        <div>
+          {/* Form */}
+          <form className="space-y-4 mt-2" onSubmit={createMyTask}>
+            <div className="grid grid-cols-4 gap-2">
+              <div>
+                <FormInput
                   autoFocus={true}
-                    label="Subject :"
-                    placeholder=" Enter Subject"
-                    logo={File}
-                    inputMode="text"
-                    name="subject"
-                    onChange={(e: any) =>
-                      handleInputChange("subject", e.target.value)
-                    }
-                    value={formData.subject}
-                    required
-                  />
-                  {errors.subject && (
-                    <span className="mt-1 ml-1 text-red-500 caption-custom-inactive">
-                      {errors.subject}
-                    </span>
-                  )}
-                </div>
-                {!isLoadingForTaskType ? (
-                  <div className="">
-                    <CustomDropdown
-                      logo={Layers}
-                      preselectedOption={formData.taskType}
-                      onSelect={(v) => handleDropdownChange("taskType", v)}
-                      requiredRedDot
-                      labelName="Task Type :"
-                      options={taskType!}
-                    />
-                    {errors.taskType && (
-                      <span className="mt-1 ml-1 text-red-500 caption-custom-inactive">
-                        {errors.taskType}
-                      </span>
-                    )}
-                  </div>
-                ) : (
-                  <div className="space-y-1 animate-pulse">
-                    {/* Label skeleton */}
-                    <div className="w-32 h-3 bg-slate-200 rounded"></div>
-
-                    {/* Dropdown skeleton */}
-                    <div className="w-full h-8 bg-slate-200 rounded-md"></div>
-                  </div>
+                  label="Subject :"
+                  placeholder=" Enter Subject"
+                  logo={File}
+                  inputMode="text"
+                  name="subject"
+                  onChange={(e: any) =>
+                    handleInputChange("subject", e.target.value)
+                  }
+                  value={formData.subject}
+                  required
+                />
+                {errors.subject && (
+                  <span className="mt-1 ml-1 text-red-500 caption-custom-inactive">
+                    {errors.subject}
+                  </span>
                 )}
-
-                {!isLoadingForaskPriority ? (
-                  <div className="">
-                    <CustomDropdown
-                      logo={Flag}
-                      requiredRedDot
-                      labelName="Priority :"
-                      options={taskPriority!}
-                      preselectedOption={formData.taskPriority}
-                      onSelect={(v) => handleDropdownChange("taskPriority", v)}
-                    />
-                    {errors.taskPriority && (
-                      <span className="mt-1 ml-1 text-red-500 caption-custom-inactive">
-                        {errors.taskPriority}
-                      </span>
-                    )}
-                  </div>
-                ) : (
-                  <div className="space-y-1 animate-pulse">
-                    {/* Label skeleton */}
-                    <div className="w-32 h-3 bg-slate-200 rounded"></div>
-
-                    {/* Dropdown skeleton */}
-                    <div className="w-full h-8 bg-slate-200 rounded-md"></div>
-                  </div>
-                )}
-                {!isLoadingForTaskFrequency ? (
-                  <div className="">
-                    <CustomDropdown
-                      logo={Repeat}
-                      preselectedOption={formData.frequency}
-                      requiredRedDot
-                      labelName="Task Frequency :"
-                      options={taskFrequency!}
-                      onSelect={(v) => handleDropdownChange("frequency", v)}
-                    />
-                    {errors.frequency && (
-                      <span className="mt-1 ml-1 text-red-500 caption-custom-inactive">
-                        {errors.frequency}
-                      </span>
-                    )}
-                  </div>
-                ) : (
-                  <div className="space-y-1 animate-pulse">
-                    {/* Label skeleton */}
-                    <div className="w-32 h-3 bg-slate-200 rounded"></div>
-
-                    {/* Dropdown skeleton */}
-                    <div className="w-full h-8 bg-slate-200 rounded-md"></div>
-                  </div>
-                )}
-                {!isLoadingForTaskFrequencyInterval ? (
-                  <div className="">
-                    <CustomDropdown
-                      logo={Timer}
-                      preselectedOption={
-                        formData.frequency === 1
-                          ? 1
-                          : formData.frequencyInterval
-                      }
-                      requiredRedDot
-                      labelName="Task Frequency Interval :"
-                      options={intervalList!}
-                      onSelect={(v) =>
-                        handleDropdownChange("frequencyInterval", v)
-                      }
-                      readOnly={formData.frequency === 1}
-                    />
-                    {errors.frequencyInterval && (
-                      <span className="mt-1 ml-1 text-red-500 caption-custom-inactive">
-                        {errors.frequencyInterval}
-                      </span>
-                    )}
-                  </div>
-                ) : (
-                  <div className="space-y-1 animate-pulse">
-                    {/* Label skeleton */}
-                    <div className="w-32 h-3 bg-slate-200 rounded"></div>
-
-                    {/* Dropdown skeleton */}
-                    <div className="w-full h-8 bg-slate-200 rounded-md"></div>
-                  </div>
-                )}
-                <div>
-                  <label className="block input-label-custom">
-                    <div className="flex gap-1 items-center">
-                      <CalendarDays size={13} className="text-blue-600" />
-                      <span>Start Date :</span>
-                      <span className="text-red-500">*</span>
-                    </div>
-                  </label>
-
-                  <input
-                    type="date"
-                    value={formData.startDate}
-                    onChange={(e) =>
-                      handleInputChange("startDate", e.target.value)
-                    }
-                    className="w-full pl-3 pr-2 py-1 border border-gray-300 focus:outline-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
-                  />
-
-                  {errors.startDate && (
-                    <span className="mt-1 ml-1 text-red-500 caption-custom-inactive">
-                      {errors.startDate}
-                    </span>
-                  )}
-                </div>
-                <div>
-                  <label className="block input-label-custom">
-                    <div className="flex gap-1 items-center">
-                      <CalendarCheck size={13} className="text-blue-600" />
-                      <span>End Date :</span>
-                      <span className="text-red-500">*</span>
-                    </div>
-                  </label>
-
-                  <input
-                    type="date"
-                    value={
-                      formData.frequency === 1
-                        ? formData.startDate
-                        : formData.endDate
-                    }
-                    disabled={formData.frequency === 1}
-                    min={formData.startDate} // 🔥 prevents selecting before start
-                    onChange={(e) =>
-                      handleInputChange("endDate", e.target.value)
-                    }
-                    className="w-full pl-3 pr-2 py-1 border border-gray-300 focus:outline-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
-                  />
-
-                  {errors.endDate && (
-                    <span className="mt-1 ml-1 text-red-500 caption-custom-inactive">
-                      {errors.endDate}
-                    </span>
-                  )}
-                </div>
-
-                <div className="col-span-1">
-                  <label
-                    htmlFor="taskTime"
-                    className="block input-label-custom"
-                  >
-                    <div className="flex gap-1 items-center">
-                      <Clock size={13} className="text-blue-600" />
-                      <span>Task Time :</span>
-                      <span className="text-red-500">*</span>
-                    </div>
-                  </label>
-
-                  <select
-                    id="taskTime"
-                    value={formData.taskTime}
-                    onChange={(e) =>
-                      handleInputChange("taskTime", e.target.value)
-                    }
-                    className="w-full pl-3 pr-10 py-1 border border-gray-300 focus:outline-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
-                  >
-                    <option value="">Select Task Time</option>
-                    {timeOptions.map((option) => (
-                      <option key={option} value={option}>
-                        {option}
-                      </option>
-                    ))}
-                  </select>
-
-                  {errors.taskTime && (
-                    <span className="mt-1 ml-1 text-red-500 caption-custom-inactive">
-                      {errors.taskTime}
-                    </span>
-                  )}
-                  <p className="caption-custom ">
-                    Note: Time is in 24-hour format (00:00 — 23:59). Please
-                    select accordingly.
-                  </p>
-                </div>
-                <div className="col-span-2">
-                  <TextAreaInput
-                    label="Description:"
-                    logo={FileText}
-                    name="description"
-                    placeholder="Enter description"
-                    value={formData.description}
-                    defaultValue={formData.description}
-                    onChange={(e: any) =>
-                      handleInputChange("description", e.target.value)
-                    }
-                    required={true}
-                    cols={0}
-                    rows={5}
-                    error={errors.description}
-                  />
-                </div>
+              </div>
+              {!isLoadingForTaskType ? (
                 <div className="">
-                  <label className="input-label-custom flex gap-1 items-center">
-                    <Paperclip size={13} className="text-blue-500" />
-                    Attachment :
+                  <CustomDropdown
+                    logo={Layers}
+                    preselectedOption={formData.taskType}
+                    onSelect={(v) => handleDropdownChange("taskType", v)}
+                    requiredRedDot
+                    labelName="Task Type :"
+                    options={taskType!}
+                  />
+                  {errors.taskType && (
+                    <span className="mt-1 ml-1 text-red-500 caption-custom-inactive">
+                      {errors.taskType}
+                    </span>
+                  )}
+                </div>
+              ) : (
+                <div className="space-y-1 animate-pulse">
+                  {/* Label skeleton */}
+                  <div className="w-32 h-3 bg-slate-200 rounded"></div>
+
+                  {/* Dropdown skeleton */}
+                  <div className="w-full h-8 bg-slate-200 rounded-md"></div>
+                </div>
+              )}
+
+              {!isLoadingForaskPriority ? (
+                <div className="">
+                  <CustomDropdown
+                    logo={Flag}
+                    requiredRedDot
+                    labelName="Priority :"
+                    options={taskPriority!}
+                    preselectedOption={formData.taskPriority}
+                    onSelect={(v) => handleDropdownChange("taskPriority", v)}
+                  />
+                  {errors.taskPriority && (
+                    <span className="mt-1 ml-1 text-red-500 caption-custom-inactive">
+                      {errors.taskPriority}
+                    </span>
+                  )}
+                </div>
+              ) : (
+                <div className="space-y-1 animate-pulse">
+                  {/* Label skeleton */}
+                  <div className="w-32 h-3 bg-slate-200 rounded"></div>
+
+                  {/* Dropdown skeleton */}
+                  <div className="w-full h-8 bg-slate-200 rounded-md"></div>
+                </div>
+              )}
+              {!isLoadingForTaskFrequency ? (
+                <div className="">
+                  <CustomDropdown
+                    logo={Repeat}
+                    preselectedOption={formData.frequency}
+                    requiredRedDot
+                    labelName="Task Frequency :"
+                    options={taskFrequency!}
+                    onSelect={(v) => handleDropdownChange("frequency", v)}
+                  />
+                  {errors.frequency && (
+                    <span className="mt-1 ml-1 text-red-500 caption-custom-inactive">
+                      {errors.frequency}
+                    </span>
+                  )}
+                </div>
+              ) : (
+                <div className="space-y-1 animate-pulse">
+                  {/* Label skeleton */}
+                  <div className="w-32 h-3 bg-slate-200 rounded"></div>
+
+                  {/* Dropdown skeleton */}
+                  <div className="w-full h-8 bg-slate-200 rounded-md"></div>
+                </div>
+              )}
+              {!isLoadingForTaskFrequencyInterval ? (
+                <div className="">
+                  <CustomDropdown
+                    logo={Timer}
+                    preselectedOption={
+                      formData.frequency === 1 ? 1 : formData.frequencyInterval
+                    }
+                    requiredRedDot
+                    labelName="Task Frequency Interval :"
+                    options={intervalList!}
+                    onSelect={(v) =>
+                      handleDropdownChange("frequencyInterval", v)
+                    }
+                    readOnly={formData.frequency === 1}
+                  />
+                  {errors.frequencyInterval && (
+                    <span className="mt-1 ml-1 text-red-500 caption-custom-inactive">
+                      {errors.frequencyInterval}
+                    </span>
+                  )}
+                </div>
+              ) : (
+                <div className="space-y-1 animate-pulse">
+                  {/* Label skeleton */}
+                  <div className="w-32 h-3 bg-slate-200 rounded"></div>
+
+                  {/* Dropdown skeleton */}
+                  <div className="w-full h-8 bg-slate-200 rounded-md"></div>
+                </div>
+              )}
+              <div>
+                <label className="block input-label-custom">
+                  <div className="flex gap-1 items-center">
+                    <CalendarDays size={13} className="text-blue-600" />
+                    <span>Start Date :</span>
+                    <span className="text-red-500">*</span>
+                  </div>
+                </label>
+
+                <input
+                  type="date"
+                  value={formData.startDate}
+                  onChange={(e) =>
+                    handleInputChange("startDate", e.target.value)
+                  }
+                  className="w-full pl-3 pr-2 py-1 border border-gray-300 focus:outline-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+                />
+
+                {errors.startDate && (
+                  <span className="mt-1 ml-1 text-red-500 caption-custom-inactive">
+                    {errors.startDate}
+                  </span>
+                )}
+              </div>
+              <div>
+                <label className="block input-label-custom">
+                  <div className="flex gap-1 items-center">
+                    <CalendarCheck size={13} className="text-blue-600" />
+                    <span>End Date :</span>
+                    <span className="text-red-500">*</span>
+                  </div>
+                </label>
+
+                <input
+                  type="date"
+                  value={
+                    formData.frequency === 1
+                      ? formData.startDate
+                      : formData.endDate
+                  }
+                  disabled={formData.frequency === 1}
+                  min={formData.startDate} // 🔥 prevents selecting before start
+                  onChange={(e) => handleInputChange("endDate", e.target.value)}
+                  className="w-full pl-3 pr-2 py-1 border border-gray-300 focus:outline-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+                />
+
+                {errors.endDate && (
+                  <span className="mt-1 ml-1 text-red-500 caption-custom-inactive">
+                    {errors.endDate}
+                  </span>
+                )}
+              </div>
+
+              <div className="col-span-1">
+                <label htmlFor="taskTime" className="block input-label-custom">
+                  <div className="flex gap-1 items-center">
+                    <Clock size={13} className="text-blue-600" />
+                    <span>Task Time :</span>
+                    <span className="text-red-500">*</span>
+                  </div>
+                </label>
+
+                <select
+                  id="taskTime"
+                  value={formData.taskTime}
+                  onChange={(e) => {
+                    if (e) handleInputChange("taskTime", e.target.value);
+                  }}
+                  className="w-full pl-3 pr-10 py-1 border border-gray-300 focus:outline-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+                >
+                  <option value="">Select Task Time</option>
+                  {timeOptions.map((option) => (
+                    <option key={option} value={option}>
+                      {option}
+                    </option>
+                  ))}
+                </select>
+
+                {errors.taskTime && (
+                  <span className="mt-1 ml-1 text-red-500 caption-custom-inactive">
+                    {errors.taskTime}
+                  </span>
+                )}
+                <p className="caption-custom ">
+                  Note: Time is in 24-hour format (00:00 — 23:59). Please select
+                  accordingly.
+                </p>
+              </div>
+              <div className="col-span-2">
+                <TextAreaInput
+                  label="Description:"
+                  logo={FileText}
+                  name="description"
+                  placeholder="Enter description"
+                  value={formData.description}
+                  defaultValue={formData.description}
+                  onChange={(e: any) =>
+                    handleInputChange("description", e.target.value)
+                  }
+                  required={true}
+                  cols={0}
+                  rows={5}
+                  error={errors.description}
+                />
+              </div>
+              <div className="">
+                <label className="input-label-custom flex gap-1 items-center">
+                  <Paperclip size={13} className="text-blue-500" />
+                  Attachment :
+                </label>
+
+                <div className="border-2 border-dashed rounded-md p-3">
+                  <input
+                    type="file"
+                    onChange={handleFileChange}
+                    className="hidden"
+                    id="fileUpload"
+                  />
+
+                  <label
+                    htmlFor="fileUpload"
+                    className="flex gap-2 items-center text-sm cursor-pointer text-blue-600"
+                  >
+                    <Upload size={16} />
+                    Upload File
                   </label>
 
-                  <div className="border-2 border-dashed rounded-md p-3">
-                    <input
-                      type="file"
-                      onChange={handleFileChange}
-                      className="hidden"
-                      id="fileUpload"
-                    />
+                  {/* Selected File */}
 
-                    <label
-                      htmlFor="fileUpload"
-                      className="flex gap-2 items-center text-sm cursor-pointer text-blue-600"
-                    >
-                      <Upload size={16} />
-                      Upload File
-                    </label>
+                  {file && (
+                    <div className="flex justify-between mt-2 bg-gray-100 rounded px-2 py-1">
+                      <span className="caption-custom">{file.name}</span>
 
-                    {/* Selected File */}
+                      <button type="button" onClick={removeFile}>
+                        <X size={14} />
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
 
-                    {file && (
-                      <div className="flex justify-between mt-2 bg-gray-100 rounded px-2 py-1">
-                        <span className="caption-custom">{file.name}</span>
+            <div className="grid grid-cols-1">
+              <div className="grid grid-cols-3">
+                <CompanyUserSearchFieldInput
+                  label="Assign To:"
+                  required
+                  // placeholder={loginStatus.fullName}
+                  defaultValue={
+                    selectedCompanyUser.fullname === ""
+                      ? loginStatus.fullName
+                      : selectedCompanyUser.fullname
+                  }
+                  logo={User}
+                  onUserSelected={(user) => {
+                    if (user && user.id !== 0) {
+                      setSelectedCompanyUser(user);
+                    }
+                    if (user === null || user === undefined) {
+                      setSelectedCompanyUser({
+                        company_id: 0,
+                        id: 0,
+                        fullname: "",
+                        email: "",
+                        mobilenumber: "",
+                        createdby: "",
+                        isactive: false,
+                        requestedby: "",
+                        generate_password: "",
+                      });
+                    }
+                  }}
+                  // isDisabled={!userHasAccessToViewUser}
+                  disabledMessage={
+                    MESSAGE.MODULE_ACCESS.COMPANY_USER.DENIED_VIEW_ACCESS
+                  }
+                />
+              </div>
+              <span className="caption-custom">
+                <span className="">Note :</span> If a task assign to is not
+                selected or is removed, then task will assigned to
+                <span className="table-header-custom active"> creator</span> by
+                default.
+              </span>
+            </div>
 
-                        <button type="button" onClick={removeFile}>
-                          <X size={14} />
-                        </button>
-                      </div>
-                    )}
+            <div className="flex justify-end ">
+              <div className="flex gap-2">
+                <Button
+                  onClick={() => {
+                    resetForm();
+                    handleClose();
+                  }}
+                  type="button"
+                >
+                  <div className="flex items-center gap-0.5">
+                    <X size={16} />
+                    <span>Cancel</span>
                   </div>
-                </div>
+                </Button>
+                <Button
+                  type="submit"
+                  // onClick={(e) => {
+                  //   e.preventDefault();
+                  //  ();
+                  // }}
+                >
+                  <div className="flex items-center gap-1">
+                    <Save size={16} />
+                    <span>Save</span>
+                  </div>
+                </Button>
               </div>
-
-              <div className="grid grid-cols-1">
-                <div className="grid grid-cols-3">
-                  <CompanyUserSearchFieldInput
-                    label="Assign To:"
-                    required
-                    // placeholder={loginStatus.fullName}
-                    defaultValue={
-                      selectedCompanyUser.fullname === ""
-                        ? loginStatus.fullName
-                        : selectedCompanyUser.fullname
-                    }
-                    logo={User}
-                    onUserSelected={(user) => {
-                      if (user && user.id !== 0) {
-                        setSelectedCompanyUser(user);
-                      }
-                      if (user === null || user === undefined) {
-                        setSelectedCompanyUser({
-                          company_id: 0,
-                          id: 0,
-                          fullname: "",
-                          email: "",
-                          mobilenumber: "",
-                          createdby: "",
-                          isactive: false,
-                          requestedby: "",
-                          generate_password: "",
-                        });
-                      }
-                    }}
-                    // isDisabled={!userHasAccessToViewUser}
-                    disabledMessage={
-                      MESSAGE.MODULE_ACCESS.COMPANY_USER.DENIED_VIEW_ACCESS
-                    }
-                  />
-                </div>
-                <span className="caption-custom">
-                  <span className="">Note :</span> If a task assign to is not
-                  selected or is removed, then task will assigned to
-                  <span className="table-header-custom active">
-                    {" "}
-                    creator
-                  </span>{" "}
-                  by default.
-                </span>
-              </div>
-
-              <div className="flex justify-end ">
-                <div className="flex gap-2">
-                  <Button
-                    onClick={() => {
-                      resetForm();
-                      handleClose();
-                    }}
-                    type="button"
-                  >
-                    <div className="flex items-center gap-0.5">
-                      <X size={16} />
-                      <span>Cancel</span>
-                    </div>
-                  </Button>
-                  <Button
-                    type="submit"
-                    // onClick={(e) => {
-                    //   e.preventDefault();
-                    //  ();
-                    // }}
-                  >
-                    <div className="flex items-center gap-1">
-                      <Save size={16} />
-                      <span>Save</span>
-                    </div>
-                  </Button>
-                </div>
-              </div>
-            </form>
-          </div>
+            </div>
+          </form>
+        </div>
         {/* </form> */}
       </div>
     </FormLayout>
