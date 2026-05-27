@@ -288,6 +288,7 @@ export const LookupCompanyProductDropdown = ({
           SingleValue: CustomSingleValue,
         }}
         inputValue={inputValue}
+        isClearable={isClearButton}
         onInputChange={(value, { action }) => {
           if (action === "input-change") {
             setInputValue(value);

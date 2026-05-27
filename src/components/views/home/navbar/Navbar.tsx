@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect, useState, useRef } from "react";
+import axios from "axios";
 import {
   Aperture,
   Bell,
-  Building2,
   Calendar,
   CreditCard,
+  FileBarChart,
   Handshake,
   Headset,
   Home,
@@ -15,6 +15,7 @@ import {
   LogOut,
   LucideFileArchive,
   LucideSettings,
+  LucideUserPlus2,
   Menu,
   MessageCircle,
   Network,
@@ -24,39 +25,39 @@ import {
   Store,
   User2,
   UserCogIcon,
-  X,
+  X
 } from "lucide-react";
-import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
-import SideNavBar from "./SideNavBar";
-import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
-import ROUTES_URL from "../../../../constants/Routes";
-import useScreenSize from "../../../../config/hooks/useScreenSize";
-import { IMAGE_SOURCE } from "../../../../constants/ImageSource";
-import Button from "../../../ui/Button";
-import { useUserAccessModules } from "../../../../config/hooks/useAccessModules";
-import AccessDeniedPopup from "../../not-found/AccessDeniedPage";
-import { SIZE, STATUS_CODE } from "../../../../constants/AppConstants";
-import NavItem from "./Component/NavItem";
-import { usePanel } from "../../../../context/panel/usePanel";
-import NotificationPopup from "../../notification/NotificationManagement";
-import { useNotificationCountContext } from "../../../../context/notification/NotificationCountContext";
-import axios from "axios";
-import POST_API from "../../../../constants/PostApi";
+import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
-import ApiError from "../../../../@types/error/ApiError";
-import RefreshToken from "../../../../config/validations/RefreshToken";
-import { alphabets, backgroundColors } from "../../../../constants/Colors";
-import MESSAGE from "../../../../constants/Messages";
-import AppTutorailManager from "../../tutorails/AppTutorailManager";
-import { NavbarSteps } from "../../../../constants/AppTutorailsSteps";
-import { useTutorailDataContext } from "../../../../context/tutorail/useTutorailDataContext";
-import { TutorailColumnName } from "../../../../constants/Tutorail";
-import { cancelAllRequests } from "../../../../axios-client/AxiosClient";
-import { LocalStorageKeys } from "../../../../enums/LocalStorageKeys";
-import { AppVersionViewCard } from "../../card/AppVersionViewCard";
-import { useUserPreference } from "../../../../context/user/UserPreference";
-import QuotationIconSvg from "../../../quotation-builder/svg/QuotationIconSvg";
 import { FaRegFileAlt, FaRegFileArchive } from "react-icons/fa";
+import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
+import ApiError from "../../../../@types/error/ApiError";
+import { cancelAllRequests } from "../../../../axios-client/AxiosClient";
+import { useUserAccessModules } from "../../../../config/hooks/useAccessModules";
+import useScreenSize from "../../../../config/hooks/useScreenSize";
+import RefreshToken from "../../../../config/validations/RefreshToken";
+import { SIZE, STATUS_CODE } from "../../../../constants/AppConstants";
+import { NavbarSteps } from "../../../../constants/AppTutorailsSteps";
+import { alphabets, backgroundColors } from "../../../../constants/Colors";
+import { IMAGE_SOURCE } from "../../../../constants/ImageSource";
+import MESSAGE from "../../../../constants/Messages";
+import POST_API from "../../../../constants/PostApi";
+import ROUTES_URL from "../../../../constants/Routes";
+import { TutorailColumnName } from "../../../../constants/Tutorail";
+import { useNotificationCountContext } from "../../../../context/notification/NotificationCountContext";
+import { usePanel } from "../../../../context/panel/usePanel";
+import { useTutorailDataContext } from "../../../../context/tutorail/useTutorailDataContext";
+import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
+import { useUserPreference } from "../../../../context/user/UserPreference";
+import { LocalStorageKeys } from "../../../../enums/LocalStorageKeys";
+import QuotationIconSvg from "../../../quotation-builder/svg/QuotationIconSvg";
+import Button from "../../../ui/Button";
+import { AppVersionViewCard } from "../../card/AppVersionViewCard";
+import AccessDeniedPopup from "../../not-found/AccessDeniedPage";
+import NotificationPopup from "../../notification/NotificationManagement";
+import AppTutorailManager from "../../tutorails/AppTutorailManager";
+import NavItem from "./Component/NavItem";
+import SideNavBar from "./SideNavBar";
 
 function Navbar({ children }: { children: React.ReactNode }) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -81,6 +82,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
     userHasAccessToAddAccountProformaInvoice,
     userHasAccessToViewCompanyQuotation,
     userHasAccessToViewCompanyProductSale,
+    userHasAccessToViewCompanyUserReportType,
   } = useUserAccessModules();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [accessDeniedPopUpView, setAccessDeniedPopUpView] =
@@ -625,8 +627,14 @@ function Navbar({ children }: { children: React.ReactNode }) {
                         <NavItem
                           disable={!userHasAccessToViewUser}
                           to={ROUTES_URL.GET_COMPANY_USERS}
-                          icon={<Building2 size={SIZE.TWENTY} />}
+                          icon={<LucideUserPlus2 size={SIZE.TWENTY} />}
                           label="Manage Users"
+                        />
+                        <NavItem
+                          disable={!userHasAccessToViewCompanyUserReportType}
+                          to={ROUTES_URL.REPORT_MANAGEMENT}
+                          icon={<FileBarChart size={SIZE.TWENTY} />}
+                          label="Report"
                         />
                         <NavItem
                           disable={!userHasAccessToViewTasks}
@@ -794,7 +802,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
                           />
                           <NavItem
                             to={ROUTES_URL.GET_COMPANY_USERS}
-                            icon={<Building2 size={SIZE.TWENTY} />}
+                            icon={<LucideUserPlus2 size={SIZE.TWENTY} />}
                             label=""
                             onClick={() => setIsDropdownOpen(false)}
                           />

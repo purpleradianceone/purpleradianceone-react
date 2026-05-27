@@ -16,6 +16,8 @@ export enum LocalStorageKeys {
   ACCOUNT_PROFORMA_INVOICE_MANAGEMENT_FILTERS = "account_proforma_invoice_management_filters",
   COMPANY_QUOTATION_MANAGEMENT_FILTERS = "company_quotation_management_filters",
   COMPANY_PRODUCT_SALE_MANAGEMENT_FILTERS = "company_product_sale_management_filters",
+  REPORT_SNAPSHOT_MANAGEMENT_FILTERS = "report_snapshot_management_filters",
+
 
 }
 

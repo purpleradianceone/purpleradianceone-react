@@ -135,5 +135,9 @@ const ROUTES_URL = {
   //Product Sale
   COMPANY_PRODUCT_SALE_MANAGEMENT: "/home/manage-company-product-sale/product-sale",
 
+  //Report
+  REPORT_MANAGEMENT: "/home/manage-report/company-user-report",
+
+
 };
 export default ROUTES_URL;

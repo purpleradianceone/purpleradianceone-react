@@ -106,6 +106,7 @@ import Features from "../../components/views/home/landing-page/Features";
 import ProformaInvoiceDetails from "../../components/views/proforma-invoice/ProformaInvoiceDetails";
 import CompanyProductSaleManagement from "../../components/views/company-product-sale-management/CompanyProductSaleManagement";
 import AccountProformaInvoice from "../../components/modals/Account/account-proforma-invoice/AccountProformaInvoice";
+import ReportSnapshotManagement from "../../components/views/reports/ReportSnapshotManagement";
 
 export const router = createBrowserRouter([
   {
@@ -1402,5 +1403,20 @@ export const router = createBrowserRouter([
   //     </MobileRedirectWrapper>
   //   ),
   // },
+  {
+    path: ROUTES_URL.REPORT_MANAGEMENT,
+    element: (
+      <MobileRedirectWrapper>
+        <PrivateRoute>
+          <div>
+            <Navbar>
+              <ReportSnapshotManagement
+              />
+            </Navbar>
+          </div>
+        </PrivateRoute>
+      </MobileRedirectWrapper>
+    ),
+  },
 ]);
 export default router;

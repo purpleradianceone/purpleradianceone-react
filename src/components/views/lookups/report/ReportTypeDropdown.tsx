@@ -1,17 +1,17 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Select from "react-select";
-import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
+import { getReportType } from "../../../../config/apis/ReportsApis";
 import { handleApiError } from "../../../../config/error/handleApiError";
-import { getQuotationType } from "../../../../config/apis/CompanyQuotationApis";
+import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
 
-export const QuotationTypeDropdown = ({
+export const ReportTypeDropdown = ({
   icon,
   label,
   value,
-  handleQuotationTypeSelection,
+  handleReportTypeSelection,
   isDisabled = false,
   heightInPx = "34px",
   isClearButton = false,
@@ -19,7 +19,7 @@ export const QuotationTypeDropdown = ({
   icon?: React.ReactNode;
   label?: string;
   value?: any;
-  handleQuotationTypeSelection: (data: any) => void;
+  handleReportTypeSelection: (data: any) => void;
   isDisabled?: boolean;
   heightInPx?: string;
   isClearButton?: boolean;
@@ -39,27 +39,22 @@ export const QuotationTypeDropdown = ({
     data: null,
   };
 
-  /* ================= FETCH ONLY ONCE ================= */
-  useEffect(() => {
-    if (isDisabled || loginStatus.companyId === 0) return;
 
-    fetchQuotationType();
-  }, []);
 
-  const fetchQuotationType = async () => {
+  const fetchReportType = async () => {
     if (loginStatus.companyId === 0) return;
     setLoading(true);
 
     const postData = {
       company_id: loginStatus.companyId,
       id: null,
-      name: "",
+      name: null,
       isactive: true,
       requestedby_id: loginStatus.id,
     };
 
     try {
-      const res = await getQuotationType(postData);
+      const res = await getReportType(postData);
 
       const formatted = res.data
         .map((item: any) => ({
@@ -69,7 +64,6 @@ export const QuotationTypeDropdown = ({
         }))
         .sort((a: any, b: any) => a.label.localeCompare(b.label));
 
-      // ✅ Add clear option at top
       const updatedOptions = isClearButton
         ? [CLEAR_OPTION, ...formatted]
         : formatted;
@@ -82,6 +76,12 @@ export const QuotationTypeDropdown = ({
       setLoading(false);
     }
   };
+
+    /* ================= FETCH ONLY ONCE ================= */
+  useEffect(() => {
+    if (isDisabled || loginStatus.companyId === 0) return;
+        fetchReportType();
+  }, []);
 
   /* ================= LOCAL FILTER ================= */
   useEffect(() => {
@@ -96,10 +96,6 @@ export const QuotationTypeDropdown = ({
       opt.label.toLowerCase().includes(search),
     );
 
-    // // ✅ Add clear option at top
-    // const updatedOptions = isClearButton
-    //   ? [CLEAR_OPTION, ...filtered]
-    //   : filtered;
 
     setFilteredOptions(filtered);
 
@@ -108,12 +104,12 @@ export const QuotationTypeDropdown = ({
     );
 
     if (exactMatch) {
-      handleQuotationTypeSelection(exactMatch.data);
+      handleReportTypeSelection(exactMatch.data);
       return;
     }
 
     if (filtered.length > 0) {
-      handleQuotationTypeSelection(filtered[0].data);
+      handleReportTypeSelection(filtered[0].data);
     }
   }, [inputValue, allOptions]);
   /* ================= SAME STYLE ================= */
@@ -207,7 +203,7 @@ export const QuotationTypeDropdown = ({
         options={filteredOptions}
         isLoading={loading}
         isDisabled={isDisabled}
-        filterOption={() => true} 
+        filterOption={() => true} // no internal filtering
         inputValue={inputValue}
         isClearable={isClearButton}
         onInputChange={(value, { action }) => {
@@ -234,10 +230,10 @@ export const QuotationTypeDropdown = ({
         }
         onChange={(selected: any) => {
           if (selected) {
-            handleQuotationTypeSelection(selected.data);
+            handleReportTypeSelection(selected.data);
             setInputValue("");
           } else {
-            handleQuotationTypeSelection(null);
+            handleReportTypeSelection(null);
           }
         }}
         noOptionsMessage={() => {
