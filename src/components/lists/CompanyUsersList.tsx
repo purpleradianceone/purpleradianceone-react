@@ -8,7 +8,7 @@ import {
   Search,
 } from "lucide-react";
 import Button from "../ui/Button";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import EditCompanyUserModal from "../modals/company-user/EditCompanyUserModal";
 import DateRangePicker from "../ui/DateRangePicker";
 import AddCompanyUserModal from "../modals/company-user/AddCompanyUserModal";
@@ -39,7 +39,11 @@ import { customDateRangeId } from "../../config/hooks/usePaginationHandler";
 
 import CustomDropdown from "../modals/leads/CustomDropdown";
 import SummaryCards from "../ui/SummaryCards";
+
+import CompanyUserSummary from "../../@types/company-users/CompanyUserSummary";
+
 import CompanyUserReportModal from "../modals/company-user/CompanyUserReportModal";
+
 
 function GetCompanyUsersList({
   users,
@@ -47,11 +51,12 @@ function GetCompanyUsersList({
   handleSearchOption,
   onStartDateChange,
   onEndDateChange,
-  handleCompanyUserChangeOnEdit,
   onRefreshUsers,
   isUsedInAccountProductForAssingingInstalledBy,
   onRowSelect,
   isDataLoading,
+   selectedStatus,
+  setSelectedStatus,
 }: GetCompanyUsersListProps) {
   const { userPreference } = useUserPreference();
   const [isAccessModalOpen, setIsAccessModalOpen] = useState<boolean>(false);
@@ -259,27 +264,50 @@ function GetCompanyUsersList({
     setIsCustomDateOptionSelected,
   ]);
 
+  
+  const [companyUserSummary, setCompanyUserSummary] =
+  useState<CompanyUserSummary>({
+    total_company_users: 0,
+    total_active_users: 0,
+    total_inactive_users: 0,
+    total_users_created_this_month: 0,
+  });
+
+
+  const fetchCompanyUserSummary = useCallback(async () => {
+  try {
+    const postData = {
+      company_id: loginStatus.companyId,
+      requestedby: loginStatus.id,
+    };
+    const response = await axios.post(
+      POST_API.SUMMARY_COMPANY_USER,
+      postData,
+      {
+        withCredentials: true,
+      },
+    );
+
+    if (response.data?.length > 0) {
+      setCompanyUserSummary(response.data[0]);
+    }
+  } catch (error) {
+    console.error(error);
+  }
+}, [loginStatus.companyId, loginStatus.id]);
+
+const refreshAllData = async () => {
+  await onRefreshUsers();
+  await fetchCompanyUserSummary();
+};
+
+useEffect(() => {
+  if (loginStatus.companyId && loginStatus.id) {
+    fetchCompanyUserSummary();
+  }
+}, [fetchCompanyUserSummary]);
   //all card data
-  const totalUsers = users?.length || 0;
-
-  const activeUsers =
-    users?.filter((user) => user.isactive === true).length || 0;
-
-  const inactiveUsers =
-    users?.filter((user) => user.isactive === false).length || 0;
-
-  const currentMonthUsers =
-    users?.filter((user) => {
-      if (!user.createdon) return false;
-
-      const createdDate = new Date(user.createdon);
-      const today = new Date();
-
-      return (
-        createdDate.getMonth() === today.getMonth() &&
-        createdDate.getFullYear() === today.getFullYear()
-      );
-    }).length || 0;
+ 
 
   //Reset
   const handleResetFilters = () => {
@@ -298,21 +326,19 @@ function GetCompanyUsersList({
 
   //STATUS FILTER
 
-  const [selectedStatus, setSelectedStatus] = useState<
-    "ALL" | "ACTIVE" | "INACTIVE"
-  >("ALL");
 
   const filteredUsers = users?.filter((user) => {
-    if (selectedStatus === "ACTIVE") {
-      return user.isactive;
-    }
+  switch (selectedStatus) {
+    case "ACTIVE":
+      return user.isactive === true;
 
-    if (selectedStatus === "INACTIVE") {
-      return !user.isactive;
-    }
+    case "INACTIVE":
+      return user.isactive === false;
 
-    return true;
-  });
+    default:
+      return true;
+  }
+});
 
   const statusOptions = [
     {
@@ -367,47 +393,47 @@ function GetCompanyUsersList({
 
         {/* Status Cards */}
         <SummaryCards
-          cardGap={0.5}
-          width="70"
-          cards={[
-            {
-              title: "Total Users",
-              count: totalUsers,
-              subtitle: "Organization users",
-              icon: Users,
-              iconBg: "bg-violet-100",
-              iconColor: "text-violet-600",
-            },
+  cardGap={0.5}
+  width="70"
+  cards={[
+    {
+      title: "Total Users",
+      count: companyUserSummary.total_company_users,
+      subtitle: "Organization users",
+      icon: Users,
+      iconBg: "bg-violet-100",
+      iconColor: "text-violet-600",
+    },
 
-            {
-              title: "Active Users",
-              count: activeUsers,
-              subtitle: "Currently active",
-              icon: UserCheck,
-              iconBg: "bg-green-100",
-              iconColor: "text-green-600",
-            },
+    {
+      title: "Active Users",
+      count: companyUserSummary.total_active_users,
+      subtitle: "Currently active",
+      icon: UserCheck,
+      iconBg: "bg-green-100",
+      iconColor: "text-green-600",
+    },
 
-            {
-              title: "Inactive Users",
-              count: inactiveUsers,
-              subtitle: "Awaiting activation",
-              icon: Clock3,
-              iconBg: "bg-orange-100",
-              iconColor: "text-orange-500",
-            },
+    {
+      title: "Inactive Users",
+      count: companyUserSummary.total_inactive_users,
+      subtitle: "Awaiting activation",
+      icon: Clock3,
+      iconBg: "bg-orange-100",
+      iconColor: "text-orange-500",
+    },
 
-            {
-              title: "New This Month",
-              count: `+${currentMonthUsers}`,
-              subtitle: "Recently added users",
-              icon: UserPlus,
-              iconBg: "bg-white/20 backdrop-blur-sm",
-              iconColor: "text-white",
-              isGradient: true,
-            },
-          ]}
-        />
+    {
+      title: "New This Month",
+      count: `+${companyUserSummary.total_users_created_this_month}`,
+      subtitle: "Recently added users",
+      icon: UserPlus,
+      iconBg: "bg-white/20 backdrop-blur-sm",
+      iconColor: "text-white",
+      isGradient: true,
+    },
+  ]}
+/>
 
         {/* SEARCH + FILTER BAR */}
         <div
@@ -624,7 +650,7 @@ function GetCompanyUsersList({
                 <AddCompanyUserModal
                   isOpen={isAddCompanyUserModalOpen}
                   onClose={() => setIsAddCompanyUserModalOpen(false)}
-                  onUserAdded={onRefreshUsers}
+                   onUserAdded={refreshAllData}
                 />
               </>
             )}
@@ -664,7 +690,7 @@ function GetCompanyUsersList({
           users={selectedCompanyUser}
         />
         <EditCompanyUserModal
-          handleCompanyUserChange={handleCompanyUserChangeOnEdit}
+           handleCompanyUserChange={refreshAllData}
           isOpen={isEditCompanyUserModalOpen}
           onClose={() => {
             setIsEditModalOpen(false);

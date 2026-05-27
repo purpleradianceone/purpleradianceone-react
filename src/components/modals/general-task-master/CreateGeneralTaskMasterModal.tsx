@@ -43,10 +43,12 @@ function CreateGeneralTaskMasterModal({
   isOpen,
   handleClose,
   handleTaskMasterCreate,
+  refreshSummary,
 }: {
   isOpen: boolean;
   handleClose: () => void;
   handleTaskMasterCreate: () => void;
+  refreshSummary: () => void;
 }) {
   const { loginStatus } = useLoggedInUserContext();
   const { taskPriority, isLoading: isLoadingForaskPriority } =
@@ -257,6 +259,7 @@ function CreateGeneralTaskMasterModal({
         if (response.data.status) {
           toast.success(response.data.message);
           handleTaskMasterCreate();
+          refreshSummary();
           setIsSubmitting(false);
           resetForm();
           handleClose();
