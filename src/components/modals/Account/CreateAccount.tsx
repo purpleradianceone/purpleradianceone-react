@@ -214,7 +214,7 @@ const CreateAccount: React.FC<CreateAccountType> = ({
       ) {
         setErrors((prev) => ({
           ...prev,
-          mobileNumber: "Please enter a valid Mobile Number.",
+          mobileNumber: "Please enter a valid 10-digit mobile number without country code or spaces.",
         }));
       } else {
         setErrors((prev) => ({ ...prev, mobileNumber: "" }));
@@ -316,8 +316,8 @@ const CreateAccount: React.FC<CreateAccountType> = ({
       !MOBILE_NUMBER_VALIDATION.MOBILE_NUMBER_PATTERN_INDIAN.test(mobilenumber)
     ) {
       newErrors.mobileNumber =
-        "Please enter a valid 10-digit Indian mobile number.";
-      toast.error("Please enter a valid 10-digit Indian mobile number.");
+        "Please enter a valid 10-digit mobile number without country code or spaces.";
+      toast.error("Please enter a valid 10-digit mobile number without country code or spaces.");
       isValid = false;
     }
 
@@ -526,7 +526,6 @@ const CreateAccount: React.FC<CreateAccountType> = ({
                 type="text"
                 label="Mobile Number: "
                 name="mobilenumber"
-                maxLength={VALIDATIONS.MOBILE_NUMBER_LENGTH}
                 minLength={VALIDATIONS.MOBILE_NUMBER_LENGTH}
                 placeholder="Enter mobile number"
                 value={createAccountFormData.mobilenumber}

@@ -260,7 +260,7 @@ function CreateLeadModal({
     ) {
       setError((prev) => ({
         ...prev,
-        mobileNumber: "Please enter a valid mobile number.",
+        mobileNumber: "Please enter a valid 10-digit mobile number without country code or spaces.",
       }));
     } else {
       setError((prev) => ({
@@ -278,7 +278,7 @@ function CreateLeadModal({
       //   message: "Please enter a valid mobile number.",
       //   type: "error",
       // });
-      toast.error("Please enter a valid mobile number.");
+      toast.error("Please enter a valid 10-digit mobile number without country code or spaces.");
       return;
     }
     if (error.email !== "") {
@@ -405,7 +405,7 @@ function CreateLeadModal({
 
   if (!isOpen) return null;
   return (
-    <FormLayout width={3} padding={3}>
+    <FormLayout width={4} padding={3}>
       {/* Header */}
       <FormHeader
         icon={Handshake}
