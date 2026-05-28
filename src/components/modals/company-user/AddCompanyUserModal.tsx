@@ -188,7 +188,6 @@ function AddCompanyUserModal({ isOpen, onClose, onUserAdded, }: AddCompanyUserMo
                   onBlur={handleBlur}
                   error={errors.mobileNumber}
                   minLength={VALIDATIONS.MOBILE_NUMBER_LENGTH}
-                  maxLength={VALIDATIONS.MOBILE_NUMBER_LENGTH}
 
                 />
                 <FormInput
