@@ -1,9 +1,4 @@
-// SummaryCards.tsx
-
-import {
-  LucideIcon,
-} from "lucide-react";
-
+import { LucideIcon } from "lucide-react";
 import { summaryCardStyles } from "../../utils/summaryCardStyles";
 
 type CardItem = {
@@ -28,14 +23,39 @@ type SummaryCardsProps = {
 function SummaryCards({
   cards,
   showGraph = false,
-  width = "100",
-  cardGap = 5,
-  cardCss = "bg-white h-[75px] border border-slate-200 rounded-2xl px-3  shadow-sm flex items-center justify-between  hover:shadow-md transition-all w-[200px] ",
+  width = "100%",
+  cardGap = 12,
+  cardCss = `
+    bg-white
+    h-[78px]
+    border
+    border-slate-200
+    rounded-2xl
+    px-3
+    shadow-sm
+    flex
+    items-center
+    justify-between
+    hover:shadow-md
+    transition-all
+    min-w-0
+    w-full
+  `,
 }: SummaryCardsProps) {
   return (
     <div
-    
-      className={`grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-${cardGap} mb-3 mt-2 w-[${width}%]`}
+      className="
+        grid
+        grid-cols-1
+        sm:grid-cols-2
+        xl:grid-cols-4
+        mb-3
+        mt-2
+      "
+      style={{
+        width,
+        gap: `${cardGap}px`,
+      }}
     >
       {cards.map((card, index) => {
         const Icon = card.icon;
@@ -44,16 +64,22 @@ function SummaryCards({
           <div
             key={index}
             className={
-              card.isGradient ? summaryCardStyles.gradientCard : cardCss
+              card.isGradient
+                ? `${summaryCardStyles.gradientCard} min-w-0 w-full`
+                : cardCss
             }
           >
             <div className={summaryCardStyles.leftSection}>
               <div
-                className={`${
-                  showGraph
-                    ? summaryCardStyles.roundIconBox
-                    : summaryCardStyles.iconBox
-                } ${card.iconBg}`}
+                className={`
+                  ${
+                    showGraph
+                      ? summaryCardStyles.roundIconBox
+                      : summaryCardStyles.iconBox
+                  }
+                  ${card.iconBg}
+                  flex-shrink-0
+                `}
               >
                 <Icon
                   className={card.isGradient ? "text-white" : card.iconColor}
@@ -61,7 +87,7 @@ function SummaryCards({
                 />
               </div>
 
-              <div className={summaryCardStyles.content}>
+              <div className={`${summaryCardStyles.content} min-w-0`}>
                 <span
                   className={
                     card.isGradient
@@ -85,8 +111,8 @@ function SummaryCards({
                 <span
                   className={
                     card.isGradient
-                      ? "text-xs text-white/70 mt-2"
-                      : summaryCardStyles.subtitle
+                      ? "text-xs text-white/70 mt-2 truncate"
+                      : `${summaryCardStyles.subtitle} truncate`
                   }
                 >
                   {card.subtitle}
@@ -94,7 +120,6 @@ function SummaryCards({
               </div>
             </div>
 
-            {/* GRAPH */}
             {showGraph && !card.isGradient && (
               <div className={summaryCardStyles.graphWrapper}>
                 <div

@@ -117,6 +117,12 @@ const savedFilters = JSON.parse(
     const effectiveDateRangeId =
       dateRangeId === customDateRangeId && !concatDate ? 0 : dateRangeId;
 
+      const getIsActiveParam = (status: "ALL" | "ACTIVE" | "INACTIVE") => {
+  if (status === "ACTIVE") return true;
+  if (status === "INACTIVE") return false;
+  return null;
+};
+
     const postData = {
       company_id: loginStatus.companyId,
       id: null,
@@ -126,6 +132,7 @@ const savedFilters = JSON.parse(
       search_company_specific_date_range_id: effectiveDateRangeId,
       search_parameter: searchParameter,
       search_parameter_date: concatDate,
+      isactive: getIsActiveParam(selectedStatus),
     };
 
     try {
@@ -177,7 +184,12 @@ const savedFilters = JSON.parse(
     concatDate,
     userUpdateCount,
     refreshUsers,
+    selectedStatus, 
   ]);
+
+  useEffect(() => {
+  handlePageChange(1);
+}, [selectedStatus]);
 
   useEffect(() => {
     if (!userHasAccessToViewUser) {

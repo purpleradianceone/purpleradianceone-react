@@ -144,7 +144,8 @@ const LeadContact = ({
     ) {
       setErrors((prev) => ({
         ...prev,
-        mobileNumber: "Please enter a valid 10-digit mobile number without country code or spaces.",
+        mobileNumber:
+          "Please enter a valid 10-digit mobile number without country code or spaces.",
       }));
     } else {
       setErrors((prev) => ({
@@ -336,7 +337,7 @@ const LeadContact = ({
           address: "",
         });
         setSocialMediaHandles([]);
-        setTempHandle("")
+        setTempHandle("");
         if (userHasAccessToViewLeadContacts) {
           fetchLeadContact();
         }
@@ -358,7 +359,7 @@ const LeadContact = ({
         address: "",
       });
       setSocialMediaHandles([]);
-      setTempHandle("")
+      setTempHandle("");
     }
   }, [isOpenAddLeadContactForm]);
 
@@ -452,7 +453,7 @@ const LeadContact = ({
 
               // RESET SOCIAL HANDLES
               setSocialMediaHandles([]);
-              setTempHandle("")
+              setTempHandle("");
 
               // finally open the form
               setIsOpenAddLeadContactForm(true);
@@ -495,35 +496,39 @@ const LeadContact = ({
 
                 {/* Text Info */}
                 <div className="flex flex-col">
+                  {/* Name */}
                   <p className="input-label-custom">
                     {contact.name && contact.name.length > 50
                       ? contact.name.substring(0, 49) + "..."
                       : contact.name || contact.email || contact.mobileNumber}
                   </p>
-                  <p className="caption-custom flex flex-wrap items-center gap-x-1">
-                    {contact.jobTitle && (
+
+                  {/* Job Title */}
+                  {contact.jobTitle && (
+                    <p className="caption-custom flex gap-1 items-center">
+                      <Briefcase size={11} />
+                      {contact.jobTitle}
+                    </p>
+                  )}
+
+                  {/* Mobile + Email */}
+                  <div className="caption-custom flex flex-wrap items-center gap-x-1">
+                    {contact.mobileNumber && (
                       <span className="flex gap-1 items-center">
-                        <Briefcase size={12} /> {contact.jobTitle}
+                        <Phone size={12} />
+                        {contact.mobileNumber}
                       </span>
                     )}
-                    {contact.jobTitle &&
-                      (contact.email || contact.mobileNumber) && <span>•</span>}
+
+                    {contact.mobileNumber && contact.email && <span>•</span>}
 
                     {contact.email && (
                       <span className="flex gap-1 items-center">
-                        {" "}
-                        <Mail size={12} /> {contact.email}
+                        <Mail size={12} />
+                        {contact.email}
                       </span>
                     )}
-                    {contact.email && contact.mobileNumber && <span>•</span>}
-
-                    {contact.mobileNumber && (
-                      <span className="flex gap-1 items-center">
-                        {" "}
-                        <Phone size={12} /> {contact.mobileNumber}
-                      </span>
-                    )}
-                  </p>
+                  </div>
                 </div>
               </div>
 
@@ -844,7 +849,7 @@ const LeadContact = ({
               setIsOpenAddLeadContactForm(false);
               setEditContactData(null);
               setSocialMediaHandles([]);
-              setTempHandle("")
+              setTempHandle("");
               setLeadContactForm({
                 name: "",
                 email: "",
@@ -1035,7 +1040,7 @@ const LeadContact = ({
 
                   <div className="mt-4">
                     <Button
-                        type="button"
+                      type="button"
                       onClick={(e) => {
                         e.preventDefault();
                         handleAddSocialMedia();

@@ -1,11 +1,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { AllCommunityModule, ColDef, themeBalham } from "ag-grid-community";
+import { AllCommunityModule, ColDef } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 import { useMemo, useRef } from "react";
-import { JSX_CHILDREN_NAME } from "../../constants/AppConstants";
+import { AGGRID, JSX_CHILDREN_NAME } from "../../constants/AppConstants";
 import LeadManagementAgGridProps from "../../@types/ag-grid/LeadManagementAgGridProps";
 import LeadDataProps from "../../@types/lead-management/LeadProps";
 import { SkeletonRowsAgGrid } from "../ui/SkeletonRowsAgGrid";
+import {
+  avatarColors,
+  leadStatusStyles,
+} from "../../utils/colourSpecifierForNameInAggrid";
+import { Eye, User } from "lucide-react";
 
 function LeadManagementAgGrid({
   leads,
@@ -16,6 +21,22 @@ function LeadManagementAgGrid({
 }: LeadManagementAgGridProps) {
   const gridRef = useRef<AgGridReact>(null); // Ref to the AgGridReact component
 
+  const renderUserWithIcon = (params: any) => {
+    if (params.data?.__isSkeleton) {
+      return <SkeletonRowsAgGrid />;
+    }
+
+    return (
+      <div className="flex items-center  gap-1 h-full">
+        <div className="w-3 h-3 rounded-full flex items-center justify-center">
+          <User />
+        </div>
+
+        <span className=" truncate">{params.value || "-"}</span>
+      </div>
+    );
+  };
+
   const columnDefs = useMemo<ColDef[]>(
     () => [
       {
@@ -25,12 +46,83 @@ function LeadManagementAgGrid({
       },
       {
         field: "name",
-        headerName: "Name",
+        headerName: "Lead Name",
         sortable: true,
         filter: "agTextColumnFilter",
-        flex: 1,
-        minWidth: 160,
-        comparator: (a, b) => a?.toLowerCase().localeCompare(b?.toLowerCase()),
+        flex: 1.5,
+        minWidth: 240,
+
+        comparator: (valueA, valueB) => {
+          if (!valueA) return -1;
+          if (!valueB) return 1;
+
+          return valueA.toLowerCase().localeCompare(valueB.toLowerCase());
+        },
+
+        cellRenderer: (params: any) => {
+          if (params.data?.__isSkeleton) {
+            return <SkeletonRowsAgGrid />;
+          }
+
+          const name = params.data?.name?.trim() || "-";
+
+          const email = params.data?.email?.trim();
+          const mobileNumber = params.data?.mobileNumber?.trim();
+
+          const secondaryText = email || mobileNumber || "-";
+
+          // avatar source only
+          const avatarSource =
+            params.data?.name?.trim() || params.data?.email?.trim() || "-";
+
+          const initials =
+            avatarSource !== "-"
+              ? avatarSource
+                  .trim()
+                  .split(/\s+/)
+                  .filter(Boolean)
+                  .map((word: string, index: number, array: string[]) =>
+                    index === 0 || index === array.length - 1
+                      ? word.charAt(0)
+                      : "",
+                  )
+                  .join("")
+                  .substring(0, 2)
+                  .toUpperCase()
+              : "-";
+
+          const colorIndex =
+            avatarSource !== "-"
+              ? avatarSource
+                  .split("")
+                  .reduce(
+                    (acc: number, char: string) => acc + char.charCodeAt(0),
+                    0,
+                  ) % avatarColors.length
+              : 0;
+
+          return (
+            <div className="flex items-center gap-3 h-full px-2 overflow-hidden">
+              <div
+                className={`w-8 h-8 rounded-full text-white text-xs font-semibold flex items-center justify-center flex-shrink-0 ${
+                  avatarColors[colorIndex]
+                }`}
+              >
+                {initials}
+              </div>
+
+              <div className="flex flex-col justify-center overflow-hidden">
+                <span className="text-sm font-semibold text-gray-800 truncate">
+                  {name}
+                </span>
+
+                <span className="text-xs text-gray-500 truncate">
+                  {secondaryText}
+                </span>
+              </div>
+            </div>
+          );
+        },
       },
       {
         field: "email",
@@ -53,13 +145,34 @@ function LeadManagementAgGrid({
         filter: "agTextColumnFilter",
         flex: 1,
         minWidth: 180,
-        comparator: (a, b) => a?.toLowerCase().localeCompare(b?.toLowerCase()),
+        cellRenderer: renderUserWithIcon,
       },
       {
         field: "leadStatus",
         headerName: "Status",
         sortable: true,
         filter: true,
+        minWidth: 170,
+
+        cellRenderer: (params: any) => {
+          if (params.data?.__isSkeleton) {
+            return <SkeletonRowsAgGrid />;
+          }
+
+          const status = params.value || "-";
+
+          return (
+            <div className="flex items-center h-full">
+              <span
+                className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap ${
+                  leadStatusStyles[status] || "bg-slate-100 text-slate-700"
+                }`}
+              >
+                {status}
+              </span>
+            </div>
+          );
+        },
       },
       {
         field: "leadSource",
@@ -96,6 +209,7 @@ function LeadManagementAgGrid({
         field: "createdBy",
         headerName: "Created by",
         filter: true,
+        cellRenderer: renderUserWithIcon,
       },
       {
         field: "createdOn",
@@ -108,6 +222,7 @@ function LeadManagementAgGrid({
         headerName: "Updated by",
         sortable: true,
         filter: true,
+        cellRenderer: renderUserWithIcon,
       },
       {
         field: "updatedOn",
@@ -136,27 +251,31 @@ function LeadManagementAgGrid({
         field: "view",
         pinned: "right",
         maxWidth: 80,
+        filter: false,
         // minWidth:80,
         // autoHeight: true,
         // suppressSizeToFit: true,
         cellRenderer: (params: LeadDataProps | any) => {
-           if (params.data?.__isSkeleton) {
-          return (
-            <SkeletonRowsAgGrid/>
-          );
-        }
-          return (
-            <div className="flex items-center justify-center  ">
-              <span
-                className="lead-details cursor-pointer text-blue-600  "
-                onClick={() => {
-                  params.context.handleRowSelect(params.data);
-                }}
-              >
-                {isUsedInLeadModule ? "Details" : "Select"}
-              </span>
-            </div>
-          );
+          if (params.data?.__isSkeleton) {
+            return <SkeletonRowsAgGrid />;
+          }
+         
+       return (
+      <div className="flex items-center justify-center h-full">
+        <button
+          className="lead-details"
+          onClick={() => {
+            params.context.handleRowSelect(params.data);
+          }}
+        >
+          <Eye size={12} strokeWidth={1.5} />
+
+          <span>
+            {isUsedInLeadModule  ? "Select" : "Details"}
+          </span>
+        </button>
+      </div>
+    );
         },
       },
     ],
@@ -193,11 +312,18 @@ function LeadManagementAgGrid({
 
       cellRenderer: (params: any) => {
         if (params.data?.__isSkeleton) {
-          return (
-            <SkeletonRowsAgGrid/>
-          );
+          return <SkeletonRowsAgGrid />;
         }
-        return params.value;
+
+        return (
+          <span className="">
+            {params.value !== null &&
+            params.value !== undefined &&
+            params.value !== ""
+              ? params.value
+              : "-"}
+          </span>
+        );
       },
     }),
     [],
@@ -205,18 +331,24 @@ function LeadManagementAgGrid({
 
   return (
     <div
-      className="ag-theme-balham w-full"
+      className=" w-full modern-user-grid custom-height-scrollbar "
       style={{ height: "100%", width: "100%" }}
     >
       <AgGridReact
-        ref={gridRef} // Attach the ref
+        ref={gridRef}
         rowData={isLoadingData ? skeletonRows : leads}
         columnDefs={columnDefs}
         defaultColDef={defaultColDef}
         modules={[AllCommunityModule]}
-        theme={themeBalham}
-        context={{ handleRowSelect: isLoadingData ? undefined : onRowSelect }}
+        context={{
+          handleRowSelect: isLoadingData ? undefined : onRowSelect,
+        }}
         onRowClicked={isLoadingData ? undefined : handleRowClick}
+        rowHeight={AGGRID.ROW_HEIGHT}
+        headerHeight={AGGRID.HEADER_HEIGHT}
+        suppressCellFocus={true}
+        suppressRowClickSelection={true}
+        rowSelection="multiple"
       />
     </div>
   );

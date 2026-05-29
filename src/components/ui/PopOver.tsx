@@ -19,6 +19,8 @@ interface PopoverProps {
   onTriggerClick?: () => void; //  API call hook
   padding ? : number,
    accessRight?: boolean;
+    open?: boolean;
+  setOpen?: (value: boolean) => void;
 }
 
 /**
@@ -44,8 +46,18 @@ export function Popover({
   onTriggerClick,
   padding =9,
   accessRight = true,
+   open: controlledOpen,
+  setOpen: setControlledOpen,
 }: PopoverProps) {
-  const [open, setOpen] = useState(false);
+  const [internalOpen, setInternalOpen] = useState(false);
+
+const open =
+  controlledOpen !== undefined
+    ? controlledOpen
+    : internalOpen;
+
+const setOpen =
+  setControlledOpen || setInternalOpen;
   const triggerRef = useRef<HTMLDivElement | null>(null);
   const popoverRef = useRef<HTMLDivElement | null>(null);
   const [position, setPosition] = useState({ top: 0, left: 0 });
