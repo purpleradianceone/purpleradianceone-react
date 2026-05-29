@@ -17,8 +17,7 @@ import CreateOrUpdateLeadDetails from "../../../@types/lead-management/CreateLea
 import RefreshToken from "../../../config/validations/RefreshToken";
 import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
 import toast from "react-hot-toast";
-import COLORS from "../../../constants/Colors";
-import {  Pen, Save } from "lucide-react";
+import {  Pen, Save, X } from "lucide-react";
 import { useUserPreference } from "../../../context/user/UserPreference";
 import axiosClient from "../../../axios-client/AxiosClient";
 import AccessDeniedMessagePage from "../../views/not-found/AccessDeniedMessagePage";
@@ -100,7 +99,9 @@ const LeadDetails = ({
     setChangedStateId(leadDetailsData.state_id);
   }, [leadDetailsData]);
 
+  // const [showSaveLeadButton, setShowSaveLeadButton] = useState<boolean>(false);
   const [showSaveLeadButton, setShowSaveLeadButton] = useState<boolean>(false);
+const [isEditingAll, setIsEditingAll] = useState<boolean>(false);
 
   const { loginStatus } = useLoggedInUserContext();
   const createNewDetailRef = useRef<boolean>(false);
@@ -165,6 +166,7 @@ const LeadDetails = ({
         if (response.data.status) {
           toast.success(response.data.message);
           setShowSaveLeadButton(false);
+          setIsEditingAll(false);
           createNewDetailRef.current = false;
 
           handleSaveEditLeadDetailsCallback(editLeadDetails);
@@ -370,6 +372,18 @@ const LeadDetails = ({
       }))
     : [];    
 
+    const handleCancelEdit = () => {
+  setEditLeadDetails(leadDetailsData);
+
+  setCountryid(String(leadDetailsData.country_id || ""));
+  setStateId(String(leadDetailsData.state_id || ""));
+  setDistrictId(String(leadDetailsData.district_id || ""));
+  setIndustryTypeId(String(leadDetailsData.industry_type_id || ""));
+
+  setShowSaveLeadButton(false);
+  setIsEditingAll(false);
+};
+
   // useEffect(() => {
   //   if (!userPreference || !editLeadDetails) return;
 
@@ -417,39 +431,71 @@ const LeadDetails = ({
 
   return (
     <div>
-      <form onSubmit={handleSave}               
+      <form className= " border rounded-lg" onSubmit={handleSave}               
 >
-        <div className="w-full flex justify-between  bg-slate-200 px-1 mb-1 ">
-          {/* <div className="w-auto flex justify-between  bg-slate-200 px-1 mb-1  "> */}
-          {/* <span className="table-header-custom">Details</span> */}
-          <HeaderInfo />
-          {showSaveLeadButton && (
-            <button
-            type="submit"
-            disabled={isSavingLeadDetailsData}
-              className={isSavingLeadDetailsData? "border rounded-md caption-custom  px-1 py-0.5 bg-gray-100 text-gray-500 cursor-not-allowed ": COLORS.ADD_BUTTON}
-            >
-              <div className="flex items-center gap-0.5">
-                {
-                  !isSavingLeadDetailsData ? <>
-                  <Save className="w-3 h-3 -mt-0.5" />
-                  Save
-                  </>
-                   : <>
-                    <LoadingSpinner height={14} width={14} colour="gray"/>Saving
-                  </>
-                }
-              </div>
-            </button>
-          )}
-        </div>
+        <div className="w-full flex justify-between border-b px-2 py-1 mb-1">
+  <HeaderInfo />
+
+  <div className="flex items-center gap-2">
+    {!isEditingAll && userHasAccessToUpdateLeadDetails && (
+      <button
+  type="button"
+  onClick={() => {
+  setIsEditingAll(true);
+  setShowSaveLeadButton(true);
+}}
+  className="flex items-center gap-1 border rounded-md px-2 py-0.5 text-xs caption-custom hover:bg-gray-100 transition-colors"
+>
+  <Pen className="w-2.5 h-2.5" />
+  Edit
+</button>
+    )}
+
+    {showSaveLeadButton && (
+  <div className="flex items-center gap-2">
+    
+    <button
+      type="submit"
+      disabled={isSavingLeadDetailsData}
+      className={
+        isSavingLeadDetailsData
+          ? "border rounded-md px-2.5 py-1 text-xs font-medium bg-gray-100 text-gray-500 cursor-not-allowed"
+          : "flex items-center gap-1 rounded-md bg-blue-600 hover:bg-blue-700 text-white px-2.5 py-1 text-xs font-medium transition-colors"
+      }
+    >
+      {!isSavingLeadDetailsData ? (
+        <>
+          <Save className="w-3 h-3" />
+          Save
+        </>
+      ) : (
+        <>
+          <LoadingSpinner height={14} width={14} colour="gray" />
+          Saving
+        </>
+      )}
+    </button>
+
+    <button
+      type="button"
+      onClick={handleCancelEdit}
+      className="flex items-center gap-0.5 border rounded-md px-1 py-1 text-xs font-medium text-gray-700 hover:bg-gray-100 transition-colors"
+    >
+      <X className="w-3 h-3" />
+      Cancel
+    </button>
+  </div>
+)}
+  </div>
+</div>
         {/* </div> */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-2">
           <FormField
             maxLength={30}
             userHasAccessToUpdate={userHasAccessToUpdateLeadDetails}
-            type="textarea"
-            label="Job title"
+            type="text"
+            label="Job title :"
+             isEditingAll={isEditingAll}
             value={editLeadDetails.job_title}
             onChange={(e) => {
               // handleLeadDetailsValueChange(e)
@@ -460,24 +506,12 @@ const LeadDetails = ({
               });
             }}
           />
-          <FormField
-            userHasAccessToUpdate={userHasAccessToUpdateLeadDetails}
-            type="textarea"
-            label="Address"
-            value={editLeadDetails.address}
-            onChange={(e) => {
-              // handleLeadDetailsValueChange(e)
-              setShowSaveLeadButton(true);
-              setEditLeadDetails({
-                ...editLeadDetails,
-                address: e.target.value,
-              });
-            }}
-          />
+          
           <FormField
             userHasAccessToUpdate={userHasAccessToUpdateLeadDetails}
             type="select"
-            label="Industry"
+            label="Industry :"
+             isEditingAll={isEditingAll}
             handleGetDropdownData={() => {
               fetchIndustryType();
             }}
@@ -501,7 +535,8 @@ const LeadDetails = ({
             maxLength={10}
             userHasAccessToUpdate={userHasAccessToUpdateLeadDetails}
             type="text"
-            label="Add. Contact Number"
+            label="Add. Contact Number :"
+             isEditingAll={isEditingAll}
             value={editLeadDetails.additional_contact_number}
             onChange={(e) => {
               setShowSaveLeadButton(true);
@@ -515,7 +550,8 @@ const LeadDetails = ({
           <FormField
             userHasAccessToUpdate={userHasAccessToUpdateLeadDetails}
             type="select"
-            label="Country"
+            label="Country :"
+             isEditingAll={isEditingAll}
             // handleGetDropdownData={() => {
             //   getAllCountries();
             // }}
@@ -567,7 +603,8 @@ const LeadDetails = ({
             userHasAccessToUpdate={userHasAccessToUpdateLeadDetails}
             type="text"
             maxLength={70}
-            label="Industry Name"
+            label="Industry Name :"
+             isEditingAll={isEditingAll}
             value={editLeadDetails.industry_name}
             onChange={(e) => {
               setShowSaveLeadButton(true);
@@ -580,7 +617,8 @@ const LeadDetails = ({
           <FormField
             userHasAccessToUpdate={userHasAccessToUpdateLeadDetails}
             type="select"
-            label="State"
+            label="State :"
+             isEditingAll={isEditingAll}
             handleGetDropdownData={() => {
               getAllState(editLeadDetails.country_id);
             }}
@@ -620,7 +658,8 @@ const LeadDetails = ({
           <FormField
             userHasAccessToUpdate={userHasAccessToUpdateLeadDetails}
             type="text"
-            label="Website"
+            label="Website :"
+             isEditingAll={isEditingAll}
             maxLength={100}
             value={editLeadDetails.website}
             onChange={(e) => {
@@ -634,7 +673,8 @@ const LeadDetails = ({
           <FormField
             userHasAccessToUpdate={userHasAccessToUpdateLeadDetails}
             type="select"
-            label="District"
+            label="District :"
+             isEditingAll={isEditingAll}
             handleGetDropdownData={() => {
               getAllDistrict(editLeadDetails.state_id);
             }}
@@ -654,6 +694,21 @@ const LeadDetails = ({
               });
             }}
           />
+          <FormField
+            userHasAccessToUpdate={userHasAccessToUpdateLeadDetails}
+            type="textarea"
+            label="Address :"
+            value={editLeadDetails.address}
+             isEditingAll={isEditingAll}
+            onChange={(e) => {
+              // handleLeadDetailsValueChange(e)
+              setShowSaveLeadButton(true);
+              setEditLeadDetails({
+                ...editLeadDetails,
+                address: e.target.value,
+              });
+            }}
+          />
         </div>
       </form>
     </div>
@@ -662,7 +717,7 @@ const LeadDetails = ({
 
 const HeaderInfo = () => {
   return (
-    <div className=" ">
+    <div className="">
       <span className="table-header-custom">Details</span>
     </div>
   );
@@ -690,6 +745,8 @@ type FormFieldProps = {
   maxLength?: number;
   defaultSelectedId?: string | number;
   hasExistingValue?: boolean;
+
+  isEditingAll: boolean;
 };
 
 const FormField = ({
@@ -704,44 +761,42 @@ const FormField = ({
   maxLength,
   defaultSelectedId,
   hasExistingValue,
-}: FormFieldProps) => {
-  const [isEditing, setIsEditing] = useState(false);
+  isEditingAll,
+}: FormFieldProps) =>  {
+ 
 
-  const handleBlur = () => {
-    setTimeout(() => setIsEditing(false), 100);
-  };
+
 
   return (
     <div className="flex w-full  items-center border-b  ">
       <div className="caption-custom w-[50%]">{label}</div>
       <div
-        className="flex items-center w-[50%]   min-w-[150px]"
-        onClick={() => {
-          if (userHasAccessToUpdate) {
-            setIsEditing(true);
-            handleGetDropdownData?.();
+  className="flex items-center w-[50%] min-w-[150px]"
+  onClick={() => {
+    if (!userHasAccessToUpdate) {
+      toast.error(
+        MESSAGE.MODULE_ACCESS.LEAD_DETAILS.DENIED_UPDATE_ACCESS,
+      );
+      return;
+    }
 
-            //  APPLY DEFAULT VALUE ONLY WHEN EMPTY
-            if (
-              type === "select" &&
-              !hasExistingValue && // <--- Only apply default if NO backend value exists!
-              (!selectedId || selectedId === "") &&
-              defaultSelectedId
-            ) {
-              const event = {
-                target: { value: String(defaultSelectedId) },
-              } as React.ChangeEvent<HTMLSelectElement>;
+    handleGetDropdownData?.();
 
-              onChange?.(event);
-            }
-          } else {
-            toast.error(
-              MESSAGE.MODULE_ACCESS.LEAD_DETAILS.DENIED_UPDATE_ACCESS,
-            );
-          }
-        }}
-      >
-        {!isEditing ? (
+    if (
+      type === "select" &&
+      !hasExistingValue &&
+      (!selectedId || selectedId === "") &&
+      defaultSelectedId
+    ) {
+      const event = {
+        target: { value: String(defaultSelectedId) },
+      } as React.ChangeEvent<HTMLSelectElement>;
+
+      onChange?.(event);
+    }
+  }}
+>
+        {!isEditingAll ? (
           <span
             className="caption-custom cursor-pointer flex items-center justify-between hover:bg-gray-50 hover:rounded-sm w-full truncate whitespace-nowrap"
             title={value?.toLocaleString()}
@@ -751,13 +806,13 @@ const FormField = ({
             ) : (
               <span className="caption-custom italic">Add here...</span>
             )}
-            <Pen size={9} className="text-gray-600" />
+            
           </span>
         ) : type === "select" ? (
           <select
             autoFocus
             value={String(selectedId)}
-            onBlur={handleBlur}
+            
             onChange={onChange}
              onKeyDown={(e) => {
     if (e.key === "Enter") {
@@ -780,12 +835,12 @@ const FormField = ({
           </select>
         ) : type === "textarea" ? (
           <textarea
-            rows={3}
+            rows={2}
             cols={50}
             placeholder="enter text here"
             value={value}
             onChange={onChange}
-            onBlur={handleBlur}
+            
             autoFocus
              onKeyDown={(e : React.KeyboardEvent<HTMLTextAreaElement>)=>{
                       if(e.key === "Enter" && !e.shiftKey){
@@ -801,7 +856,7 @@ const FormField = ({
             type={type}
             value={value}
             onChange={onChange}
-            onBlur={handleBlur}
+            placeholder="Type here...."
             maxLength={maxLength}
             className="caption-custom border-none border-gray-300 focus:outline-none"
           />

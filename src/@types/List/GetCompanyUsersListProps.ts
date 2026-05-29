@@ -9,7 +9,7 @@ type GetCompanyUsersListProps = {
     handleSearchOption: HandleSearchOptionProps;
     onStartDateChange: (date: Date) => void;
     onEndDateChange: (date: Date) => void;
-    onRefreshUsers: () => void;
+    onRefreshUsers: (isactive?: boolean | null) => void;
     handleCompanyUserChangeOnEdit: (companyUser: CompanyUser) => void;
     isTourFinished? : boolean;
     isUsedInAccountProductForAssingingInstalledBy? : boolean
@@ -23,6 +23,7 @@ type GetCompanyUsersListProps = {
       "ALL" | "ACTIVE" | "INACTIVE"
     >
   >;
+  
 }
 
 export default GetCompanyUsersListProps;

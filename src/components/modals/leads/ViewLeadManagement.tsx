@@ -3,6 +3,7 @@
 import {
   ArrowLeft,
   Calendar,
+  CheckCircle2,
   ChevronRight,
   CircleUser,
   Crown,
@@ -11,6 +12,7 @@ import {
   History,
   Mail,
   Network,
+  Pen,
   Phone,
   Plus,
   Save,
@@ -69,6 +71,7 @@ import LeadQuotationDetails from "./LeadQuotationDetails";
 import TextAreaInput from "../../ui/TextAreaInput";
 import { LeadWhatsappConversation } from "./lead-whatsapp-conversation/LeadWhatsappConversation";
 import COLORS from "../../../constants/Colors";
+import CustomDropdown from "./CustomDropdown";
 
 const ViewLeadManagement = () => {
   const navigate = useNavigate();
@@ -126,6 +129,16 @@ const ViewLeadManagement = () => {
   // const [isOpenLeadTeamsCard, setIsOpenLeadTeamsCard] =
   //   useState<boolean>(false);
 
+  const [openedPopoverStatusId, setOpenedPopoverStatusId] = useState<
+    number | null
+  >(null);
+
+  const [showAllContacts, setShowAllContacts] = useState(false);
+
+  const visibleContacts = showAllContacts
+    ? leadContact
+    : leadContact.slice(0, 2);
+
   const fetchLeadStatus = async () => {
     try {
       const postDataForLeadStatusData = {
@@ -160,6 +173,7 @@ const ViewLeadManagement = () => {
       }
     }
   };
+
   const [isLeadStatusSaving, setIsLeadStatusSaving] = useState<boolean>(false);
   const handleSaveStatusUpdate = async (
     event: React.FormEvent<HTMLFormElement>,
@@ -200,10 +214,11 @@ const ViewLeadManagement = () => {
           setSelectedLeadData((prev: any) => ({
             ...prev,
             leadStatus: updatedStatusName,
+            leadStatusId: selectedStatusId,
           }));
+          setSelectedStatusId(selectedStatusId);
           setReasonInputBoxOpen(false);
           setReasonText("");
-          setSelectedStatusId(null);
 
           const newPath = `${window.location.pathname}?${newQueryString}`;
           navigate(newPath, { replace: true });
@@ -589,6 +604,17 @@ const ViewLeadManagement = () => {
 
   const [showSaveLeadButton, setShowSaveLeadButton] = useState<boolean>(false);
 
+  const [isEditingLeadInfo, setIsEditingLeadInfo] = useState<boolean>(false);
+
+  const [originalLeadInfo, setOriginalLeadInfo] =
+    useState<LeadDataProps>(selectedLeadData);
+
+  const handleCancelLeadInfoEdit = () => {
+    setSelectedLeadData(originalLeadInfo);
+    setShowSaveLeadButton(false);
+    setIsEditingLeadInfo(false);
+  };
+
   const handleLeadInfoSave = async () => {
     const trimmedName = selectedLeadData.name?.trim() ?? "";
 
@@ -600,15 +626,18 @@ const ViewLeadManagement = () => {
       }));
     }
 
-    if (selectedLeadData.email !== "") {
-      const isValid = selectedLeadData.email?.match(VALIDATIONS.EMAIL);
+    if (selectedLeadData.email !== "" && selectedLeadData.email !== null) {
+      const isValid = selectedLeadData.email?.trim().match(VALIDATIONS.EMAIL);
       if (!isValid) {
         toast.error(MESSAGE.ERROR.EMAIL_NOT_VALID_ERROR);
         return;
       }
     }
 
-    if (selectedLeadData.mobileNumber !== "") {
+    if (
+      selectedLeadData.mobileNumber !== "" &&
+      selectedLeadData.mobileNumber !== null
+    ) {
       const isValid = VALIDATIONS.MOBILE_NUMBER_REGEX.test(
         selectedLeadData.mobileNumber || "",
       );
@@ -657,8 +686,13 @@ const ViewLeadManagement = () => {
         navigate(newPath, { replace: true });
 
         toast.success(response.data.message);
+
         fetchLeadContact();
+
         setShowSaveLeadButton(false);
+        setIsEditingLeadInfo(false);
+
+        setOriginalLeadInfo(selectedLeadData);
       } else if (response.data.status === false) {
         toast.error(response.data.message);
       }
@@ -671,6 +705,8 @@ const ViewLeadManagement = () => {
         // setIsDialogueOpen(!refreshTokenStatus);
         if (refreshTokenStatus) {
           handleLeadInfoSave();
+          setOriginalLeadInfo(selectedLeadData);
+          setIsEditingLeadInfo(false);
         }
       } else if (error.status === 400) {
         toast.error(error.response.data);
@@ -721,6 +757,23 @@ const ViewLeadManagement = () => {
     setReasonInputBoxOpenForLeadOwner(true);
   }
 
+  const handleStatusSelection = (statusId: number) => {
+    if (!userHasAccessToUpdateLeadDetails) {
+      toast.error(
+        MESSAGE.MODULE_ACCESS.LEAD_MODULE.UPDATE_LEAD_ACCESS_DENIED_message,
+      );
+      return;
+    }
+
+    // prevent same status update
+    if (Number(selectedLeadData.leadStatusId) === statusId) {
+      return;
+    }
+
+    setSelectedStatusId(statusId);
+    setReasonInputBoxOpen(true);
+  };
+
   const [showName, setShowName] = useState<boolean>(false);
   return (
     <PageLayout onScrollChange={setShowName} scrollTopValue={70}>
@@ -745,13 +798,13 @@ const ViewLeadManagement = () => {
                 {/* <ChevronRight size={16} /> */}
                 <span
                   className={`
-    ml-2 max-w-[240px] truncate text-sm text-gray-500
-  transition-all duration-200 ease-out
-  will-change-transform will-change-opacity ${
-    showName
-      ? "opacity-100 translate-x-0"
-      : "opacity-0 -translate-x-1 pointer-events-none"
-  } `}
+            ml-2 max-w-[240px] truncate text-sm text-gray-500
+          transition-all duration-200 ease-out
+          will-change-transform will-change-opacity ${
+            showName
+              ? "opacity-100 translate-x-0"
+              : "opacity-0 -translate-x-1 pointer-events-none"
+          } `}
                 >
                   (
                   {selectedLeadData.name ||
@@ -902,102 +955,127 @@ const ViewLeadManagement = () => {
           </div>
         </div>
 
-        {/* Lead Status Section */}
-        <div className="   flex w-[100%] border-b  bg-slate-50   rounded-sm">
-          <div className="flex w-full  ">
-            {leadStatus!.map((item: any) => (
-              <div
-                className={`flex-1  items-center justify-center  ${
-                  selectedLeadData.leadStatus === item.name
-                    ? "bg-blue-700 table-header-custom-white hover:bg-blue-500 hover:text-white"
-                    : "hover:bg-blue-700 table-header-custom hover:text-white"
-                }
-                      ${
-                        selectedStatusId === item.id &&
-                        "bg-sky-400 hover:bg-sky-500 table-header-custom-white"
-                      } text-center p-1`}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  width: "100%",
-                  clipPath:
-                    "polygon(0 0, calc(100% - 16px) 0, 100% 50%, calc(100% - 16px) 100%, 0 100%)",
-                }}
+        <div className="flex items-start justify-start gap-16 py-2 px-1">
+          {/* LEFT SECTION */}
+          <div className="flex items-start gap-3 min-w-0">
+            {/* ICON */}
+            <div className="bg-blue-600 p-2 rounded text-white mt-1">
+              <Handshake size={30} />
+            </div>
+
+            {/* NAME + STATUS */}
+            <div className="flex flex-col leading-none min-w-0">
+              {/* LEAD NAME */}
+              <div className="flex items-center pb-0.5 min-w-0">
+                <span
+                  title={selectedLeadData.name || ""}
+                  className={`
+      text-slate-800 min-w-0 truncate
+
+      ${
+        selectedLeadData.name
+          ? "table-header-custom !text-[17px]"
+          : "caption-custom italic text-slate-500"
+      }
+    `}
+                >
+                  {selectedLeadData.name || "Add here..."}
+                </span>
+              </div>
+              <span
+                className={`caption-custom !text-[11px]
+    truncate
+    ${leadDetailsData.job_title ? "" : "italic text-slate-500"}
+  `}
+                title={leadDetailsData.job_title || ""}
               >
+                {leadDetailsData.job_title}
+              </span>
+
+              {/* STATUS DROPDOWN */}
+              <div className="w-[130px] min-w-0 flex pt-1 items-center">
+                <div className="w-full min-w-0">
+                  <CustomDropdown
+                    labelName="status"
+                    options={leadStatus || []}
+                    selectedValue={
+                      selectedLeadData.leadStatusId
+                        ? Number(selectedLeadData.leadStatusId)
+                        : 0
+                    }
+                    readOnly={!userHasAccessToUpdateLeadDetails}
+                    paddingy={0}
+                    height="h-6"
+                    onSelect={(value) => {
+                      if (value === null || value === undefined) return;
+
+                      const statusId = Number(value);
+
+                      if (Number(selectedLeadData.leadStatusId) === statusId)
+                        return;
+
+                      handleStatusSelection(statusId);
+                      setOpenedPopoverStatusId(statusId);
+                    }}
+                  />
+                </div>
+
+                {/* POPUP MODALS */}
                 <Popover
-                  width={500}
+                  width={350}
+                  open={openedPopoverStatusId !== null}
                   onClose={() => {
+                    setOpenedPopoverStatusId(null);
                     setSelectedStatusId(null);
+                    setReasonInputBoxOpen(false);
+                    setReasonText("");
                   }}
-                  trigger={
-                    <div className="flex w-full ">
-                      <button
-                        type="button"
-                        // disabled={!userHasAccessToUpdateLeadDetails}
-                        onClick={() => {
-                          if (userHasAccessToUpdateLeadDetails) {
-                            setReasonInputBoxOpen(true);
-                            setSelectedStatusId(item.id);
-                          } else {
-                            toast.error(
-                              MESSAGE.MODULE_ACCESS.LEAD_MODULE
-                                .UPDATE_LEAD_ACCESS_DENIED_message,
-                            );
-                          }
-                        }}
-                        title={item.name}
-                        key={item.id}
-                      >
-                        <div className=" w-[100%]">{item.name}</div>
-                      </button>
-                    </div>
-                  }
+                  trigger={<div />}
                 >
                   {(onClose) => (
                     <>
                       {reasonInputBoxOpen &&
-                        item.id !== 9 &&
+                        selectedStatusId !== null &&
                         selectedStatusId !== 9 && (
                           <StatusUpdateModal
                             isLeadStatusSaving={isLeadStatusSaving}
                             handleCancel={() => {
-                              setReasonInputBoxOpen(!reasonInputBoxOpen);
+                              setReasonInputBoxOpen(false);
+                              setOpenedPopoverStatusId(null);
                               setSelectedStatusId(null);
                               setReasonText("");
                               onClose();
                             }}
-                            handleSaveStatusUpdate={async (
-                              event: React.FormEvent<HTMLFormElement>,
-                            ) => {
+                            handleSaveStatusUpdate={async (event) => {
                               event.preventDefault();
                               await handleSaveStatusUpdate(event);
+                              setOpenedPopoverStatusId(null);
                               onClose();
                             }}
-                            onReasonChange={(
-                              e:
-                                | React.ChangeEvent<HTMLInputElement>
-                                | React.ChangeEvent<HTMLTextAreaElement>,
-                            ) => setReasonText(e.target.value)}
+                            onReasonChange={(e) =>
+                              setReasonText(e.target.value)
+                            }
                             reasonText={reasonText}
                           />
                         )}
+
                       {reasonInputBoxOpen && selectedStatusId === 9 && (
                         <ConvertLeadModal
                           isLeadStatusSaving={isLeadStatusSaving}
                           isOpen={reasonInputBoxOpen}
                           onClose={() => {
-                            setReasonInputBoxOpen(!reasonInputBoxOpen);
+                            setReasonInputBoxOpen(false);
+                            setOpenedPopoverStatusId(null);
                             setSelectedStatusId(null);
                             setReasonText("");
                             onClose();
                           }}
                           leadData={selectedLeadData}
-                          handleLeadConversion={(
-                            event: React.FormEvent<HTMLFormElement>,
-                          ) => {
+                          handleLeadConversion={(event) => {
                             event.preventDefault();
                             handleSaveStatusUpdate(event);
+
+                            setOpenedPopoverStatusId(null);
                             onClose();
                           }}
                           onReasonChange={(e) => setReasonText(e.target.value)}
@@ -1006,8 +1084,10 @@ const ViewLeadManagement = () => {
                             const parsedQuery = JSON.parse(
                               searchParams.get("leadData") || "{}",
                             );
+
                             parsedQuery.leadStatusId = "9";
                             parsedQuery.leadStatus = "Converted";
+
                             const newQueryString = qs.stringify({
                               leadData: JSON.stringify(parsedQuery),
                             });
@@ -1016,7 +1096,9 @@ const ViewLeadManagement = () => {
                               ...prev,
                               leadStatus: "Converted",
                             }));
+
                             setReasonInputBoxOpen(false);
+                            setOpenedPopoverStatusId(null);
                             setReasonText("");
                             setSelectedStatusId(null);
 
@@ -1029,25 +1111,259 @@ const ViewLeadManagement = () => {
                   )}
                 </Popover>
               </div>
-            ))}
+            </div>
+          </div>
 
-            {/* </div> */}
-            {/* status history */}
-            <div className="flex justify-end bg-purple-50 caption-custom  mb-1 px-2">
-              {/* <span className="font-semibold ">Lead Status</span> */}
+          {/* RIGHT SECTION */}
+          <div className="grid grid-cols-3 gap-x-10 shrink-0 mt-1 ml-2">
+            {/* Owner */}
+            <div className="flex flex-col gap-1 min-w-[100px]">
+              <div className="flex items-center gap-1">
+                <Crown className="h-3.5 w-3.5 text-pink-500 ml-5 shrink-0" />
+                <span className="font-medium caption-custom">Owner:</span>
+              </div>
+
+              <span className="caption-custom-black pl-6">
+                {selectedLeadData.leadOwner}
+              </span>
+            </div>
+
+            {/* Source */}
+            <div className="flex flex-col gap-1 min-w-[100px]">
+              <div className="flex items-center gap-1">
+                <Network className="h-3.5 w-3.5 text-orange-500 ml-5 shrink-0" />
+                <span className="font-medium caption-custom">Source:</span>
+              </div>
+
+              <span className="caption-custom-black pl-6">
+                {selectedLeadData.leadSource}
+              </span>
+            </div>
+
+            {/* Created On */}
+            <div className="flex flex-col gap-1 min-w-[120px]">
+              <div className="flex items-center gap-1">
+                <Calendar className="h-3.5 w-3.5 text-yellow-500 ml-5 shrink-0" />
+                <span className="font-medium caption-custom">Created On:</span>
+              </div>
+
+              <span className="caption-custom-black pl-6">
+                {selectedLeadData.createdOn}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Lead Status Section */}
+        <div className="w-[99.5%] bg-white border rounded-md  px-1 mx-1 pt-3 pb-1 mb-2  ">
+          <div className="flex items-center overflow-x-auto min-w-max">
+            {leadStatus!.map((item: any, index: number) => {
+              const currentIndex = leadStatus!.findIndex(
+                (s: any) => s.name === selectedLeadData.leadStatus,
+              );
+
+              const isCompleted = index < currentIndex;
+              const isActive = selectedLeadData.leadStatus === item.name;
+
+              return (
+                <React.Fragment key={item.id}>
+                  {/* STATUS ITEM */}
+                  <Popover
+                    width={500}
+                    onClose={() => {
+                      setSelectedStatusId(null);
+                    }}
+                    trigger={
+                      <button
+                        type="button"
+                        title={item.name}
+                        onClick={() => {
+                          handleStatusSelection(item.id);
+                        }}
+                        className="flex flex-col items-center relative z-10 min-w-[110px]"
+                      >
+                        {/* TOP SECTION */}
+
+                        <div
+                          className={`
+                              flex items-center gap-1 px-1 py-1 rounded-lg transition-all duration-300
+
+                              ${isActive ? "bg-blue-50" : ""}
+                            `}
+                        >
+                          {/* ICON */}
+                          <div
+                            className={`
+                                w-4 h-4 rounded-full flex items-center justify-center
+                                transition-all duration-300
+
+                                ${
+                                  isCompleted
+                                    ? "bg-green-500 text-white"
+                                    : isActive
+                                      ? "bg-blue-500 text-white"
+                                      : "bg-slate-100 text-slate-400 border"
+                                }
+                              `}
+                          >
+                            <CheckCircle2 size={12} />
+                          </div>
+
+                          {/* TEXT */}
+                          <span
+                            className={`
+                                text-xs font-medium whitespace-nowrap
+
+                                ${
+                                  isActive
+                                    ? "text-blue-600"
+                                    : isCompleted
+                                      ? "text-slate-700"
+                                      : "text-slate-500"
+                                }
+                              `}
+                          >
+                            {item.name}
+                          </span>
+                        </div>
+
+                        {/* BOTTOM PROGRESS */}
+                        <div className="mt-0.5 flex items-center ml-1 w-full">
+                          {/* DOT */}
+                          <div
+                            className={`
+                                      w-1.5 h-1.5 rounded-full z-10 transition-all duration-300
+
+                                      ${
+                                        isCompleted
+                                          ? "bg-green-500"
+                                          : isActive
+                                            ? "bg-blue-600"
+                                            : "bg-slate-300"
+                                      }
+                                    `}
+                          />
+
+                          {/* LINE */}
+                          {index !== leadStatus!.length && (
+                            <div
+                              className={`
+                               h-[2px] flex-1 transition-all  duration-300
+
+                              ${
+                                index < currentIndex
+                                  ? "bg-green-500"
+                                  : index === currentIndex
+                                    ? "bg-blue-600"
+                                    : "bg-slate-200"
+                              }
+                            `}
+                            />
+                          )}
+                        </div>
+                      </button>
+                    }
+                  >
+                    {(onClose) => (
+                      <>
+                        {reasonInputBoxOpen &&
+                          item.id !== 9 &&
+                          selectedStatusId !== 9 && (
+                            <StatusUpdateModal
+                              isLeadStatusSaving={isLeadStatusSaving}
+                              handleCancel={() => {
+                                setReasonInputBoxOpen(!reasonInputBoxOpen);
+                                setSelectedStatusId(null);
+                                setReasonText("");
+                                onClose();
+                              }}
+                              handleSaveStatusUpdate={async (
+                                event: React.FormEvent<HTMLFormElement>,
+                              ) => {
+                                event.preventDefault();
+                                await handleSaveStatusUpdate(event);
+                                onClose();
+                              }}
+                              onReasonChange={(
+                                e:
+                                  | React.ChangeEvent<HTMLInputElement>
+                                  | React.ChangeEvent<HTMLTextAreaElement>,
+                              ) => setReasonText(e.target.value)}
+                              reasonText={reasonText}
+                            />
+                          )}
+
+                        {reasonInputBoxOpen && selectedStatusId === 9 && (
+                          <ConvertLeadModal
+                            isLeadStatusSaving={isLeadStatusSaving}
+                            isOpen={reasonInputBoxOpen}
+                            onClose={() => {
+                              setReasonInputBoxOpen(!reasonInputBoxOpen);
+                              setSelectedStatusId(null);
+                              setReasonText("");
+                              onClose();
+                            }}
+                            leadData={selectedLeadData}
+                            handleLeadConversion={(
+                              event: React.FormEvent<HTMLFormElement>,
+                            ) => {
+                              event.preventDefault();
+                              handleSaveStatusUpdate(event);
+                              onClose();
+                            }}
+                            onReasonChange={(e) =>
+                              setReasonText(e.target.value)
+                            }
+                            reasonText={reasonText}
+                            handleLeadMappedToAccount={() => {
+                              const parsedQuery = JSON.parse(
+                                searchParams.get("leadData") || "{}",
+                              );
+
+                              parsedQuery.leadStatusId = "9";
+                              parsedQuery.leadStatus = "Converted";
+
+                              const newQueryString = qs.stringify({
+                                leadData: JSON.stringify(parsedQuery),
+                              });
+
+                              setSelectedLeadData((prev: any) => ({
+                                ...prev,
+                                leadStatus: "Converted",
+                              }));
+
+                              setReasonInputBoxOpen(false);
+                              setReasonText("");
+                              setSelectedStatusId(null);
+
+                              const newPath = `${window.location.pathname}?${newQueryString}`;
+                              navigate(newPath, { replace: true });
+                            }}
+                          />
+                        )}
+                      </>
+                    )}
+                  </Popover>
+                </React.Fragment>
+              );
+            })}
+
+            {/* HISTORY BUTTON */}
+            <div className="ml-1">
               <button
                 type="button"
                 onClick={() => {
                   setIsOpenLeadStatusHistory(!isOpenLeadStatusHistory);
                 }}
+                className="
+                  flex items-center gap-1
+                  text-xs text-slate-500
+                  hover:text-blue-600
+                  transition-all border rounded-md p-0.5
+                "
               >
-                <span
-                  title="Status history"
-                  className="flex items-center justify-center hover:text-blue-600 "
-                >
-                  <History size={12} className="mt-0" />
-                  History
-                </span>
+                <History size={13} />
+                History
               </button>
             </div>
           </div>
@@ -1055,133 +1371,158 @@ const ViewLeadManagement = () => {
         {/* Sections  */}
         <div className="w-full  flex flex-col md:flex-row gap-1 mt-1">
           {/* Column 1 */}
-          <div className="w-full md:w-1/2 flex flex-col gap-2">
+          <div className="w-full md:w-1/2 flex flex-col gap-2 p-1">
             {/* Lead Basic Info */}
-            <div className=" flex    rounded-sm p-1 ">
-              <div className=" bg-pink-00 w-full grid md:grid-cols-3 items-center  bg-pink-00 sm:grid-cols-1  gap-2   ">
-                <div className=" flex items-center justify-between gap-3 col-span-3  ">
-                  <div className="flex items-center gap-3">
-                    <div className="bg-blue-600  p-2 rounded text-white">
-                      <Handshake size={30} />
-                    </div>
+            <div className=" flex   border rounded-lg shadow-md ">
+              <div className="w-full grid grid-cols-3 gap-x-6 gap-y-4 pb-2">
+                {/* HEADER */}
+                <div className="flex items-center justify-between border-b col-span-3 py-1 px-2">
+                  <span className="table-header-custom">Lead Information</span>
 
-                    {/* Name */}
-                    <div>
-                      <label
-                        id="name"
-                        className="caption-custom block whitespace-nowrap overflow-hidden"
+                  <div className="flex items-center gap-2">
+                    {!isEditingLeadInfo && userHasAccessToUpdateLead && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setOriginalLeadInfo(selectedLeadData);
+                          setIsEditingLeadInfo(true);
+                          setShowSaveLeadButton(true);
+                        }}
+                        className="flex items-center gap-1 border rounded-md px-2 py-0.5 caption-custom  hover:bg-gray-100 transition-colors"
                       >
-                        Name
-                      </label>
+                        <Pen className="w-2.5 h-2.5" />
+                        Edit
+                      </button>
+                    )}
 
-                      <div className="inline-flex items-center gap-1">
-                        <input
-                        disabled={!userHasAccessToUpdateLead}
-                          title={selectedLeadData.name || ""}
-                          name="name"
-                          type="text"
-                          placeholder="Add here..."
-                          className={`
-          border-none bg-transparent p-0 m-0
-          outline-none focus:ring-0
-          text-slate-800
-          min-w-0
+                    {showSaveLeadButton && (
+                      <div className="flex items-center gap-2">
+                        <Button
+                          type="button"
+                          onClick={handleLeadInfoSave}
+                          className={`${COLORS.ADD_BUTTON} flex items-center justify-center gap-1`}
+                        >
+                          <Save size={12} />
+                          Save
+                        </Button>
 
-          ${
-            selectedLeadData.name
-              ? "table-header-custom"
-              : "caption-custom italic"
-          }
-
-          placeholder:caption-custom
-          placeholder:text-slate-500
-          placeholder:italic
-          
-        `}
-                          value={selectedLeadData.name || ""}
-                          style={{
-                            width: `${Math.min(
-                              selectedLeadData.name?.length || 10,
-                              35,
-                            )}ch`,
-                          }}
-                          onChange={(e) => {
-                            setShowSaveLeadButton(true);
-
-                            setSelectedLeadData({
-                              ...selectedLeadData,
-                              name: e.target.value,
-                            });
-                          }}
-                          maxLength={60}
-                          size={
-                            selectedLeadData.name
-                              ? selectedLeadData.name.length
-                              : 10
-                          }
-                          onKeyDown={async (e) => {
-                            if (e.key === "Enter") {
-                              await handleLeadInfoSave();
-                              e.currentTarget.blur();
-                            }
-                          }}
-                        />
-
-                        <Edit3 className="h-3 w-3 text-slate-400 flex-shrink-0" />
+                        <button
+                          type="button"
+                          onClick={handleCancelLeadInfoEdit}
+                          className="flex items-center gap-1 border rounded-md px-2 py-1 text-xs font-medium text-gray-700 hover:bg-gray-100 transition-colors"
+                        >
+                          <X className="w-3 h-3" />
+                          Cancel
+                        </button>
                       </div>
-                    </div>
+                    )}
                   </div>
-                  {showSaveLeadButton && (
-                    <Button
-                      type="button"
-                      onClick={handleLeadInfoSave}
-                      className={`${COLORS.ADD_BUTTON} flex items-center justify-center gap-0.5`}
-                    >
-                      {" "}
-                      <Save size={12} />
-                      Save
-                    </Button>
-                  )}
                 </div>
 
-                {/* email */}
-                <div className="flex items-center gap-1 ">
-                  {/* Email Icon Box */}
+                {/* NAME - FULL WIDTH */}
+                <div className="col-span-3 flex items-start gap-2 pl-1">
+                  {/* ICON */}
+                  <div className="h-8 w-8 rounded-xl bg-blue-50 flex items-center justify-center flex-shrink-0 mt-1">
+                    <Handshake className="h-4 w-4 text-blue-600" />
+                  </div>
+
+                  {/* CONTENT */}
+                  <div className="flex flex-col min-w-0">
+                    <label className="caption-custom text-slate-500">
+                      Name
+                    </label>
+
+                    <div className="flex items-center gap-1 min-w-0">
+                      <input
+                        disabled={!userHasAccessToUpdateLead}
+                        title={selectedLeadData.name || ""}
+                        name="name"
+                        type="text"
+                        placeholder="Add here..."
+                        className={`
+            border-none bg-transparent p-0 m-0
+            outline-none focus:ring-0
+            text-slate-800 min-w-0
+
+            ${
+              selectedLeadData.name
+                ? "input-label-custom !font-semibold"
+                : "caption-custom italic"
+            }
+
+            placeholder:caption-custom
+            placeholder:text-slate-500
+            placeholder:italic
+          `}
+                        value={selectedLeadData.name || ""}
+                        style={{
+                          width: `${Math.min(
+                            selectedLeadData.name?.length || 10,
+                            35,
+                          )}ch`,
+                        }}
+                        onChange={(e) => {
+                          setShowSaveLeadButton(true);
+
+                          setSelectedLeadData({
+                            ...selectedLeadData,
+                            name: e.target.value,
+                          });
+                        }}
+                        maxLength={60}
+                        size={
+                          selectedLeadData.name
+                            ? selectedLeadData.name.length
+                            : 10
+                        }
+                        onKeyDown={async (e) => {
+                          if (e.key === "Enter") {
+                            await handleLeadInfoSave();
+                            e.currentTarget.blur();
+                          }
+                        }}
+                      />
+
+                      {isEditingLeadInfo && (
+                        <Edit3 className="h-3.5 w-3.5 text-slate-400 flex-shrink-0" />
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* EMAIL */}
+                <div className="flex items-start gap-2 min-w-0 pl-1">
                   <div className="h-8 w-8 rounded-xl bg-blue-50 flex items-center justify-center flex-shrink-0">
                     <Mail className="h-4 w-4 text-blue-500" />
                   </div>
 
-                  <div className=" items-center   max-w-full">
-                    <label
-                      id="email"
-                      className="caption-custom text-slate-500 "
-                    >
+                  <div className="flex flex-col min-w-0">
+                    <label className="caption-custom text-slate-500">
                       Email
                     </label>
-                    {/* Input + Edit */}
-                    <div className="flex justify-center items-center ">
+
+                    <div className="flex items-center min-w-0">
                       <input
-                       disabled={!userHasAccessToUpdateLead}
+                        disabled={!userHasAccessToUpdateLead}
                         title={selectedLeadData.email || ""}
                         name="email"
                         type="text"
                         placeholder="Add here..."
                         className={`
-          border-none bg-transparent p-0 m-0
-          outline-none focus:ring-0
-          text-slate-800
-          min-w-0
+            border-none bg-transparent p-0 m-0
+            outline-none focus:ring-0
+            text-slate-800 min-w-0
 
-           ${
-            selectedLeadData.email
-              ? "input-label-custom"
-              : "caption-custom italic"
-          }
+            ${
+              selectedLeadData.email
+                ? "input-label-custom"
+                : "caption-custom italic"
+            }
 
-          placeholder:caption-custom
-          placeholder:text-slate-500
-          placeholder:italic
-        `}
+            placeholder:caption-custom
+            placeholder:text-slate-500
+            placeholder:italic
+          `}
                         value={selectedLeadData.email || ""}
                         style={{
                           width: `${Math.min(
@@ -1197,83 +1538,52 @@ const ViewLeadManagement = () => {
                             email: e.target.value,
                           });
                         }}
-                        maxLength={60}
-                        size={
-                          selectedLeadData.email
-                            ? selectedLeadData.email.length
-                            : 10
-                        }
-                        onKeyDown={async (e) => {
-                          if (e.key === "Enter") {
-                            await handleLeadInfoSave();
-
-                            // removes focus
-                            e.currentTarget.blur();
-                          }
-                        }}
                       />
 
-                      <Edit3
-                        className="
-           h-3.5 w-3.5 text-slate-400 flex-shrink-0
-
-          cursor-pointer
-        "
-                      />
+                      {isEditingLeadInfo && (
+                        <Edit3 className="h-3.5 w-3.5 text-slate-400 flex-shrink-0" />
+                      )}
                     </div>
                   </div>
                 </div>
-                {/* Mobile Number */}
-                <div className="flex items-start gap-1 min-w-0 ml-5 ">
-                  {/* Left Icon */}
-                  <div className="h-8 w-8 rounded-xl bg-green-50 flex items-center justify-center flex-shrink-0 mt-1">
+
+                {/* MOBILE */}
+                <div className="flex items-start gap-2 min-w-0">
+                  <div className="h-8 w-8 rounded-xl bg-green-50 flex items-center justify-center flex-shrink-0">
                     <Phone className="h-4 w-4 text-green-500" />
                   </div>
 
-                  {/* Label + Value */}
                   <div className="flex flex-col min-w-0">
-                    <label
-                      id="mobileNumber"
-                      className="caption-custom text-slate-500 whitespace-nowrap"
-                    >
-                      Mobile number
+                    <label className="caption-custom text-slate-500">
+                      Mobile Number
                     </label>
 
                     <div className="flex items-center min-w-0">
                       <input
-                       disabled={!userHasAccessToUpdateLead}
+                        disabled={!userHasAccessToUpdateLead}
                         title={selectedLeadData.mobileNumber || ""}
                         name="mobileNumber"
                         type="text"
                         placeholder="Add here..."
                         className={`
-          border-none bg-transparent p-0 m-0
-          outline-none focus:ring-0
-          text-slate-800
-          min-w-0
+            border-none bg-transparent p-0 m-0
+            outline-none focus:ring-0
+            text-slate-800 min-w-0
 
-           ${
-            selectedLeadData.mobileNumber
-              ? "input-label-custom"
-              : "caption-custom italic"
-          }
+            ${
+              selectedLeadData.mobileNumber
+                ? "input-label-custom"
+                : "caption-custom italic"
+            }
 
-          placeholder:caption-custom
-          placeholder:text-slate-500
-          placeholder:italic
-        `}
+            placeholder:caption-custom
+            placeholder:text-slate-500
+            placeholder:italic
+          `}
                         value={selectedLeadData.mobileNumber || ""}
-                        style={{
-                          width: `${Math.min(
-                            (selectedLeadData.mobileNumber?.length || 10) + 1,
-                            12,
-                          )}ch`,
-                        }}
                         onChange={(e) => {
-                          // remove non-numeric characters
                           const value = e.target.value.replace(/\D/g, "");
 
-                          // allow only 10 digits
                           if (value.length <= 10) {
                             setShowSaveLeadButton(true);
 
@@ -1283,129 +1593,87 @@ const ViewLeadManagement = () => {
                             });
                           }
                         }}
-                        inputMode="numeric"
-                        pattern="[0-9]*"
-                        maxLength={10}
-                        minLength={10}
-                        size={
-                          selectedLeadData.mobileNumber
-                            ? selectedLeadData.mobileNumber.length
-                            : 10
-                        }
-                        onKeyDown={async (e) => {
-                          if (e.key === "Enter") {
-                            const mobile = selectedLeadData.mobileNumber || "";
-
-                            if (mobile.length !== 10) {
-                              toast.error(
-                                "Mobile number must be exactly 10 digits",
-                              );
-                              return;
-                            }
-
-                            await handleLeadInfoSave();
-
-                            // remove focus
-                            e.currentTarget.blur();
-                          }
-                        }}
                       />
 
-                      <Edit3
-                        className="
-          ml-1 h-3.5 w-3.5 text-slate-400 flex-shrink-0
-          cursor-pointer
-        "
-                      />
+                      {isEditingLeadInfo && (
+                        <Edit3 className="h-3.5 w-3.5 text-slate-400 flex-shrink-0" />
+                      )}
                     </div>
                   </div>
                 </div>
-                <div className="flex items-center  gap-1  ">
-                  {/* Left Icon */}
-                  <div className="h-8 w-8 rounded-xl bg-orange-50 flex items-center justify-center flex-shrink-0 ">
-                    <Network className="h-4 w-4 text-orange-400" />
+
+                {/* LEAD OWNER */}
+                <div className="flex items-start gap-2 min-w-0">
+                  <div className="h-8 w-8 rounded-xl bg-pink-50 flex items-center justify-center flex-shrink-0">
+                    <Crown className="h-4 w-4 text-pink-500" />
                   </div>
+
+                  <div className="flex relative">
+                    <CompanyUserSearchFieldInput
+                      key={refreshkeyForLeadOwnerChange}
+                      label="Lead Owner"
+                      labelClassname="caption-custom"
+                      onUserSelected={handleLeadOwnerSelected}
+                      defaultValue={selectedLeadData?.leadOwner}
+                      disabled={!isEditingLeadInfo}
+                      has={{
+                        border: false,
+                        penLogo: isEditingLeadInfo,
+                        xLogo: false,
+                        searchLogo: false,
+                      }}
+                    />
+
+                    <button
+                      type="button"
+                      title="Lead owner history"
+                      className="absolute left-24 caption-custom flex items-center mt-1 hover:text-blue-700"
+                      onClick={() => {
+                        setIsOpenLeadOwnerHistory(!isOpenLeadOwnerHistory);
+                      }}
+                    >
+                      <History size={12} />
+                    </button>
+                  </div>
+                </div>
+
+                {/* LEAD SOURCE */}
+                <div className="flex items-start gap-2 min-w-0 pl-1">
+                  <div className="h-8 w-8 rounded-xl bg-orange-50 flex items-center justify-center flex-shrink-0">
+                    <Network className="h-4 w-4 text-orange-500" />
+                  </div>
+
                   <Detail
                     type="none"
-                    label="Lead source"
+                    label="Lead Source"
                     value={selectedLeadData?.leadSource}
                   />
                 </div>
 
-                <div className="flex items-center  gap-1  ">
-                  {/* Left Icon */}
-                  <div className="h-8 w-8 rounded-xl bg-yellow-50 flex items-center justify-center flex-shrink-0 ">
+                {/* CREATED ON */}
+                <div className="flex items-start gap-2 min-w-0">
+                  <div className="h-8 w-8 rounded-xl bg-yellow-50 flex items-center justify-center flex-shrink-0">
                     <Calendar className="h-4 w-4 text-yellow-500" />
                   </div>
+
                   <Detail
                     type="none"
-                    label="Created on"
+                    label="Created On"
                     value={selectedLeadData?.createdOn}
                   />
                 </div>
 
-                <div className="flex items-center  gap-1  ml-5">
-                  {/* Left Icon */}
-                  <div className="h-8 w-8 rounded-xl bg-cyan-50 flex items-center justify-center flex-shrink-0 ">
+                {/* CREATED BY */}
+                <div className="flex items-start gap-2 min-w-0">
+                  <div className="h-8 w-8 rounded-xl bg-cyan-50 flex items-center justify-center flex-shrink-0">
                     <CircleUser className="h-4 w-4 text-cyan-500" />
                   </div>
-                  <div className="">
-                    <Detail
-                      type="none"
-                      label="Created by"
-                      value={selectedLeadData?.createdBy}
-                    />
-                  </div>
-                </div>
-                {/* lead owner */}
-                <div className="flex items-center gap-1">
-                  {/* Left Icon */}
-                  <div className="h-8 w-8 rounded-xl bg-pink-50 flex items-center justify-center flex-shrink-0 ">
-                    <Crown className="h-4 w-4 text-pink-500" />
-                  </div>
-                  <div
-                    className="flex"
-                    title={
-                      userHasAccessToUpdateLead
-                        ? ""
-                        : MESSAGE.MODULE_ACCESS.LEAD_MODULE
-                            .UPDATE_LEAD_ACCESS_DENIED_message
-                    }
-                    onClick={() => {
-                      if (!userHasAccessToUpdateLead) {
-                        toast.error(
-                          MESSAGE.MODULE_ACCESS.LEAD_MODULE
-                            .UPDATE_LEAD_ACCESS_DENIED_message,
-                        );
-                      }
-                    }}
-                  >
-                    <div className="flex relative ">
-                      <CompanyUserSearchFieldInput
-                        key={refreshkeyForLeadOwnerChange}
-                        label="Lead Owner"
-                        labelClassname="caption-custom"
-                        onUserSelected={handleLeadOwnerSelected}
-                        defaultValue={selectedLeadData?.leadOwner}
-                        has={{
-                          border: false,
-                          penLogo: true,
-                          xLogo: false,
-                          searchLogo: false,
-                        }}
-                      />
-                      <button
-                        type="button"
-                        title="Lead owner history"
-                        className="absolute left-24 caption-custom flex items-center mt-1 hover:text-blue-700"
-                        onClick={() => {
-                          setIsOpenLeadOwnerHistory(!isOpenLeadOwnerHistory);
-                        }}
-                      >
-                        <History size={12} className="mt-0" />
-                      </button>
-                    </div>
-                  </div>
+
+                  <Detail
+                    type="none"
+                    label="Created By"
+                    value={selectedLeadData?.createdBy}
+                  />
                 </div>
               </div>
               {reasonInputBoxOpenForLeadOwner && (
@@ -1476,75 +1744,103 @@ const ViewLeadManagement = () => {
           {/* Column 2 */}
           <div className="w-full md:w-1/2 flex  bg-pink-00 flex-col gap-0 ">
             {/* Meeting / Contact / Span Tabs */}
-            <div className=" min-h-[342px] mb-2 shadow-md ">
-              <div className="bg-slate-200   pl-1 mb-0.5  border-b-2 flex caption-custom gap-4">
-                <span
-                  id="contact"
-                  className={`cursor-pointer ${
-                    activeTab === "contact"
-                      ? "border-b-2 border-blue-500 caption-custom-blue"
-                      : "hover:text-blue-500"
-                  }`}
-                  onClick={handleClickCards}
-                >
-                  Contacts
-                </span>
-                <span
-                  id="meeting"
-                  className={`cursor-pointer ${
-                    activeTab === "meeting"
-                      ? "border-b-2 border-blue-500 caption-custom-blue"
-                      : "hover:text-blue-500"
-                  }`}
-                  onClick={handleClickCards}
-                >
-                  Meeting
-                </span>
-
-                <span
-                  id="LeadTeams"
-                  className={`cursor-pointer ${
-                    activeTab === "LeadTeams"
-                      ? "border-b-2 border-blue-500 caption-custom-blue"
-                      : "hover:text-blue-500"
-                  }`}
-                  onClick={handleClickCards}
-                >
-                  Lead Teams
-                </span>
-
-                <span
-                  id="LeadNotes"
-                  className={`cursor-pointer ${
-                    activeTab === "LeadNotes"
-                      ? "border-b-2 border-blue-500 caption-custom-blue"
-                      : "hover:text-blue-500"
-                  }`}
-                  onClick={handleClickCards}
-                >
-                  Notes
-                </span>
-
-                {selectedLeadData?.leadSourceId === 2 && (
+            <div
+              className={`
+                      transition-all duration-300
+                      overflow-hidden
+                      border border-slate-200
+                      rounded-lg
+                      bg-white
+                      shadow-md
+                      my-1
+                      h-[260px]
+                  
+                      ${showAllContacts ? "max-h-[400px]" : "h-[260px]"}
+                    `}
+            >
+              <div className="pl-1 py-1.5 border-b flex justify-between items-center">
+                <div className="flex gap-4 caption-custom">
                   <span
-                    id="conversation"
+                    id="contact"
                     className={`cursor-pointer ${
-                      activeTab === "conversation"
+                      activeTab === "contact"
                         ? "border-b-2 border-blue-500 caption-custom-blue"
                         : "hover:text-blue-500"
                     }`}
                     onClick={handleClickCards}
                   >
-                    Conversation
+                    Contacts
                   </span>
-                )}
+                  <span
+                    id="meeting"
+                    className={`cursor-pointer ${
+                      activeTab === "meeting"
+                        ? "border-b-2 border-blue-500 caption-custom-blue"
+                        : "hover:text-blue-500"
+                    }`}
+                    onClick={handleClickCards}
+                  >
+                    Meeting
+                  </span>
+
+                  <span
+                    id="LeadTeams"
+                    className={`cursor-pointer ${
+                      activeTab === "LeadTeams"
+                        ? "border-b-2 border-blue-500 caption-custom-blue"
+                        : "hover:text-blue-500"
+                    }`}
+                    onClick={handleClickCards}
+                  >
+                    Lead Teams
+                  </span>
+
+                  <span
+                    id="LeadNotes"
+                    className={`cursor-pointer ${
+                      activeTab === "LeadNotes"
+                        ? "border-b-2 border-blue-500 caption-custom-blue"
+                        : "hover:text-blue-500"
+                    }`}
+                    onClick={handleClickCards}
+                  >
+                    Notes
+                  </span>
+
+                  {selectedLeadData?.leadSourceId === 2 && (
+                    <span
+                      id="conversation"
+                      className={`cursor-pointer ${
+                        activeTab === "conversation"
+                          ? "border-b-2 border-blue-500 caption-custom-blue"
+                          : "hover:text-blue-500"
+                      }`}
+                      onClick={handleClickCards}
+                    >
+                      Conversation
+                    </span>
+                  )}
+                </div>
+
+                {/* RIGHT SIDE: ADD BUTTON */}
+                {/* {activeTab === "contact" && (
+    <Button
+      className={COLORS.ADD_BUTTON}
+      onClick={() => setOpenLeadContactModal(true)}
+    >
+      + Add Contact
+    </Button>
+  )} */}
               </div>
-              <div className="flex flex-col min-h-72 max-h-72 h-full bg-red-00  gap-2">
+              <div className="flex flex-col h-full bg-red-00 gap-2">
                 <div
-                  className={`flex min-h-72 max-h-72  overflow-y-scroll flex-col  gap-2 [&::-webkit-scrollbar]:w-2
-            [&::-webkit-scrollbar-track]:bg-gray-50
-             [&::-webkit-scrollbar-thumb]:bg-gray-50
-              [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full`}
+                  className="
+                      flex flex-col gap-2 h-full overflow-y-auto
+                      [&::-webkit-scrollbar]:w-2
+                      [&::-webkit-scrollbar-track]:bg-gray-50
+                      [&::-webkit-scrollbar-thumb]:bg-gray-200
+                      [&::-webkit-scrollbar-thumb]:rounded-full
+                    "
                 >
                   {activeTab === "meeting" && (
                     <div className="flex  items-center justify-center   min-h-72">
@@ -1585,11 +1881,37 @@ const ViewLeadManagement = () => {
                   )}
 
                   {activeTab === "contact" && (
-                    <LeadContact
-                      selectedLeadData={selectedLeadData}
-                      leadContact={leadContact}
-                      fetchLeadContact={fetchLeadContact}
-                    />
+                    <div className="h-[220px] overflow-y-auto ">
+                      {
+                        <LeadContact
+                          selectedLeadData={selectedLeadData}
+                          leadContact={visibleContacts}
+                          fetchLeadContact={fetchLeadContact}
+                        />
+                      }
+
+                      {leadContact.length > 2 && (
+                        <div
+                          className="sticky bottom-0 
+                          bg-white
+                          px-2 
+                          z-10"
+                        >
+                          <button
+                            type="button"
+                            onClick={() => setShowAllContacts(!showAllContacts)}
+                            className="
+                                  hover:text-blue-700 hover:underline focus:outline-none caption-custom-blue 
+                                  
+                                "
+                          >
+                            {showAllContacts
+                              ? "Show Less"
+                              : `View All Contacts (${leadContact.length})`}
+                          </button>
+                        </div>
+                      )}
+                    </div>
                   )}
                   {activeTab === "LeadTeams" && (
                     <LeadAssignedTeams
@@ -1961,7 +2283,7 @@ const Detail: React.FC<DetailProps> = ({
           {value ? (
             <>
               {value} {/* Icon never gets truncated */}
-              <Edit3 className="ml-1 h-3 w-3 inline-block text-slate-400 flex-shrink-0" />
+              <Edit3 className="ml-1 h-4 w-4 inline-block text-slate-400 flex-shrink-0" />
             </>
           ) : (
             <span className="input-label-custom">Add here...</span>
@@ -1991,7 +2313,7 @@ const Detail: React.FC<DetailProps> = ({
             </span>
 
             {/* Icon never gets truncated */}
-            <Edit3 className="ml-1 h-3 w-3 text-slate-400 flex-shrink-0" />
+            <Edit3 className="ml-1 h-4 w-4 text-slate-400 flex-shrink-0" />
           </div>
         </div>
 

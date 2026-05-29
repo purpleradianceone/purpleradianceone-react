@@ -37,13 +37,12 @@ import PaginationWithoutCount from "../ag-grid/PaginationWithoutCount";
 import CompanyUserAccessManagementModalNew from "../modals/company-user/CompanyUserAccessManagementModalNew";
 import { customDateRangeId } from "../../config/hooks/usePaginationHandler";
 
-import CustomDropdown from "../modals/leads/CustomDropdown";
 import SummaryCards from "../ui/SummaryCards";
 
 import CompanyUserSummary from "../../@types/company-users/CompanyUserSummary";
 
 import CompanyUserReportModal from "../modals/company-user/CompanyUserReportModal";
-
+import CustomStatusFilterDropdown from "../ui/CustomStatusFilterDropdown";
 
 function GetCompanyUsersList({
   users,
@@ -55,7 +54,7 @@ function GetCompanyUsersList({
   isUsedInAccountProductForAssingingInstalledBy,
   onRowSelect,
   isDataLoading,
-   selectedStatus,
+  selectedStatus,
   setSelectedStatus,
 }: GetCompanyUsersListProps) {
   const { userPreference } = useUserPreference();
@@ -66,7 +65,7 @@ function GetCompanyUsersList({
   const [isDashboardModalOpen, setIsDashboardModalOpen] =
     useState<boolean>(false);
 
-    const [isUserReportModalOpen, setIsUserReportModalOpen] =
+  const [isUserReportModalOpen, setIsUserReportModalOpen] =
     useState<boolean>(false);
 
   const [isEditCompanyUserModalOpen, setIsEditModalOpen] =
@@ -87,6 +86,7 @@ function GetCompanyUsersList({
   const { loginStatus } = useLoggedInUserContext();
   const { tutorailData, setTutorailData } = useTutorailDataContext();
   const [tourFinished, setTourFinished] = useState<boolean>(false);
+  
 
   useEffect(() => {
     setTourFinished(tutorailData.isCompanyUserSeen);
@@ -139,7 +139,7 @@ function GetCompanyUsersList({
 
   const handleUserReportModalOpen = (status: boolean) => {
     setIsUserReportModalOpen(status);
-  }
+  };
 
   const handleTourModalOpen = (index: number) => {
     if (index === 2) {
@@ -264,81 +264,65 @@ function GetCompanyUsersList({
     setIsCustomDateOptionSelected,
   ]);
 
-  
   const [companyUserSummary, setCompanyUserSummary] =
-  useState<CompanyUserSummary>({
-    total_company_users: 0,
-    total_active_users: 0,
-    total_inactive_users: 0,
-    total_users_created_this_month: 0,
-  });
-
+    useState<CompanyUserSummary>({
+      total_company_users: 0,
+      total_active_users: 0,
+      total_inactive_users: 0,
+      total_users_created_this_month: 0,
+    });
 
   const fetchCompanyUserSummary = useCallback(async () => {
-  try {
-    const postData = {
-      company_id: loginStatus.companyId,
-      requestedby: loginStatus.id,
-    };
-    const response = await axios.post(
-      POST_API.SUMMARY_COMPANY_USER,
-      postData,
-      {
-        withCredentials: true,
-      },
-    );
+    try {
+      const postData = {
+        company_id: loginStatus.companyId,
+        requestedby: loginStatus.id,
+        
+      };
+      const response = await axios.post(
+        POST_API.SUMMARY_COMPANY_USER,
+        postData,
+        {
+          withCredentials: true,
+        },
+      );
 
-    if (response.data?.length > 0) {
-      setCompanyUserSummary(response.data[0]);
+      if (response.data?.length > 0) {
+        setCompanyUserSummary(response.data[0]);
+      }
+    } catch (error) {
+      console.error(error);
     }
-  } catch (error) {
-    console.error(error);
-  }
-}, [loginStatus.companyId, loginStatus.id]);
+  },[loginStatus.companyId, loginStatus.id]);
 
-const refreshAllData = async () => {
-  await onRefreshUsers();
-  await fetchCompanyUserSummary();
-};
 
-useEffect(() => {
-  if (loginStatus.companyId && loginStatus.id) {
-    fetchCompanyUserSummary();
-  }
-}, [fetchCompanyUserSummary]);
+  useEffect(() => {
+    if (loginStatus.companyId && loginStatus.id) {
+      fetchCompanyUserSummary();
+    }
+  }, [fetchCompanyUserSummary]);
   //all card data
- 
 
   //Reset
-  const handleResetFilters = () => {
-    // reset search
-    handleSearchOption.handleSearchParameterChange("");
+const handleResetFilters = () => {
+  handleSearchOption.handleSearchParameterChange("");
+  setSelectedStatus("ALL");
+  handleDateRangeIdChange(0);
+  setIsCustomDateOptionSelected(false);
 
-    // reset status
-    setSelectedStatus("ALL");
-
-    // reset date filter
-    handleDateRangeIdChange(0);
-
-    // reset custom date picker
-    setIsCustomDateOptionSelected(false);
-  };
-
-  //STATUS FILTER
+  setTimeout(() => {
+    onRefreshUsers();
+    fetchCompanyUserSummary();
+  }, 0);
+};
 
 
-  const filteredUsers = users?.filter((user) => {
-  switch (selectedStatus) {
-    case "ACTIVE":
-      return user.isactive === true;
-
-    case "INACTIVE":
-      return user.isactive === false;
-
-    default:
-      return true;
-  }
-});
+ const refreshAllData = useCallback(async () => {
+  await Promise.all([
+    onRefreshUsers(),
+    fetchCompanyUserSummary(),
+  ]);
+}, [onRefreshUsers, fetchCompanyUserSummary]);
 
   const statusOptions = [
     {
@@ -393,47 +377,47 @@ useEffect(() => {
 
         {/* Status Cards */}
         <SummaryCards
-  cardGap={0.5}
-  width="70"
-  cards={[
-    {
-      title: "Total Users",
-      count: companyUserSummary.total_company_users,
-      subtitle: "Organization users",
-      icon: Users,
-      iconBg: "bg-violet-100",
-      iconColor: "text-violet-600",
-    },
+         cardGap={12}
+         width="70%"
+          cards={[
+            {
+              title: "Total Users",
+              count: companyUserSummary.total_company_users,
+              subtitle: "Organization users",
+              icon: Users,
+              iconBg: "bg-violet-100",
+              iconColor: "text-violet-600",
+            },
 
-    {
-      title: "Active Users",
-      count: companyUserSummary.total_active_users,
-      subtitle: "Currently active",
-      icon: UserCheck,
-      iconBg: "bg-green-100",
-      iconColor: "text-green-600",
-    },
+            {
+              title: "Active Users",
+              count: companyUserSummary.total_active_users,
+              subtitle: "Currently active",
+              icon: UserCheck,
+              iconBg: "bg-green-100",
+              iconColor: "text-green-600",
+            },
 
-    {
-      title: "Inactive Users",
-      count: companyUserSummary.total_inactive_users,
-      subtitle: "Awaiting activation",
-      icon: Clock3,
-      iconBg: "bg-orange-100",
-      iconColor: "text-orange-500",
-    },
+            {
+              title: "Inactive Users",
+              count: companyUserSummary.total_inactive_users,
+              subtitle: "Currently inactive",
+              icon: Clock3,
+              iconBg: "bg-orange-100",
+              iconColor: "text-orange-500",
+            },
 
-    {
-      title: "New This Month",
-      count: `+${companyUserSummary.total_users_created_this_month}`,
-      subtitle: "Recently added users",
-      icon: UserPlus,
-      iconBg: "bg-white/20 backdrop-blur-sm",
-      iconColor: "text-white",
-      isGradient: true,
-    },
-  ]}
-/>
+            {
+              title: "New This Month",
+              count: `+${companyUserSummary.total_users_created_this_month}`,
+              subtitle: "Recently added users",
+              icon: UserPlus,
+              iconBg: "bg-white/20 backdrop-blur-sm",
+              iconColor: "text-white",
+              isGradient: true,
+            },
+          ]}
+        />
 
         {/* SEARCH + FILTER BAR */}
         <div
@@ -467,7 +451,7 @@ useEffect(() => {
                     );
                   }}
                   value={handleSearchOption.searchParameter}
-                  placeholder="Search by name, email or mobile number..."
+                  placeholder="Search by name, email or mobile number"
                   height="h-9"
                 />
               </div>
@@ -476,21 +460,19 @@ useEffect(() => {
             {/* DATE FILTER */}
             <div
               className="
-        h-9
-        px-2
-      
-        border border-slate-200
-        rounded-lg
-        bg-white
-        flex items-center 
-        
-        shadow-sm
-      "
+                  h-9
+                  px-2
+                  border border-slate-200
+                  rounded-lg
+                  bg-white
+                  flex items-center 
+                  shadow-sm
+                "
             >
-              <div className="bg-violet-100 h-6 w-6 rounded-md flex justify-center items-center ">
-                <Calendar className="text-violet-600 " size={16} />
+              <div className="bg-violet-100 h-5 w-5 rounded-md flex justify-center items-center ">
+                <Calendar className="text-violet-600 " size={14} />
               </div>
-              <div className="flex flex-col leading-none">
+              <div className="flex items-center py-1">
                 {/* <span className="text-[11px] text-slate-400">
           Date Filter
         </span> */}
@@ -518,67 +500,17 @@ useEffect(() => {
           {/* RIGHT SECTION */}
           <div className="flex items-center gap-5 flex-wrap">
             {/* STATUS */}
-            {/* STATUS */}
-            <div
-              className="
-  
-        h-9
-        px-2
-      
-        border border-slate-200
-        rounded-lg
-        bg-white
-        flex items-center gap-3
-        shadow-sm
-    
-    
-  "
-            >
-              {/* Status Dot */}
-              <div
-                className={`h-6 w-6 rounded-md flex justify-center items-center ${
-                  selectedStatus === "ACTIVE"
-                    ? "bg-green-100"
-                    : selectedStatus === "INACTIVE"
-                      ? "bg-red-100"
-                      : "bg-violet-100"
-                }`}
-              >
-                <div
-                  className={`w-2 h-2 rounded-full flex-shrink-0 ${
-                    selectedStatus === "ACTIVE"
-                      ? "bg-green-500"
-                      : selectedStatus === "INACTIVE"
-                        ? "bg-red-500"
-                        : "bg-violet-500"
-                  }`}
-                />
-              </div>
 
-              {/* Dropdown */}
-              <div className="flex-1 flex items-center ">
-                <CustomDropdown
-                  labelName=""
-                  showBorder={false}
-                  options={statusOptions}
-                  preselectedOption={
-                    statusOptions.find((item) => item.value === selectedStatus)
-                      ?.id
-                  }
-                  onSelect={(selectedId) => {
-                    const selected = statusOptions.find(
-                      (item) => item.id === selectedId,
-                    );
-
-                    if (selected) {
+                        <CustomStatusFilterDropdown
+                    options={statusOptions}
+                    selectedValue={selectedStatus}
+                    onChange={(value) =>
                       setSelectedStatus(
-                        selected.value as "ALL" | "ACTIVE" | "INACTIVE",
-                      );
+                        value as "ALL" | "ACTIVE" | "INACTIVE"
+                      )
                     }
-                  }}
-                />
-              </div>
-            </div>
+                  />
+
 
             {/* RESET */}
             <button
@@ -650,7 +582,7 @@ useEffect(() => {
                 <AddCompanyUserModal
                   isOpen={isAddCompanyUserModalOpen}
                   onClose={() => setIsAddCompanyUserModalOpen(false)}
-                   onUserAdded={refreshAllData}
+                  onUserAdded={refreshAllData}
                 />
               </>
             )}
@@ -674,7 +606,7 @@ useEffect(() => {
               isUsedInAccountProductForAssingingInstalledBy
             }
             handleSelectedCompanyUserChange={handleSelectedCompanyUserChange}
-            users={filteredUsers}
+            users={users}
             handleIdIsEditModalOpen={handleIdIsEditModalOpen}
             handleIsAccessModalOpen={handleIsAccessModalOpen}
             handleIsDashboardModalOpen={handleIsDashboardModalOpen}
@@ -690,7 +622,7 @@ useEffect(() => {
           users={selectedCompanyUser}
         />
         <EditCompanyUserModal
-           handleCompanyUserChange={refreshAllData}
+          handleCompanyUserChange={refreshAllData}
           isOpen={isEditCompanyUserModalOpen}
           onClose={() => {
             setIsEditModalOpen(false);
@@ -707,14 +639,12 @@ useEffect(() => {
         />
 
         <CompanyUserReportModal
-        isOpen={isUserReportModalOpen}
-        onClose={()=>{
-          setIsUserReportModalOpen(false);
-        }}
-        companyUser={selectedCompanyUser}
+          isOpen={isUserReportModalOpen}
+          onClose={() => {
+            setIsUserReportModalOpen(false);
+          }}
+          companyUser={selectedCompanyUser}
         />
-
-
       </div>
       {/* pagination component */}
       <div className="flex items-center justify-end ">

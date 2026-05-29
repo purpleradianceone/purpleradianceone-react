@@ -34,6 +34,7 @@ interface CompanyUserSearchFieldProps {
   hasPenLogo?: boolean;
   hasBorder?: boolean;
   hasSearchLogo?: boolean;
+  disabled?: boolean;
 
   has?: {
     xLogo?: boolean;

@@ -182,7 +182,7 @@ useEffect(() => {
         <SummaryCards
           cardCss="bg-white border border-slate-200 rounded-2xl px-5 py-1.5  shadow-sm flex items-center justify-between gap-2 over:shadow-md transition-all  "
           showGraph
-          cardGap={10}
+          cardGap={40}
           cards={[
             {
               title: "Master Tasks",
