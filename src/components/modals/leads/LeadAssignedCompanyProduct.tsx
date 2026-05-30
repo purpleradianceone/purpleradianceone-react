@@ -238,7 +238,7 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
         
         <span className="table-header-custom text-black whitespace-nowrap pl-1 py-1 ">Products/Requirements</span>
 
-        {userHasAccessToViewLeadProduct && data.length>0 && (
+        {userHasAccessToViewLeadProduct && (
         <div className="flex justify-end items-center gap-x-2 p-1 input-label-custom">
           <Button
             disabled={!userHasAccessToAddLeadProduct}
