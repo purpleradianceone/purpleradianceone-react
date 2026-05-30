@@ -1,13 +1,14 @@
 import {
-  Building2,
   Calendar,
   CircleUser,
+  FileBarChart,
   Handshake,
   Headset,
   Home,
   Layers,
   ListChecks,
   LucideFileArchive,
+  LucideUserPlus2,
   Menu,
   Network,
   PackageCheck,
@@ -16,17 +17,17 @@ import {
   Settings,
   Store,
   UserCogIcon,
-  X,
+  X
 } from "lucide-react";
+import toast from "react-hot-toast";
+import { FaRegFileAlt, FaRegFileArchive } from "react-icons/fa";
 import { Link, NavLink } from "react-router-dom";
 import SideBarProps from "../../../../@types/home/navbar/SideBarProps";
 import { useUserAccessModules } from "../../../../config/hooks/useAccessModules";
 import { SIZE } from "../../../../constants/AppConstants";
+import MESSAGE from "../../../../constants/Messages";
 import ROUTES_URL from "../../../../constants/Routes";
 import SideNavBarItem from "./SideNavBarItem";
-import { FaRegFileAlt, FaRegFileArchive } from "react-icons/fa";
-import toast from "react-hot-toast";
-import MESSAGE from "../../../../constants/Messages";
 
 function SideNavBar({ isOpen, onToggle }: SideBarProps) {
   const {
@@ -44,6 +45,7 @@ function SideNavBar({ isOpen, onToggle }: SideBarProps) {
     userHasAccessToViewCompanyQuotation,
     userHasAccessToViewCompanyProductSale,
     userHasAccessToViewSettingGeneral,
+    userHasAccessToViewCompanyUserReportType,
   } = useUserAccessModules();
 
   return (
@@ -81,11 +83,22 @@ function SideNavBar({ isOpen, onToggle }: SideBarProps) {
         <NavLink to={ROUTES_URL.GET_COMPANY_USERS}>
           {({ isActive }) => (
             <SideNavBarItem
-              icon={Building2}
+              icon={LucideUserPlus2}
               label="Manage Users"
               isOpen={isOpen}
               isActive={isActive}
               disabled={!userHasAccessToViewUser}
+            />
+          )}
+        </NavLink>
+        <NavLink to={ROUTES_URL.REPORT_MANAGEMENT}>
+          {({ isActive }) => (
+            <SideNavBarItem
+              icon={FileBarChart}
+              label="Report"
+              isOpen={isOpen}
+              isActive={isActive}
+              disabled={!userHasAccessToViewCompanyUserReportType}
             />
           )}
         </NavLink>

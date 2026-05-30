@@ -9,13 +9,21 @@ type GetCompanyUsersListProps = {
     handleSearchOption: HandleSearchOptionProps;
     onStartDateChange: (date: Date) => void;
     onEndDateChange: (date: Date) => void;
-    onRefreshUsers: () => void;
+    onRefreshUsers: (isactive?: boolean | null) => void;
     handleCompanyUserChangeOnEdit: (companyUser: CompanyUser) => void;
     isTourFinished? : boolean;
     isUsedInAccountProductForAssingingInstalledBy? : boolean
      // eslint-disable-next-line @typescript-eslint/no-explicit-any
      onRowSelect? : (data : any ) =>void,
      isDataLoading : boolean
+       selectedStatus: "ALL" | "ACTIVE" | "INACTIVE";
+
+  setSelectedStatus: React.Dispatch<
+    React.SetStateAction<
+      "ALL" | "ACTIVE" | "INACTIVE"
+    >
+  >;
+  
 }
 
 export default GetCompanyUsersListProps;

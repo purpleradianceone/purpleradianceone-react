@@ -235,7 +235,7 @@ const LeadAssignedTeams = ({
     {
      ( userHasAccessToViewLeadTeams && leadCompanyTeam && leadCompanyTeam.length ===0) && (
 <div className=" w-full min-h-56 h-full bg-slate-0">
-          <div className="flex min-h-56 gap-1 w-full text-xs h-full bg-green-0 items-center justify-center">
+          <div className="flex min-h-40 gap-1 w-full text-xs bg-green-0 items-center justify-center">
             <Button
               disabled={!userHasAccessToAddLeadTeams}
               onClick={() => {

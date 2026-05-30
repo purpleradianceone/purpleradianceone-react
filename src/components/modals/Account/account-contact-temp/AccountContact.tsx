@@ -179,7 +179,7 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
     ) {
       setErrors((prev) => ({
         ...prev,
-        mobileNumber: "Please enter a valid mobile number.",
+        mobileNumber: "Please enter a valid 10-digit mobile number without country code or spaces.",
       }));
     } else {
       setErrors((prev) => ({
@@ -240,7 +240,7 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
       !MOBILE_NUMBER_VALIDATION.MOBILE_NUMBER_PATTERN_INDIAN.test(mobileNumber)
     ) {
       newErrors.mobileNumber =
-        "Please enter a valid 10-digit Indian mobile number.";
+        "Please enter a valid 10-digit mobile number without country code or spaces.";
       isValid = false;
     }
 
@@ -889,7 +889,6 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
                       type="text"
                       name="mobileNumber"
                       minLength={10}
-                      maxLength={10}
                       placeholder="Enter mobile number"
                       // className={inputClass}
                       onChange={handleFormInputChange}

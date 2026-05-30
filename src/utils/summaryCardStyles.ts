@@ -12,9 +12,9 @@ export const summaryCardStyles = {
   content: "flex flex-col",
 
   /* ICON */
-  iconBox: "w-10 h-10 rounded-2xl  flex items-center justify-center ",
+  iconBox: "w-9 h-9 rounded-2xl  flex items-center justify-center ",
 
-  roundIconBox: "w-10 h-10 rounded-full flex items-center justify-center mt-1",
+  roundIconBox: "w-9 h-9 rounded-full flex items-center justify-center mt-1",
 
   /* TEXT */
   title: "text-xs text-slate-500 font-medium font-['Roboto']",

@@ -167,7 +167,7 @@ function LeadManagementList({
       >
         {/* sticky */}
         <div
-          className={`z-10 top-12 mt-1 p-0.5  flex items-center justify-between text-sm ${COLORS.GRID_HEADER_SECTION_BG_COLOR} rounded-lg shadow-sm  mb-1.5 w-full`}
+          className={`z-10 top-12 mt-1 p-0.5  flex items-center justify-between text-sm ${COLORS.GRID_HEADER_SECTION_BG_COLOR}  rounded-sm w-full mb-0.5 `}
         >
           {isUsedInLeadModule && (
             // <div className="flex gap-1">
@@ -371,10 +371,10 @@ function LeadManagementList({
           <div
             className={
               !isUsedInLeadModule
-                ? `ag-theme-balham w-full h-[60vh]`
+                ? `w-full h-[60vh]`
                 : userPreference.isLeftMenu
-                  ? `ag-theme-balham w-full h-[calc(100vh-115px)]`
-                  : "ag-theme-balham w-full h-[calc(100vh-120px)]"
+                  ? `w-full h-[calc(100vh-111px)]`
+                  : "w-full h-[calc(100vh-120px)]"
             }
           >
             <LeadManagementAgGrid

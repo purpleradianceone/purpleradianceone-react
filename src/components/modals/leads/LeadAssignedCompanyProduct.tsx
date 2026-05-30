@@ -9,12 +9,13 @@ import RefreshToken from "../../../config/validations/RefreshToken";
 import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
 import MESSAGE from "../../../constants/Messages";
 import toast from "react-hot-toast";
-import { Edit2, Save } from "lucide-react";
+import { Edit2, Package, Save } from "lucide-react";
 import COLORS from "../../../constants/Colors";
 import Button from "../../ui/Button";
 import axiosClient from "../../../axios-client/AxiosClient";
-import AccessDeniedMessagePage from "../../views/not-found/AccessDeniedMessagePage";
+// import AccessDeniedMessagePage from "../../views/not-found/AccessDeniedMessagePage";
 import LoadingSpinner from "../../../assets/animations/LoadingSpinner";
+import { taskPriorityStyles } from "../../../utils/colourSpecifierForNameInAggrid";
 
 interface LeadAssignedProductsTableProps {
   data: LeadAssignedCompanyProduct[];
@@ -231,38 +232,13 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
   }
   
   return (
-    <div className="  w-full  h-[400px] overflow-auto  bg-gray-0 ">
-      {/* Header row */}
-      <div className="grid grid-cols-[2.3fr_1.2fr_1fr_1fr_0.5fr] bg-gray-200 border-gray-500 px-1 py-0.5 ">
-        <div className="table-header-custom">Product Name</div>
-        <div className="table-header-custom">Req. Quantity</div>
-        <div className="table-header-custom">Exp. Cost</div>
-        <div className="table-header-custom">Interest</div>
-        <div className="table-header-custom">Status</div>
-      </div>
-       {!userHasAccessToViewLeadProduct && (
-<AccessDeniedMessagePage message={MESSAGE.MODULE_ACCESS.LEAD_PRODUCT.DENIED_VIEW_ACCESS}/>      )}
-      { userHasAccessToViewLeadProduct && data.length == 0 && (
-        <div className="flex w-full gap-1 min-h-28 h-80  caption-custom justify-center items-center ">
-          <Button
-            disabled={!userHasAccessToAddLeadProduct}
-            onClick={() =>{
-              if(userHasAccessToAddLeadProduct){
-                handleAddProductToLeadButtonClick()
-              }else{
-                toast.error(MESSAGE.MODULE_ACCESS.LEAD_MODULE.UPDATE_LEAD_ACCESS_DENIED_message)
-              }
-            }}
-            className={COLORS.ADD_BUTTON}
-          >
-            +Add
-          </Button>
-          <span className="italic">Product is not assigned to lead.</span>
-        </div>
-      )}
-      {/* Data rows */}
-     
-      {userHasAccessToViewLeadProduct && data.length>0 && (
+    <div className="  w-full  h-[205px] border rounded-lg bg-gray-0 ">
+      <div >
+        <div className="border-b px-1 my-1 flex justify-between">
+        
+        <span className="table-header-custom text-black whitespace-nowrap pl-1 py-1 ">Products/Requirements</span>
+
+        {userHasAccessToViewLeadProduct && (
         <div className="flex justify-end items-center gap-x-2 p-1 input-label-custom">
           <Button
             disabled={!userHasAccessToAddLeadProduct}
@@ -281,6 +257,35 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
           </Button>
         </div>
       )}
+        </div>
+
+        
+      {/* Header row */}
+      <div className="border rounded-lg m-2 ">
+      <div className="grid grid-cols-[2.3fr_1.2fr_1fr_1fr_0.5fr] border-b rounded-t-md px-1 py-1.5 bg-slate-100 ">
+        <div className="table-header-custom">Product Name</div>
+        <div className="table-header-custom">Req. Quantity</div>
+        <div className="table-header-custom">Exp. Cost</div>
+        <div className="table-header-custom">Interest</div>
+        <div className="table-header-custom">Status</div>
+
+
+        
+      </div>
+      
+      
+      {/* Data rows */}
+     
+      <div
+      className="
+        max-h-[110px] overflow-y-auto
+        [&::-webkit-scrollbar]:w-2
+        [&::-webkit-scrollbar-track]:bg-gray-50
+        [&::-webkit-scrollbar-thumb]:bg-gray-50
+        [&::-webkit-scrollbar-thumb]:rounded-full
+        [&::-webkit-scrollbar-track]:rounded-full
+      "
+    >
       {userHasAccessToViewLeadProduct &&
         data.length > 0 &&
         data.map(
@@ -294,11 +299,11 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
                   key={index}
                   ref={editingProductId === product.id ? wrapperRef : null}
                   title={product.companyProductName}
-                  className="grid grid-cols-[2fr_1fr_1fr_0.8fr_0.7fr] gap-4 bg-slate-50  border shadow-sm  border-gray-100 rounded-md p-1 mb-2 text-[13px]  hover:shadow-md items-center " // Added 'animate-fade-in' removed this function of animation
+                  className="grid grid-cols-[2fr_1fr_1fr_0.8fr_0.7fr] gap-4 p-1 my-2 text-[13px]  hover:shadow-md items-center " // Added 'animate-fade-in' removed this function of animation
                 >
                   <div
-                    className={`  input-label-custom rounded-lg ${
-                      !product.isActive ? "opacity-50 " : ""
+                    className={`flex items-center gap-2 input-label-custom rounded-lg min-w-0 ${
+                      !product.isActive ? "opacity-50" : ""
                     }`}
                     onClick={() => {
                       if (!product.isActive) {
@@ -307,7 +312,14 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
                       }
                     }}
                   >
-                    {product.companyProductName}
+                    <div className="w-5 h-5 rounded-md bg-blue-100 flex items-center justify-center">
+                      <Package size={14} className="text-blue-600 flex-shrink-0" />
+                    </div>
+
+
+                    <span className="truncate w-full">
+                      {product.companyProductName}
+                    </span>
                   </div>
 
                   {product.isActive &&
@@ -412,11 +424,19 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
                         </span>
                       </div>
                       <div
-                        className={`input-label-custom cursor-pointer flex items-center justify-center gap-1 border rounded-lg ${
-                          !product.isActive
-                            ? "opacity-50 cursor-not-allowed"
-                            : ""
-                        }`}
+                        className={`
+                          input-label-custom cursor-pointer flex items-center justify-center gap-1 
+                          rounded-lg px-2  border 
+                          ${
+                            taskPriorityStyles[product.leadInterestName] ||
+                            "bg-slate-100 text-slate-700 border-slate-200"
+                          }
+                          ${
+                            !product.isActive
+                              ? "opacity-50 cursor-not-allowed"
+                              : ""
+                          }
+                        `}
                         onClick={() => {
                           if (!product.isActive) {
                             handleShowToasterAboutProductIsInactive();
@@ -466,12 +486,15 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
             </>
           )
         )}
+        </div>
 
       {/* {userHasAccessToViewLeadProduct && data.length === 0 && (
         <p className="caption-custom italic text-center p-3">
           No product assigned
         </p>
       )} */}
+      </div>
+    </div>
     </div>
   );
 };

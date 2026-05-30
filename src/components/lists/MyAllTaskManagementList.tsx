@@ -37,6 +37,7 @@ import DateRangePicker from "../ui/DateRangePicker";
 import SearchInput from "../ui/SearchInput";
 import { supportTicketDataUrlSearchParamKey } from "./SupportTicketManagementList";
 import SummaryCards from "../ui/SummaryCards";
+import TaskSummary from "../../@types/my-task-management/TaskSummary";
 
 export const MytaskQueryKey = "task";
 
@@ -86,6 +87,45 @@ function MyAllTaskManagementList({
     handleSearchOption.dateRangeId,
     setIsCustomDateOptionSelected,
   ]);
+
+  const [taskSummary, setTaskSummary] = useState<TaskSummary>({
+  total_task_assigned: 0,
+  total_task_overdue: 0,
+  total_task_due_today: 0,
+  total_task_completed_this_month: 0,
+});
+
+const fetchTaskSummary = async () => {
+  try {
+    const postData = {
+  company_id: loginStatus.companyId,
+  requestedby_id: loginStatus.id,
+};
+
+    const response = await axiosClient.post(
+      POST_API.SUMMARY_GENERAL_TASK,
+      postData,
+      {
+        withCredentials: true,
+      },
+    );
+
+    if (response.data?.length > 0) {
+       setTaskSummary(response.data[0]);
+    }
+  } catch (error: any) {
+    handleApiError(error);
+  }
+};
+
+
+
+useEffect(() => {
+  if (  userHasAccessToViewAllTasks &&
+    loginStatus.companyId && loginStatus.id) {
+    fetchTaskSummary();
+  }
+}, [   userHasAccessToViewAllTasks ,loginStatus.companyId, loginStatus.id]);
 
   if (userHasAccessToViewAllTasks) {
     const getLeadDetails = async (leadId: number) => {
@@ -272,42 +312,9 @@ function MyAllTaskManagementList({
       console.log(data);
     };
 
-    const totalTasks = allTaskData?.length || 0;
 
-    const completedTasks =
-      allTaskData?.filter((task) => task.completedAtDateTime)?.length || 0;
 
-    const overdueTasks =
-      allTaskData?.filter(
-        (task) =>
-          !task.completedAtDateTime &&
-          task.dueDateTime &&
-          new Date(task.dueDateTime) < new Date(),
-      )?.length || 0;
-
-    // const pendingTasks =
-    //   allTaskData?.filter(
-    //     (task) =>
-    //       !task.completedAtDateTime &&
-    //       task.dueDateTime &&
-    //       new Date(task.dueDateTime) >= new Date()
-    //   )?.length || 0;
-
-    const dueTodayTasks =
-      allTaskData?.filter((task) => {
-        if (!task.dueDateTime || task.completedAtDateTime) {
-          return false;
-        }
-
-        const dueDate = new Date(task.dueDateTime);
-        const today = new Date();
-
-        return (
-          dueDate.getDate() === today.getDate() &&
-          dueDate.getMonth() === today.getMonth() &&
-          dueDate.getFullYear() === today.getFullYear()
-        );
-      })?.length || 0;
+  
 
     return (
       <div
@@ -318,51 +325,51 @@ function MyAllTaskManagementList({
         {/* Task Overview Cards */}
         {/* My Task Overview Cards */}
         <SummaryCards
-          cardCss="bg-white border border-slate-200 rounded-2xl px-5 py-1.5  shadow-sm flex items-center justify-between gap-2 over:shadow-md transition-all"
-          showGraph
-          cardGap={10}
-          cards={[
-            {
-              title: "My Tasks",
-              count: totalTasks,
-              subtitle: "Tasks assigned to you",
-              icon: ListTodo,
-              iconBg: "bg-violet-100",
-              iconColor: "text-violet-600",
-              graphColor: "bg-violet-500",
-            },
+  cardCss="bg-white border border-slate-200 rounded-2xl px-5 py-1.5 shadow-sm flex items-center justify-between gap-2 hover:shadow-md transition-all"
+  showGraph
+  cardGap={40}
+  cards={[
+    {
+      title: "My Tasks",
+      count: taskSummary.total_task_assigned,
+      subtitle: "Tasks assigned to you",
+      icon: ListTodo,
+      iconBg: "bg-violet-100",
+      iconColor: "text-violet-600",
+      graphColor: "bg-violet-500",
+    },
 
-            {
-              title: "Overdue",
-              count: overdueTasks,
-              subtitle: "Tasks need attention",
-              icon: AlertCircle,
-              iconBg: "bg-red-100",
-              iconColor: "text-red-500",
-              graphColor: "bg-red-500",
-            },
+    {
+      title: "Overdue",
+      count: taskSummary.total_task_overdue,
+      subtitle: "Tasks need attention",
+      icon: AlertCircle,
+      iconBg: "bg-red-100",
+      iconColor: "text-red-500",
+      graphColor: "bg-red-500",
+    },
 
-            {
-              title: "Due Today",
-              count: dueTodayTasks,
-              subtitle: "Tasks due today",
-              icon: CalendarClock,
-              iconBg: "bg-orange-100",
-              iconColor: "text-orange-500",
-              graphColor: "bg-orange-500",
-            },
+    {
+      title: "Due Today",
+      count: taskSummary.total_task_due_today,
+      subtitle: "Tasks due today",
+      icon: CalendarClock,
+      iconBg: "bg-orange-100",
+      iconColor: "text-orange-500",
+      graphColor: "bg-orange-500",
+    },
 
-            {
-              title: "Completed",
-              count: completedTasks,
-              subtitle: "This month",
-              icon: CheckCircle2,
-              iconBg: "bg-emerald-100",
-              iconColor: "text-emerald-500",
-              graphColor: "bg-emerald-500",
-            },
-          ]}
-        />
+    {
+      title: "Completed",
+      count: taskSummary.total_task_completed_this_month,
+      subtitle: "This month",
+      icon: CheckCircle2,
+      iconBg: "bg-emerald-100",
+      iconColor: "text-emerald-500",
+      graphColor: "bg-emerald-500",
+    },
+  ]}
+/>
         {/* sticky */}
         {
           <div
@@ -403,7 +410,7 @@ function MyAllTaskManagementList({
                   >
                     <SearchInput
                       value={handleSearchOption.searchParameter}
-                      placeholder="Search Task ..."
+                      placeholder="Search by subject, description or remark"
                       onChange={(e) => {
                         handleSearchOption.handleSearchParameterChange(
                           e.target.value,
@@ -515,6 +522,7 @@ function MyAllTaskManagementList({
             isOpen={isCreateTaskMasterModalOpen}
             handleClose={handleCreateTaskMasterModalClose}
             handleTaskMasterCreate={handleAddAllTask}
+            refreshSummary={fetchTaskSummary}
           ></CreateGeneralTaskMasterModal>
         </div>
 

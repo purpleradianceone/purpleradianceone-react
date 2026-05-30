@@ -7,8 +7,6 @@ import ActionsDropdownButton from "../../ui/ActionsDropdownButton";
 import ConfirmationDialog from "../../dialogue-box/ConfirmationDialogue";
 
 const QuotationActionsDropdown = ({ data, context }: any) => {
-  console.log("QuotationActionDropdown data:");
-  console.log(data);
   const [open, setOpen] = useState(false);
   const [isOpenConfirmationDialog, setOpenConfirmationDialog] =
     useState<boolean>(false);

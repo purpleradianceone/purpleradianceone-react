@@ -208,7 +208,7 @@ function CompanyUserReportModal({
   if (!isOpen) return null;
 
   return createPortal(
-    <div className="fixed inset-0 z-50 p-4 overflow-hidden bg-black bg-opacity-5">
+    <div className="fixed inset-0 z-50 p-4 overflow-hidden bg-black/40 backdrop-blur-[1px] bg-opacity-5">
       <div className="flex min-h-screen items-center justify-center">
         <div className="relative p-4 w-full max-w-[50%] min-h-[50vh] h-[55vh] max-h-[60vh] bg-white rounded-lg shadow-xl animate-fadeIn flex flex-col">
           {/* HEADER */}

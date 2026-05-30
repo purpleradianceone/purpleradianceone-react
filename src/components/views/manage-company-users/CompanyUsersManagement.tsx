@@ -66,9 +66,6 @@ function GetCompanyUsers({
 
    const [refreshUsers, setRefreshUsers] = useState(0);
 
-  const handleRefreshUsers = () => {
-  setRefreshUsers((prev) => prev + 1);
-};
 
 
 
@@ -103,6 +100,15 @@ const savedFilters = JSON.parse(
     }
   };
 
+    const [selectedStatus, setSelectedStatus] = useState<
+  "ALL" | "ACTIVE" | "INACTIVE"
+>(
+  savedFilters.selectedStatus || "ALL"
+);
+  const handleRefreshUsers = () => {
+  setRefreshUsers((prev) => prev + 1);
+};
+
   // Fetch data function
   const fetchCompanyUsers = async (signal: AbortSignal) => {
     if (dateRangeId === customDateRangeId && concatDate.trim() === "") return;
@@ -110,6 +116,12 @@ const savedFilters = JSON.parse(
 
     const effectiveDateRangeId =
       dateRangeId === customDateRangeId && !concatDate ? 0 : dateRangeId;
+
+      const getIsActiveParam = (status: "ALL" | "ACTIVE" | "INACTIVE") => {
+  if (status === "ACTIVE") return true;
+  if (status === "INACTIVE") return false;
+  return null;
+};
 
     const postData = {
       company_id: loginStatus.companyId,
@@ -120,6 +132,7 @@ const savedFilters = JSON.parse(
       search_company_specific_date_range_id: effectiveDateRangeId,
       search_parameter: searchParameter,
       search_parameter_date: concatDate,
+      isactive: getIsActiveParam(selectedStatus),
     };
 
     try {
@@ -171,7 +184,12 @@ const savedFilters = JSON.parse(
     concatDate,
     userUpdateCount,
     refreshUsers,
+    selectedStatus, 
   ]);
+
+  useEffect(() => {
+  handlePageChange(1);
+}, [selectedStatus]);
 
   useEffect(() => {
     if (!userHasAccessToViewUser) {
@@ -189,6 +207,7 @@ const savedFilters = JSON.parse(
       concatDate,
       customStartDate: startDate,
       customEndDate: endDate,
+      selectedStatus,
     };
 
     localStorage.setItem(
@@ -203,6 +222,7 @@ const savedFilters = JSON.parse(
     concatDate,
     startDate,
     endDate,
+    selectedStatus,
   ]);
 
   // Note : On refresh button click clear the storage
@@ -225,6 +245,8 @@ const savedFilters = JSON.parse(
               transition={{ duration: 0.4, ease: "easeOut" }}
             >
               <GetCompanyUsersList
+               selectedStatus={selectedStatus}
+               setSelectedStatus={setSelectedStatus}
                 onRefreshUsers={handleRefreshUsers}
                 handleCompanyUserChangeOnEdit={handleCompanyUserChangeOnEdit}
                 onEndDateChange={handleEndDateChange}
