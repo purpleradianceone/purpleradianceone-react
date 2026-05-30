@@ -26,7 +26,7 @@ function ReportSnapshotManagement() {
   const { userHasAccessToViewCompanyUserReportType } = useUserAccessModules();
   const [accessDeniedPopUpOpen, setAccessDeniedPopUpOpen] = useState(false);
   const [isLoadingForReportSnapshot, setIsLoadingForReportSnapshot] =
-    useState<boolean>(true);
+    useState<boolean>(false);
   const [reportSnapshotData, setReportSnapshotData] = useState<
     ReportSnapshotProps[]
   >([]);
