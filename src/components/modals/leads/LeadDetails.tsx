@@ -496,6 +496,8 @@ const [isEditingAll, setIsEditingAll] = useState<boolean>(false);
             type="text"
             label="Job title :"
              isEditingAll={isEditingAll}
+             setIsEditingAll={setIsEditingAll}
+             setShowSaveLeadButton={setShowSaveLeadButton}
             value={editLeadDetails.job_title}
             onChange={(e) => {
               // handleLeadDetailsValueChange(e)
@@ -511,7 +513,9 @@ const [isEditingAll, setIsEditingAll] = useState<boolean>(false);
             userHasAccessToUpdate={userHasAccessToUpdateLeadDetails}
             type="select"
             label="Industry :"
-             isEditingAll={isEditingAll}
+            isEditingAll={isEditingAll}
+            setIsEditingAll={setIsEditingAll}
+            setShowSaveLeadButton={setShowSaveLeadButton}
             handleGetDropdownData={() => {
               fetchIndustryType();
             }}
@@ -537,6 +541,8 @@ const [isEditingAll, setIsEditingAll] = useState<boolean>(false);
             type="text"
             label="Add. Contact Number :"
              isEditingAll={isEditingAll}
+             setIsEditingAll={setIsEditingAll}
+             setShowSaveLeadButton={setShowSaveLeadButton}
             value={editLeadDetails.additional_contact_number}
             onChange={(e) => {
               setShowSaveLeadButton(true);
@@ -552,6 +558,8 @@ const [isEditingAll, setIsEditingAll] = useState<boolean>(false);
             type="select"
             label="Country :"
              isEditingAll={isEditingAll}
+             setIsEditingAll={setIsEditingAll}
+             setShowSaveLeadButton={setShowSaveLeadButton}
             // handleGetDropdownData={() => {
             //   getAllCountries();
             // }}
@@ -605,6 +613,8 @@ const [isEditingAll, setIsEditingAll] = useState<boolean>(false);
             maxLength={70}
             label="Industry Name :"
              isEditingAll={isEditingAll}
+             setIsEditingAll={setIsEditingAll}
+             setShowSaveLeadButton={setShowSaveLeadButton}
             value={editLeadDetails.industry_name}
             onChange={(e) => {
               setShowSaveLeadButton(true);
@@ -619,6 +629,8 @@ const [isEditingAll, setIsEditingAll] = useState<boolean>(false);
             type="select"
             label="State :"
              isEditingAll={isEditingAll}
+             setIsEditingAll={setIsEditingAll}
+             setShowSaveLeadButton={setShowSaveLeadButton}
             handleGetDropdownData={() => {
               getAllState(editLeadDetails.country_id);
             }}
@@ -660,6 +672,8 @@ const [isEditingAll, setIsEditingAll] = useState<boolean>(false);
             type="text"
             label="Website :"
              isEditingAll={isEditingAll}
+             setIsEditingAll={setIsEditingAll}
+             setShowSaveLeadButton={setShowSaveLeadButton}
             maxLength={100}
             value={editLeadDetails.website}
             onChange={(e) => {
@@ -675,6 +689,8 @@ const [isEditingAll, setIsEditingAll] = useState<boolean>(false);
             type="select"
             label="District :"
              isEditingAll={isEditingAll}
+             setIsEditingAll={setIsEditingAll}
+             setShowSaveLeadButton={setShowSaveLeadButton}
             handleGetDropdownData={() => {
               getAllDistrict(editLeadDetails.state_id);
             }}
@@ -700,6 +716,8 @@ const [isEditingAll, setIsEditingAll] = useState<boolean>(false);
             label="Address :"
             value={editLeadDetails.address}
              isEditingAll={isEditingAll}
+             setIsEditingAll={setIsEditingAll}
+             setShowSaveLeadButton={setShowSaveLeadButton}
             onChange={(e) => {
               // handleLeadDetailsValueChange(e)
               setShowSaveLeadButton(true);
@@ -747,6 +765,8 @@ type FormFieldProps = {
   hasExistingValue?: boolean;
 
   isEditingAll: boolean;
+  setIsEditingAll?: React.Dispatch<React.SetStateAction<boolean>>;
+  setShowSaveLeadButton?: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 const FormField = ({
@@ -762,6 +782,8 @@ const FormField = ({
   defaultSelectedId,
   hasExistingValue,
   isEditingAll,
+   setIsEditingAll,
+  setShowSaveLeadButton,
 }: FormFieldProps) =>  {
  
 
@@ -797,10 +819,23 @@ const FormField = ({
   }}
 >
         {!isEditingAll ? (
-          <span
-            className="caption-custom cursor-pointer flex items-center justify-between hover:bg-gray-50 hover:rounded-sm w-full truncate whitespace-nowrap"
-            title={value?.toLocaleString()}
-          >
+         <span
+          className="caption-custom cursor-pointer flex items-center justify-between hover:bg-gray-50 hover:rounded-sm w-full truncate whitespace-nowrap"
+          title={value?.toLocaleString()}
+          onClick={() => {
+            if (!userHasAccessToUpdate) {
+              toast.error(
+                MESSAGE.MODULE_ACCESS.LEAD_DETAILS.DENIED_UPDATE_ACCESS
+              );
+              return;
+            }
+
+            setIsEditingAll?.(true);
+            setShowSaveLeadButton?.(true);
+
+            handleGetDropdownData?.();
+          }}
+        >
             {value ? (
               <span className="card-data">{value?.toLocaleString()}</span>
             ) : (

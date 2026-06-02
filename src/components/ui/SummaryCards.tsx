@@ -18,6 +18,7 @@ type SummaryCardsProps = {
   width?: string;
   cardCss?: string;
   cardGap?: number;
+  gridCols?: number;
 };
 
 function SummaryCards({
@@ -25,6 +26,7 @@ function SummaryCards({
   showGraph = false,
   width = "100%",
   cardGap = 12,
+  gridCols = 4,
   cardCss = `
     bg-white
     h-[78px]
@@ -48,13 +50,15 @@ function SummaryCards({
         grid
         grid-cols-1
         sm:grid-cols-2
-        xl:grid-cols-4
+        xl:grid-cols-5
         mb-3
         mt-2
       "
       style={{
         width,
         gap: `${cardGap}px`,
+        gridTemplateColumns: `repeat(${gridCols}, minmax(0, 1fr))`,
+
       }}
     >
       {cards.map((card, index) => {

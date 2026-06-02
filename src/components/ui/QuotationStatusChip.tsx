@@ -50,7 +50,7 @@ const QuotationStatusChip: React.FC<Props> = ({ statusId }) => {
 
   return (
     <span
-      className={`inline-flex items-center gap-1 px-2 py-0.5 text-xs  rounded-full border ${status.bg} ${status.text} ${status.border}`}
+      className={`inline-flex items-center gap-1 px-2 py-0.5 text-xs  rounded-lg border ${status.bg} ${status.text} ${status.border}`}
     >
       {status.icon}
       {status.label}

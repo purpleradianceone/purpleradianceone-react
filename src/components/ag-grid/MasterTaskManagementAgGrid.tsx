@@ -7,7 +7,6 @@ import { useMemo, useRef } from "react";
 import MasterTaskManagementAgGridProps from "../../@types/ag-grid/MasterTaskManagementAgGridProps";
 import {
   AGGRID,
-  INNERHTML,
   JSX_CHILDREN_NAME,
 } from "../../constants/AppConstants";
 import { SkeletonRowsAgGrid } from "../ui/SkeletonRowsAgGrid";
@@ -335,7 +334,7 @@ function MasterTaskManagementAgGrid({
         rowHeight={AGGRID.ROW_HEIGHT}
         headerHeight={AGGRID.HEADER_HEIGHT}
         // theme={themeBalham}
-        overlayNoRowsTemplate={INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
+        // overlayNoRowsTemplate={INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
         context={{
           handleRowSelect: onRowSelect,
         }}
