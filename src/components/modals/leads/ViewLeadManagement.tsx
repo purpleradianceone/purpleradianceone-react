@@ -615,6 +615,16 @@ const ViewLeadManagement = () => {
     setIsEditingLeadInfo(false);
   };
 
+  const enableLeadInfoEdit = () => {
+  if (!userHasAccessToUpdateLead) return;
+
+  if (!isEditingLeadInfo) {
+    setOriginalLeadInfo(selectedLeadData);
+    setIsEditingLeadInfo(true);
+    setShowSaveLeadButton(true);
+  }
+};
+
   const handleLeadInfoSave = async () => {
     const trimmedName = selectedLeadData.name?.trim() ?? "";
 
@@ -817,7 +827,7 @@ const ViewLeadManagement = () => {
           </div>
           {/**Add Setting in lead details page here  */}
           <div className=" flex items-center min-w-20 justify-end mr-2  ">
-            {/* new code  */}
+            
             <div className="relative inline-block">
               <Popover
                 accessRight={userHasAccessToViewLeadSettings}
@@ -887,9 +897,9 @@ const ViewLeadManagement = () => {
             </button>
           </div>
 
-          {/**Add Setting in lead details page here  */}
+          {/** Setting in lead details page here  */}
           <div className=" flex items-center min-w-20 justify-end mr-2  w-full">
-            {/* new code  */}
+            
             <div className="relative inline-block">
               <button
                 type="button"
@@ -921,7 +931,7 @@ const ViewLeadManagement = () => {
           </div>
 
           <div className="hidden items-center justify-evenly w-48">
-            {/* new code  */}
+            
             <div className="relative inline-block">
               <button
                 type="button"
@@ -970,23 +980,29 @@ const ViewLeadManagement = () => {
                 <span
                   title={selectedLeadData.name || ""}
                   className={`
-      text-slate-800 min-w-0 truncate
+                text-slate-800 min-w-0 truncate
 
-      ${
-        selectedLeadData.name
-          ? "table-header-custom !text-[17px]"
-          : "caption-custom italic text-slate-500"
-      }
-    `}
-                >
-                  {selectedLeadData.name || "Add here..."}
+                ${
+                  selectedLeadData.name
+                    ? "table-header-custom !text-[17px]"
+                    : "!text-slate-700 table-header-custom "
+                }
+              `}
+                          >
+                          {selectedLeadData.name
+                ? selectedLeadData.name
+                : `  — (${
+                    selectedLeadData.email ||
+                    selectedLeadData.mobileNumber ||
+                    ""
+                  })`}
                 </span>
               </div>
               <span
                 className={`caption-custom !text-[11px]
-    truncate
-    ${leadDetailsData.job_title ? "" : "italic text-slate-500"}
-  `}
+                  truncate
+                  ${leadDetailsData.job_title ? "" : "italic text-slate-500"}
+                `}
                 title={leadDetailsData.job_title || ""}
               >
                 {leadDetailsData.job_title}
@@ -999,6 +1015,7 @@ const ViewLeadManagement = () => {
                     labelName="status"
                     options={leadStatus || []}
                     selectedValue={
+                      selectedStatusId ??
                       selectedLeadData.leadStatusId
                         ? Number(selectedLeadData.leadStatusId)
                         : 0
@@ -1155,8 +1172,12 @@ const ViewLeadManagement = () => {
         </div>
 
         {/* Lead Status Section */}
-        <div className="w-[99.5%] bg-white border rounded-md  px-1 mx-1 pt-3 pb-1 mb-2  ">
-          <div className="flex items-center overflow-x-auto min-w-max">
+        <div className="w-[99.5%] bg-white border rounded-md  overflow-x-auto px-1 mx-1 pt-3 pb-1 mb-2 
+                      [&::-webkit-scrollbar]:h-1
+                      [&::-webkit-scrollbar-track]:bg-gray-50
+                      [&::-webkit-scrollbar-thumb]:bg-gray-200
+                      [&::-webkit-scrollbar-thumb]:rounded-full ">
+          <div className="flex items-center min-w-max">
             {leadStatus!.map((item: any, index: number) => {
               const currentIndex = leadStatus!.findIndex(
                 (s: any) => s.name === selectedLeadData.leadStatus,
@@ -1434,8 +1455,10 @@ const ViewLeadManagement = () => {
 
                     <div className="flex items-center gap-1 min-w-0">
                       <input
-                        disabled={!userHasAccessToUpdateLead}
+                        readOnly={!isEditingLeadInfo || !userHasAccessToUpdateLead}
                         title={selectedLeadData.name || ""}
+                        onFocus={enableLeadInfoEdit}
+                        onClick={enableLeadInfoEdit}
                         name="name"
                         type="text"
                         placeholder="Add here..."
@@ -1503,8 +1526,16 @@ const ViewLeadManagement = () => {
 
                     <div className="flex items-center min-w-0">
                       <input
-                        disabled={!userHasAccessToUpdateLead}
+                        readOnly={!isEditingLeadInfo || !userHasAccessToUpdateLead}
                         title={selectedLeadData.email || ""}
+                        onFocus={enableLeadInfoEdit}
+                        onClick={enableLeadInfoEdit}
+                        onKeyDown={async (e) => {
+                          if (e.key === "Enter") {
+                            await handleLeadInfoSave();
+                            e.currentTarget.blur();
+                          }
+                        }}
                         name="email"
                         type="text"
                         placeholder="Add here..."
@@ -1560,9 +1591,17 @@ const ViewLeadManagement = () => {
 
                     <div className="flex items-center min-w-0">
                       <input
-                        disabled={!userHasAccessToUpdateLead}
+                        readOnly={!isEditingLeadInfo || !userHasAccessToUpdateLead}
                         title={selectedLeadData.mobileNumber || ""}
                         name="mobileNumber"
+                        onFocus={enableLeadInfoEdit}
+                   onClick={enableLeadInfoEdit}
+                        onKeyDown={async (e) => {
+                        if (e.key === "Enter") {
+                          await handleLeadInfoSave();
+                          e.currentTarget.blur();
+                        }
+                      }}
                         type="text"
                         placeholder="Add here..."
                         className={`
@@ -1615,7 +1654,9 @@ const ViewLeadManagement = () => {
                       labelClassname="caption-custom"
                       onUserSelected={handleLeadOwnerSelected}
                       defaultValue={selectedLeadData?.leadOwner}
-                      disabled={!isEditingLeadInfo}
+                      disabled={!userHasAccessToUpdateLead || !isEditingLeadInfo}
+                       
+                      
                       has={{
                         border: false,
                         penLogo: isEditingLeadInfo,

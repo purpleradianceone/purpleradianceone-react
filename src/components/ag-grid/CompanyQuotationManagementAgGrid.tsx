@@ -1,14 +1,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { AllCommunityModule, ColDef, themeBalham } from "ag-grid-community";
+import { AllCommunityModule, ColDef } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 import { useMemo, useRef } from "react";
 import CompanyQuotationManagementAgGridProps from "../../@types/ag-grid/CompanyQuotationManagementAgGridProps";
 import { useUserAccessModules } from "../../config/hooks/useAccessModules";
 import QuotationStatusChip from "../ui/QuotationStatusChip";
-import StatusIndicator from "../ui/StatusIndicator";
 import QuotationActionsDropdown from "../views/company-quotation-management/QuotationActionsDropdown";
 import { SkeletonRowsAgGrid } from "../ui/SkeletonRowsAgGrid";
+import { AGGRID } from "../../constants/AppConstants";
+import RenderUserWithIcon from "../ui/UserAgGridCellRenderer";
+import StatusBadge from "../ui/StatusBadge";
 
 function CompanyQuotationManagementAgGrid({
   quotations,
@@ -30,7 +32,7 @@ function CompanyQuotationManagementAgGrid({
             return <SkeletonRowsAgGrid />;
           }
           return (
-            <div className="flex items-center font-bold gap-2">
+            <div className="flex items-center font-bold text-[#1f2937] gap-2">
               <span>{params.value || "[Auto-generated]"}</span>
             </div>
           );
@@ -121,9 +123,9 @@ function CompanyQuotationManagementAgGrid({
            if (params.data?.__isSkeleton) {
             return <SkeletonRowsAgGrid />;
           }
-          return (
-            <div className="flex items-center text-sm gap-1 mt-1">
-              <StatusIndicator isActive={params.value} />
+           return (
+            <div className="h-full flex items-center">
+              <StatusBadge isActive={params.value} />
             </div>
           );
         },
@@ -133,6 +135,7 @@ function CompanyQuotationManagementAgGrid({
         field: "createdBy",
         headerName: "Created By",
         filter: true,
+        cellRenderer: RenderUserWithIcon,
       },
 
       {
@@ -145,6 +148,7 @@ function CompanyQuotationManagementAgGrid({
         field: "updatedBy",
         headerName: "Updated By",
         filter: true,
+        cellRenderer: RenderUserWithIcon,
       },
 
       {
@@ -158,6 +162,7 @@ function CompanyQuotationManagementAgGrid({
         field: "actions",
         pinned: "right",
         maxWidth: 90,
+        filter: false,
         cellRenderer: (params: any) => {
            if (params.data?.__isSkeleton) {
             return <SkeletonRowsAgGrid />;
@@ -194,7 +199,7 @@ function CompanyQuotationManagementAgGrid({
 
   return (
     <div
-      className="ag-theme-balham w-full"
+      className="modern-user-grid custom-height-scrollbar w-full"
       style={{ height: "100%", width: "100%" }}
     >
       <AgGridReact
@@ -204,7 +209,9 @@ function CompanyQuotationManagementAgGrid({
         columnDefs={columnDefs}
         defaultColDef={defaultColDef}
         modules={[AllCommunityModule]}
-        theme={themeBalham}
+        rowHeight={AGGRID.ROW_HEIGHT}
+        headerHeight={AGGRID.HEADER_HEIGHT}
+        // theme={themeBalham}
         // overlayNoRowsTemplate={INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
         context={{
           handleRowSelect: onRowSelect, 
