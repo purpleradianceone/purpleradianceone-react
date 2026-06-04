@@ -25,3 +25,16 @@ export const formatQuantity = (
     maximumFractionDigits: 4,
   });
 };
+export const formatQuantityWithoutDecimal = (
+  value: number | string | null | undefined,
+): string => {
+  if (value === null || value === undefined) return "";
+
+  const num = Number(value);
+  if (isNaN(num)) return "";
+
+  return num.toLocaleString("en-IN", {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  });
+};

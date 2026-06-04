@@ -2,9 +2,11 @@
 import {
   Calendar,
   ClipboardPlus,
+  Clock3,
   Handshake,
   User,
   X,
+  XCircle,
 } from "lucide-react";
 import useScreenSize from "../../config/hooks/useScreenSize";
 import { JSX_CHILDREN_NAME, SIZE } from "../../constants/AppConstants";
@@ -12,7 +14,7 @@ import Button from "../ui/Button";
 import LeadManagementAgGrid from "../ag-grid/LeadManagementsAgGrid";
 import { useUserAccessModules } from "../../config/hooks/useAccessModules";
 import CreateLeadModal from "../modals/leads/CreateLeadModal";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import GetCompanyUsersForLead from "../modals/leads/company-users-selection-modal/GetCompanyUsersForLead";
 import SearchInput from "../ui/SearchInput";
 import DateRangePicker from "../ui/DateRangePicker";
@@ -36,6 +38,12 @@ import PaginationWithoutCount from "../ag-grid/PaginationWithoutCount";
 import { customDateRangeId } from "../../config/hooks/usePaginationHandler";
 import { ComponentHeaderAndLogo } from "../ui/ComponentHeaderAndLogo";
 import { CiImport } from "react-icons/ci";
+import LeadSummary from "../../@types/lead-management/LeadSummary";
+import axiosClient from "../../axios-client/AxiosClient";
+import POST_API from "../../constants/PostApi";
+import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
+import SummaryCards from "../ui/SummaryCards";
+
 function LeadManagementList({
   handleSearchOption,
   onStartDateChange,
@@ -104,6 +112,56 @@ function LeadManagementList({
     console.log(selectedLeadForEdit);
   };
 
+  
+
+const { loginStatus } = useLoggedInUserContext();
+
+const [leadSummary, setLeadSummary] =
+  useState<LeadSummary>({
+    total_leads_converted_this_month: 0,
+    total_leads_converted_last_month: 0,
+    total_leads_created_this_month: 0,
+    total_leads_open: 0,
+    total_leads_lost_this_month: 0,
+  });
+
+  const fetchLeadSummary = useCallback(async () => {
+  try {
+    const postData = {
+      company_id: loginStatus.companyId,
+      requestedby: loginStatus.id,
+    };
+
+    const response = await axiosClient.post(
+      POST_API.SUMMARY_LEAD,
+      postData,
+      {
+        withCredentials: true,
+      }
+    );
+
+    if (response.data?.length > 0) {
+      setLeadSummary(response.data[0]);
+    }
+  } catch (error) {
+    console.error(error);
+  }
+}, [loginStatus.companyId, loginStatus.id]);
+
+
+useEffect(() => {
+  if (loginStatus.companyId && loginStatus.id) {
+    fetchLeadSummary();
+  }
+}, [fetchLeadSummary]);
+
+const refreshAllData = useCallback(async () => {
+  await Promise.all([
+    handleAddLead(),
+    fetchLeadSummary(),
+  ]);
+}, [handleAddLead, fetchLeadSummary]);
+
   const [openPopUpOfCompanyUserModal, setOpenPopUpOfCompanyUserModal] =
     useState(false);
 
@@ -163,11 +221,77 @@ function LeadManagementList({
   if (userHasAccessToViewLead) { 
     return (
       <div
-        className={`w-full ${position === "left" && isUsedInLeadModule ? "pl-5" : "pl-1"} pr-1 gap-1`}
+        className={`w-full ${position === "left" && isUsedInLeadModule ? "pl-7 pr-2" : "pl-1"} pr-1 gap-1 pt-2`}
       >
+
+        {/* Top Header */}
+        <div className="flex items-start justify-between ">
+          <div>
+            <h1 className="page-header-custom tracking-tight pb-0.5">
+              Leads
+            </h1>
+
+            <p className="page-subtitle-custom ">
+              Track, Manage and Convert your leads efficiently.
+            </p>
+          </div>
+        </div>
+ 
+        <SummaryCards
+          cardGap={20}
+          width="100%"
+          gridCols={5}
+          loading = {isLoading}
+          cards={[
+            {
+              title: "Converted Leads",
+              count: leadSummary.total_leads_converted_this_month,
+              subtitle: "This Month",
+              icon: Handshake,
+              iconBg: "bg-green-100",
+              iconColor: "text-green-600",
+            },
+
+            {
+              title: "Converted Leads",
+              count: leadSummary.total_leads_converted_last_month,
+              subtitle: "Last Month",
+              icon: Handshake,
+              iconBg: "bg-blue-100",
+              iconColor: "text-blue-600",
+            },
+
+            {
+              title: "New Leads",
+              count: leadSummary.total_leads_created_this_month,
+              subtitle: "Created This Month",
+              icon: ClipboardPlus,
+              iconBg: "bg-violet-100",
+              iconColor: "text-violet-600",
+            },
+
+            {
+              title: "Open Leads",
+              count: leadSummary.total_leads_open,
+              subtitle: "Current Open Leads",
+              icon: Clock3,
+              iconBg: "bg-orange-100",
+              iconColor: "text-orange-600",
+            },
+
+            {
+              title: "Lost Leads",
+              count: leadSummary.total_leads_lost_this_month,
+              subtitle: "This Month",
+              icon: XCircle,
+              iconBg: "bg-red-100",
+              iconColor:"text-red-600",
+            },
+          ]}
+        />
         {/* sticky */}
         <div
-          className={`z-10 top-12 mt-1 p-0.5  flex items-center justify-between text-sm ${COLORS.GRID_HEADER_SECTION_BG_COLOR}  rounded-sm w-full mb-0.5 `}
+          className={`z-10 top-12 mt-1 py-1.5 px-3 mb-3  flex items-center justify-between text-sm ${COLORS.GRID_HEADER_SECTION_BG_COLOR} border border-slate-200 rounded-lg w-full mb-0.5 `}
         >
           {isUsedInLeadModule && (
             // <div className="flex gap-1">
@@ -186,6 +310,7 @@ function LeadManagementList({
             logo={Handshake}
             />
           )}
+          
 
           {/* {isLargeScreen && ( */}
           <>
@@ -373,7 +498,7 @@ function LeadManagementList({
               !isUsedInLeadModule
                 ? `w-full h-[60vh]`
                 : userPreference.isLeftMenu
-                  ? `w-full h-[calc(100vh-111px)]`
+                  ? `w-full h-[calc(100vh-280px)]`
                   : "w-full h-[calc(100vh-120px)]"
             }
           >
@@ -389,7 +514,7 @@ function LeadManagementList({
           <CreateLeadModal
             isOpen={isCreateLeadModalOpen}
             onClose={handleCreateLeadModalClose}
-            onCreateLeadRefreshLeadData={handleAddLead}
+            onCreateLeadRefreshLeadData={refreshAllData}
           ></CreateLeadModal>
         </div>
 

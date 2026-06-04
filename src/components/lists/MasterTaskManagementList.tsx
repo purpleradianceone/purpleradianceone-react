@@ -183,6 +183,7 @@ useEffect(() => {
           cardCss="bg-white border border-slate-200 rounded-2xl px-5 py-1.5  shadow-sm flex items-center justify-between gap-2 over:shadow-md transition-all  "
           showGraph
           cardGap={40}
+          loading={isDataLoading}
           cards={[
             {
               title: "Master Tasks",
@@ -230,7 +231,7 @@ useEffect(() => {
         {/* sticky */}
         {
           <div
-            className={`sticky z-10 top-12 mt-1 px-3 py-1 flex flex-wrap items-center justify-between gap-3 text-sm ${COLORS.GRID_HEADER_SECTION_BG_COLOR} mb-3 border rounded-lg
+            className={`sticky z-10 top-12 mt-1 px-3 py-1.5 flex flex-wrap items-center justify-between gap-3 text-sm ${COLORS.GRID_HEADER_SECTION_BG_COLOR} mb-3 border rounded-lg
                       w-full
                     `}
           >
@@ -446,7 +447,7 @@ useEffect(() => {
           <div
             className={
               userPreference.isLeftMenu
-                ? `w-full h-[calc(100vh-310px)]`
+                ? `w-full h-[calc(100vh-314px)]`
                 : "w-full h-[calc(100vh-192px)]"
             }
           >
