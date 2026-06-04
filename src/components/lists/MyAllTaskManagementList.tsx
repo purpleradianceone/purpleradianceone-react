@@ -325,51 +325,52 @@ useEffect(() => {
         {/* Task Overview Cards */}
         {/* My Task Overview Cards */}
         <SummaryCards
-  cardCss="bg-white border border-slate-200 rounded-2xl px-5 py-1.5 shadow-sm flex items-center justify-between gap-2 hover:shadow-md transition-all"
-  showGraph
-  cardGap={40}
-  cards={[
-    {
-      title: "My Tasks",
-      count: taskSummary.total_task_assigned,
-      subtitle: "Tasks assigned to you",
-      icon: ListTodo,
-      iconBg: "bg-violet-100",
-      iconColor: "text-violet-600",
-      graphColor: "bg-violet-500",
-    },
+          cardCss="bg-white border border-slate-200 rounded-2xl px-5 py-1.5 shadow-sm flex items-center justify-between gap-2 hover:shadow-md transition-all"
+          showGraph
+          cardGap={40}
+          loading={gridLoading}
+          cards={[
+            {
+              title: "My Tasks",
+              count: taskSummary.total_task_assigned,
+              subtitle: "Tasks assigned to you",
+              icon: ListTodo,
+              iconBg: "bg-violet-100",
+              iconColor: "text-violet-600",
+              graphColor: "bg-violet-500",
+            },
 
-    {
-      title: "Overdue",
-      count: taskSummary.total_task_overdue,
-      subtitle: "Tasks need attention",
-      icon: AlertCircle,
-      iconBg: "bg-red-100",
-      iconColor: "text-red-500",
-      graphColor: "bg-red-500",
-    },
+            {
+              title: "Overdue",
+              count: taskSummary.total_task_overdue,
+              subtitle: "Tasks need attention",
+              icon: AlertCircle,
+              iconBg: "bg-red-100",
+              iconColor: "text-red-500",
+              graphColor: "bg-red-500",
+            },
 
-    {
-      title: "Due Today",
-      count: taskSummary.total_task_due_today,
-      subtitle: "Tasks due today",
-      icon: CalendarClock,
-      iconBg: "bg-orange-100",
-      iconColor: "text-orange-500",
-      graphColor: "bg-orange-500",
-    },
+            {
+              title: "Due Today",
+              count: taskSummary.total_task_due_today,
+              subtitle: "Tasks due today",
+              icon: CalendarClock,
+              iconBg: "bg-orange-100",
+              iconColor: "text-orange-500",
+              graphColor: "bg-orange-500",
+            },
 
-    {
-      title: "Completed",
-      count: taskSummary.total_task_completed_this_month,
-      subtitle: "This month",
-      icon: CheckCircle2,
-      iconBg: "bg-emerald-100",
-      iconColor: "text-emerald-500",
-      graphColor: "bg-emerald-500",
-    },
-  ]}
-/>
+            {
+              title: "Completed",
+              count: taskSummary.total_task_completed_this_month,
+              subtitle: "This month",
+              icon: CheckCircle2,
+              iconBg: "bg-emerald-100",
+              iconColor: "text-emerald-500",
+              graphColor: "bg-emerald-500",
+            },
+          ]}
+        />
         {/* sticky */}
         {
           <div

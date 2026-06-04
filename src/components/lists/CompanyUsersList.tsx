@@ -370,7 +370,7 @@ const handleResetFilters = () => {
             </h1>
 
             <p className="page-subtitle-custom ">
-              Manage your organization users, permissions and activities
+              Manage your organization users, permissions and activities.
             </p>
           </div>
         </div>
@@ -379,6 +379,7 @@ const handleResetFilters = () => {
         <SummaryCards
          cardGap={12}
          width="70%"
+         loading={isDataLoading}
           cards={[
             {
               title: "Total Users",
@@ -596,7 +597,7 @@ const handleResetFilters = () => {
             isUsedInAccountProductForAssingingInstalledBy
               ? ` w-full h-[calc(70vh-122px)]`
               : userPreference.isLeftMenu
-                ? ` w-full h-[calc(100vh-283px)]`
+                ? ` w-full h-[calc(100vh-286px)]`
                 : " w-full h-[calc(100vh-120px)]"
           }
         >

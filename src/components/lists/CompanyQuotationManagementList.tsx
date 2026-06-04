@@ -256,13 +256,14 @@ useEffect(() => {
             </h1>
 
             <p className="page-subtitle-custom ">
-              Manage, track and update all your company qotation
+              Manage, track and update all your company qotation.
             </p>
           </div>
         </div>
           <SummaryCards
             cardGap={12}
             width="75%"
+            loading={isDataLoading}
             cards={[
               {
                 title: "Total Quotations",
@@ -307,7 +308,7 @@ useEffect(() => {
         {/*  Header */}
         {isUsedFor == Modules.QUOTATION_MODULE ? (
           <div
-            className={`sticky z-10 top-12 mt-1 py-2 px-3 mb-3 flex items-center justify-between gap-3 text-sm 
+            className={`sticky z-10 top-12 mt-1 py-1.5 px-3 mb-3 flex items-center justify-between gap-3 text-sm 
               ${COLORS.GRID_HEADER_SECTION_BG_COLOR} border border-slate-200 rounded-lg shadow-sm mb-1.5 w-full`}
           >
             
@@ -504,7 +505,7 @@ useEffect(() => {
               userPreference.isLeftMenu
                 ? `w-full ${
                     isUsedFor === Modules.QUOTATION_MODULE
-                      ? "h-[calc(100vh-284px)]"
+                      ? "h-[calc(100vh-280px)]"
                       : isUsedFor === Modules.LEAD_QUOTATION
                         ? "h-[calc(40vh-100px)]"
                         : "h-[calc(50vh-120px)]"

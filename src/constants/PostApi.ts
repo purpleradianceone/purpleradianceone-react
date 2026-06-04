@@ -330,7 +330,8 @@ const POST_API = {
 
   SUMMARY_COMPANY_QUOTATION:`${BASE_URL}${import.meta.env.VITE_SUMMARY_COMPANY_QUOTATION!}`,
 
-
+  SUMMARY_LEAD: `${BASE_URL}${import.meta.env.VITE_SUMMARY_LEAD}`,
+  SUMMARY_ACCOUNT: `${BASE_URL}${import.meta.env.VITE_SUMMARY_ACCOUNT!}`,
 }
 
 
