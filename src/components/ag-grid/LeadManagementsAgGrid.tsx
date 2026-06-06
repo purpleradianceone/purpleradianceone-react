@@ -131,6 +131,7 @@ function LeadManagementAgGrid({
         filter: true,
         flex: 1.5,
         minWidth: 200,
+        hide: true,
       },
       {
         field: "mobileNumber",
@@ -271,7 +272,7 @@ function LeadManagementAgGrid({
           <Eye size={12} strokeWidth={1.5} />
 
           <span>
-            {isUsedInLeadModule  ? "Select" : "Details"}
+            {isUsedInLeadModule ? "Details" : "Select"}
           </span>
         </button>
       </div>

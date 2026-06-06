@@ -65,8 +65,13 @@ export const taskStageStyles: Record<string, string> = {
   "In Progress": "bg-amber-100 text-amber-700",
 
   Completed: "bg-emerald-100 text-emerald-700",
+};
 
-  
+export const productTypeStyles: Record<string, string> = {
+  Subscription: "bg-violet-100 text-violet-700",
+  Software: "bg-blue-100 text-blue-700",
+  Service: "bg-orange-100 text-orange-700",
+  Hardware: "bg-teal-100 text-teal-700",
 };
 
 

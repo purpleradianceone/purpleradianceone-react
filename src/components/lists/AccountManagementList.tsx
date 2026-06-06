@@ -183,6 +183,63 @@ const refreshAllData = useCallback(async () => {
               Manage all your accounts and organization in one place.
             </p>
           </div>
+
+          <div className="flex gap-2 pt-1">
+          {!isUsedForAccountLead && (
+            <div className="w-fit h-fit">
+              <Button
+                disabled={!userHasAccessToAddAccount}
+                type="button"
+                className="button-import"
+                onClick={() => {
+                  if (userHasAccessToAddAccount) {
+                    handleShowImportModule();
+                  } else {
+                    toast.error(
+                      MESSAGE.MODULE_ACCESS.ACCOUNT_ACCESS
+                        .DENIED_ADD_ACCOUNT_IMPORT_ACCESS,
+                    );
+                  }
+                }}
+              >
+                <div className="flex items-center gap-0.5">
+                  <Plus size={SIZE.SIXTEEN} />
+                  Import
+                </div>
+              </Button>
+            </div>
+          )}
+
+          <div>
+            {!isUsedForSupportTicketCreation && (
+              <Button
+                disabled={!userHasAccessToAddAccount}
+                type="submit"
+                onClick={(e) => {
+                  if (userHasAccessToAddAccount) {
+                    e.preventDefault();
+                    setOpenAccountForm(!openCreateAccountForm);
+                  } else {
+                    toast.error(
+                      MESSAGE.MODULE_ACCESS.ACCOUNT_ACCESS.DENIED_ADD_ACCESS,
+                    );
+                  }
+                }}
+              >
+                <div className="flex items-center gap-0.5">
+                  <Plus size={SIZE.SIXTEEN} /> Create
+                </div>
+              </Button>
+            )}
+            {openCreateAccountForm && (
+              <CreateAccount
+                onClose={() => setOpenAccountForm(false)}
+                handleCreateAccount={refreshAllData}
+              />
+            )}
+          </div>
+        </div>
+
         </div>
 
       <SummaryCards
@@ -241,6 +298,7 @@ const refreshAllData = useCallback(async () => {
                     );
                   }}
                   value={handleSearchOption.searchParameter}
+                  placeholder="Search by name, email, mobile number, country, state, district and address"
                 />
               </div>
 
@@ -281,59 +339,7 @@ const refreshAllData = useCallback(async () => {
           {/* </> */}
         </div>
 
-        <div className="flex gap-2">
-          {!isUsedForAccountLead && (
-            <div className="w-fit h-fit">
-              <Button
-                disabled={!userHasAccessToAddAccount}
-                onClick={() => {
-                  if (userHasAccessToAddAccount) {
-                    handleShowImportModule();
-                  } else {
-                    toast.error(
-                      MESSAGE.MODULE_ACCESS.ACCOUNT_ACCESS
-                        .DENIED_ADD_ACCOUNT_IMPORT_ACCESS,
-                    );
-                  }
-                }}
-              >
-                <div className="flex items-center gap-0.5">
-                  <Plus size={SIZE.SIXTEEN} />
-                  Import
-                </div>
-              </Button>
-            </div>
-          )}
-
-          <div>
-            {!isUsedForSupportTicketCreation && (
-              <Button
-                disabled={!userHasAccessToAddAccount}
-                type="submit"
-                onClick={(e) => {
-                  if (userHasAccessToAddAccount) {
-                    e.preventDefault();
-                    setOpenAccountForm(!openCreateAccountForm);
-                  } else {
-                    toast.error(
-                      MESSAGE.MODULE_ACCESS.ACCOUNT_ACCESS.DENIED_ADD_ACCESS,
-                    );
-                  }
-                }}
-              >
-                <div className="flex items-center gap-0.5">
-                  <Plus size={SIZE.SIXTEEN} /> Create
-                </div>
-              </Button>
-            )}
-            {openCreateAccountForm && (
-              <CreateAccount
-                onClose={() => setOpenAccountForm(false)}
-                handleCreateAccount={refreshAllData}
-              />
-            )}
-          </div>
-        </div>
+        
       </div>
 
       <div className="bg-white overflow-y-auto  ">
@@ -341,7 +347,7 @@ const refreshAllData = useCallback(async () => {
           className={
             !isUsedForAccountLead
               ? userPreference.isLeftMenu
-                ? `w-full h-[calc(100vh-280px)]`
+                ? `w-full h-[calc(100vh-278px)]`
                 : "w-full h-[calc(100vh-140px)]"
               : "w-full h-[calc(100vh-270px)]"
           }

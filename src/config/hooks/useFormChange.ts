@@ -20,7 +20,6 @@ export const useFormChange = <
       | React.ChangeEvent<HTMLSelectElement>,
   ) => {
     const { name, value } = e.target;
-    console.log(name + " value : " + value);
 
     if (name === "isActive") {
       setFormData((prevFormData) => ({

@@ -1,11 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { AllCommunityModule, ColDef, themeBalham } from "ag-grid-community";
+import { AllCommunityModule, ColDef, } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 import { useMemo, useRef } from "react";
-import { INNERHTML, JSX_CHILDREN_NAME } from "../../constants/AppConstants";
+import { AGGRID, JSX_CHILDREN_NAME } from "../../constants/AppConstants";
 import SupportTicketManagementAgGridProps from "../../@types/ag-grid/SupportTicketManagementAgGridProps";
 import SupportTicketProps from "../../@types/support-ticket-management/SupportTicketProps";
 import { SkeletonRowsAgGrid } from "../ui/SkeletonRowsAgGrid";
+import { Eye } from "lucide-react";
+import { supportTicketStatusStyles } from "../../utils/colourSpecifierForNameInAggrid";
+import RenderUserWithIcon from "../ui/UserAgGridCellRenderer";
 
 function SupportTicketManagementAgGrid({
   supportTickets,
@@ -22,7 +25,12 @@ function SupportTicketManagementAgGrid({
         hide: false,
         field: "ticketNumber",
         headerName: "Ticket Number",
-        minWidth: 130,
+        minWidth: 150,
+         cellStyle: () => ({
+          fontSize: "14px",
+          fontWeight: 600,
+          color: "#1f2937",
+        }),
       },
 
       {
@@ -44,12 +52,14 @@ function SupportTicketManagementAgGrid({
         sortable: true,
         filter: true,
       },
+
       {
         field: "companyProductName",
         headerName: "Product Name",
         sortable: true,
         filter: true,
       },
+      
       {
         field: "serialNumber",
         headerName: "Serial Number",
@@ -62,6 +72,35 @@ function SupportTicketManagementAgGrid({
         headerName: "Query Description",
         sortable: true,
         filter: true,
+      },
+
+      {
+        field: "supportTicketLifecycleName",
+        headerName: "Lifecycle",
+        sortable: true,
+        filter: true,
+        minWidth: 100,
+
+         cellRenderer: (params: any) => {
+          if (params.data?.__isSkeleton) {
+            return <SkeletonRowsAgGrid />;
+          }
+
+          const status = params.value || "-";
+
+          return (
+            <div className="flex items-center h-full">
+              <span
+                className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap ${
+                  supportTicketStatusStyles[status] ||
+                  "bg-slate-100"
+                }`}
+              >
+                {status}
+              </span>
+            </div>
+          );
+        },
       },
 
        {
@@ -80,6 +119,7 @@ function SupportTicketManagementAgGrid({
         field: "createdBy",
         headerName: "Created By",
         filter: true,
+        cellRenderer: RenderUserWithIcon,
       },
       {
         field: "createdOn",
@@ -95,6 +135,7 @@ function SupportTicketManagementAgGrid({
         flex: 1,
         minWidth: 180,
         comparator: (a, b) => a?.toLowerCase().localeCompare(b?.toLowerCase()),
+        cellRenderer: RenderUserWithIcon,
       },
       {
         field: "dueDateTime",
@@ -107,6 +148,7 @@ function SupportTicketManagementAgGrid({
         headerName: "Resolved By",
         sortable: true,
         filter: true,
+        cellRenderer: RenderUserWithIcon,
       },
 
       {
@@ -140,13 +182,7 @@ function SupportTicketManagementAgGrid({
         flex: 1.5,
         minWidth: 150,
       },
-      {
-        field: "supportTicketLifecycleName",
-        headerName: "Lifecycle",
-        sortable: true,
-        filter: true,
-        minWidth: 100
-      },
+      
       {
         field: "companyProductSlaName",
         headerName: "Product SLA",
@@ -168,12 +204,14 @@ function SupportTicketManagementAgGrid({
         sortable: true,
         filter: true,
         minWidth: 120,
+        cellRenderer: RenderUserWithIcon,
       },
       {
         field: "updatedOn",
         headerName: "Updated on",
         sortable: true,
         filter: true,
+        minWidth: 120,
       },
       {
         hide: true,
@@ -195,6 +233,7 @@ function SupportTicketManagementAgGrid({
         field: "view",
         pinned: "right",
         maxWidth: 80,
+        filter: false,
         // minWidth:80,
         // autoHeight: true,
         // suppressSizeToFit: true,
@@ -202,20 +241,22 @@ function SupportTicketManagementAgGrid({
            if (params.data?.__isSkeleton) {
                       return <SkeletonRowsAgGrid />;
                     }
-          return (
-            <div className="flex items-center justify-center  ">
-              <span
-                className="lead-details cursor-pointer text-blue-600  "
-                onClick={() => {
-                  params.context.handleRowSelect(params.data);
-                }}
-              >
-                {
-                  isUsedInSupportTicketModule ? "Details": "Select"
-                }
-              </span>
-            </div>
-          );
+         return (
+      <div className="flex items-center justify-center h-full">
+        <button
+          className="lead-details"
+          onClick={() => {
+            params.context.handleRowSelect(params.data);
+          }}
+        >
+          <Eye size={12} strokeWidth={1.5} />
+
+          <span>
+            {isUsedInSupportTicketModule  ? "Details" : "Select "}
+          </span>
+        </button>
+      </div>
+    );
         },
       },
     ],
@@ -235,7 +276,15 @@ function SupportTicketManagementAgGrid({
                     if (params.data?.__isSkeleton) {
                       return <SkeletonRowsAgGrid />;
                     }
-                    return params.value;
+                   return (
+          <span className="">
+            {params.value !== null &&
+            params.value !== undefined &&
+            params.value !== ""
+              ? params.value
+              : "-"}
+          </span>
+        );
                   },
     }),
     []
@@ -249,7 +298,7 @@ function SupportTicketManagementAgGrid({
 
   return (
     <div
-      className="ag-theme-balham w-full"
+      className="modern-user-grid custom-height-scrollbar w-full"
       style={{ height: "100%", width: "100%" }}
     >
       <AgGridReact
@@ -258,8 +307,10 @@ function SupportTicketManagementAgGrid({
         columnDefs={columnDefs}
         defaultColDef={defaultColDef}
         modules={[AllCommunityModule]}
-        theme={themeBalham}
-        overlayNoRowsTemplate={INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
+        // theme={themeBalham}
+        // overlayNoRowsTemplate={INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
+        rowHeight={AGGRID.ROW_HEIGHT}
+        headerHeight={AGGRID.HEADER_HEIGHT}
         context={{ handleRowSelect: onRowSelect }}
         onRowClicked={handleRowClick}
       />
