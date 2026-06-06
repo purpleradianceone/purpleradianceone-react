@@ -235,10 +235,58 @@ const refreshAllData = useCallback(async () => {
               Track, Manage and Convert your leads efficiently.
             </p>
           </div>
+          <div className="pt-1">
+          {isUsedInLeadModule && (
+            <div className="flex gap-1">
+              <Button
+                type="button"
+                className="button-import"
+
+                disabled={!userHasAccessToAddLead}
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (userHasAccessToAddLead) {
+                    handleShowImportModule();
+                  } else {
+                    toast.error(
+                      MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                        .DENIED_ADD_LEAD_IMPORT_ACCESS,
+                    );
+                  }
+                }}
+              >
+                  <CiImport size={SIZE.SIXTEEN}  />
+                  <span>Import </span>
+                {/* </span> */}
+              </Button>
+              <Button
+                type="submit"
+                disabled={!userHasAccessToAddLead}
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (!userHasAccessToAddLead) {
+                    toast.error(
+                      MESSAGE.MODULE_ACCESS.LEAD_MODULE.DENIED_ADD_ACCESS,
+                    );
+                    return;
+                  } else {
+                    setIsCreateLeadModalOpen(true);
+                  }
+                }}
+              >
+                <span className="flex items-center ">
+                  {!isSmallScreen && <ClipboardPlus size={SIZE.SIXTEEN} />}
+                  {isSmallScreen && <ClipboardPlus size={SIZE.EIGHT} />}
+                  {isLargeScreen && JSX_CHILDREN_NAME.CREATE_LEAD}
+                </span>
+              </Button>
+            </div>
+          )}
+            </div>
         </div>
  
         <SummaryCards
-          cardGap={20}
+          cardGap={15}
           width="100%"
           gridCols={5}
           loading = {isLoading}
@@ -291,7 +339,7 @@ const refreshAllData = useCallback(async () => {
         />
         {/* sticky */}
         <div
-          className={`z-10 top-12 mt-1 py-1.5 px-3 mb-3  flex items-center justify-between text-sm ${COLORS.GRID_HEADER_SECTION_BG_COLOR} border border-slate-200 rounded-lg w-full mb-0.5 `}
+          className={`z-10 top-12 mt-1 py-1.5 px-3 mb-3  flex items-center  text-sm ${COLORS.GRID_HEADER_SECTION_BG_COLOR} border border-slate-200 rounded-lg w-full mb-0.5 `}
         >
           {isUsedInLeadModule && (
             // <div className="flex gap-1">
@@ -314,13 +362,14 @@ const refreshAllData = useCallback(async () => {
 
           {/* {isLargeScreen && ( */}
           <>
-            <div className="flex gap-2  px-1 justify-center items-center">
+            <div className="flex gap-4 px-5 justify-center items-center">
               {/* search box flex div */}
               <div
                 className={`relative flex items-start ${isCustomDateOptionSelected ||  userPreference.sidebarOpen?  "w-56": "w-80"}`}
               >
                 <SearchInput
                   value={handleSearchOption.searchParameter}
+                  placeholder="Search by name, email, mobile number, country, state, district and address"
                   onChange={(e) => {
                     handleSearchOption.handleSearchParameterChange(
                       e.target.value,
@@ -367,7 +416,7 @@ const refreshAllData = useCallback(async () => {
                 </div>
               </div>
               {isUsedInLeadModule && (
-                <div className="flex gap-1">
+                <div className="flex gap-5">
                   <div className="ml-0.5 min-w-[120px] max-h-[40px]">
                     <CustomDropdown
                       selectedValue={
@@ -444,52 +493,7 @@ const refreshAllData = useCallback(async () => {
           </>
           {/* )} */}
 
-          {isUsedInLeadModule && (
-            <div className="flex  gap-1">
-              <Button
-                type="button"
-                className="button-import "
-
-                disabled={!userHasAccessToAddLead}
-                onClick={(e) => {
-                  e.preventDefault();
-                  if (userHasAccessToAddLead) {
-                    handleShowImportModule();
-                  } else {
-                    toast.error(
-                      MESSAGE.MODULE_ACCESS.LEAD_MODULE
-                        .DENIED_ADD_LEAD_IMPORT_ACCESS,
-                    );
-                  }
-                }}
-              >
-                  <CiImport size={SIZE.SIXTEEN}  />
-                  <span>Import </span>
-                {/* </span> */}
-              </Button>
-              <Button
-                type="submit"
-                disabled={!userHasAccessToAddLead}
-                onClick={(e) => {
-                  e.preventDefault();
-                  if (!userHasAccessToAddLead) {
-                    toast.error(
-                      MESSAGE.MODULE_ACCESS.LEAD_MODULE.DENIED_ADD_ACCESS,
-                    );
-                    return;
-                  } else {
-                    setIsCreateLeadModalOpen(true);
-                  }
-                }}
-              >
-                <span className="flex items-center ">
-                  {!isSmallScreen && <ClipboardPlus size={SIZE.SIXTEEN} />}
-                  {isSmallScreen && <ClipboardPlus size={SIZE.EIGHT} />}
-                  {isLargeScreen && JSX_CHILDREN_NAME.CREATE_LEAD}
-                </span>
-              </Button>
-            </div>
-          )}
+          
         </div>
 
         <div className="bg-white  overflow-y-auto rounded-lg shadow-sm ">
@@ -498,7 +502,7 @@ const refreshAllData = useCallback(async () => {
               !isUsedInLeadModule
                 ? `w-full h-[60vh]`
                 : userPreference.isLeftMenu
-                  ? `w-full h-[calc(100vh-280px)]`
+                  ? `w-full h-[calc(100vh-278px)]`
                   : "w-full h-[calc(100vh-120px)]"
             }
           >

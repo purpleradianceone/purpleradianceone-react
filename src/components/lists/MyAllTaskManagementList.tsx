@@ -272,7 +272,6 @@ useEffect(() => {
           toast.error("This record is inactive and cannot be accessed.");
           return;
         }
-        console.log(rowData);
         switch (rowData?.source?.split(" ")[0]) {
           case source[0].name: {
             const path = ROUTES_URL.GENERAL_TASK.replace(
@@ -320,7 +319,7 @@ useEffect(() => {
       <div
         className={`w-full ${
           position === "left" && isUsedInAllTasksModule ? "" : "pr-1 "
-        }  gap-1 ${isLoadingForNavigate ? "cursor-wait" : ""} px-2 `}
+        }  gap-1 ${isLoadingForNavigate ? "cursor-wait" : ""} px-2  `}
       >
         {/* Task Overview Cards */}
         {/* My Task Overview Cards */}

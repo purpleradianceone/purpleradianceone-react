@@ -1,7 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {
+  CheckCircle2,
+  Clock3,
+  FolderOpen,
   Headset,
+  Hourglass,
   ShoppingBag,
+  Ticket,
   TicketPlus,
   User,
   UserCheck,
@@ -11,7 +16,7 @@ import useScreenSize from "../../config/hooks/useScreenSize";
 import { JSX_CHILDREN_NAME, SIZE } from "../../constants/AppConstants";
 import Button from "../ui/Button";
 import { useUserAccessModules } from "../../config/hooks/useAccessModules";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import SearchInput from "../ui/SearchInput";
 import DateRangePicker from "../ui/DateRangePicker";
 import { useComapanySpecificSearchDateRange } from "../../config/hooks/useCompanySpecificDateRange";
@@ -34,6 +39,11 @@ import LookupCompanyUserSelection from "../views/lookups/lookup-company-user/Loo
 import LookupCompanyProductSelection from "../views/lookups/lookup-company-product/LookupCompanyProductSelection";
 import PaginationWithoutCount from "../ag-grid/PaginationWithoutCount";
 import { customDateRangeId } from "../../config/hooks/usePaginationHandler";
+import SupportTicketSummary from "../../@types/support-ticket-management/SupportTicketSummary";
+import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
+import axiosClient from "../../axios-client/AxiosClient";
+import POST_API from "../../constants/PostApi";
+import SummaryCards from "../ui/SummaryCards";
 
 export const supportTicketDataUrlSearchParamKey: string = "supportTicketData";
 
@@ -110,6 +120,48 @@ function SupportTicketManagementList({
       updatedBy: "",
       updatedOn: "",
     });
+
+     const { loginStatus } = useLoggedInUserContext();
+
+const [supportTicketSummary, setSupportTicketSummary] =
+  useState<SupportTicketSummary>({
+    total_support_tickets: 0,
+    total_support_tickets_today: 0,
+    total_open_support_tickets: 0,
+    total_in_progress_support_tickets: 0,
+    total_resolved_closed_support_tickets: 0,
+  });
+
+const fetchSupportTicketSummary = useCallback(async () => {
+  try {
+    const postData = {
+      company_id: loginStatus.companyId,
+      requestedby: loginStatus.id,
+    };
+
+    const response = await axiosClient.post(
+      POST_API.SUMMARY_SUPPORT_TICKET,
+      postData,
+      {
+        withCredentials: true,
+      }
+    );
+
+    if (response.data?.length > 0) {
+      setSupportTicketSummary(response.data[0]);
+    }
+  } catch (error) {
+    console.error(error);
+  }
+}, [loginStatus.companyId, loginStatus.id]);
+
+useEffect(() => {
+  if (loginStatus.companyId && loginStatus.id) {
+    fetchSupportTicketSummary();
+  }
+}, [fetchSupportTicketSummary]);
+
+
 
   //note : this is new
   const handleSupportTicketDataFormChange = (data: SupportTicketProps) => {
@@ -190,13 +242,108 @@ function SupportTicketManagementList({
     return (
       <div
         className={`w-full ${
-          position === "left" && isUsedInSupportTicketModule ? "pl-5" : "pl-1"
-        } pr-1 gap-1`}
+          position === "left" && isUsedInSupportTicketModule ? "pl-7 pr-2" : "pl-1"
+        } pr-1 gap-1 pt-2`}
       >
+        {/* Top Header */}
+            <div className="flex items-start justify-between ">
+              <div>
+                <h1 className="page-header-custom tracking-tight pb-0.5">
+                  Support
+                </h1>
+
+                <p className="page-subtitle-custom ">
+                  Manage and resolve customer support tickets.
+                </p>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2 pt-1 w-fit">
+              {/* RIGHT SECTION - Create Button */}
+              {isUsedInSupportTicketModule && (
+                <div className="flex gap-1 justify-end w-fit">
+                  <Button
+                    type="submit"
+                    disabled={!userHasAccessToAddSupportTicket}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      if (!userHasAccessToAddSupportTicket) {
+                        toast.error(
+                          MESSAGE.MODULE_ACCESS.SUPPORT_MODULE
+                            .DENIED_ADD_ACCESS,
+                        );
+                        return;
+                      }
+                      setIsCreateSupportTicketModalOpen(true);
+                    }}
+                  >
+                    <span className="flex items-center gap-1">
+                      {!isSmallScreen && <TicketPlus size={SIZE.SIXTEEN} />}
+                      {isSmallScreen && <TicketPlus size={SIZE.EIGHT} />}
+                      {isLargeScreen && JSX_CHILDREN_NAME.CREATE_SUPPORT_TICKET}
+                    </span>
+                  </Button>
+                </div>
+              )}
+            </div>
+            </div>
+
+            <SummaryCards
+              cardGap={15}
+              width="100%"
+              gridCols={5}
+              loading={isDataLoading}
+              cards={[
+                {
+                  title: "Total Tickets",
+                  count: supportTicketSummary.total_support_tickets,
+                  subtitle: "All Support Tickets",
+                  icon: Ticket,
+                  iconBg: "bg-blue-100",
+                  iconColor: "text-blue-600",
+                },
+
+                {
+                  title: "New Ticket",
+                  count: supportTicketSummary.total_support_tickets_today,
+                  subtitle: "Created Today",
+                  icon:   FolderOpen,
+                  iconBg: "bg-violet-100",
+                  iconColor: "text-violet-600",
+                },
+
+                {
+                  title: "Open Ticket",
+                  count: supportTicketSummary.total_open_support_tickets,
+                  subtitle: "Currently Open",
+                  icon: Clock3,
+                  iconBg: "bg-orange-100",
+                  iconColor: "text-orange-600",
+                },
+
+                {
+                  title: "In Progress",
+                  count: supportTicketSummary.total_in_progress_support_tickets,
+                  subtitle: "Being Worked On",
+                  icon: Hourglass,
+                iconBg: "bg-amber-100",
+                  iconColor: "text-amber-600",
+                },
+
+                {
+                  title: "Resolved/Closed",
+                  count:
+                    supportTicketSummary.total_resolved_closed_support_tickets,
+                  subtitle: "Resolved/Closed Tickets",
+                  icon: CheckCircle2,
+                  iconBg: "bg-green-100",
+                  iconColor: "text-green-600",
+                },
+              ]}
+            />
         {/* sticky */}
         {
           <div
-            className={`sticky z-10 top-12 mt-1 p-1 flex flex-wrap items-center justify-between gap-3 text-sm ${COLORS.GRID_HEADER_SECTION_BG_COLOR} rounded-lg shadow-sm mb-1.5 
+            className={`sticky z-10 top-12 mt-1 py-1.5 px-3 mb-3  flex flex-wrap items-center justify-between gap-3 text-sm ${COLORS.GRID_HEADER_SECTION_BG_COLOR} border border-slate-200 rounded-lg mb-1.5 
                       w-full
                     `}
           >
@@ -447,34 +594,7 @@ function SupportTicketManagementList({
               </div>
             )}
 
-            <div className="flex flex-wrap items-center gap-2 w-fit">
-              {/* RIGHT SECTION - Create Button */}
-              {isUsedInSupportTicketModule && (
-                <div className="flex gap-1 justify-end w-fit">
-                  <Button
-                    type="submit"
-                    disabled={!userHasAccessToAddSupportTicket}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      if (!userHasAccessToAddSupportTicket) {
-                        toast.error(
-                          MESSAGE.MODULE_ACCESS.SUPPORT_MODULE
-                            .DENIED_ADD_ACCESS,
-                        );
-                        return;
-                      }
-                      setIsCreateSupportTicketModalOpen(true);
-                    }}
-                  >
-                    <span className="flex items-center gap-1">
-                      {!isSmallScreen && <TicketPlus size={SIZE.SIXTEEN} />}
-                      {isSmallScreen && <TicketPlus size={SIZE.EIGHT} />}
-                      {isLargeScreen && JSX_CHILDREN_NAME.CREATE_SUPPORT_TICKET}
-                    </span>
-                  </Button>
-                </div>
-              )}
-            </div>
+            
           </div>
         }
 
@@ -482,8 +602,8 @@ function SupportTicketManagementList({
           <div
             className={
               userPreference.isLeftMenu
-                ? `ag-theme-balham w-full h-[calc(100vh-120px)]`
-                : "ag-theme-balham w-full h-[calc(100vh-122px)]"
+                ? `w-full h-[calc(100vh-278px)]`
+                : "w-full h-[calc(100vh-122px)]"
             }
           >
             <SupportTicketManagementAgGrid
@@ -500,7 +620,10 @@ function SupportTicketManagementList({
           <CreateSupportTicketModal
             isOpen={isCreateSupportTicketModalOpen}
             onClose={handleCreateSupportTicketModalClose}
-            handleSupportTicketCreated={handleAddSupportTicket}
+            handleSupportTicketCreated={async () => {
+            await handleAddSupportTicket();
+            await fetchSupportTicketSummary();
+          }}
           ></CreateSupportTicketModal>
         </div>
 

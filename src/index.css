@@ -384,6 +384,7 @@
   color: #5e6168;
   font-size: 12px;
   font-weight: 400;
+  font-family: "Roboto", sans-serif !important;
 }
 .modern-user-grid .ag-cell-value {
   display: flex;

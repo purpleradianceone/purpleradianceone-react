@@ -179,7 +179,6 @@ function CompanyQuotationManagementList({
         type: "application/pdf",
       });
 
-      console.log(response.data);
 
       const fileUrl = URL.createObjectURL(blob);
 
@@ -258,10 +257,36 @@ useEffect(() => {
             <p className="page-subtitle-custom ">
               Manage, track and update all your company qotation.
             </p>
+            
           </div>
+          <div>
+ <Button
+    disabled={!userHasAccessToAddCompanyQuotation}
+    onClick={() => {
+      if (!userHasAccessToAddCompanyQuotation) {
+        toast.error(
+          MESSAGE.MODULE_ACCESS.COMPANY_QUOTATION.DENIED_ADD_ACCESS
+        );
+        return;
+      }
+
+      const path =
+        ROUTES_URL.QUOTATION_CREATE_AND_DETAILS.replace(
+          ":quotationId",
+          String(0)
+        );
+
+      navigate(path);
+    }}
+  >
+    + Create Quotation
+  </Button>
+  </div>
+          
         </div>
+        
           <SummaryCards
-            cardGap={12}
+            cardGap={15}
             width="75%"
             loading={isDataLoading}
             cards={[
@@ -384,28 +409,7 @@ useEffect(() => {
             </div>
 
             {/* RIGHT */}
-            <div>
-              <Button
-                disabled={!userHasAccessToAddCompanyQuotation}
-                onClick={() => {
-                  if (!userHasAccessToAddCompanyQuotation) {
-                    toast.error(
-                      MESSAGE.MODULE_ACCESS.COMPANY_QUOTATION.DENIED_ADD_ACCESS,
-                    );
-                    return;
-                  }
-
-                  const path = ROUTES_URL.QUOTATION_CREATE_AND_DETAILS.replace(
-                    ":quotationId",
-                    String(0),
-                  );
-                  navigate(path);
-                }}
-                // className={COLORS.ADD_BUTTON}
-              >
-                + Create Quotation
-              </Button>
-            </div>
+           
           </div>
         ) : (
           <div
