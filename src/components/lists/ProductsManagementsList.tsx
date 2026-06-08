@@ -307,6 +307,7 @@ useEffect(() => {
                       );
                     }}
                     value={handleSearchOption.searchParameter}
+                    placeholder="Search by name, barcode and description"
                   ></SearchInput>
                 </div>
 

@@ -57,19 +57,20 @@ const LeadContact = ({
   leadContact,
   fetchLeadContact,
   selectedLeadData,
+  isOpenAddLeadContactForm,
+  setIsOpenAddLeadContactForm,
 }: {
   leadContact: LeadContactType[];
   fetchLeadContact: () => void;
   selectedLeadData: any;
+  isOpenAddLeadContactForm: boolean;
+  setIsOpenAddLeadContactForm: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
   const { loginStatus } = useLoggedInUserContext();
   const {
     userHasAccessToViewLeadContacts,
-    userHasAccessToAddLeadContacts,
     userHasAccessToUpdateLeadContacts,
   } = useUserAccessModules();
-  const [isOpenAddLeadContactForm, setIsOpenAddLeadContactForm] =
-    useState(false);
   const [editContactData, setEditContactData] =
     useState<LeadContactType | null>(null); // null when adding
   const [socialMediaHandles, setSocialMediaHandles] = useState<string[]>([]);
@@ -429,44 +430,6 @@ const LeadContact = ({
   return (
     <div className={`w-full z-10 px-1  `}>
       {/* Header */}
-      <div className="flex justify-end items-center text-xs gap-x-1  text-gray-500">
-        <Button
-          disabled={!userHasAccessToAddLeadContacts}
-          onClick={() => {
-            if (userHasAccessToAddLeadContacts) {
-              // RESET EVERYTHING RELATED TO EDIT MODE
-              setEditingContactId(null);
-              setEditContactData(null);
-              setSelectedContactCard(null);
-
-              // RESET FORM INPUTS
-              setLeadContactForm({
-                name: "",
-                email: "",
-                mobileNumber: "",
-                jobTitle: "",
-                preferredLanguage: "",
-                preferredCommunicationChannel: "",
-                linkedinProfile: "",
-                address: "",
-              });
-
-              // RESET SOCIAL HANDLES
-              setSocialMediaHandles([]);
-              setTempHandle("");
-
-              // finally open the form
-              setIsOpenAddLeadContactForm(true);
-              // setIsOpenAddLeadContactForm(!isOpenAddLeadContactForm);
-            } else {
-              toast.error(MESSAGE.MODULE_ACCESS.LEAD_CONTACT.DENIED_ADD_ACCESS);
-            }
-          }}
-          className={COLORS.ADD_BUTTON}
-        >
-          +Add
-        </Button>
-      </div>
 
       {/* Contacts List */}
       <div className="space-y-2 ">
@@ -947,6 +910,7 @@ const LeadContact = ({
                 )}
               </div>
               {/* job title */}
+
               <FormInput
                 label="Job title :"
                 logo={Briefcase}

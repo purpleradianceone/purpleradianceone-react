@@ -101,7 +101,7 @@ const [summaryData, setSummaryData] =
   try {
     const postData = {
       company_id: loginStatus.companyId,
-      requestedby_id: loginStatus.id,
+      requestedby: loginStatus.id,
     };
 
     const response = await axiosClient.post(

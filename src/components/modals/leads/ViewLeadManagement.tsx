@@ -134,6 +134,9 @@ const ViewLeadManagement = () => {
   >(null);
 
   const [showAllContacts, setShowAllContacts] = useState(false);
+  const [isOpenAddLeadContactForm, setIsOpenAddLeadContactForm] =
+    useState(false);
+  const { userHasAccessToAddLeadContacts } = useUserAccessModules();
 
   const visibleContacts = showAllContacts
     ? leadContact
@@ -616,14 +619,14 @@ const ViewLeadManagement = () => {
   };
 
   const enableLeadInfoEdit = () => {
-  if (!userHasAccessToUpdateLead) return;
+    if (!userHasAccessToUpdateLead) return;
 
-  if (!isEditingLeadInfo) {
-    setOriginalLeadInfo(selectedLeadData);
-    setIsEditingLeadInfo(true);
-    setShowSaveLeadButton(true);
-  }
-};
+    if (!isEditingLeadInfo) {
+      setOriginalLeadInfo(selectedLeadData);
+      setIsEditingLeadInfo(true);
+      setShowSaveLeadButton(true);
+    }
+  };
 
   const handleLeadInfoSave = async () => {
     const trimmedName = selectedLeadData.name?.trim() ?? "";
@@ -827,7 +830,6 @@ const ViewLeadManagement = () => {
           </div>
           {/**Add Setting in lead details page here  */}
           <div className=" flex items-center min-w-20 justify-end mr-2  ">
-            
             <div className="relative inline-block">
               <Popover
                 accessRight={userHasAccessToViewLeadSettings}
@@ -899,7 +901,6 @@ const ViewLeadManagement = () => {
 
           {/** Setting in lead details page here  */}
           <div className=" flex items-center min-w-20 justify-end mr-2  w-full">
-            
             <div className="relative inline-block">
               <button
                 type="button"
@@ -931,7 +932,6 @@ const ViewLeadManagement = () => {
           </div>
 
           <div className="hidden items-center justify-evenly w-48">
-            
             <div className="relative inline-block">
               <button
                 type="button"
@@ -988,14 +988,14 @@ const ViewLeadManagement = () => {
                     : "!text-slate-700 table-header-custom "
                 }
               `}
-                          >
-                          {selectedLeadData.name
-                ? selectedLeadData.name
-                : `  — (${
-                    selectedLeadData.email ||
-                    selectedLeadData.mobileNumber ||
-                    ""
-                  })`}
+                >
+                  {selectedLeadData.name
+                    ? selectedLeadData.name
+                    : `  — (${
+                        selectedLeadData.email ||
+                        selectedLeadData.mobileNumber ||
+                        ""
+                      })`}
                 </span>
               </div>
               <span
@@ -1015,8 +1015,7 @@ const ViewLeadManagement = () => {
                     labelName="status"
                     options={leadStatus || []}
                     selectedValue={
-                      selectedStatusId ??
-                      selectedLeadData.leadStatusId
+                      (selectedStatusId ?? selectedLeadData.leadStatusId)
                         ? Number(selectedLeadData.leadStatusId)
                         : 0
                     }
@@ -1172,11 +1171,13 @@ const ViewLeadManagement = () => {
         </div>
 
         {/* Lead Status Section */}
-        <div className="w-[99.5%] bg-white border rounded-md  overflow-x-auto px-1 mx-1 pt-3 pb-1 mb-2 
+        <div
+          className="w-[99.5%] bg-white border rounded-md  overflow-x-auto px-1 mx-1 pt-3 pb-1 mb-2 
                       [&::-webkit-scrollbar]:h-1
                       [&::-webkit-scrollbar-track]:bg-gray-50
                       [&::-webkit-scrollbar-thumb]:bg-gray-200
-                      [&::-webkit-scrollbar-thumb]:rounded-full ">
+                      [&::-webkit-scrollbar-thumb]:rounded-full "
+        >
           <div className="flex items-center min-w-max">
             {leadStatus!.map((item: any, index: number) => {
               const currentIndex = leadStatus!.findIndex(
@@ -1455,7 +1456,9 @@ const ViewLeadManagement = () => {
 
                     <div className="flex items-center gap-1 min-w-0">
                       <input
-                        readOnly={!isEditingLeadInfo || !userHasAccessToUpdateLead}
+                        readOnly={
+                          !isEditingLeadInfo || !userHasAccessToUpdateLead
+                        }
                         title={selectedLeadData.name || ""}
                         onFocus={enableLeadInfoEdit}
                         onClick={enableLeadInfoEdit}
@@ -1526,7 +1529,9 @@ const ViewLeadManagement = () => {
 
                     <div className="flex items-center min-w-0">
                       <input
-                        readOnly={!isEditingLeadInfo || !userHasAccessToUpdateLead}
+                        readOnly={
+                          !isEditingLeadInfo || !userHasAccessToUpdateLead
+                        }
                         title={selectedLeadData.email || ""}
                         onFocus={enableLeadInfoEdit}
                         onClick={enableLeadInfoEdit}
@@ -1591,17 +1596,19 @@ const ViewLeadManagement = () => {
 
                     <div className="flex items-center min-w-0">
                       <input
-                        readOnly={!isEditingLeadInfo || !userHasAccessToUpdateLead}
+                        readOnly={
+                          !isEditingLeadInfo || !userHasAccessToUpdateLead
+                        }
                         title={selectedLeadData.mobileNumber || ""}
                         name="mobileNumber"
                         onFocus={enableLeadInfoEdit}
-                   onClick={enableLeadInfoEdit}
+                        onClick={enableLeadInfoEdit}
                         onKeyDown={async (e) => {
-                        if (e.key === "Enter") {
-                          await handleLeadInfoSave();
-                          e.currentTarget.blur();
-                        }
-                      }}
+                          if (e.key === "Enter") {
+                            await handleLeadInfoSave();
+                            e.currentTarget.blur();
+                          }
+                        }}
                         type="text"
                         placeholder="Add here..."
                         className={`
@@ -1654,9 +1661,9 @@ const ViewLeadManagement = () => {
                       labelClassname="caption-custom"
                       onUserSelected={handleLeadOwnerSelected}
                       defaultValue={selectedLeadData?.leadOwner}
-                      disabled={!userHasAccessToUpdateLead || !isEditingLeadInfo}
-                       
-                      
+                      disabled={
+                        !userHasAccessToUpdateLead || !isEditingLeadInfo
+                      }
                       has={{
                         border: false,
                         penLogo: isEditingLeadInfo,
@@ -1783,7 +1790,7 @@ const ViewLeadManagement = () => {
           </div>
 
           {/* Column 2 */}
-          <div className="w-full md:w-1/2 flex  bg-pink-00 flex-col gap-0 ">
+          <div className="w-full md:w-1/2 flex  bg-pink-00 flex-col gap-0  ">
             {/* Meeting / Contact / Span Tabs */}
             <div
               className={`
@@ -1799,7 +1806,7 @@ const ViewLeadManagement = () => {
                       ${showAllContacts ? "max-h-[400px]" : "h-[260px]"}
                     `}
             >
-              <div className="pl-1 py-1.5 border-b flex justify-between items-center">
+              <div className="px-1 mb-1 py-1 border-b flex justify-between items-center">
                 <div className="flex gap-4 caption-custom">
                   <span
                     id="contact"
@@ -1864,6 +1871,27 @@ const ViewLeadManagement = () => {
                 </div>
 
                 {/* RIGHT SIDE: ADD BUTTON */}
+                {/* RIGHT SIDE: ADD BUTTON */}
+                {activeTab === "contact" && (
+                  <Button
+                    disabled={!userHasAccessToAddLeadContacts}
+                    className={COLORS.ADD_BUTTON}
+                    onClick={() => {
+                      if (!userHasAccessToAddLeadContacts) {
+                        toast.error(
+                          MESSAGE.MODULE_ACCESS.LEAD_CONTACT.DENIED_ADD_ACCESS,
+                        );
+                        return;
+                      }
+
+                      setIsOpenAddLeadContactForm(true);
+                    }}
+                  >
+                    +Add
+                  </Button>
+                )}
+
+                {/* RIGHT SIDE: ADD BUTTON */}
                 {/* {activeTab === "contact" && (
     <Button
       className={COLORS.ADD_BUTTON}
@@ -1884,8 +1912,8 @@ const ViewLeadManagement = () => {
                     "
                 >
                   {activeTab === "meeting" && (
-                    <div className="flex  items-center justify-center   min-h-72">
-                      <div className="flex flex-col items-center justify-center p-6 text-center space-y-3 border rounded-xl bg-gray-50 shadow-sm">
+                    <div className="flex  items-center justify-center   min-h-62">
+                      <div className="flex flex-col items-center justify-center p-3 m-3 text-center space-y-3 border rounded-xl bg-gray-50 shadow-sm">
                         <h2 className="table-header-custom">
                           Schedule a Meeting
                         </h2>
@@ -1928,6 +1956,10 @@ const ViewLeadManagement = () => {
                           selectedLeadData={selectedLeadData}
                           leadContact={visibleContacts}
                           fetchLeadContact={fetchLeadContact}
+                          isOpenAddLeadContactForm={isOpenAddLeadContactForm}
+                          setIsOpenAddLeadContactForm={
+                            setIsOpenAddLeadContactForm
+                          }
                         />
                       }
 
