@@ -13,6 +13,7 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
   animation: fadeIn 0.4s ease-in-out;
   overflow: hidden;
+  
 }
 
 /* ===== Header ===== */
@@ -28,7 +29,7 @@
   font-family: "Roboto", sans-serif;
   font-size: 14px;
   font-weight: 700;
-  color: #333333;
+  color: #333334;
 }
 
 .ag-theme-balham .ag-header-cell:hover {
