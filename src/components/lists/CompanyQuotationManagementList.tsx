@@ -196,7 +196,7 @@ function CompanyQuotationManagementList({
   try {
     const postData = {
       company_id: loginStatus.companyId,
-      requestedby_id: loginStatus.id,
+      requestedby: loginStatus.id,
     };
 
     const response = await axiosClient.post(
@@ -255,11 +255,11 @@ useEffect(() => {
             </h1>
 
             <p className="page-subtitle-custom ">
-              Manage, track and update all your company qotation.
+              Manage, track and update all your company quotation.
             </p>
             
           </div>
-          <div>
+          <div className="pt-1">
  <Button
     disabled={!userHasAccessToAddCompanyQuotation}
     onClick={() => {

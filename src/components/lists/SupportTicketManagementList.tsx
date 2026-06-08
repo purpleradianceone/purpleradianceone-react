@@ -376,7 +376,7 @@ useEffect(() => {
                 {/* Search Box */}
                 <div
                   className={`relative flex items-start ${
-                    isCustomDateOptionSelected ?(userPreference.sidebarOpen?"w-24": "w-28 ") : (userPreference.sidebarOpen?"w-32":"w-52")
+                    isCustomDateOptionSelected ?(userPreference.sidebarOpen?"w-24": "w-28 ") : (userPreference.sidebarOpen?"w-32":"w-57")
                   }`}
                 >
                   <SearchInput
@@ -387,6 +387,7 @@ useEffect(() => {
                       );
                     }}
                     height="h-8"
+                    placeholder="Search by ticket number, name, email, mobilenumber, barcode and serial number"
                   ></SearchInput>
                 </div>
 

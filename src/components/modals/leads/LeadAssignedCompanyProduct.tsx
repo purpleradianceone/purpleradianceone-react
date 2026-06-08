@@ -236,7 +236,7 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
   }
 
   return (
-    <div className="  w-full  h-[205px] border rounded-lg bg-gray-0 ">
+    <div className="  w-full  h-[210px] border rounded-lg bg-gray-0 ">
       <div>
         <div className="border-b px-1 my-1 flex justify-between">
           <span className="table-header-custom text-black whitespace-nowrap pl-1 py-1 ">
