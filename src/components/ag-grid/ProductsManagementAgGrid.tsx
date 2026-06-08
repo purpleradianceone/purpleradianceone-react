@@ -1,9 +1,9 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-import { AllCommunityModule, ColDef, themeBalham } from "ag-grid-community";
+import { AllCommunityModule, ColDef } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { JSX_CHILDREN_NAME } from "../../constants/AppConstants";
+import { AGGRID, JSX_CHILDREN_NAME } from "../../constants/AppConstants";
 import { CLASS_NAMES } from "../../constants/ClassNames";
 import ActionsDropdownButton from "../ui/ActionsDropdownButton";
 import { Edit, Network, Plus, UserPlus } from "lucide-react";
@@ -14,6 +14,9 @@ import MESSAGE from "../../constants/Messages";
 import StatusIndicator from "../ui/StatusIndicator";
 import { Product } from "../../@types/products/ProductsManagementProps";
 import { SkeletonRowsAgGrid } from "../ui/SkeletonRowsAgGrid";
+import GridActionButton from "../ui/GridActionButton";
+import StatusBadge from "../ui/StatusBadge";
+import { productTypeStyles } from "../../utils/colourSpecifierForNameInAggrid";
 
 function ProductsManagementGrid({
   products,
@@ -53,6 +56,11 @@ function ProductsManagementGrid({
           if (!valueB) return 1;
           return valueA.toLowerCase().localeCompare(valueB.toLowerCase());
         },
+        cellStyle: () => ({
+          fontSize: "14px",
+          fontWeight: 600,
+          color: "#1f2937",
+        }),
       },
 
       {
@@ -84,10 +92,28 @@ function ProductsManagementGrid({
         field: "productTypeName",
         headerName: "Product Type",
         sortable: true,
-        maxWidth: 120,
+        maxWidth: 140,
         filter: true,
         flex: 1,
         hide: isGridForAccountProduct,
+         cellRenderer: (params: any) => {
+          if (params.data?.__isSkeleton) {
+            return <SkeletonRowsAgGrid />;
+          }
+        const type = params.value || "-";
+          return (
+          <div className="flex items-center h-full">
+            <span
+              className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap ${
+                productTypeStyles[type] ||
+                "bg-slate-100 text-slate-700"
+              }`}
+            >
+              {type}
+            </span>
+          </div>
+        );
+        },
       },
       {
         field: "unitName",
@@ -120,9 +146,9 @@ function ProductsManagementGrid({
             return <SkeletonRowsAgGrid />;
           }
           return (
-            <div className="flex items-center gap-1">
-              <StatusIndicator isActive={params.value} />
-            </div>
+             <div className="h-full flex items-center">
+                  <StatusBadge isActive={params.value} />
+                </div>
           );
         },
         hide: isGridForAccountProduct,
@@ -336,6 +362,8 @@ function ProductsManagementGrid({
         sortable: false,
         maxWidth: 100,
         pinned: "right",
+        filter: false,
+        headerClass: "",
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         cellRenderer: (params: any) => {
           if (params.data?.__isSkeleton) {
@@ -395,13 +423,12 @@ function ProductsManagementGrid({
 
           return (
             <>
-              <button
-                hidden={isDataLoading}
-                className="text-blue-600"
-                onClick={handleActionsButtonClick}
-              >
-                {JSX_CHILDREN_NAME.ACTIONS}
-              </button>
+              <div>
+              <GridActionButton        
+                  id="actions-button"
+                  onClick={handleActionsButtonClick}
+                />
+                </div>
 
               {isActionsDropDownOpen &&
                 createPortal(
@@ -536,14 +563,22 @@ function ProductsManagementGrid({
         if (params.data?.__isSkeleton) {
           return <SkeletonRowsAgGrid />;
         }
-        return params.value;
+         return (
+          <span className="">
+            {params.value !== null &&
+            params.value !== undefined &&
+            params.value !== ""
+              ? params.value
+              : "-"}
+          </span>
+        );
       },
     };
   }, []);
 
   return (
     <div
-      className="ag-theme-balham w-full"
+      className="modern-user-grid custom-height-scrollbar w-full"
       style={{ height: "100%", width: "100%" }}
     >
       <AgGridReact
@@ -551,8 +586,10 @@ function ProductsManagementGrid({
         columnDefs={columnDefs}
         defaultColDef={defaultColDef}
         modules={[AllCommunityModule]}
+        rowHeight={AGGRID.ROW_HEIGHT}
+        headerHeight={AGGRID.HEADER_HEIGHT}
         // overlayNoRowsTemplate={INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
-        theme={themeBalham}
+        // theme={themeBalham}
         context={{ handleRowSelect: isDataLoading ? undefined : onRowSelect }}
       />
     </div>

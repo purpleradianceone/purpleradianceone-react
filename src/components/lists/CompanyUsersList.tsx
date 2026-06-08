@@ -370,23 +370,65 @@ const handleResetFilters = () => {
             </h1>
 
             <p className="page-subtitle-custom ">
-              Manage your organization users, permissions and activities
+              Manage your organization users, permissions and activities.
             </p>
           </div>
+          {/* ADD USER */}
+          <div className="pt-1">
+            {!isUsedInAccountProductForAssingingInstalledBy && (
+              <>
+                <div
+                  id="company-users-module-add-button"
+                  className="flex gap-2"
+                >
+                  <Button
+                    type="submit"
+                    disabled={!userHasAccessToAddUser}
+                    onClick={(e) => {
+                      e.preventDefault();
+
+                      if (!userHasAccessToAddUser) {
+                        toast.error(
+                          MESSAGE.MODULE_ACCESS.COMPANY_USER
+                            .DENIED_ADD_ACCESS_COMPANY_USER,
+                        );
+
+                        return;
+                      }
+
+                      setIsAddCompanyUserModalOpen(true);
+                    }}
+                  >
+                    <div className="flex items-center gap-1">
+                      <UserPlus size={SIZE.SIXTEEN} />
+                      Add User
+                    </div>
+                  </Button>
+                </div>
+
+                <AddCompanyUserModal
+                  isOpen={isAddCompanyUserModalOpen}
+                  onClose={() => setIsAddCompanyUserModalOpen(false)}
+                  onUserAdded={refreshAllData}
+                />
+              </>
+            )}
+            </div>
         </div>
 
         {/* Status Cards */}
         <SummaryCards
-         cardGap={12}
+         cardGap={15}
          width="70%"
+         loading={isDataLoading}
           cards={[
             {
               title: "Total Users",
               count: companyUserSummary.total_company_users,
               subtitle: "Organization users",
               icon: Users,
-              iconBg: "bg-violet-100",
-              iconColor: "text-violet-600",
+              iconBg: "bg-blue-100",
+              iconColor: "text-blue-600",
             },
 
             {
@@ -422,17 +464,17 @@ const handleResetFilters = () => {
         {/* SEARCH + FILTER BAR */}
         <div
           className="
-    w-full
-    bg-white
-    border border-slate-200
-    rounded-xl
-    py-2
-    px-3
-    flex items-center justify-between
-    gap-3
-    flex-wrap
-    shadow-sm
-  "
+          w-full
+          bg-white
+          border border-slate-200
+          rounded-xl
+          py-2
+          px-3
+          flex items-center 
+          gap-5
+          flex-wrap
+          shadow-sm
+        "
         >
           {/* LEFT */}
           <div className="flex items-center gap-3 flex-wrap">
@@ -534,58 +576,7 @@ const handleResetFilters = () => {
               Reset
             </button>
 
-            {/* ADD USER */}
-            {!isUsedInAccountProductForAssingingInstalledBy && (
-              <>
-                <div
-                  id="company-users-module-add-button"
-                  className="flex gap-2"
-                >
-                  <Button
-                    type="submit"
-                    disabled={!userHasAccessToAddUser}
-                    onClick={(e) => {
-                      e.preventDefault();
-
-                      if (!userHasAccessToAddUser) {
-                        toast.error(
-                          MESSAGE.MODULE_ACCESS.COMPANY_USER
-                            .DENIED_ADD_ACCESS_COMPANY_USER,
-                        );
-
-                        return;
-                      }
-
-                      setIsAddCompanyUserModalOpen(true);
-                    }}
-                    // className="
-                    //   h-10
-                    //   px-5
-                    //   rounded-lg
-                    //   bg-violet-600
-                    //   hover:bg-violet-700
-                    //   text-white
-                    //   text-sm
-                    //   font-semibold
-                    //   flex items-center gap-2
-                    //   shadow-sm
-                    //   transition-all duration-200
-                    // "
-                  >
-                    <div className="flex items-center gap-1">
-                      <UserPlus size={SIZE.SIXTEEN} />
-                      Add User
-                    </div>
-                  </Button>
-                </div>
-
-                <AddCompanyUserModal
-                  isOpen={isAddCompanyUserModalOpen}
-                  onClose={() => setIsAddCompanyUserModalOpen(false)}
-                  onUserAdded={refreshAllData}
-                />
-              </>
-            )}
+    
           </div>
         </div>
       </div>
@@ -596,7 +587,7 @@ const handleResetFilters = () => {
             isUsedInAccountProductForAssingingInstalledBy
               ? ` w-full h-[calc(70vh-122px)]`
               : userPreference.isLeftMenu
-                ? ` w-full h-[calc(100vh-283px)]`
+                ? ` w-full h-[calc(100vh-286px)]`
                 : " w-full h-[calc(100vh-120px)]"
           }
         >

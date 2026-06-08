@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Calendar, Plus, UserRoundCogIcon } from "lucide-react";
+import { Building2, Calendar, CalendarDays, CalendarRange, Plus, UserRoundCogIcon } from "lucide-react";
 import { usePanel } from "../../context/panel/usePanel";
 import SearchInput from "../ui/SearchInput";
 import HandleSearchOptionProps from "../../@types/company-users/HandleSearchOptionProps";
@@ -7,7 +7,7 @@ import DateRangeFilterDropdown from "../ui/DateRangeFilterDropdown";
 import { useComapanySpecificSearchDateRange } from "../../config/hooks/useCompanySpecificDateRange";
 import { useDateRangeIdChange } from "../../config/hooks/useDateRangeIdChange";
 import DateRangePicker from "../ui/DateRangePicker";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Button from "../ui/Button";
 import { useUserPreference } from "../../context/user/UserPreference";
 import Account from "../../@types/account/Account";
@@ -23,6 +23,11 @@ import COLORS from "../../constants/Colors";
 import PaginationWithoutCount, { PaginationDataWithoutCountProps } from "../ag-grid/PaginationWithoutCount";
 import { customDateRangeId } from "../../config/hooks/usePaginationHandler";
 import { ComponentHeaderAndLogo } from "../ui/ComponentHeaderAndLogo";
+import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
+import AccountSummary from "../../@types/account/AccountSummary";
+import axiosClient from "../../axios-client/AxiosClient";
+import POST_API from "../../constants/PostApi";
+import SummaryCards from "../ui/SummaryCards";
 
 function AccountManagementList({
   accounts,
@@ -102,6 +107,51 @@ function AccountManagementList({
     navigate(ROUTES_URL.ACCOUNT_IMPORT_CSV);
   };
 
+  const { loginStatus } = useLoggedInUserContext();
+
+const [accountSummary, setAccountSummary] =
+  useState<AccountSummary>({
+    total_account: 0,
+    total_account_created_this_month: 0,
+    total_account_created_last_month: 0,
+  });
+
+  const fetchAccountSummary = useCallback(async () => {
+  try {
+    const postData = {
+      company_id: loginStatus.companyId,
+      requestedby: loginStatus.id,
+    };
+
+    const response = await axiosClient.post(
+      POST_API.SUMMARY_ACCOUNT,
+      postData,
+      {
+        withCredentials: true,
+      }
+    );
+
+    if (response.data?.length > 0) {
+      setAccountSummary(response.data[0]);
+    }
+  } catch (error) {
+    console.error(error);
+  }
+}, [loginStatus.companyId, loginStatus.id]);
+
+useEffect(() => {
+  if (loginStatus.companyId && loginStatus.id) {
+    fetchAccountSummary();
+  }
+}, [fetchAccountSummary]);
+
+const refreshAllData = useCallback(async () => {
+  await Promise.all([
+    handleCreateCompanyAccountType(),
+    fetchAccountSummary(),
+  ]);
+}, [handleCreateCompanyAccountType, fetchAccountSummary]);
+
   const selectedDateName =
     dateRangeDropdownOptions.find(
       (o) => o.search_date_range_id === handleSearchOption.dateRangeId
@@ -119,75 +169,28 @@ function AccountManagementList({
 
   return (
     <div
-      className={`w-full ${position === "left" ? "pl-5" : "pl-1"} pr-1 gap-1`}
+      className={`w-full ${position === "left" ? "pl-7 pr-2" : "pl-1"} pr-1 gap-1 pt-2`}
     >
-      <div
-        className={`sticky z-10 top-10 mt-1 p-0.5  flex items-center justify-between text-sm ${COLORS.GRID_HEADER_SECTION_BG_COLOR} rounded-lg shadow-sm  mb-1.5 w-full`}
-      >
-        <div className="flex items-center justify-center gap-5">
-          
-          <ComponentHeaderAndLogo
-          headerText="Account"
-          logo={UserRoundCogIcon}
-          />
 
-          <div className="flex gap-2  justify-center items-center">
-            {/* search box flex div */}
-            <div className="flex gap-1">
-              {/* search box flex div */}
-              <div className="relative flex items-start w-80 ">
-                <SearchInput
-                  onChange={(e) => {
-                    handleSearchOption.handleSearchParameterChange(
-                      e.target.value,
-                    );
-                  }}
-                  value={handleSearchOption.searchParameter}
-                />
-              </div>
+       {/* Top Header */}
+        <div className="flex items-start justify-between ">
+          <div>
+            <h1 className="page-header-custom tracking-tight pb-0.5">
+              Accounts
+            </h1>
 
-              {/* Date FIlters Dropdown */}
-              <div className="flex mx-3 gap-1">
-                <div className="flex">
-                  <div className="flex items-center size-4 justify-center mt-1 mr-2 gap-2 input-label-custom">
-                    <Calendar className="input-label-custom mt-1" />
-                  </div>
-
-                  <DateRangeFilterDropdown
-                    dropdownOptions={dateRangeDropdownOptions}
-                    handleDateIdChange={handleDateRangeIdChange}
-                    selectedOption={selectedDateName}
-                  ></DateRangeFilterDropdown>
-                </div>
-                {/* Custom Date Picker Div Flex Box*/}
-                {isCustomDateOptionSelected && (
-                  <div
-                    className="flex"
-                    style={
-                      isCustomDateOptionSelected
-                        ? { visibility: "visible" }
-                        : { visibility: "hidden" }
-                    }
-                  >
-                    <DateRangePicker
-                      onStartDateChange={onStartDateChange}
-                      onEndDateChange={onEndDateChange}
-                      initialStartDate={handleSearchOption.startDate}
-                      initialEndDate={handleSearchOption.endDate}
-                    />
-                  </div>
-                )}
-              </div>
-            </div>
+            <p className="page-subtitle-custom ">
+              Manage all your accounts and organization in one place.
+            </p>
           </div>
-          {/* </> */}
-        </div>
 
-        <div className="flex gap-2">
+          <div className="flex gap-2 pt-1">
           {!isUsedForAccountLead && (
             <div className="w-fit h-fit">
               <Button
                 disabled={!userHasAccessToAddAccount}
+                type="button"
+                className="button-import"
                 onClick={() => {
                   if (userHasAccessToAddAccount) {
                     handleShowImportModule();
@@ -231,21 +234,122 @@ function AccountManagementList({
             {openCreateAccountForm && (
               <CreateAccount
                 onClose={() => setOpenAccountForm(false)}
-                handleCreateAccount={handleCreateCompanyAccountType}
+                handleCreateAccount={refreshAllData}
               />
             )}
           </div>
         </div>
+
+        </div>
+
+      <SummaryCards
+        cardGap={12}
+        width="55%"
+        gridCols={3}
+        loading={isDataLoading}
+        cards={[
+          {
+            title: "Total Accounts",
+            count: accountSummary.total_account,
+            subtitle: "All Accounts",
+            icon: Building2,
+            iconBg: "bg-blue-100",
+            iconColor: "text-blue-600",
+          },
+
+          {
+            title: "New This Month",
+            count: accountSummary.total_account_created_this_month,
+            subtitle: "Recently added Account",
+            icon: CalendarDays,
+            iconBg: "bg-green-100",
+            iconColor: "text-green-600",
+          },
+
+          {
+            title: "Added Last Month",
+            count: accountSummary.total_account_created_last_month,
+            subtitle: "Previous Month Activity",
+            icon: CalendarRange,
+            iconBg: "bg-violet-100",
+            iconColor: "text-violet-600",
+          },
+        ]}
+      />
+      <div
+        className={`sticky z-10 top-10 mt-1 py-1.5 px-3 mb-3 flex items-center justify-between text-sm ${COLORS.GRID_HEADER_SECTION_BG_COLOR} border border-slate-200 rounded-lg  mb-0.5 w-full`}
+      >
+        <div className="flex items-center justify-center gap-5">
+          
+          <ComponentHeaderAndLogo
+          headerText="Account"
+          logo={UserRoundCogIcon}
+          />
+
+          <div className="flex gap-2  justify-center items-center">
+            {/* search box flex div */}
+            <div className="flex gap-1">
+              {/* search box flex div */}
+              <div className="relative flex items-start w-80 ">
+                <SearchInput
+                  onChange={(e) => {
+                    handleSearchOption.handleSearchParameterChange(
+                      e.target.value,
+                    );
+                  }}
+                  value={handleSearchOption.searchParameter}
+                  placeholder="Search by name, email, mobile number, country, state, district and address"
+                />
+              </div>
+
+              {/* Date FIlters Dropdown */}
+              <div className="flex mx-3 gap-1">
+                <div className="flex">
+                  <div className="flex items-center size-4 justify-center mt-1 mr-2 gap-2 input-label-custom">
+                    <Calendar className="input-label-custom mt-1" />
+                  </div>
+
+                  <DateRangeFilterDropdown
+                    dropdownOptions={dateRangeDropdownOptions}
+                    handleDateIdChange={handleDateRangeIdChange}
+                    selectedOption={selectedDateName}
+                  ></DateRangeFilterDropdown>
+                </div>
+                {/* Custom Date Picker Div Flex Box*/}
+                {isCustomDateOptionSelected && (
+                  <div
+                    className="flex"
+                    style={
+                      isCustomDateOptionSelected
+                        ? { visibility: "visible" }
+                        : { visibility: "hidden" }
+                    }
+                  >
+                    <DateRangePicker
+                      onStartDateChange={onStartDateChange}
+                      onEndDateChange={onEndDateChange}
+                      initialStartDate={handleSearchOption.startDate}
+                      initialEndDate={handleSearchOption.endDate}
+                    />
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+          {/* </> */}
+        </div>
+
+        
       </div>
 
-      <div className="bg-white overflow-y-auto rounded-lg shadow-sm ">
+      <div className="bg-white overflow-y-auto  ">
         <div
           className={
             !isUsedForAccountLead
               ? userPreference.isLeftMenu
-                ? `ag-theme-balham w-full h-[calc(100vh-115px)]`
-                : "ag-theme-balham w-full h-[calc(100vh-120px)]"
-              : "ag-theme-balham w-full h-[calc(100vh-270px)]"
+                ? `w-full h-[calc(100vh-278px)]`
+                : "w-full h-[calc(100vh-140px)]"
+              : "w-full h-[calc(100vh-270px)]"
           }
         >
           <AccountManagementAgGrid

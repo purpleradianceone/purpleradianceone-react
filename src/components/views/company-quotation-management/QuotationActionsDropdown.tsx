@@ -2,9 +2,9 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Download, Eye, Trash2, X } from "lucide-react";
-import { JSX_CHILDREN_NAME } from "../../../constants/AppConstants";
 import ActionsDropdownButton from "../../ui/ActionsDropdownButton";
 import ConfirmationDialog from "../../dialogue-box/ConfirmationDialogue";
+import GridActionButton from "../../ui/GridActionButton";
 
 const QuotationActionsDropdown = ({ data, context }: any) => {
   const [open, setOpen] = useState(false);
@@ -56,12 +56,12 @@ const QuotationActionsDropdown = ({ data, context }: any) => {
   return (
     <>
       {/* BUTTON */}
-      <button
-        className="text-blue-500 hover:text-blue-700"
-        onClick={handleClick}
-      >
-        {JSX_CHILDREN_NAME.ACTIONS}
-      </button>
+      <div onClick={(e) => e.stopPropagation()}>
+        <GridActionButton
+          id={`quotation-actions-${data.id}`}
+          onClick={handleClick}
+        />
+      </div>
 
       {/* DROPDOWN */}
       {open &&
