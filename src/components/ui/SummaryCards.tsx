@@ -18,6 +18,8 @@ type SummaryCardsProps = {
   width?: string;
   cardCss?: string;
   cardGap?: number;
+  gridCols?: number;
+  loading?: boolean;
 };
 
 function SummaryCards({
@@ -25,6 +27,8 @@ function SummaryCards({
   showGraph = false,
   width = "100%",
   cardGap = 12,
+  gridCols = 4,
+  loading = false,
   cardCss = `
     bg-white
     h-[78px]
@@ -43,32 +47,73 @@ function SummaryCards({
   `,
 }: SummaryCardsProps) {
   return (
-    <div
-      className="
-        grid
-        grid-cols-1
-        sm:grid-cols-2
-        xl:grid-cols-4
-        mb-3
-        mt-2
-      "
-      style={{
-        width,
-        gap: `${cardGap}px`,
-      }}
-    >
-      {cards.map((card, index) => {
-        const Icon = card.icon;
-
-        return (
+  <div
+    className="
+      grid
+      grid-cols-1
+      sm:grid-cols-2
+      xl:grid-cols-5
+      mb-3
+      mt-2
+    "
+    style={{
+      width,
+      gap: `${cardGap}px`,
+      gridTemplateColumns: `repeat(${gridCols}, minmax(0, 1fr))`,
+    }}
+  >
+    {loading
+      ? Array.from({ length: gridCols }).map((_, index) => (
           <div
             key={index}
-            className={
-              card.isGradient
-                ? `${summaryCardStyles.gradientCard} min-w-0 w-full`
-                : cardCss
-            }
+            className="
+              bg-white
+              h-[78px]
+              border
+              border-slate-200
+              rounded-2xl
+              px-3
+              shadow-sm
+              flex
+              items-center
+              justify-between
+              animate-pulse
+            "
           >
+            <div className="flex items-center gap-3 w-full">
+              {/* Icon */}
+              <div className="w-10 h-10 rounded-xl bg-slate-200 flex-shrink-0" />
+
+              {/* Content */}
+              <div className="flex flex-col gap-2 flex-1">
+                <div className="h-3 w-20 bg-slate-200 rounded" />
+                <div className="h-5 w-10 bg-slate-300 rounded" />
+                <div className="h-3 w-24 bg-slate-200 rounded" />
+              </div>
+
+              {showGraph && (
+                <div className="flex items-end gap-1">
+                  <div className="w-1 h-2 bg-slate-200 rounded" />
+                  <div className="w-1 h-4 bg-slate-200 rounded" />
+                  <div className="w-1 h-6 bg-slate-200 rounded" />
+                  <div className="w-1 h-8 bg-slate-300 rounded" />
+                </div>
+              )}
+            </div>
+          </div>
+        ))
+      : cards.map((card, index) => {
+          const Icon = card.icon;
+
+          return (
+            <div
+              key={index}
+              className={
+                card.isGradient
+                  ? `${summaryCardStyles.gradientCard} min-w-0 w-full`
+                  : cardCss
+              }
+            >
             <div className={summaryCardStyles.leftSection}>
               <div
                 className={`

@@ -29,6 +29,9 @@ import SearchInput from "../ui/SearchInput";
 import LoadingPopUpAnimation from "../views/card/LoadingPopUpAnimation";
 import QuotationIconSvg from "../quotation-builder/svg/QuotationIconSvg";
 import { QuotationTypeDropdown } from "../views/lookups/company-quotation/QuotationTypeDropdown";
+import {FileText, Send, FilePenLine, IndianRupee,} from "lucide-react";
+import CompanyQuotationSummary from "../../@types/company-quotation/CompanyQuotationSummary";
+import SummaryCards from "../ui/SummaryCards";
 
 export const companyQuotationDataUrlSearchParamKey: string =
   "companyQuotationData";
@@ -64,6 +67,14 @@ function CompanyQuotationManagementList({
   // for invoice modal open
   //   const [isCreateInvoiceModalOpen, setIsCreateInvoiceModalOpen] =
   //     useState<boolean>(false);
+  
+  const [quotationSummary, setQuotationSummary] =
+  useState<CompanyQuotationSummary>({
+    total_quotation: 0,
+    total_quotation_submitted: 0,
+    total_quotation_drafts: 0,
+    total_quotation_value_this_month: 0,
+  });
 
   const { dateRangeDropdownOptions } = useComapanySpecificSearchDateRange();
 
@@ -130,6 +141,7 @@ function CompanyQuotationManagementList({
         handleAddQuotation();
         // 🔄 Refresh latest data
         // getInvoices(new AbortController().signal);
+        fetchQuotationSummary();
       } else {
         toast.error(res.data.message);
       }
@@ -167,7 +179,6 @@ function CompanyQuotationManagementList({
         type: "application/pdf",
       });
 
-      console.log(response.data);
 
       const fileUrl = URL.createObjectURL(blob);
 
@@ -180,6 +191,36 @@ function CompanyQuotationManagementList({
       setIsSubmitting(false);
     }
   };
+
+  const fetchQuotationSummary = async () => {
+  try {
+    const postData = {
+      company_id: loginStatus.companyId,
+      requestedby: loginStatus.id,
+    };
+
+    const response = await axiosClient.post(
+      POST_API.SUMMARY_COMPANY_QUOTATION,
+      postData,
+      {
+        withCredentials: true,
+      }
+    );
+
+    if (response.data?.length > 0) {
+      setQuotationSummary(response.data[0]);
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+useEffect(() => {
+  if (loginStatus.companyId && loginStatus.id) {
+    fetchQuotationSummary();
+  }
+}, [loginStatus.companyId, loginStatus.id]);
+
 
   const handleRowSelected = (rowData: CompanyQuotationProps) => {
     navigateToCompanyQuotation(rowData);
@@ -202,18 +243,104 @@ function CompanyQuotationManagementList({
 
     return (
       <div
-        className={`w-full  ${isUsedFor == Modules.QUOTATION_MODULE ? (userPreference.isLeftMenu?"pl-5":"pl-1" ): ""} gap-1`}
+        className={`w-full ${isUsedFor == Modules.QUOTATION_MODULE ? (userPreference.isLeftMenu?"pl-7 pr-2":"pl-1" ): ""} gap-1 pt-2`}
       >
+        
+        {isUsedFor === Modules.QUOTATION_MODULE && (
+          <div className=" ">
+        <div className="flex items-start justify-between ">
+          <div>
+            <h1 className="page-header-custom tracking-tight pb-0.5 ">
+              Quotation Management
+            </h1>
+
+            <p className="page-subtitle-custom ">
+              Manage, track and update all your company quotation.
+            </p>
+            
+          </div>
+          <div className="pt-1">
+ <Button
+    disabled={!userHasAccessToAddCompanyQuotation}
+    onClick={() => {
+      if (!userHasAccessToAddCompanyQuotation) {
+        toast.error(
+          MESSAGE.MODULE_ACCESS.COMPANY_QUOTATION.DENIED_ADD_ACCESS
+        );
+        return;
+      }
+
+      const path =
+        ROUTES_URL.QUOTATION_CREATE_AND_DETAILS.replace(
+          ":quotationId",
+          String(0)
+        );
+
+      navigate(path);
+    }}
+  >
+    + Create Quotation
+  </Button>
+  </div>
+          
+        </div>
+        
+          <SummaryCards
+            cardGap={15}
+            width="75%"
+            loading={isDataLoading}
+            cards={[
+              {
+                title: "Total Quotations",
+                count: quotationSummary.total_quotation,
+                subtitle: "All quotations",
+                icon: FileText,
+                iconBg: "bg-blue-100",
+                iconColor: "text-blue-600",
+              },
+              {
+                title: "Submitted",
+                count: quotationSummary.total_quotation_submitted,
+                subtitle: "Submitted quotations",
+                icon: Send,
+                iconBg: "bg-green-100",
+                iconColor: "text-green-600",
+              },
+              {
+                title: "Drafts",
+                count: quotationSummary.total_quotation_drafts,
+                subtitle: "Pending completion",
+                icon: FilePenLine,
+                iconBg: "bg-orange-100",
+                iconColor: "text-orange-600",
+              },
+              {
+                title: "This Month Value",
+                count: `₹${Number(
+                  quotationSummary.total_quotation_value_this_month || 0
+                ).toLocaleString("en-IN")}`,
+                subtitle: "Monthly Quotation Value",
+                icon: IndianRupee,
+                iconBg: "bg-violet-100",
+                iconColor: "text-violet-700",
+              },
+            ]}
+          />
+          </div>
+        )}
+
         {isSubmitting && <LoadingPopUpAnimation show={isSubmitting} />}
-        {/* 🔹 Header */}
+        {/*  Header */}
         {isUsedFor == Modules.QUOTATION_MODULE ? (
           <div
-            className={`sticky z-10 top-12 mt-1 p-1 flex items-center justify-between gap-3 text-sm 
-              ${COLORS.GRID_HEADER_SECTION_BG_COLOR} rounded-lg shadow-sm mb-1.5 w-full`}
+            className={`sticky z-10 top-12 mt-1 py-1.5 px-3 mb-3 flex items-center justify-between gap-3 text-sm 
+              ${COLORS.GRID_HEADER_SECTION_BG_COLOR} border border-slate-200 rounded-lg shadow-sm mb-1.5 w-full`}
           >
+            
             {/* LEFT */}
             <div className="flex items-center gap-2 flex-wrap">
-              {/* 🔹 Title */}
+              
+              {/*  Title */}
               {/* <ComponentHeaderAndLogo logo={File} headerText="Quotation" /> */}
               <div className="flex justify-center items-center gap-1 pr-3">
                 {/* <Quote className={COLORS.GRID_HEADER_ICONS_COLOR_AND_SIZE} /> */}
@@ -235,6 +362,7 @@ function CompanyQuotationManagementList({
                     )
                   }
                   height="h-8"
+                  placeholder="Search by quotation number"
                 />
               </div>
                   {/* 🔹 Date Filter + Picker (Grouped) */}
@@ -281,28 +409,7 @@ function CompanyQuotationManagementList({
             </div>
 
             {/* RIGHT */}
-            <div>
-              <Button
-                disabled={!userHasAccessToAddCompanyQuotation}
-                onClick={() => {
-                  if (!userHasAccessToAddCompanyQuotation) {
-                    toast.error(
-                      MESSAGE.MODULE_ACCESS.COMPANY_QUOTATION.DENIED_ADD_ACCESS,
-                    );
-                    return;
-                  }
-
-                  const path = ROUTES_URL.QUOTATION_CREATE_AND_DETAILS.replace(
-                    ":quotationId",
-                    String(0),
-                  );
-                  navigate(path);
-                }}
-                // className={COLORS.ADD_BUTTON}
-              >
-                + Create Quotation
-              </Button>
-            </div>
+           
           </div>
         ) : (
           <div
@@ -316,7 +423,7 @@ function CompanyQuotationManagementList({
             </div>
 
             <div className="flex items-center gap-2 w-fit">
-              {/* 🔍 Search */}
+              {/*  Search */}
               <div className="relative flex items-start w-44">
                 <SearchInput
                   value={handleSearchOption.searchParameter}
@@ -394,19 +501,20 @@ function CompanyQuotationManagementList({
             />
           </div>
         )}
+        
         {/* Grid */}
-        <div className="bg-white overflow-y-auto rounded-lg shadow-sm">
+        <div className="bg-white overflow-y-auto rounded-lg  shadow-sm">
           <div
             className={
               userPreference.isLeftMenu
-                ? `ag-theme-balham w-full ${
+                ? `w-full ${
                     isUsedFor === Modules.QUOTATION_MODULE
-                      ? "h-[calc(100vh-120px)]"
+                      ? "h-[calc(100vh-280px)]"
                       : isUsedFor === Modules.LEAD_QUOTATION
                         ? "h-[calc(40vh-100px)]"
                         : "h-[calc(50vh-120px)]"
                   }`
-                : `ag-theme-balham w-full ${
+                : `w-full ${
                     isUsedFor === Modules.QUOTATION_MODULE
                       ? "h-[calc(100vh-120px)]"
                       : isUsedFor === Modules.LEAD_QUOTATION
@@ -438,7 +546,8 @@ function CompanyQuotationManagementList({
             onPageChange={paginationData.onPageChange}
           />
         </div>
-      </div>
+        </div>
+      
     );
   }
 }
