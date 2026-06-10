@@ -72,7 +72,7 @@ function ReminderSetting() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isGoogleConnected, setIsGoogleConnected] = useState<boolean>(false);
   const [googleCalendarData, setGoogleCalendarData] = useState<any>({});
-  const [isOutlookConnected, setIsoutlookConnected] = useState<boolean>(false);
+  // const [isOutlookConnected, setIsoutlookConnected] = useState<boolean>(false);
   const {
     userHasAccessToUpdateSettingReminder,
     userHasAccessToViewSettingReminder,
@@ -99,19 +99,18 @@ function ReminderSetting() {
       );
 
       const data = response.data;
-      console.log(data);
 
       if (data && data.length > 0) {
         const googleProvider = data.find((p: any) => p.calendar_type_id == 1);
-        const outlookProvider = data.find((p: any) => p.calendar_type_id == 2);
+        // const outlookProvider = data.find((p: any) => p.calendar_type_id == 2);
 
         if (googleProvider) {
           setGoogleCalendarData(googleProvider);
           setIsGoogleConnected(googleProvider.isactive);
         }
-        if (outlookProvider) {
-          setIsoutlookConnected(outlookProvider.isactive);
-        }
+        // if (outlookProvider) {
+        //   setIsoutlookConnected(outlookProvider.isactive);
+        // }
       }
     } catch (error) {
       console.error("Error fetching provider status:", error);
@@ -119,7 +118,6 @@ function ReminderSetting() {
       setIsLoading(false);
     }
   };
-  console.log("provider status", isGoogleConnected, isOutlookConnected);
 
   useEffect(() => {
     fetchProviderStatus();
@@ -199,7 +197,6 @@ function ReminderSetting() {
       <FormHeader
         preText="Manage your company's default settings and services."
         description="Choose how you want to receive Reminders. You can enable or disable different channels based on your preference. Reminders will be sent through Mobile, or directly in your Web browser."
-        // onClose={() => {}}
         icon={Bell}
         isModal={false}
         wantBorderBottom={false}

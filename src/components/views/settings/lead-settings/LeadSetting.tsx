@@ -11,7 +11,7 @@ import {
 } from "../../../../constants/AppConstants";
 import RefreshToken from "../../../../config/validations/RefreshToken";
 import CompanyLeadSettingType from "../../../../@types/settings/CompanyLeadSettings";
-import { useGoogleMeetStatus } from "../../../../config/hooks/useGoogleMeetStatus";
+// import { useGoogleMeetStatus } from "../../../../config/hooks/useGoogleMeetStatus";
 import { useZoomMeetingsStatus } from "../../../../config/hooks/useZoomMeetingsStatus";
 import SettingToggleCard from "../../../ui/SettingToggleCard";
 import { Handshake, User2 } from "lucide-react";
@@ -24,7 +24,7 @@ import MESSAGE from "../../../../constants/Messages";
 import FacebookPageSkeleton from "../social-media-integration/meta-app-facebook/PafeIdListCardPopUp";
 
 const LeadSetting: React.FC = () => {
-  useGoogleMeetStatus();
+  // useGoogleMeetStatus();
   useZoomMeetingsStatus();
 
   const { loginStatus } = useLoggedInUserContext();
@@ -134,7 +134,6 @@ const LeadSetting: React.FC = () => {
       return false;
     }
     if (data === null || data === undefined) {
-      console.log("handleUpdateLeadUser false");
       return false;
     }
     //////////////////////////////////////
@@ -144,12 +143,9 @@ const LeadSetting: React.FC = () => {
       data.all_leads_visible === null ||
       data.all_leads_visible === undefined
     ) {
-      console.log("handleUpdate false");
       return false;
     }
     const allLeadsVisibleStatus = !data.all_leads_visible;
-    console.log(data.id);
-    console.log(data.all_leads_visible);
 
     const postData = {
       company_id: loginStatus.companyId,
@@ -160,7 +156,6 @@ const LeadSetting: React.FC = () => {
 
     let result = false;
     try {
-      console.log("previous value: " + data.all_leads_visible);
       axios
         .post(POST_API.UPDATE_LEAD_COMPANY_USERS, postData, {
           withCredentials: true,
@@ -168,7 +163,6 @@ const LeadSetting: React.FC = () => {
         .then((response) => {
           toast.success(response.data.message);
           result = true;
-          console.log("after value: " + data.all_leads_visible);
         })
         .catch((error) => {
           result = false;
@@ -177,7 +171,6 @@ const LeadSetting: React.FC = () => {
     } catch (e) {
       console.log(e);
     }
-    console.log("handleUpdate " + result);
 
     return result;
   };

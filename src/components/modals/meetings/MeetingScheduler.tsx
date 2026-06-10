@@ -26,7 +26,6 @@ import ROUTES_URL from "../../../constants/Routes";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
 import AddCompanyUsersEmailAttendeesModal from "./AddCompanyUsersEmailAttendeesModal";
 import CompanyUsersSearchProps from "../../../@types/company-users/CompanyUserProps";
-import { useGoogleMeetContext } from "../../../context/meeting/GoogleMeetContext";
 import { STATUS_CODE } from "../../../constants/AppConstants";
 import ApiError from "../../../@types/error/ApiError";
 import RefreshToken from "../../../config/validations/RefreshToken";
@@ -38,10 +37,12 @@ import { useMeetingPlatform } from "../../../config/hooks/useMeetingPlatforms";
 import CompanyLeadContactsSelectionAgGrid from "../../ag-grid/CompanyLeadContactsSelectionAgGrid";
 import LeadContactType from "../../../@types/lead-management/LeadContact";
 import Lead from "../../../@types/lead-management/LeadManagementProps";
-import { useGoogleMeetStatus } from "../../../config/hooks/useGoogleMeetStatus";
+// import { useGoogleMeetStatus } from "../../../config/hooks/useGoogleMeetStatus";
 import { useZoomMeetingsStatus } from "../../../config/hooks/useZoomMeetingsStatus";
 import toast from "react-hot-toast";
 import FormHeader from "../../ui/FormHeader";
+import { useGoogleMeetStatusUpdated } from "../../../config/hooks/useGoogleMeetStatusUpdated";
+import LoadingSpinner from "../../../assets/animations/LoadingSpinner";
 
 const MeetingScheduler = () => {
   const { loginStatus } = useLoggedInUserContext();
@@ -59,9 +60,13 @@ const MeetingScheduler = () => {
   const [startDate, setStartDate] = useState<string>("");
   const [endDate, setEndDate] = useState<string>("");
 
-  useGoogleMeetStatus();
+  // useGoogleMeetStatus();
   useZoomMeetingsStatus();
 
+ const {googleMeetStatus  , loading : googleMeetStatusLoading }= useGoogleMeetStatusUpdated({
+  companyId : loginStatus.companyId,
+  userId : loginStatus.id
+  })
   const { userPreference } = useUserPreference();
   const { meetingPlatform } = useMeetingPlatform();
 
@@ -73,20 +78,6 @@ const MeetingScheduler = () => {
     isAddCompanyLeadContactModalOpen,
     setIsAddCompanyLeadContactModalOpen,
   ] = useState<boolean>(false);
-
-  // const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
-  //   open: false,
-  //   message: "",
-  //   type: "success" as "success" | "error",
-  // });
-
-  // const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
-  //   setMessageSnackbar({ open: true, message, type });
-  // };
-
-  // const handleCloseSnackbar = () => {
-  //   setMessageSnackbar((prev) => ({ ...prev, open: false }));
-  // };
 
   useEffect(() => {
     setServerCurrentTime(new Date(currentTime.replace(" ", "T")));
@@ -110,8 +101,7 @@ const MeetingScheduler = () => {
   ] = useState<LeadContactType[]>([]);
 
   const navigate = useNavigate();
-  const { googleMeetStatus } = useGoogleMeetContext();
-  console.log(googleMeetStatus);
+  // const { googleMeetStatus } = useGoogleMeetContext();
 
   const { zoomMeetingStatus } = useZoomMeetingContext();
 
@@ -133,6 +123,11 @@ const MeetingScheduler = () => {
     }
   }, [searchParams]);
   const createGoogleMeetMeeting = async () => {
+
+    if(!googleMeetStatus?.isactive){
+      toast.error("Google Meet is not integrated.")
+      return;
+    } 
     if (isCreating) {
       return;
     }
@@ -152,61 +147,34 @@ const MeetingScheduler = () => {
     );
 
     if (title === "") {
-      // showMessageSnackbar({
-      //   message: "Please give title to meeting",
-      //   type: "error",
-      // });
       toast.error("Please give title to meeting");
       setIsCreating(false);
       return;
     } else if (startDate === "") {
-      // showMessageSnackbar({
-      //   message: "Please select start date",
-      //   type: "error",
-      // });
       toast.error("Please select start date");
       setIsCreating(false);
       return;
     } else if (startTime === "") {
-      // showMessageSnackbar({
-      //   message: "Please select start time",
-      //   type: "error",
-      // });
       toast.error("Please select start time");
       setIsCreating(false);
       return;
     } else if (endDate === "") {
-      // showMessageSnackbar({ message: "Please select end date", type: "error" });
       toast.error("Please select end date");
       setIsCreating(false);
       return;
     } else if (endTime === "") {
-      // showMessageSnackbar({ message: "Please select end time", type: "error" });
       toast.error("Please select end time");
       setIsCreating(false);
       return;
     } else if (selectedMeetingPlatform === "") {
-      // showMessageSnackbar({
-      //   message: "Please select meeting platform",
-      //   type: "error",
-      // });
       toast.error("Please select meeting platform");
-
       setIsCreating(false);
       return;
     } else if (endDateTime.toDate() < startDateTIme.toDate()) {
-      // showMessageSnackbar({
-      //   message: "End Time should be greater than start time",
-      //   type: "error",
-      // });
       toast.error("End Time should be greater than start time");
       setIsCreating(false);
       return;
     } else if (serverCurrentTime! > startDateTIme.toDate()) {
-      // showMessageSnackbar({
-      //   message: "Connot create meeting as start time is in the past",
-      //   type: "error",
-      // });
       toast.error("Connot create meeting as start time is in the past");
       setIsCreating(false);
       return;
@@ -283,11 +251,7 @@ const MeetingScheduler = () => {
           setIsCreating(false);
         });
     } else {
-      // showMessageSnackbar({
-      //   message: "Please fill the required fields",
-      //   type: "error",
-      // });
-      toast.error("Please fill the required fields");
+       toast.error("Please fill the required fields");
     }
   };
   const createZoomMeeting = async () => {
@@ -309,61 +273,35 @@ const MeetingScheduler = () => {
       userPreference.timezoneName,
     );
     if (title === "") {
-      // showMessageSnackbar({
-      //   message: "Please give title to meeting",
-      //   type: "error",
-      // });
       toast.error("Please give title to meeting");
       setIsCreating(false);
       return;
     } else if (startDate === "") {
-      // showMessageSnackbar({
-      //   message: "Please select start date",
-      //   type: "error",
-      // });
-      toast.error("Please select start date");
+       toast.error("Please select start date");
       setIsCreating(false);
       return;
     } else if (startTime === "") {
-      // showMessageSnackbar({
-      //   message: "Please select start time",
-      //   type: "error",
-      // });
-      toast.error("Please select start time");
+       toast.error("Please select start time");
       setIsCreating(false);
       return;
     } else if (endDate === "") {
-      // showMessageSnackbar({ message: "Please select end date", type: "error" });
       toast.error("Please select end date");
       setIsCreating(false);
       return;
     } else if (endTime === "") {
-      // showMessageSnackbar({ message: "Please select end time", type: "error" });
       toast.error("Please select end time");
       setIsCreating(false);
       return;
     } else if (selectedMeetingPlatform === "") {
-      // showMessageSnackbar({
-      //   message: "Please select meeting platform",
-      //   type: "error",
-      // });
-      toast.error("Please select meeting platform");
+       toast.error("Please select meeting platform");
       setIsCreating(false);
       return;
     } else if (endDateTime.toDate() < startDateTIme.toDate()) {
-      // showMessageSnackbar({
-      //   message: "End Time should be greater than start time",
-      //   type: "error",
-      // });
       toast.error("End Time should be greater than start time.");
       setIsCreating(false);
       return;
     } else if (serverCurrentTime! > startDateTIme.toDate()) {
-      // showMessageSnackbar({
-      //   message: "Connot create meeting as start time is in the past",
-      //   type: "error",
-      // });
-      toast.error("Connot create meeting as start time is in the past");
+     toast.error("Connot create meeting as start time is in the past");
       setIsCreating(false);
       return;
     }
@@ -398,16 +336,8 @@ const MeetingScheduler = () => {
         .then((response) => {
           if (response.status === STATUS_CODE.OK) {
             if (response.data.status) {
-              // showMessageSnackbar({
-              //   message: response.data.message,
-              //   type: "success",
-              // });
-              toast.success(response.data.message);
+               toast.success(response.data.message);
             } else {
-              // showMessageSnackbar({
-              //   message: response.data.message,
-              //   type: "error",
-              // });
               toast.error(response.data.message);
             }
           }
@@ -513,9 +443,7 @@ const MeetingScheduler = () => {
     id: number,
     type: "user" | "leadContact" | "normal",
   ) => {
-    console.log("remove lead attanfosdn");
-    console.log(email);
-    console.log(id);
+    
     setAttendees(attendees.filter((attendee) => attendee !== email));
     if (type === "user") {
       setSelectedCompanyUsersIdArray((prev) =>
@@ -621,23 +549,16 @@ const MeetingScheduler = () => {
     }
   };
 
+
+  if(googleMeetStatusLoading){
+    return (
+      <LoadingSpinner/>
+    )
+  }
+
   return createPortal(
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50  overflow-y-auto">
       <div className="max-w-5xl mt-1 w-full p-4 bg-white rounded-lg shadow-xl overflow-y-auto">
-        {/* <div className="flex justify-between">
-          <h1 className="text-xl font-semibold mb-3 text-gray-800">
-            Schedule Meeting
-          </h1>
-          <div className="flex self-start">
-            <button
-              onClick={() => {
-                handleCloseMeetingModal();
-              }}
-            >
-              <X className="text-gray-500 hover:text-gray-700" size={20}></X>
-            </button>
-          </div>
-        </div> */}
         <FormHeader
           onClose={handleCloseMeetingModal}
           icon={CalendarPlusIcon}
@@ -669,10 +590,12 @@ const MeetingScheduler = () => {
               value={selectedMeetingPlatform}
               onChange={(e) => {
                 if (e.target.value === meetingPlatform[0].name) {
-                  if (googleMeetStatus.isConnected) {
+                  // if (googleMeetStatus.isConnected) {
+                  if (googleMeetStatus?.isactive) {
                     setSelectedMeetingPlatform(e.target.value);
                   } else {
-                    setSelectedMeetingPlatform(e.target.value);
+                    setSelectedMeetingPlatform("");
+                    toast.error("Google meet is not connected.")
                     // handleGoogleMeetAuth();
                   }
                 } else if (e.target.value === meetingPlatform[1].name) {
@@ -708,6 +631,7 @@ const MeetingScheduler = () => {
           <div className="">
             <DatePickerInput
               label="Start Date"
+              value={startDate}
               onChange={(e) => {
                 setStartDate(e.target.value);
               }}
@@ -746,7 +670,9 @@ const MeetingScheduler = () => {
 
           <div className="">
             <DatePickerInput
+            value={endDate}
               label="End Date"
+              minDate={startDate}
               onChange={(e) => {
                 setEndDate(e.target.value);
               }}
