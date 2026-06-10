@@ -26,10 +26,8 @@ function FacebookOAuthConsent() {
   // http://localhost:8080/api/main/purple-crm-api/main/facebook
   // "http://localhost:8080/api/main/purple-crm-api/main/facebook";
   const handleConfirm = () => {
-    console.log("Button clicked");
     
     const baseUrl = POST_API.OAUTH_CONSENT_FACEBOOK_ACCOUNT
-    console.log(baseUrl);
     
     const params = new URLSearchParams();
     params.append("company_id", loginStatus.companyId.toString());

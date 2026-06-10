@@ -1,48 +1,48 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { createPortal } from 'react-dom';
-import { STATUS_CODE } from '../../constants/AppConstants';
-import axios from 'axios';
-import POST_API from '../../constants/PostApi';
-import { useGoogleMeetContext } from '../../context/meeting/GoogleMeetContext';
+// import { STATUS_CODE } from '../../constants/AppConstants';
+// import axios from 'axios';
+// import POST_API from '../../constants/PostApi';
+// import { useGoogleMeetContext } from '../../context/meeting/GoogleMeetContext';
 import { useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+// import { useSearchParams } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
 
 
 function GoogleOAuthConsentAndroid() {
 
 
-  const {setGoogleMeetStatus} = useGoogleMeetContext();
+  // const {setGoogleMeetStatus} = useGoogleMeetContext();
 
-  const [searchParams] = useSearchParams();
+  // const [searchParams] = useSearchParams();
 
-  const code = searchParams.get("code");
-  const state = searchParams.get("state");
+  // const code = searchParams.get("code");
+  // const state = searchParams.get("state");
 
-     const handleGoogleMeetCallback = async (code: string, state: string) => {
+  //    const handleGoogleMeetCallback = async (code: string, state: string) => {
 
-    const googleMeetCallbackPostData = {
-      code: code,
-      state: state,
-      redirect_url : window.location.origin + window.location.pathname
-    };
+  //   const googleMeetCallbackPostData = {
+  //     code: code,
+  //     state: state,
+  //     redirect_url : window.location.origin + window.location.pathname
+  //   };
 
-    axios
-      .post(POST_API.GOOGLE_MEET_CALLBACK, googleMeetCallbackPostData, {
-        withCredentials: true,
-      })
-      .then((response) => {
-        if (response.status === STATUS_CODE.OK) {
-          setGoogleMeetStatus({
-            isConnected: true,
-          });
-          const newUrl = window.location.pathname;
-          window.history.replaceState(null, "", newUrl);
-        }
-       window.location.href = "com.purpleradiance.crm://oauth";
+  //   axios
+  //     .post(POST_API.GOOGLE_MEET_CALLBACK, googleMeetCallbackPostData, {
+  //       withCredentials: true,
+  //     })
+  //     .then((response) => {
+  //       if (response.status === STATUS_CODE.OK) {
+  //         setGoogleMeetStatus({
+  //           isConnected: true,
+  //         });
+  //         const newUrl = window.location.pathname;
+  //         window.history.replaceState(null, "", newUrl);
+  //       }
+  //      window.location.href = "com.purpleradiance.crm://oauth";
        
-      });
-  };
+  //     });
+  // };
 
 const initialText = 'Please wait Redirecting To PurpleCRM';
   const dotCount = 12; // ...... means 6 dots max
@@ -63,11 +63,11 @@ const initialText = 'Please wait Redirecting To PurpleCRM';
     return () => clearInterval(dotInterval);
   }, [dotCount, interval]);
 
-   useEffect(() => {
-      if (code && state){
-          handleGoogleMeetCallback(code, state);
-   }
-    }, []);
+  //  useEffect(() => {
+  //     if (code && state){
+  //         handleGoogleMeetCallback(code, state);
+  //  }
+  //   }, []);
 
   return (createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center">
