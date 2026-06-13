@@ -1,15 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   AlertCircle,
-  BookCheck,
   CheckCircle2,
   ClipboardList,
   Repeat,
 } from "lucide-react";
 import qs from "query-string";
 import { useCallback, useEffect, useState } from "react";
-import toast from "react-hot-toast";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useOutletContext, } from "react-router-dom";
 import MasterTaskManagementProps from "../../@types/List/MasterTaskManagementProps";
 import MasterTaskProps from "../../@types/my-task-management/MasterTaskProps";
 import MyAllTaskProps from "../../@types/my-task-management/MyAlltaskProps";
@@ -18,7 +16,6 @@ import { useComapanySpecificSearchDateRange } from "../../config/hooks/useCompan
 import { useDateRangeIdChange } from "../../config/hooks/useDateRangeIdChange";
 import { customDateRangeId } from "../../config/hooks/usePaginationHandler";
 import useScreenSize from "../../config/hooks/useScreenSize";
-import { JSX_CHILDREN_NAME, SIZE } from "../../constants/AppConstants";
 import COLORS from "../../constants/Colors";
 import MESSAGE from "../../constants/Messages";
 import ROUTES_URL from "../../constants/Routes";
@@ -28,7 +25,6 @@ import MasterTaskManagementAgGrid from "../ag-grid/MasterTaskManagementAgGrid";
 import PaginationWithoutCount from "../ag-grid/PaginationWithoutCount";
 import CreateGeneralTaskMasterModal from "../modals/general-task-master/CreateGeneralTaskMasterModal";
 import CustomDropdown from "../modals/leads/CustomDropdown";
-import Button from "../ui/Button";
 import CompanyUserSearchFieldInput from "../ui/CompanyUserSearchFieldInput";
 import DateRangeFilterDropdown from "../ui/DateRangeFilterDropdown";
 import DateRangePicker from "../ui/DateRangePicker";
@@ -61,21 +57,19 @@ function MasterTaskManagementList({
   // isActive,
   // setIsActive,
 }: MasterTaskManagementProps) {
-  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { position } = usePanel();
   const { isLargeScreen, isMediumScreen, isSmallScreen } = useScreenSize();
   const { dateRangeDropdownOptions } = useComapanySpecificSearchDateRange();
   const { userPreference } = useUserPreference();
-  const { userHasAccessToViewAllTasks, userHasAccessToAddMasterTasks } =
+  const { userHasAccessToViewAllTasks } =
     useUserAccessModules();
   const {
     handleDateRangeIdChange,
     isCustomDateOptionSelected,
     setIsCustomDateOptionSelected,
   } = useDateRangeIdChange({ dateRangeDropdownOptions, handleSearchOption });
-  const [isCreateTaskMasterModalOpen, setIsCreateTaskMasterModalOpen] =
-    useState<boolean>(searchParams.get("fromDashboard") === "true");
+
   // const [selectedRowData, setSelectedRowData] = useState<MasterTaskProps>()
    const { loginStatus } = useLoggedInUserContext();
 
@@ -104,6 +98,7 @@ const [summaryData, setSummaryData] =
       requestedby: loginStatus.id,
     };
 
+
     const response = await axiosClient.post(
       POST_API.SUMMARY_GENERAL_TASK_MASTER,
       postData,
@@ -129,9 +124,15 @@ useEffect(() => {
     
 
   if (userHasAccessToViewAllTasks) {
-    const handleCreateTaskMasterModalClose = () => {
-      setIsCreateTaskMasterModalOpen(false);
-    };
+   const {
+  isCreateTaskModalOpen,
+  setIsCreateTaskModalOpen,
+} = useOutletContext<{
+  isCreateTaskModalOpen: boolean;
+  setIsCreateTaskModalOpen: React.Dispatch<
+    React.SetStateAction<boolean>
+  >;
+}>();
 
     const selectedDateName =
       dateRangeDropdownOptions.find(
@@ -275,7 +276,7 @@ useEffect(() => {
                       }}
                     ></SearchInput>
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex ">
                     <div>
                       <div className="grid grid-cols-1 justify-center gap-1 w-full">
                         {/* Shared width wrapper */}
@@ -306,7 +307,7 @@ useEffect(() => {
                     </div>
 
                     {isUsedInAllTasksModule && (
-                      <div className="flex flex-wrap gap-2 w-full md:w-auto">
+                      <div className="flex flex-wrap gap-1 w-full md:w-auto">
                         {/* priority */}
 
                         <div className="min-w-[100px]">
@@ -413,31 +414,7 @@ useEffect(() => {
                 {/* Master task FILTERS */}
 
                 {/* RIGHT SECTION - Create Button */}
-                {isUsedInAllTasksModule && (
-                  <div className="flex gap-1 justify-end w-fit">
-                    <Button
-                      type="submit"
-                      disabled={!userHasAccessToAddMasterTasks}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        if (!userHasAccessToAddMasterTasks) {
-                          toast.error(
-                            MESSAGE.MODULE_ACCESS.MY_TASK.MASTER_TASK
-                              .DENIED_ADD_ACCESS,
-                          );
-                          return;
-                        }
-                        setIsCreateTaskMasterModalOpen(true);
-                      }}
-                    >
-                      <span className="flex items-center gap-1">
-                        {!isSmallScreen && <BookCheck size={SIZE.SIXTEEN} />}
-                        {isSmallScreen && <BookCheck size={SIZE.EIGHT} />}
-                        {isLargeScreen && JSX_CHILDREN_NAME.ADD_GENERAL_TASK}
-                      </span>
-                    </Button>
-                  </div>
-                )}
+                
               </div>
             </div>
           </div>
@@ -462,11 +439,11 @@ useEffect(() => {
             />
           </div>
           <CreateGeneralTaskMasterModal
-            isOpen={isCreateTaskMasterModalOpen}
-            handleClose={handleCreateTaskMasterModalClose}
+            isOpen={isCreateTaskModalOpen}
+            handleClose={() => setIsCreateTaskModalOpen(false)}
             handleTaskMasterCreate={handleAddAllTask}
             refreshSummary={fetchSummaryGeneralTaskMaster}
-          ></CreateGeneralTaskMasterModal>
+          />
         </div>
 
         <div className="flex items-center justify-end col-span-1 ">

@@ -2,9 +2,28 @@ import { Tab, Tabs, TabsHeader } from "@material-tailwind/react";
 import ROUTES_URL from "../../constants/Routes";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useUserAccessModules } from "../../config/hooks/useAccessModules";
+import { BookCheck } from "lucide-react";
+import Button from "../ui/Button";
+import { SIZE, JSX_CHILDREN_NAME } from "../../constants/AppConstants"; 
+import toast from "react-hot-toast";
+import MESSAGE from "../../constants/Messages";
 
-function TaskTab() {
-  const { userHasAccessToViewMasterTasks } = useUserAccessModules();
+type TaskTabProps = {
+  onAddMasterTask?: () => void;
+};
+
+function TaskTab({ onAddMasterTask }: TaskTabProps) {
+  const {
+    userHasAccessToViewMasterTasks,
+    userHasAccessToAddMasterTasks,
+  } = useUserAccessModules();
+
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const isMasterTaskPage = location.pathname.includes(
+    ROUTES_URL.MY_TASKS,
+  );
 
   const TABS = [
     {
@@ -24,10 +43,6 @@ function TaskTab() {
     path: string;
   }[];
 
-  const location = useLocation();
-
-  const navigate = useNavigate();
-
   const basePath = ROUTES_URL.TASKS_MANAGEMENT;
 
   const activeTab =
@@ -40,13 +55,44 @@ function TaskTab() {
   return (
     <div className=" sticky top-0 z-30 w-full flex flex-col gap-2 px-2 pb-1">
       {/* Header Section */}
+      <div className="flex justify-between ">
       <div className="flex flex-col ">
         <h1 className=" page-header-custom">Tasks</h1>
 
         <p className="page-subtitle-custom">
           Organize and track all your tasks in one place.
         </p>
-      </div>
+
+        </div>
+        <div className="pt-1">
+          {isMasterTaskPage && (
+            <Button
+              type="submit"
+              disabled={!userHasAccessToAddMasterTasks}
+              onClick={(e) => {
+                e.preventDefault();
+
+                if (!userHasAccessToAddMasterTasks) {
+                  toast.error(
+                    MESSAGE.MODULE_ACCESS.MY_TASK.MASTER_TASK.DENIED_ADD_ACCESS,
+                  );
+                  return;
+                }
+
+                onAddMasterTask?.();
+              }}
+            >
+              <div className="flex items-center gap-1">
+                <BookCheck size={SIZE.SIXTEEN} />
+                {JSX_CHILDREN_NAME.ADD_GENERAL_TASK}
+              </div>
+            </Button>
+          )}
+        </div>
+        </div>
+
+        
+          
 
       {/* Tabs Section */}
       <div className="w-[200px] rounded-md border border-slate-200 bg-slate-100 ">

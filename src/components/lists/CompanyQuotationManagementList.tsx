@@ -32,6 +32,7 @@ import { QuotationTypeDropdown } from "../views/lookups/company-quotation/Quotat
 import {FileText, Send, FilePenLine, IndianRupee,} from "lucide-react";
 import CompanyQuotationSummary from "../../@types/company-quotation/CompanyQuotationSummary";
 import SummaryCards from "../ui/SummaryCards";
+import { formatRupee } from "../../utils/helperMethods/formatFunctions";
 
 export const companyQuotationDataUrlSearchParamKey: string =
   "companyQuotationData";
@@ -316,9 +317,9 @@ useEffect(() => {
               },
               {
                 title: "This Month Value",
-                count: `₹${Number(
-                  quotationSummary.total_quotation_value_this_month || 0
-                ).toLocaleString("en-IN")}`,
+                count: `₹ ${formatRupee(
+                  quotationSummary?.total_quotation_value_this_month ?? 0
+                )}`,
                 subtitle: "Monthly Quotation Value",
                 icon: IndianRupee,
                 iconBg: "bg-violet-100",

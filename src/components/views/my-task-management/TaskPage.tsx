@@ -7,12 +7,16 @@ import TaskTab from "../../tabs/TaskTab";
 import { PageLayout } from "../../ui/PageLayout";
 import AccessDeniedPopup from "../not-found/AccessDeniedPage";
 
+
 function TaskPage() {
   const [ref, inView] = useInView({ fallbackInView: true, threshold: 0.1 });
   const { userHasAccessToViewTasks } = useUserAccessModules();
   const [accessDeniedPopUpOpen, setAccessDeniedPopUpOpen] = useState(
     !userHasAccessToViewTasks,
+    
   );
+  const [isCreateTaskModalOpen, setIsCreateTaskModalOpen] =
+  useState(false);
 
   return (
     <PageLayout>
@@ -36,12 +40,22 @@ function TaskPage() {
             </div> */}
             {
               <div className="sticky top-1 left-0 z-20">
-                <TaskTab />
+            <TaskTab
+              onAddMasterTask={() =>
+            setIsCreateTaskModalOpen(true)
+          }
+        />
               </div>
             }
+            
             <div className="">
               <div className="">
-                <Outlet />
+                <Outlet
+            context={{
+              isCreateTaskModalOpen,
+              setIsCreateTaskModalOpen,
+            }}
+          />
               </div>
             </div>
           </motion.section>

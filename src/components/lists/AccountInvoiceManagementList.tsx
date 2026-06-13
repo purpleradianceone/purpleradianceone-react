@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import Button from "../ui/Button";
 import { useUserAccessModules } from "../../config/hooks/useAccessModules";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import SearchInput from "../ui/SearchInput";
 import DateRangePicker from "../ui/DateRangePicker";
 import { useComapanySpecificSearchDateRange } from "../../config/hooks/useCompanySpecificDateRange";
@@ -29,6 +29,10 @@ import { ComponentHeaderAndLogo } from "../ui/ComponentHeaderAndLogo";
 import CustomDocumentPreviewComponent from "../custom-document-preview-component/CustomDocumentPreviewComponent";
 import LoadingPopUpAnimation from "../views/card/LoadingPopUpAnimation";
 import { FaRegFileAlt } from "react-icons/fa";
+import CompanyInvoiceSummary from "../../@types/invoice/CompanyInvoiceSummary";
+import { FilePenLine, FileText, IndianRupee, Receipt } from "lucide-react";
+import SummaryCards from "../ui/SummaryCards";
+import { formatRupee } from "../../utils/helperMethods/formatFunctions";
 
 export const accountInvoiceDataUrlSearchParamKey: string = "accountInvoiceData";
 
@@ -71,6 +75,50 @@ function AccountInvoiceManagementList({
     dateRangeDropdownOptions,
     handleSearchOption,
   });
+   
+const [invoiceSummary, setInvoiceSummary] =
+  useState<CompanyInvoiceSummary>({
+    total_company_invoice_this_month: 0,
+    total_company_invoice_in_draft: 0,
+    total_company_invoice_amount_this_month: 0,
+    total_company_invoice_tax_this_month: 0,
+  });
+
+  const fetchInvoiceSummary = useCallback(async () => {
+  try {
+    const postData = {
+      company_id: loginStatus.companyId,
+      requestedby: loginStatus.id,
+    };
+
+    const response = await axiosClient.post(
+      POST_API.SUMMARY_COMPANY_INVOICE,
+      postData,
+      {
+        withCredentials: true,
+      }
+    );
+
+    if (response.data?.length > 0) {
+      setInvoiceSummary(response.data[0]);
+    }
+  } catch (error) {
+    console.error(error);
+  }
+}, [loginStatus.companyId, loginStatus.id]);
+
+useEffect(() => {
+  if (loginStatus.companyId && loginStatus.id) {
+    fetchInvoiceSummary();
+  }
+}, [fetchInvoiceSummary]);
+
+const refreshAllData = useCallback(async () => {
+  await Promise.all([
+    handleAddInvoice(),
+    fetchInvoiceSummary(),
+  ]);
+}, [handleAddInvoice, fetchInvoiceSummary]);
 
   const navigateToInvoice = (rowData: AccountInvoiceProps) => {
     console.log(rowData);
@@ -108,7 +156,6 @@ function AccountInvoiceManagementList({
       // due_date: dueDate,
       createdby_id: loginStatus.id,
     };
-    console.log(formPayload);
     // console.log(selectedAccount);
     setIsSubmitting(true);
     await axiosClient
@@ -121,7 +168,7 @@ function AccountInvoiceManagementList({
           console.log(response.data);
 
           const invoiceId = response?.data?.newid || 0;
-          handleAddInvoice();
+          refreshAllData();
           const path = ROUTES_URL.INVOICE_DETAILS.replace(
             ":invoiceId",
             String(invoiceId),
@@ -164,7 +211,8 @@ function AccountInvoiceManagementList({
       if (res.data.status) {
         toast.success(res.data.message);
         handleAddInvoice();
-        // 🔄 Refresh latest data
+        fetchInvoiceSummary() 
+        //  Refresh latest data
         // getInvoices(new AbortController().signal);
       } else {
         toast.error(res.data.message);
@@ -190,7 +238,7 @@ function AccountInvoiceManagementList({
           requestedby_id: loginStatus.id,
         },
         {
-          responseType: "blob", // ✅ IMPORTANT
+          responseType: "blob", // 
           withCredentials: true,
         },
       );
@@ -198,12 +246,9 @@ function AccountInvoiceManagementList({
       const blob = new Blob([response.data], {
         type: "application/pdf", // fixed for invoice
       });
-
-      console.log(response.data);
-
       const fileUrl = URL.createObjectURL(blob);
 
-      // ✅ Same as your task document logic
+      //  Same as your task document logic
       setLogoPreview(fileUrl); // you can rename this later (e.g. setInvoicePreview)
       setShowCompanyLogoPreview(true);
     } catch (error) {
@@ -235,26 +280,117 @@ function AccountInvoiceManagementList({
 
     return (
       <div
-        className={`w-full ${position === "left"} ${isUsedForSidebar ? (userPreference.isLeftMenu ? "pl-5" : "pl-1") : ""} gap-1`}
+        className={`w-full ${position === "left"} ${isUsedForSidebar ? (userPreference.isLeftMenu ? "pl-7 pr-2" : "pl-1") : ""} gap-1 pt-2`}
       >
         {isSubmitting && <LoadingPopUpAnimation show={isSubmitting} />}
-        {/* 🔹 Header */}
+
+        
+        {/* Header */}
         {isUsedForSidebar ? (
+        <div>
+        {/* Top Header */}
+        <div className="flex items-start justify-between ">
+          <div>
+            <h1 className="page-header-custom tracking-tight pb-0.5">
+               Invoices
+            </h1>
+
+            <p className="page-subtitle-custom ">
+              Manage and track all your invoices efficiently.
+            </p>
+          </div>
+
+          {/* RIGHT */}
+          <div className="pt-1">
+            <div>
+              <Button
+                disabled={!userHasAccessToAddCompanyInvoiceDraft}
+                onClick={() => {
+                  if (!userHasAccessToAddCompanyInvoiceDraft) {
+                    toast.error(
+                      MESSAGE.MODULE_ACCESS.COMPANY_INVOICE.DENIED_ADD_ACCESS,
+                    );
+                    return;
+                  }
+
+                  // setIsCreateInvoiceModalOpen(true);
+                  const path = ROUTES_URL.INVOICE_DETAILS.replace(
+                    ":invoiceId",
+                    String(0),
+                  );
+                  navigate(path);
+                }}
+                // className={COLORS.ADD_BUTTON}
+              >
+                + Add Invoice
+              </Button>
+            </div>
+            </div> 
+        </div>
+              <SummaryCards
+                cardGap={20}
+                width="75%"
+                gridCols={4}
+                loading={gridLoading}
+                cards={[
+                  {
+                    title: "Total Invoices",
+                    count: invoiceSummary.total_company_invoice_this_month,
+                    subtitle: "Created This Month",
+                    icon: FileText,
+                    iconBg: "bg-blue-100",
+                    iconColor: "text-blue-600",
+                  },
+
+                  {
+                    title: "Draft Invoices",
+                    count: invoiceSummary.total_company_invoice_in_draft,
+                    subtitle: "All Draft Invoices",
+                    icon: FilePenLine,
+                    iconBg: "bg-orange-100",
+                    iconColor: "text-orange-600",
+                  },
+
+                  {
+                    title: "Total Tax",
+                    count: `₹ ${formatRupee(
+                                      invoiceSummary?.total_company_invoice_tax_this_month ?? 0
+                                    )}`,
+                    subtitle: "GST Amount This Month",
+                    icon: Receipt,
+                    iconBg: "bg-violet-100",
+                    iconColor: "text-violet-600",
+                  },
+
+                  {
+                    title: "Invoice Amount",
+                    count: `₹ ${formatRupee(
+                      invoiceSummary?.total_company_invoice_amount_this_month ?? 0
+                    )}`,
+                    subtitle: "This Month",
+                    icon: IndianRupee,
+                    iconBg: "bg-green-100",
+                    iconColor: "text-green-600",
+                  },
+                ]}
+              />
+
           <div
-            className={`sticky z-10 top-12 mt-1 p-1 flex items-center justify-between gap-3 text-sm 
-              ${COLORS.GRID_HEADER_SECTION_BG_COLOR} rounded-lg shadow-sm mb-1.5 w-full`}
+            className={`sticky z-10 top-12 mt-1 py-1.5 px-3 mb-3 flex items-center justify-between gap-3 text-sm 
+              ${COLORS.GRID_HEADER_SECTION_BG_COLOR} border border-slate-200 rounded-lg mb-1.5 w-full`}
           >
             {/* LEFT */}
             <div className="flex items-center gap-2 flex-wrap">
-              {/* 🔹 Title */}
+              {/*  Title */}
               <ComponentHeaderAndLogo
                 logo={FaRegFileAlt}
                 headerText="Invoices"
               />
-              {/* 🔹 Search */}
+              {/*  Search */}
               <div className="w-fit min-w-[120px]">
                 <SearchInput
                   value={handleSearchOption.searchParameter}
+                  placeholder="Search by invoice no, account name"
                   onChange={(e) =>
                     handleSearchOption.handleSearchParameterChange(
                       e.target.value,
@@ -291,31 +427,7 @@ function AccountInvoiceManagementList({
                 )}
               </div>
             </div>
-
-            {/* RIGHT */}
-            <div>
-              <Button
-                disabled={!userHasAccessToAddCompanyInvoiceDraft}
-                onClick={() => {
-                  if (!userHasAccessToAddCompanyInvoiceDraft) {
-                    toast.error(
-                      MESSAGE.MODULE_ACCESS.COMPANY_INVOICE.DENIED_ADD_ACCESS,
-                    );
-                    return;
-                  }
-
-                  // setIsCreateInvoiceModalOpen(true);
-                  const path = ROUTES_URL.INVOICE_DETAILS.replace(
-                    ":invoiceId",
-                    String(0),
-                  );
-                  navigate(path);
-                }}
-                // className={COLORS.ADD_BUTTON}
-              >
-                + Add Invoice
-              </Button>
-            </div>
+          </div>
           </div>
         ) : (
           <div
@@ -329,7 +441,7 @@ function AccountInvoiceManagementList({
             </div>
 
             <div className="flex items-center gap-2 w-fit">
-              {/* 🔍 Search */}
+              {/* Search */}
               <div className="relative flex items-start w-44">
                 <SearchInput
                   value={handleSearchOption.searchParameter}
@@ -349,7 +461,7 @@ function AccountInvoiceManagementList({
                 />
               </div>
 
-              {/* 📅 Date Filters */}
+              {/* Date Filters */}
               <div className="flex items-center gap-2 w-fit">
                 <DateRangeFilterDropdown
                   dropdownOptions={dateRangeDropdownOptions}
@@ -366,7 +478,7 @@ function AccountInvoiceManagementList({
                   />
                 )}
 
-                {/* ➕ Add Invoice */}
+                {/* Add Invoice */}
                 <div className="flex gap-1 justify-end w-fit">
                   <Button
                     type="button"
@@ -405,19 +517,19 @@ function AccountInvoiceManagementList({
             />
           </div>
         )}
-        {/* 🔹 Grid */}
+        {/*  Grid */}
         <div className="bg-white overflow-y-auto rounded-lg shadow-sm">
           <div
             className={
               userPreference.isLeftMenu
-                ? `ag-theme-balham w-full ${
+                ? `w-full ${
                     isUsedForSidebar
-                      ? "h-[calc(100vh-120px)]"
+                      ? "h-[calc(100vh-278px)]"
                       : isUsedForSidebar
                         ? "h-[calc(40vh-100px)]"
                         : "h-[calc(50vh-120px)]"
                   }`
-                : `ag-theme-balham w-full ${
+                : `w-full ${
                     isUsedForSidebar
                       ? "h-[calc(100vh-122px)]"
                       : isUsedForSidebar
@@ -437,7 +549,7 @@ function AccountInvoiceManagementList({
             />
           </div>
 
-          {/* 🔹 Create Modal */}
+          {/* Create Modal */}
           <GenerateInvoiceModal
             isOpen={isCreateInvoiceModalOpen}
             onClose={() => setIsCreateInvoiceModalOpen(false)}
@@ -446,7 +558,7 @@ function AccountInvoiceManagementList({
           />
         </div>
 
-        {/* 🔹 Pagination */}
+        {/* Pagination */}
         <div className="flex items-center justify-end col-span-1">
           <PaginationWithoutCount
             pageSize={paginationData.pageSize}
