@@ -17,8 +17,8 @@ const STATUS_MAP: Record<number, StatusConfig> = {
   1: {
     label: "DRAFT",
     bg: "bg-orange-100",
-    text: "text-gray-700",
-    border: "border-gray-300",
+    text: "text-orange-500",
+    border: "border-orange-200",
     icon: <FileText size={12} />,
   },
   2: {
@@ -50,7 +50,7 @@ const InvoiceStatusChip: React.FC<Props> = ({ statusId }) => {
 
   return (
     <span
-      className={`inline-flex items-center gap-1 px-2 py-0.5 text-xs  rounded-full border ${status.bg} ${status.text} ${status.border}`}
+      className={`inline-flex items-center gap-1 px-1.5 py-0.5 text-xs rounded-full border ${status.bg} ${status.text} ${status.border}`}
     >
       {status.icon}
       {status.label}

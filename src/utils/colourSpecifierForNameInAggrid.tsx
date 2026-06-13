@@ -39,7 +39,7 @@ export const leadStatusStyles: Record<string, string> = {
 
 
 export const supportTicketStatusStyles: Record<string, string> = {
-  Open: "bg-blue-100 text-blue-700",
+  Open: "bg-blue-50 text-blue-700",
 
   "In Progress": "bg-amber-100 text-amber-700",
 
