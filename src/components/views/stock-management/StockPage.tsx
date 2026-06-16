@@ -7,6 +7,7 @@ import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
 import AccessDeniedPopup from "../not-found/AccessDeniedPage";
 import { useState } from "react";
 import { Layers } from "lucide-react";
+import COLORS from "../../../constants/Colors";
 
 function StockPage() {
   const [ref, inView] = useInView({ fallbackInView: true, threshold: 0.1 });
@@ -25,13 +26,23 @@ function StockPage() {
             animate={inView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.4, ease: "easeOut" }}
           >
-            <div className="sticky top-0 z-50  py-1  flex items-center justify-between bg-gray-50 rounded-sm shadow-sm   w-full">
-              <div className="flex w-full gap-2 justify-start pl-1">
-                <div className="flex items-center gap-1">
-                  <Layers className="w-5 h-5 text-blue-600" />
-                  <span className="section-header-custom">Stock</span>
-                </div>
+            <div className="bg-white overflow-hidden px-2 mb-2">
+            {/* Header */}
+            <div>
+            <div className="flex items-center gap-3 py-1.5">
+              <div className={`p-2 rounded-lg ${COLORS.PAGE_HEADER_SECTION_BG_COLOR}`}>
+              <Layers className={COLORS.PAGE_HEADER_ICONS_COLOR_AND_SIZE} />
+            </div>
+
+              <div>
+                <h1 className="page-header-custom tracking-tight">
+                  Stock
+                </h1>
+                <p className="page-subtitle-custom">
+                  Manage and track your inventory in real-time
+                </p>
               </div>
+            </div>
             </div>
 
             <div className="sticky top-1 left-0 z-20">
@@ -39,8 +50,9 @@ function StockPage() {
             </div>
 
             <div className="">
-              <div className="border rounded-md  bg-gray-50">
+              <div className="my-2 border rounded-md ">
                 <Outlet />
+              </div>
               </div>
             </div>
           </motion.section>

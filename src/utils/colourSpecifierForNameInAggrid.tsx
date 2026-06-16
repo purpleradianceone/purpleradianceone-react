@@ -74,6 +74,12 @@ export const productTypeStyles: Record<string, string> = {
   Hardware: "bg-teal-100 text-teal-700",
 };
 
+export const stockLedgerTransactionTypeStyles: Record<string, string> = {
+  Adjustment: "bg-green-100 text-green-700",
+
+  Sale: "bg-red-100 text-red-700",
+};
+
 
 
 

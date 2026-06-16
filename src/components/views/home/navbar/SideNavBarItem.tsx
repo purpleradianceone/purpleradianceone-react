@@ -178,6 +178,7 @@ function SideNavBarItem({
               <div className="flex items-center">
                 <Icon
                   size={20}
+                  
                   className={`mr-3 ${isIconActive ? iconActiveClasses : iconBaseClasses}`}
                 />
                 <span

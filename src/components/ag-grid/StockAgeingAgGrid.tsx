@@ -1,8 +1,11 @@
 import { useMemo } from "react";
-import { AllCommunityModule, ColDef, themeBalham } from "ag-grid-community";
+import { AllCommunityModule, ColDef, } from "ag-grid-community";
 import StockAgeing from "../../@types/stock/StockAgeing";
 import { AgGridReact } from "ag-grid-react";
 import { SkeletonRowsAgGrid } from "../ui/SkeletonRowsAgGrid";
+import AgGridProfileCell from "../ui/AgGridProfileCell";
+import { Package } from "lucide-react";
+import { AGGRID } from "../../constants/AppConstants";
 
 const StockAgeingAgGrid = ({ data , isDataLoading }: { data: StockAgeing[] , isDataLoading : boolean }) => {
   const columnDefs = useMemo<ColDef[]>(
@@ -14,7 +17,14 @@ const StockAgeingAgGrid = ({ data , isDataLoading }: { data: StockAgeing[] , isD
         cellStyle: {
           color: "black",
           fontWeight: "bold",
-        }
+        },
+        
+         cellRenderer: (params: any) => (
+      <AgGridProfileCell
+        primaryText={params.value}
+        icon={<Package size={16} />}
+      />
+    ),
         
       },
       {
@@ -72,7 +82,7 @@ const StockAgeingAgGrid = ({ data , isDataLoading }: { data: StockAgeing[] , isD
 
   return (
     <div
-      className="ag-theme-balham w-full"
+      className="modern-user-grid custom-height-scrollbar w-full"
       style={{ height: "100%", width: "100%" }}
     >
       <AgGridReact
@@ -81,7 +91,9 @@ const StockAgeingAgGrid = ({ data , isDataLoading }: { data: StockAgeing[] , isD
         defaultColDef={defaultColDef}
         modules={[AllCommunityModule]}
         // overlayNoRowsTemplate={INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
-        theme={themeBalham}
+        // theme={themeBalham}
+        rowHeight={AGGRID.ROW_HEIGHT}
+        headerHeight={AGGRID.HEADER_HEIGHT}
       />
     </div>
   );

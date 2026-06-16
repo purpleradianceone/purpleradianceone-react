@@ -1,11 +1,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { AllCommunityModule, ColDef, themeBalham } from "ag-grid-community";
+import { AllCommunityModule, ColDef,  } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 import React, { useMemo } from "react";
 import Transaction from "../../@types/stock/Transaction";
 import StatusIndicator from "../ui/StatusIndicator";
 import { SkeletonRowsAgGrid } from "../ui/SkeletonRowsAgGrid";
+import { AGGRID } from "../../constants/AppConstants";
+import RenderUserWithIcon from "../ui/UserAgGridCellRenderer";
+import { stockLedgerTransactionTypeStyles } from "../../utils/colourSpecifierForNameInAggrid";
+import AgGridProfileCell from "../ui/AgGridProfileCell";
+import { Package } from "lucide-react";
 
 const TransactionAgGrid: React.FC<{
   data: Transaction[];
@@ -33,6 +38,13 @@ const TransactionAgGrid: React.FC<{
           color: "black",
           fontWeight: "bold",
         },
+
+        cellRenderer: (params: any) => (
+      <AgGridProfileCell
+        primaryText={params.value}
+        icon={<Package size={16} />}
+      />
+    ),
       },
       {
         field: "transactionTypeName",
@@ -42,15 +54,20 @@ const TransactionAgGrid: React.FC<{
           if (params.data?.__isSkeleton) {
                 return <SkeletonRowsAgGrid />;
               }
-          return(
-             <div className="flex items-center gap-1">
-              <StatusIndicator
-                isActive={params.value==="Adjustment" ? true : false}
-                activeLabel="Adjustment"
-                inactiveLabel="Sell"
-              />
-            </div>
-          )
+          const type = params.value || "-";
+
+            return (
+              <div className="flex items-center h-full">
+                <span
+                  className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap ${
+                    stockLedgerTransactionTypeStyles[type] ||
+                    "bg-slate-100 text-slate-700"
+                  }`}
+                >
+                  {type}
+                </span>
+              </div>
+            );
         }
       },
       {
@@ -93,6 +110,7 @@ const TransactionAgGrid: React.FC<{
       {
         field: "createdBy",
         headerName: "createdBy",
+        cellRenderer: RenderUserWithIcon,
       },
       {
         hide: true,
@@ -121,13 +139,21 @@ const TransactionAgGrid: React.FC<{
               if (params.data?.__isSkeleton) {
                 return <SkeletonRowsAgGrid />;
               }
-              return params.value;
+              return (
+          <span className="">
+            {params.value !== null &&
+            params.value !== undefined &&
+            params.value !== ""
+              ? params.value
+              : "-"}
+          </span>
+        );
             },
     };
   }, []);
   return (
     <div
-      className="ag-theme-balham w-full"
+      className="modern-user-grid custom-height-scrollbar w-full"
       style={{ height: "100%", width: "100%" }}
     >
       <AgGridReact
@@ -136,7 +162,8 @@ const TransactionAgGrid: React.FC<{
         defaultColDef={defaultColDef}
         modules={[AllCommunityModule]}
         // overlayNoRowsTemplate={INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
-        theme={themeBalham}
+        rowHeight={AGGRID.ROW_HEIGHT}
+        headerHeight={AGGRID.HEADER_HEIGHT}
       />
     </div>
   );

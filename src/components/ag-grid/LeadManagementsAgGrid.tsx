@@ -7,10 +7,10 @@ import LeadManagementAgGridProps from "../../@types/ag-grid/LeadManagementAgGrid
 import LeadDataProps from "../../@types/lead-management/LeadProps";
 import { SkeletonRowsAgGrid } from "../ui/SkeletonRowsAgGrid";
 import {
-  avatarColors,
   leadStatusStyles,
 } from "../../utils/colourSpecifierForNameInAggrid";
 import { Eye, User } from "lucide-react";
+import AgGridProfileCell from "../ui/AgGridProfileCell";
 
 function LeadManagementAgGrid({
   leads,
@@ -52,77 +52,22 @@ function LeadManagementAgGrid({
         flex: 1.5,
         minWidth: 240,
 
-        comparator: (valueA, valueB) => {
-          if (!valueA) return -1;
-          if (!valueB) return 1;
-
-          return valueA.toLowerCase().localeCompare(valueB.toLowerCase());
-        },
-
         cellRenderer: (params: any) => {
-          if (params.data?.__isSkeleton) {
-            return <SkeletonRowsAgGrid />;
-          }
+              if (params.data?.__isSkeleton) {
+                return <SkeletonRowsAgGrid />;
+              }
 
-          const name = params.data?.name?.trim() || "-";
-
-          const email = params.data?.email?.trim();
-          const mobileNumber = params.data?.mobileNumber?.trim();
-
-          const secondaryText = email || mobileNumber || "-";
-
-          // avatar source only
-          const avatarSource =
-            params.data?.name?.trim() || params.data?.email?.trim() || "-";
-
-          const initials =
-            avatarSource !== "-"
-              ? avatarSource
-                  .trim()
-                  .split(/\s+/)
-                  .filter(Boolean)
-                  .map((word: string, index: number, array: string[]) =>
-                    index === 0 || index === array.length - 1
-                      ? word.charAt(0)
-                      : "",
-                  )
-                  .join("")
-                  .substring(0, 2)
-                  .toUpperCase()
-              : "-";
-
-          const colorIndex =
-            avatarSource !== "-"
-              ? avatarSource
-                  .split("")
-                  .reduce(
-                    (acc: number, char: string) => acc + char.charCodeAt(0),
-                    0,
-                  ) % avatarColors.length
-              : 0;
-
-          return (
-            <div className="flex items-center gap-3 h-full px-2 overflow-hidden">
-              <div
-                className={`w-8 h-8 rounded-full text-white text-xs font-semibold flex items-center justify-center flex-shrink-0 ${
-                  avatarColors[colorIndex]
-                }`}
-              >
-                {initials}
-              </div>
-
-              <div className="flex flex-col justify-center overflow-hidden">
-                <span className="text-sm font-semibold text-gray-800 truncate">
-                  {name}
-                </span>
-
-                <span className="text-xs text-gray-500 truncate">
-                  {secondaryText}
-                </span>
-              </div>
-            </div>
-          );
-        },
+              return (
+                <AgGridProfileCell
+                  primaryText={params.data?.name}
+                  secondaryText={
+                    params.data?.email ||
+                    params.data?.mobileNumber ||
+                    "-"
+                  }
+                />
+              );
+            },
       },
       {
         field: "email",

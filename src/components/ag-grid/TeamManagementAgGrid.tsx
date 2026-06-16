@@ -14,6 +14,7 @@ import { SkeletonRowsAgGrid } from "../ui/SkeletonRowsAgGrid";
 import GridActionButton from "../ui/GridActionButton";
 import StatusBadge from "../ui/StatusBadge";
 import RenderUserWithIcon from "../ui/UserAgGridCellRenderer";
+import AgGridProfileCell from "../ui/AgGridProfileCell";
 
 function TeamManagementAgGrid({
   companyTeamList,
@@ -37,11 +38,17 @@ function TeamManagementAgGrid({
         filter: true,
         flex: 1,
         cellClass: "font-bold text-gray-800  px-2 py-1 rounded",
-        cellStyle: () => ({
-          fontSize: "14px",
-          fontWeight: 600,
-          color: "#1f2937",
-        }),
+        cellRenderer: (params: any) => {
+              if (params.data?.__isSkeleton) {
+                return <SkeletonRowsAgGrid />;
+              }
+
+              return (
+                <AgGridProfileCell
+                  primaryText={params.data?.name}
+                />
+              );
+            },
       },
       {
         headerName: "Team Description",

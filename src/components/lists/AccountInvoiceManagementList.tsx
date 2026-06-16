@@ -290,15 +290,21 @@ const refreshAllData = useCallback(async () => {
         <div>
         {/* Top Header */}
         <div className="flex items-start justify-between ">
-          <div>
-            <h1 className="page-header-custom tracking-tight pb-0.5">
+          <div className="flex items-center gap-3 ">
+              <div className={`p-2 rounded-lg ${COLORS.PAGE_HEADER_SECTION_BG_COLOR}`}>
+              <FileText className={COLORS.PAGE_HEADER_ICONS_COLOR_AND_SIZE} />
+            </div>
+
+              <div>
+                <h1 className="page-header-custom tracking-tight pb-0.5">
                Invoices
             </h1>
+              <p className="page-subtitle-custom ">
+               Manage and track all your invoices efficiently.
 
-            <p className="page-subtitle-custom ">
-              Manage and track all your invoices efficiently.
             </p>
-          </div>
+              </div>
+            </div>
 
           {/* RIGHT */}
           <div className="pt-1">
@@ -338,8 +344,8 @@ const refreshAllData = useCallback(async () => {
                     count: invoiceSummary.total_company_invoice_this_month,
                     subtitle: "Created This Month",
                     icon: FileText,
-                    iconBg: "bg-blue-100",
-                    iconColor: "text-blue-600",
+                    iconBg: "bg-violet-100",
+                    iconColor: "text-violet-600",
                   },
 
                   {
@@ -358,8 +364,8 @@ const refreshAllData = useCallback(async () => {
                                     )}`,
                     subtitle: "GST Amount This Month",
                     icon: Receipt,
-                    iconBg: "bg-violet-100",
-                    iconColor: "text-violet-600",
+                    iconBg: "bg-blue-100",
+                    iconColor: "text-blue-600",
                   },
 
                   {

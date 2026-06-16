@@ -42,6 +42,7 @@ const WareHouseWiseStockList = ({
                   handleSearchParameterChange(e.target.value);
                 }}
                 value={searchParameter}
+                placeholder="Search by warehouse name"
               ></SearchInput>
             </div>
           </div>
@@ -51,8 +52,8 @@ const WareHouseWiseStockList = ({
         <div
           className={
             userPreference.isLeftMenu
-              ? `ag-theme-balham w-full h-[calc(100vh-190px)]`
-              : "ag-theme-balham w-full h-[calc(100vh-192px)]"
+              ? `w-full h-[calc(100vh-241px)]`
+              : "w-full h-[calc(100vh-192px)]"
           }
         >
           <StockLiveAgGrid data={warehouseStock} isDataLoading={isDataLoading} />
