@@ -85,8 +85,8 @@ const StockLedgerList = ({
         <div
           className={
             userPreference.isLeftMenu
-              ? `ag-theme-balham w-full h-[calc(100vh-190px)]`
-              : "ag-theme-balham w-full h-[calc(100vh-192px)]"
+              ? `w-full h-[calc(100vh-242px)]`
+              : "w-full h-[calc(100vh-192px)]"
           }
         >
           <TransactionAgGrid data={stockLedger} isDataLoading={isDataLoading} />

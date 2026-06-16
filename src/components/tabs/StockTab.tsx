@@ -1,6 +1,7 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import ROUTES_URL from "../../constants/Routes";
 import { Tab, Tabs, TabsHeader } from "@material-tailwind/react";
+import COLORS from "../../constants/Colors";
 
 function StockTab() {
   const TABS = [
@@ -40,9 +41,10 @@ function StockTab() {
     )?.value || "product-stock";
 
   return (
-    <div className="relative">
+    <div className="relative border rounded-lg p-1">
       <Tabs value={activeTab}>
-        <div className="sticky top-0 left-0 bg-white">
+        
+        <div className={`sticky top-0 left-0 w-[60%] ${COLORS.GRID_HEADER_SECTION_BG_COLOR} rounded-lg `}>
           <TabsHeader
             placeholder=""
             onResize={undefined}
@@ -51,7 +53,7 @@ function StockTab() {
             onPointerLeaveCapture={undefined}
             indicatorProps={{
               className:
-                "main-nav-custom-setting active-header-setting shadow-none",
+                "main-nav-custom-setting active-header-setting !bg-violet-100 border !border-violet-100 rounded-md shadow-none",
             }}
             className="shadow-none"
           >
@@ -64,7 +66,7 @@ function StockTab() {
                 }
                 className={
                   activeTab === value
-                    ? "main-nav-custom-setting active-tab-setting "
+                    ? "main-nav-custom-setting active-tab-setting !text-violet-700"
                     : "main-nav-custom-setting"
                 }
                 placeholder=""

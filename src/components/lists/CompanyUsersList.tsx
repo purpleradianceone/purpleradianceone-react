@@ -43,6 +43,7 @@ import CompanyUserSummary from "../../@types/company-users/CompanyUserSummary";
 
 import CompanyUserReportModal from "../modals/company-user/CompanyUserReportModal";
 import CustomStatusFilterDropdown from "../ui/CustomStatusFilterDropdown";
+import COLORS from "../../constants/Colors";
 
 function GetCompanyUsersList({
   users,
@@ -361,18 +362,28 @@ const handleResetFilters = () => {
 
       {/* ================= HEADER + STATS SECTION ================= */}
 
-      <div className="w-full bg-white  px-2 mb-2 ">
+      <div className="w-full bg-white  px-2 mb-2">
         {/* Top Header */}
         <div className="flex items-start justify-between mt-1">
-          <div>
-            <h1 className="page-header-custom tracking-tight pb-0.5">
+
+          {/* Header */}
+            
+            <div className="flex items-center gap-3 ">
+              
+              <div className={`p-2 rounded-lg ${COLORS.PAGE_HEADER_SECTION_BG_COLOR}`}>
+              <Users className={COLORS.PAGE_HEADER_ICONS_COLOR_AND_SIZE} />
+            </div>
+
+              <div>
+                <h1 className="page-header-custom tracking-tight pb-0.5">
               Company Users
             </h1>
-
-            <p className="page-subtitle-custom ">
-              Manage your organization users, permissions and activities.
+              <p className="page-subtitle-custom ">
+               Manage your organization users, permissions and activities.
             </p>
-          </div>
+              </div>
+            </div>
+            
           {/* ADD USER */}
           <div className="pt-1">
             {!isUsedInAccountProductForAssingingInstalledBy && (
@@ -419,7 +430,7 @@ const handleResetFilters = () => {
         {/* Status Cards */}
         <SummaryCards
          cardGap={15}
-         width="70%"
+         width="75%"
          loading={isDataLoading}
           cards={[
             {
@@ -427,8 +438,8 @@ const handleResetFilters = () => {
               count: companyUserSummary.total_company_users,
               subtitle: "Organization users",
               icon: Users,
-              iconBg: "bg-blue-100",
-              iconColor: "text-blue-600",
+              iconBg: "bg-violet-100",
+              iconColor: "text-violet-600",
             },
 
             {

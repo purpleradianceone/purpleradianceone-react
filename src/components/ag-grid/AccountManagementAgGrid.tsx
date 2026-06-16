@@ -6,9 +6,9 @@ import {  AGGRID, JSX_CHILDREN_NAME } from "../../constants/AppConstants";
 import { AllCommunityModule, ColDef,} from "ag-grid-community";
 
 import { SkeletonRowsAgGrid } from "../ui/SkeletonRowsAgGrid";
-import { avatarColors } from "../../utils/colourSpecifierForNameInAggrid";
 import { Eye } from "lucide-react";
 import StatusBadge from "../ui/StatusBadge";
+import AgGridProfileCell from "../ui/AgGridProfileCell";
 
 function AccountManagementAgGrid({
   accounts,
@@ -36,60 +36,22 @@ function AccountManagementAgGrid({
         flex: 1.5,
         minWidth: 250,
 
-        comparator: (valueA, valueB) => {
-          if (!valueA) return -1;
-          if (!valueB) return 1;
-
-          return valueA.toLowerCase().localeCompare(valueB.toLowerCase());
-        },
-
         cellRenderer: (params: any) => {
-          if (params.data?.__isSkeleton) {
-            return <SkeletonRowsAgGrid />;
-          }
+              if (params.data?.__isSkeleton) {
+                return <SkeletonRowsAgGrid />;
+              }
 
-          const name = params.data?.name?.trim() || "Account";
-
-          const initials =
-            name
-              .trim()
-              .split(/\s+/)
-              .filter(Boolean)
-              .map((word: string, index: number, array: string[]) =>
-                index === 0 || index === array.length - 1 ? word.charAt(0) : "",
-              )
-              .join("")
-              .substring(0, 2)
-              .toUpperCase() || "A";
-
-          const colorIndex =
-            name
-              .split("")
-              .reduce(
-                (acc: number, char: string) => acc + char.charCodeAt(0),
-                0,
-              ) % avatarColors.length;
-
-          return (
-            <div className="flex items-center gap-3 h-full px-2">
-              <div
-                className={`w-8 h-8 rounded-full text-white text-xs font-semibold flex items-center justify-center flex-shrink-0 ${avatarColors[colorIndex]}`}
-              >
-                {initials}
-              </div>
-
-              <div className="flex flex-col justify-center overflow-hidden">
-                <span className="text-sm font-semibold text-gray-800 truncate">
-                  {params.data?.name}
-                </span>
-
-                <span className="text-xs text-gray-500 truncate">
-                  {params.data?.email || "No Email"}
-                </span>
-              </div>
-            </div>
-          );
-        },
+              return (
+                <AgGridProfileCell
+                  primaryText={params.data?.name}
+                  secondaryText={
+                    params.data?.email ||
+                    params.data?.mobileNumber ||
+                    "-"
+                  }
+                />
+              );
+            },
       },
       {
         field: "email",

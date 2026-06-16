@@ -36,10 +36,11 @@ import AppTutorailManager from "../views/tutorails/AppTutorailManager";
 import { CompanyUsersGridActionsButtonStep } from "../../constants/AppTutorailsSteps";
 
 import { SkeletonRowsAgGrid } from "../ui/SkeletonRowsAgGrid";
-import { avatarColors } from "../../utils/colourSpecifierForNameInAggrid";
+
 import GridActionButton from "../ui/GridActionButton";
 import StatusBadge from "../ui/StatusBadge";
 import RenderUserWithIcon from "../ui/UserAgGridCellRenderer";
+import AgGridProfileCell from "../ui/AgGridProfileCell";
 
 function CompanyUserAgGrid({
   users,
@@ -87,56 +88,23 @@ function CompanyUserAgGrid({
         sortable: true,
         filter: "agTextColumnFilter",
         flex: 1.8,
-
-        comparator: (valueA, valueB) => {
-          if (!valueA) return -1;
-          if (!valueB) return 1;
-
-          return valueA.toLowerCase().localeCompare(valueB.toLowerCase());
-        },
-
-        cellRenderer: (params: any) => {
+          cellRenderer: (params: any) => {
           if (params.data?.__isSkeleton) {
             return <SkeletonRowsAgGrid />;
           }
-          const name =
-            params.data?.fullname?.trim() ||
-            params.data?.email?.trim() ||
-            "User";
-
-          const initials =
-            name
-              .trim()
-              .split(/\s+/)
-              .filter(Boolean)
-              .map((word: string) => word.charAt(0))
-              .join("")
-              .substring(0, 2)
-              .toUpperCase() || "U";
-
-          const colorIndex = name.length % avatarColors.length;
 
           return (
-            <div className="flex items-center  gap-3 h-full overflow-visible  px-2">
-              <div
-                className={`w-7 h-7  rounded-full text-white text-xs font-semibold flex items-center justify-center flex-shrink-0 overflow-hidden ${avatarColors[colorIndex]}`}
-              >
-                {initials}
-              </div>
-
-              <div className="flex flex-col justify-center">
-                <span className="text-sm font-semibold text-gray-800">
-                  {params.data?.fullname}
-                </span>
-
-                <span className="text-xs text-gray-500">
-                  {params.data?.email}
-                </span>
-              </div>
-            </div>
+            <AgGridProfileCell
+              primaryText={params.data?.fullname}
+              secondaryText={
+                params.data?.email ||
+                params.data?.mobileNumber ||
+                "-"
+              }
+            />
           );
-        },
-      },
+        },     
+          },
 
       {
         hide: true,

@@ -148,6 +148,7 @@ function SideNavBar({ isOpen, onToggle }: SideBarProps) {
               disabled={!userHasAccessToViewAccount}
             />
           )}
+          
         </NavLink>
         <NavLink to={ROUTES_URL.INVOICE_MANAGEMENT}>
           {({ isActive }) => (

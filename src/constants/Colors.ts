@@ -21,7 +21,9 @@ const COLORS={
     // CONTACT_CARD : "bg-gray-50 border border-blue-200 cursor-pointer input-label-custom px-4 py-1 rounded-lg shadow-sm flex justify-between items-center hover:shadow hover:text-blue-600 hover:border-blue-300 transition",
      CONTACT_CARD : " border border-gray-200 cursor-pointer input-label-custom px-2 py-1 rounded-lg shadow-sm flex justify-between items-center hover:shadow hover:text-blue-600 hover:border-blue-300 transition",
     ADD_BUTTON : "border rounded-md caption-custom white-text px-1 py-0.5 bg-blue-600 hover:bg-blue-700",
-    ICON_DELETE_BUTTON:" text-red-500 scale-110 hover:scale-125 "
+    ICON_DELETE_BUTTON:" text-red-500 scale-110 hover:scale-125 ",
+    PAGE_HEADER_SECTION_BG_COLOR : "bg-violet-50 p-1",
+    PAGE_HEADER_ICONS_COLOR_AND_SIZE : "w-5.5 h-5.5 text-violet-600",
 }
 
 export const chartColors = [

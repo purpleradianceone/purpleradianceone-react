@@ -1,13 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { AllCommunityModule, ColDef, themeBalham } from "ag-grid-community";
+import { AllCommunityModule, ColDef,  } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
-import { Eye } from "lucide-react";
+import { Eye, FileJson } from "lucide-react";
 import { useMemo, useRef } from "react";
 import ReportSnapshotManagementAgGridProps from "../../@types/ag-grid/ReportSnapshotManagementAgGridProps";
 import ReportSnapshotProps from "../../@types/report/ReportSnapshotProps";
 import { useUserAccessModules } from "../../config/hooks/useAccessModules";
 import { SkeletonRowsAgGrid } from "../ui/SkeletonRowsAgGrid";
+import { AGGRID } from "../../constants/AppConstants";
 
 function ReportSnapshotManagementAgGrid({
   reports,
@@ -74,36 +75,12 @@ function ReportSnapshotManagementAgGrid({
                         "
               >
                 {/* File Icon */}
-                <div
-                  className="
-                            relative
-                            min-w-[28px]
-                            h-7
-                            w-4
-                            bg-blue-50
-                            border
-                            border-blue-300
-                            rounded-sm
-                        "
-                >
-                  {/* Folded Corner */}
-                  <div
-                    className="
-                            absolute
-                            top-0
-                            right-0
-                            w-3
-                            h-3
-                            bg-white
-                            border-l
-                            border-b
-                            border-blue-300
-                            rotate-45
-                            translate-x-[6px]
-                            -translate-y-[6px]
-                            "
-                  />
-                </div>
+                <div className="h-7 w-7 bg-violet-50 rounded-md flex justify-center items-center">
+          <FileJson
+        size={16}
+        className="text-violet-600 flex-shrink-0"
+      />
+      </div>
 
                 {/* File Name / JSON Preview */}
                 <span
@@ -253,8 +230,10 @@ function ReportSnapshotManagementAgGrid({
         columnDefs={columnDefs}
         defaultColDef={defaultColDef}
         modules={[AllCommunityModule]}
-        theme={themeBalham}
+        // theme={themeBalham}
         // overlayNoRowsTemplate={INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
+         rowHeight={AGGRID.ROW_HEIGHT}
+          headerHeight={AGGRID.HEADER_HEIGHT}
         context={{
           handleRowSelect: onRowSelect,
           userHasAccessToViewCompanyUserReportType,

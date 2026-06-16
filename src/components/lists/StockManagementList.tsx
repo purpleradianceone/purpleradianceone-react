@@ -128,7 +128,7 @@ const StockManagementList = ({
       } pr-1 gap-1`}
     >
       <div
-        className={`sticky z-10 top-9 py-0.5 flex items-center justify-between ${COLORS.GRID_HEADER_SECTION_BG_COLOR} rounded-lg shadow-sm  mb-1.5 w-full`}
+        className={`sticky z-10 top-9 py-1.5 px-3 mb-2 flex items-center justify-between ${COLORS.GRID_HEADER_SECTION_BG_COLOR} rounded-lg shadow-sm  mb-1.5 w-full`}
       >
         <div className="flex items-center pl-1 gap-5">
           {/* <div className="flex gap-1">
@@ -140,11 +140,12 @@ const StockManagementList = ({
             logo={Package}
           />
 
-          <div className="flex justify-center items-center  gap-1">
+          <div className="flex justify-center items-center gap-1">
             {/* search box flex div */}
             <div className="flex items-start w-80">
               <SearchInput
               autoFocus={true}
+              placeholder="Search by product name"
                 id="company-user-module-search-box"
                 onChange={(e) => {
                   handleSearchParameterChange(e.target.value);
@@ -155,12 +156,12 @@ const StockManagementList = ({
           </div>
         </div>
       </div>
-      <div className="bg-white  overflow-y-auto rounded-lg shadow-sm ">
+      <div className="bg-white overflow-y-auto rounded-lg shadow-sm ">
         <div
           className={
             userPreference.isLeftMenu
-              ? `ag-theme-balham w-full h-[calc(100vh-190px)]`
-              : "ag-theme-balham w-full h-[calc(100vh-192px)]"
+              ? `w-full h-[calc(100vh-252px)]`
+              : "w-full h-[calc(100vh-192px)]"
           }
         >
           <StockLiveForCompanyProductAgGrid

@@ -1,8 +1,11 @@
-import { AllCommunityModule, ColDef, themeBalham } from "ag-grid-community";
+import { AllCommunityModule, ColDef, } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 import { useMemo } from "react";
 import LiveStock from "../../@types/stock/LiveStock";
 import { SkeletonRowsAgGrid } from "../ui/SkeletonRowsAgGrid";
+import { AGGRID } from "../../constants/AppConstants";
+import AgGridProfileCell from "../ui/AgGridProfileCell";
+import { Warehouse } from "lucide-react";
 
 const StockLiveAgGrid = ({
   data,
@@ -14,12 +17,19 @@ const StockLiveAgGrid = ({
   const columnDefs = useMemo<ColDef[]>(
     () => [
        {
+
         field: "companyWarehouseName",
         headerName: "Warehouse",
         cellStyle:{
           color : "black",
           fontWeight: "bold",
-        }
+        },
+        cellRenderer: (params: any) => (
+      <AgGridProfileCell
+        primaryText={params.value}
+        icon={<Warehouse size={16} />}
+      />
+    ),
       },
       {
         hide: false,
@@ -72,7 +82,7 @@ const StockLiveAgGrid = ({
   }, []);
   return (
     <div
-      className="ag-theme-balham w-full"
+      className="modern-user-grid custom-height-scrollbar w-full"
       style={{ height: "100%", width: "100%" }}
     >
       <AgGridReact
@@ -81,7 +91,9 @@ const StockLiveAgGrid = ({
         defaultColDef={defaultColDef}
         modules={[AllCommunityModule]}
         // overlayNoRowsTemplate={INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
-        theme={themeBalham}
+        // theme={themeBalham}
+        rowHeight={AGGRID.ROW_HEIGHT}
+                headerHeight={AGGRID.HEADER_HEIGHT}
       />
     </div>
   );

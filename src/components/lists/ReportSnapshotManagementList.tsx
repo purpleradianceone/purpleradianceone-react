@@ -92,13 +92,32 @@ function ReportSnapshotManagementList({
 
     return (
       <div
-        className={`w-full  ${userPreference.isLeftMenu ? "pl-5" : "pl-1"} gap-1`}
+        className={`w-full  ${userPreference.isLeftMenu ? "pl-7 pr-2" : "pl-1"} gap-1 pt-2`}
       >
-        {/* 🔹 Header */}
+
+          {/* Header */}
+            <div>
+            <div className="flex items-center gap-3 py-1.5">
+              <div className={`p-2 rounded-lg ${COLORS.PAGE_HEADER_SECTION_BG_COLOR}`}>
+              <FileBarChart className={COLORS.PAGE_HEADER_ICONS_COLOR_AND_SIZE} />
+            </div>
+              
+
+              <div>
+                <h1 className="page-header-custom tracking-tight pb-0.5">
+              Reports
+            </h1>
+              <p className="page-subtitle-custom ">
+              View, filter and analyze your lead activity reports
+            </p>
+              </div>
+            </div>
+            </div>
+
         {
           <div
-            className={`sticky z-10 top-12 mt-1 p-1 flex items-center justify-between gap-3 text-sm 
-              ${COLORS.GRID_HEADER_SECTION_BG_COLOR} rounded-lg shadow-sm mb-1.5 w-full`}
+            className={`sticky z-10 top-12 mt-1 py-1.5 px-3 mb-3 flex items-center justify-between gap-3 text-sm 
+              ${COLORS.GRID_HEADER_SECTION_BG_COLOR} border border-slate-200 rounded-lg w-full`}
           >
             {/* LEFT */}
             <div className="flex items-center gap-2 flex-wrap">
@@ -106,11 +125,11 @@ function ReportSnapshotManagementList({
               {/* <ComponentHeaderAndLogo logo={File} headerText="Quotation" /> */}
               <div className="flex justify-center items-center gap-1 pr-3">
                 {/* <Quote className={COLORS.GRID_HEADER_ICONS_COLOR_AND_SIZE} /> */}
-                <FileBarChart
+                {/* <FileBarChart
                   strokeWidth={2}
                   size={24}
                   className="text-blue-600"
-                />
+                /> */}
                 <span className="section-header-custom">Report</span>
               </div>
               {/* 🔹 Search */}
@@ -197,8 +216,8 @@ function ReportSnapshotManagementList({
           <div
             className={
               userPreference.isLeftMenu
-                ? `ag-theme-balham w-full ${"h-[calc(100vh-120px)]"}`
-                : `ag-theme-balham w-full ${"h-[calc(100vh-120px)]"}`
+                ? `w-full ${"h-[calc(100vh-196px)]"}`
+                : `w-full ${"h-[calc(100vh-120px)]"}`
             }
           >
             <ReportSnapshotManagementAgGrid

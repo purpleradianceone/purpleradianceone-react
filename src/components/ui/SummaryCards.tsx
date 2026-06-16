@@ -128,7 +128,7 @@ function SummaryCards({
               >
                 <Icon
                   className={card.isGradient ? "text-white" : card.iconColor}
-                  size={20}
+                  size={18}
                 />
               </div>
 
