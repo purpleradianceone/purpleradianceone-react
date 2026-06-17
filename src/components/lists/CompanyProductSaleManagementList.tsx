@@ -219,16 +219,21 @@ const revenueChartData = revenueTrend.map((item) => ({
           position === "left" && isUsedInProductSaleModule ? "pl-7 pr-2" : "pl-1"
         } pr-1 gap-1 pt-2`}
       >
-    
-        <div>
-            <h1 className="page-header-custom tracking-tight pb-0.5">
-              Sales
-            </h1>
 
-            <p className="page-subtitle-custom ">
-              Track all product sales transactions in chronological order.
+          <div className="flex items-center gap-3 ">
+              <div className={`p-2 rounded-lg ${COLORS.PAGE_HEADER_SECTION_BG_COLOR}`}>
+              <PackageCheck className={COLORS.PAGE_HEADER_ICONS_COLOR_AND_SIZE} />
+            </div>
+
+              <div>
+                <h1 className="page-header-custom tracking-tight pb-0.5">
+               Sales
+            </h1>
+              <p className="page-subtitle-custom ">
+                Track all product sales transactions in chronological order.
             </p>
-          </div>
+              </div>
+            </div>
 
           <SummaryCards
           cardGap={15}
@@ -311,15 +316,7 @@ const revenueChartData = revenueTrend.map((item) => ({
             {isUsedInProductSaleModule && (
               <div className="flex gap-2 items-center w-fit">
                 <div className="flex gap-1 items-center w-fit mr-4">
-                  {!isSmallScreen && (
-                    <PackageCheck
-                      className={`${
-                        isCustomDateOptionSelected
-                          ? "w-4 h-4 text-blue-600"
-                          : COLORS.GRID_HEADER_ICONS_COLOR_AND_SIZE
-                      } `}
-                    />
-                  )}
+                  
 
                   {(isMediumScreen || isLargeScreen) && (
                     <span

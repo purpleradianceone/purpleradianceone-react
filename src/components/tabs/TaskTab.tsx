@@ -2,11 +2,12 @@ import { Tab, Tabs, TabsHeader } from "@material-tailwind/react";
 import ROUTES_URL from "../../constants/Routes";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useUserAccessModules } from "../../config/hooks/useAccessModules";
-import { BookCheck } from "lucide-react";
+import { BookCheck, ListChecks } from "lucide-react";
 import Button from "../ui/Button";
 import { SIZE, JSX_CHILDREN_NAME } from "../../constants/AppConstants"; 
 import toast from "react-hot-toast";
 import MESSAGE from "../../constants/Messages";
+import COLORS from "../../constants/Colors";
 
 type TaskTabProps = {
   onAddMasterTask?: () => void;
@@ -56,14 +57,21 @@ function TaskTab({ onAddMasterTask }: TaskTabProps) {
     <div className=" sticky top-0 z-30 w-full flex flex-col gap-2 px-2 pb-1">
       {/* Header Section */}
       <div className="flex justify-between ">
-      <div className="flex flex-col ">
-        <h1 className=" page-header-custom">Tasks</h1>
 
-        <p className="page-subtitle-custom">
-          Organize and track all your tasks in one place.
-        </p>
+        <div className="flex items-center gap-3 ">
+              <div className={`p-2 rounded-lg ${COLORS.PAGE_HEADER_SECTION_BG_COLOR}`}>
+              <ListChecks className={COLORS.PAGE_HEADER_ICONS_COLOR_AND_SIZE} />
+            </div>
 
-        </div>
+              <div>
+                <h1 className="page-header-custom tracking-tight pb-0.5">
+               Tasks
+            </h1>
+              <p className="page-subtitle-custom ">
+               Organize and track all your tasks in one place.
+            </p>
+              </div>
+            </div>
         <div className="pt-1">
           {isMasterTaskPage && (
             <Button
@@ -105,7 +113,7 @@ function TaskTab({ onAddMasterTask }: TaskTabProps) {
             onPointerLeaveCapture={undefined}
             indicatorProps={{
               className:
-                "bg-blue-100 rounded-md shadow-[0_4px_14px_rgba(37,99,235,0.35)] border border-blue-400 shadow-sm",
+                "bg-violet-100 rounded-md shadow-[0_4px_14px_rgba(37,99,235,0.35)] border border-violet-400 shadow-sm",
             }}
             className="bg-transparent p-0 shadow-none flex gap-1 min-w-fit"
           >
@@ -118,7 +126,7 @@ function TaskTab({ onAddMasterTask }: TaskTabProps) {
                 }
                 className={`px-2 py-2 text-xs transition-all rounded-md font-['Roboto'] ${
                   activeTab === value
-                    ? "text-blue-700 font-bold shadow-sm"
+                    ? "text-violet-700 font-bold shadow-sm"
                     : "text-slate-500 hover:text-slate-700"
                 }`}
                 placeholder=""

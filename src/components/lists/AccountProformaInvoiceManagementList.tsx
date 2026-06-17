@@ -24,7 +24,7 @@ import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
 import { ComponentHeaderAndLogo } from "../ui/ComponentHeaderAndLogo";
 import CustomDocumentPreviewComponent from "../custom-document-preview-component/CustomDocumentPreviewComponent";
 import LoadingPopUpAnimation from "../views/card/LoadingPopUpAnimation";
-import { FaRegFileAlt } from "react-icons/fa";
+import { FaRegFileAlt, FaRegFileArchive } from "react-icons/fa";
 import AccountProformaInvoiceManagementListProps from "../../@types/List/AccountProformaInvoiceManagementListProps";
 import AccountProformaInvoiceProps from "../../@types/account/AccountProformaInvoiceProps";
 import CreateProformaInvoiceModal from "../modals/ProformaInvoice/CreateProformaInvoiceModal";
@@ -280,7 +280,7 @@ const refreshAllData = useCallback(async () => {
           <div className="flex items-start justify-between ">
           <div className="flex items-center gap-3 ">
               <div className={`p-2 rounded-lg ${COLORS.PAGE_HEADER_SECTION_BG_COLOR}`}>
-              <FaRegFileAlt className={COLORS.PAGE_HEADER_ICONS_COLOR_AND_SIZE} />
+              <FaRegFileArchive className={`${COLORS.PAGE_HEADER_ICONS_COLOR_AND_SIZE} w-6 h-6`} />
             </div>
 
               <div>
@@ -293,6 +293,7 @@ const refreshAllData = useCallback(async () => {
             </p>
               </div>
             </div>
+            
 
            {/* RIGHT */}
            <div className="pt-1">

@@ -35,7 +35,7 @@ function TeamManagementList({
   isDataLoading
 }: TeamManagementListProps) {
   const { userPreference } = useUserPreference();
-  const { isLargeScreen, isMediumScreen, isSmallScreen } = useScreenSize();
+  const { isLargeScreen, isMediumScreen, } = useScreenSize();
   const { userHasAccessToAddTeamManagement } = useUserAccessModules();
   const { loginStatus } = useLoggedInUserContext();
   const { dateRangeDropdownOptions } = useComapanySpecificSearchDateRange();
@@ -142,14 +142,20 @@ const handleUpdateAndRefresh = async (teamId: number) => {
     >
 
       <div className="flex items-start justify-between ">
-          <div>
-           <h1 className="page-header-custom tracking-tight pb-0.5">
-              Teams
-            </h1>
+          
+            <div className="flex items-center gap-3 ">
+              <div className={`p-2 rounded-lg ${COLORS.PAGE_HEADER_SECTION_BG_COLOR}`}>
+              <Network className={COLORS.PAGE_HEADER_ICONS_COLOR_AND_SIZE} />
+            </div>
 
-            <p className="page-subtitle-custom">
-              Organize teams and manage members across your company.
+              <div>
+                <h1 className="page-header-custom tracking-tight pb-0.5">
+               Teams
+            </h1>
+              <p className="page-subtitle-custom ">
+                Organize teams and manage members across your company.
             </p>
+              </div>
             </div>
 
              <div className="pt-1">
@@ -189,8 +195,10 @@ const handleUpdateAndRefresh = async (teamId: number) => {
               count: teamSummary.total_company_team,
               subtitle: "All Teams in workspace",
               icon: Network,
-              iconBg: "bg-blue-100",
-              iconColor: "text-blue-600",
+               iconBg: "bg-violet-100",
+              iconColor: "text-violet-600",
+              
+
             },
 
             {
@@ -207,8 +215,8 @@ const handleUpdateAndRefresh = async (teamId: number) => {
               count: teamSummary.total_company_team_company_user,
               subtitle: "Across all Teams",
               icon: Users,
-              iconBg: "bg-violet-100",
-              iconColor: "text-violet-600",
+              iconBg: "bg-blue-100",
+              iconColor: "text-blue-600",
             },
 
             {
@@ -228,11 +236,6 @@ const handleUpdateAndRefresh = async (teamId: number) => {
       >
         <div className="flex justify-center items-center gap-5">
           <div className="flex gap-1">
-            {!isSmallScreen && (
-              <Network
-                className={`${COLORS.GRID_HEADER_ICONS_COLOR_AND_SIZE}`}
-              />
-            )}
 
             {(isMediumScreen || isLargeScreen) && (
               <span className="section-header-custom">Teams</span>

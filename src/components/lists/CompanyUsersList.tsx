@@ -489,6 +489,18 @@ const handleResetFilters = () => {
         >
           {/* LEFT */}
           <div className="flex items-center gap-3 flex-wrap">
+
+             
+                    <span
+                      className={`${
+                        isCustomDateOptionSelected
+                          ? "text-xs"
+                          : "section-header-custom"
+                      } ${userPreference.sidebarOpen?"":"mr-2"}`}
+                    >
+                      {userPreference.sidebarOpen?"":"Company Users"}
+                    </span>
+                 
             {/* SEARCH */}
             <div className=" relative w-[350px] ">
               <Search
