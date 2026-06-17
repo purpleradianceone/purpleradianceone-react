@@ -59,7 +59,7 @@ function MasterTaskManagementList({
 }: MasterTaskManagementProps) {
   const navigate = useNavigate();
   const { position } = usePanel();
-  const { isLargeScreen, isMediumScreen, isSmallScreen } = useScreenSize();
+  const { isLargeScreen, isMediumScreen, } = useScreenSize();
   const { dateRangeDropdownOptions } = useComapanySpecificSearchDateRange();
   const { userPreference } = useUserPreference();
   const { userHasAccessToViewAllTasks } =
@@ -239,16 +239,7 @@ useEffect(() => {
             {/* LEFT SECTION - Support Label */}
             {isUsedInAllTasksModule && (
               <div className="flex gap-1 items-center w-fit">
-                {!isSmallScreen && (
-                  <ClipboardList
-                    className={`${
-                      isCustomDateOptionSelected
-                        ? "w-4 h-4 text-blue-600"
-                        : COLORS.GRID_HEADER_ICONS_COLOR_AND_SIZE
-                    } `}
-                  />
-                )}
-
+               
                 {(isMediumScreen || isLargeScreen) && (
                   <span
                     className={`${

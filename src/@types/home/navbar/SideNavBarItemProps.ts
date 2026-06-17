@@ -6,6 +6,8 @@ type SideNavBarItemProps =  {
     onClick?: () => void;
     disabled?:boolean;
     isActive?: boolean;
+    iconColor?: string;
+    bgColor?: string;
   }
 
   export default SideNavBarItemProps;

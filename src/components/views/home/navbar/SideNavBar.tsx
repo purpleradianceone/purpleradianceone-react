@@ -1,14 +1,16 @@
+
 import {
+  Building,
   Calendar,
   CircleUser,
   FileBarChart,
+  FileText,
   Handshake,
   Headset,
   Home,
   Layers,
   ListChecks,
   LucideFileArchive,
-  LucideUserPlus2,
   Menu,
   Network,
   PackageCheck,
@@ -16,18 +18,19 @@ import {
   PanelRightClose,
   Settings,
   Store,
-  UserCogIcon,
+  Users,
   X
 } from "lucide-react";
 import toast from "react-hot-toast";
-import { FaRegFileAlt, FaRegFileArchive } from "react-icons/fa";
-import { Link, NavLink } from "react-router-dom";
+import {  FaRegFileArchive } from "react-icons/fa";
+import { Link, NavLink, useLocation } from "react-router-dom";
 import SideBarProps from "../../../../@types/home/navbar/SideBarProps";
 import { useUserAccessModules } from "../../../../config/hooks/useAccessModules";
 import { SIZE } from "../../../../constants/AppConstants";
 import MESSAGE from "../../../../constants/Messages";
 import ROUTES_URL from "../../../../constants/Routes";
 import SideNavBarItem from "./SideNavBarItem";
+import { menuColors } from "../../../../constants/Colors";
 
 function SideNavBar({ isOpen, onToggle }: SideBarProps) {
   const {
@@ -48,6 +51,21 @@ function SideNavBar({ isOpen, onToggle }: SideBarProps) {
     userHasAccessToViewCompanyUserReportType,
   } = useUserAccessModules();
 
+const location = useLocation();
+
+const isSettingsActive = [
+  ROUTES_URL.COMPANY_SETTING,
+  ROUTES_URL.EMAIL_TEMPLATE,
+  ROUTES_URL.QUOTATION_SETTINGS,
+  ROUTES_URL.INTEGRATIONS_SETTINGS,
+].some((route) => location.pathname.startsWith(route));
+  
+  const SectionHeader = ({ title }: { title: string }) => (
+  <div className="px-4 mt-3 mb-1 caption-custom !text-[11px] !font-bold tracking-wider uppercase !text-[#585da2]">
+    {title}
+  </div>
+);
+
   return (
     <aside
       id="left-side-navbar"
@@ -58,16 +76,19 @@ function SideNavBar({ isOpen, onToggle }: SideBarProps) {
         className={`flex items-center border-b  justify-center ${SIZE.NAVBAR.TOP_HEIGHT_USER_PREF_LEFT}`}
       >
         {isOpen && (
-          <span className="section-header-custom-blue">PurpleRadiance One</span>
+          <span className="section-header-custom-blue !text-gray-800">PurpleRadiance 
+          <span className="section-header-custom-blue !text-violet-700"> One</span> </span>
         )}
         <button
           onClick={onToggle}
-          className="section-header-custom hover:text-blue-800 rounded-lg"
+          className="section-header-custom hover:text-blue-800 rounded-lg "
         >
           {isOpen ? <X size={20} /> : <Menu size={20} />}
         </button>
       </div>
-      <nav className="p-1 space-y-1  bg-pink-00 overflow-auto max-h-[520px] custom-scrollbar-invinsible border-b">
+      <nav className="p-1 space-y-1  bg-pink-00 overflow-auto max-h-[520px] custom-scrollbar border-b">
+       
+        {isOpen && <SectionHeader title="Overview" />}
         <NavLink to={ROUTES_URL.HOME}>
           {({ isActive }) => (
             <SideNavBarItem
@@ -75,22 +96,12 @@ function SideNavBar({ isOpen, onToggle }: SideBarProps) {
               label="Home"
               isOpen={isOpen}
               isActive={isActive}
+               iconColor={menuColors.home.icon}
+               bgColor={menuColors.home.bg}
             />
           )}
         </NavLink>
 
-        {/* Enabled Nav Links */}
-        <NavLink to={ROUTES_URL.GET_COMPANY_USERS}>
-          {({ isActive }) => (
-            <SideNavBarItem
-              icon={LucideUserPlus2}
-              label="Manage Users"
-              isOpen={isOpen}
-              isActive={isActive}
-              disabled={!userHasAccessToViewUser}
-            />
-          )}
-        </NavLink>
         <NavLink to={ROUTES_URL.REPORT_MANAGEMENT}>
           {({ isActive }) => (
             <SideNavBarItem
@@ -99,9 +110,63 @@ function SideNavBar({ isOpen, onToggle }: SideBarProps) {
               isOpen={isOpen}
               isActive={isActive}
               disabled={!userHasAccessToViewCompanyUserReportType}
+              // iconColor="#7C3AED"
+              // bgColor="#EDE9FE"
+               iconColor={menuColors.reports.icon}
+                bgColor={menuColors.reports.bg}
+              
             />
           )}
         </NavLink>
+
+        {isOpen && <SectionHeader title="CRM & CUSTOMER MANAGEMENT"  />}
+
+        {/* Enabled Nav Links */}
+        <NavLink to={ROUTES_URL.GET_COMPANY_USERS}>
+          {({ isActive }) => (
+            <SideNavBarItem
+              icon={Users}
+              label="Manage Users"
+              isOpen={isOpen}
+              isActive={isActive}
+              disabled={!userHasAccessToViewUser}
+               iconColor={menuColors.users.icon}
+               bgColor={menuColors.users.bg}
+            />
+          )}
+        </NavLink>
+
+          <NavLink to={ROUTES_URL.GET_LEAD_MANAGEMENT}>
+          {({ isActive }) => (
+            <SideNavBarItem
+              icon={Handshake}
+              label="Leads"
+              isOpen={isOpen}
+              isActive={isActive}
+              disabled={!userHasAccessToViewLead}
+              iconColor={menuColors.leads.icon}
+               bgColor={menuColors.leads.bg}
+            />
+          )}
+        </NavLink>
+
+         <NavLink to={ROUTES_URL.ACCOUNT_MANAGEMENT}>
+          {({ isActive }) => (
+            <SideNavBarItem
+              icon={Building}
+              label="Accounts"
+              isOpen={isOpen}
+              isActive={isActive}
+              disabled={!userHasAccessToViewAccount}
+              // iconColor="#0891B2"
+              // bgColor="#CFFAFE"
+               iconColor={menuColors.accounts.icon}
+                 bgColor={menuColors.accounts.bg}
+            />
+          )}
+          
+        </NavLink>
+  
         <NavLink to={ROUTES_URL.TASKS_MANAGEMENT}>
           {({ isActive }) => (
             <SideNavBarItem
@@ -110,21 +175,27 @@ function SideNavBar({ isOpen, onToggle }: SideBarProps) {
               isOpen={isOpen}
               isActive={isActive}
               disabled={!userHasAccessToViewTasks}
+               iconColor={menuColors.tasks.icon}
+               bgColor={menuColors.tasks.bg}
             />
           )}
         </NavLink>
 
-        <NavLink to={ROUTES_URL.GET_LEAD_MANAGEMENT}>
+         <NavLink to={ROUTES_URL.MEETINGS}>
           {({ isActive }) => (
             <SideNavBarItem
-              icon={Handshake}
-              label="Leads"
+              icon={Calendar}
+              label="Meetings"
               isOpen={isOpen}
               isActive={isActive}
-              disabled={!userHasAccessToViewLead}
+              disabled={!userHasAccessToViewMeeting}
+               iconColor={menuColors.meetings.icon}
+              bgColor={menuColors.meetings.bg}
             />
           )}
         </NavLink>
+
+      {isOpen && <SectionHeader title="SALES & BILLING" />}
 
         <NavLink to={ROUTES_URL.QUOTATION_MANAGEMENT}>
           {({ isActive }) => (
@@ -134,30 +205,23 @@ function SideNavBar({ isOpen, onToggle }: SideBarProps) {
               isOpen={isOpen}
               isActive={isActive}
               disabled={!userHasAccessToViewCompanyQuotation}
+              iconColor={menuColors.quotation.icon}
+               bgColor={menuColors.quotation.bg}
             />
           )}
         </NavLink>
 
-        <NavLink to={ROUTES_URL.ACCOUNT_MANAGEMENT}>
-          {({ isActive }) => (
-            <SideNavBarItem
-              icon={UserCogIcon}
-              label="Accounts"
-              isOpen={isOpen}
-              isActive={isActive}
-              disabled={!userHasAccessToViewAccount}
-            />
-          )}
-          
-        </NavLink>
+       
         <NavLink to={ROUTES_URL.INVOICE_MANAGEMENT}>
           {({ isActive }) => (
             <SideNavBarItem
-              icon={FaRegFileAlt}
+              icon={FileText}
               label="Invoices"
               isOpen={isOpen}
               isActive={isActive}
               disabled={!userHasAccessToViewCompanyInvoice}
+               iconColor={menuColors.invoice.icon}
+                bgColor={menuColors.invoice.bg}
             />
           )}
         </NavLink>
@@ -169,6 +233,8 @@ function SideNavBar({ isOpen, onToggle }: SideBarProps) {
               isOpen={isOpen}
               isActive={isActive}
               disabled={!userHasAccessToViewAccountProformaInvoice}
+               iconColor={menuColors.proformaInvoice.icon}
+               bgColor={menuColors.proformaInvoice.bg}
             />
           )}
         </NavLink>
@@ -181,9 +247,14 @@ function SideNavBar({ isOpen, onToggle }: SideBarProps) {
               isOpen={isOpen}
               isActive={isActive}
               disabled={!userHasAccessToViewCompanyProductSale}
+               iconColor={menuColors.sales.icon}
+              bgColor={menuColors.sales.bg}
             />
           )}
         </NavLink>
+
+
+        {isOpen && <SectionHeader title="INVENTORY" />}
 
         <NavLink to={ROUTES_URL.PRODUCT_MANAGEMENT}>
           {({ isActive }) => (
@@ -193,6 +264,8 @@ function SideNavBar({ isOpen, onToggle }: SideBarProps) {
               isOpen={isOpen}
               isActive={isActive}
               disabled={!userHasAccessToViewProduct}
+               iconColor={menuColors.products.icon}
+               bgColor={menuColors.products.bg}
             />
           )}
         </NavLink>
@@ -205,9 +278,13 @@ function SideNavBar({ isOpen, onToggle }: SideBarProps) {
               isOpen={isOpen}
               isActive={isActive}
               disabled={!userHasAccessToViewStock}
+               iconColor={menuColors.stock.icon}
+              bgColor={menuColors.stock.bg}
             />
           )}
         </NavLink>
+
+        {isOpen && <SectionHeader title="SUPPORT & COLLABORATION"/>}
         <NavLink to={ROUTES_URL.SUPPORT_TICKET_MANAGEMENT}>
           {({ isActive }) => (
             <SideNavBarItem
@@ -216,6 +293,8 @@ function SideNavBar({ isOpen, onToggle }: SideBarProps) {
               isOpen={isOpen}
               isActive={isActive}
               disabled={!userHasAccessToViewSupportTicket}
+              iconColor={menuColors.support.icon}
+              bgColor={menuColors.support.bg}
             />
           )}
         </NavLink>
@@ -227,26 +306,22 @@ function SideNavBar({ isOpen, onToggle }: SideBarProps) {
               isOpen={isOpen}
               isActive={isActive}
               disabled={!userHasAccessToViewTeamManagement}
+               iconColor={menuColors.teams.icon}
+                bgColor={menuColors.teams.bg}
             />
           )}
         </NavLink>
-        <NavLink to={ROUTES_URL.MEETINGS}>
-          {({ isActive }) => (
-            <SideNavBarItem
-              icon={Calendar}
-              label="Meetings"
-              isOpen={isOpen}
-              isActive={isActive}
-              disabled={!userHasAccessToViewMeeting}
-            />
-          )}
-        </NavLink>
+       
       </nav>
       {/* CRM Settings Dropdown */}
       <SideNavBarItem
         icon={Settings}
         label="App Settings"
         isOpen={isOpen}
+         isActive={isSettingsActive}
+          iconColor={menuColors.settings.icon}
+            bgColor={menuColors.settings.bg}
+            
         children={[
           <NavLink key="company-settings" to={ROUTES_URL.COMPANY_SETTING}>
             {({ isActive }) => (
@@ -295,15 +370,15 @@ function SideNavBar({ isOpen, onToggle }: SideBarProps) {
         ]}
       />
       {/* alksd */}
-      <div className={`flex items-center    justify-center pt-1`}>
+      <div className={`flex items-center justify-center `}>
         {/* {isOpen && (
           <span className="section-header-custom-blue">PurpleRadiance One</span>
         )} */}
-        <div className="flex justify-between  w-full">
+        <div className="flex justify-between bg-[#EDE9FE] h-8 rounded w-full">
           <button
             onClick={onToggle}
             title="Open Sidebar"
-            className="table-header-custom hover:text-blue-800 pl-4 w-full bg-pink-00"
+            className="table-header-custom hover:text-violet-700 pl-4 w-full bg-pink-00"
           >
             {isOpen ? (
               <div className="  flex gap-1 items-center w-full ">
@@ -333,7 +408,7 @@ function SideNavBar({ isOpen, onToggle }: SideBarProps) {
                 }
               }}
               className={`table-header-custom pl-4 w-full flex items-center justify-center gap-1
-    ${!userHasAccessToViewSettingGeneral ? "opacity-50 cursor-not-allowed" : "hover:text-blue-800"}`}
+    ${!userHasAccessToViewSettingGeneral ? "opacity-50 cursor-not-allowed" : "hover:text-violet-800"}`}
             >
               <CircleUser size={20} />
               Profile

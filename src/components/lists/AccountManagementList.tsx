@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Building2, Calendar, CalendarDays, CalendarRange, Plus, UserRoundCogIcon } from "lucide-react";
+import { Building, Building2, Calendar, CalendarDays, CalendarRange, Plus, UserRoundCogIcon } from "lucide-react";
 import { usePanel } from "../../context/panel/usePanel";
 import SearchInput from "../ui/SearchInput";
 import HandleSearchOptionProps from "../../@types/company-users/HandleSearchOptionProps";
@@ -177,7 +177,7 @@ const refreshAllData = useCallback(async () => {
              {/* Header */} 
             <div className="flex items-center gap-3 ">
               <div className={`p-2 rounded-lg ${COLORS.PAGE_HEADER_SECTION_BG_COLOR}`}>
-              <UserRoundCogIcon className={COLORS.PAGE_HEADER_ICONS_COLOR_AND_SIZE} />
+              <Building className={COLORS.PAGE_HEADER_ICONS_COLOR_AND_SIZE} />
             </div>
 
               <div>
