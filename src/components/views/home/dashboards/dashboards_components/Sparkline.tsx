@@ -7,6 +7,7 @@ interface SparklineProps {
 const Sparkline: React.FC<SparklineProps> = ({
   trend = 0,
 }) => {
+  
   const positivePath =
     "M5 25 L20 10 L35 30 L50 24 L65 26 L80 15 L95 20 L110 8";
 

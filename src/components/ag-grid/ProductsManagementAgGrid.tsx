@@ -17,6 +17,7 @@ import { SkeletonRowsAgGrid } from "../ui/SkeletonRowsAgGrid";
 import GridActionButton from "../ui/GridActionButton";
 import StatusBadge from "../ui/StatusBadge";
 import { productTypeStyles } from "../../utils/colourSpecifierForNameInAggrid";
+import RenderUserWithIcon from "../ui/UserAgGridCellRenderer";
 
 function ProductsManagementGrid({
   products,
@@ -321,6 +322,7 @@ function ProductsManagementGrid({
         filter: true,
         flex: 1,
         hide: isGridForAccountProduct,
+        cellRenderer: RenderUserWithIcon,
       },
       {
         field: "createdOn",

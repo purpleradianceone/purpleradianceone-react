@@ -28,8 +28,8 @@ const StockAgeingList = ({
         <div
           className={
             userPreference.isLeftMenu
-              ? `ag-theme-balham w-full h-[calc(100vh-190px)]`
-              : "ag-theme-balham w-full h-[calc(100vh-192px)]"
+              ? `w-full h-[calc(100vh-233px)]`
+              : " w-full h-[calc(100vh-192px)]"
           }
         >
           <StockAgeingAgGrid data={stockAgeing} isDataLoading={isDataLoading} />

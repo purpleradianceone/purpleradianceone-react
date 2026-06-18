@@ -1,8 +1,8 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-hooks/rules-of-hooks */
-import { AllCommunityModule, ColDef, themeBalham } from "ag-grid-community";
+import { AllCommunityModule, ColDef, } from "ag-grid-community";
 import { useEffect, useMemo, useRef, useState } from "react";
-import {  JSX_CHILDREN_NAME } from "../../constants/AppConstants";
+import {  AGGRID, } from "../../constants/AppConstants";
 import { ReceiptText } from "lucide-react";
 import { AgGridReact } from "ag-grid-react";
 import { createPortal } from "react-dom";
@@ -10,8 +10,11 @@ import { useUserAccessModules } from "../../config/hooks/useAccessModules";
 import ActionsDropdownButton from "../ui/ActionsDropdownButton";
 import { CLASS_NAMES } from "../../constants/ClassNames";
 import TeamManagementAgGridProps from "../../@types/ag-grid/TeamManagementAgGridProps";
-import StatusIndicator from "../ui/StatusIndicator";
 import { SkeletonRowsAgGrid } from "../ui/SkeletonRowsAgGrid";
+import GridActionButton from "../ui/GridActionButton";
+import StatusBadge from "../ui/StatusBadge";
+import RenderUserWithIcon from "../ui/UserAgGridCellRenderer";
+import AgGridProfileCell from "../ui/AgGridProfileCell";
 
 function TeamManagementAgGrid({
   companyTeamList,
@@ -35,6 +38,17 @@ function TeamManagementAgGrid({
         filter: true,
         flex: 1,
         cellClass: "font-bold text-gray-800  px-2 py-1 rounded",
+        cellRenderer: (params: any) => {
+              if (params.data?.__isSkeleton) {
+                return <SkeletonRowsAgGrid />;
+              }
+
+              return (
+                <AgGridProfileCell
+                  primaryText={params.data?.name}
+                />
+              );
+            },
       },
       {
         headerName: "Team Description",
@@ -57,10 +71,10 @@ function TeamManagementAgGrid({
           return <SkeletonRowsAgGrid />;
         }
           return (
-            <div className="flex items-center gap-1">
-              <StatusIndicator isActive={params.value} />
-            </div>
-          );
+                <div className="h-full flex items-center">
+                  <StatusBadge isActive={params.value} />
+                </div>
+              );
         },
       },
       {
@@ -69,6 +83,7 @@ function TeamManagementAgGrid({
         sortable: true,
         filter: true,
         hide: isGridForProductTeam || isGridForLeadProductTeam,
+        cellRenderer: RenderUserWithIcon,
       },
       {
         field: "createdOn",
@@ -82,6 +97,7 @@ function TeamManagementAgGrid({
         sortable: false,
         maxWidth: 100,
         pinned: "right",
+        filter: false,
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         cellRenderer: (params: any) => {
           if (params.data?.__isSkeleton) {
@@ -148,12 +164,12 @@ function TeamManagementAgGrid({
           ) {
             return (
               <>
-                <button
-                  className="text-blue-600"
+               <div>
+              <GridActionButton
+                  id="actions-button"
                   onClick={handleActionsButtonClick}
-                >
-                  {JSX_CHILDREN_NAME.ACTIONS}
-                </button>
+              />
+              </div>
 
                 {isActionsDropDownOpen &&
                   createPortal(
@@ -231,14 +247,22 @@ function TeamManagementAgGrid({
         if (params.data?.__isSkeleton) {
           return <SkeletonRowsAgGrid />;
         }
-        return params.value;
+         return (
+          <span className="">
+            {params.value !== null &&
+            params.value !== undefined &&
+            params.value !== ""
+              ? params.value
+              : "-"}
+          </span>
+        );
       },
     };
   }, []);
 
   return (
     <div
-      className="ag-theme-balham w-full"
+      className="modern-user-grid custom-height-scrollbar w-full"
       style={
         isGridForProductTeam || isGridForLeadProductTeam
           ? { height: "300px", width: "100%" }
@@ -251,7 +275,9 @@ function TeamManagementAgGrid({
         defaultColDef={defaultColDef}
         modules={[AllCommunityModule]}
         // overlayNoRowsTemplate={INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
-        theme={themeBalham}
+        // theme={themeBalham}
+        rowHeight={AGGRID.ROW_HEIGHT}
+        headerHeight={AGGRID.HEADER_HEIGHT}
         onViewportChanged={handleViewPortChanged!}
         onGridReady={onGridReady!}
       />

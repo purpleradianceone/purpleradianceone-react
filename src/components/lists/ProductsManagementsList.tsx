@@ -184,15 +184,21 @@ useEffect(() => {
       >
         {/* Top Header */}
         <div className="flex items-start justify-between ">
-          <div>
-            <h1 className="page-header-custom tracking-tight pb-0.5">
-              Products
-            </h1>
 
-            <p className="page-subtitle-custom ">
-              Manage all your products and inventory.
+          <div className="flex items-center gap-3 ">
+              <div className={`p-2 rounded-lg ${COLORS.PAGE_HEADER_SECTION_BG_COLOR}`}>
+              <Store className={COLORS.PAGE_HEADER_ICONS_COLOR_AND_SIZE} />
+            </div>
+
+              <div>
+                <h1 className="page-header-custom tracking-tight pb-0.5">
+               Products
+            </h1>
+              <p className="page-subtitle-custom ">
+                Manage all your products and inventory.
             </p>
-          </div>
+              </div>
+            </div>
           {!isGridForAccountProduct && (
               <>
                 <div className="flex gap-1 mt-1">
@@ -234,7 +240,7 @@ useEffect(() => {
 
         <SummaryCards
   cardGap={15}
-  width="75%"
+  width="80%"
   gridCols={4}
   loading={isDataLoading}
   cards={[
@@ -243,8 +249,8 @@ useEffect(() => {
       count: productSummary.total_company_product,
       subtitle: "All Products in catalog",
       icon: Package,
-      iconBg: "bg-blue-100",
-      iconColor: "text-blue-600",
+       iconBg: "bg-violet-100",
+      iconColor: "text-violet-600",
     },
 
     {
@@ -272,8 +278,9 @@ useEffect(() => {
       ).toLocaleString("en-IN")}`,
       subtitle: "Current Stock Value",
       icon: IndianRupee,
-      iconBg: "bg-violet-100",
-      iconColor: "text-violet-600",
+     
+      iconBg: "bg-blue-100",
+      iconColor: "text-blue-600",
     },
   ]}
 />
@@ -284,9 +291,7 @@ useEffect(() => {
           <div className="flex  justify-between w-full ">
             <div className="flex items-center gap-5">
               <div className="flex mt-1 gap-1">
-                <Store
-                  className={`${COLORS.GRID_HEADER_ICONS_COLOR_AND_SIZE} `}
-                />
+                
 
                 {(isMediumScreen || isLargeScreen) && (
                   <>

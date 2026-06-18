@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { HandCoins, PackageCheck } from "lucide-react";
-import { useEffect } from "react";
+import { HandCoins, IndianRupee, Package, PackageCheck, ShoppingCart, Users } from "lucide-react";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import CompanyProductSaleManagementListProps from "../../@types/List/CompanyProductSaleManagementListProps";
@@ -27,6 +27,16 @@ import DateRangePicker from "../ui/DateRangePicker";
 import SearchInput from "../ui/SearchInput";
 import { LookupAccountDropdown } from "../views/lookups/lookup-account/LookupAccountDropdown";
 import { LookupCompanyProductDropdown } from "../views/lookups/lookup-company-product/LookupCompanyProductDropdown";
+import { RevenueTrendProps, SummarySalesProps, TopSaleProductProps } from "../../@types/products/SummarySalesProps";
+import { REFCURSOR_KEY } from "../../constants/RefcursorConstants";
+import POST_API from "../../constants/PostApi";
+import axiosClient from "../../axios-client/AxiosClient";
+import { handleApiError } from "../../config/error/handleApiError";
+import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
+import SummaryCards from "../ui/SummaryCards";
+import SalesRevenueTrendChart from "../views/charts/SalesRevenueTrendChart";
+import TopSellingProducts from "../views/company-product-sale-management/TopSellingProducts";
+import { formatRupee } from "../../utils/helperMethods/formatFunctions";
 
 function CompanyProductSaleManagementList({
   handleSearchOption,
@@ -55,6 +65,7 @@ function CompanyProductSaleManagementList({
 
   const { productTypeData, loading: loadingForProductType } = useProductType();
 
+
   const { dateRangeDropdownOptions } = useComapanySpecificSearchDateRange();
 
   const {
@@ -62,6 +73,69 @@ function CompanyProductSaleManagementList({
     isCustomDateOptionSelected,
     setIsCustomDateOptionSelected,
   } = useDateRangeIdChange({ dateRangeDropdownOptions, handleSearchOption });
+
+  const { loginStatus } = useLoggedInUserContext();
+
+   const [summaryCards, setSummaryCards] =
+  useState<SummarySalesProps>();
+
+const [revenueTrend, setRevenueTrend] =
+  useState<RevenueTrendProps[]>([]);
+  
+
+const [topProducts, setTopProducts] =
+  useState<TopSaleProductProps[]>([]);
+
+const [isSummaryLoading, setIsSummaryLoading] =
+  useState(false);
+
+  const getSalesSummary = async () => {
+  try {
+    setIsSummaryLoading(true);
+
+    const response = await axiosClient.post(
+      POST_API.SUMMARY_COMPANY_PRODUCT_SALE,
+      {
+        company_id: loginStatus.companyId,
+        requestedby: loginStatus.id,
+      },
+      {
+        withCredentials: true,
+      }
+    );
+
+    setSummaryCards(
+      response.data[
+        REFCURSOR_KEY.MY_FIXED_CURSOR_SALES_SUMMARY
+      ]?.[0]
+    );
+
+    setRevenueTrend(
+      response.data[
+        REFCURSOR_KEY.MY_FIXED_CURSOR_REVENUE_TREND
+      ] ?? []
+    );
+
+    setTopProducts(
+      response.data[
+        REFCURSOR_KEY.MY_FIXED_CURSOR_TOP_PRODUCTS
+      ] ?? []
+    );
+
+  } catch (error) {
+    handleApiError(error);
+  } finally {
+    setIsSummaryLoading(false);
+  }
+};
+
+useEffect(() => {
+  if (loginStatus.companyId > 0) {
+    getSalesSummary();
+  }
+}, [loginStatus.companyId]);
+
+
 
   //NOTE : BELOW BOTH FUNCTION DO THE SAME THING
   const handleRowClicked = (event: any) => {
@@ -112,6 +186,14 @@ function CompanyProductSaleManagementList({
     }
   };
 
+
+const revenueChartData = revenueTrend.map((item) => ({
+  month: item.month_year.split(" ")[0],
+  revenue: Number(item.total_cost),
+}));
+
+
+
   if (userHasAccessToViewCompanyProductSale) {
     const selectedDateName =
       dateRangeDropdownOptions.find(
@@ -129,16 +211,104 @@ function CompanyProductSaleManagementList({
       setIsCustomDateOptionSelected,
     ]);
 
+    
+
     return (
       <div
         className={`w-full ${
-          position === "left" && isUsedInProductSaleModule ? "pl-5" : "pl-1"
-        } pr-1 gap-1`}
+          position === "left" && isUsedInProductSaleModule ? "pl-7 pr-2" : "pl-1"
+        } pr-1 gap-1 pt-2`}
       >
+
+          <div className="flex items-center gap-3 ">
+              <div className={`p-2 rounded-lg ${COLORS.PAGE_HEADER_SECTION_BG_COLOR}`}>
+              <PackageCheck className={COLORS.PAGE_HEADER_ICONS_COLOR_AND_SIZE} />
+            </div>
+
+              <div>
+                <h1 className="page-header-custom tracking-tight pb-0.5">
+               Sales
+            </h1>
+              <p className="page-subtitle-custom ">
+                Track all product sales transactions in chronological order.
+            </p>
+              </div>
+            </div>
+
+          <SummaryCards
+          cardGap={15}
+          width="92%"
+          gridCols={4}
+          loading={isSummaryLoading}
+          cards={[
+            {
+              title: " Total Transactions",
+              count:
+                summaryCards?.total_transactions_current_month ?? 0,
+              subtitle: "Transactions This Month",
+              icon: ShoppingCart,
+              iconBg: "bg-violet-100",
+              iconColor: "text-violet-600",
+            },
+
+            {
+              title: "Units Sold",
+              count:
+                summaryCards?.units_sold_current_month ?? 0,
+              subtitle: "Units Sold This Month",
+              icon: Package,
+              iconBg: "bg-blue-100",
+              iconColor: "text-blue-600",
+            },
+
+            {
+                title: "Total Revenue",
+                count: `₹ ${formatRupee(
+                  summaryCards?.total_revenue_current_month ?? 0
+                )}`,
+                subtitle: "Current Month Revenue",
+                icon: IndianRupee,
+                iconBg: "bg-green-100",
+                iconColor: "text-green-600",
+              },
+
+            {
+              title: "Customers Served",
+              count:
+                summaryCards?.total_customer_served_current_month ?? 0,
+              subtitle: "Current Month",
+              icon: Users,
+              iconBg: "bg-orange-100",
+              iconColor: "text-orange-600",
+            },
+          ]}
+        />
+       
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 mb-3">
+              <div className="lg:col-span-7">
+                <div className="bg-white border border-slate-200 rounded-xl p-2 shadow-sm">
+              <SalesRevenueTrendChart
+                  title="Revenue Trend"
+                  data={revenueChartData}
+                  xKey="month"
+                  yKey="revenue"
+                  chartType="line"
+                  height={120}  
+                />
+                </div>
+              </div>
+
+              <div className="lg:col-span-5">
+                <TopSellingProducts
+                  topProducts={topProducts}
+                />
+              </div>
+            </div>
         {/* sticky */}
         {
           <div
-            className={`sticky z-10 top-12 mt-1 p-1 flex flex-wrap items-center justify-between gap-3 text-sm ${COLORS.GRID_HEADER_SECTION_BG_COLOR} rounded-lg shadow-sm mb-1.5 
+            className={`sticky z-10 top-12 mt-1 py-1.5 px-3 mb-3 flex flex-wrap items-center justify-between gap-3 text-sm ${COLORS.GRID_HEADER_SECTION_BG_COLOR} border border-slate-200 rounded-lg shadow-sm mb-1.5 
                       w-full
                     `}
           >
@@ -146,15 +316,7 @@ function CompanyProductSaleManagementList({
             {isUsedInProductSaleModule && (
               <div className="flex gap-2 items-center w-fit">
                 <div className="flex gap-1 items-center w-fit mr-4">
-                  {!isSmallScreen && (
-                    <PackageCheck
-                      className={`${
-                        isCustomDateOptionSelected
-                          ? "w-4 h-4 text-blue-600"
-                          : COLORS.GRID_HEADER_ICONS_COLOR_AND_SIZE
-                      } `}
-                    />
-                  )}
+                  
 
                   {(isMediumScreen || isLargeScreen) && (
                     <span
@@ -183,6 +345,7 @@ function CompanyProductSaleManagementList({
                       );
                     }}
                     height="h-8"
+                    placeholder="Search by account name, product name, barcode and serial no"
                   ></SearchInput>
                 </div>
 
@@ -305,8 +468,8 @@ function CompanyProductSaleManagementList({
           <div
             className={
               userPreference.isLeftMenu
-                ? `ag-theme-balham w-full h-[calc(100vh-120px)]`
-                : "ag-theme-balham w-full h-[calc(100vh-122px)]"
+                ? `w-full h-[calc(100vh-300px)]`
+                : "w-full h-[calc(100vh-122px)]"
             }
           >
             <CompanyProductSaleAgGrid

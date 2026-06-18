@@ -247,14 +247,20 @@ useEffect(() => {
       >
         {/* Top Header */}
             <div className="flex items-start justify-between ">
+
+            <div className="flex items-center gap-3 ">
+              <div className={`p-2 rounded-lg ${COLORS.PAGE_HEADER_SECTION_BG_COLOR}`}>
+              <Headset className={COLORS.PAGE_HEADER_ICONS_COLOR_AND_SIZE} />
+            </div>
+
               <div>
                 <h1 className="page-header-custom tracking-tight pb-0.5">
-                  Support
-                </h1>
-
-                <p className="page-subtitle-custom ">
-                  Manage and resolve customer support tickets.
-                </p>
+               Support
+            </h1>
+              <p className="page-subtitle-custom ">
+                Manage and resolve customer support tickets.
+            </p>
+              </div>
             </div>
 
             <div className="flex flex-wrap items-center gap-2 pt-1 w-fit">
@@ -298,8 +304,8 @@ useEffect(() => {
                   count: supportTicketSummary.total_support_tickets,
                   subtitle: "All Support Tickets",
                   icon: Ticket,
-                  iconBg: "bg-blue-100",
-                  iconColor: "text-blue-600",
+                  iconBg: "bg-violet-100",
+                  iconColor: "text-violet-600",
                 },
 
                 {
@@ -307,8 +313,8 @@ useEffect(() => {
                   count: supportTicketSummary.total_support_tickets_today,
                   subtitle: "Created Today",
                   icon:   FolderOpen,
-                  iconBg: "bg-violet-100",
-                  iconColor: "text-violet-600",
+                  iconBg: "bg-blue-100",
+                  iconColor: "text-blue-600",
                 },
 
                 {
@@ -351,15 +357,7 @@ useEffect(() => {
             {isUsedInSupportTicketModule && (
               <div className="flex gap-2 items-center w-fit">
                 <div className="flex gap-1 items-center w-fit">
-                  {!isSmallScreen && (
-                    <Headset
-                      className={`${
-                        isCustomDateOptionSelected
-                          ? "w-4 h-4 text-blue-600"
-                          : COLORS.GRID_HEADER_ICONS_COLOR_AND_SIZE
-                      } `}
-                    />
-                  )}
+                  
 
                   {(isMediumScreen || isLargeScreen) && (
                     <span
@@ -376,7 +374,7 @@ useEffect(() => {
                 {/* Search Box */}
                 <div
                   className={`relative flex items-start ${
-                    isCustomDateOptionSelected ?(userPreference.sidebarOpen?"w-24": "w-28 ") : (userPreference.sidebarOpen?"w-32":"w-57")
+                    isCustomDateOptionSelected ?(userPreference.sidebarOpen?"w-24": "w-28 ") : (userPreference.sidebarOpen?"w-32":"w-40")
                   }`}
                 >
                   <SearchInput
@@ -387,7 +385,7 @@ useEffect(() => {
                       );
                     }}
                     height="h-8"
-                    placeholder="Search by ticket number, name, email, mobilenumber, barcode and serial number"
+                    placeholder="Search by ticket no, name, email, mobile no, barcode and serial no"
                   ></SearchInput>
                 </div>
 

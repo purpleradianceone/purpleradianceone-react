@@ -1,11 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { AllCommunityModule, ColDef, themeBalham } from "ag-grid-community";
+import { AllCommunityModule, ColDef, } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 import { useMemo, useRef } from "react";
-import {  JSX_CHILDREN_NAME } from "../../constants/AppConstants";
+import {  AGGRID, JSX_CHILDREN_NAME } from "../../constants/AppConstants";
 import SupportTicketProps from "../../@types/support-ticket-management/SupportTicketProps";
 import { SkeletonRowsAgGrid } from "../ui/SkeletonRowsAgGrid";
 import CompanyProductSaleManagementAgGridProps from "../../@types/ag-grid/CompanyProductSaleManagementAgGridProps";
+import { productTypeStyles } from "../../utils/colourSpecifierForNameInAggrid";
+import RenderUserWithIcon from "../ui/UserAgGridCellRenderer";
+import { formatQuantityWithoutDecimal, } from "../../utils/helperMethods/formatFunctions";
 
 function CompanyProductSaleAgGrid({
   companyProductSold,
@@ -36,6 +39,11 @@ function CompanyProductSaleAgGrid({
         headerName: "Sold To",
         sortable: true,
         filter: true,
+         cellStyle: () => ({
+          fontSize: "14px",
+          fontWeight: 600,
+          color: "#1f2937",
+        }),
       },
       {
         hide: true,
@@ -56,6 +64,26 @@ function CompanyProductSaleAgGrid({
         headerName: "Product Type",
         sortable: true,
         filter: true,
+        minWidth: 130,
+
+        cellRenderer: (params: any) => {
+                  if (params.data?.__isSkeleton) {
+                    return <SkeletonRowsAgGrid />;
+                  }
+                const type = params.value || "-";
+                  return (
+                  <div className="flex items-center h-full">
+                    <span
+                      className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap ${
+                        productTypeStyles[type] ||
+                        "bg-slate-100 text-slate-700"
+                      }`}
+                    >
+                      {type}
+                    </span>
+                  </div>
+                );
+                },
       },
 
       {
@@ -65,16 +93,23 @@ function CompanyProductSaleAgGrid({
         filter: true,
         // maxWidth:100,
         width:90,
-        minWidth:90,
+        minWidth:100,
       },
 
       {
-        field: "totalCost",
-        headerName: "Total Cost",
-        sortable: true,
-        filter: true,
-        width:100,
-        minWidth:100,
+            field: "totalCost",
+            headerName: "Total Cost",
+            sortable: true,
+            filter: true,
+            width: 100,
+            minWidth: 110,
+                    cellRenderer: (params: any) => {
+            if (params.data?.__isSkeleton) {
+              return <SkeletonRowsAgGrid />;
+            }
+
+            return `₹ ${formatQuantityWithoutDecimal(params.value)}`;
+            },
       },
 
       {
@@ -93,6 +128,7 @@ function CompanyProductSaleAgGrid({
         field: "createdBy",
         headerName: "Created By",
         filter: true,
+        cellRenderer: RenderUserWithIcon,
       },
       {
         field: "createdOn",
@@ -107,6 +143,7 @@ function CompanyProductSaleAgGrid({
         sortable: true,
         filter: true,
         minWidth: 120,
+        cellRenderer: RenderUserWithIcon,
       },
       {
         field: "updatedOn",
@@ -134,6 +171,7 @@ function CompanyProductSaleAgGrid({
         field: "view",
         pinned: "right",
         maxWidth: 80,
+        filter: false,
         // minWidth:80,
         // autoHeight: true,
         // suppressSizeToFit: true,
@@ -172,7 +210,15 @@ function CompanyProductSaleAgGrid({
         if (params.data?.__isSkeleton) {
           return <SkeletonRowsAgGrid />;
         }
-        return params.value;
+        return (
+          <span className="">
+            {params.value !== null &&
+            params.value !== undefined &&
+            params.value !== ""
+              ? params.value
+              : "-"}
+          </span>
+        );
       },
     }),
     [],
@@ -186,7 +232,7 @@ function CompanyProductSaleAgGrid({
 
   return (
     <div
-      className="ag-theme-balham w-full"
+      className="w-full modern-user-grid custom-height-scrollbar"
       style={{ height: "100%", width: "100%" }}
     >
       <AgGridReact
@@ -195,7 +241,9 @@ function CompanyProductSaleAgGrid({
         columnDefs={columnDefs}
         defaultColDef={defaultColDef}
         modules={[AllCommunityModule]}
-        theme={themeBalham}
+        rowHeight={AGGRID.ROW_HEIGHT}
+        headerHeight={AGGRID.HEADER_HEIGHT}
+        // theme={themeBalham}
         // overlayNoRowsTemplate={INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
         context={{ handleRowSelect: onRowSelect }}
         onRowClicked={handleRowClick}

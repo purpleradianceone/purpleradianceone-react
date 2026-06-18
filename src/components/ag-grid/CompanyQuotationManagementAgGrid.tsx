@@ -11,6 +11,7 @@ import { SkeletonRowsAgGrid } from "../ui/SkeletonRowsAgGrid";
 import { AGGRID } from "../../constants/AppConstants";
 import RenderUserWithIcon from "../ui/UserAgGridCellRenderer";
 import StatusBadge from "../ui/StatusBadge";
+import { formatRupee } from "../../utils/helperMethods/formatFunctions";
 
 function CompanyQuotationManagementAgGrid({
   quotations,
@@ -86,6 +87,13 @@ function CompanyQuotationManagementAgGrid({
         headerName: "Basic Amount",
         sortable: true,
         filter: true,
+        cellRenderer: (params: any) => {
+        if (params.data?.__isSkeleton) {
+          return <SkeletonRowsAgGrid />;
+        }
+
+        return `₹ ${formatRupee(params.value)}`;
+        },
       },
 
       {
@@ -93,6 +101,12 @@ function CompanyQuotationManagementAgGrid({
         headerName: "Discount Amount",
         sortable: true,
         filter: true,
+         cellRenderer: (params: any) => {
+        if (params.data?.__isSkeleton) {
+          return <SkeletonRowsAgGrid />;
+        }
+        return `₹ ${formatRupee(params.value)}`;
+        },
       },
 
       {
@@ -100,18 +114,36 @@ function CompanyQuotationManagementAgGrid({
         headerName: "Taxable Value",
         sortable: true,
         filter: true,
+         cellRenderer: (params: any) => {
+        if (params.data?.__isSkeleton) {
+          return <SkeletonRowsAgGrid />;
+        }
+        return `₹ ${formatRupee(params.value)}`;
+        },
       },
       {
         field: "totalTax",
         headerName: "Total Tax",
         sortable: true,
         filter: true,
+         cellRenderer: (params: any) => {
+        if (params.data?.__isSkeleton) {
+          return <SkeletonRowsAgGrid />;
+        }
+        return `₹ ${formatRupee(params.value)}`;
+        },
       },
       {
         field: "totalAmount",
         headerName: "Total Amount",
         sortable: true,
         filter: true,
+         cellRenderer: (params: any) => {
+        if (params.data?.__isSkeleton) {
+          return <SkeletonRowsAgGrid />;
+        }
+        return `₹ ${formatRupee(params.value)}`;
+        },
       },
 
       {

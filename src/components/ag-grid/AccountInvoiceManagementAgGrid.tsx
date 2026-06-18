@@ -1,15 +1,17 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { AllCommunityModule, ColDef, themeBalham } from "ag-grid-community";
+import { AllCommunityModule, ColDef, } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 import { useMemo, useRef } from "react";
-import { JSX_CHILDREN_NAME } from "../../constants/AppConstants";
-import StatusIndicator from "../ui/StatusIndicator";
+import { AGGRID, JSX_CHILDREN_NAME } from "../../constants/AppConstants";
 import AccountInvoiceManagementGridProps from "../../@types/ag-grid/AccountInvoiceManagementGridProps";
 import InvoiceActionsDropdown from "../views/invoice/InvoiceActionsDropdown";
 import InvoiceStatusChip from "../ui/InvoiceStatusChip";
 import { useUserAccessModules } from "../../config/hooks/useAccessModules";
 import { SkeletonRowsAgGrid } from "../ui/SkeletonRowsAgGrid";
+import RenderUserWithIcon from "../ui/UserAgGridCellRenderer";
+import StatusBadge from "../ui/StatusBadge";
+import { formatRupee } from "../../utils/helperMethods/formatFunctions";
 
 function AccountInvoiceManagementAgGrid({
   invoices,
@@ -31,11 +33,16 @@ function AccountInvoiceManagementAgGrid({
             return <SkeletonRowsAgGrid />;
           }
           return (
-            <div className="flex items-center font-bold gap-2">
+            <div className="flex items-center font-semibold gap-2">
               <span>{params.value || "[Auto-generated]"}</span>
             </div>
           );
         },
+        cellStyle: () => ({
+          fontSize: "13px",
+          fontWeight: 500,
+          color: "#1f2937",
+        }),
       },
 
       {
@@ -107,6 +114,13 @@ function AccountInvoiceManagementAgGrid({
         headerName: "Basic Amount",
         sortable: true,
         filter: true,
+         cellRenderer: (params: any) => {
+            if (params.data?.__isSkeleton) {
+              return <SkeletonRowsAgGrid />;
+            }
+        
+            return `₹ ${formatRupee(params.value)}`;
+          },
       },
 
       {
@@ -114,6 +128,13 @@ function AccountInvoiceManagementAgGrid({
         headerName: "Discount Amount",
         sortable: true,
         filter: true,
+         cellRenderer: (params: any) => {
+            if (params.data?.__isSkeleton) {
+              return <SkeletonRowsAgGrid />;
+            }
+        
+            return `₹ ${formatRupee(params.value)}`;
+          },
       },
 
       {
@@ -121,18 +142,39 @@ function AccountInvoiceManagementAgGrid({
         headerName: "Taxable Value",
         sortable: true,
         filter: true,
+         cellRenderer: (params: any) => {
+            if (params.data?.__isSkeleton) {
+              return <SkeletonRowsAgGrid />;
+            }
+        
+            return `₹ ${formatRupee(params.value)}`;
+          },
       },
       {
         field: "totalTax",
         headerName: "Total Tax",
         sortable: true,
         filter: true,
+         cellRenderer: (params: any) => {
+            if (params.data?.__isSkeleton) {
+              return <SkeletonRowsAgGrid />;
+            }
+        
+            return `₹ ${formatRupee(params.value)}`;
+          },
       },
       {
         field: "totalAmount",
         headerName: "Total Amount",
         sortable: true,
         filter: true,
+         cellRenderer: (params: any) => {
+            if (params.data?.__isSkeleton) {
+              return <SkeletonRowsAgGrid />;
+            }
+        
+            return `₹ ${formatRupee(params.value)}`;
+          },
       },
 
       {
@@ -144,11 +186,11 @@ function AccountInvoiceManagementAgGrid({
           if (params.data?.__isSkeleton) {
             return <SkeletonRowsAgGrid />;
           }
-          return (
-            <div className="flex items-center text-sm gap-1 mt-1">
-              <StatusIndicator isActive={params.value} />
-            </div>
-          );
+           return (
+                <div className="h-full flex items-center">
+                  <StatusBadge isActive={params.value} />
+                </div>
+              );
         },
       },
 
@@ -156,6 +198,7 @@ function AccountInvoiceManagementAgGrid({
         field: "createdBy",
         headerName: "Created By",
         filter: true,
+        cellRenderer: RenderUserWithIcon,
       },
 
       {
@@ -168,6 +211,7 @@ function AccountInvoiceManagementAgGrid({
         field: "updatedBy",
         headerName: "Updated By",
         filter: true,
+        cellRenderer: RenderUserWithIcon,
       },
 
       {
@@ -223,7 +267,15 @@ function AccountInvoiceManagementAgGrid({
         if (params.data?.__isSkeleton) {
           return <SkeletonRowsAgGrid />;
         }
-        return params.value;
+         return (
+          <span className="">
+            {params.value !== null &&
+            params.value !== undefined &&
+            params.value !== ""
+              ? params.value
+              : "-"}
+          </span>
+        )
       },
     }),
     [],
@@ -237,7 +289,7 @@ function AccountInvoiceManagementAgGrid({
 
   return (
     <div
-      // className="ag-theme-balham w-full"
+      className="modern-user-grid custom-height-scrollbar w-full"
       style={{ height: "100%", width: "100%" }}
     >
       <AgGridReact
@@ -246,8 +298,10 @@ function AccountInvoiceManagementAgGrid({
         columnDefs={columnDefs}
         defaultColDef={defaultColDef}
         modules={[AllCommunityModule]}
-        theme={themeBalham}
+        // theme={themeBalham}
         // overlayNoRowsTemplate={INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
+        rowHeight={AGGRID.ROW_HEIGHT}
+        headerHeight={AGGRID.HEADER_HEIGHT}
         context={{
           handleRowSelect: onRowSelect, // ✅ correct
           onDelete: onDeleteInvoice,

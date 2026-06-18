@@ -27,11 +27,11 @@ import DateRangeFilterDropdown from "../ui/DateRangeFilterDropdown";
 import DateRangePicker from "../ui/DateRangePicker";
 import SearchInput from "../ui/SearchInput";
 import LoadingPopUpAnimation from "../views/card/LoadingPopUpAnimation";
-import QuotationIconSvg from "../quotation-builder/svg/QuotationIconSvg";
 import { QuotationTypeDropdown } from "../views/lookups/company-quotation/QuotationTypeDropdown";
-import {FileText, Send, FilePenLine, IndianRupee,} from "lucide-react";
+import {FileText, Send, FilePenLine, IndianRupee, LucideFileArchive,} from "lucide-react";
 import CompanyQuotationSummary from "../../@types/company-quotation/CompanyQuotationSummary";
 import SummaryCards from "../ui/SummaryCards";
+import { formatRupee } from "../../utils/helperMethods/formatFunctions";
 
 export const companyQuotationDataUrlSearchParamKey: string =
   "companyQuotationData";
@@ -249,16 +249,20 @@ useEffect(() => {
         {isUsedFor === Modules.QUOTATION_MODULE && (
           <div className=" ">
         <div className="flex items-start justify-between ">
-          <div>
-            <h1 className="page-header-custom tracking-tight pb-0.5 ">
-              Quotation Management
-            </h1>
+          <div className="flex items-center gap-3 ">
+              <div className={`p-2 rounded-lg ${COLORS.PAGE_HEADER_SECTION_BG_COLOR}`}>
+              <LucideFileArchive className={COLORS.PAGE_HEADER_ICONS_COLOR_AND_SIZE} />
+            </div>
 
-            <p className="page-subtitle-custom ">
-              Manage, track and update all your company quotation.
+              <div>
+                <h1 className="page-header-custom tracking-tight pb-0.5">
+               Quotation Management
+            </h1>
+              <p className="page-subtitle-custom ">
+                Manage, track and update all your company quotation.
             </p>
-            
-          </div>
+              </div>
+            </div>
           <div className="pt-1">
  <Button
     disabled={!userHasAccessToAddCompanyQuotation}
@@ -287,7 +291,7 @@ useEffect(() => {
         
           <SummaryCards
             cardGap={15}
-            width="75%"
+            width="80%"
             loading={isDataLoading}
             cards={[
               {
@@ -295,8 +299,9 @@ useEffect(() => {
                 count: quotationSummary.total_quotation,
                 subtitle: "All quotations",
                 icon: FileText,
-                iconBg: "bg-blue-100",
-                iconColor: "text-blue-600",
+                iconBg: "bg-violet-100",
+                iconColor: "text-violet-700",
+               
               },
               {
                 title: "Submitted",
@@ -316,13 +321,14 @@ useEffect(() => {
               },
               {
                 title: "This Month Value",
-                count: `₹${Number(
-                  quotationSummary.total_quotation_value_this_month || 0
-                ).toLocaleString("en-IN")}`,
+                count: `₹ ${formatRupee(
+                  quotationSummary?.total_quotation_value_this_month ?? 0
+                )}`,
                 subtitle: "Monthly Quotation Value",
                 icon: IndianRupee,
-                iconBg: "bg-violet-100",
-                iconColor: "text-violet-700",
+                
+                 iconBg: "bg-blue-100",
+                iconColor: "text-blue-600",
               },
             ]}
           />
@@ -344,12 +350,7 @@ useEffect(() => {
               {/* <ComponentHeaderAndLogo logo={File} headerText="Quotation" /> */}
               <div className="flex justify-center items-center gap-1 pr-3">
                 {/* <Quote className={COLORS.GRID_HEADER_ICONS_COLOR_AND_SIZE} /> */}
-                <QuotationIconSvg
-                  strokeWidth={2}
-                  size={24}
-                  className="text-blue-600"
-                  showCurrency={true}
-                />
+                
                 <span className="section-header-custom">Quotation</span>
               </div>
               {/* 🔹 Search */}

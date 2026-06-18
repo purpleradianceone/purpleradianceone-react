@@ -11,6 +11,9 @@ import { DATA_TYPE } from "../../constants/AppConstants";
 import ZoomMeetingContextProps, {
   ZoomMeetingContextState,
 } from "../../@types/meeting/ZoomMeetingContextProps";
+import axiosClient from "../../axios-client/AxiosClient";
+import POST_API from "../../constants/PostApi";
+import { useLoggedInUserContext } from "../user/LoggedInUserContext";
 
 const ZoomMeetingContext = createContext<ZoomMeetingContextProps | undefined>(
   undefined,
@@ -25,11 +28,33 @@ export const ZoomMeetingContextProvider: React.FC<{ children: ReactNode }> = ({
   //     isConnected : false,
   //     }
   // });
+
+  const {loginStatus}= useLoggedInUserContext();
   const [zoomMeetingStatus, setZoomMeetingStatus] =
     useState<ZoomMeetingContextState>({
-      isConnected: false, // 👈 important (loading state)
+      isConnected: false, //  important (loading state)
       email: undefined,
     });
+
+    const refreshZoomMeetingStatus = async () => {
+  try {
+    const response = await axiosClient.post(
+      POST_API.VALIDATE_ZOOM_MEETINGS_CONNECTION,
+      {
+        company_user_id : loginStatus.id,
+        requestedby: loginStatus.id,
+        company_id: loginStatus.companyId,
+      }
+    );
+    
+    setZoomMeetingStatus({
+      isConnected: response.data.isConnected,
+      email: response.data.email,
+    });
+  } catch (error) {
+    console.error(error);
+  }
+};
 
   // useEffect(() => {
   //   localStorage.setItem(
@@ -40,7 +65,7 @@ export const ZoomMeetingContextProvider: React.FC<{ children: ReactNode }> = ({
 
   return (
     <ZoomMeetingContext.Provider
-      value={{ zoomMeetingStatus, setZoomMeetingStatus }}
+      value={{ zoomMeetingStatus, setZoomMeetingStatus , refreshZoomMeetingStatus }}
     >
       {children}
     </ZoomMeetingContext.Provider>

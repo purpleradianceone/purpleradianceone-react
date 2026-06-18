@@ -2,9 +2,9 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Download, Eye, Trash2 } from "lucide-react";
-import { JSX_CHILDREN_NAME } from "../../../constants/AppConstants";
 import ActionsDropdownButton from "../../ui/ActionsDropdownButton";
 import ConfirmationDialog from "../../dialogue-box/ConfirmationDialogue";
+import GridActionButton from "../../ui/GridActionButton";
 
 const InvoiceActionsDropdown = ({ data, context }: any) => {
   console.log(data);
@@ -68,12 +68,7 @@ const InvoiceActionsDropdown = ({ data, context }: any) => {
   return (
     <>
       {/* BUTTON */}
-      <button
-        className="text-blue-500 hover:text-blue-700"
-        onClick={handleClick}
-      >
-        {JSX_CHILDREN_NAME.ACTIONS}
-      </button>
+      <GridActionButton onClick={handleClick} />
 
       {/* DROPDOWN */}
       {open &&
@@ -90,6 +85,7 @@ const InvoiceActionsDropdown = ({ data, context }: any) => {
                 setOpen(false);
               }}
             >
+              
               <div className="flex items-center gap-2">
                 <Eye size={14} />
                 Details

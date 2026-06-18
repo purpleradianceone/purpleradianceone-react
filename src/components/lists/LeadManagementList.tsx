@@ -226,15 +226,21 @@ const refreshAllData = useCallback(async () => {
 
         {/* Top Header */}
         <div className="flex items-start justify-between ">
-          <div>
-            <h1 className="page-header-custom tracking-tight pb-0.5">
-              Leads
-            </h1>
+             {/* Header */} 
+            <div className="flex items-center gap-3 ">
+              <div className={`p-2 rounded-lg ${COLORS.PAGE_HEADER_SECTION_BG_COLOR}`}>
+              <Handshake className={COLORS.PAGE_HEADER_ICONS_COLOR_AND_SIZE} />
+            </div>
 
-            <p className="page-subtitle-custom ">
-              Track, Manage and Convert your leads efficiently.
+              <div>
+                <h1 className="page-header-custom tracking-tight pb-0.5">
+               Leads
+            </h1>
+              <p className="page-subtitle-custom ">
+               Track, Manage and Convert your leads efficiently.
             </p>
-          </div>
+              </div>
+            </div>
           <div className="pt-1">
           {isUsedInLeadModule && (
             <div className="flex gap-1">
@@ -296,8 +302,8 @@ const refreshAllData = useCallback(async () => {
               count: leadSummary.total_leads_converted_this_month,
               subtitle: "This Month",
               icon: Handshake,
-              iconBg: "bg-green-100",
-              iconColor: "text-green-600",
+              iconBg: "bg-violet-100",
+              iconColor: "text-violet-600",
             },
 
             {
@@ -314,8 +320,8 @@ const refreshAllData = useCallback(async () => {
               count: leadSummary.total_leads_created_this_month,
               subtitle: "Created This Month",
               icon: ClipboardPlus,
-              iconBg: "bg-violet-100",
-              iconColor: "text-violet-600",
+              iconBg: "bg-green-100",
+              iconColor: "text-green-600",
             },
 
             {

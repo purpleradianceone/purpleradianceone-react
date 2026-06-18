@@ -39,7 +39,7 @@ export const leadStatusStyles: Record<string, string> = {
 
 
 export const supportTicketStatusStyles: Record<string, string> = {
-  Open: "bg-blue-100 text-blue-700",
+  Open: "bg-blue-50 text-blue-700",
 
   "In Progress": "bg-amber-100 text-amber-700",
 
@@ -72,6 +72,12 @@ export const productTypeStyles: Record<string, string> = {
   Software: "bg-blue-100 text-blue-700",
   Service: "bg-orange-100 text-orange-700",
   Hardware: "bg-teal-100 text-teal-700",
+};
+
+export const stockLedgerTransactionTypeStyles: Record<string, string> = {
+  Adjustment: "bg-green-100 text-green-700",
+
+  Sale: "bg-red-100 text-red-700",
 };
 
 

@@ -58,6 +58,10 @@ export const REFCURSOR_KEY = {
     MY_FIXED_CURSOR_TODAYS_OUTWARD_VALUE : "my_fixed_cursor_today_outward_value",
 
 
+    MY_FIXED_CURSOR_SALES_SUMMARY: "my_fixed_cursor_summary_cards",
+    MY_FIXED_CURSOR_REVENUE_TREND: "my_fixed_cursor_revenue_trend",
+    MY_FIXED_CURSOR_TOP_PRODUCTS: "my_fixed_cursor_top_three_sale"
+
 
 
 

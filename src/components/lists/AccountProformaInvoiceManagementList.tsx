@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import Button from "../ui/Button";
 import { useUserAccessModules } from "../../config/hooks/useAccessModules";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import SearchInput from "../ui/SearchInput";
 import DateRangePicker from "../ui/DateRangePicker";
 import { useComapanySpecificSearchDateRange } from "../../config/hooks/useCompanySpecificDateRange";
@@ -24,11 +24,15 @@ import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
 import { ComponentHeaderAndLogo } from "../ui/ComponentHeaderAndLogo";
 import CustomDocumentPreviewComponent from "../custom-document-preview-component/CustomDocumentPreviewComponent";
 import LoadingPopUpAnimation from "../views/card/LoadingPopUpAnimation";
-import { FaRegFileAlt } from "react-icons/fa";
+import { FaRegFileAlt, FaRegFileArchive } from "react-icons/fa";
 import AccountProformaInvoiceManagementListProps from "../../@types/List/AccountProformaInvoiceManagementListProps";
 import AccountProformaInvoiceProps from "../../@types/account/AccountProformaInvoiceProps";
 import CreateProformaInvoiceModal from "../modals/ProformaInvoice/CreateProformaInvoiceModal";
 import AccountProformaInvoiceManagementAgGrid from "../ag-grid/AccountProformaInvoiceManagementAgGrid";
+import CompanyProformaInvoiceSummary from "../../@types/invoice/CompanyProformaInvoiceSummary";
+import { FilePenLine, FileText, IndianRupee, Receipt } from "lucide-react";
+import SummaryCards from "../ui/SummaryCards";
+import { formatRupee } from "../../utils/helperMethods/formatFunctions";
 
 export const accountInvoiceDataUrlSearchParamKey: string = "accountInvoiceData";
 
@@ -59,6 +63,14 @@ function AccountProformaInvoiceManagementList({
   // for invoice modal open
   const [isCreateInvoiceModalOpen, setIsCreateInvoiceModalOpen] =
     useState<boolean>(false);
+
+    const [proformaInvoiceSummary, setProformaInvoiceSummary] =
+  useState<CompanyProformaInvoiceSummary>({
+    total_company_proforma_invoice_this_month: 0,
+    total_company_proforma_invoice_in_draft: 0,
+    total_company_proforma_invoice_amount_this_month: 0,
+    total_company_proforma_invoice_tax_this_month: 0,
+  });
 
   const { dateRangeDropdownOptions } = useComapanySpecificSearchDateRange();
 
@@ -125,6 +137,46 @@ function AccountProformaInvoiceManagementList({
   //       });
   //   };
 
+    const fetchProformaInvoiceSummary = useCallback(async () => {
+  try {
+    const postData = {
+      company_id: loginStatus.companyId,
+      requestedby: loginStatus.id,
+    };
+
+    const response = await axiosClient.post(
+      POST_API.SUMMARY_COMPANY_PROFORMA_INVOICE,
+      postData,
+      {
+        withCredentials: true,
+      }
+    );
+
+    if (response.data?.length > 0) {
+      setProformaInvoiceSummary(response.data[0]);
+    }
+  } catch (error) {
+    console.error(error);
+  }
+}, [loginStatus.companyId, loginStatus.id]);
+
+useEffect(() => {
+  if (loginStatus.companyId && loginStatus.id) {
+    fetchProformaInvoiceSummary();
+  }
+}, [fetchProformaInvoiceSummary]);
+
+const refreshAllData = useCallback(async () => {
+  await Promise.all([
+    handleAddProformaInvoice(),
+    fetchProformaInvoiceSummary(),
+  ]);
+}, [
+  handleAddProformaInvoice,
+  fetchProformaInvoiceSummary,
+]);
+
+
   const onDeleteInvoice = async (rowData: AccountProformaInvoiceProps) => {
     if(loginStatus.companyId === 0)return;
     console.log("Delete Invoice:", rowData);
@@ -148,6 +200,7 @@ function AccountProformaInvoiceManagementList({
       if (res.data.status) {
         toast.success(res.data.message);
         handleAddProformaInvoice();
+        fetchProformaInvoiceSummary();
       } else {
         toast.error(res.data.message);
       }
@@ -218,14 +271,105 @@ function AccountProformaInvoiceManagementList({
 
     return (
       <div
-        className={`w-full ${position === "left"} ${isUsedForSidebar ? (userPreference.isLeftMenu ? "pl-5" : "pl-1") : ""} gap-1`}
+        className={`w-full ${position === "left"} ${isUsedForSidebar ? (userPreference.isLeftMenu ? "pl-7 pr-2" : "pl-1") : ""} gap-1 pt-2`}
       >
         {isSubmitting && <LoadingPopUpAnimation show={isSubmitting} />}
         {/* 🔹 Header */}
         {isUsedForSidebar ? (
+          <div>
+          <div className="flex items-start justify-between ">
+          <div className="flex items-center gap-3 ">
+              <div className={`p-2 rounded-lg ${COLORS.PAGE_HEADER_SECTION_BG_COLOR}`}>
+              <FaRegFileArchive className={`${COLORS.PAGE_HEADER_ICONS_COLOR_AND_SIZE} w-6 h-6`} />
+            </div>
+
+              <div>
+                <h1 className="page-header-custom tracking-tight pb-0.5">
+               Proforma Invoices
+            </h1>
+              <p className="page-subtitle-custom ">
+               Manage and track all your Proforma invoices efficiently.
+
+            </p>
+              </div>
+            </div>
+            
+
+           {/* RIGHT */}
+           <div className="pt-1">
+              <Button
+                disabled={!userHasAccessToAddAccountProformaInvoice}
+                onClick={() => {
+                  if (!userHasAccessToAddAccountProformaInvoice) {
+                    toast.error(
+                      MESSAGE.MODULE_ACCESS.ACCOUNT_PROFORMA_INVOICE
+                        .DENIED_ADD_ACCESS,
+                    );
+                    return;
+                  }
+                  //   handleSaveHeader();
+                  setIsCreateInvoiceModalOpen(true);
+                }}
+                // className={COLORS.ADD_BUTTON}
+              >
+                + Add Proforma Invoice
+              </Button>
+            </div>
+          </div>
+
+          <SummaryCards
+            cardGap={20}
+            width="80%"
+            gridCols={4}
+            loading={gridLoading}
+            cards={[
+              {
+                title: "Total Proforma Invoices",
+                count:
+                  proformaInvoiceSummary.total_company_proforma_invoice_this_month,
+                subtitle: "Created This Month",
+                icon: FileText,
+                iconBg: "bg-violet-100",
+                iconColor: "text-violet-600",
+              },
+
+              {
+                title: "Draft Proforma Invoices",
+                count:
+                  proformaInvoiceSummary.total_company_proforma_invoice_in_draft,
+                subtitle: "All Draft Invoices",
+                icon: FilePenLine,
+                iconBg: "bg-orange-100",
+                iconColor: "text-orange-600",
+              },
+
+              {
+                title: "Total Tax",
+                count: `₹ ${formatRupee(
+                 proformaInvoiceSummary?.total_company_proforma_invoice_tax_this_month ?? 0
+              )}`,
+                subtitle: "GST Amount This Month",
+                icon: Receipt,
+                iconBg: "bg-blue-100",
+                iconColor: "text-blue-600",
+              },
+
+              {
+                title: "Proforma Amount",
+                count: `₹ ${formatRupee(
+                  proformaInvoiceSummary.total_company_proforma_invoice_amount_this_month ?? 0
+                )}`,
+                subtitle: "This Month",
+                icon: IndianRupee,
+                iconBg: "bg-green-100",
+                iconColor: "text-green-600",
+              },
+            ]}
+          />
+             
           <div
-            className={`sticky z-10 top-12 mt-1 p-1 flex items-center justify-between gap-3 text-sm 
-              ${COLORS.GRID_HEADER_SECTION_BG_COLOR} rounded-lg shadow-sm mb-1.5 w-full`}
+            className={`sticky z-10 top-12 mt-1 py-1.5 px-3 mb-3 flex items-center justify-between gap-3 text-sm 
+              ${COLORS.GRID_HEADER_SECTION_BG_COLOR} border border-slate-200 rounded-lg mb-1.5 w-full`}
           >
             {/* LEFT */}
             <div className="flex items-center gap-2 flex-wrap">
@@ -238,6 +382,7 @@ function AccountProformaInvoiceManagementList({
               <div className="w-fit min-w-[120px]">
                 <SearchInput
                   value={handleSearchOption.searchParameter}
+                  placeholder="Search by invoice no, account name"
                   onChange={(e) =>
                     handleSearchOption.handleSearchParameterChange(
                       e.target.value,
@@ -274,27 +419,7 @@ function AccountProformaInvoiceManagementList({
                 )}
               </div>
             </div>
-
-            {/* RIGHT */}
-            <div>
-              <Button
-                disabled={!userHasAccessToAddAccountProformaInvoice}
-                onClick={() => {
-                  if (!userHasAccessToAddAccountProformaInvoice) {
-                    toast.error(
-                      MESSAGE.MODULE_ACCESS.ACCOUNT_PROFORMA_INVOICE
-                        .DENIED_ADD_ACCESS,
-                    );
-                    return;
-                  }
-                  //   handleSaveHeader();
-                  setIsCreateInvoiceModalOpen(true);
-                }}
-                // className={COLORS.ADD_BUTTON}
-              >
-                + Add Proforma Invoice
-              </Button>
-            </div>
+          </div>
           </div>
         ) : (
           <div
@@ -389,14 +514,14 @@ function AccountProformaInvoiceManagementList({
           <div
             className={
               userPreference.isLeftMenu
-                ? `ag-theme-balham w-full ${
+                ? `w-full ${
                     isUsedForSidebar
-                      ? "h-[calc(100vh-120px)]"
+                      ? "h-[calc(100vh-278px)]"
                       : isUsedForSidebar
                         ? "h-[calc(40vh-100px)]"
                         : "h-[calc(50vh-120px)]"
                   }`
-                : `ag-theme-balham w-full ${
+                : `w-full ${
                     isUsedForSidebar
                       ? "h-[calc(100vh-122px)]"
                       : isUsedForSidebar
@@ -420,7 +545,7 @@ function AccountProformaInvoiceManagementList({
             isOpen={isCreateInvoiceModalOpen}
             onClose={() => setIsCreateInvoiceModalOpen(false)}
             account={account} // 👉 pass account if page is account-specific
-            handleAddInvoice={handleAddProformaInvoice}
+             handleAddInvoice={refreshAllData}
           />
         </div>
 

@@ -9,6 +9,7 @@ import { useEffect } from "react";
 import LOCALSTORAGE_KEYS from "../../constants/LocalStorage";
 import { useSearchParams } from "react-router-dom";
 import { useZoomMeetingContext } from "../../context/meeting/ZoomMeetingContext";
+import POST_API from "../../constants/PostApi";
 
 function ZoomMeetingsOAuthConsent() {
   const { loginStatus } = useLoggedInUserContext();
@@ -30,8 +31,8 @@ function ZoomMeetingsOAuthConsent() {
       STRING_VALUES.ZOOM_MEETINGS,
     );
     setZoomMeetingStatus({ isConnected: false });
-    const baseUrl =
-      "http://localhost:8080/api/main/purple-crm-api/authentication/zoom";
+    const baseUrl =  `${POST_API.ZOOM_MEET_CONNECT}`
+      // "http://localhost:8080/api/main/purple-crm-api/authentication/zoom";
     const params = new URLSearchParams();
     params.append("company_id", loginStatus.companyId.toString());
     params.append("company_user_id", loginStatus.id.toString());
@@ -43,47 +44,8 @@ function ZoomMeetingsOAuthConsent() {
     window.location.href = `${baseUrl}?${params}`;
   };
 
-  // const handleZoomMeetingOAuthCallback = (
-  //   codeString: string,
-  //   stateString: string,
-  // ) => {
-  //   const zoomMeetingCallbackPostData = {
-  //     code: codeString,
-  //     state: stateString,
-  //     redirect_url: window.location.origin + window.location.pathname,
-  //   };
-
-  //   axios
-  //     .post(POST_API.ZOOM_MEETINGS_CALLBACK, zoomMeetingCallbackPostData, {
-  //       withCredentials: true,
-  //     })
-  //     .then((response) => {
-  //       if (response.status === STATUS_CODE.OK) {
-  //         setZoomMeetingStatus({
-  //           isConnected: true,
-  //         });
-
-  //         const newUrl = window.location.pathname;
-  //         window.history.replaceState(null, "", newUrl);
-  //       }
-  //       handleClose(true);
-  //     });
-  // };
-
-  // useEffect(() => {
-  //   if (code && state) {
-  //     const redirectPlatform = localStorage.getItem(
-  //       LOCALSTORAGE_KEYS.REDIRECT_PLATFORM,
-  //     );
-
-  //     if (
-  //       !zoomMeetingStatus.isConnected &&
-  //       redirectPlatform === STRING_VALUES.ZOOM_MEETINGS
-  //     ) {
-  //       handleZoomMeetingOAuthCallback(code, state);
-  //     }
-  //   }
-  // }, []);
+  
+ 
 
   useEffect(() => {
     const zoomStatus = searchParams.get("zoom");

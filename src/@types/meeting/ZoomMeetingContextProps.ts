@@ -7,6 +7,7 @@ export type ZoomMeetingContextProps = {
   setZoomMeetingStatus: (
     googleMeetStatusState: ZoomMeetingContextState,
   ) => void;
+   refreshZoomMeetingStatus: () => Promise<void>;
 };
 
 export default ZoomMeetingContextProps;

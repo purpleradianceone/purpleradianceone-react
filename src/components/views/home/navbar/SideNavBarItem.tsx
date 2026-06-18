@@ -3,6 +3,7 @@ import React, { useState, useRef, useEffect } from "react";
 import SideNavBarItemProps from "../../../../@types/home/navbar/SideNavBarItemProps";
 import { useLocation } from "react-router-dom";
 
+
 function SideNavBarItem({
   icon: Icon,
   label,
@@ -11,6 +12,8 @@ function SideNavBarItem({
   onClick,
   disabled,
   isActive,
+   iconColor,
+  bgColor,
 }: SideNavBarItemProps) {
   const [expanded, setExpanded] = useState(false);
   const [isTooltipVisible, setIsTooltipVisible] = useState(false);
@@ -66,11 +69,12 @@ function SideNavBarItem({
     }
   };
 
+
   const baseClasses =
-    "w-full flex items-center px-4 py-2.5 table-header-custom rounded-lg";
-  const hoverClasses = "hover:bg-blue-50";
-  const iconActiveClasses = "table-header-custom-blue";
-  const iconBaseClasses = "table-header-custom";
+    "w-full flex items-center px-4 py-1 table-header-custom rounded-lg";
+  const hoverClasses = "hover:bg-violet-100";
+  const iconActiveClasses = "table-header-custom";
+  const iconBaseClasses = "table-header-custom text-gray-600";
 
   if (disabled) {
     // Disabled state
@@ -173,19 +177,39 @@ function SideNavBarItem({
             <button
              ref={buttonRef}
               onClick={() => (children ? setExpanded(!expanded) : onClick?.())}
-              className={`${baseClasses} ${hoverClasses} text-gray-700 ${isActive ? "bg-blue-100 font-semibold" : ""}`}
+             className={`${baseClasses} ${hoverClasses} text-gray-700 ${
+  isActive && label !== "App Settings"
+    ? "bg-[#F3EEFF] font-semibold"
+    : ""
+}`}
             >
-              <div className="flex items-center">
+              <div className="flex items-center gap-3">
+              <div
+                className="flex items-center justify-center w-8 h-8 rounded-lg"
+                style={{
+                  backgroundColor: bgColor || "#F3F4F6",
+                }}
+              >
                 <Icon
                   size={20}
-                  className={`mr-3 ${isIconActive ? iconActiveClasses : iconBaseClasses}`}
+                  style={{
+                    color: iconColor || "#4F46E5",
+                  }}
                 />
-                <span
-                  className={`${isIconActive ? iconActiveClasses : iconBaseClasses}`}
-                >
-                  {label}
-                </span>
               </div>
+
+                    <span
+          className={
+            label === "App Settings" && isIconActive
+              ? "text-violet-600 font-semibold"
+              : isIconActive
+              ? iconActiveClasses
+              : iconBaseClasses
+          }
+        >
+          {label}
+        </span>
+            </div>
               {/* {children && (
                 <ChevronDown
                   size={20}
@@ -197,12 +221,16 @@ function SideNavBarItem({
             <button
               ref={buttonRef}
               onClick={onClick}
-              className={`w-full cursor-pointer flex items-center justify-center px-0 py-2.5 rounded-lg ${hoverClasses} ${isIconActive ? "bg-blue-100" : ""}`}
+              className={`w-full cursor-pointer flex items-center justify-center px-0 py-2.5 rounded-lg ${hoverClasses} ${isIconActive ? "bg-[#F3EEFF] rounded-lg" : ""}`}
             >
               <Icon
-                size={20}
-                className={`${isIconActive ? iconActiveClasses : iconBaseClasses}`}
-              />
+  size={20}
+  style={{
+    color: isIconActive ? "#6C4CF1" : undefined,
+  }}
+  className={`${isIconActive ? iconActiveClasses : iconBaseClasses}`}
+/>
+              
               {/* {isOpen && (
                 <span
                   className={`${isIconActive ? iconActiveClasses : iconBaseClasses}`}

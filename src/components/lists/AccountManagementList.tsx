@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Building2, Calendar, CalendarDays, CalendarRange, Plus, UserRoundCogIcon } from "lucide-react";
+import { Building, Building2, Calendar, CalendarDays, CalendarRange, Plus, UserRoundCogIcon } from "lucide-react";
 import { usePanel } from "../../context/panel/usePanel";
 import SearchInput from "../ui/SearchInput";
 import HandleSearchOptionProps from "../../@types/company-users/HandleSearchOptionProps";
@@ -174,15 +174,21 @@ const refreshAllData = useCallback(async () => {
 
        {/* Top Header */}
         <div className="flex items-start justify-between ">
-          <div>
-            <h1 className="page-header-custom tracking-tight pb-0.5">
-              Accounts
-            </h1>
+             {/* Header */} 
+            <div className="flex items-center gap-3 ">
+              <div className={`p-2 rounded-lg ${COLORS.PAGE_HEADER_SECTION_BG_COLOR}`}>
+              <Building className={COLORS.PAGE_HEADER_ICONS_COLOR_AND_SIZE} />
+            </div>
 
-            <p className="page-subtitle-custom ">
-              Manage all your accounts and organization in one place.
+              <div>
+                <h1 className="page-header-custom tracking-tight pb-0.5">
+               Accounts
+            </h1>
+              <p className="page-subtitle-custom ">
+               Manage all your accounts and organization in one place.
             </p>
-          </div>
+              </div>
+            </div>
 
           <div className="flex gap-2 pt-1">
           {!isUsedForAccountLead && (
@@ -253,8 +259,8 @@ const refreshAllData = useCallback(async () => {
             count: accountSummary.total_account,
             subtitle: "All Accounts",
             icon: Building2,
-            iconBg: "bg-blue-100",
-            iconColor: "text-blue-600",
+            iconBg: "bg-violet-100",
+            iconColor: "text-violet-600",
           },
 
           {
@@ -271,8 +277,8 @@ const refreshAllData = useCallback(async () => {
             count: accountSummary.total_account_created_last_month,
             subtitle: "Previous Month Activity",
             icon: CalendarRange,
-            iconBg: "bg-violet-100",
-            iconColor: "text-violet-600",
+            iconBg: "bg-blue-100",
+            iconColor: "text-blue-600",
           },
         ]}
       />

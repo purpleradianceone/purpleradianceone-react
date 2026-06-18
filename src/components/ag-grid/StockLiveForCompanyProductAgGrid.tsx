@@ -1,13 +1,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { AllCommunityModule, ColDef, themeBalham } from "ag-grid-community";
+import { AllCommunityModule, ColDef, } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 import {
   ActionTypeForStockMOdule,
+  AGGRID,
 } from "../../constants/AppConstants";
 import LiveStockForCompanyProduct from "../../@types/stock/LiveStockForCompanyProduct";
 import { useMemo, useRef } from "react";
 import { useUserAccessModules } from "../../config/hooks/useAccessModules";
 import { SkeletonRowsAgGrid } from "../ui/SkeletonRowsAgGrid";
+import { Eye, Package } from "lucide-react";
+import AgGridProfileCell from "../ui/AgGridProfileCell";
 
 const StockLiveForCompanyProductAgGrid = ({
   data,
@@ -34,7 +37,14 @@ const StockLiveForCompanyProductAgGrid = ({
         cellStyle:{
           color : "black",
           fontWeight: "bold",
-        }
+        },
+        cellRenderer: (params: any) => (
+      <AgGridProfileCell
+        primaryText={params.value}
+        icon={<Package size={16} />}
+      />
+    ),
+        
       },
       {
         hide: true,
@@ -107,32 +117,34 @@ const StockLiveForCompanyProductAgGrid = ({
         headerName: "Actions",
         field: "",
         pinned: "right",
-        maxWidth: 80,
+        maxWidth: 100,
+        filter: false,
         cellRenderer: (params: LiveStockForCompanyProduct | any) => {
            if (params.data?.__isSkeleton) {
                 return <SkeletonRowsAgGrid />;
               }
           return (
-            <div className="flex items-center justify-center">
-              <button
-                type="button"
-                disabled={!userHasAccessToAddStock}
-                className={`px-2 py-1 rounded text-sm
-            ${
-              userHasAccessToAddStock
-                ? "bg-blue-500 text-white hover:bg-blue-600"
-                : "bg-gray-200 text-gray-400 cursor-not-allowed opacity-60"
-            }`}
-                onClick={() => {
-                  if (!userHasAccessToAddStock) return;
+      <div className="flex items-center justify-center">
+       
+        <span
+          className="lead-details"
+          onClick={() => {
+            if (!userHasAccessToAddStock) return;
 
-                  params.context.handleRowSelect(params.data);
-                }}
-              >
-                {"Add Stock"}
-              </button>
-            </div>
-          );
+            params.context.handleRowSelect(params.data);
+          }}
+          style={{
+            opacity: userHasAccessToAddStock ? 1 : 0.5,
+            cursor: userHasAccessToAddStock
+              ? "pointer"
+              : "not-allowed",
+          }}
+        >
+           <Eye size={12} strokeWidth={1.5} />
+          Add Stock
+        </span>
+      </div>
+    );
         },
       },
     ],
@@ -166,7 +178,7 @@ const StockLiveForCompanyProductAgGrid = ({
 
   return (
     <div
-      className="ag-theme-balham w-full"
+      className="modern-user-grid custom-height-scrollbar w-full"
       style={{ height: "100%", width: "100%" }}
     >
       <AgGridReact
@@ -175,7 +187,8 @@ const StockLiveForCompanyProductAgGrid = ({
         columnDefs={columnDefs}
         defaultColDef={defaultColDef}
         modules={[AllCommunityModule]}
-        theme={themeBalham}
+        rowHeight={AGGRID.ROW_HEIGHT}
+        headerHeight={AGGRID.HEADER_HEIGHT}
         // overlayNoRowsTemplate={INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
         context={{ handleRowSelect: isDataLoading ? undefined : onRowSelect }}
         onRowClicked={ isDataLoading ? undefined : handleRowClick}
