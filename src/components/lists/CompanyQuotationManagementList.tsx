@@ -61,6 +61,8 @@ function CompanyQuotationManagementList({
   } = useUserAccessModules();
   const { loginStatus } = useLoggedInUserContext();
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
+  const [isSummaryLoading, setIsSummaryLoading] = useState(false);
+
   const [showCompanyLogoPreview, setShowCompanyLogoPreview] = useState(false);
   const [quotationFileName, setQuotationFileName] = useState<string>();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -194,6 +196,8 @@ function CompanyQuotationManagementList({
 
   const fetchQuotationSummary = async () => {
   try {
+   setIsSummaryLoading(true);
+
     const postData = {
       company_id: loginStatus.companyId,
       requestedby: loginStatus.id,
@@ -212,6 +216,8 @@ function CompanyQuotationManagementList({
     }
   } catch (error) {
     console.error(error);
+  }finally {
+    setIsSummaryLoading(false);
   }
 };
 
@@ -292,15 +298,15 @@ useEffect(() => {
           <SummaryCards
             cardGap={15}
             width="80%"
-            loading={isDataLoading}
+              loading={isSummaryLoading}
             cards={[
               {
                 title: "Total Quotations",
                 count: quotationSummary.total_quotation,
                 subtitle: "All quotations",
                 icon: FileText,
-                iconBg: "bg-violet-100",
-                iconColor: "text-violet-700",
+                iconBg: COLORS.LIGHT_PURPLE_BACKGROUND,
+                iconColor: COLORS.PRIMARY_PURPLE,
                
               },
               {

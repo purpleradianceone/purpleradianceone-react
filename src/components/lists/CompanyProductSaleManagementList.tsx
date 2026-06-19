@@ -247,8 +247,8 @@ const revenueChartData = revenueTrend.map((item) => ({
                 summaryCards?.total_transactions_current_month ?? 0,
               subtitle: "Transactions This Month",
               icon: ShoppingCart,
-              iconBg: "bg-violet-100",
-              iconColor: "text-violet-600",
+              iconBg: COLORS.LIGHT_PURPLE_BACKGROUND,
+              iconColor: COLORS.PRIMARY_PURPLE,
             },
 
             {

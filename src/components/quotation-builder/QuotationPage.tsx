@@ -486,7 +486,7 @@ export const QuotationPage: React.FC = () => {
             <QuotationIconSvg
               strokeWidth={2}
               size={24}
-              className="text-blue-600"
+              className={`${COLORS.PRIMARY_PURPLE}`}
               showCurrency={true}
             />
             <span className="section-header-custom">Quotation Template</span>

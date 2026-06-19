@@ -65,6 +65,7 @@ function AccountInvoiceManagementList({
   const [isCreateInvoiceModalOpen, setIsCreateInvoiceModalOpen] =
     useState<boolean>(false);
 
+      const [isSummaryLoading, setIsSummaryLoading] = useState(false);
   const { dateRangeDropdownOptions } = useComapanySpecificSearchDateRange();
 
   const {
@@ -86,6 +87,8 @@ const [invoiceSummary, setInvoiceSummary] =
 
   const fetchInvoiceSummary = useCallback(async () => {
   try {
+       setIsSummaryLoading(true);
+
     const postData = {
       company_id: loginStatus.companyId,
       requestedby: loginStatus.id,
@@ -104,8 +107,11 @@ const [invoiceSummary, setInvoiceSummary] =
     }
   } catch (error) {
     console.error(error);
+  }finally {
+    setIsSummaryLoading(false);
   }
 }, [loginStatus.companyId, loginStatus.id]);
+
 
 useEffect(() => {
   if (loginStatus.companyId && loginStatus.id) {
@@ -337,15 +343,15 @@ const refreshAllData = useCallback(async () => {
                 cardGap={20}
                 width="75%"
                 gridCols={4}
-                loading={gridLoading}
+               loading={isSummaryLoading}
                 cards={[
                   {
                     title: "Total Invoices",
                     count: invoiceSummary.total_company_invoice_this_month,
                     subtitle: "Created This Month",
                     icon: FileText,
-                    iconBg: "bg-violet-100",
-                    iconColor: "text-violet-600",
+                    iconBg: COLORS.LIGHT_PURPLE_BACKGROUND,
+                    iconColor: COLORS.PRIMARY_PURPLE,
                   },
 
                   {

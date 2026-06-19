@@ -420,9 +420,8 @@
 
 .modern-user-grid .ag-cell-value .lead-details:hover {
   background: #eff6ff;
-
-  border-color: #469fff;
-  color: #007bff;
+  border-color: #6C4CF1;
+  color: #5B21B6;
   transform: translateY(-1px);
 }
 

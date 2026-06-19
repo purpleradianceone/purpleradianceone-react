@@ -1,4 +1,5 @@
 import { ReactNode } from "react";
+import COLORS from "../../constants/Colors";
 
 interface AgGridProfileCellProps {
   primaryText?: string;
@@ -31,18 +32,8 @@ function AgGridProfileCell({
   return (
     <div className="flex items-center gap-3 h-full overflow-hidden">
       <div
-        className="
-          w-8 h-8
-          rounded-full
-          bg-violet-100
-          text-violet-700
-          text-xs
-          font-semibold
-          flex
-          items-center
-          justify-center
-          flex-shrink-0
-        "
+        className={`w-8 h-8 rounded-full ${COLORS.LIGHT_PURPLE_BACKGROUND} ${COLORS.PRIMARY_PURPLE} text-xs font-semibold 
+        flex items-center justify-center flex-shrink-0`}
       >
         {icon || initials}
       </div>

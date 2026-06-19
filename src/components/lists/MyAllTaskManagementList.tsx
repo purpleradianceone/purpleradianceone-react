@@ -64,6 +64,8 @@ function MyAllTaskManagementList({
   const { isLargeScreen, isMediumScreen, } = useScreenSize();
   const { dateRangeDropdownOptions } = useComapanySpecificSearchDateRange();
   const { userPreference } = useUserPreference();
+  const [isSummaryLoading, setIsSummaryLoading] = useState(false);
+
 
   const {
     handleDateRangeIdChange,
@@ -97,6 +99,8 @@ function MyAllTaskManagementList({
 
 const fetchTaskSummary = async () => {
   try {
+       setIsSummaryLoading(true);
+
     const postData = {
   company_id: loginStatus.companyId,
   requestedby: loginStatus.id,
@@ -115,6 +119,8 @@ const fetchTaskSummary = async () => {
     }
   } catch (error: any) {
     handleApiError(error);
+  }finally {
+    setIsSummaryLoading(false);
   }
 };
 
@@ -327,16 +333,15 @@ useEffect(() => {
           cardCss="bg-white border border-slate-200 rounded-2xl px-5 py-1.5 shadow-sm flex items-center justify-between gap-2 hover:shadow-md transition-all"
           showGraph
           cardGap={40}
-          loading={gridLoading}
+          loading={isSummaryLoading}
           cards={[
             {
               title: "My Tasks",
               count: taskSummary.total_task_assigned,
               subtitle: "Tasks assigned to you",
               icon: ListTodo,
-              iconBg: "bg-violet-100",
-              iconColor: "text-violet-600",
-              graphColor: "bg-violet-500",
+              iconBg: COLORS.LIGHT_PURPLE_BACKGROUND,
+              iconColor: COLORS.PRIMARY_PURPLE,
             },
 
             {
@@ -443,7 +448,7 @@ useEffect(() => {
 
                     {/* All Task FILTERS */}
                     {isUsedInAllTasksModule && (
-                      <div className="flex flex-wrap gap-4 w-full md:w-auto">
+                      <div className="flex flex-wrap gap-1 w-full md:w-auto">
                         {/* Source */}
                         <div className="min-w-[150px]">
                           <CustomDropdown
