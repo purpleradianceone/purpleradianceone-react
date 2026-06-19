@@ -83,6 +83,8 @@ function SupportTicketManagementList({
   const [isCreateSupportTicketModalOpen, setIsCreateSupportTicketModalOpen] =
     useState<boolean>(searchParams.get("fromDashboard") === "true");
 
+  const [isSummaryLoading, setIsSummaryLoading] = useState(false);
+
   const [selectedSupportTicketForEdit, setSelectedSupportTicketForEdit] =
     useState<SupportTicketProps>({
       count: 0,
@@ -134,6 +136,8 @@ const [supportTicketSummary, setSupportTicketSummary] =
 
 const fetchSupportTicketSummary = useCallback(async () => {
   try {
+        setIsSummaryLoading(true);
+
     const postData = {
       company_id: loginStatus.companyId,
       requestedby: loginStatus.id,
@@ -152,6 +156,8 @@ const fetchSupportTicketSummary = useCallback(async () => {
     }
   } catch (error) {
     console.error(error);
+  }finally {
+    setIsSummaryLoading(false);
   }
 }, [loginStatus.companyId, loginStatus.id]);
 
@@ -297,15 +303,15 @@ useEffect(() => {
               cardGap={15}
               width="100%"
               gridCols={5}
-              loading={isDataLoading}
+              loading={isSummaryLoading}
               cards={[
                 {
                   title: "Total Tickets",
                   count: supportTicketSummary.total_support_tickets,
                   subtitle: "All Support Tickets",
                   icon: Ticket,
-                  iconBg: "bg-violet-100",
-                  iconColor: "text-violet-600",
+                 iconBg: COLORS.LIGHT_PURPLE_BACKGROUND,
+                  iconColor: COLORS.PRIMARY_PURPLE,
                 },
 
                 {
