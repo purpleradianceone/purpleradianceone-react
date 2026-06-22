@@ -1,14 +1,17 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { AllCommunityModule, ColDef, themeBalham } from "ag-grid-community";
+import { AllCommunityModule, ColDef,  } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 import { useMemo, useRef } from "react";
-import { INNERHTML, JSX_CHILDREN_NAME } from "../../constants/AppConstants";
+import {  JSX_CHILDREN_NAME } from "../../constants/AppConstants";
 import AccountServiceProps from "../../@types/account/AccountServiceProps";
 import StatusIndicator from "../ui/StatusIndicator";
 import AccountSubscriptionManagementGridProps from "../../@types/ag-grid/AccountSubscriptionManagementAgGridProps";
 import Button from "../ui/Button";
 import COLORS from "../../constants/Colors";
+import { Eye } from "lucide-react";
+import RenderUserWithIcon from "../ui/UserAgGridCellRenderer";
+import StatusBadge from "../ui/StatusBadge";
 
 function AccountSubscriptionManagementAgGrid({
   accountSubscriptions,
@@ -27,6 +30,11 @@ function AccountSubscriptionManagementAgGrid({
         field: "accountSubscriptionCode",
         headerName: "Code",
         minWidth: 130,
+         cellStyle: () => ({
+          fontSize: "14px",
+          fontWeight: 600,
+          color: "#1f2937",
+        }),
       },
 
       {
@@ -78,7 +86,7 @@ function AccountSubscriptionManagementAgGrid({
                     params.context.handleAddToInvoice(params.data);
                   }}
                 >
-                  Add to Invoice
+                  + Add to Invoice
                 </Button>
               )}
             </div>
@@ -108,7 +116,7 @@ function AccountSubscriptionManagementAgGrid({
         cellRenderer: (params: any) => {
           return (
             <div className="flex items-center text-sm gap-1 mt-1">
-              <StatusIndicator isActive={params.value} />
+              <StatusBadge isActive={params.value} />
             </div>
           );
         },
@@ -117,6 +125,7 @@ function AccountSubscriptionManagementAgGrid({
         field: "createdBy",
         headerName: "Created By",
         filter: true,
+        cellRenderer: RenderUserWithIcon,
       },
       {
         field: "createdOn",
@@ -144,7 +153,8 @@ function AccountSubscriptionManagementAgGrid({
         headerName: "Actions",
         field: "view",
         pinned: "right",
-        maxWidth: 80,
+        maxWidth: 90,
+        filter: false,
         // minWidth:80,
         // autoHeight: true,
         // suppressSizeToFit: true,
@@ -157,7 +167,10 @@ function AccountSubscriptionManagementAgGrid({
                   params.context.handleRowSelect(params.data);
                 }}
               >
+                <Eye size={12} strokeWidth={1.5} />
+                 <span>
                 {isUsedInSupportTicketModule ? "Select" : "Details"}
+                </span>
               </span>
             </div>
           );
@@ -180,7 +193,7 @@ function AccountSubscriptionManagementAgGrid({
 
   return (
     <div
-      className="ag-theme-balham w-full"
+      className="w-full modern-user-grid custom-height-scrollbar"
       style={{ height: "100%", width: "100%" }}
     >
       <AgGridReact
@@ -189,8 +202,8 @@ function AccountSubscriptionManagementAgGrid({
         columnDefs={columnDefs}
         defaultColDef={defaultColDef}
         modules={[AllCommunityModule]}
-        theme={themeBalham}
-        overlayNoRowsTemplate={INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
+        // theme={themeBalham}
+        // overlayNoRowsTemplate={INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
         context={{
           handleRowSelect: onRowSelect,
           handleAddToInvoice: handleAddToInvoice,

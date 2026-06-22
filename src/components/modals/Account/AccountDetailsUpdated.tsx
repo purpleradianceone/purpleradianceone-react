@@ -43,6 +43,7 @@ import { toSelectOptions } from "../../../utils/toSelectOption";
 import TextAreaInput from "../../ui/TextAreaInput";
 import { handleApiError } from "../../../config/error/handleApiError";
 import { updateAccount } from "../../../config/apis/AccountApis";
+import COLORS from "../../../constants/Colors";
 
 const AccountDetailsUpdated: React.FC = () => {
   const location = useLocation();
@@ -102,6 +103,11 @@ const AccountDetailsUpdated: React.FC = () => {
   const [activeTab, setActiveTab] = useState<
     "primary contact" | "legal" | "address" | "details"
   >("details");
+  const activeClass =
+  `border-violet-500 table-header-custom ${COLORS.PRIMARY_PURPLE}`;
+
+const inactiveClass =
+  "border-transparent table-header-custom";
 
   const { industryTypeData, loading: isIndustryTypeLoading } =
     useIndustryType();
@@ -511,7 +517,7 @@ const AccountDetailsUpdated: React.FC = () => {
     switch (activeTab) {
       case "details":
         return (
-          <div className="grid grid-cols-2 gap-2 p-1">
+          <div className="grid grid-cols-2 gap-2 p-1 ">
             <div className="space-y-0">
               <h3 className="font-medium text-slate-700 flex items-center">
                 <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
@@ -540,10 +546,10 @@ const AccountDetailsUpdated: React.FC = () => {
                   />
                 </div>
               </div>
-            </div>
+            </div>     
             <div className="space-y-0">
               <h3 className="font-medium text-slate-700 flex items-center">
-                <div className="w-2 h-2 bg-purple-500 rounded-full mr-2"></div>
+                <div className="w-2 h-2 bg-violet-500 rounded-full mr-2"></div>
                 <span className="caption-custom">Country</span>
               </h3>
               <div className="text-sm text-slate-600 bg-white p-1 rounded-lg border border-green-100">
@@ -778,7 +784,7 @@ const AccountDetailsUpdated: React.FC = () => {
             <div className="col-span-2 flex justify-between p-1 bg-slate-50 border rounded-xl px-2 hover:shadow-sm transition">
               {!isEditing && (
                 <div className="flex items-center gap-2">
-                  <Mail className="h-5 w-5 text-blue-600" />
+                  <Mail className="h-5 w-5 text-violet-600" />
                 </div>
               )}
               <div className="truncate pl-3 w-full overflow-hidden">
@@ -1025,7 +1031,7 @@ const AccountDetailsUpdated: React.FC = () => {
                 </>
               )}
             </div>
-            <div className="p-2 bg-purple-50 rounded-lg border border-purple-100">
+            <div className="p-2 bg-violet-50 rounded-lg border border-violet-100">
               {!isEditing && (
                 <p className="input-label-custom-active-tab mb-1 flex items-center gap-1">
                   <Scale size={SIZE.LUCIDE_LOGO_INPUT_LABEL_SIZE} /> TAN
@@ -1199,12 +1205,12 @@ const AccountDetailsUpdated: React.FC = () => {
             </div>
             <div className="space-y-1">
               <h3 className="font-medium text-slate-700 flex items-center">
-                <div className="w-2 h-2 bg-purple-500 rounded-full mr-2"></div>
+                <div className="w-2 h-2 bg-violet-500 rounded-full mr-2"></div>
                 <span className="caption-custom">
                   Registered Office Address
                 </span>
               </h3>
-              <div className="text-sm text-slate-600 bg-purple-50 p-2 rounded-lg border border-purple-100">
+              <div className="text-sm text-slate-600 bg-violet-50 p-2 rounded-lg border border-violet-100">
                 {/* {renderEditableField(
                   "registeredOfficeAddress",
                   formData.registeredOfficeAddress,
@@ -1257,21 +1263,15 @@ const AccountDetailsUpdated: React.FC = () => {
       {/* Main Content Grid */}
       <div className="grid sm:grid-cols-1 md:grid-cols-1    gap-1">
         {/* Left Card with Tabs */}
-        <div className="bg-white rounded-xl  border-slate-200">
-          <div className="col-span-2 bg-white  flex items-center justify-between rounded-lg  p-1  mb-1 border">
+        <div className="bg-white rounded-xl border-slate-200">
+          <div className="col-span-2 bg-white flex items-center justify-between p-1 mb-1 border-b border-gray-100">
            
                  {/* header name and logo */}
             <div className="flex items-start w-[70%]  justify-between p-1">
               <div className="flex w-full items-center space-x-3">
-                <div
-                  className={`p-2 rounded-md ${
-                    formData.isActive
-                      ? "bg-gradient-to-br from-blue-500 to-indigo-600"
-                      : "bg-gradient-to-br from-red-500 to-amber-600"
-                  }`}
-                >
-                  <Building2 className="h-6 w-6 text-white" />
-                </div>
+                <div className={`w-12 h-11 rounded-lg ${COLORS.PRIMARY_PURPLE_BACKGROUND} flex items-center justify-center`}>
+                <Building2 className="w-6 h-6 text-white" />
+            </div>
                 <div className="w-full bg-pink-00  justify-between items-center gap-1">
                   {isEditing ? (
                     <div className="w-full">
@@ -1329,7 +1329,10 @@ const AccountDetailsUpdated: React.FC = () => {
                         }
                       }}
                     >
-                      <button className="bg-blue-500  flex items-center h-[20px] px-1  rounded text-white">  Edit</button>
+                      <button className={`flex items-center h-[20px] p-1 ${COLORS.PRIMARY_PURPLE} font-medium rounded border gap-1 ${COLORS.LIGHT_PURPLE_HOVER}
+                        border-violet-200`}> 
+                        <Pen size={10}/>
+                        Edit</button>
                     </div>
                   )}
                   {isEditing && (
@@ -1346,33 +1349,34 @@ const AccountDetailsUpdated: React.FC = () => {
                         className="cursor-pointer caption-custom-blue "
                         // onClick={handleSaveAccountDetails}
                       >
-                        <button type="submit" className="bg-blue-600  flex items-center h-[20px] px-1  rounded text-white">Save</button>
+                        <button type="submit" className={`${COLORS.PRIMARY_PURPLE_BACKGROUND} flex items-center h-[20px] px-1 rounded text-white`}>Save</button>
                       </div>
                     </div>
                   )}
                  </div>
           </div>
           {/* Tab Navigation */}
-          <div className="flex border-b  border-gray-200 ">
+          <div className="flex border-b border-gray-200 ">
             <button
             type="button"
               onClick={() => setActiveTab("details")}
               className={`flex items-center px-4  rounded-t-lg border-b-2 ${
                 activeTab === "details"
-                  ? "border-teal-600 table-header-custom active"
-                  : "border-transparent table-header-custom"
+                   ? activeClass
+                    : inactiveClass
               }`}
             >
               <FileText className="h-4 w-4 mr-2" />
               Details
             </button>
+            
             <button
             type="button"
               onClick={() => setActiveTab("primary contact")}
               className={`flex items-center px-2 rounded-t-lg border-b-2 ${
                 activeTab === "primary contact"
-                  ? "border-teal-600 table-header-custom active"
-                  : "border-transparent table-header-custom"
+                   ? activeClass
+                   : inactiveClass
               }`}
             >
               <Mail className="h-4 w-4 mr-2" />
@@ -1383,8 +1387,8 @@ const AccountDetailsUpdated: React.FC = () => {
               onClick={() => setActiveTab("legal")}
               className={`flex items-center px-4  p-0.5 rounded-t-lg border-b-2 ${
                 activeTab === "legal"
-                  ? "border-teal-600 table-header-custom active"
-                  : "border-transparent table-header-custom"
+                   ? activeClass
+                    : inactiveClass
               }`}
             >
               <FileText className="h-4 w-4 mr-2" />
@@ -1395,8 +1399,8 @@ const AccountDetailsUpdated: React.FC = () => {
               onClick={() => setActiveTab("address")}
               className={`flex items-center px-4 py-0.5 rounded-t-lg border-b-2 ${
                 activeTab === "address"
-                  ? "border-teal-600 table-header-custom active"
-                  : "border-transparent table-header-custom"
+                   ? activeClass
+                   : inactiveClass
               }`}
             >
               <MapPin className="h-4 w-4 mr-2" />
@@ -1416,7 +1420,7 @@ const AccountDetailsSkeleton = () => {
   return (
     <div className="w-full  bg-white rounded-xl shadow-sm border p-4 animate-pulse">
       {/* Header */}
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex justify-between items-start p-5">
         <div className="h-5 w-64 bg-gray-200 rounded-md" />
         <div className="h-4 w-10 bg-gray-200 rounded-md" />
       </div>

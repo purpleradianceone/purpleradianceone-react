@@ -1,6 +1,17 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { ChevronRight, Download, FileText, Flag, Save } from "lucide-react";
+import {
+  AlignLeft,
+  Calendar,
+  CalendarCheck,
+  CalendarDays,
+  ChevronRight,
+  Download,
+  FileText,
+  Flag,
+  Save,
+  User,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { Link, useParams } from "react-router-dom";
@@ -16,12 +27,13 @@ import ROUTES_URL from "../../../constants/Routes";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
 import CustomDropdown from "../../modals/leads/CustomDropdown";
 import Button from "../../ui/Button";
-import MetaField from "../../ui/MetaField";
 import TaskPriorityChip from "../../ui/TaskPriorityChip";
 import TextAreaInput from "../../ui/TextAreaInput";
 import LoadingPopUpAnimation from "../card/LoadingPopUpAnimation";
 import AccessDeniedPopup from "../not-found/AccessDeniedPage";
 import CustomDocumentPreviewComponent from "../../custom-document-preview-component/CustomDocumentPreviewComponent";
+import COLORS from "../../../constants/Colors";
+import MetaInfoItem from "../../ui/MetaInfoItem";
 
 function GeneralTask() {
   const { loginStatus } = useLoggedInUserContext();
@@ -258,14 +270,12 @@ function GeneralTask() {
     getMasterTaskData();
   }, [taskId, masterId]);
 
- 
-
   /* ---------- UI ---------- */
   return (
     <>
       {userHasAccessToUpdateAllTasks ? (
-        <div className=" w-full h-[100vh] pl-5 pt-2 ">
-          <div className=" sticky top-10 z-10 bg-slate-100 flex text-center justify-start items-center gap-3 ml-0.5 ">
+        <div className="w-full min-h-screen bg-slate-50 pl-5">
+          <div className=" sticky top-10 z-10 bg-slate-100 h-8 flex text-center justify-start items-center gap-3 ml-0.5 ">
             <Link to={ROUTES_URL.TASKS_MANAGEMENT}>
               <Button className="caption-custom flex items-center justify-center hover:text-gray-800">
                 My Tasks
@@ -274,31 +284,50 @@ function GeneralTask() {
             <ChevronRight size={16} />
             <h1 className="table-header-custom">My Task Details</h1>
           </div>
-          <div className=" grid grid-cols-2 gap-1 p-4">
-            <div className=" bg-gray-50 w-full  rounded">
+          <div className="grid md:grid-cols-[1.2fr_1.1fr] grid-cols-1 gap-6 p-4">
+            <div>
               {isSubmitting && <LoadingPopUpAnimation show={isSubmitting} />}
               {isLoadingTask && !selectedGeneralTask ? (
                 <GeneralTaskSkeleton />
               ) : (
                 <>
-                  <div className=" bg-white border rounded-lg p-4 space-y-4 ">
+                  <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm h-full">
                     {/* HEADER */}
-                    <h1 className=" font-semibold text-gray-800 border-b pb-2 ">
-                      General Task Update
-                    </h1>
+                    <div className="flex items-center gap-3 pb-3 border-b border-slate-200">
+                      <div
+                        className={`w-10 h-10 rounded-lg ${COLORS.LIGHT_PURPLE_BACKGROUND} flex items-center justify-center`}
+                      >
+                        <FileText
+                          size={22}
+                          className={`${COLORS.PRIMARY_PURPLE}`}
+                        />
+                      </div>
+
+                      <div>
+                        <h2 className="page-header-custom !text-[16px] font-semibold ">
+                          General Task Update
+                        </h2>
+                      </div>
+                    </div>
                     {/* ROW */}
 
-                    <div className=" grid grid-cols-2 gap-3">
-                      <MetaField
+                    <div className="grid grid-cols-2 gap-y-4 mt-4">
+                      <MetaInfoItem
+                        icon={FileText}
                         label="Subject"
                         value={formData.subject}
+                        iconBgClass="bg-orange-50"
+                        iconColorClass="text-orange-600"
                         className="col-span-2"
                       />
                       <div className="col-span-2 flex items-start gap-6">
-                        <MetaField
-                          className="flex-1"
+                        <MetaInfoItem
+                          icon={AlignLeft}
                           label="Description"
                           value={selectedGeneralTask?.description}
+                          iconBgClass={COLORS.LIGHT_PURPLE_BACKGROUND}
+                          iconColorClass={COLORS.PRIMARY_PURPLE}
+                          className="col-span-2"
                         />
                         {generalMasterTask?.extension && (
                           <button
@@ -333,23 +362,24 @@ function GeneralTask() {
                         )}
                       </div>
                     </div>
-                    <div className="flex flex-1 gap-2">
-                      <div className="w-[65%] justify-end">
+                    <div className="grid grid-cols-1 lg:grid-cols-[2.4fr_1.5fr] mt-4 pb-5">
+                      <div className="w-[75%] justify-end  ">
                         <TextAreaInput
                           label="Remark"
-                          logo={FileText}
+                          // logo={FileText}
                           value={formData.remark}
+                          placeholder="Enter remark here...."
                           onChange={(e: any) => {
                             handleInputChange("remark", e.target.value);
                           }}
                           // onBlur={autoSave}
                           cols={5}
-                          rows={4}
+                          rows={3}
                         />
                       </div>
-                      <div className="flex-1">
+                      <div className="flex-1 pt-1">
                         <CustomDropdown
-                          logo={Flag}
+                          // logo={Flag}
                           labelName="Task Stage"
                           options={taskStage}
                           preselectedOption={formData.taskStageId}
@@ -359,7 +389,7 @@ function GeneralTask() {
                         />
                       </div>
                     </div>
-                    <div className="flex justify-end items-end border-t pt-2">
+                    <div className="flex justify-end border-t border-slate-200 pt-5 mt-2">
                       <div>
                         <Button
                           disabled={isSubmitting}
@@ -377,49 +407,114 @@ function GeneralTask() {
                 </>
               )}
             </div>
-            <div className=" w-full  px-2 rounded">
+            <div>
               {isLoadingTask && !selectedGeneralTask ? (
                 <GeneralTaskDetailsSkeleton />
               ) : (
-                <div className=" bg-white border rounded-lg p-4 space-y-4 ">
-                  <div className="grid grid-cols-2 gap-4 input-label-custom">
-                    <MetaField
-                      label="Task Type"
-                      value={selectedGeneralTask?.general_task_type_name}
-                    />
-                    <MetaField
-                      label="Due Date Time"
-                      value={selectedGeneralTask?.due_date_time}
-                    />
-                    <MetaField
-                      label="Completed Date"
-                      value={selectedGeneralTask?.completed_at_date_time}
-                    />
+                <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm h-full">
+                  {/* Header */}
+                  <div className="flex items-center gap-3 pb-3 border-b border-slate-200">
+                    <div
+                      className={`w-10 h-10 rounded-lg ${COLORS.LIGHT_PURPLE_BACKGROUND}
+                        flex items-center justify-center`}
+                    >
+                      <FileText size={22} className={COLORS.PRIMARY_PURPLE} />
+                    </div>
 
-                    <div>
-                      <label className="caption-custom flex">Priority</label>
-                      <TaskPriorityChip
-                        priorityName={
-                          selectedGeneralTask?.general_task_priority_name
-                        }
+                    <h2 className="page-header-custom !text-[16px] font-semibold">
+                      Task Information
+                    </h2>
+                  </div>
+
+                  {/* Information Grid */}
+                  <div className="grid grid-cols-2 gap-x-10 gap-y-2 mt-2 ">
+                    <div className="p-2 border-b border-slate-100">
+                      <MetaInfoItem
+                        icon={Flag}
+                        label="Task Type"
+                        value={selectedGeneralTask?.general_task_type_name}
+                        iconBgClass={COLORS.LIGHT_PURPLE_BACKGROUND}
+                        iconColorClass={COLORS.PRIMARY_PURPLE}
                       />
                     </div>
-                    <MetaField
-                      label="Created By"
-                      value={selectedGeneralTask?.createdby}
-                    />
-                    <MetaField
-                      label="Updated By"
-                      value={selectedGeneralTask?.updatedby}
-                    />
-                    <MetaField
-                      label="Created On"
-                      value={selectedGeneralTask?.createdon}
-                    />
-                    <MetaField
-                      label="Updated On"
-                      value={selectedGeneralTask?.updatedon}
-                    />
+                    <div className="p-2 border-b border-slate-100">
+                      <MetaInfoItem
+                        icon={Calendar}
+                        label="Due Date Time"
+                        value={selectedGeneralTask?.due_date_time}
+                        iconBgClass="bg-orange-50"
+                        iconColorClass="text-orange-600"
+                      />
+                    </div>
+                    <div className="p-2  border-b border-slate-100">
+                      <MetaInfoItem
+                        icon={CalendarCheck}
+                        label="Completed Date"
+                        value={selectedGeneralTask?.completed_at_date_time}
+                        iconBgClass="bg-green-50"
+                        iconColorClass="text-green-600"
+                      />
+                    </div>
+
+                    <div className="p-2  border-b border-slate-100">
+                      <div className="flex gap-3 items-start">
+                        <div
+                          className="w-7 h-7 rounded-xl bg-blue-50
+                      flex items-center justify-center"
+                        >
+                          <Flag size={16} className="text-blue-500" />
+                        </div>
+
+                        <div>
+                          <p className="caption-custom">Priority</p>
+
+                          <TaskPriorityChip
+                            priorityName={
+                              selectedGeneralTask?.general_task_priority_name
+                            }
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    <div className="p-2  border-b border-slate-100">
+                      <MetaInfoItem
+                        icon={User}
+                        label="Created By"
+                        value={selectedGeneralTask?.createdby}
+                        iconBgClass="bg-violet-50"
+                        iconColorClass="text-violet-600"
+                      />
+                    </div>
+
+                    <div className="p-2  border-b border-slate-100">
+                      <MetaInfoItem
+                        icon={User}
+                        label="Updated By"
+                        value={selectedGeneralTask?.updatedby}
+                        iconBgClass="bg-violet-50"
+                        iconColorClass="text-violet-600"
+                      />
+                    </div>
+
+                    <div className="p-2  border-b border-slate-100">
+                      <MetaInfoItem
+                        icon={CalendarDays}
+                        label="Created On"
+                        value={selectedGeneralTask?.createdon}
+                        iconBgClass="bg-blue-50"
+                        iconColorClass="text-blue-600"
+                      />
+                    </div>
+
+                    <div className="p-2  border-b border-slate-100">
+                      <MetaInfoItem
+                        icon={CalendarDays}
+                        label="Updated On"
+                        value={selectedGeneralTask?.updatedon}
+                        iconBgClass="bg-blue-50"
+                        iconColorClass="text-blue-600"
+                      />
+                    </div>
                   </div>
                 </div>
               )}
