@@ -20,7 +20,7 @@ import {
   Store,
   Users,
   Waypoints,
-  X
+  
 } from "lucide-react";
 
 import {  FaRegFileArchive } from "react-icons/fa";
@@ -64,18 +64,18 @@ function SideNavBar({ isOpen, onToggle }: SideBarProps) {
           ${isOpen ? "w-64 custom-scrollbar " : "w-12 "}`}
     >
       <div
-        className={`flex items-center border-b  justify-center ${SIZE.NAVBAR.TOP_HEIGHT_USER_PREF_LEFT}`}
-      >
-        {isOpen && (
-          <span className="section-header-custom-blue !text-gray-800">PurpleRadiance 
-          <span className={`section-header-custom-blue ${COLORS.PRIMARY_PURPLE}`}> One</span> </span>
-        )}
-        <button
+        className={`flex items-center border-b gap-1 justify-center ${SIZE.NAVBAR.TOP_HEIGHT_USER_PREF_LEFT}`}
+      ><button
           onClick={onToggle}
-          className="section-header-custom hover:text-blue-800 rounded-lg "
+          className="section-header-custom hover:text-violet-600 rounded-lg "
         >
-          {isOpen ? <X size={20} /> : <Menu size={20} />}
+          {isOpen ? <Menu size={20}/> : <Menu size={20} />}
         </button>
+        {isOpen && (
+          <span className="section-header-custom-blue !text-gray-800 px-1.5">PurpleRadiance 
+          <span className={`section-header-custom-blue ${COLORS.PRIMARY_PURPLE}`}>One</span> </span>
+        )}
+        
       </div>
     <nav className="flex-1 p-1 space-y-1 overflow-y-auto overflow-x-visible custom-scrollbar">
        

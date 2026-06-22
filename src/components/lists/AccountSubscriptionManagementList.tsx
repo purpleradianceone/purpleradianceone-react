@@ -203,8 +203,8 @@ function AccountSubscriptionManagementList({
           <div
             className={
               userPreference.isLeftMenu
-                ? `ag-theme-balham w-full h-[calc(50vh-120px)]`
-                : "ag-theme-balham w-full h-[calc(50vh-122px)]"
+                ? `w-full h-[calc(50vh-120px)]`
+                : "w-full h-[calc(50vh-122px)]"
             }
           >
             <AccountSubscriptionManagementAgGrid

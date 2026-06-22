@@ -3,6 +3,7 @@ import AccountContact from "./account-contact-temp/AccountContact";
 import Account from "../../../@types/account/Account";
 import AccountLead from "./account-lead/AccountLead";
 import AccountCompanyType from "./AccountCompanyType";
+import COLORS from "../../../constants/Colors";
 
 export const AccountContactLeadTypeConjuction = ({
   account,
@@ -19,13 +20,13 @@ export const AccountContactLeadTypeConjuction = ({
 
   return (
     <div className=" "> 
-      <div className="bg-slate-200 border-b-2 pl-1  flex caption-custom gap-4">
+      <div className="bg-slate-200 border-b-2 pl-1 flex caption-custom gap-4">
         <span
           id="contact"
           className={`cursor-pointer ${
             activeTab === "contact"
-              ? "border-b-2 border-blue-500 caption-custom-blue"
-              : "hover:text-blue-500"
+              ? `border-b-2 border-violet-500 caption-custom ${COLORS.PRIMARY_PURPLE} `
+              : `${COLORS.PRIMARY_PURPLE_TEXT_HOVER}`
           }`}
           onClick={handleClickCards}
         >
@@ -35,8 +36,8 @@ export const AccountContactLeadTypeConjuction = ({
           id="accountRelatedLeads"
           className={`cursor-pointer ${
             activeTab === "accountRelatedLeads"
-              ? "border-b-2 border-blue-500 caption-custom-blue"
-              : "hover:text-blue-500"
+               ? `border-b-2 border-violet-500 caption-custom ${COLORS.PRIMARY_PURPLE}`
+              : `${COLORS.PRIMARY_PURPLE_TEXT_HOVER}`
           }`}
           onClick={handleClickCards}
         >
@@ -47,8 +48,8 @@ export const AccountContactLeadTypeConjuction = ({
           id="companyAccountType"
           className={`cursor-pointer ${
             activeTab === "companyAccountType"
-              ? "border-b-2 border-blue-500 caption-custom-blue"
-              : "hover:text-blue-500"
+              ? `border-b-2 border-violet-500 caption-custom ${COLORS.PRIMARY_PURPLE}`
+              : `${COLORS.PRIMARY_PURPLE_TEXT_HOVER}`
           }`}
           onClick={handleClickCards}
         >

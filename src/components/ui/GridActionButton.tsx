@@ -17,14 +17,14 @@ function GridActionButton(props: GridActionButtonProps) {
       <button
         onClick={props.onClick}
         className="
-          w-7 h-7
+          !w-7 !h-7
           flex items-center justify-center
-          rounded-lg
-          border border-slate-300
-          bg-white
-          text-slate-500
-          hover:bg-slate-50
-          hover:text-slate-600
+          !rounded-lg
+          border !border-slate-300
+          !bg-white
+          !text-slate-500
+          !hover:bg-slate-50
+          !hover:text-slate-600
           transition-all duration-150
           shadow-sm
         "

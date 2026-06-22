@@ -19,15 +19,23 @@ const COLORS={
     CHIP_INACTIVE : "bg-white px-2  border-red-400 border   caption-custom-inactive",
     CHIP_SECONDARY : "bg-white px-2  border-blue-400 border rounded-full caption-custom-blue",
     // CONTACT_CARD : "bg-gray-50 border border-blue-200 cursor-pointer input-label-custom px-4 py-1 rounded-lg shadow-sm flex justify-between items-center hover:shadow hover:text-blue-600 hover:border-blue-300 transition",
-     CONTACT_CARD : " border border-gray-200 cursor-pointer input-label-custom px-2 py-1 rounded-lg shadow-sm flex justify-between items-center hover:shadow hover:text-blue-600 hover:border-blue-300 transition",
-    ADD_BUTTON : "border rounded-md caption-custom white-text px-1 py-0.5 bg-blue-600 hover:bg-blue-700",
+     CONTACT_CARD : " border border-gray-200 cursor-pointer input-label-custom px-2 py-1 rounded-lg shadow-sm flex justify-between items-center hover:shadow hover:text-[#6C4CF1] hover:border-violet-300 transition",
+    // ADD_BUTTON : "border rounded-md caption-custom white-text px-1 py-0.5 bg-blue-600 hover:bg-blue-700",
+        ADD_BUTTON : `border rounded-md caption-custom white-text px-1 py-0.5 bg-[#6C4CF1] hover:bg-[#533ac1]`,
+
     ICON_DELETE_BUTTON:" text-red-500 scale-110 hover:scale-125 ",
+
     PAGE_HEADER_SECTION_BG_COLOR : "bg-[#F3EEFF] p-1",
     PAGE_HEADER_ICONS_COLOR_AND_SIZE : "w-5.5 h-5.5 text-[#6C4CF1]",
     PRIMARY_PURPLE : "!text-[#6C4CF1]",
     LIGHT_PURPLE_BACKGROUND : "!bg-[#F3EEFF]",
     DARK_PURPLE : "#5B21B6",
     LIGHT_PURPLE_HOVER: "hover:bg-[#F3EEFF]",
+     PRIMARY_PURPLE_BACKGROUND : "bg-[#6C4CF1]",
+     DARK_PURPLE_HOVER : "hover:!bg-[#533ac1]",
+     PRIMARY_PURPLE_TEXT_HOVER : "hover:!text-[#6C4CF1]",
+
+
 }
 
 export const chartColors = [

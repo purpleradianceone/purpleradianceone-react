@@ -1,13 +1,17 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { AllCommunityModule, ColDef, themeBalham } from "ag-grid-community";
+import { AllCommunityModule, ColDef, } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 import { useMemo, useRef } from "react";
-import { INNERHTML, JSX_CHILDREN_NAME } from "../../constants/AppConstants";
+import { AGGRID,  JSX_CHILDREN_NAME } from "../../constants/AppConstants";
 import AccountServiceManagementGridProps from "../../@types/ag-grid/AccountServiceManagementAgGridProps";
 import AccountServiceProps from "../../@types/account/AccountServiceProps";
-import StatusIndicator from "../ui/StatusIndicator";
+
 import COLORS from "../../constants/Colors";
 import Button from "../ui/Button";
+import { Eye } from "lucide-react";
+import { SkeletonRowsAgGrid } from "../ui/SkeletonRowsAgGrid";
+import StatusBadge from "../ui/StatusBadge";
+import RenderUserWithIcon from "../ui/UserAgGridCellRenderer";
 
 function AccountServiceManagementAgGrid({
   accountServices,
@@ -26,6 +30,12 @@ function AccountServiceManagementAgGrid({
         field: "accountServiceCode",
         headerName: "Code",
         minWidth: 130,
+
+        cellStyle: () => ({
+          fontSize: "14px",
+          fontWeight: 600,
+          color: "#1f2937",
+        }),
       },
 
       {
@@ -59,13 +69,16 @@ function AccountServiceManagementAgGrid({
         headerName: "Status",
         sortable: true,
         filter: true,
-        cellRenderer: (params: any) => {
-          return (
-            <div className="flex items-center text-sm gap-1 mt-1">
-              <StatusIndicator isActive={params.value} />
-            </div>
-          );
-        },
+         cellRenderer: (params: any) => {
+                  if (params.data?.__isSkeleton) {
+                    return <SkeletonRowsAgGrid />;
+                  }
+                  return (
+                        <div className="h-full flex items-center">
+                          <StatusBadge isActive={params.value} />
+                        </div>
+                      );
+                },
       },
       {
         field: "isAddedToInvoiceDraft",
@@ -90,7 +103,7 @@ function AccountServiceManagementAgGrid({
                     params.context.handleAddToInvoice(params.data);
                   }}
                 >
-                  Add to Invoice
+                  + Add to Invoice
                 </Button>
               )}
             </div>
@@ -101,6 +114,7 @@ function AccountServiceManagementAgGrid({
         field: "createdBy",
         headerName: "Created By",
         filter: true,
+         cellRenderer: RenderUserWithIcon,
       },
       {
         field: "createdOn",
@@ -128,7 +142,8 @@ function AccountServiceManagementAgGrid({
         headerName: "Actions",
         field: "view",
         pinned: "right",
-        maxWidth: 80,
+        maxWidth: 90,
+        filter: false,
         // minWidth:80,
         // autoHeight: true,
         // suppressSizeToFit: true,
@@ -141,7 +156,10 @@ function AccountServiceManagementAgGrid({
                   params.context.handleRowSelect(params.data);
                 }}
               >
+                <Eye size={12} strokeWidth={1.5} />
+                 <span>
                 {isUsedInSupportTicketModule ? "Select" : "Details"}
+                </span>
               </span>
             </div>
           );
@@ -164,7 +182,7 @@ function AccountServiceManagementAgGrid({
 
   return (
     <div
-      className="ag-theme-balham w-full"
+      className="w-full modern-user-grid custom-height-scrollbar"
       style={{ height: "100%", width: "100%" }}
     >
       <AgGridReact
@@ -173,8 +191,10 @@ function AccountServiceManagementAgGrid({
         columnDefs={columnDefs}
         defaultColDef={defaultColDef}
         modules={[AllCommunityModule]}
-        theme={themeBalham}
-        overlayNoRowsTemplate={INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
+        rowHeight={AGGRID.ROW_HEIGHT}
+        headerHeight={AGGRID.HEADER_HEIGHT}
+        // theme={themeBalham}
+        // overlayNoRowsTemplate={INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
         context={{
           handleRowSelect: onRowSelect,
           handleAddToInvoice: handleAddToInvoice,

@@ -393,7 +393,7 @@
 
 .modern-user-grid .ag-cell-value .lead-details {
   height: 25px;
- 
+
   padding: 0 5px;
 
   display: flex;
@@ -451,3 +451,22 @@
 .modern-user-grid .ag-root-wrapper ::-webkit-scrollbar-thumb:hover {
   background: #adb5bd;
 }
+
+.modern-user-grid .ag-cell-value button {
+ display: flex;
+  height: 23px;
+  align-items: center;
+  justify-content: center;
+  background-color: white;
+  border:1px solid #c6b7fd;
+  color: #6C4CF1;
+  font-weight: 600;
+
+}
+.modern-user-grid .ag-cell-value button:hover {
+
+  background-color: #F3EEFF;
+    transform: translateY(-1px);
+
+}
+
