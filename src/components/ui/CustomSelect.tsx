@@ -2,6 +2,7 @@ import React, { useMemo } from "react";
 import Select, { SingleValue } from "react-select";
 import { LucideIcon } from "lucide-react";
 import toast from "react-hot-toast";
+import COLORS from "../../constants/Colors";
 // types/select.ts
 export interface SelectOption {
   value: number;
@@ -70,7 +71,7 @@ const CustomSelect: React.FC<AppSelectProps> = ({
   return (
     <div className={`w-full ${className ?? ""}`}>
       <label className="block input-label-custom ">
-        {Icon && <Icon size={14} className="inline mr-1 text-blue-500" />}
+    {Icon && <Icon size={14} className={`inline mr-1 ${COLORS.PRIMARY_PURPLE}`} />}
         {label && <span>{label}</span> }
         {isRequired && <span className="text-rose-500 ml-0.5">*</span>}
       </label>
@@ -103,8 +104,11 @@ const CustomSelect: React.FC<AppSelectProps> = ({
             height: 30,
             alignItems: "center",
             fontSize: 16,            //  smaller text
-            borderColor: state.isFocused ? "#2563eb" : base.borderColor,
-            boxShadow: state.isFocused ? "0 0 0 1px #2563eb" : "none",
+            borderColor: state.isFocused ? "#9782f2" : "#d1d5db",
+            boxShadow: "none",
+            "&:hover": {
+              borderColor: state.isFocused ? "#7a62e5" : "#d1d5db",
+            },
           }),
           option: (base, state) => ({
             ...base,

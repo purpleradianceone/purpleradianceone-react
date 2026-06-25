@@ -364,7 +364,7 @@ const CompanyUserSearchFieldInput = forwardRef<
           } `}
         >
           {Icon && (
-            <Icon size={14} className={COLORS.INPUT_LABEL_ICONS_COLOR} />
+            <Icon size={19} className={COLORS.INPUT_LABEL_ICONS_COLOR} />
           )}
 
           {label}
@@ -398,11 +398,11 @@ const CompanyUserSearchFieldInput = forwardRef<
                 ? "appearance-none block w-full px-1 pb-1 pt-1 border bg-gray-200 border-gray-300 rounded-md shadow-sm text-gray-500 cursor-not-allowed"
                 : readOnly
                   ? "appearance-none block w-full px-1 pb-1 pt-1 border bg-gray-200 border-gray-300 rounded-md shadow-sm"
-                  : `appearance-none block w-full  ${
+                  : `appearance-none block w-full ${
                       has.border
-                        ? "border border-gray-300 px-1 pb-1 pt-1 rounded-md shadow-sm focus:outline-none"
+                        ? "border border-gray-300 px-1 pb-1 pt-1 pr-8 rounded-md shadow-sm focus:outline-none"
                         : ""
-                    }   focus:ring-blue-500 focus:border-blue-500`
+                    }  ${COLORS.INPUT_FOCUS_COLOR} pr-8`
             }
           />
           {/* TEXT WIDTH MEASURER (hidden) */}

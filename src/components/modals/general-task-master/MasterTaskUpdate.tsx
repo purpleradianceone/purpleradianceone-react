@@ -750,7 +750,7 @@ function MasterTaskUpdate() {
 
                             <div className="flex-1 min-w-0">
                               <p
-                                className="text-sm font-medium truncate"
+                                className="table-header-custom truncate"
                                 title={selectedSupportTicket.subject}
                               >
                                 {selectedSupportTicket.subject ||

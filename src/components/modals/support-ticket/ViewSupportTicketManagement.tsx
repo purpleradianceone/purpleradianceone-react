@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {
+  CheckCircle2,
   ChevronRight,
   Edit3,
   HeadsetIcon,
@@ -61,6 +62,7 @@ import { Popover } from "../../ui/PopOver";
 import FormHeader from "../../ui/FormHeader";
 import { SupportWhatsappConversation } from "./support-whatsapp-conversation/SupportWhatsappConversation";
 import { FaWhatsapp } from "react-icons/fa";
+import COLORS from "../../../constants/Colors";
 
 const ViewSupportTicketManagement = () => {
   const searchRef = useRef<CompanyUserSearchFieldRef>(null);
@@ -71,7 +73,7 @@ const ViewSupportTicketManagement = () => {
   const {
     userHasAccessToUpdateSupportTicket,
     userHasAccessToViewSupportTicketTask,
-    userHasAccessToViewSupportWhatsAppConversation
+    userHasAccessToViewSupportWhatsAppConversation,
   } = useUserAccessModules();
 
   const [selectedSupportTicket, setSelectedSupportTicket] = useState(
@@ -505,6 +507,7 @@ const ViewSupportTicketManagement = () => {
 
   return (
     <PageLayout onScrollChange={setShowAccountName} scrollTopValue={80}>
+        <div className=" bg-slate-50">
       {/* Header */}
       <div className="sticky top-0 z-20 bg-slate-100 py-1 border-b transition-all duration-200">
         <div className="flex text-center justify-start items-center gap-3 ml-0.5 ">
@@ -550,104 +553,174 @@ const ViewSupportTicketManagement = () => {
         {/*Support Ticket Lifecycle*/}
         {!isLoadingForSupportTicketLifecycle ? (
           <div
-            className={`mx-1 mt-2  flex  bg-slate-100  shadow rounded-sm ${
-              isLoadingForSupportTicketInfoSave || isLoadingForLifecycleChanging
-                ? "cursor-wait"
-                : "cursor-default"
-            }`}
+  className={`mt-2 w-full ${
+    isLoadingForSupportTicketInfoSave || isLoadingForLifecycleChanging
+      ? "cursor-wait"
+      : "cursor-default"
+  }`}
+>
+  <div
+  className=" bg-white border rounded-md overflow-x-auto px-3 pt-3 pb-1 mb-2 mx-1 shadow-sm"
+>
+<div className="flex flex-wrap items-center gap-y-2">
+  {supportTicketLifecycle?.map((item, index) => {
+      const currentIndex = supportTicketLifecycle.findIndex(
+        (x) =>
+          x.id === selectedSupportTicket.supportTicketLifecycleId,
+      );
+
+      const isCompleted = index < currentIndex;
+      const isCurrent =
+        item.id === selectedSupportTicket.supportTicketLifecycleId;
+
+     return (
+      <div
+        key={item.id}
+        className="flex-1 flex flex-col items-center relative "
+      >
+          {/* CLICKABLE STATUS */}
+          <button
+            type="button"
+            onClick={() => {
+              if (
+                userHasAccessToUpdateSupportTicket &&
+                selectedSupportTicket.supportTicketLifecycleId !== item.id
+              ) {
+                setSelectedSupportTicketLifecycleId(item.id  ?? undefined );
+                setSelectedSupportTicketLifecycleName(item.name ?? undefined);
+              }
+            }}
+            className="w-full flex flex-col items-center relative"
           >
-            <div className="flex w-full">
+            {/* TOP SECTION */}
+            <div
+              className={`
+                flex items-center gap-1 px-1 py-1 rounded-lg transition-all duration-300
+                ${isCurrent ? `${COLORS.LIGHT_PURPLE_BACKGROUND}` : ""}
+              `}
+            >
+              {/* ICON */}
               <div
-                className="flex w-[100%] border bg-white"
-                style={{
-                  clipPath:
-                    "polygon(0 0, calc(100% - 16px) 0, 100% 50%, calc(100% - 16px) 100%, 0 100%)",
-                }}
+                className={`
+                  w-4 h-4 rounded-full flex items-center justify-center
+                  transition-all duration-300
+                  ${
+                    isCompleted
+                      ? "bg-green-500 text-white"
+                      : isCurrent
+                      ? `${COLORS.PRIMARY_PURPLE_BACKGROUND} text-white`
+                      : "bg-slate-100 text-slate-400 border"
+                  }
+                `}
               >
-                {supportTicketLifecycle!.map((item: any) => (
-                  <button
-                    title={item.name}
-                    key={item.id}
-                    className={`flex-1 overflow-hidden ${
-                      selectedSupportTicket.supportTicketLifecycleName ===
-                      item.name
-                        ? "bg-blue-700 table-header-custom-white hover:bg-blue-500 hover:text-white"
-                        : "hover:bg-blue-700 table-header-custom hover:text-white"
-                    }
-              ${
-                selectedSupportTicketLifecycleId === item.id &&
-                "bg-sky-400 hover:bg-sky-500 table-header-custom-white"
-              } text-center p-1`}
-                    style={{
-                      clipPath:
-                        "polygon(0 0, calc(100% - 16px) 0, 100% 50%, calc(100% - 16px) 100%, 0 100%)",
-                    }}
-                    onClick={async () => {
-                      if (userHasAccessToUpdateSupportTicket) {
-                        if (
-                          selectedSupportTicket.supportTicketLifecycleId !==
-                          item.id
-                        ) {
-                          setSelectedSupportTicketLifecycleId(item.id);
-                          setSelectedSupportTicketLifecycleName(item.name);
-                        }
-                      } else {
-                        toast.error(
-                          MESSAGE.MODULE_ACCESS.SUPPORT_MODULE
-                            .UPDATE_ACCESS_DENIED_MESSAGE,
-                        );
-                      }
-                    }}
-                  >
-                    {item.name}
-                  </button>
-                ))}
-              </div>
-              {/* status history */}
-              <div className="flex justify-end caption-custom  mb-1 px-2">
-                <button
-                  onClick={() => {
-                    setIsOpenSupportTicketHistory(!isOpenSupportTicketHistory);
-                  }}
-                >
-                  <span
-                    title="Status history"
-                    className="flex items-center justify-center hover:text-blue-600 "
-                  >
-                    <History size={12} className="mt-0" />
-                    History
-                  </span>
-                </button>
-              </div>
-            </div>
-          </div>
-        ) : (
-          <div className="mx-1 mt-2 flex bg-slate-100 shadow rounded-sm animate-pulse">
-            <div className="flex w-full">
-              {/* Skeleton for lifecycle buttons */}
-              <div
-                className="flex w-[100%] border bg-white"
-                style={{
-                  clipPath:
-                    "polygon(0 0, calc(100% - 16px) 0, 100% 50%, calc(100% - 16px) 100%, 0 100%)",
-                }}
-              >
-                {[1, 2, 3, 4, 5].map((s) => (
-                  <div
-                    key={s}
-                    className="flex-1 p-1 mx-1 bg-slate-200 rounded"
-                    style={{
-                      height: "28px",
-                      clipPath:
-                        "polygon(0 0, calc(100% - 16px) 0, 100% 50%, calc(100% - 16px) 100%, 0 100%)",
-                    }}
-                  ></div>
-                ))}
+                <CheckCircle2 size={12} />
               </div>
 
-              {/* Skeleton for History button */}
-              <div className="flex justify-end caption-custom mb-1 px-2 items-center">
-                <div className="w-14 h-4 bg-slate-200 rounded"></div>
+              {/* LABEL */}
+              <span
+                className={`
+                  text-xs font-medium whitespace-nowrap
+                  ${
+                    isCurrent
+                      ? `${COLORS.PRIMARY_PURPLE}`
+                      : isCompleted
+                      ? "text-slate-700"
+                      : "text-slate-500"
+                  }
+                `}
+              >
+                {item.name}
+              </span>
+            </div>
+
+            {/* BOTTOM PROGRESS */}
+            <div className="mt-3 flex items-center ml-1 w-full">
+              {/* DOT */}
+              <div
+                className={`
+                  w-1.5 h-1.5 rounded-full z-10 transition-all duration-300
+                  ${
+                    isCompleted
+                      ? "bg-green-500"
+                      : isCurrent
+                      ? `${COLORS.PRIMARY_PURPLE_BACKGROUND}`
+                      : "bg-slate-300"
+                  }
+                `}
+              />
+
+              {/* LINE */}
+              {index !== supportTicketLifecycle.length  && (
+                <div
+                  className={`
+                    h-[2px] flex-1 transition-all duration-300
+                    ${
+                      index < currentIndex
+                        ? "bg-green-500"
+                        : index === currentIndex
+                        ?  `${COLORS.PRIMARY_PURPLE_BACKGROUND}`
+                        : "bg-slate-200"
+                    }
+                  `}
+                />
+              )}
+            </div>
+          </button>
+        </div>
+      );
+    })}
+
+    {/* HISTORY BUTTON */}
+    <div className="ml-3">
+      <button
+        type="button"
+        onClick={() =>
+          setIsOpenSupportTicketHistory(
+            !isOpenSupportTicketHistory,
+          )
+        }
+        className={`
+          flex items-center gap-1
+          text-xs text-slate-500
+          ${COLORS.PRIMARY_PURPLE_TEXT_HOVER}
+          transition-all border rounded-md p-0.5
+        `}
+      >
+        <History size={13} />
+        History
+      </button>
+    </div>
+  </div>
+</div>
+          </div>
+        ) : (
+          <div className="mx-1 mt-2 bg-white border rounded-md px-3 pt-3 pb-2 shadow-sm animate-pulse">
+            <div className="flex items-center">
+              {[1, 2, 3, 4, 5].map((item, index) => (
+                <div
+                  key={item}
+                  className="flex-1 flex flex-col items-center"
+                >
+                  {/* Top */}
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 rounded-full bg-slate-200" />
+                    <div className="h-3 w-16 bg-slate-200 rounded" />
+                  </div>
+
+                  {/* Bottom Progress */}
+                  <div className="mt-3 flex items-center w-full">
+                    <div className="w-2 h-2 rounded-full bg-slate-200 z-10" />
+
+                    {index !== 4 && (
+                      <div className="flex-1 h-[2px] bg-slate-200" />
+                    )}
+                  </div>
+                </div>
+              ))}
+
+              {/* History Button Skeleton */}
+              <div className="ml-4 flex items-center">
+                <div className="h-7 w-16 rounded-md bg-slate-200" />
               </div>
             </div>
           </div>
@@ -663,14 +736,14 @@ const ViewSupportTicketManagement = () => {
         >
           {/** Section 1 */}
           {/* SUPPORT TICKET DETAILS */}
-          <div className="w-full flex flex-col gap-4 ">
+          <div className="w-full flex flex-col gap-2 ">
             {/* ===== ACCOUNT + PRODUCT IN SINGLE CARD ===== */}
-            <div className="p-2 bg-white shadow rounded-lg border  flex flex-col gap-4">
+            <div className="p-3 bg-white shadow rounded-lg border  flex flex-col gap-4">
               <div className="flex col-span-1 md:con-span-2 gap-6 justify-between ">
-                <div className="flex gap-3">
+                <div className="flex gap-8">
                   {/* Ticket Number */}
                   <div className="flex items-center gap-1.5">
-                    <div className="bg-blue-600 p-1.5 rounded text-white">
+                    <div className={`${COLORS.LIGHT_PURPLE_BACKGROUND} p-1.5 rounded ${COLORS.PRIMARY_PURPLE}`}>
                       <TicketIcon size={27} strokeWidth={2} />
                     </div>
                     <Detail
@@ -682,7 +755,7 @@ const ViewSupportTicketManagement = () => {
                   </div>
                   {/* Account */}
                   <div className="flex items-center gap-1.5">
-                    <div className="bg-blue-600 p-1.5 rounded text-white">
+                    <div className={`${COLORS.LIGHT_PURPLE_BACKGROUND} p-1.5 rounded ${COLORS.PRIMARY_PURPLE}`}>
                       <HeadsetIcon size={27} strokeWidth={2} />
                     </div>
                     <Detail
@@ -695,7 +768,7 @@ const ViewSupportTicketManagement = () => {
 
                   {/* Support Product Name*/}
                   <div className="flex items-center gap-1.5">
-                    <div className="bg-blue-600 p-1.5 rounded text-white ">
+                    <div className={`${COLORS.LIGHT_PURPLE_BACKGROUND} p-1.5 rounded ${COLORS.PRIMARY_PURPLE}`}>
                       <ShoppingBag size={27} strokeWidth={2} />
                     </div>
                     <Detail
@@ -708,7 +781,7 @@ const ViewSupportTicketManagement = () => {
                   {/* Product SerialNumber */}
                   {selectedSupportTicket?.serialNumber && (
                     <div className="flex items-center gap-1.5">
-                      <div className="bg-blue-600 p-1.5 rounded text-white">
+                      <div className={`${COLORS.LIGHT_PURPLE_BACKGROUND} p-1.5 rounded ${COLORS.PRIMARY_PURPLE}`}>
                         <QrCodeIcon size={27} strokeWidth={2} />
                       </div>
                       <Detail
@@ -727,14 +800,19 @@ const ViewSupportTicketManagement = () => {
                     {selectedSupportTicket.supportTicketSourceId === 5 && (
                       <Popover
                         trigger={
-                          <button className="text-green-500 flex items-center gap-1" type="button">
-                           <FaWhatsapp /> Conversation
+                          <button
+                            className="text-green-500 flex items-center gap-1"
+                            type="button"
+                          >
+                            <FaWhatsapp /> Conversation
                           </button>
                         }
                         padding={3}
                         width={500}
                         align="left"
-                        accessRight={userHasAccessToViewSupportWhatsAppConversation}
+                        accessRight={
+                          userHasAccessToViewSupportWhatsAppConversation
+                        }
                         children={(onClose) => (
                           <>
                             <FormHeader
@@ -783,13 +861,13 @@ const ViewSupportTicketManagement = () => {
 
             {/* ===== MAIN TWO-COLUMN LAYOUT ===== */}
             <div
-              className="grid grid-cols-1 md:grid-cols-2 gap-4"
+              className="grid grid-cols-1 md:grid-cols-2 gap-3"
               // data-refresh={keyForTextAreaInput}
               key={keyForPageDataChange}
             >
               {/* LEFT SIDE FORM */}
               <div className="flex flex-col gap-4">
-                <div className="p-1 bg-white shadow rounded-lg border grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <div className="px-5 py-4 bg-white shadow rounded-lg border grid grid-cols-1 sm:grid-cols-2 gap-2 gap-x-5">
                   {/* Ticket Category */}
                   {isLoadingForSupportTicketCategory ? (
                     <div className="flex flex-col gap-2 animate-pulse w-full">
@@ -1116,61 +1194,75 @@ const ViewSupportTicketManagement = () => {
               </div>
 
               {/* RIGHT SIDE DETAILS */}
-              <div className="flex flex-col gap-4">
+              <div className="p-5 bg-white shadow rounded-lg border">
                 {/* Created/Updated Info */}
-                <div className="p-4 bg-white shadow rounded-lg border grid grid-cols-2 gap-1">
-                  {/* Account Email */}
-                  <div className="flex items-center gap-1.5 mb-1.5">
-                    <div className="bg-blue-600 p-1 mb-1.5 rounded text-white">
-                      <LucideMail size={25} strokeWidth={2} />
+                <div className="grid grid-cols-[1fr_auto_1fr] gap-5">
+                  <div>
+                    {/* Account Email */}
+                    <div className="flex items-center gap-3 mb-2">
+                      <div
+                        className={`${COLORS.LIGHT_PURPLE_BACKGROUND} p-1 mb-1.5 rounded ${COLORS.PRIMARY_PURPLE}`}
+                      >
+                        <LucideMail size={25} strokeWidth={2} />
+                      </div>
+                      <Detail
+                        label="Account Email"
+                        hasBorder={false}
+                        type="none"
+                        value={selectedSupportTicket?.accountEmail}
+                      />
                     </div>
-                    <Detail
-                      label="Account Email"
-                      hasBorder={false}
-                      type="none"
-                      value={selectedSupportTicket?.accountEmail}
-                    />
-                  </div>
-                  {/* Account Mobile Number*/}
-                  <div className="flex items-center gap-1.5 mb-1.5">
-                    <div className="bg-blue-600 p-1 mb-1.5 rounded text-white">
-                      <LucidePhoneCall size={25} strokeWidth={2} />
+
+                    <div className="flex items-center gap-1.5 p-1">
+                      <Detail
+                        label="Created By"
+                        type="none"
+                        value={selectedSupportTicket?.createdBy}
+                      />
                     </div>
-                    <Detail
-                      label="Account Mobile Number"
-                      hasBorder={false}
-                      type="none"
-                      value={selectedSupportTicket?.accountMobileNumber}
-                    />
-                  </div>
-                  <div className="flex items-center gap-1.5 ">
-                    <Detail
-                      label="Created By"
-                      type="none"
-                      value={selectedSupportTicket?.createdBy}
-                    />
-                  </div>
-                  <div className="flex items-center gap-1.5 ">
-                    <Detail
-                      label="Created On"
-                      type="none"
-                      value={selectedSupportTicket?.createdOn}
-                    />
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <Detail
-                      label="Updated By"
-                      type="none"
-                      value={selectedSupportTicket?.updatedBy}
-                    />
+                    <div className="flex items-center gap-1.5 p-1">
+                      <Detail
+                        label="Updated By"
+                        type="none"
+                        value={selectedSupportTicket?.updatedBy}
+                      />
+                    </div>
                   </div>
 
-                  <div className="flex items-center gap-1.5">
-                    <Detail
-                      label="Updated On"
-                      type="none"
-                      value={selectedSupportTicket?.updatedOn}
-                    />
+                  {/* Vertical Divider */}
+                  <div className="w-px bg-gray-200 self-stretch" />
+
+                  <div>
+                    {/* Account Mobile Number*/}
+                    <div className="flex items-center gap-3 mb-2">
+                      <div
+                        className={`${COLORS.LIGHT_PURPLE_BACKGROUND} p-1 mb-1.5 rounded ${COLORS.PRIMARY_PURPLE}`}
+                      >
+                        <LucidePhoneCall size={25} strokeWidth={2} />
+                      </div>
+                      <Detail
+                        label="Account Mobile Number"
+                        hasBorder={false}
+                        type="none"
+                        value={selectedSupportTicket?.accountMobileNumber}
+                      />
+                    </div>
+
+                    <div className="flex items-center gap-1.5 p-1">
+                      <Detail
+                        label="Created On"
+                        type="none"
+                        value={selectedSupportTicket?.createdOn}
+                      />
+                    </div>
+
+                    <div className="flex items-center gap-1.5 p-1">
+                      <Detail
+                        label="Updated On"
+                        type="none"
+                        value={selectedSupportTicket?.updatedOn}
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
@@ -1179,7 +1271,7 @@ const ViewSupportTicketManagement = () => {
 
           {/* Second Column */}
           <div
-            className="grid grid-cols-1 sm:grid-cols-3 gap-3 w-full"
+            className="grid grid-cols-1 sm:grid-cols-3 gap-5 w-full pt-2"
             // data-refresh={keyForTextAreaInput}
             // key={keyForTextAreaInput}
           >
@@ -1284,6 +1376,7 @@ const ViewSupportTicketManagement = () => {
           />
         )}
       </motion.section>
+    </div>
     </PageLayout>
   );
 };

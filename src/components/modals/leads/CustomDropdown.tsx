@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { ChevronDown, ChevronUp, Delete, LucideIcon } from "lucide-react";
 import toast from "react-hot-toast";
+import COLORS from "../../../constants/Colors";
 
 interface DropdownProps {
   options: any[];
@@ -85,7 +86,7 @@ const CustomDropdown: React.FC<DropdownProps> = ({
   return (
     <div className="relative w-auto" ref={dropdownRef}>
       <label className="block input-label-custom">
-        {Icon && <Icon size={14} className="inline mr-1 text-blue-500" />}
+        {Icon && <Icon size={14} className={`inline mr-1 ${COLORS.PRIMARY_PURPLE}`} />}
         {labelName === "status" ||
         labelName === "source" ||
         labelName === "type" ||
