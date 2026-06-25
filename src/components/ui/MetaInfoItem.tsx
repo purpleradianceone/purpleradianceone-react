@@ -1,5 +1,6 @@
 import { LucideIcon } from "lucide-react";
 import { ReactNode } from "react";
+import COLORS from "../../constants/Colors";
 
 interface MetaInfoItemProps {
   icon: LucideIcon;
@@ -15,8 +16,8 @@ function MetaInfoItem({
   icon: Icon,
   label,
   value,
-  iconBgClass = "bg-violet-50",
-  iconColorClass = "text-violet-600",
+  iconBgClass = `${COLORS.LIGHT_PURPLE_BACKGROUND}`,
+  iconColorClass = `${COLORS.PRIMARY_PURPLE}`,
   children,
   className = "",
 }: MetaInfoItemProps) {

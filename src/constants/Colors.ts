@@ -11,9 +11,9 @@ const COLORS={
     GRID_HEADER_ICONS_COLOR_AND_SIZE : "w-5 h-5 text-blue-600",
     GRID_HEADER_SECTION_BG_COLOR : "bg-gray-50",
     FORM_HEADER_ICONS_COLOR : "text-blue-500 mt-1",
-    INPUT_LABEL_ICONS_COLOR : "inline mr-1 text-blue-500",
+    INPUT_LABEL_ICONS_COLOR : `inline mr-1 text-[#6C4CF1]`, //purplecoloR
     INPUT_READONLY_BG_COLOR : "bg-gray-100",
-    INPUT_FOCUS_COLOR : "focus:outline-none focus:ring-blue-500 focus:border-blue-500",
+    INPUT_FOCUS_COLOR : "focus:outline-none focus:ring-violet-400 focus:border-violet-400",
     INPUT_BORDER_COLOR : "border-gray-300",
     CHIP_ACTIVE : "bg-white px-2  border-green-400 border  caption-custom-active",
     CHIP_INACTIVE : "bg-white px-2  border-red-400 border   caption-custom-inactive",
@@ -21,19 +21,22 @@ const COLORS={
     // CONTACT_CARD : "bg-gray-50 border border-blue-200 cursor-pointer input-label-custom px-4 py-1 rounded-lg shadow-sm flex justify-between items-center hover:shadow hover:text-blue-600 hover:border-blue-300 transition",
      CONTACT_CARD : " border border-gray-200 cursor-pointer input-label-custom px-2 py-1 rounded-lg shadow-sm flex justify-between items-center hover:shadow hover:text-[#6C4CF1] hover:border-violet-300 transition",
     // ADD_BUTTON : "border rounded-md caption-custom white-text px-1 py-0.5 bg-blue-600 hover:bg-blue-700",
-        ADD_BUTTON : `border rounded-md caption-custom white-text px-1 py-0.5 bg-[#6C4CF1] hover:bg-[#533ac1]`,
+    ADD_BUTTON : `border rounded-md caption-custom white-text px-1 py-0.5 bg-[#6C4CF1] hover:bg-[#533ac1]`,
 
     ICON_DELETE_BUTTON:" text-red-500 scale-110 hover:scale-125 ",
-
+SECTION_HEADER_ICON_STYLE: "flex items-center justify-center w-7 h-7 rounded-full bg-[#F3EEFF] text-[#6C4CF1]",
     PAGE_HEADER_SECTION_BG_COLOR : "bg-[#F3EEFF] p-1",
     PAGE_HEADER_ICONS_COLOR_AND_SIZE : "w-5.5 h-5.5 text-[#6C4CF1]",
     PRIMARY_PURPLE : "!text-[#6C4CF1]",
+    BORDER_PRIMARY_COLOUR: "border-violet-400",
     LIGHT_PURPLE_BACKGROUND : "!bg-[#F3EEFF]",
-    DARK_PURPLE : "#5B21B6",
+    DARK_PURPLE : "!text-[#5B21B6]",
     LIGHT_PURPLE_HOVER: "hover:bg-[#F3EEFF]",
-     PRIMARY_PURPLE_BACKGROUND : "bg-[#6C4CF1]",
-     DARK_PURPLE_HOVER : "hover:!bg-[#533ac1]",
-     PRIMARY_PURPLE_TEXT_HOVER : "hover:!text-[#6C4CF1]",
+    PRIMARY_PURPLE_BACKGROUND : "bg-[#6C4CF1]",
+    DARK_PURPLE_HOVER : "hover:!bg-[#533ac1]",
+    PRIMARY_PURPLE_TEXT_HOVER : "hover:!text-[#6C4CF1]",
+     LIGHT_BACKGROUND_HOVER : "hover:bg-[#F3EEFF]",
+
 
 
 }
@@ -47,6 +50,7 @@ export const chartColors = [
   "#00C49F",
   "#FFBB28",
   "#FF8042"
+  
 ];
 
  export const backgroundColors = [

@@ -58,6 +58,7 @@
 
 import  { useRef } from "react";
 import FormInputProps from "../../@types/ui/FormInputProps";
+import COLORS from "../../constants/Colors";
 
 function DatePickerInput(props: FormInputProps) {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -79,8 +80,8 @@ function DatePickerInput(props: FormInputProps) {
         {props.logo && (
           <props.logo
             size={14}
-            className="inline mr-1 text-blue-500 cursor-pointer"
-            onClick={openDatePicker} // ✅ click logo opens date picker
+            className={`inline mr-1 ${COLORS.PRIMARY_PURPLE} cursor-pointer`}
+            onClick={openDatePicker} // click logo opens date picker
           />
         )}
         {props.label}
@@ -110,8 +111,8 @@ function DatePickerInput(props: FormInputProps) {
           onBlur={props.onBlur}
           className={
             props.readonly
-              ? "input-label-custom appearance-none block w-full px-2 py-0.5 border bg-gray-300 border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-              : "input-label-custom cursor-pointer appearance-none block w-full px-2 py-0.5 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              ? `input-label-custom appearance-none block w-full px-2 py-0.5 border bg-gray-300 border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none ${COLORS.INPUT_FOCUS_COLOR}`
+              : `input-label-custom cursor-pointer appearance-none block w-full px-2 py-0.5 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none ${COLORS.INPUT_FOCUS_COLOR}`
           }
           inputMode={props.inputMode}
           max={props.maxDate}

@@ -197,6 +197,7 @@ useEffect(() => {
               icon: ClipboardList,
               iconBg: COLORS.LIGHT_PURPLE_BACKGROUND,
               iconColor: COLORS.PRIMARY_PURPLE,
+              graphColor: COLORS.PRIMARY_PURPLE_BACKGROUND,
             },
 
             {

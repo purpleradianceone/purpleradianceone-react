@@ -7,6 +7,8 @@ import {
   Notebook,
   Clipboard,
   LucideLaptop,
+  Pen,
+  User,
 } from "lucide-react"; // Corrected import for Lucide React icons
 import LoadingSpinner from "../../../assets/animations/LoadingSpinner";
 import StatusChip from "../../ui/StatusChip";
@@ -15,6 +17,8 @@ import SupportTicketTaskProps from "../../../@types/support-ticket-management/Su
 import SupportTicketTaskStage from "../../../@types/support-ticket-management/SupportTicketTaskStage";
 import UpdateSupportTicketTaskModal from "./UpdateSupportTicketTaskModal";
 import MESSAGE from "../../../constants/Messages";
+import COLORS from "../../../constants/Colors";
+import { taskStageStyles } from "../../../utils/colourSpecifierForNameInAggrid";
 
 function SupportTicketTaskList({
   taskId,
@@ -85,7 +89,7 @@ function SupportTicketTaskList({
             </div>
           ) : (
             <div
-              className="space-y-2 max-h-72 overflow-y-auto [&::-webkit-scrollbar]:w-2
+              className="grid grid-cols-2 gap-3  max-h-72 overflow-y-auto [&::-webkit-scrollbar]:w-2
   [&::-webkit-scrollbar-track]:bg-gray-50
   [&::-webkit-scrollbar-thumb]:bg-gray-50
     [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full"
@@ -95,7 +99,9 @@ function SupportTicketTaskList({
                   key={activity.id}
                   className={`bg-white min-h-16 px-2 py-2 rounded-xl shadow-md hover:shadow-xl border-2 transition-shadow duration-300 flex items-start space-x-2 border-gray-100 relative`}
                 >
-                  <div className="flex-shrink-0 p-1 bg-gray-200 rounded-full">
+                  <div
+                    className={`flex-shrink-0 p-1 ${COLORS.LIGHT_PURPLE_BACKGROUND} ${COLORS.PRIMARY_PURPLE} rounded-full`}
+                  >
                     {" "}
                     {getActivityIcon(1)}
                   </div>
@@ -114,16 +120,22 @@ function SupportTicketTaskList({
                         <p className="pb-1 pt-2">
                           {taskId === 0 && (
                             <div className="mt-1">
-                              <span className="caption-custom-blue">
+                              <span className="caption-custom">
                                 Task Stage :{" "}
                               </span>{" "}
-                              <span className="caption-custom">
-                                {activity.supportTicketTaskStageName || ""}
-                              </span>{" "}
+                              <span
+                                className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                                  taskStageStyles[
+                                    activity.supportTicketTaskStageName as keyof typeof taskStageStyles
+                                  ] || "bg-gray-100 text-gray-700"
+                                }`}
+                              >
+                                {activity.supportTicketTaskStageName}
+                              </span>
                             </div>
                           )}
                           <div>
-                            <span className="caption-custom-blue">
+                            <span className="caption-custom">
                               Description :{" "}
                             </span>{" "}
                             <span className="caption-custom">
@@ -131,12 +143,17 @@ function SupportTicketTaskList({
                             </span>{" "}
                           </div>
                           <div className="flex gap-1">
-                            <span className="caption-custom-blue">
-                              Assignees :{" "}
-                            </span>{" "}
-                            <div className="grid grid-cols-3">
-                              <span className="bg-gray-50 border caption-custom-blue mx-1 rounded-md px-1 py-0">
-                                {" "}
+                            <span className="caption-custom">Assignees : </span>{" "}
+                            <div className="grid grid-cols-2">
+                              <span
+                                className={`${COLORS.LIGHT_PURPLE_BACKGROUND} ${COLORS.PRIMARY_PURPLE}
+                                    border caption-custom mx-1 rounded-md px-0.5 
+                                    inline-flex items-center gap-0.5`}
+                              >
+                                <User
+                                  size={11}
+                                  className={`${COLORS.PRIMARY_PURPLE} `}
+                                />{" "}
                                 {activity.assignToName.length > 50
                                   ? activity.assignToName.substring(0, 50) +
                                     "..."
@@ -145,9 +162,7 @@ function SupportTicketTaskList({
                             </div>
                           </div>
                           <div className="mt-0 pt-0">
-                            <span className="caption-custom-blue">
-                              Outcome :{" "}
-                            </span>{" "}
+                            <span className="caption-custom">Outcome : </span>{" "}
                             <span className="caption-custom">
                               {activity.resultOutcome ?? (
                                 <>
@@ -161,7 +176,7 @@ function SupportTicketTaskList({
                         </p>
                         <button
                           onClick={() => toggleExpand(activity.id)}
-                          className="caption-custom-blue hover:underline focus:outline-none"
+                          className={`caption-custom hover:underline focus:outline-none ${COLORS.PRIMARY_PURPLE_TEXT_HOVER}`}
                         >
                           View Less
                         </button>
@@ -171,16 +186,22 @@ function SupportTicketTaskList({
                         <p className="truncate  mt-1">
                           {taskId === 0 && (
                             <div className="mt-1">
-                              <span className="caption-custom-blue">
+                              <span className="caption-custom">
                                 Task Stage :{" "}
                               </span>{" "}
-                              <span className="caption-custom">
-                                {activity.supportTicketTaskStageName || ""}
-                              </span>{" "}
+                              <span
+                                className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                                  taskStageStyles[
+                                    activity.supportTicketTaskStageName as keyof typeof taskStageStyles
+                                  ] || "bg-gray-100 text-gray-700"
+                                }`}
+                              >
+                                {activity.supportTicketTaskStageName}
+                              </span>
                             </div>
                           )}
                           <div className="mt-1">
-                            <span className="caption-custom-blue">
+                            <span className="caption-custom">
                               Description :{" "}
                             </span>{" "}
                             <span className="caption-custom">
@@ -188,10 +209,16 @@ function SupportTicketTaskList({
                             </span>{" "}
                           </div>
                           <div className="mt-1">
-                            <span className="caption-custom-blue">
-                              Assignees :{" "}
-                            </span>{" "}
-                            <span className="bg-gray-50 border caption-custom-blue  mx-1 rounded-md px-1">
+                            <span className="caption-custom">Assignees : </span>{" "}
+                              <span
+                                className={`${COLORS.LIGHT_PURPLE_BACKGROUND} ${COLORS.PRIMARY_PURPLE}
+                                    border caption-custom mx-1 rounded-md px-0.5 
+                                    inline-flex items-center gap-0.5`}
+                              >
+                                <User
+                                  size={11}
+                                  className={`${COLORS.PRIMARY_PURPLE} `}
+                                />
                               {activity.assignToName.length > 20
                                 ? activity.assignToName.substring(0, 20) + "..."
                                 : activity.assignToName}
@@ -201,7 +228,7 @@ function SupportTicketTaskList({
                         {activity.assignToName.length > 0 && ( // Adjust threshold as needed
                           <button
                             onClick={() => toggleExpand(activity.id)}
-                            className="caption-custom-blue hover:underline font-normal mt-1 focus:outline-none hover:text-blue-700"
+                            className={`caption-custom hover:underline font-normal mt-1 focus:outline-none ${COLORS.PRIMARY_PURPLE_TEXT_HOVER}`}
                           >
                             View More
                           </button>
@@ -211,7 +238,7 @@ function SupportTicketTaskList({
                   </div>
 
                   {/* Date and Action Buttons */}
-                  <div className="absolute top-2  right-2 flex items-center space-x-0.5">
+                  <div className="absolute top-2  right-2 flex items-center space-x-1">
                     <span className="caption-custom">
                       {activity.dueDateTime}
                     </span>
@@ -220,14 +247,16 @@ function SupportTicketTaskList({
                         setIsUpdateSupportTicketTaskModalOpen(true);
                         setSelecedSupportTicketTask(activity);
                       }}
-                      className="px-2 caption-custom white-text bg-blue-500  rounded hover:bg-blue-600 transition-colors"
+                      className={`flex items-center h-[20px] p-1 caption-custom ${COLORS.PRIMARY_PURPLE} !font-medium rounded border gap-1 ${COLORS.LIGHT_PURPLE_HOVER}
+                        border-violet-200`}
                     >
+                      <Pen size={10} />
                       Edit
                     </button>
                   </div>
 
                   {/*right corner*/}
-                  <div className="absolute bottom-2  right-2 flex items-center space-x-1">
+                  <div className="absolute bottom-8 right-2 flex items-center space-x-1">
                     <StatusChip isActive={activity.isActive} />
                   </div>
                 </div>

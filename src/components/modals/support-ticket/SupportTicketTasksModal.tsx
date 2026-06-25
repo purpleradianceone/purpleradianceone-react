@@ -19,6 +19,7 @@ import CreateSupportTicketTaskModal from "./CreateSupportTicketTaskModal";
 import { handleApiError } from "../../../config/error/handleApiError";
 import { supportTicketDataUrlSearchParamKey } from "../../lists/SupportTicketManagementList";
 import AccessDeniedMessagePage from "../../views/not-found/AccessDeniedMessagePage";
+import COLORS from "../../../constants/Colors";
 
 function SupportTicketTasksModal() {
   const {
@@ -144,7 +145,7 @@ function SupportTicketTasksModal() {
                 {/* <span>Add</span> */}
                 <Button
                   disabled={!userHasAccessToAddSupportTicketTask}
-                  className="bg-blue-600 hover:bg-blue-700 caption-custom white-text px-1 py-0.5 rounded-md flex items-center gap-1"
+                  className={`${COLORS.ADD_BUTTON}`}
                   onClick={() => {
                     if (userHasAccessToAddSupportTicketTask) {
                       setIsCreateSupportTicketTaskModalOpen(true);
