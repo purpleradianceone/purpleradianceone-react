@@ -10,7 +10,6 @@ import { useEffect, useState } from "react";
 import LoadingSpinner from "../../../assets/animations/LoadingSpinner";
 import AccountCompanyAccountType from "../../../@types/account/AccountCompanyAccountType";
 import COLORS from "../../../constants/Colors";
-import { createPortal } from "react-dom";
 import CreateAccountCompanyAccountType from "./CreateAccountCompanyAccountType";
 import ToggleButton from "../../ui/ToggleButton";
 import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
@@ -18,9 +17,14 @@ import MESSAGE from "../../../constants/Messages";
 import Button from "../../ui/Button";
 import axiosClient from "../../../axios-client/AxiosClient";
 import AccessDeniedMessagePage from "../../views/not-found/AccessDeniedMessagePage";
+import { Popover } from "../../ui/PopOver";
 
 const AccountCompanyType = ({ accountId }: { accountId: number }) => {
-  const { userHasAccessToAddAccountTypes , userHasAccessToUpdateAccountTypes , userHasAccessToViewAccountTypes} = useUserAccessModules();
+  const {
+    userHasAccessToAddAccountTypes,
+    userHasAccessToUpdateAccountTypes,
+    userHasAccessToViewAccountTypes,
+  } = useUserAccessModules();
   const { loginStatus } = useLoggedInUserContext();
 
   // States
@@ -29,8 +33,6 @@ const AccountCompanyType = ({ accountId }: { accountId: number }) => {
   const [accountCompanyAccountType, setAccountCompanyAccountType] = useState<
     AccountCompanyAccountType[]
   >([]);
-  const [showCompanyAccountTypeForCreate, setShowCompanyAccountTypeForCreate] =
-    useState<boolean>(false);
 
   const getAccountCompanyAccountType = async () => {
     const postData = {
@@ -59,7 +61,7 @@ const AccountCompanyType = ({ accountId }: { accountId: number }) => {
               updatedBy: item.updatedby,
               createdOn: item.createdon,
               updatedOn: item.updatedon,
-            })
+            }),
           );
 
           setAccountCompanyAccountType(filteredData);
@@ -82,7 +84,7 @@ const AccountCompanyType = ({ accountId }: { accountId: number }) => {
   };
 
   const handleAccountCompanyAccountStatusChange = async (
-    item: AccountCompanyAccountType
+    item: AccountCompanyAccountType,
   ) => {
     const status = !item.isActive;
     const postData = {
@@ -119,44 +121,69 @@ const AccountCompanyType = ({ accountId }: { accountId: number }) => {
   };
 
   useEffect(() => {
-    if(userHasAccessToViewAccountTypes){
+    if (userHasAccessToViewAccountTypes) {
       getAccountCompanyAccountType();
     }
   }, [userHasAccessToViewAccountTypes]);
 
-  if(!userHasAccessToViewAccountTypes)return <AccessDeniedMessagePage message={MESSAGE.MODULE_ACCESS.ACCOUNT_TYPES.DENIED_VIEW_ACCESS}/>
+  if (!userHasAccessToViewAccountTypes)
+    return (
+      <AccessDeniedMessagePage
+        message={MESSAGE.MODULE_ACCESS.ACCOUNT_TYPES.DENIED_VIEW_ACCESS}
+      />
+    );
 
   return (
-  <div className="bg-white  flex flex-col   rounded-lg p-1 max-h-96 overflow-auto">
+    <div className="bg-white  flex flex-col h-full  rounded-lg   overflow-auto">
       {/* Header */}
-    {/* <div className="bg-gray-100 table-header-custom rounded-t-md px-2 ">
+      {/* <div className="bg-gray-100 table-header-custom rounded-t-md px-2 ">
       <span>Company Account Type</span>
     </div> */}
       {isLoadingCompanyAccountType ? (
-       <div className="h-20 flex items-center justify-center">
+        <div className="  min-h-[280px]  h-full  flex items-center justify-center">
           <LoadingSpinner />
         </div>
       ) : accountCompanyAccountType.length === 0 &&
         !isLoadingCompanyAccountType ? (
-        <div className="flex items-center justify-center min-h-20  " >
-        <span className="italic caption-custom flex gap-1 items-center ">
-            <Button
-              disabled={!userHasAccessToAddAccountTypes}
-              onClick={() => {
-                if (userHasAccessToAddAccountTypes) {
-                  setShowCompanyAccountTypeForCreate(
-                    !showCompanyAccountTypeForCreate
-                  );
-                } else {
-                  toast.error(
-                    MESSAGE.MODULE_ACCESS.ACCOUNT_ACCESS.DENIED_UPDATE_ACCESS
-                  );
-                }
-              }}
-              className={COLORS.ADD_BUTTON}
+        <div className="  min-h-[280px] bg-slate-0 flex  justify-center items-center ">
+          <span className="italic caption-custom  flex gap-1 justify-center items-center ">
+            <Popover
+              width={600}
+              trigger={
+                <Button
+                  disabled={!userHasAccessToAddAccountTypes}
+                  // onClick={() => {
+                  //   if (userHasAccessToAddAccountTypes) {
+                  //     setShowCompanyAccountTypeForCreate(
+                  //       !showCompanyAccountTypeForCreate,
+                  //     );
+                  //   } else {
+                  //     toast.error(
+                  //       MESSAGE.MODULE_ACCESS.ACCOUNT_ACCESS
+                  //         .DENIED_UPDATE_ACCESS,
+                  //     );
+                  //   }
+                  // }}
+                  className={COLORS.ADD_BUTTON}
+                >
+                  +Add
+                </Button>
+              }
+              accessRight={userHasAccessToAddAccountTypes}
+              align="left"
             >
-              +Add
-            </Button>
+              {(onClose) => (
+                <div className="">
+                  <CreateAccountCompanyAccountType
+                    onClose={() => {
+                      onClose();
+                    }}
+                    accountId={accountId}
+                    getAccountCompanyAccountType={getAccountCompanyAccountType}
+                  />
+                </div>
+              )}
+            </Popover>
             <span className="italic caption-custom">
               No company account type available.
             </span>
@@ -164,24 +191,61 @@ const AccountCompanyType = ({ accountId }: { accountId: number }) => {
         </div>
       ) : (
         <div className="grid md:grid-cols-2 gap-1 w-full ">
-          <div className="col-span-2 flex justify-end">
-            <Button
+          <div className="col-span-2 flex justify-end ">
+            <Popover
+              width={600}
+              accessRight={userHasAccessToAddAccountTypes}
+              trigger={
+                <Button
+                  disabled={!userHasAccessToAddAccountTypes}
+                  // onClick={() => {
+                  //   if (userHasAccessToAddAccountTypes) {
+                  //     setShowCompanyAccountTypeForCreate(
+                  //       !showCompanyAccountTypeForCreate,
+                  //     );
+                  //   } else {
+                  //     toast.error(
+                  //       MESSAGE.MODULE_ACCESS.ACCOUNT_ACCESS
+                  //         .DENIED_UPDATE_ACCESS,
+                  //     );
+                  //   }
+                  // }}
+                  className={COLORS.ADD_BUTTON}
+                >
+                  +Add
+                </Button>
+              }
+              align="right"
+            >
+              {(onClose) => (
+                <div className=" ">
+                  <CreateAccountCompanyAccountType
+                    onClose={() => {
+                      onClose();
+                    }}
+                    accountId={accountId}
+                    getAccountCompanyAccountType={getAccountCompanyAccountType}
+                  />
+                </div>
+              )}
+            </Popover>
+            {/* <Button
               disabled={!userHasAccessToAddAccountTypes}
               onClick={() => {
                 if (userHasAccessToAddAccountTypes) {
                   setShowCompanyAccountTypeForCreate(
-                    !showCompanyAccountTypeForCreate
+                    !showCompanyAccountTypeForCreate,
                   );
                 } else {
                   toast.error(
-                    MESSAGE.MODULE_ACCESS.ACCOUNT_ACCESS.DENIED_UPDATE_ACCESS
+                    MESSAGE.MODULE_ACCESS.ACCOUNT_ACCESS.DENIED_UPDATE_ACCESS,
                   );
                 }
               }}
               className={COLORS.ADD_BUTTON}
             >
               +Add
-            </Button>
+            </Button> */}
           </div>
           {accountCompanyAccountType.map((item: AccountCompanyAccountType) => (
             <div
@@ -208,40 +272,36 @@ const AccountCompanyType = ({ accountId }: { accountId: number }) => {
                   </p>
                 </div>
                 <div className="absolute top-2 right-2">
-                {/* Toggle */}
-                <ToggleButton
-                  checked={item.isActive}
-                  name={item.id.toString()}
-                  onToggle={(e) => {
-                    e.preventDefault();
-                    if(!userHasAccessToUpdateAccountTypes) {
-                      toast.error(MESSAGE.MODULE_ACCESS.ACCOUNT_TYPES.DENIED_UPDATE_ACCESS)
-                      return;
-                    };
-                    handleAccountCompanyAccountStatusChange(item);
-                  }}
+                  {/* Toggle */}
+                  <ToggleButton
+                    checked={item.isActive}
+                    name={item.id.toString()}
+                    onToggle={(e) => {
+                      e.preventDefault();
+                      if (!userHasAccessToUpdateAccountTypes) {
+                        toast.error(
+                          MESSAGE.MODULE_ACCESS.ACCOUNT_TYPES
+                            .DENIED_UPDATE_ACCESS,
+                        );
+                        return;
+                      }
+                      handleAccountCompanyAccountStatusChange(item);
+                    }}
                   />
-                  </div>
-                  </div>
+                </div>
+              </div>
             </div>
           ))}
         </div>
       )}
 
       {/* Modal */}
-      {showCompanyAccountTypeForCreate &&
+
+      {/* {showCompanyAccountTypeForCreate &&
         createPortal(
-          <CreateAccountCompanyAccountType
-            onClose={() => {
-              setShowCompanyAccountTypeForCreate(
-                !showCompanyAccountTypeForCreate
-              );
-            }}
-            accountId={accountId}
-            getAccountCompanyAccountType={getAccountCompanyAccountType}
-          />,
-          document.body
-        )}
+         ,
+          document.body,
+        )} */}
     </div>
   );
 };

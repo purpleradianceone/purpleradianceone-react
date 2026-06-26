@@ -1,57 +1,63 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect, useState, useRef } from "react";
+import axios from "axios";
 import {
   Aperture,
   Bell,
-  Building2,
   Calendar,
   CreditCard,
+  FileBarChart,
   Handshake,
   Headset,
   Home,
   Layers,
   LayoutPanelLeft,
+  ListChecks,
   LogOut,
+  LucideFileArchive,
   LucideSettings,
+  LucideUserPlus2,
   Menu,
   MessageCircle,
   Network,
-  Quote,
+  PackageCheck,
   Settings,
   SettingsIcon,
   Store,
   User2,
   UserCogIcon,
-  X,
+  X
 } from "lucide-react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import SideNavBar from "./SideNavBar";
-import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
-import ROUTES_URL from "../../../../constants/Routes";
-import useScreenSize from "../../../../config/hooks/useScreenSize";
-import { IMAGE_SOURCE } from "../../../../constants/ImageSource";
-import Button from "../../../ui/Button";
-import { useUserAccessModules } from "../../../../config/hooks/useAccessModules";
-import AccessDeniedPopup from "../../not-found/AccessDeniedPage";
-import { SIZE, STATUS_CODE } from "../../../../constants/AppConstants";
-import NavItem from "./Component/NavItem";
-import { usePanel } from "../../../../context/panel/usePanel";
-import NotificationPopup from "../../notification/NotificationManagement";
-import { useNotificationCountContext } from "../../../../context/notification/NotificationCountContext";
-import axios from "axios";
-import POST_API from "../../../../constants/PostApi";
+import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
+import { FaRegFileAlt, FaRegFileArchive } from "react-icons/fa";
+import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import ApiError from "../../../../@types/error/ApiError";
-import RefreshToken from "../../../../config/validations/RefreshToken";
-import { alphabets, backgroundColors } from "../../../../constants/Colors";
-import MESSAGE from "../../../../constants/Messages";
-import AppTutorailManager from "../../tutorails/AppTutorailManager";
-import { NavbarSteps } from "../../../../constants/AppTutorailsSteps";
-import { useTutorailDataContext } from "../../../../context/tutorail/useTutorailDataContext";
-import { TutorailColumnName } from "../../../../constants/Tutorail";
 import { cancelAllRequests } from "../../../../axios-client/AxiosClient";
+import { useUserAccessModules } from "../../../../config/hooks/useAccessModules";
+import useScreenSize from "../../../../config/hooks/useScreenSize";
+import RefreshToken from "../../../../config/validations/RefreshToken";
+import { SIZE, STATUS_CODE } from "../../../../constants/AppConstants";
+import { NavbarSteps } from "../../../../constants/AppTutorailsSteps";
+import { alphabets, backgroundColors } from "../../../../constants/Colors";
+import { IMAGE_SOURCE } from "../../../../constants/ImageSource";
+import MESSAGE from "../../../../constants/Messages";
+import POST_API from "../../../../constants/PostApi";
+import ROUTES_URL from "../../../../constants/Routes";
+import { TutorailColumnName } from "../../../../constants/Tutorail";
+import { useNotificationCountContext } from "../../../../context/notification/NotificationCountContext";
+import { usePanel } from "../../../../context/panel/usePanel";
+import { useTutorailDataContext } from "../../../../context/tutorail/useTutorailDataContext";
+import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
+import { useUserPreference } from "../../../../context/user/UserPreference";
 import { LocalStorageKeys } from "../../../../enums/LocalStorageKeys";
+import QuotationIconSvg from "../../../quotation-builder/svg/QuotationIconSvg";
+import Button from "../../../ui/Button";
 import { AppVersionViewCard } from "../../card/AppVersionViewCard";
+import AccessDeniedPopup from "../../not-found/AccessDeniedPage";
+import NotificationPopup from "../../notification/NotificationManagement";
+import AppTutorailManager from "../../tutorails/AppTutorailManager";
+import NavItem from "./Component/NavItem";
+import SideNavBar from "./SideNavBar";
 
 function Navbar({ children }: { children: React.ReactNode }) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -71,6 +77,12 @@ function Navbar({ children }: { children: React.ReactNode }) {
     userHasAccessToUpdateSettingGeneral,
     userHasAccessToViewStock,
     userHasAccessToViewSupportTicket,
+    userHasAccessToViewTasks,
+    userHasAccessToViewCompanyInvoice,
+    userHasAccessToAddAccountProformaInvoice,
+    userHasAccessToViewCompanyQuotation,
+    userHasAccessToViewCompanyProductSale,
+    userHasAccessToViewCompanyUserReportType,
   } = useUserAccessModules();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [accessDeniedPopUpView, setAccessDeniedPopUpView] =
@@ -79,6 +91,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
   const Navigate = useNavigate();
   const { position } = usePanel();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const { userPreference, setUserPreference } = useUserPreference();
 
   // const position = localStorage.getItem('panel_position');
 
@@ -118,6 +131,13 @@ function Navbar({ children }: { children: React.ReactNode }) {
   }, [location]);
 
   useEffect(() => {
+    setUserPreference({
+      ...userPreference,
+      sidebarOpen: sidebarOpen,
+    });
+  }, [sidebarOpen]);
+
+  useEffect(() => {
     const element = location.pathname;
     if (element === ROUTES_URL.HOME) {
       setIsDashboardRendered(true);
@@ -135,10 +155,10 @@ function Navbar({ children }: { children: React.ReactNode }) {
       .then((response) => {
         if (response.status === 200) {
           localStorage.removeItem(
-            LocalStorageKeys.SUPPORT_TICKET_MANAGEMENT_FILTERS
+            LocalStorageKeys.SUPPORT_TICKET_MANAGEMENT_FILTERS,
           );
           localStorage.removeItem(
-            LocalStorageKeys.ACCOUNT_COMPANY_PRODUCT_FOR_SUPPORT_TICKET
+            LocalStorageKeys.ACCOUNT_COMPANY_PRODUCT_FOR_SUPPORT_TICKET,
           );
           toast.success(response.data);
           setLoginStatus({
@@ -289,61 +309,115 @@ function Navbar({ children }: { children: React.ReactNode }) {
   ) {
     return (
       <div>
-        <header className="fixed bg-white w-full shadow-sm z-50 py-5">
-          <nav className="">
+        {/* <header className="fixed bg-white w-full shadow-sm z-50 py-5"> */}
+        <header className="fixed w-full bg-white/80 backdrop-blur-md shadow-sm z-50 py-4">
+          <nav className=" font-dm text-sm">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              <div className="flex justify-between h-10">
+              <div className="flex justify-between items-center h-10">
                 <div className="flex items-center">
                   <div className=" justify-self-start">
-                    <img
-                      height={28}
-                      width={100}
-                      src={IMAGE_SOURCE.PR_ONE_LOGO}
-                      alt="Logo"
-                    />
+                    <Link to={ROUTES_URL.LANDING_PAGE}>
+                      <img
+                        height={28}
+                        width={100}
+                        src={IMAGE_SOURCE.PR_ONE_LOGO}
+                        alt="Logo"
+                        onClick={() =>
+                          window.scrollTo({ top: 0, behavior: "smooth" })
+                        }
+                      />
+                    </Link>
                   </div>
                 </div>
 
                 <div className="hidden md:flex items-center space-x-8">
-                  <a
-                    href={ROUTES_URL.FEATURES}
-                    className="text-gray-700 hover:text-blue-600"
+                  <NavLink
+                    to={ROUTES_URL.LANDING_PAGE}
+                    // href={ROUTES_URL.FEATURES}
+                    onClick={() =>
+                      window.scrollTo({ top: 0, behavior: "smooth" })
+                    }
+                    className={({ isActive }) =>
+                      isActive
+                        ? "text-purple font-semibold border-b-2 border-purple "
+                        : "text-gray-700 hover:text-purple"
+                    }
+                  >
+                    Home
+                  </NavLink>
+                  <NavLink
+                    to={ROUTES_URL.FEATURES}
+                    // href={ROUTES_URL.FEATURES}
+                    onClick={() =>
+                      window.scrollTo({ top: 0, behavior: "smooth" })
+                    }
+                    className={({ isActive }) =>
+                      isActive
+                        ? "text-purple font-semibold border-b-2 border-purple "
+                        : "text-gray-700 hover:text-purple"
+                    }
                   >
                     Features
-                  </a>
-                  <a
-                    href={ROUTES_URL.PRICING}
-                    className="text-gray-700 hover:text-blue-600"
+                  </NavLink>
+                  <NavLink
+                    to={ROUTES_URL.PRICING}
+                    // href={ROUTES_URL.PRICING}
+                    onClick={() =>
+                      window.scrollTo({ top: 0, behavior: "smooth" })
+                    }
+                    className={({ isActive }) =>
+                      isActive
+                        ? "text-purple font-semibold border-b-2 border-purple "
+                        : "text-gray-700 hover:text-purple"
+                    }
                   >
                     Pricing
-                  </a>
-                  <a
-                    href={ROUTES_URL.ABOUT_US}
-                    className="text-gray-700 hover:text-blue-600"
+                  </NavLink>
+                  <NavLink
+                    to={ROUTES_URL.ABOUT_US}
+                    // href={ROUTES_URL.ABOUT_US}
+                    onClick={() =>
+                      window.scrollTo({ top: 0, behavior: "smooth" })
+                    }
+                    // className="text-gray-700 hover:text-blue-600"
+                    className={({ isActive }) =>
+                      isActive
+                        ? "text-purple font-semibold border-b-2 border-purple "
+                        : "text-gray-700 hover:text-purple"
+                    }
                   >
                     About Us
-                  </a>
-                  <a
-                    href={ROUTES_URL.CONTACT_US}
-                    className="text-gray-700 hover:text-blue-600"
+                  </NavLink>
+                  <NavLink
+                    to={ROUTES_URL.CONTACT_US}
+                    // href={ROUTES_URL.CONTACT_US}
+                    onClick={() =>
+                      window.scrollTo({ top: 0, behavior: "smooth" })
+                    }
+                    className={({ isActive }) =>
+                      isActive
+                        ? "text-purple font-semibold border-b-2 border-purple "
+                        : "text-gray-700 hover:text-purple"
+                    }
                   >
                     Contact Us
-                  </a>
-                  <a
+                  </NavLink>
+                  {/* <a
                     href={ROUTES_URL.CAREERS}
                     className="text-gray-700 hover:text-blue-600"
                   >
                     Careers
-                  </a>
-
-                  <Link to={ROUTES_URL.SIGN_UP}>
-                    <button className="bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700">
-                      Get Started
+                  </a> */}
+                </div>
+                <div className="hidden md:flex gap-4">
+                  <Link to={ROUTES_URL.SIGN_IN}>
+                    <button className="border border-purple text-purple px-6 py-2  rounded-full w-full hover:bg-purple-light">
+                      Login
                     </button>
                   </Link>
-                  <Link to={ROUTES_URL.SIGN_IN}>
-                    <button className="bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700">
-                      Login
+                  <Link to={ROUTES_URL.SIGN_UP}>
+                    <button className="bg-purple text-white px-6 py-2 rounded-full w-full hover:bg-purpleHover">
+                      Get Started
                     </button>
                   </Link>
                 </div>
@@ -361,9 +435,9 @@ function Navbar({ children }: { children: React.ReactNode }) {
             </div>
 
             {isOpen && (
-              <div className="md:hidden">
+              <div className="md:hidden font-dm text-sm">
                 <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-                  <a
+                  {/* <a
                     href="#features"
                     className="block px-3 py-2 text-gray-700 hover:text-blue-600"
                   >
@@ -380,16 +454,96 @@ function Navbar({ children }: { children: React.ReactNode }) {
                     className="block px-3 py-2 text-gray-700 hover:text-blue-600"
                   >
                     Pricing
-                  </a>
-                  <Link to={ROUTES_URL.SIGN_UP}>
-                    <Button className="bg-blue-600 text-white px-4 py-2 rounded-full hover:bg-blue-700 w-full text-center">
-                      Get Started
+                  </a> */}
+                  <NavLink
+                    to={ROUTES_URL.LANDING_PAGE}
+                    // href={ROUTES_URL.LANDING_PAGE}
+                    onClick={() =>
+                      window.scrollTo({ top: 0, behavior: "smooth" })
+                    }
+                    className={({ isActive }) =>
+                      `block px-3 py-2 rounded-md transition ${
+                        isActive
+                          ? "bg-blue-50 text-purple font-semibold"
+                          : "text-gray-700 hover:bg-gray-100 hover:text-purple"
+                      }`
+                    }
+                  >
+                    Home
+                  </NavLink>
+                  <NavLink
+                    to={ROUTES_URL.FEATURES}
+                    // href={ROUTES_URL.FEATURES}
+                    onClick={() =>
+                      window.scrollTo({ top: 0, behavior: "smooth" })
+                    }
+                    className={({ isActive }) =>
+                      `block px-3 py-2 rounded-md transition ${
+                        isActive
+                          ? "bg-blue-50 text-purple font-semibold"
+                          : "text-gray-700 hover:bg-gray-100 hover:text-purple"
+                      }`
+                    }
+                  >
+                    Features
+                  </NavLink>
+                  <NavLink
+                    to={ROUTES_URL.PRICING}
+                    // href={ROUTES_URL.PRICING}
+                    onClick={() =>
+                      window.scrollTo({ top: 0, behavior: "smooth" })
+                    }
+                    className={({ isActive }) =>
+                      `block px-3 py-2 rounded-md transition ${
+                        isActive
+                          ? "bg-blue-50 text-purple font-semibold"
+                          : "text-gray-700 hover:bg-gray-100 hover:text-purple"
+                      }`
+                    }
+                  >
+                    Pricing
+                  </NavLink>
+                  <NavLink
+                    to={ROUTES_URL.ABOUT_US}
+                    // href={ROUTES_URL.ABOUT_US}
+                    onClick={() =>
+                      window.scrollTo({ top: 0, behavior: "smooth" })
+                    }
+                    className={({ isActive }) =>
+                      `block px-3 py-2 rounded-md transition ${
+                        isActive
+                          ? "bg-blue-50 text-purple font-semibold"
+                          : "text-gray-700 hover:bg-gray-100 hover:text-purple"
+                      }`
+                    }
+                  >
+                    About Us
+                  </NavLink>
+                  <NavLink
+                    to={ROUTES_URL.CONTACT_US}
+                    onClick={() =>
+                      window.scrollTo({ top: 0, behavior: "smooth" })
+                    }
+                    // href={ROUTES_URL.CONTACT_US}
+                    className={({ isActive }) =>
+                      `block px-3 py-2 rounded-md transition ${
+                        isActive
+                          ? "bg-blue-50 text-purple font-semibold"
+                          : "text-gray-700 hover:bg-gray-100 hover:text-purple"
+                      }`
+                    }
+                  >
+                    Contact Us
+                  </NavLink>
+                  <Link to={ROUTES_URL.SIGN_IN}>
+                    <Button className="border border-purple text-purple px-6 py-2 rounded-full w-full hover:bg-purple-light ">
+                      Login
                     </Button>
                   </Link>
-                  <Link to={ROUTES_URL.SIGN_IN}>
-                    <button className="bg-blue-600 text-white px-4 py-2 rounded-full hover:bg-blue-700 w-full text-center">
-                      Login
-                    </button>
+                  <Link to={ROUTES_URL.SIGN_UP}>
+                    <Button className="bg-purple text-white px-6 py-2 rounded-full mt-1 w-full hover:bg-purpleHover">
+                      Get Started
+                    </Button>
                   </Link>
                 </div>
               </div>
@@ -473,10 +627,21 @@ function Navbar({ children }: { children: React.ReactNode }) {
                         <NavItem
                           disable={!userHasAccessToViewUser}
                           to={ROUTES_URL.GET_COMPANY_USERS}
-                          icon={<Building2 size={SIZE.TWENTY} />}
+                          icon={<LucideUserPlus2 size={SIZE.TWENTY} />}
                           label="Manage Users"
                         />
-
+                        <NavItem
+                          disable={!userHasAccessToViewCompanyUserReportType}
+                          to={ROUTES_URL.REPORT_MANAGEMENT}
+                          icon={<FileBarChart size={SIZE.TWENTY} />}
+                          label="Report"
+                        />
+                        <NavItem
+                          disable={!userHasAccessToViewTasks}
+                          to={ROUTES_URL.TASKS_MANAGEMENT}
+                          icon={<ListChecks size={SIZE.TWENTY} />}
+                          label="Tasks"
+                        />
                         {/* {userHasAccessToViewLead && ( */}
                         <NavItem
                           disable={!userHasAccessToViewLead}
@@ -484,6 +649,14 @@ function Navbar({ children }: { children: React.ReactNode }) {
                           icon={<Handshake size={SIZE.TWENTY} />}
                           label="Lead"
                         />
+
+                        <NavItem
+                          disable={!userHasAccessToViewCompanyQuotation}
+                          to={ROUTES_URL.QUOTATION_MANAGEMENT}
+                          icon={<LucideFileArchive size={SIZE.TWENTY} />}
+                          label="Quotation"
+                        />
+
                         {/* )} */}
                         {/* {!userHasAccessToViewLead && (
                           <NavItem
@@ -499,6 +672,25 @@ function Navbar({ children }: { children: React.ReactNode }) {
                           to={ROUTES_URL.ACCOUNT_MANAGEMENT}
                           icon={<UserCogIcon size={SIZE.TWENTY} />}
                           label="Accounts"
+                        />
+                        <NavItem
+                          disable={!userHasAccessToViewCompanyInvoice}
+                          to={ROUTES_URL.INVOICE_MANAGEMENT}
+                          icon={<FaRegFileAlt size={SIZE.TWENTY} />}
+                          label="Invoices"
+                        />
+                        <NavItem
+                          disable={!userHasAccessToAddAccountProformaInvoice}
+                          to={ROUTES_URL.ACCOUNT_PROFORMA_INVOICE_MANAGEMENT}
+                          icon={<FaRegFileArchive size={SIZE.TWENTY} />}
+                          label="Proforma"
+                        />
+
+                        <NavItem
+                          disable={!userHasAccessToViewCompanyProductSale}
+                          to={ROUTES_URL.COMPANY_PRODUCT_SALE_MANAGEMENT}
+                          icon={<PackageCheck size={SIZE.TWENTY} />}
+                          label="Sales"
                         />
 
                         {/* )} */}
@@ -572,14 +764,20 @@ function Navbar({ children }: { children: React.ReactNode }) {
                               label: "Email Template",
                             },
                             {
+                              icon: (
+                                <QuotationIconSvg
+                                  strokeWidth={2}
+                                  size={SIZE.TWENTY + 1}
+                                  showCurrency={true}
+                                />
+                              ),
+                              to: ROUTES_URL.QUOTATION_SETTINGS,
+                              label: "Quotation Template",
+                            },
+                            {
                               icon: <Layers size={SIZE.TWENTY} />,
                               to: ROUTES_URL.INTEGRATIONS_SETTINGS,
                               label: "Integrations",
-                            },
-                            {
-                              icon: <Quote size={SIZE.TWENTY} />,
-                              to: ROUTES_URL.QUOTATION_SETTINGS,
-                              label: "Quotation",
                             },
                           ]}
                         />
@@ -604,7 +802,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
                           />
                           <NavItem
                             to={ROUTES_URL.GET_COMPANY_USERS}
-                            icon={<Building2 size={SIZE.TWENTY} />}
+                            icon={<LucideUserPlus2 size={SIZE.TWENTY} />}
                             label=""
                             onClick={() => setIsDropdownOpen(false)}
                           />
@@ -612,6 +810,15 @@ function Navbar({ children }: { children: React.ReactNode }) {
                             <NavItem
                               to={ROUTES_URL.GET_LEAD_MANAGEMENT}
                               icon={<Handshake size={SIZE.TWENTY} />}
+                              label=""
+                              onClick={() => setIsDropdownOpen(false)}
+                            />
+                          )}
+
+                          {userHasAccessToViewCompanyQuotation && (
+                            <NavItem
+                              to={ROUTES_URL.QUOTATION_MANAGEMENT}
+                              icon={<LucideFileArchive size={SIZE.TWENTY} />}
                               label=""
                               onClick={() => setIsDropdownOpen(false)}
                             />
@@ -681,7 +888,14 @@ function Navbar({ children }: { children: React.ReactNode }) {
                           />
                           <NavItem
                             to={ROUTES_URL.QUOTATION_SETTINGS}
-                            icon={<Quote size={SIZE.TWENTY} />}
+                            icon={
+                              <QuotationIconSvg
+                                strokeWidth={2}
+                                size={26}
+                                className="text-blue-600"
+                                showCurrency={true}
+                              />
+                            }
                             onClick={() => setIsDropdownOpen(false)}
                             label=""
                           />
@@ -694,7 +908,6 @@ function Navbar({ children }: { children: React.ReactNode }) {
                         </div>
                       )}
                     </div>
-                    
                   </>
                 )}
 
@@ -727,7 +940,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
                           onClick={() => {
                             resetNotificationCount();
                             setIsOpenPopUpOfNotification(
-                              !isOpenPopUpOfNotification
+                              !isOpenPopUpOfNotification,
                             );
                             // unreadCount=0;
                           }}
@@ -764,7 +977,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
                           onClick={() => {
                             toast.error(
                               MESSAGE.MODULE_ACCESS.GENERAL_SETTING
-                                .DENIED_UPDATE_ACCESS
+                                .DENIED_UPDATE_ACCESS,
                             );
                           }}
                           id="panel-layout-navbar"
@@ -783,7 +996,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
                   >
                     <div
                       className={`w-9 h-9 rounded-full grid place-content-center section-header-custom-white border border-gray-300 ${getColor(
-                        loginStatus.email
+                        loginStatus.email,
                       )}`}
                     >
                       {loginStatus.fullName
@@ -811,7 +1024,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
                         <div className="p-3 border-b border-gray-200 flex items-center space-x-3">
                           <div
                             className={`w-9 h-9 rounded-full grid place-content-center section-header-custom-white border border-gray-300 ${getColor(
-                              loginStatus.email
+                              loginStatus.email,
                             )}`}
                           >
                             {loginStatus.fullName
@@ -904,7 +1117,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
                             </div>
                           </button>
 
-                          <AppVersionViewCard/>
+                          <AppVersionViewCard />
                         </div>
                       </div>
                     )}

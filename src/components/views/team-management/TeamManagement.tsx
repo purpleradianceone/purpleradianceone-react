@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { STATUS_CODE } from "../../../constants/AppConstants";
 import AccessDeniedPopup from "../not-found/AccessDeniedPage";
 import TeamManagementList from "../../lists/TeamManagementList";
-import { useSearchFilterPaginationDateHandlers } from "../../../config/hooks/usePaginationHandler";
+import { customDateRangeId, useSearchFilterPaginationDateHandlers } from "../../../config/hooks/usePaginationHandler";
 import axios from "axios";
 import POST_API from "../../../constants/PostApi";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
@@ -49,6 +49,7 @@ function TeamManagement() {
     CompanyTeamSearchProps[]
   >([]);
 
+  const [isDataLoading, setIsDataLoading] = useState<boolean>(false);
   // Read filters from LocalStorage (before hook initializes)
 const savedFilters = JSON.parse(
   localStorage.getItem(LocalStorageKeys.TEAMS_MANAGEMEMNT_FILTERS) || "{}"
@@ -72,10 +73,10 @@ const savedFilters = JSON.parse(
   } = useSearchFilterPaginationDateHandlers(savedFilters);
 
   const effectiveDateRangeId =
-    dateRangeId === 8 && !concatDate ? 0 : dateRangeId;
+    dateRangeId === customDateRangeId && !concatDate ? 0 : dateRangeId;
 
   const fetchCompanyTeam = async (signal : AbortSignal) => {
-    if (dateRangeId === 8 && concatDate.trim() === "") return;
+    if (dateRangeId === customDateRangeId && concatDate.trim() === "") return;
     const offset = (currentPage - 1) * pageSize;
     if (userHasAccessToViewTeamManagement) {
 
@@ -89,6 +90,7 @@ const savedFilters = JSON.parse(
         search_parameter_date: concatDate,
       };
 
+      setIsDataLoading(true)
       await axios
         .post(POST_API.GET_COMPANY_TEAM, getCompanyTeamPostData, {
           signal,
@@ -122,6 +124,8 @@ const savedFilters = JSON.parse(
               fetchCompanyTeam(signal);
             }
           }
+        }).finally(()=>{
+          setIsDataLoading(false)
         });
     }
   };
@@ -230,6 +234,7 @@ const savedFilters = JSON.parse(
                 onPageChange: handlePageChange,
                 pageSize,
               }}
+              isDataLoading={isDataLoading}
             ></TeamManagementList>
           </div>
         </>

@@ -1,6 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Edit2 } from "lucide-react";
-import FormHeader from "../../ui/FormHeader";
 import { useEffect, useState } from "react";
 import CompanyAccountType from "../../../@types/settings/CompanyAccountType";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
@@ -12,6 +10,8 @@ import LoadingSpinner from "../../../assets/animations/LoadingSpinner";
 import AccountCompanyAccountTypeAgGrid from "../../ag-grid/AccountCompanyAccountTypeAgGrid";
 import ApiError from "../../../@types/error/ApiError";
 import axiosClient from "../../../axios-client/AxiosClient";
+import FormHeader from "../../ui/FormHeader";
+import { Edit2 } from "lucide-react";
 
 const CreateAccountCompanyAccountType = ({
   onClose,
@@ -130,8 +130,8 @@ const CreateAccountCompanyAccountType = ({
   }, []);
 
   return (
-    <div className="fixed inset-0 z-50 bg-black bg-opacity-5 flex justify-center items-center  p-2 sm:p-2">
-      <div className="bg-white w-full max-w-6xl  rounded  p-2 relative">
+    // <div className="fixed inset-0  bg bg-opacity-5 flex justify-center items-center  p-2 sm:p-2">
+      <div className="h-72 w-full rounded  relative">
         {/* Header */}
         <FormHeader
           icon={Edit2}
@@ -154,7 +154,7 @@ const CreateAccountCompanyAccountType = ({
 
         {
             companyAccountType && !isLoadingCompanyAccountType && (
-                <div className="ag-theme-balham w-full h-[calc(100vh-120px)] p-2">
+                <div className=" w-full h-[250px] ">
                     <AccountCompanyAccountTypeAgGrid
                         accountCompanyAccountTypeData={companyAccountType}
                         onRowSelect={handleRowSelectForAssingingToAccount}
@@ -163,7 +163,7 @@ const CreateAccountCompanyAccountType = ({
             )
         }
       </div>
-    </div>
+    // {/* </div> */}
   );
 };
 

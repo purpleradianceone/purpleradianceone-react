@@ -12,6 +12,7 @@ import AccessDeniedMessagePage from '../../not-found/AccessDeniedMessagePage';
 import toast from 'react-hot-toast';
 import SettingToggleCard from '../../../ui/SettingToggleCard';
 import MESSAGE from '../../../../constants/Messages';
+import FacebookPageSkeleton from '../social-media-integration/meta-app-facebook/PafeIdListCardPopUp';
 
 
 
@@ -19,33 +20,33 @@ function EmailTypeSettings() {
   const [emailTypeSettings, setEmailTypeSettings] = useState<EmailTypeSettingsType[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const { loginStatus } = useLoggedInUserContext();
-  const { userHasAccessToViewEmailTypeSetting , userHasAccessToUpdateEmailTypeSetting} = useUserAccessModules();
+  const { userHasAccessToViewEmailTypeSetting, userHasAccessToUpdateEmailTypeSetting } = useUserAccessModules();
 
 
 
-const getDescription = (setting : EmailTypeSettingsType) => {
-  if(setting.emailTypeId === 1){
-    return setting.isActive ? emailDescriptions.active.welcomeCompanyUser : emailDescriptions.inactive.welcomeCompanyUser;
+  const getDescription = (setting: EmailTypeSettingsType) => {
+    if (setting.emailTypeId === 1) {
+      return setting.isActive ? emailDescriptions.active.welcomeCompanyUser : emailDescriptions.inactive.welcomeCompanyUser;
+    }
+    else if (setting.emailTypeId === 2) {
+      return setting.isActive ? emailDescriptions.active.newLeadCreated : emailDescriptions.inactive.newLeadCreated;
+    }
+    else if (setting.emailTypeId === 3) {
+      return setting.isActive ? emailDescriptions.active.leadAssigned : emailDescriptions.inactive.leadAssigned;
+    }
+    else if (setting.emailTypeId === 4) {
+      return setting.isActive ? emailDescriptions.active.leadStatusChanged : emailDescriptions.inactive.leadStatusChanged;
+    }
+    else if (setting.emailTypeId === 9) {
+      return setting.isActive ? emailDescriptions.active.companyUserAssignedToCompanyProduct : emailDescriptions.inactive.companyUserAssignedToCompanyProduct;
+    }
+    else if (setting.emailTypeId === 10) {
+      return setting.isActive ? emailDescriptions.active.companyUserAssignedToCompanyTeam : emailDescriptions.inactive.companyUserAssignedToCompanyTeam;
+    }
+    else if (setting.emailTypeId === 11) {
+      return setting.isActive ? emailDescriptions.active.newAccountCreated : emailDescriptions.inactive.newAccountCreated;
+    }
   }
-  else if(setting.emailTypeId === 2){
-        return setting.isActive ? emailDescriptions.active.newLeadCreated : emailDescriptions.inactive.newLeadCreated;
-  }
-  else if(setting.emailTypeId === 3){
-        return setting.isActive ? emailDescriptions.active.leadAssigned : emailDescriptions.inactive.leadAssigned;
-  }
-  else if(setting.emailTypeId === 4){
-        return setting.isActive ? emailDescriptions.active.leadStatusChanged : emailDescriptions.inactive.leadStatusChanged;
-  }
-  else if(setting.emailTypeId === 9){
-        return setting.isActive ? emailDescriptions.active.companyUserAssignedToCompanyProduct : emailDescriptions.inactive.companyUserAssignedToCompanyProduct;
-  }
-  else if(setting.emailTypeId === 10){
-        return setting.isActive ? emailDescriptions.active.companyUserAssignedToCompanyTeam : emailDescriptions.inactive.companyUserAssignedToCompanyTeam;
-  }
-   else if(setting.emailTypeId === 11){
-        return setting.isActive ? emailDescriptions.active.newAccountCreated : emailDescriptions.inactive.newAccountCreated;
-  }
-}
 
   const fetchCompanyEmailTypeSettings = async () => {
     setIsLoading(true);
@@ -89,7 +90,7 @@ const getDescription = (setting : EmailTypeSettingsType) => {
   };
 
   const handleEmailTypeSettingCheckBoxChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    if(!userHasAccessToUpdateEmailTypeSetting) {
+    if (!userHasAccessToUpdateEmailTypeSetting) {
       toast.error(MESSAGE.MODULE_ACCESS.SETTING.EMAIL_TYPE_SETTING.DENIED_UPDATE_ACCESS)
       return;
     }
@@ -118,7 +119,7 @@ const getDescription = (setting : EmailTypeSettingsType) => {
           );
           toast.success(response.data.message)
         } else {
-         toast.error(response.data.message)
+          toast.error(response.data.message)
         }
       }
     } catch (error: any) {
@@ -144,15 +145,26 @@ const getDescription = (setting : EmailTypeSettingsType) => {
   }
 
   return (
-    <div className="w-full min-h-screen bg-white p-4 sm:p-6 lg:p-1">
+    <div className="w-full h-full bg-white p-4 sm:p-6 lg:p-1">
       <div className="text-center mb-3">
         <p className="table-data-custom mt-2">Manage settings for different types of emails sent from your company email.</p>
       </div>
 
       {isLoading ? (
-        <div className="flex justify-center items-center mt-20">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-blue-500" />
-        </div>
+         <div className="grid md:grid-cols-3 sm:grid-cols-2 gap-4">
+        <FacebookPageSkeleton />
+        <FacebookPageSkeleton />
+        <FacebookPageSkeleton />
+        <FacebookPageSkeleton />
+        <FacebookPageSkeleton />
+        <FacebookPageSkeleton />
+        <FacebookPageSkeleton />
+        <FacebookPageSkeleton />
+        <FacebookPageSkeleton />
+        <FacebookPageSkeleton />
+        <FacebookPageSkeleton />
+        <FacebookPageSkeleton />
+      </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {emailTypeSettings.map((setting) => (
@@ -160,12 +172,12 @@ const getDescription = (setting : EmailTypeSettingsType) => {
           ))}
         </div>
       )}
-    <div className="w-full h-fit bg-gray-50 px-2 py-2">
-      {!userHasAccessToViewEmailTypeSetting && (
-        <AccessDeniedMessagePage></AccessDeniedMessagePage>
-      )}
+      {!userHasAccessToViewEmailTypeSetting && <div className="w-full h-fit bg-gray-50 px-2 py-2">
+        {!userHasAccessToViewEmailTypeSetting && (
+          <AccessDeniedMessagePage></AccessDeniedMessagePage>
+        )}
+      </div>}
     </div>
-      </div>
   );
 }
 

@@ -143,8 +143,8 @@ function RecentTicketsDashboard({ isLoading, recentTickets }: Props) {
         {/* Header */}
         <div className="flex items-center justify-between mb-4 flex-shrink-0">
           <div>
-            <h3 className="section-header-custom mb-1">Recent Tickets</h3>
-            <p className="table-header-custom">
+            <h3 className="table-header-custom">Recent Tickets</h3>
+            <p className="caption-custom">
               Recently created or updated support tickets
             </p>
           </div>
@@ -181,7 +181,7 @@ function RecentTicketsDashboard({ isLoading, recentTickets }: Props) {
                     <div className="flex items-start justify-between mb-1">
                       <div>
                         <h4
-                          className={`table-header-custom ${
+                          className={`table-data-custom ${
                             isLoadingForNavigate
                               ? "cursor-wait"
                               : "cursor-pointer"
@@ -189,8 +189,8 @@ function RecentTicketsDashboard({ isLoading, recentTickets }: Props) {
                         >
                           Ticket Number: {ticket.ticket_number}
                         </h4>
-                        <p className="caption-custom mt-1 line-clamp-2">
-                          {ticket.query_description}
+                        <p className="caption-custom-black mt-1 line-clamp-2">
+                          Query: <span className="caption-custom">{ticket.query_description}</span>
                         </p>
                       </div>
 
@@ -204,24 +204,24 @@ function RecentTicketsDashboard({ isLoading, recentTickets }: Props) {
                     </div>
 
                     <div className="flex items-center justify-between mt-2">
-                      <div className="flex items-center space-x-4 input-label-custom  ">
-                        <span className="table-header-custom ">Product:</span>
-                        <span className="table-data-custom hover:text-blue-600">
+                      <div className="flex items-center space-x-2 input-label-custom  ">
+                        <span className="caption-custom-black ">Product:</span>
+                        <span className="caption-custom hover:text-blue-600">
                           {ticket.company_product_name}
                         </span>
                         <span>•</span>
-                        <span className="table-header-custom">Category: </span>
-                        <span className="table-data-custom hover:text-blue-600">
+                        <span className="caption-custom-black">Category:</span>
+                        <span className="caption-custom hover:text-blue-600">
                           {ticket.support_ticket_category_name}
                         </span>
                         <span>•</span>
-                        <span className="table-header-custom">SLA: </span>
-                        <span className="table-data-custom hover:text-blue-600">
+                        <span className="caption-custom-black">SLA: </span>
+                        <span className="caption-custom hover:text-blue-600">
                           {ticket.company_product_sla_name}
                         </span>
                       </div>
 
-                      <div className="flex items-center space-x-1 input-label-custom">
+                      <div className="flex items-center space-x-1 table-data-custom">
                         <Clock className="w-3 h-3" />
                         <span>{ticket.due_date_time}</span>
                       </div>

@@ -58,7 +58,10 @@ const StockLiveForCompanyProduct = ({
       })
       .then((response) => {
         if (response.status === STATUS_CODE.OK) {
-          setCurrentPageData({currentPage: currentPage, pageDataLength: response.data.length});
+          setCurrentPageData({
+            currentPage: currentPage,
+            pageDataLength: response.data.length,
+          });
           const data = response.data;
           const formattedData: LiveStock[] = data.map((item: any) => ({
             count: item.count,
@@ -172,7 +175,7 @@ const StockLiveForCompanyProduct = ({
             : "h-[calc(100vh-148px)]"
         }`}
       >
-        <StockLiveAgGrid data={liveStock} />
+        <StockLiveAgGrid data={liveStock}  isDataLoading={loading}/>
       </div>
       <div className="flex items-center justify-end ">
         <PaginationWithoutCount

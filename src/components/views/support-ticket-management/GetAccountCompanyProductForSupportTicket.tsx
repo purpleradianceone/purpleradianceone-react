@@ -6,7 +6,7 @@ import POST_API from "../../../constants/PostApi";
 import { STATUS_CODE } from "../../../constants/AppConstants";
 import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
 import RefreshToken from "../../../config/validations/RefreshToken";
-import { useSearchFilterPaginationDateHandlers } from "../../../config/hooks/usePaginationHandler";
+import { customDateRangeId, useSearchFilterPaginationDateHandlers } from "../../../config/hooks/usePaginationHandler";
 import { useInView } from "react-intersection-observer";
 import { motion } from "framer-motion";
 import { LocalStorageKeys } from "../../../enums/LocalStorageKeys";
@@ -24,6 +24,7 @@ function GetAccountCompanyProductForSupportTicket({
   const [accountsCompanyProductForSupportTicke, setAccountsCompanyProductForSupportTicke] = useState<
     AccountCompanyProductForSupportTicket[]
   >([]);
+  const [isDataLoading, setIsDataLoading] = useState<boolean>(false);  
   const [ref, inView] = useInView({ fallbackInView: true, threshold: 0.1 });
   const { loginStatus } = useLoggedInUserContext();
   const [accessDeniedPopUpOpen, setAccessDeniedPopUpOpen] = useState(false);
@@ -59,11 +60,11 @@ function GetAccountCompanyProductForSupportTicket({
   // Fetch data function
   const fetchAccountCompanyProductForSupportTicket = async () => {
     if(loginStatus.companyId === 0) return;
-    if (dateRangeId === 8 && concatDate.trim() === "") return;
+    if (dateRangeId === customDateRangeId && concatDate.trim() === "") return;
     const offset = (currentPage - 1) * pageSize;
-
+    setIsDataLoading(true)
     const effectiveDateRangeId =
-      dateRangeId === 8 && !concatDate ? 0 : dateRangeId;
+      dateRangeId === customDateRangeId && !concatDate ? 0 : dateRangeId;
 
     const postData = {
       company_id: loginStatus.companyId,
@@ -124,6 +125,8 @@ function GetAccountCompanyProductForSupportTicket({
           fetchAccountCompanyProductForSupportTicket();
         }
       }
+    }finally{
+      setIsDataLoading(false);
     }
   };
 
@@ -217,6 +220,7 @@ function GetAccountCompanyProductForSupportTicket({
                   
                 }}
                 handleRowSelect={handleRowSelect}
+                isDataLaoding={isDataLoading}
               />
             </motion.section>
           </div>

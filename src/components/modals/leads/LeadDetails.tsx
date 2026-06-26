@@ -17,12 +17,13 @@ import CreateOrUpdateLeadDetails from "../../../@types/lead-management/CreateLea
 import RefreshToken from "../../../config/validations/RefreshToken";
 import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
 import toast from "react-hot-toast";
-import COLORS from "../../../constants/Colors";
-import {  Pen, Save } from "lucide-react";
+import {  Pen, Save, X } from "lucide-react";
 import { useUserPreference } from "../../../context/user/UserPreference";
 import axiosClient from "../../../axios-client/AxiosClient";
 import AccessDeniedMessagePage from "../../views/not-found/AccessDeniedMessagePage";
 import MESSAGE from "../../../constants/Messages";
+import { handleApiError } from "../../../config/error/handleApiError";
+import LoadingSpinner from "../../../assets/animations/LoadingSpinner";
 
 const LeadDetails = ({
   leadDetailsData,
@@ -39,15 +40,17 @@ const LeadDetails = ({
 
   getLeadDetails: () => void;
   handleSaveEditLeadDetailsCallback: (
-    editLeadDetailsData: LeadDetailsData
+    editLeadDetailsData: LeadDetailsData,
   ) => void;
 }) => {
-  const {    userHasAccessToUpdateLeadDetails, userHasAccessToViewLeadDetails} = useUserAccessModules();
+  const { userPreference } = useUserPreference();
+  const { userHasAccessToUpdateLeadDetails, userHasAccessToViewLeadDetails } =
+    useUserAccessModules();
 
   const [editLeadDetails, setEditLeadDetails] = useState<LeadDetailsData>({
     additional_contact_number: "",
     address: "",
-    country_id: 0,
+    country_id: userPreference.countryId,
     district_id: 0,
     country_name: "",
     createdby: "",
@@ -67,6 +70,7 @@ const LeadDetails = ({
   });
 
   const [countries, setCountries] = useState<Country[]>([]);
+
   const [industryType, setIndustryType] = useState<industryType[]>([]);
   const [stateData, setStateData] = useState<State[]>([]);
   const [district, setDistrict] = useState<District[]>([]);
@@ -95,20 +99,25 @@ const LeadDetails = ({
     setChangedStateId(leadDetailsData.state_id);
   }, [leadDetailsData]);
 
+  // const [showSaveLeadButton, setShowSaveLeadButton] = useState<boolean>(false);
   const [showSaveLeadButton, setShowSaveLeadButton] = useState<boolean>(false);
+const [isEditingAll, setIsEditingAll] = useState<boolean>(false);
 
   const { loginStatus } = useLoggedInUserContext();
   const createNewDetailRef = useRef<boolean>(false);
 
+  const [isSavingLeadDetailsData , setIsSavingLeadDetailsData] = useState<boolean>(false);
   // Note : Create or Edit save api call
-  const handleSave = async (e: React.MouseEvent) => {
+  const handleSave = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    // Note : if the is Saving is true and then user again clicks the button then will check here 
+    if(isSavingLeadDetailsData)return;
     if (
       editLeadDetails.additional_contact_number !== "" &&
       editLeadDetails.additional_contact_number !== null &&
       !editLeadDetails.additional_contact_number?.match(
-        MOBILE_NUMBER_VALIDATION.MOBILE_NUMBER_PATTERN_INDIAN
+        MOBILE_NUMBER_VALIDATION.MOBILE_NUMBER_PATTERN_INDIAN,
       )
     ) {
       toast.error(MOBILE_NUMBER_VALIDATION.ERROR_MESSAGE_MOBILE_NUMBER_INDIAN);
@@ -120,6 +129,9 @@ const LeadDetails = ({
     } else {
       createNewDetailRef.current = false;
     }
+
+    //Note : state true to disable the save button
+    setIsSavingLeadDetailsData(true);
     const PostDataCreateLead: CreateOrUpdateLeadDetails = {
       ...(createNewDetailRef.current
         ? { lead_id: selectedLeadData.id }
@@ -154,6 +166,7 @@ const LeadDetails = ({
         if (response.data.status) {
           toast.success(response.data.message);
           setShowSaveLeadButton(false);
+          setIsEditingAll(false);
           createNewDetailRef.current = false;
 
           handleSaveEditLeadDetailsCallback(editLeadDetails);
@@ -166,16 +179,9 @@ const LeadDetails = ({
         }
       }
     } catch (error: any) {
-      if (error.status === STATUS_CODE.UNATHORISED) {
-        const refreshTokenStatus = await RefreshToken({
-          callFunctionWithEvent: handleSave,
-        });
-
-        // setIsDialogueOpen(!refreshTokenStatus);
-        if (refreshTokenStatus) {
-          handleSave(e);
-        }
-      }
+      handleApiError(error)
+    }finally{
+      setIsSavingLeadDetailsData(false)
     }
   };
 
@@ -187,9 +193,13 @@ const LeadDetails = ({
       isactive: true,
     };
     try {
-      const response = await axiosClient.post(POST_API.GET_INDUSTRY_TYPE, postData, {
-        withCredentials: true,
-      });
+      const response = await axiosClient.post(
+        POST_API.GET_INDUSTRY_TYPE,
+        postData,
+        {
+          withCredentials: true,
+        },
+      );
 
       if (response.status === STATUS_CODE.OK) {
         setIndustryType(response.data);
@@ -228,17 +238,21 @@ const LeadDetails = ({
         setCountries(response.data);
       }
     } catch (error: any) {
-      if (error.status === STATUS_CODE.UNATHORISED) {
-        const refreshTokenStatus = await RefreshToken({
-          callFunctionWithEvent: getAllCountries,
-        });
-        if (refreshTokenStatus) {
-          getAllCountries();
-        }
-      }
+      handleApiError(error);
+      // if (error.status === STATUS_CODE.UNATHORISED) {
+      //   const refreshTokenStatus = await RefreshToken({
+      //     callFunctionWithEvent: getAllCountries,
+      //   });
+      //   if (refreshTokenStatus) {
+      //     getAllCountries();
+      //   }
+      // }
     }
   };
 
+  useEffect(() => {
+    getAllCountries();
+  }, []);
   //Note : function to get state
   const getAllState = async (countryId: number | null) => {
     if (!countryId) return;
@@ -247,15 +261,20 @@ const LeadDetails = ({
       country_id: countryId,
       name: null,
       description: null,
+      gst_code: null,
       isactive: true,
     };
     try {
-      const response = await axiosClient.post(POST_API.GET_STATE, PostDataForState, {
-        withCredentials: true,
-        headers: {
-          "Content-Type": "application/json",
+      const response = await axiosClient.post(
+        POST_API.GET_STATE,
+        PostDataForState,
+        {
+          withCredentials: true,
+          headers: {
+            "Content-Type": "application/json",
+          },
         },
-      });
+      );
       if (response.status === STATUS_CODE.OK) {
         setStateData(response.data);
       } else {
@@ -293,7 +312,7 @@ const LeadDetails = ({
           headers: {
             "Content-Type": "application/json",
           },
-        }
+        },
       );
 
       if (response.status === STATUS_CODE.OK) {
@@ -351,9 +370,19 @@ const LeadDetails = ({
         value: val.name,
         id: val.id,
       }))
-    : [];
+    : [];    
 
-  const { userPreference } = useUserPreference();
+    const handleCancelEdit = () => {
+  setEditLeadDetails(leadDetailsData);
+
+  setCountryid(String(leadDetailsData.country_id || ""));
+  setStateId(String(leadDetailsData.state_id || ""));
+  setDistrictId(String(leadDetailsData.district_id || ""));
+  setIndustryTypeId(String(leadDetailsData.industry_type_id || ""));
+
+  setShowSaveLeadButton(false);
+  setIsEditingAll(false);
+};
 
   // useEffect(() => {
   //   if (!userPreference || !editLeadDetails) return;
@@ -376,32 +405,99 @@ const LeadDetails = ({
   //   }
   // }, [userPreference, editLeadDetails]);
 
-  if(!userHasAccessToViewLeadDetails) return <>
-  <HeaderInfo/>
-  <AccessDeniedMessagePage/>
-  </>
+  // useEffect(() => {
+  //   console.log(leadDetailsData);
+  // }, [leadDetailsData]);
+
+  if (!userHasAccessToViewLeadDetails)
+    return (  
+      <>
+        <HeaderInfo />
+        <AccessDeniedMessagePage />
+      </>
+    );
+
+  // if (!leadDetailsData.id) {
+  //   return (
+  //      <div className="w-full    bg-slate-200 px-1 mb-1 ">
+  //       <HeaderInfo />
+  //       <div className="min-h-20 bg-white flex items-center justify-center">
+
+  //       <LoadingSpinner />
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   return (
     <div>
-      <form>
-        {/* <div className="w-auto flex justify-between  bg-slate-200 px-1 mb-1  "> */}
-          {/* <span className="table-header-custom">Details</span> */}
-          <HeaderInfo/>
-          {showSaveLeadButton && (
-            <button type="submit" className={COLORS.ADD_BUTTON} onClick={handleSave}>
-              <div className="flex items-center gap-0.5">
-                <Save className="w-3 h-3 -mt-0.5" />
-                Save
-              </div>
-            </button>
-          )}
+      <form className= " border rounded-lg" onSubmit={handleSave}               
+>
+        <div className="w-full flex justify-between border-b px-2 py-1 mb-1">
+  <HeaderInfo />
+
+  <div className="flex items-center gap-2">
+    {!isEditingAll && userHasAccessToUpdateLeadDetails && (
+      <button
+  type="button"
+  onClick={() => {
+  setIsEditingAll(true);
+  setShowSaveLeadButton(true);
+}}
+  className="flex items-center gap-1 border rounded-md px-2 py-0.5 text-xs caption-custom hover:bg-gray-100 transition-colors"
+>
+  <Pen className="w-2.5 h-2.5" />
+  Edit
+</button>
+    )}
+
+    {showSaveLeadButton && (
+  <div className="flex items-center gap-2">
+    
+    <button
+      type="submit"
+      disabled={isSavingLeadDetailsData}
+      className={
+        isSavingLeadDetailsData
+          ? "border rounded-md px-2.5 py-1 text-xs font-medium bg-gray-100 text-gray-500 cursor-not-allowed"
+          : "flex items-center gap-1 rounded-md bg-blue-600 hover:bg-blue-700 text-white px-2.5 py-1 text-xs font-medium transition-colors"
+      }
+    >
+      {!isSavingLeadDetailsData ? (
+        <>
+          <Save className="w-3 h-3" />
+          Save
+        </>
+      ) : (
+        <>
+          <LoadingSpinner height={14} width={14} colour="gray" />
+          Saving
+        </>
+      )}
+    </button>
+
+    <button
+      type="button"
+      onClick={handleCancelEdit}
+      className="flex items-center gap-0.5 border rounded-md px-1 py-1 text-xs font-medium text-gray-700 hover:bg-gray-100 transition-colors"
+    >
+      <X className="w-3 h-3" />
+      Cancel
+    </button>
+  </div>
+)}
+  </div>
+</div>
         {/* </div> */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-2">
           <FormField
             maxLength={30}
             userHasAccessToUpdate={userHasAccessToUpdateLeadDetails}
             type="text"
-            label="Job title"
+            label="Job title :"
+             isEditingAll={isEditingAll}
+             setIsEditingAll={setIsEditingAll}
+             setShowSaveLeadButton={setShowSaveLeadButton}
             value={editLeadDetails.job_title}
             onChange={(e) => {
               // handleLeadDetailsValueChange(e)
@@ -412,24 +508,14 @@ const LeadDetails = ({
               });
             }}
           />
-          <FormField
-            userHasAccessToUpdate={userHasAccessToUpdateLeadDetails}
-            type="textarea"
-            label="Address"
-            value={editLeadDetails.address}
-            onChange={(e) => {
-              // handleLeadDetailsValueChange(e)
-              setShowSaveLeadButton(true);
-              setEditLeadDetails({
-                ...editLeadDetails,
-                address: e.target.value,
-              });
-            }}
-          />
+          
           <FormField
             userHasAccessToUpdate={userHasAccessToUpdateLeadDetails}
             type="select"
-            label="Industry"
+            label="Industry :"
+            isEditingAll={isEditingAll}
+            setIsEditingAll={setIsEditingAll}
+            setShowSaveLeadButton={setShowSaveLeadButton}
             handleGetDropdownData={() => {
               fetchIndustryType();
             }}
@@ -447,12 +533,16 @@ const LeadDetails = ({
               });
             }}
           />
+           
 
           <FormField
             maxLength={10}
             userHasAccessToUpdate={userHasAccessToUpdateLeadDetails}
             type="text"
-            label="Add. Contact Number"
+            label="Add. Contact Number :"
+             isEditingAll={isEditingAll}
+             setIsEditingAll={setIsEditingAll}
+             setShowSaveLeadButton={setShowSaveLeadButton}
             value={editLeadDetails.additional_contact_number}
             onChange={(e) => {
               setShowSaveLeadButton(true);
@@ -466,10 +556,13 @@ const LeadDetails = ({
           <FormField
             userHasAccessToUpdate={userHasAccessToUpdateLeadDetails}
             type="select"
-            label="Country"
-            handleGetDropdownData={() => {
-              getAllCountries();
-            }}
+            label="Country :"
+             isEditingAll={isEditingAll}
+             setIsEditingAll={setIsEditingAll}
+             setShowSaveLeadButton={setShowSaveLeadButton}
+            // handleGetDropdownData={() => {
+            //   getAllCountries();
+            // }}
             selectOptions={countryOptions}
             value={editLeadDetails.country_name}
             selectedId={countryid}
@@ -481,10 +574,14 @@ const LeadDetails = ({
 
               const selectedCountryId = parseInt(e.target.value);
 
+              const userPrefCountry = countries.find(
+                (item) => item.id == userPreference.countryId,
+              )?.name;
               const selectedCountryName =
-                countryOptions.find((option) => option.id === selectedCountryId)
-                  ?.value || "";
-
+                countryOptions.find((option) => option.id == selectedCountryId)
+                  ?.value ??
+                userPrefCountry ??
+                "";
               // check if changed or not
               const isCountryChanged =
                 changedCountryId !== parseInt(e.target.value);
@@ -514,7 +611,10 @@ const LeadDetails = ({
             userHasAccessToUpdate={userHasAccessToUpdateLeadDetails}
             type="text"
             maxLength={70}
-            label="Industry Name"
+            label="Industry Name :"
+             isEditingAll={isEditingAll}
+             setIsEditingAll={setIsEditingAll}
+             setShowSaveLeadButton={setShowSaveLeadButton}
             value={editLeadDetails.industry_name}
             onChange={(e) => {
               setShowSaveLeadButton(true);
@@ -527,7 +627,10 @@ const LeadDetails = ({
           <FormField
             userHasAccessToUpdate={userHasAccessToUpdateLeadDetails}
             type="select"
-            label="State"
+            label="State :"
+             isEditingAll={isEditingAll}
+             setIsEditingAll={setIsEditingAll}
+             setShowSaveLeadButton={setShowSaveLeadButton}
             handleGetDropdownData={() => {
               getAllState(editLeadDetails.country_id);
             }}
@@ -542,7 +645,7 @@ const LeadDetails = ({
               const selectedStateId = parseInt(e.target.value);
               const selectedStateName =
                 stateOptions.find(
-                  (option) => option.id === parseInt(e.target.value)
+                  (option) => option.id === parseInt(e.target.value),
                 )?.value || "";
 
               const isStateChanged =
@@ -567,7 +670,10 @@ const LeadDetails = ({
           <FormField
             userHasAccessToUpdate={userHasAccessToUpdateLeadDetails}
             type="text"
-            label="Website"
+            label="Website :"
+             isEditingAll={isEditingAll}
+             setIsEditingAll={setIsEditingAll}
+             setShowSaveLeadButton={setShowSaveLeadButton}
             maxLength={100}
             value={editLeadDetails.website}
             onChange={(e) => {
@@ -581,7 +687,10 @@ const LeadDetails = ({
           <FormField
             userHasAccessToUpdate={userHasAccessToUpdateLeadDetails}
             type="select"
-            label="District"
+            label="District :"
+             isEditingAll={isEditingAll}
+             setIsEditingAll={setIsEditingAll}
+             setShowSaveLeadButton={setShowSaveLeadButton}
             handleGetDropdownData={() => {
               getAllDistrict(editLeadDetails.state_id);
             }}
@@ -596,8 +705,25 @@ const LeadDetails = ({
                 district_id: parseInt(e.target.value),
                 district_name:
                   districtOptions.find(
-                    (opt) => opt.id === parseInt(e.target.value)
+                    (opt) => opt.id === parseInt(e.target.value),
                   )?.value || "",
+              });
+            }}
+          />
+          <FormField
+            userHasAccessToUpdate={userHasAccessToUpdateLeadDetails}
+            type="textarea"
+            label="Address :"
+            value={editLeadDetails.address}
+             isEditingAll={isEditingAll}
+             setIsEditingAll={setIsEditingAll}
+             setShowSaveLeadButton={setShowSaveLeadButton}
+            onChange={(e) => {
+              // handleLeadDetailsValueChange(e)
+              setShowSaveLeadButton(true);
+              setEditLeadDetails({
+                ...editLeadDetails,
+                address: e.target.value,
               });
             }}
           />
@@ -607,13 +733,13 @@ const LeadDetails = ({
   );
 };
 
-const HeaderInfo=()=>{
-  return(
-            <div className="w-auto flex justify-between  bg-slate-200 px-1 mb-1  ">
-              <span className="table-header-custom">Details</span>
-              </div>
-  )
-}
+const HeaderInfo = () => {
+  return (
+    <div className="">
+      <span className="table-header-custom">Details</span>
+    </div>
+  );
+};
 
 type OptionType = {
   label: string | null;
@@ -627,7 +753,7 @@ type FormFieldProps = {
   onChange?: (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-    >
+    >,
   ) => void;
   type: "text" | "number" | "select" | "textarea";
   selectOptions?: OptionType[];
@@ -637,6 +763,10 @@ type FormFieldProps = {
   maxLength?: number;
   defaultSelectedId?: string | number;
   hasExistingValue?: boolean;
+
+  isEditingAll: boolean;
+  setIsEditingAll?: React.Dispatch<React.SetStateAction<boolean>>;
+  setShowSaveLeadButton?: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 const FormField = ({
@@ -651,59 +781,84 @@ const FormField = ({
   maxLength,
   defaultSelectedId,
   hasExistingValue,
-}: FormFieldProps) => {
-  const [isEditing, setIsEditing] = useState(false);
+  isEditingAll,
+   setIsEditingAll,
+  setShowSaveLeadButton,
+}: FormFieldProps) =>  {
+ 
 
-  const handleBlur = () => {
-    setTimeout(() => setIsEditing(false), 100);
-  };
+
 
   return (
     <div className="flex w-full  items-center border-b  ">
       <div className="caption-custom w-[50%]">{label}</div>
       <div
-        className="flex items-center w-[50%]   min-w-[150px]"
-        onClick={() => {
-          if (userHasAccessToUpdate) {
-            setIsEditing(true);
-            handleGetDropdownData?.();
+  className="flex items-center w-[50%] min-w-[150px]"
+  onClick={() => {
+    if (!userHasAccessToUpdate) {
+      toast.error(
+        MESSAGE.MODULE_ACCESS.LEAD_DETAILS.DENIED_UPDATE_ACCESS,
+      );
+      return;
+    }
 
-            //  APPLY DEFAULT VALUE ONLY WHEN EMPTY
-            if (
-              type === "select" &&
-              !hasExistingValue && // <--- Only apply default if NO backend value exists!
-              (!selectedId || selectedId === "") &&
-              defaultSelectedId
-            ) {
-              const event = {
-                target: { value: String(defaultSelectedId) },
-              } as React.ChangeEvent<HTMLSelectElement>;
+    handleGetDropdownData?.();
 
-              onChange?.(event);
+    if (
+      type === "select" &&
+      !hasExistingValue &&
+      (!selectedId || selectedId === "") &&
+      defaultSelectedId
+    ) {
+      const event = {
+        target: { value: String(defaultSelectedId) },
+      } as React.ChangeEvent<HTMLSelectElement>;
+
+      onChange?.(event);
+    }
+  }}
+>
+        {!isEditingAll ? (
+         <span
+          className="caption-custom cursor-pointer flex items-center justify-between hover:bg-gray-50 hover:rounded-sm w-full truncate whitespace-nowrap"
+          title={value?.toLocaleString()}
+          onClick={() => {
+            if (!userHasAccessToUpdate) {
+              toast.error(
+                MESSAGE.MODULE_ACCESS.LEAD_DETAILS.DENIED_UPDATE_ACCESS
+              );
+              return;
             }
-          } else {
-            toast.error(MESSAGE.MODULE_ACCESS.LEAD_DETAILS.DENIED_UPDATE_ACCESS);
-          }
-        }}
-      >
-        {!isEditing ? (
-          <span
-            className="caption-custom cursor-pointer flex items-center justify-between hover:bg-gray-50 hover:rounded-sm w-full truncate whitespace-nowrap"
-            title={value?.toLocaleString()}
-          >
+
+            setIsEditingAll?.(true);
+            setShowSaveLeadButton?.(true);
+
+            handleGetDropdownData?.();
+          }}
+        >
             {value ? (
               <span className="card-data">{value?.toLocaleString()}</span>
             ) : (
               <span className="caption-custom italic">Add here...</span>
             )}
-            <Pen size={9} className="text-gray-600"/>
+            
           </span>
         ) : type === "select" ? (
           <select
             autoFocus
             value={String(selectedId)}
-            onBlur={handleBlur}
+            
             onChange={onChange}
+             onKeyDown={(e) => {
+    if (e.key === "Enter") {
+      e.preventDefault(); // prevents dropdown open
+      e.stopPropagation();
+
+      // submit form manually
+      const form = (e.target as HTMLElement).closest("form");
+      form?.requestSubmit();
+    }
+  }}
             className="caption-custom border border-gray-300 w-36 rounded p-1 focus:outline-none"
           >
             <option value=""> Select {label} </option>
@@ -715,14 +870,19 @@ const FormField = ({
           </select>
         ) : type === "textarea" ? (
           <textarea
-            rows={3}
+            rows={2}
             cols={50}
             placeholder="enter text here"
             value={value}
             onChange={onChange}
-            onBlur={handleBlur}
-            autoFocus
             
+            autoFocus
+             onKeyDown={(e : React.KeyboardEvent<HTMLTextAreaElement>)=>{
+                      if(e.key === "Enter" && !e.shiftKey){
+                        e.preventDefault();
+                        (e.currentTarget.form  as HTMLFormElement)?.requestSubmit()
+                      }
+                    }}
             className="caption-custom border border-gray-300 rounded p-1 focus:outline-none "
           />
         ) : (
@@ -731,7 +891,7 @@ const FormField = ({
             type={type}
             value={value}
             onChange={onChange}
-            onBlur={handleBlur}
+            placeholder="Type here...."
             maxLength={maxLength}
             className="caption-custom border-none border-gray-300 focus:outline-none"
           />

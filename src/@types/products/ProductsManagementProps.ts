@@ -14,6 +14,7 @@ export type Product = {
   defaultAmcCycle: number;
   defaultAmcCycleName: string;
   name: string;
+  minimumStock : number,
   barcode: string;
   parentUnitId? : number,
   isSerialNumber? : boolean,
@@ -25,6 +26,7 @@ export type Product = {
   hsn?: string;
   sac?: string;
   taxRate?: number;
+  cess?: number;
   validFrom?: string;
   createdBy?: string;
   createdOn?: string;

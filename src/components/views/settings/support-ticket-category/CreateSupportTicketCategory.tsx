@@ -135,6 +135,7 @@ function CreateSupportTicketCategory({
         <form onSubmit={handleAddSupportTicketCategory}>
           <div className="space-y-3 p-2">
             <FormInput
+            autoFocus={true}
               label="Name :"
               logo={User}
               maxLength={70}

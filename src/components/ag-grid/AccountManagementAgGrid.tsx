@@ -2,21 +2,27 @@
 import { AgGridReact } from "ag-grid-react";
 import Account from "../../@types/account/Account";
 import { useMemo, useRef } from "react";
-import { INNERHTML, JSX_CHILDREN_NAME } from "../../constants/AppConstants";
-import { AllCommunityModule, ColDef, themeBalham } from "ag-grid-community";
-import StatusIndicator from "../ui/StatusIndicator";
+import {  AGGRID, JSX_CHILDREN_NAME } from "../../constants/AppConstants";
+import { AllCommunityModule, ColDef,} from "ag-grid-community";
+
+import { SkeletonRowsAgGrid } from "../ui/SkeletonRowsAgGrid";
+import { Eye } from "lucide-react";
+import StatusBadge from "../ui/StatusBadge";
+import AgGridProfileCell from "../ui/AgGridProfileCell";
 
 function AccountManagementAgGrid({
   accounts,
   handleRowClick,
   onRowSelect,
   isUsedForAccountLead,
+  isDataLoading 
 
 }: {
   accounts: Account[];
   handleRowClick?: (event:  any) => void;
   onRowSelect?: (data: Account | any) => void;
   isUsedForAccountLead : boolean;
+  isDataLoading : boolean
 }) {
   const gridRef = useRef<AgGridReact>(null); // Ref to the AgGridReact component
 
@@ -27,9 +33,25 @@ function AccountManagementAgGrid({
         headerName: "Name",
         sortable: true,
         filter: "agTextColumnFilter",
-        flex: 1,
-        minWidth: 160,
-        comparator: (a, b) => a?.toLowerCase().localeCompare(b?.toLowerCase()),
+        flex: 1.5,
+        minWidth: 250,
+
+        cellRenderer: (params: any) => {
+              if (params.data?.__isSkeleton) {
+                return <SkeletonRowsAgGrid />;
+              }
+
+              return (
+                <AgGridProfileCell
+                  primaryText={params.data?.name}
+                  secondaryText={
+                    params.data?.email ||
+                    params.data?.mobileNumber ||
+                    "-"
+                  }
+                />
+              );
+            },
       },
       {
         field: "email",
@@ -38,6 +60,7 @@ function AccountManagementAgGrid({
         filter: true,
         flex: 1.5,
         minWidth: 200,
+        hide: true,
         
       },
       {
@@ -52,7 +75,7 @@ function AccountManagementAgGrid({
         sortable: true,
         filter: "agTextColumnFilter",
         flex: 1,
-        minWidth: 180,
+        minWidth: 150,
         comparator: (a, b) => a?.toLowerCase().localeCompare(b?.toLowerCase()),
         hide: isUsedForAccountLead
       },
@@ -61,10 +84,29 @@ function AccountManagementAgGrid({
         headerName: "Business Type",
         sortable: true,
         filter: true,
-        minWidth: 200,
+        minWidth: 220,
         hide: isUsedForAccountLead,
         tooltipValueGetter(params) {
           return params.data.businessTypeName;
+        },
+      },
+
+       {
+        field: "isActive",
+        headerName: "Status",
+        sortable: true,
+        filter: true,
+        maxWidth: 120,
+
+        cellRenderer: (params: any) => {
+          if (params.data?.__isSkeleton) {
+            return <SkeletonRowsAgGrid />;
+          }
+          return (
+                <div className="h-full flex items-center">
+                  <StatusBadge isActive={params.value} />
+                </div>
+              );
         },
       },
        {
@@ -72,7 +114,7 @@ function AccountManagementAgGrid({
         headerName: "Country",
         sortable: true,
         filter: true,
-        minWidth: 200,
+        minWidth: 150,
         tooltipValueGetter(params) {
           return params.data.countryName;
         },
@@ -205,6 +247,11 @@ function AccountManagementAgGrid({
           return params.data.website;
         },
         cellRenderer: (params: any) => {
+          if (params.data?.__isSkeleton) {
+                return (
+                  <SkeletonRowsAgGrid/>
+                );
+              }
           if (!params.value) {
             return null;
           }
@@ -217,20 +264,6 @@ function AccountManagementAgGrid({
             >
               {params.value}
             </a>
-          );
-        },
-      },
-      {
-        field: "isActive",
-        headerName: "Status",
-        sortable: true,
-        filter: true,
-        // hide: isUsedForAccountLead,
-        cellRenderer: (params: any) => {
-          return (
-            <div className="flex items-center text-sm gap-1 mt-1">
-             <StatusIndicator isActive={params.value}/>
-            </div>
           );
         },
       },
@@ -266,27 +299,61 @@ function AccountManagementAgGrid({
         headerName: "Actions",
         field: "view",
         pinned: "right",
-        maxWidth: 80,
+        maxWidth: 100,
+        filter:false,
         // cellRenderer : ()=> "View",
         cellRenderer: (params: Account | any) => {
-          
-          return (
-              <div className="flex items-center justify-center">
-            <span
-              className="lead-details"
-              onClick={() => {
-                params.context.handleRowSelect(params.data);
-              }}
-              >
+          if (params.data?.__isSkeleton) {
+                return (
+                  <SkeletonRowsAgGrid/>
+                );
+              }
+         return (
+        <div className="flex items-center justify-center h-full">
+          <button
+            className="lead-details"
+            onClick={() => {
+              params.context.handleRowSelect(params.data);
+            }}
+          >
+            <Eye size={12} strokeWidth={1.5} />
+
+            <span>
               {isUsedForAccountLead ? "Select" : "Details"}
             </span>
-              </div>
-          );
+          </button>
+        </div>
+      );
         },
       },
     ],
     []
   );
+
+  const skeletonRows = useMemo(() => {
+    return Array.from({ length: 30 }).map(() => ({
+      name: "",
+      email: "",
+      mobileNumber: "",
+      industryTypeName: "",
+      businessTypeName: "",
+      countryName: "",
+      stateName: "",
+      districtName: "",
+      pan: "",
+      tan: "",
+      gst: "",
+      billingAddressan: "",
+      shippingAddress: "",
+      registeredOfficeAddress: "",
+      businessResgistrationNumber: "",
+      website: "",
+      isActive: "",
+      createdBy: "",
+      createdOn: "",
+      __isSkeleton: true,
+    }));
+  }, []);
 
   const defaultColDef = useMemo(
     () => ({
@@ -295,25 +362,35 @@ function AccountManagementAgGrid({
       flex: 0.8,
       suppressHeaderMenuButton: true,
       suppressHeaderContextMenu: true,
+       cellRenderer: (params: any) => {
+              if (params.data?.__isSkeleton) {
+                return (
+                  <SkeletonRowsAgGrid/>
+                );
+              }
+              return params.value;
+            },
     }),
     []
   );
 
   return (
     <div
-      className="ag-theme-balham w-full"
+      className="modern-user-grid custom-height-scrollbar w-full"
       style={{ height: "100%", width: "100%" }}
     >
       <AgGridReact
         ref={gridRef} // Attach the ref
-        rowData={accounts}
+        rowData={ isDataLoading ? skeletonRows:  accounts}
         columnDefs={columnDefs}
         defaultColDef={defaultColDef}
         modules={[AllCommunityModule]}
-        theme={themeBalham}
-        overlayNoRowsTemplate={INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
-        context={{ handleRowSelect: onRowSelect }}
-        onRowClicked={handleRowClick}
+        rowHeight={AGGRID.ROW_HEIGHT}
+        headerHeight={AGGRID.HEADER_HEIGHT}
+        // theme={themeBalham}
+        // overlayNoRowsTemplate={INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
+        context={{ handleRowSelect:  isDataLoading  ? undefined :  onRowSelect }}
+        onRowClicked={ isDataLoading  ? undefined : handleRowClick}
       />
     </div>
   );

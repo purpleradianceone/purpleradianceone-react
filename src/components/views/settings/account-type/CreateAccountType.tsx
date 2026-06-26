@@ -1,9 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Briefcase, Edit, Save,  User, X } from "lucide-react";
 import AccountType from "../../../../@types/settings/AccountType";
-import { useState } from "react";
-import RefreshToken from "../../../../config/validations/RefreshToken";
-import { STATUS_CODE, VALIDATIONS } from "../../../../constants/AppConstants";
+import React, { useState } from "react";
+import {  VALIDATIONS } from "../../../../constants/AppConstants";
 import toast from "react-hot-toast";
 import POST_API from "../../../../constants/PostApi";
 import axios from "axios";
@@ -14,6 +13,7 @@ import FormInput from "../../../ui/FormInput";
 import Button from "../../../ui/Button";
 import FormHeader from "../../../ui/FormHeader";
 import { createPortal } from "react-dom";
+import { handleApiError } from "../../../../config/error/handleApiError";
 
 export default function CreateAccountType({
   onClose,
@@ -32,10 +32,15 @@ export default function CreateAccountType({
   const [newParentType, setNewParentType] = useState<number>(0);
 
   // --- Add Functions ---
-  const handleAddAccountType = async () => {
+  const handleAddAccountType = async (event : React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
     if (!userHasAccessToAddCompanyAccountType) {
       toast.error(MESSAGE.MODULE_ACCESS.ACCOUNT_TYPE_ACCESS.DENIED_ADD_ACCESS);
       addFunctionStatesCleanup();
+      return;
+    }
+    if( newParentType==null||newParentType===0){
+      toast.error("Please enter account type")
       return;
     }
 
@@ -64,16 +69,17 @@ export default function CreateAccountType({
         getComapnyAccountType();
       })
       .catch(async (error: any) => {
-        if (error.status === STATUS_CODE.UNATHORISED) {
-          const refreshTokenResponse = await RefreshToken({
-            callFunction: handleAddAccountType,
-          });
-          if (refreshTokenResponse) {
-            handleAddAccountType();
-          }
-        } else {
-          toast.error(error.response.status + error.response.data);
-        }
+        // if (error.status === STATUS_CODE.UNATHORISED) {
+        //   const refreshTokenResponse = await RefreshToken({
+        //     callFunction: handleAddAccountType,
+        //   });
+        //   if (refreshTokenResponse) {
+        //     handleAddAccountType();
+        //   }
+        // } else {
+        //   toast.error(error.response.status + error.response.data);
+        // }
+        handleApiError(error)
       })
       .finally(() => {
         addFunctionStatesCleanup();
@@ -110,10 +116,11 @@ export default function CreateAccountType({
         description="Create a new company account type to categorize business accounts."
         />
 
-        <div className="space-y-3 p-2">
+        <form onSubmit={handleAddAccountType} className="space-y-3 p-2">
           <div>
 
             <FormInput
+            autoFocus={true}
             logo={User}
               label="Name : "
               type="text"
@@ -179,10 +186,10 @@ export default function CreateAccountType({
             </Button>
             <Button
               type="submit"
-              onClick={(e) => {
-                e.preventDefault();
-                handleAddAccountType();
-              }}
+              // onClick={(e) => {
+              //   e.preventDefault();
+              //   ();
+              // }}
               disabled={!newTypeName.trim() || newParentType === 0}
             >
               <div className="flex items-center  gap-1">
@@ -193,7 +200,7 @@ export default function CreateAccountType({
            </div>
             
           </div>
-        </div>
+        </form>
       </div>
     </div>,
     document.body

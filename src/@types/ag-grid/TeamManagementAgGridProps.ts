@@ -13,6 +13,7 @@ type TeamManagementAgGridProps = {
       ) => void;
       handleViewPortChanged?: (params: ViewportChangedEvent) => void;
       onGridReady?: (params: { api: GridApi }) => void;
+       isDataLoading: boolean
 }
 
 export default TeamManagementAgGridProps;

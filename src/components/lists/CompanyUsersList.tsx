@@ -1,6 +1,14 @@
-import { Users, UserPlus, Calendar } from "lucide-react";
+import {
+  Users,
+  UserPlus,
+  Calendar,
+  Clock3,
+  UserCheck,
+  RotateCcw,
+  Search,
+} from "lucide-react";
 import Button from "../ui/Button";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import EditCompanyUserModal from "../modals/company-user/EditCompanyUserModal";
 import DateRangePicker from "../ui/DateRangePicker";
 import AddCompanyUserModal from "../modals/company-user/AddCompanyUserModal";
@@ -12,13 +20,11 @@ import { useUserAccessModules } from "../../config/hooks/useAccessModules";
 import { useComapanySpecificSearchDateRange } from "../../config/hooks/useCompanySpecificDateRange";
 import { useDateRangeIdChange } from "../../config/hooks/useDateRangeIdChange";
 import GetCompanyUsersListProps from "../../@types/List/GetCompanyUsersListProps";
-
 import CompanyUserDashboardModal from "../modals/company-user/CompanyUserDashboardModal";
 import { useUserPreference } from "../../context/user/UserPreference";
 import toast from "react-hot-toast";
 import MESSAGE from "../../constants/Messages";
 import { SIZE, STATUS_CODE } from "../../constants/AppConstants";
-import COLORS from "../../constants/Colors";
 import AppTutorailManager from "../views/tutorails/AppTutorailManager";
 import { CompanyUsersModuleSteps } from "../../constants/AppTutorailsSteps";
 import POST_API from "../../constants/PostApi";
@@ -29,6 +35,15 @@ import { TutorailColumnName } from "../../constants/Tutorail";
 import RefreshToken from "../../config/validations/RefreshToken";
 import PaginationWithoutCount from "../ag-grid/PaginationWithoutCount";
 import CompanyUserAccessManagementModalNew from "../modals/company-user/CompanyUserAccessManagementModalNew";
+import { customDateRangeId } from "../../config/hooks/usePaginationHandler";
+
+import SummaryCards from "../ui/SummaryCards";
+
+import CompanyUserSummary from "../../@types/company-users/CompanyUserSummary";
+
+import CompanyUserReportModal from "../modals/company-user/CompanyUserReportModal";
+import CustomStatusFilterDropdown from "../ui/CustomStatusFilterDropdown";
+import COLORS from "../../constants/Colors";
 
 function GetCompanyUsersList({
   users,
@@ -36,9 +51,12 @@ function GetCompanyUsersList({
   handleSearchOption,
   onStartDateChange,
   onEndDateChange,
-  handleCompanyUserChangeOnEdit,
+  onRefreshUsers,
   isUsedInAccountProductForAssingingInstalledBy,
   onRowSelect,
+  isDataLoading,
+  selectedStatus,
+  setSelectedStatus,
 }: GetCompanyUsersListProps) {
   const { userPreference } = useUserPreference();
   const [isAccessModalOpen, setIsAccessModalOpen] = useState<boolean>(false);
@@ -46,6 +64,9 @@ function GetCompanyUsersList({
   const [isActionsTourEnded, setIsActionsTourEnded] = useState<boolean>(false);
 
   const [isDashboardModalOpen, setIsDashboardModalOpen] =
+    useState<boolean>(false);
+
+  const [isUserReportModalOpen, setIsUserReportModalOpen] =
     useState<boolean>(false);
 
   const [isEditCompanyUserModalOpen, setIsEditModalOpen] =
@@ -66,6 +87,7 @@ function GetCompanyUsersList({
   const { loginStatus } = useLoggedInUserContext();
   const { tutorailData, setTutorailData } = useTutorailDataContext();
   const [tourFinished, setTourFinished] = useState<boolean>(false);
+  
 
   useEffect(() => {
     setTourFinished(tutorailData.isCompanyUserSeen);
@@ -114,6 +136,10 @@ function GetCompanyUsersList({
 
   const handleIsDashboardModalOpen = (status: boolean) => {
     setIsDashboardModalOpen(status);
+  };
+
+  const handleUserReportModalOpen = (status: boolean) => {
+    setIsUserReportModalOpen(status);
   };
 
   const handleTourModalOpen = (index: number) => {
@@ -226,11 +252,11 @@ function GetCompanyUsersList({
   };
   const selectedDateName =
     dateRangeDropdownOptions.find(
-      (o) => o.search_date_range_id === handleSearchOption.dateRangeId
+      (o) => o.search_date_range_id === handleSearchOption.dateRangeId,
     )?.date_range || "Date Filter";
 
   useEffect(() => {
-    if (handleSearchOption.dateRangeId === 8) {
+    if (handleSearchOption.dateRangeId === customDateRangeId) {
       setIsCustomDateOptionSelected(true);
     }
   }, [
@@ -238,6 +264,84 @@ function GetCompanyUsersList({
     handleSearchOption.dateRangeId,
     setIsCustomDateOptionSelected,
   ]);
+
+  const [companyUserSummary, setCompanyUserSummary] =
+    useState<CompanyUserSummary>({
+      total_company_users: 0,
+      total_active_users: 0,
+      total_inactive_users: 0,
+      total_users_created_this_month: 0,
+    });
+
+  const fetchCompanyUserSummary = useCallback(async () => {
+    try {
+      const postData = {
+        company_id: loginStatus.companyId,
+        requestedby: loginStatus.id,
+        
+      };
+      const response = await axios.post(
+        POST_API.SUMMARY_COMPANY_USER,
+        postData,
+        {
+          withCredentials: true,
+        },
+      );
+
+      if (response.data?.length > 0) {
+        setCompanyUserSummary(response.data[0]);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  },[loginStatus.companyId, loginStatus.id]);
+
+
+  useEffect(() => {
+    if (loginStatus.companyId && loginStatus.id) {
+      fetchCompanyUserSummary();
+    }
+  }, [fetchCompanyUserSummary]);
+  //all card data
+
+  //Reset
+const handleResetFilters = () => {
+  handleSearchOption.handleSearchParameterChange("");
+  setSelectedStatus("ALL");
+  handleDateRangeIdChange(0);
+  setIsCustomDateOptionSelected(false);
+
+  setTimeout(() => {
+    onRefreshUsers();
+    fetchCompanyUserSummary();
+  }, 0);
+};
+
+
+ const refreshAllData = useCallback(async () => {
+  await Promise.all([
+    onRefreshUsers(),
+    fetchCompanyUserSummary(),
+  ]);
+}, [onRefreshUsers, fetchCompanyUserSummary]);
+
+  const statusOptions = [
+    {
+      id: 1,
+      name: "All Status",
+      value: "ALL",
+    },
+    {
+      id: 2,
+      name: "Active",
+      value: "ACTIVE",
+    },
+    {
+      id: 3,
+      name: "Inactive",
+      value: "INACTIVE",
+    },
+  ];
 
   return (
     <div
@@ -256,117 +360,258 @@ function GetCompanyUsersList({
             />
           )}
 
-      <div
-        className={`sticky z-10 top-9 py-0.5 flex items-center justify-between ${COLORS.GRID_HEADER_SECTION_BG_COLOR} rounded-lg shadow-sm  mb-1.5 w-full`}
-      >
-        <div className="flex justify-center items-center gap-5">
-          <div className="flex gap-1">
-            <Users className={COLORS.GRID_HEADER_ICONS_COLOR_AND_SIZE} />
-            <span className="section-header-custom">Company Users</span>
-          </div>
+      {/* ================= HEADER + STATS SECTION ================= */}
 
-          <div className="flex gap-1">
-            {/* search box flex div */}
+      <div className="w-full bg-white  px-2 mb-2">
+        {/* Top Header */}
+        <div className="flex items-start justify-between mt-1">
 
-            <div className="relative flex justify-start items-start w-80">
-              <SearchInput
-                id="company-user-module-search-box"
-                onChange={(e) => {
-                  handleSearchOption.handleSearchParameterChange(
-                    e.target.value,
-                  );
-                }}
-                value={handleSearchOption.searchParameter}
-              ></SearchInput>
+          {/* Header */}
+            
+            <div className="flex items-center gap-3 ">
+              
+              <div className={`p-2 rounded-lg ${COLORS.PAGE_HEADER_SECTION_BG_COLOR}`}>
+              <Users className={COLORS.PAGE_HEADER_ICONS_COLOR_AND_SIZE} />
             </div>
 
-            {/* Date FIlters Dropdown */}
-            <div
-              id="company-users-module-date-range-filter"
-              className="flex mx-3 gap-1"
-            >
-              <div className="flex">
-                <div className="flex items-center size-4 justify-center mt-1 mr-2 gap-2 input-label-custom">
-                  <Calendar className="input-label-custom mt-1" />
+              <div>
+                <h1 className="page-header-custom tracking-tight pb-0.5">
+              Company Users
+            </h1>
+              <p className="page-subtitle-custom ">
+               Manage your organization users, permissions and activities.
+            </p>
+              </div>
+            </div>
+            
+          {/* ADD USER */}
+          <div className="pt-1">
+            {!isUsedInAccountProductForAssingingInstalledBy && (
+              <>
+                <div
+                  id="company-users-module-add-button"
+                  className="flex gap-2"
+                >
+                  <Button
+                    type="submit"
+                    disabled={!userHasAccessToAddUser}
+                    onClick={(e) => {
+                      e.preventDefault();
+
+                      if (!userHasAccessToAddUser) {
+                        toast.error(
+                          MESSAGE.MODULE_ACCESS.COMPANY_USER
+                            .DENIED_ADD_ACCESS_COMPANY_USER,
+                        );
+
+                        return;
+                      }
+
+                      setIsAddCompanyUserModalOpen(true);
+                    }}
+                  >
+                    <div className="flex items-center gap-1">
+                      <UserPlus size={SIZE.SIXTEEN} />
+                      Add User
+                    </div>
+                  </Button>
                 </div>
+
+                <AddCompanyUserModal
+                  isOpen={isAddCompanyUserModalOpen}
+                  onClose={() => setIsAddCompanyUserModalOpen(false)}
+                  onUserAdded={refreshAllData}
+                />
+              </>
+            )}
+            </div>
+        </div>
+
+        {/* Status Cards */}
+        <SummaryCards
+         cardGap={15}
+         width="75%"
+         loading={isDataLoading}
+          cards={[
+            {
+              title: "Total Users",
+              count: companyUserSummary.total_company_users,
+              subtitle: "Organization users",
+              icon: Users,
+              iconBg: "bg-violet-100",
+              iconColor: "text-violet-600",
+            },
+
+            {
+              title: "Active Users",
+              count: companyUserSummary.total_active_users,
+              subtitle: "Currently active",
+              icon: UserCheck,
+              iconBg: "bg-green-100",
+              iconColor: "text-green-600",
+            },
+
+            {
+              title: "Inactive Users",
+              count: companyUserSummary.total_inactive_users,
+              subtitle: "Currently inactive",
+              icon: Clock3,
+              iconBg: "bg-orange-100",
+              iconColor: "text-orange-500",
+            },
+
+            {
+              title: "New This Month",
+              count: `+${companyUserSummary.total_users_created_this_month}`,
+              subtitle: "Recently added users",
+              icon: UserPlus,
+              iconBg: "bg-white/20 backdrop-blur-sm",
+              iconColor: "text-white",
+              isGradient: true,
+            },
+          ]}
+        />
+
+        {/* SEARCH + FILTER BAR */}
+        <div
+          className="
+          w-full
+          bg-white
+          border border-slate-200
+          rounded-xl
+          py-2
+          px-3
+          flex items-center 
+          gap-5
+          flex-wrap
+          shadow-sm
+        "
+        >
+          {/* LEFT */}
+          <div className="flex items-center gap-3 flex-wrap">
+
+             
+                    <span
+                      className={`${
+                        isCustomDateOptionSelected
+                          ? "text-xs"
+                          : "section-header-custom"
+                      } ${userPreference.sidebarOpen?"":"mr-2"}`}
+                    >
+                      {userPreference.sidebarOpen?"":"Company Users"}
+                    </span>
+                 
+            {/* SEARCH */}
+            <div className=" relative w-[350px] ">
+              <Search
+                size={16}
+                className="absolute left-3  top-1/2 -translate-y-1/2 text-gray-400 "
+              />
+              <div className="[&>input]:pl-10">
+                <SearchInput
+                  id="company-user-module-search-box"
+                  onChange={(e) => {
+                    handleSearchOption.handleSearchParameterChange(
+                      e.target.value,
+                    );
+                  }}
+                  value={handleSearchOption.searchParameter}
+                  placeholder="Search by name, email or mobile number"
+                  height="h-9"
+                />
+              </div>
+            </div>
+
+            {/* DATE FILTER */}
+            <div
+              className="
+                  h-9
+                  px-2
+                  border border-slate-200
+                  rounded-lg
+                  bg-white
+                  flex items-center 
+                  shadow-sm
+                "
+            >
+              <div className="bg-violet-100 h-5 w-5 rounded-md flex justify-center items-center ">
+                <Calendar className="text-violet-600 " size={14} />
+              </div>
+              <div className="flex items-center py-1">
+                {/* <span className="text-[11px] text-slate-400">
+          Date Filter
+        </span> */}
 
                 <DateRangeFilterDropdown
                   dropdownOptions={dateRangeDropdownOptions}
                   handleDateIdChange={handleDateRangeIdChange}
                   selectedOption={selectedDateName}
-                ></DateRangeFilterDropdown>
+                  showBorder={false}
+                />
               </div>
-              {/* Custom Date Picker Div Flex Box*/}
-              {isCustomDateOptionSelected && (
-                <div
-                  style={
-                    isCustomDateOptionSelected
-                      ? { visibility: "visible" }
-                      : { visibility: "hidden" }
-                  }
-                >
-                  <DateRangePicker
-                    onStartDateChange={onStartDateChange}
-                    onEndDateChange={onEndDateChange}
-                    initialStartDate={handleSearchOption.startDate}
-                    initialEndDate={handleSearchOption.endDate}
-                  />
-                </div>
-              )}
             </div>
+
+            {/* CUSTOM DATE RANGE */}
+            {isCustomDateOptionSelected && (
+              <DateRangePicker
+                onStartDateChange={onStartDateChange}
+                onEndDateChange={onEndDateChange}
+                initialStartDate={handleSearchOption.startDate}
+                initialEndDate={handleSearchOption.endDate}
+              />
+            )}
+          </div>
+
+          {/* RIGHT SECTION */}
+          <div className="flex items-center gap-5 flex-wrap">
+            {/* STATUS */}
+
+                        <CustomStatusFilterDropdown
+                    options={statusOptions}
+                    selectedValue={selectedStatus}
+                    onChange={(value) =>
+                      setSelectedStatus(
+                        value as "ALL" | "ACTIVE" | "INACTIVE"
+                      )
+                    }
+                  />
+
+
+            {/* RESET */}
+            <button
+              className="
+        h-9
+        in-w-[110px]
+        px-4
+        rounded-lg
+        border border-slate-200
+        bg-white
+        flex items-center gap-2
+        text-sm font-medium
+        text-slate-600
+        hover:bg-slate-50
+        transition-all duration-200
+        shadow-sm
+      "
+              onClick={handleResetFilters}
+            >
+              <RotateCcw size={15} />
+              Reset
+            </button>
+
+    
           </div>
         </div>
-
-        <>
-          {/* {userHasAccessToAddUser ? ( */}
-          {/* <> */}
-          {!isUsedInAccountProductForAssingingInstalledBy && (
-            <>
-              <div id="company-users-module-add-button" className="flex gap-1">
-                <Button
-                  type="submit"
-                  disabled={!userHasAccessToAddUser}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    if (!userHasAccessToAddUser) {
-                      toast.error(
-                        MESSAGE.MODULE_ACCESS.COMPANY_USER
-                          .DENIED_ADD_ACCESS_COMPANY_USER,
-                      );
-                      return;
-                    } else {
-                      setIsAddCompanyUserModalOpen(true);
-                    }
-                  }}
-                  // onClick={() => setIsAddCompanyUserModalOpen(true)}
-                >
-                  {/* {!isSmallScreen && <UserPlus size={SIZE.TWENTY} />}
-                {isSmallScreen && <UserPlus size={SIZE.EIGHT} />}
-                {isLargeScreen && JSX_CHILDREN_NAME.ADD_USER} */}
-                  <div className="flex items-center gap-1">
-                    <UserPlus size={SIZE.SIXTEEN} />
-                    Add
-                  </div>
-                </Button>
-              </div>
-
-              <AddCompanyUserModal
-                isOpen={isAddCompanyUserModalOpen}
-                onClose={() => setIsAddCompanyUserModalOpen(false)}
-              />
-            </>
-          )}
-        </>
       </div>
 
-      <div className="bg-white overflow-y-auto rounded-lg shadow-sm p-0">
+      <div className="bg-white overflow-y-auto px-2 pt-1">
         <div
           className={
             isUsedInAccountProductForAssingingInstalledBy
-              ? `ag-theme-balham w-full h-[calc(70vh-122px)]`
+              ? ` w-full h-[calc(70vh-122px)]`
               : userPreference.isLeftMenu
-                ? `ag-theme-balham w-full h-[calc(100vh-116px)]`
-                : "ag-theme-balham w-full h-[calc(100vh-120px)]"
+                ? ` w-full h-[calc(100vh-286px)]`
+                : " w-full h-[calc(100vh-120px)]"
           }
         >
           <CompanyUserAgGrid
@@ -379,8 +624,10 @@ function GetCompanyUsersList({
             handleIdIsEditModalOpen={handleIdIsEditModalOpen}
             handleIsAccessModalOpen={handleIsAccessModalOpen}
             handleIsDashboardModalOpen={handleIsDashboardModalOpen}
+            handleUserReportModalOpen={handleUserReportModalOpen}
             isActionsTourEnded={isActionsTourEnded}
             handleActionsTourEnd={handleActionsTourEnd}
+            isDataLoading={isDataLoading}
           />
         </div>
         <CompanyUserAccessManagementModalNew
@@ -389,7 +636,7 @@ function GetCompanyUsersList({
           users={selectedCompanyUser}
         />
         <EditCompanyUserModal
-          handleCompanyUserChange={handleCompanyUserChangeOnEdit}
+          handleCompanyUserChange={refreshAllData}
           isOpen={isEditCompanyUserModalOpen}
           onClose={() => {
             setIsEditModalOpen(false);
@@ -403,6 +650,14 @@ function GetCompanyUsersList({
             setIsDashboardModalOpen(false);
           }}
           users={selectedCompanyUser}
+        />
+
+        <CompanyUserReportModal
+          isOpen={isUserReportModalOpen}
+          onClose={() => {
+            setIsUserReportModalOpen(false);
+          }}
+          companyUser={selectedCompanyUser}
         />
       </div>
       {/* pagination component */}

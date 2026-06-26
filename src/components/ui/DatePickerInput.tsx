@@ -98,8 +98,8 @@ function DatePickerInput(props: FormInputProps) {
           // onKeyDown={handleKeyDown}
           // onKeyDown={props.onKeyDown}
          
-
-  
+        
+        
           defaultValue={props.defaultValue}
           onClick={openDatePicker} //  click input also opens picker
           name={props.name}

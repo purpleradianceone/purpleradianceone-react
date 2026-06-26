@@ -11,7 +11,7 @@ import {
 } from "../../../../constants/AppConstants";
 import RefreshToken from "../../../../config/validations/RefreshToken";
 import CompanyLeadSettingType from "../../../../@types/settings/CompanyLeadSettings";
-import { useGoogleMeetStatus } from "../../../../config/hooks/useGoogleMeetStatus";
+// import { useGoogleMeetStatus } from "../../../../config/hooks/useGoogleMeetStatus";
 import { useZoomMeetingsStatus } from "../../../../config/hooks/useZoomMeetingsStatus";
 import SettingToggleCard from "../../../ui/SettingToggleCard";
 import { Handshake, User2 } from "lucide-react";
@@ -21,9 +21,10 @@ import CompanyUser from "../../../../@types/company-users/CompanyUser";
 import { useUserAccessModules } from "../../../../config/hooks/useAccessModules";
 import axiosClient from "../../../../axios-client/AxiosClient";
 import MESSAGE from "../../../../constants/Messages";
+import FacebookPageSkeleton from "../social-media-integration/meta-app-facebook/PafeIdListCardPopUp";
 
 const LeadSetting: React.FC = () => {
-  useGoogleMeetStatus();
+  // useGoogleMeetStatus();
   useZoomMeetingsStatus();
 
   const { loginStatus } = useLoggedInUserContext();
@@ -133,7 +134,6 @@ const LeadSetting: React.FC = () => {
       return false;
     }
     if (data === null || data === undefined) {
-      console.log("handleUpdateLeadUser false");
       return false;
     }
     //////////////////////////////////////
@@ -143,12 +143,9 @@ const LeadSetting: React.FC = () => {
       data.all_leads_visible === null ||
       data.all_leads_visible === undefined
     ) {
-      console.log("handleUpdate false");
       return false;
     }
     const allLeadsVisibleStatus = !data.all_leads_visible;
-    console.log(data.id);
-    console.log(data.all_leads_visible);
 
     const postData = {
       company_id: loginStatus.companyId,
@@ -159,7 +156,6 @@ const LeadSetting: React.FC = () => {
 
     let result = false;
     try {
-      console.log("previous value: " + data.all_leads_visible);
       axios
         .post(POST_API.UPDATE_LEAD_COMPANY_USERS, postData, {
           withCredentials: true,
@@ -167,7 +163,6 @@ const LeadSetting: React.FC = () => {
         .then((response) => {
           toast.success(response.data.message);
           result = true;
-          console.log("after value: " + data.all_leads_visible);
         })
         .catch((error) => {
           result = false;
@@ -176,7 +171,6 @@ const LeadSetting: React.FC = () => {
     } catch (e) {
       console.log(e);
     }
-    console.log("handleUpdate " + result);
 
     return result;
   };
@@ -203,17 +197,22 @@ const LeadSetting: React.FC = () => {
         <FormHeader
           preText="Manage your company's lead-related configurations."
           description="Select and assign a user to whom lead will be visible."
-          onClose={() => {
-            // setCompanyUserModalOpen(false);
-          }}
+          // onClose={() => {
+          //   // setCompanyUserModalOpen(false);
+          // }}
           icon={Handshake}
           isModal={false}
           wantBorderBottom={false}
         />
         {isLoading ? (
-          <div className="flex justify-center items-center mt-20">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-blue-500" />
-          </div>
+          <div className="grid md:grid-cols-3 sm:grid-cols-2 gap-4">
+        <FacebookPageSkeleton />
+        <FacebookPageSkeleton />
+        <FacebookPageSkeleton />
+      </div>
+          // <div className="flex justify-center items-center mt-20">
+          //   <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-blue-500" />
+          // </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-1">
             {leadSetting.map((per) => (
@@ -235,9 +234,9 @@ const LeadSetting: React.FC = () => {
         <FormHeader
           preText="Assign Users to whom all leads should be visible"
           description="Select and assign a user to whom all the lead's will be visible."
-          onClose={() => {
-            // setCompanyUserModalOpen(false);
-          }}
+          // onClose={() => {
+          //   // setCompanyUserModalOpen(false);
+          // }}
           icon={User2}
           isModal={false}
           wantBorderBottom={false}

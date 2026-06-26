@@ -1,5 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import {
+  ListOrdered,
   LucideAirplay,
   LucideCalendar,
   LucideClock,
@@ -55,7 +56,6 @@ function AddProductModal({
   const { loading: intervalTypeLoading, intervalTypeData } = useIntervalType();
   const { loading: productTypeLoading, productTypeData } = useProductType();
   const { userHasAccessToAddProduct } = useUserAccessModules();
-  // const { isSmallScreen } = useScreenSize();
   const { loginStatus } = useLoggedInUserContext();
   const [isSaving, setIsSaving] = useState<boolean>(false);
 
@@ -79,7 +79,7 @@ function AddProductModal({
   ];
 
   const handleTaxRadioButtonChange = (
-    event: React.ChangeEvent<HTMLInputElement>
+    event: React.ChangeEvent<HTMLInputElement>,
   ) => {
     if (event.target.value === "hsn") {
       setSelectedTaxCode("hsn");
@@ -117,10 +117,12 @@ function AddProductModal({
       hsn: "",
       sac: "",
       taxRate: 0,
+      cess: 0,
       validFrom: "",
       createdBy: "",
       createdOn: "",
       unitNameInStock: "",
+      minimumStock: 0,
     });
 
   const [selectedUnitId, setUnitId] = useState<number | undefined>(0);
@@ -152,7 +154,7 @@ function AddProductModal({
 
   const { errors, handleBlur, setErrors } = useFormValidation(
     addProductFormData,
-    "registration"
+    "registration",
   );
 
   const [selectedProductTypeIdError, setSelectedProductTypeIdError] =
@@ -160,8 +162,25 @@ function AddProductModal({
 
   const [selectedUnitError, setSelectedUnitError] = useState<boolean>(false);
 
+  const isProuctSelected =
+    selectedProductTypeId === 3 || selectedProductTypeId === 4;
+
+  useEffect(() => {
+    if (selectedProductTypeId === 3 || selectedProductTypeId === 4) {
+      setInitialAddProductFormData((prev) => ({
+        ...prev,
+      }));
+
+      setIsSerialNumberChecked(false);
+      setErrors((prev) => ({
+        ...prev,
+        mininumStock: "",
+      }));
+    }
+  }, [selectedProductTypeId]);
+
   function handleCheckboxChangeOfSerialNumber(
-    event: React.ChangeEvent<HTMLInputElement>
+    event: React.ChangeEvent<HTMLInputElement>,
   ) {
     setIsSerialNumberChecked(event.target.checked);
   }
@@ -173,7 +192,9 @@ function AddProductModal({
       setSelectedProductTypeIdError(false);
     }
 
-    if (selectedUnitId === 0 || selectedUnitId === undefined) {
+    if (selectedProductTypeId === 3 || selectedProductTypeId === 4) {
+      setSelectedUnitError(false);
+    } else if (selectedUnitId === 0 || selectedUnitId === undefined) {
       setSelectedUnitError(true);
       // toast.error("Please select 'AMC Cycle Duration'");
     } else {
@@ -181,12 +202,37 @@ function AddProductModal({
     }
   };
 
-
+  function validate() {
+    // Validation the minimum stock field here also before the api call
+    if (selectedProductTypeId === 3 || selectedProductTypeId === 4) {
+      setErrors((prev) => ({
+        ...prev,
+        mininumStock: "",
+      }));
+    } else if (
+      addProductFormData.minimumStock == 0 ||
+      addProductFormData.minimumStock == null ||
+      addProductFormData.minimumStock === undefined
+    ) {
+      setErrors((prev) => ({
+        ...prev,
+        mininumStock: "minimum stock is required.",
+      }));
+    } else {
+      setErrors((prev) => ({
+        ...prev,
+        mininumStock: "",
+      }));
+    }
+    return true;
+  }
 
   const handleAddProductFormSubmit = async (
-    event: React.FormEvent<HTMLFormElement>
+    event: React.FormEvent<HTMLFormElement>,
   ) => {
     event.preventDefault();
+    const isvalid = validate();
+    if (!isvalid) return;
     validateDropdown();
     if (isSaving) return;
     if (userHasAccessToAddProduct) {
@@ -213,6 +259,12 @@ function AddProductModal({
           if (addProductFormData.taxRate) {
             taxRateDecimal = parseFloat(addProductFormData.taxRate.toString());
           }
+
+          let cessDecimal: number = 0;
+          if (addProductFormData.cess) {
+            cessDecimal = parseFloat(addProductFormData.cess.toString());
+          }
+
           if (
             selectedProductTypeId !== 0 &&
             selectedProductTypeId !== undefined &&
@@ -224,32 +276,46 @@ function AddProductModal({
             // selectedAmcIntervalTypeId !== undefined &&
             // selectedDefaultAmc !== 0 &&
             // selectedDefaultAmc !== undefined &&
-            selectedUnitId !== 0 &&
-            selectedUnitId !== undefined &&
-            addProductFormData.cost !== null
+            (isProuctSelected || selectedUnitId !== 0) &&
+            // selectedUnitId !== 0 &&
+            // selectedUnitId !== undefined &&
+            addProductFormData.cost !== null &&
+            (isProuctSelected || addProductFormData.minimumStock != 0)
           ) {
             setIsSaving(true);
             const addProductPostData = {
               company_id: loginStatus.companyId,
               product_type_id: selectedProductTypeId,
-              default_warranty_interval_type_id: selectedWarrantyIntervalTypeId,
-              default_warranty: selectedDefaultWarranty,
-              default_amc_cycle_interval_type_id: selectedAmcIntervalTypeId,
-              default_amc_cycle: selectedDefaultAmc,
+              default_warranty_interval_type_id: isProuctSelected
+                ? null
+                : selectedWarrantyIntervalTypeId,
+              default_warranty: isProuctSelected
+                ? null
+                : selectedDefaultWarranty,
+              default_amc_cycle_interval_type_id: isProuctSelected
+                ? null
+                : selectedAmcIntervalTypeId,
+              default_amc_cycle: isProuctSelected ? null : selectedDefaultAmc,
               name: addProductFormData.name,
-              unit_id: selectedUnitId,
+              unit_id: isProuctSelected ? 1 : selectedUnitId,
               barcode: addProductFormData.barcode,
               is_serial_number: isSerialNumberChecked,
               cost: addProductFormData.cost,
               description: addProductFormData.description,
-              version: addProductFormData.version,
+              version: isProuctSelected ? "1.0" : addProductFormData.version,
+              minimum_stock: isProuctSelected
+                ? 1
+                : Number(addProductFormData.minimumStock),
               url: addProductFormData.url,
               hsn: selectedTaxCode === "hsn" ? addProductFormData.hsn : null,
               sac: selectedTaxCode === "sac" ? addProductFormData.sac : null,
               tax_rate: taxRateDecimal,
+              cess: cessDecimal || 0,
               valid_from_string: formattedDate,
               createdby_id: loginStatus.id,
             };
+
+            // alert(JSON.stringify(addProductPostData, null, 2));
 
             await axios
               .post(POST_API.ADD_PRODUCT, addProductPostData, {
@@ -282,6 +348,8 @@ function AddProductModal({
               .finally(() => {
                 setIsSaving(false);
               });
+          } else {
+            toast.error(MESSAGE.ERROR.REQUIRED_FIELDS);
           }
         }
       } else {
@@ -325,10 +393,12 @@ function AddProductModal({
       hsn: "",
       sac: "",
       taxRate: 0,
+      cess: 0,
       validFrom: "",
       createdBy: "",
       createdOn: "",
       unitNameInStock: "",
+      minimumStock: 0,
     });
 
     addProductFormData.description = "";
@@ -344,25 +414,21 @@ function AddProductModal({
     // }
   }, [isOpen]);
 
- const filteredUnits = useMemo(() => {
-  return isSerialNumberChecked
-    ? unitData.filter(unit => unit.isBaseUnit)
-    : unitData;
-}, [unitData, isSerialNumberChecked]);
+  const filteredUnits = useMemo(() => {
+    return isSerialNumberChecked
+      ? unitData.filter((unit) => unit.isBaseUnit)
+      : unitData;
+  }, [unitData, isSerialNumberChecked]);
 
-
-useEffect(() => {
-  if (
-    isSerialNumberChecked &&
-    selectedUnitId &&
-    !unitData.find(
-      unit => unit.id === selectedUnitId && unit.isBaseUnit
-    )
-  ) {
-    setUnitId(undefined);
-  }
-}, [isSerialNumberChecked, selectedUnitId, unitData]);
-
+  useEffect(() => {
+    if (
+      isSerialNumberChecked &&
+      selectedUnitId &&
+      !unitData.find((unit) => unit.id === selectedUnitId && unit.isBaseUnit)
+    ) {
+      setUnitId(undefined);
+    }
+  }, [isSerialNumberChecked, selectedUnitId, unitData]);
 
   // const [unitDataFiltered , setUnitDataFiltered ] = useState<UnitType[]>([]);
 
@@ -375,7 +441,7 @@ useEffect(() => {
   //   if(addProductFormData.isSerialNumber){
   //     const filteredParentUnits= unitData.filter((item)=> item.isBaseUnit);
   //     console.log("this is the filter");
-      
+
   //     setUnitDataFiltered(filteredParentUnits);
   //   }
   // } , [addProductFormData.isSerialNumber])
@@ -388,6 +454,7 @@ useEffect(() => {
       </FormLayout>
     );
   }
+
   return (
     <FormLayout padding={3} width={6}>
       <LoadingPopUpAnimation show={isSaving} />
@@ -402,10 +469,7 @@ useEffect(() => {
           description="Enter the necessary details to add a new product."
         />
 
-        <form
-          className="space-y-2 p-1"
-          onSubmit={handleAddProductFormSubmit}
-        >
+        <form className="space-y-2 p-1" onSubmit={handleAddProductFormSubmit}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
             {/* product name */}
             <FormInput
@@ -420,30 +484,9 @@ useEffect(() => {
               onChange={handleAddProductFormDataChange}
               onBlur={handleBlur}
               error={errors.name}
+              autoFocus={true}
             />
             <div className="grid grid-cols-2 gap-3 ">
-              {/* Unit */}
-              <div>
-                <CustomDropdown
-                  labelName="Unit :"
-                  logo={LucideTimer}
-                  preselectedOption={0}
-                  onSelect={(data) => {
-                    if (data) {
-                      setSelectedUnitError(false);
-                    }
-                    setUnitId(data);
-                  }}
-                  // options={unitData}
-                  options={filteredUnits}
-                  requiredRedDot={true}
-                />
-                {selectedUnitError && (
-                  <div className="caption-custom-inactive">
-                    Product Unit is required
-                  </div>
-                )}
-              </div>
               {/* product type */}
               <div className="">
                 <CustomDropdown
@@ -465,20 +508,66 @@ useEffect(() => {
                   </div>
                 )}
               </div>
+              {/* Unit */}
+              <div>
+                <CustomDropdown
+                  labelName="Unit :"
+                  logo={LucideTimer}
+                  preselectedOption={0}
+                  key={selectedProductTypeId}
+                  onSelect={(data) => {
+                    if (data) {
+                      setSelectedUnitError(false);
+                    }
+                    setUnitId(data);
+                  }}
+                  // options={unitData}
+                  options={filteredUnits}
+                  requiredRedDot={true}
+                  readOnly={
+                    selectedProductTypeId === 3 || selectedProductTypeId === 4
+                  }
+                />
+                {selectedUnitError && (
+                  <div className="caption-custom-inactive">
+                    Product Unit is required
+                  </div>
+                )}
+              </div>
             </div>
-            <div className="grid grid-cols-2 gap-3 ">
+            <div className="grid grid-cols-3 gap-3 ">
               {/* basic cost */}
               <FormInput
                 label="Basic Cost : "
                 logo={LucideIndianRupee}
                 type="number"
                 name="cost"
-                value={addProductFormData.cost?.toString()}
+                value={addProductFormData.cost}
+                // value={addProductFormData.cost ==0 ? "" : addProductFormData.cost}
                 placeholder="Product Price"
                 onChange={handleAddProductFormDataChange}
                 error={errors.cost}
                 min={0}
+                step={'0.0001'} />
+              {/* Minimum Stock */}
+              <FormInput
+                label="Minimum Stock : "
+                logo={ListOrdered}
+                type="number"
+                name="minimumStock"
+                value={addProductFormData.minimumStock}
+                // value={addProductFormData.minimumStock ==0 ? "" : addProductFormData.minimumStock}
+                placeholder="Enter Mininum Stock"
+                onChange={handleAddProductFormDataChange}
+                error={errors.mininumStock}
+                min={0}
+                onBlur={handleBlur}
+                required={true}
+                disabled={
+                  selectedProductTypeId === 3 || selectedProductTypeId === 4
+                }
               />
+
               {/* version */}
               <FormInput
                 label="Version :"
@@ -492,6 +581,9 @@ useEffect(() => {
                 onChange={handleAddProductFormDataChange}
                 onBlur={handleBlur}
                 error={errors.version}
+                disabled={
+                  selectedProductTypeId === 3 || selectedProductTypeId === 4
+                }
               />
             </div>
             {/* barcode */}
@@ -513,6 +605,9 @@ useEffect(() => {
                   name="is_serial_number"
                   onChange={handleCheckboxChangeOfSerialNumber}
                   checked={isSerialNumberChecked}
+                  disabled={
+                    selectedProductTypeId === 3 || selectedProductTypeId === 4
+                  }
                 />
               </div>
             </div>
@@ -529,6 +624,9 @@ useEffect(() => {
                   }}
                   options={rangeOfNumber}
                   // requiredRedDot={true}
+                  readOnly={
+                    selectedProductTypeId === 3 || selectedProductTypeId === 4
+                  }
                 />
                 {/* {selectedDefaultWarrantyError && (
                     <div className="caption-custom-inactive">
@@ -547,6 +645,9 @@ useEffect(() => {
                   }}
                   options={intervalTypeData}
                   // requiredRedDot={true}
+                  readOnly={
+                    selectedProductTypeId === 3 || selectedProductTypeId === 4
+                  }
                 />
                 {/* {selectedWarrantyIntervalTypeIdError && (
                     <div className="caption-custom-inactive">
@@ -562,12 +663,15 @@ useEffect(() => {
                 <CustomDropdown
                   labelName="AMC Cycle Duration :"
                   logo={LucideClock}
-                  preselectedOption={0}
+                  preselectedOption={selectedDefaultAmc}
                   onSelect={(e) => {
                     setDefaultAmc(e);
                   }}
                   options={rangeOfNumber}
                   // requiredRedDot={true}
+                  readOnly={
+                    selectedProductTypeId === 3 || selectedProductTypeId === 4
+                  }
                 />
                 {/* {selectedDefaultAmcError && (
                     <div className="caption-custom-inactive">
@@ -587,6 +691,9 @@ useEffect(() => {
                   }}
                   options={intervalTypeData}
                   // requiredRedDot={true}
+                  readOnly={
+                    selectedProductTypeId === 3 || selectedProductTypeId === 4
+                  }
                 />
                 {/* {selectedAmcIntervalTypeIdError && (
                     <div className="caption-custom-inactive">
@@ -630,7 +737,7 @@ useEffect(() => {
                 )}
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-3 ">
+            <div className="grid grid-cols-3 gap-3 ">
               {/* tax rate */}
               <FormInput
                 label="Tax Rate"
@@ -642,6 +749,18 @@ useEffect(() => {
                 onChange={handleAddProductFormDataChange}
                 onBlur={handleBlur}
                 error={errors.taxRate}
+              />
+
+              <FormInput
+                label="Cess"
+                logo={LucidePercent}
+                type="text"
+                name="cess"
+                value={addProductFormData.cess?.toString()}
+                placeholder="Enter Cess"
+                onChange={handleAddProductFormDataChange}
+                onBlur={handleBlur}
+                error={errors.cess}
               />
               {/* valid from */}
               <DatePickerInput

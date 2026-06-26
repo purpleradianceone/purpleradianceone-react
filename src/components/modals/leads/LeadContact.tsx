@@ -16,7 +16,7 @@ import {
   X,
 } from "lucide-react";
 import LeadContactType from "../../../@types/lead-management/LeadContact";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Button from "../../ui/Button";
 import {
   MOBILE_NUMBER_VALIDATION,
@@ -57,15 +57,20 @@ const LeadContact = ({
   leadContact,
   fetchLeadContact,
   selectedLeadData,
+  isOpenAddLeadContactForm,
+  setIsOpenAddLeadContactForm,
 }: {
   leadContact: LeadContactType[];
   fetchLeadContact: () => void;
   selectedLeadData: any;
+  isOpenAddLeadContactForm: boolean;
+  setIsOpenAddLeadContactForm: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
   const { loginStatus } = useLoggedInUserContext();
-  const { userHasAccessToViewLeadContacts,  userHasAccessToAddLeadContacts , userHasAccessToUpdateLeadContacts} = useUserAccessModules();
-  const [isOpenAddLeadContactForm, setIsOpenAddLeadContactForm] =
-    useState(false);
+  const {
+    userHasAccessToViewLeadContacts,
+    userHasAccessToUpdateLeadContacts,
+  } = useUserAccessModules();
   const [editContactData, setEditContactData] =
     useState<LeadContactType | null>(null); // null when adding
   const [socialMediaHandles, setSocialMediaHandles] = useState<string[]>([]);
@@ -107,7 +112,7 @@ const LeadContact = ({
   const handleBlur = (
     e:
       | React.FocusEvent<HTMLInputElement>
-      | React.FocusEvent<HTMLTextAreaElement>
+      | React.FocusEvent<HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
 
@@ -140,7 +145,8 @@ const LeadContact = ({
     ) {
       setErrors((prev) => ({
         ...prev,
-        mobileNumber: "Please enter a valid mobile number.",
+        mobileNumber:
+          "Please enter a valid 10-digit mobile number without country code or spaces.",
       }));
     } else {
       setErrors((prev) => ({
@@ -152,7 +158,7 @@ const LeadContact = ({
   const handleFormInputChange = (
     e:
       | React.ChangeEvent<HTMLInputElement>
-      | React.ChangeEvent<HTMLTextAreaElement>
+      | React.ChangeEvent<HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
     setLeadContactForm({ ...leadContactForm, [name]: value.trim() });
@@ -160,7 +166,7 @@ const LeadContact = ({
 
   // to change the status of contact
   const handleActiveStatusChange = async (
-    selectedContactCard: LeadContactType
+    selectedContactCard: LeadContactType,
   ) => {
     const previousStatus = isActive;
     const newStatus = !isActive;
@@ -196,7 +202,7 @@ const LeadContact = ({
         const data = response.data;
         if (response.data.status === true) {
           toast.success(data.message);
-          if(userHasAccessToViewLeadContacts){
+          if (userHasAccessToViewLeadContacts) {
             fetchLeadContact();
           }
         } else {
@@ -217,7 +223,7 @@ const LeadContact = ({
         }
       });
   };
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (isSaving) return;
     const { name, email, mobileNumber } = leadContactForm;
@@ -332,8 +338,8 @@ const LeadContact = ({
           address: "",
         });
         setSocialMediaHandles([]);
-        if(userHasAccessToViewLeadContacts){
-
+        setTempHandle("");
+        if (userHasAccessToViewLeadContacts) {
           fetchLeadContact();
         }
       });
@@ -354,6 +360,7 @@ const LeadContact = ({
         address: "",
       });
       setSocialMediaHandles([]);
+      setTempHandle("");
     }
   }, [isOpenAddLeadContactForm]);
 
@@ -364,21 +371,20 @@ const LeadContact = ({
   //   }
   // };
   const handleAddSocialMedia = () => {
-  const newHandle = tempHandle.trim();
+    const newHandle = tempHandle.trim();
 
-  if (!newHandle) return;
+    if (!newHandle) return;
 
-  if (socialMediaHandles.includes(newHandle)) {
-    toast.error("Already added.")
+    if (socialMediaHandles.includes(newHandle)) {
+      toast.error("Already added.");
       setTempHandle("");
 
-    return;
-  }
+      return;
+    }
 
-  setSocialMediaHandles(prev => [...prev, newHandle]);
-  setTempHandle("");
-};
-
+    setSocialMediaHandles((prev) => [...prev, newHandle]);
+    setTempHandle("");
+  };
 
   const handleEditLeadContactClick = (selectedContactCard: LeadContactType) => {
     // for to distinguish between edit and add
@@ -395,7 +401,7 @@ const LeadContact = ({
             .split(",")
             .map((handle) => handle.trim())
             .filter((handle) => handle !== "")
-        : []
+        : [],
     );
     setLeadContactForm({
       name: selectedContactCard.name || "",
@@ -415,58 +421,25 @@ const LeadContact = ({
       setIsActive(selectedContactCard.isActive);
     }
   }, [selectedContactCard]);
-  if(!userHasAccessToViewLeadContacts) return <AccessDeniedMessagePage message={MESSAGE.MODULE_ACCESS.LEAD_CONTACT.DENIED_VIEW_ACCESS}/> ;
+  if (!userHasAccessToViewLeadContacts)
+    return (
+      <AccessDeniedMessagePage
+        message={MESSAGE.MODULE_ACCESS.LEAD_CONTACT.DENIED_VIEW_ACCESS}
+      />
+    );
   return (
     <div className={`w-full z-10 px-1  `}>
       {/* Header */}
-      <div className="flex justify-end items-center text-xs gap-x-1  text-gray-500">
-        <Button
-          disabled={!userHasAccessToAddLeadContacts}
-          onClick={() => {
-            if (userHasAccessToAddLeadContacts) {
-              // RESET EVERYTHING RELATED TO EDIT MODE
-              setEditingContactId(null);
-              setEditContactData(null);
-              setSelectedContactCard(null);
-
-              // RESET FORM INPUTS
-              setLeadContactForm({
-                name: "",
-                email: "",
-                mobileNumber: "",
-                jobTitle: "",
-                preferredLanguage: "",
-                preferredCommunicationChannel: "",
-                linkedinProfile: "",
-                address: "",
-              });
-
-              // RESET SOCIAL HANDLES
-              setSocialMediaHandles([]);
-
-              // finally open the form
-              setIsOpenAddLeadContactForm(true);
-              // setIsOpenAddLeadContactForm(!isOpenAddLeadContactForm);
-            } else {
-              toast.error(
-                MESSAGE.MODULE_ACCESS.LEAD_CONTACT.DENIED_ADD_ACCESS
-              );
-            }
-          }}
-          className={COLORS.ADD_BUTTON}
-        >
-          +Add
-        </Button>
-      </div>
 
       {/* Contacts List */}
       <div className="space-y-2 ">
-        {userHasAccessToViewLeadContacts && leadContact  && leadContact.length > 0 ? (
+        {userHasAccessToViewLeadContacts &&
+        leadContact &&
+        leadContact.length > 0 ? (
           leadContact.map((contact, index) => (
             <div
-            
               key={index}
-              className={`${COLORS.CONTACT_CARD}  ${userHasAccessToUpdateLeadContacts ? "": ""}`}
+              className={`${COLORS.CONTACT_CARD}  ${userHasAccessToUpdateLeadContacts ? "" : ""}`}
               onClick={() => setSelectedContactCard(contact)}
             >
               {/* Left: Contact Info */}
@@ -477,65 +450,65 @@ const LeadContact = ({
                     contact.isActive ? "bg-blue-500 " : "bg-red-500"
                   } text-white flex items-center justify-center w-9 h-9 rounded-full border  font-semibold shadow-sm`}
                 >
-                 {
-  contact?.name?.trim()
-    ? contact.name.trim().charAt(0).toUpperCase()
-    : contact?.email?.trim()
-      ? contact.email.trim().charAt(0).toUpperCase()
-      : "?"
-}
-
+                  {contact?.name?.trim()
+                    ? contact.name.trim().charAt(0).toUpperCase()
+                    : contact?.email?.trim()
+                      ? contact.email.trim().charAt(0).toUpperCase()
+                      : "?"}
                 </div>
 
                 {/* Text Info */}
                 <div className="flex flex-col">
+                  {/* Name */}
                   <p className="input-label-custom">
                     {contact.name && contact.name.length > 50
                       ? contact.name.substring(0, 49) + "..."
                       : contact.name || contact.email || contact.mobileNumber}
                   </p>
-                  <p className="caption-custom flex flex-wrap items-center gap-x-1">
-                    {contact.jobTitle && (
+
+                  {/* Job Title */}
+                  {contact.jobTitle && (
+                    <p className="caption-custom flex gap-1 items-center">
+                      <Briefcase size={11} />
+                      {contact.jobTitle}
+                    </p>
+                  )}
+
+                  {/* Mobile + Email */}
+                  <div className="caption-custom flex flex-wrap items-center gap-x-1">
+                    {contact.mobileNumber && (
                       <span className="flex gap-1 items-center">
-                        <Briefcase size={12} /> {contact.jobTitle}
+                        <Phone size={12} />
+                        {contact.mobileNumber}
                       </span>
                     )}
-                    {contact.jobTitle &&
-                      (contact.email || contact.mobileNumber) && <span>•</span>}
+
+                    {contact.mobileNumber && contact.email && <span>•</span>}
 
                     {contact.email && (
                       <span className="flex gap-1 items-center">
-                        {" "}
-                        <Mail size={12} /> {contact.email}
+                        <Mail size={12} />
+                        {contact.email}
                       </span>
                     )}
-                    {contact.email && contact.mobileNumber && <span>•</span>}
-
-                    {contact.mobileNumber && (
-                      <span className="flex gap-1 items-center">
-                        {" "}
-                        <Phone size={12} /> {contact.mobileNumber}
-                      </span>
-                    )}
-                  </p>
+                  </div>
                 </div>
               </div>
 
               {/* Right: Badges */}
               <div className="flex  items-end gap-1">
+                {/* <StatusChip isActive={contact.isPrimary}  /> */}
                 <PrimarySecondaryChip isPrimary={contact.isPrimary} />
                 <StatusChip isActive={contact.isActive} />
               </div>
             </div>
           ))
+        ) : !userHasAccessToViewLeadContacts ? (
+          <p className="caption-custom italic flex items-center justify-center text-center">
+            No view access
+          </p>
         ) : (
-          !userHasAccessToViewLeadContacts? (
-
-             <p className="caption-custom italic flex items-center justify-center text-center">No view access</p>
-          ) : (
-                         <p className="caption-custom text-center">No contacts available</p>
-
-          )
+          <p className="caption-custom text-center">No contacts available</p>
         )}
       </div>
       {/* view in pop up card  */}
@@ -567,7 +540,7 @@ const LeadContact = ({
                       title={selectedContactCard.name ?? ""}
                       className="section-header-custom"
                     >
-                      {selectedContactCard.name  &&
+                      {selectedContactCard.name &&
                       selectedContactCard.name.length > 40 ? (
                         selectedContactCard.name.substring(0, 49) + "..."
                       ) : selectedContactCard.name ? (
@@ -595,7 +568,7 @@ const LeadContact = ({
                   </div>
                   <div>
                     <Button
-                    disabled={!userHasAccessToUpdateLeadContacts}
+                      disabled={!userHasAccessToUpdateLeadContacts}
                       type="submit"
                       onClick={(e) => {
                         e.preventDefault();
@@ -603,7 +576,8 @@ const LeadContact = ({
                           handleEditLeadContactClick(selectedContactCard);
                         } else {
                           toast.error(
-                            MESSAGE.MODULE_ACCESS.LEAD_CONTACT.DENIED_UPDATE_ACCESS
+                            MESSAGE.MODULE_ACCESS.LEAD_CONTACT
+                              .DENIED_UPDATE_ACCESS,
                           );
                         }
                       }}
@@ -745,17 +719,18 @@ const LeadContact = ({
                               userHasAccessToUpdateLeadContacts
                                 ? () => {
                                     handleActiveStatusChange(
-                                      selectedContactCard
+                                      selectedContactCard,
                                     );
                                   }
                                 : () => {
                                     if (selectedContactCard.isPrimary) {
                                       toast.error(
-                                        "Update request denied — the user is designated as the Primary Contact."
+                                        "Update request denied — the user is designated as the Primary Contact.",
                                       );
                                     } else {
                                       toast.error(
-                                        MESSAGE.MODULE_ACCESS.LEAD_CONTACT.DENIED_UPDATE_ACCESS
+                                        MESSAGE.MODULE_ACCESS.LEAD_CONTACT
+                                          .DENIED_UPDATE_ACCESS,
                                       );
                                     }
                                   }
@@ -816,7 +791,7 @@ const LeadContact = ({
               </div>
             </div>
           </div>,
-          document.body
+          document.body,
         )}
 
       {/* Add Contact Form Modal */}
@@ -837,6 +812,7 @@ const LeadContact = ({
               setIsOpenAddLeadContactForm(false);
               setEditContactData(null);
               setSocialMediaHandles([]);
+              setTempHandle("");
               setLeadContactForm({
                 name: "",
                 email: "",
@@ -851,11 +827,12 @@ const LeadContact = ({
           />
 
           {/* Form Grid */}
-          <form>
+          <form onSubmit={handleSubmit}>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2 text-sm text-gray-500">
               <div>
                 <FormInput
                   logo={User}
+                  autoFocus
                   label="Full Name :"
                   required
                   type="text"
@@ -911,7 +888,7 @@ const LeadContact = ({
                   type="text"
                   name="mobileNumber"
                   minLength={10}
-                  maxLength={10}
+                  // maxLength={10}
                   placeholder="Enter mobile number"
                   // className={inputClass}
                   onChange={handleFormInputChange}
@@ -933,6 +910,7 @@ const LeadContact = ({
                 )}
               </div>
               {/* job title */}
+
               <FormInput
                 label="Job title :"
                 logo={Briefcase}
@@ -1026,11 +1004,11 @@ const LeadContact = ({
 
                   <div className="mt-4">
                     <Button
+                      type="button"
                       onClick={(e) => {
                         e.preventDefault();
                         handleAddSocialMedia();
                       }}
-                      type="submit"
                     >
                       + Add
                     </Button>
@@ -1049,9 +1027,10 @@ const LeadContact = ({
                       </div>
                       <Button
                         size="icon"
+                        type="button"
                         onClick={() =>
                           setSocialMediaHandles((prev) =>
-                            prev.filter((h) => h !== handle)
+                            prev.filter((h) => h !== handle),
                           )
                         }
                         className="caption-custom hover:text-red-500"
@@ -1107,10 +1086,10 @@ const LeadContact = ({
                 <Button
                   type="submit"
                   disabled={isSaving}
-                  onClick={(event) => {
-                    if (isSaving) return;
-                    handleSubmit(event);
-                  }}
+                  // onClick={(event) => {
+                  //   if (isSaving) return;
+                  //   handleSubmit(event);
+                  // }}
                 >
                   <div className="flex items-center gap-1">
                     <Save size={16} />

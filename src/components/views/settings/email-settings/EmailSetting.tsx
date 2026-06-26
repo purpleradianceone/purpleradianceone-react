@@ -27,6 +27,7 @@ import toast from "react-hot-toast";
 import ApiError from "../../../../@types/error/ApiError";
 import RefreshToken from "../../../../config/validations/RefreshToken";
 import ToggleButton from "../../../ui/ToggleButton";
+import FacebookPageSkeleton from "../social-media-integration/meta-app-facebook/PafeIdListCardPopUp";
 
 interface CompanyEmailSetting {
   id: number;
@@ -63,13 +64,13 @@ interface CompanyUserEmailSetting {
 
 export default function EmailSettingsTabs() {
   const [activeTab, setActiveTab] = useState<"company" | "user" | "email type">(
-    "company"
+    "company",
   );
   const [companySettings, setCompanySettings] = useState<CompanyEmailSetting[]>(
-    []
+    [],
   );
   const [userSettings, setUserSettings] = useState<CompanyUserEmailSetting[]>(
-    []
+    [],
   );
 
   // Modal control states
@@ -110,13 +111,13 @@ export default function EmailSettingsTabs() {
             company_id: loginStatus.companyId,
             requestedby_id: loginStatus.id,
           },
-          { withCredentials: true }
+          { withCredentials: true },
         )
         .then((result) => {
           if (result.status === STATUS_CODE.OK) {
             const companyEmailSetting = result.data;
             setCompanySettings(
-              companyEmailSetting.length > 0 ? companyEmailSetting : []
+              companyEmailSetting.length > 0 ? companyEmailSetting : [],
             );
           }
         })
@@ -149,13 +150,13 @@ export default function EmailSettingsTabs() {
             company_user_id: loginStatus.id,
             requestedby_id: loginStatus.id,
           },
-          { withCredentials: true }
+          { withCredentials: true },
         )
         .then((result) => {
           if (result.status === STATUS_CODE.OK) {
             const companyUserEmailSetting = result.data;
             setUserSettings(
-              companyUserEmailSetting.length > 0 ? companyUserEmailSetting : []
+              companyUserEmailSetting.length > 0 ? companyUserEmailSetting : [],
             );
           }
         })
@@ -196,7 +197,7 @@ export default function EmailSettingsTabs() {
   const onEmailSettingToggle = async (
     event: React.ChangeEvent<HTMLInputElement>,
     setting: CompanyUserEmailSetting | CompanyEmailSetting,
-    isForCompany: boolean
+    isForCompany: boolean,
   ) => {
     const { checked } = event.target;
 
@@ -222,7 +223,7 @@ export default function EmailSettingsTabs() {
           updateEmailSettingPostData,
           {
             withCredentials: true,
-          }
+          },
         )
         .then((response) => {
           if (response.status === STATUS_CODE.OK) {
@@ -232,16 +233,16 @@ export default function EmailSettingsTabs() {
                   prev.map((item) =>
                     item.id === setting.id
                       ? { ...item, isactive: checked }
-                      : item
-                  )
+                      : item,
+                  ),
                 );
               } else {
                 setUserSettings((prev) =>
                   prev.map((item) =>
                     item.id === setting.id
                       ? { ...item, isactive: checked }
-                      : item
-                  )
+                      : item,
+                  ),
                 );
               }
             }
@@ -267,9 +268,9 @@ export default function EmailSettingsTabs() {
 
   const renderCompanyEmailCard = (
     setting: CompanyEmailSetting,
-    index: number
+    index: number,
   ) => (
-    <>
+    <div className="w-full h-full">
       <div className="flex justify-between">
         <div
           key={index}
@@ -288,7 +289,7 @@ export default function EmailSettingsTabs() {
                 } else {
                   toast.error(
                     MESSAGE.MODULE_ACCESS.SETTING.COMPANY_EMAIL_SETTING
-                      .DENIED_UPDATE_ACCESS
+                      .DENIED_UPDATE_ACCESS,
                   );
                 }
               }}
@@ -336,8 +337,8 @@ export default function EmailSettingsTabs() {
                 {setting.email_security_type_id === 1
                   ? "SSL"
                   : setting.email_security_type_id === 2
-                  ? "TLS"
-                  : "Unknown"}
+                    ? "TLS"
+                    : "Unknown"}
               </span>
             </p>
           </div>
@@ -414,12 +415,12 @@ export default function EmailSettingsTabs() {
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 
   const renderUserEmailCard = (
     setting: CompanyUserEmailSetting,
-    index: number
+    index: number,
   ) => (
     <>
       {userHasAccessToViewSettingPersonalEmail ? (
@@ -442,7 +443,7 @@ export default function EmailSettingsTabs() {
                     } else {
                       toast.error(
                         MESSAGE.MODULE_ACCESS.SETTING.PERSONAL_EMAIL_SETTING
-                          .DENIED_UPDATE_ACCESS
+                          .DENIED_UPDATE_ACCESS,
                       );
                     }
                   }}
@@ -492,8 +493,8 @@ export default function EmailSettingsTabs() {
                     {setting.email_security_type_id === 1
                       ? "SSL"
                       : setting.email_security_type_id === 2
-                      ? "TLS"
-                      : "Unknown"}
+                        ? "TLS"
+                        : "Unknown"}
                   </span>
                 </p>
               </div>
@@ -614,16 +615,21 @@ export default function EmailSettingsTabs() {
       </div>
 
       {/* Content */}
-      <div>
+      <div className="h-[78vh]">
         {activeTab === "company" ? (
           <div className="w-full">
             {userHasAccessToViewEmailSettingCompany ? (
               isLoading ? (
-                <div className="flex justify-center items-center h-[40vh]">
-                  <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-600"></div>
+                <div className="grid md:grid-cols-3 sm:grid-cols-2 gap-4">
+                  <FacebookPageSkeleton />
+                  <FacebookPageSkeleton />
+                  <FacebookPageSkeleton />
+                  <FacebookPageSkeleton />
+                  <FacebookPageSkeleton />
+                  <FacebookPageSkeleton />
                 </div>
               ) : (
-                <div>
+                <div className="w-full ">
                   {companySettings.length > 0 ? (
                     companySettings.map(renderCompanyEmailCard)
                   ) : (
@@ -645,7 +651,7 @@ export default function EmailSettingsTabs() {
                             } else {
                               toast.error(
                                 MESSAGE.MODULE_ACCESS.SETTING
-                                  .COMPANY_EMAIL_SETTING.DENIED_ADD_ACCESS
+                                  .COMPANY_EMAIL_SETTING.DENIED_ADD_ACCESS,
                               );
                             }
                           }}
@@ -673,9 +679,17 @@ export default function EmailSettingsTabs() {
           <div className="w-full">
             {userHasAccessToViewSettingPersonalEmail ? (
               isLoading ? (
-                <div className="flex justify-center items-center h-[40vh]">
-                  <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-600"></div>
-                </div>
+                // <div className="flex justify-center items-center h-[40vh]">
+                //   <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-600"></div>
+                // </div>
+                 <div className="grid md:grid-cols-3 sm:grid-cols-2 gap-4">
+        <FacebookPageSkeleton />
+        <FacebookPageSkeleton />
+        <FacebookPageSkeleton />
+        <FacebookPageSkeleton />
+        <FacebookPageSkeleton />
+        <FacebookPageSkeleton />
+      </div>
               ) : (
                 <div>
                   {userSettings.length > 0 ? (
@@ -700,7 +714,7 @@ export default function EmailSettingsTabs() {
                             } else {
                               toast.error(
                                 MESSAGE.MODULE_ACCESS.SETTING
-                                  .PERSONAL_EMAIL_SETTING.DENIED_ADD_ACCESS
+                                  .PERSONAL_EMAIL_SETTING.DENIED_ADD_ACCESS,
                               );
                             }
                           }}
@@ -731,7 +745,8 @@ export default function EmailSettingsTabs() {
             ) : (
               <AccessDeniedMessagePage
                 message={
-                  MESSAGE.MODULE_ACCESS.SETTING.EMAIL_TYPE_SETTING.DENIED_VIEW_ACCESS
+                  MESSAGE.MODULE_ACCESS.SETTING.EMAIL_TYPE_SETTING
+                    .DENIED_VIEW_ACCESS
                 }
               ></AccessDeniedMessagePage>
             )}

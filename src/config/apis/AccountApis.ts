@@ -30,3 +30,14 @@ export const updateAccountCompanyProductSerialNumberApiCall  = async (payload: o
     const response = await axiosClient.post(POST_API.UPDATE_ACCOUNT_COMPANY_PRODUCT_SERIAL_NUMBER, payload, { withCredentials: true })
     return response;
 }
+
+
+export const updateAccount  = async (payload: object
+) => {
+    const response = await axiosClient.post(POST_API.UPDATE_ACCOUNT, payload, { withCredentials: true })
+    return response;
+}
+
+
+
+

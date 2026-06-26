@@ -14,6 +14,7 @@ import AccountCompanyProductForSupportTicket from "../../@types/support-ticket-m
 import AccountCompanyProductForSupportTicketAgGrid from "../ag-grid/AccountCompanyProductForSupportTicketAgGrid";
 import { useEffect } from "react";
 import PaginationWithoutCount, { PaginationDataWithoutCountProps } from "../ag-grid/PaginationWithoutCount";
+import { customDateRangeId } from "../../config/hooks/usePaginationHandler";
 
 
 function AccountCompanyProductForSupportTicketList({
@@ -23,6 +24,7 @@ function AccountCompanyProductForSupportTicketList({
   onEndDateChange,
   paginationData,
   handleRowSelect,
+  isDataLaoding
 }: {
   accountCompanyProductsForSupportTicket: AccountCompanyProductForSupportTicket[];
   handleSearchOption: HandleSearchOptionProps;
@@ -30,6 +32,7 @@ function AccountCompanyProductForSupportTicketList({
   onEndDateChange: (date: Date) => void;
   paginationData: PaginationDataWithoutCountProps;
   handleRowSelect?: (data: AccountCompanyProductForSupportTicket | any) => void;
+  isDataLaoding : boolean
 }) {
   const { position } = usePanel();
   const { isLargeScreen, isMediumScreen, isSmallScreen } = useScreenSize();
@@ -52,7 +55,7 @@ function AccountCompanyProductForSupportTicketList({
     )?.date_range || "Date Filter";
 
   useEffect(() => {
-    if (handleSearchOption.dateRangeId === 8) {
+    if (handleSearchOption.dateRangeId === customDateRangeId) {
       setIsCustomDateOptionSelected(true);
     }
   }, [
@@ -95,7 +98,7 @@ function AccountCompanyProductForSupportTicketList({
                       e.target.value,
                     );
                   }}
-                  placeholder={"Search by Account's Email, mobilenumber"}
+                  placeholder={"Name, email, mobile, serial number, barcode"}
                   value={handleSearchOption.searchParameter}
                 ></SearchInput>
               </div>
@@ -144,6 +147,7 @@ function AccountCompanyProductForSupportTicketList({
               accountCompanyProductsForSupportTicket
             }
             onRowSelect={handleRowSelectedForSupportTicket}
+            isDataLaoding={isDataLaoding}
           />
         </div>
       </div>

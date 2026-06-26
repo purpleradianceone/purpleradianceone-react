@@ -1,6 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import LeadTaskTabs from "../../../tabs/LeadTasksTabs";
 import { useEffect, useState } from "react";
 import CreateLeadTaskModal from "./CreateLeadTaskModal";
 import POST_API from "../../../../constants/PostApi";
@@ -19,11 +18,18 @@ import { useUserAccessModules } from "../../../../config/hooks/useAccessModules"
 import toast from "react-hot-toast";
 import MESSAGE from "../../../../constants/Messages";
 import axiosClient from "../../../../axios-client/AxiosClient";
+import LeadTaskList from "./LeadTaskList";
+import { Tabs,TabsBody,TabPanel, } from "@material-tailwind/react";
+import { useMeetingPlatform } from "../../../../config/hooks/useMeetingPlatforms";
 
 function LeadTasksModal({ ownerId }: { ownerId: number }) {
   const { userHasAccessToAddLeadTasks, userHasAccessToViewLeadTasks} = useUserAccessModules();
   const { loginStatus } = useLoggedInUserContext();
   const [searchParams] = useSearchParams();
+
+  const [activeTab, setActiveTab] = useState("allTasks");
+
+  const { meetingPlatform } = useMeetingPlatform();
 
   const [leadActivity, setLeadActivity] = useState<LeadActivityType[]>([]);
   const [leadTaskPriority, setLeadTaskPriority] = useState<
@@ -272,20 +278,127 @@ function LeadTasksModal({ ownerId }: { ownerId: number }) {
 
   const [isCreateLeadTaskModalOpen, setIsCreateLeadTaskModalOpen] =
     useState<boolean>(false);
+
+     const data = [
+    {
+      label: "All Tasks",
+      value: "allTasks",
+      desc: (
+       <LeadTaskList 
+       isLoading = {isLoading}
+       leadActivity={leadActivity}
+       leadTaskPriority={leadTaskPriority}
+       leadTasks={leadTasks}
+       leadTaskStage={leadTaskStage}
+       handleLeadActivityFilterDropdownChange={handleLeadActivityFilterDropdownChange}
+       handleLeadPriorityFilterDropdownChange={handleLeadPriorityFilterDropdownChange}
+       handleLeadTaskUpdate={handleLeadTaskUpdate}
+       meetingPlatform={meetingPlatform}
+       />
+      ),
+      taskId : 0
+    },
+    {
+      label: leadTaskStage[0]?.name,
+      value: leadTaskStage[0]?.name,
+      desc: (
+       <LeadTaskList 
+        isLoading = {isLoading}
+       leadActivity={leadActivity}
+       leadTaskPriority={leadTaskPriority}
+       leadTasks={leadTasks}
+       leadTaskStage={leadTaskStage}
+       handleLeadActivityFilterDropdownChange={handleLeadActivityFilterDropdownChange}
+       handleLeadPriorityFilterDropdownChange={handleLeadPriorityFilterDropdownChange}
+        handleLeadTaskUpdate={handleLeadTaskUpdate}
+        meetingPlatform={meetingPlatform}
+       />
+      ),
+       taskId : leadTaskStage[0]?.id,
+    },
+    {
+      label: leadTaskStage[1]?.name,
+      value: leadTaskStage[1]?.name,
+      desc: (
+     <LeadTaskList 
+      isLoading = {isLoading}
+       leadActivity={leadActivity}
+       leadTaskPriority={leadTaskPriority}
+       leadTasks={leadTasks}
+       leadTaskStage={leadTaskStage}
+       handleLeadActivityFilterDropdownChange={handleLeadActivityFilterDropdownChange}
+       handleLeadPriorityFilterDropdownChange={handleLeadPriorityFilterDropdownChange}
+        handleLeadTaskUpdate={handleLeadTaskUpdate}
+        meetingPlatform={meetingPlatform}
+       />
+      ),
+      taskId : leadTaskStage[1]?.id,
+    },
+    {
+      label: leadTaskStage[2]?.name,
+      value: leadTaskStage[2]?.name,
+      desc: (
+       <LeadTaskList 
+        isLoading = {isLoading}
+       leadActivity={leadActivity}
+       leadTaskPriority={leadTaskPriority}
+       leadTasks={leadTasks}
+       leadTaskStage={leadTaskStage}
+       handleLeadActivityFilterDropdownChange={handleLeadActivityFilterDropdownChange}
+       handleLeadPriorityFilterDropdownChange={handleLeadPriorityFilterDropdownChange}
+        handleLeadTaskUpdate={handleLeadTaskUpdate}
+        meetingPlatform={meetingPlatform}
+       />
+      ),
+      taskId : leadTaskStage[2]?.id,
+    },
+  ];
+
+
   return (
-    <div className="w-full  shadow-lg ">
-      <div className="w-full gap-1">
-        <div className="sticky top-16 flex bg-gray-200 shadow-sm  mb-1.5 w-full">
-          <div className="flex justify-between  w-full pr-3">
-            <span className="table-header-custom pl-1  text-center ">
-              Tasks
-            </span>
-            {visibleAssignUsersBtn && userHasAccessToViewLeadTasks && (
-              <div className="flex justify-end items-center text-xs gap-x-2  text-gray-500">
+    <div className="w-full h-full">
+      
+       <div className="w-full bg-white border rounded-md shadow-sm mt-1">
+
+  {/* Header */}
+  <div className="flex items-center justify-between w-full px-1  py-1.5 border-b mb-1 shadow-sm ">
+
+  {/* Left Side */}
+  <div className="flex items-center gap-6">
+
+    {/* Title */}
+    <span className="table-header-custom text-black whitespace-nowrap pl-1">
+      Tasks
+    </span>
+
+    {/* Only 4 Status Tabs */}
+    <div className="flex items-center gap-5 ">
+      {data.map(({ label, value, taskId }) => (
+        <button
+          key={value}
+          onClick={() => {
+            setActiveTab(value);
+            handleTaskTabChange(taskId);
+          }}
+          className={`text-xs caption-custom  border-b-2 transition-all whitespace-nowrap ${
+            activeTab === value
+              ? "border-b-2 border-blue-500 caption-custom-blue"
+              : "border-transparent text-gray-500 hover:text-blue-500"
+          }`}
+        >
+          {label}
+        </button>
+      ))}
+    </div>
+  </div>
+
+  {/* Add Button */}
+  {visibleAssignUsersBtn && userHasAccessToViewLeadTasks && (
+ <div className="flex justify-end items-center text-xs gap-x-2 text-gray-500">
                 {/* <span>Add</span> */}
                 <Button
                   disabled={!userHasAccessToAddLeadTasks}
-                  className="bg-blue-600 hover:bg-blue-700 caption-custom white-text px-1 py-0.5 rounded-md flex items-center gap-1"
+                  className="flex bg-blue-600 hover:bg-blue-700 caption-custom white-text px-1 py-0.5 rounded-md items-center gap-1"
                   onClick={() => {
                     if(userHasAccessToAddLeadTasks){
                       setIsCreateLeadTaskModalOpen(true);
@@ -297,27 +410,28 @@ function LeadTasksModal({ ownerId }: { ownerId: number }) {
                   +Add
                 </Button>
               </div>
-            )}
-          </div>
-        </div>
-        <div className="bg-white overflow-y-auto rounded-lg shadow-sm p-0">
-          <LeadTaskTabs
-            isLoading={isLoading}
-            leadActivity={leadActivity}
-            leadTaskPriority={leadTaskPriority}
-            leadTaskStage={leadTaskStage}
-            leadTasks={leadTasks}
-            handleTaskTabChange={handleTaskTabChange}
-            handleLeadActivityFilterDropdownChange={
-              handleLeadActivityFilterDropdownChange
-            }
-            handleLeadPriorityFilterDropdownChange={
-              handleLeadPriorityFilterDropdownChange
-            }
-            handleLeadTaskUpdate={handleLeadTaskUpdate}
-          ></LeadTaskTabs>
-        </div>
-      </div>
+  )}
+</div>
+
+  {/* Body */}
+  <div className="overflow-y-auto max-h-[calc(100vh-240px)]">
+    <Tabs value={activeTab}>
+      <TabsBody
+        placeholder="Lead Tasks"
+        onPointerEnterCapture={undefined}
+        onPointerLeaveCapture={undefined}
+        onResize={undefined}
+        onResizeCapture={undefined}
+      >
+        {data.map(({ value, desc }) => (
+          <TabPanel key={value} value={value} className="p-0">
+            {desc}
+          </TabPanel>
+        ))}
+      </TabsBody>
+    </Tabs>
+  </div>
+</div>
       {leadData && (
         <CreateLeadTaskModal
           leadActivity={leadActivity}

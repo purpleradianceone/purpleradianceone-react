@@ -9,22 +9,23 @@ export interface SelectOption {
 }
 
 interface AppSelectProps {
-  label: string;
+  label?: string;
   options: SelectOption[];
   value?: number;
-  onChange: (value: number | undefined) => void;
+  onChange: (value: number | undefined , name?: string ) => void;
   placeholder?: string;
   isDisabled?: boolean;
   isRequired?: boolean;
   icon?: LucideIcon;
   className?: string;
-  isClearable? : boolean
+  isClearable?: boolean
 
   // New Props for scroll api data and onSearchApiCall
   onMenuOpen?: () => void;
   onMenuScrollToBottom?: () => void;
   onInputChange?: (value: string) => void;
   isLoading?: boolean;
+  autoFocus? : boolean
 }
 
 
@@ -48,9 +49,10 @@ const CustomSelect: React.FC<AppSelectProps> = ({
   className,
   isClearable = true,
   isLoading,
-  onInputChange ,
-  onMenuOpen ,
-  onMenuScrollToBottom 
+  onInputChange,
+  onMenuOpen,
+  onMenuScrollToBottom,
+  autoFocus = false
 }) => {
   const selectedOption = useMemo(
     () => options.find((opt) => opt.value === value) ?? null,
@@ -62,19 +64,20 @@ const CustomSelect: React.FC<AppSelectProps> = ({
       toast.error(`Can't update ${label}`);
       return;
     }
-    onChange(option?.value);
+    onChange(option?.value );
   };
 
   return (
     <div className={`w-full ${className ?? ""}`}>
       <label className="block input-label-custom ">
         {Icon && <Icon size={14} className="inline mr-1 text-blue-500" />}
-        {label}
+        {label && <span>{label}</span> }
         {isRequired && <span className="text-rose-500 ml-0.5">*</span>}
       </label>
 
       <Select<SelectOption, false>
         options={options}
+        autoFocus={autoFocus}
         value={selectedOption}
         onChange={handleChange}
         isClearable={isClearable}
@@ -90,21 +93,44 @@ const CustomSelect: React.FC<AppSelectProps> = ({
         onMenuScrollToBottom={onMenuScrollToBottom}
         // above props are used for the search and scroll api call
         classNames={{
-            placeholder : ()=> "input-label-custom placeholder-gray-400",
-            input: ()=> "caption-custom",
+          placeholder: () => "input-label-custom placeholder-gray-400",
+          input: () => "input-label-custom",
         }}
         styles={{
           control: (base, state) => ({
             ...base,
             minHeight: 30,
             height: 30,
+            alignItems: "center",
+            fontSize: 16,            //  smaller text
             borderColor: state.isFocused ? "#2563eb" : base.borderColor,
             boxShadow: state.isFocused ? "0 0 0 1px #2563eb" : "none",
+          }),
+          option: (base, state) => ({
+            ...base,
+            fontSize: 14,           //  smaller text
+            minHeight: 28,         //  smaller row height
+            padding: "4px 8px",    //  compact padding
+            backgroundColor: state.isFocused
+              ? "#e0e7ff"
+              : state.isSelected
+                ? "#c7d2fe"
+                : "white",
+            color: "#000000",
+            fontFamily : "sans-serif"
+          }),
+          singleValue: (base)=>({
+              ...base,
+              fontSize: 14,
+              fontFamily: "sans-serif",
+              fontWeight : 400,
+              // color: "#757575";
           }),
           valueContainer: (base) => ({
             ...base,
             height: 30,
-            padding: "0 12px",
+            // padding: "0 8px",       //  tighter padding
+            fontSize: 12,
           }),
           input: (base) => ({
             ...base,
@@ -114,6 +140,11 @@ const CustomSelect: React.FC<AppSelectProps> = ({
           indicatorsContainer: (base) => ({
             ...base,
             height: 30,
+          }),
+          menuList: (base) => ({
+            ...base,
+            padding: 1,            //  reduce top/bottom spacing
+            maxHeight: 180,       //  optional: smaller dropdown height
           }),
           menuPortal: (base) => ({ ...base, zIndex: 9999 }),
           menu: (base) => ({ ...base, zIndex: 9999 }),

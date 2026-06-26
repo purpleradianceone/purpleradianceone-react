@@ -16,10 +16,10 @@ import CreateCompanyWarehouse from "./CreateCompanyWarehouse";
 import ToggleButton from "../../../ui/ToggleButton";
 import { useWarehouseType } from "../../../../config/hooks/useWarehouseType";
 import CompanyWarehouseType from "../../../../@types/warehouse/CompanyWarehouse";
-import LoadingSpinner from "../../../../assets/animations/LoadingSpinner";
 import validateName from "../../../../config/validations/ValidateName";
 import validateDescription from "../../../../config/validations/ValidateDescription";
 import validateLocation from "../../../../config/validations/ValidateLocation";
+import FacebookPageSkeleton from "../social-media-integration/meta-app-facebook/PafeIdListCardPopUp";
 
 const CompanyWarehouseSetting: React.FC = () => {
   const { warehouseTypeData } = useWarehouseType();
@@ -106,9 +106,9 @@ const CompanyWarehouseSetting: React.FC = () => {
     location?: string | null;
     isactive?: boolean | null;
   }) => {
-  
 
-    if(!userHasAccessToUpdateSettingCompanyWarehouse){
+
+    if (!userHasAccessToUpdateSettingCompanyWarehouse) {
       toast.error(MESSAGE.MODULE_ACCESS.SETTING.COMPANY_WAREHOUSE_SETTING.DENIED_UPDATE_ACCESS)
       return;
     }
@@ -133,7 +133,7 @@ const CompanyWarehouseSetting: React.FC = () => {
       return;
     }
 
-      const postDataToUpdateCompanyWarehouse = {
+    const postDataToUpdateCompanyWarehouse = {
       company_id: loginStatus.companyId,
       id: updatedType?.id ?? editingTypeId,
       name: updatedType?.name ?? editingTypeName,
@@ -190,17 +190,25 @@ const CompanyWarehouseSetting: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="h-screen flex items-center justify-center">
-        <div className="flex items-center justify-between gap-3">
-          {/* <span>Loading...</span> */}
-           <LoadingSpinner />
-        </div>
+       <div className="grid md:grid-cols-3 sm:grid-cols-2 gap-4">
+        <FacebookPageSkeleton />
+        <FacebookPageSkeleton />
+        <FacebookPageSkeleton />
+        <FacebookPageSkeleton />
+        <FacebookPageSkeleton />
+        <FacebookPageSkeleton />
+        <FacebookPageSkeleton />
+        <FacebookPageSkeleton />
+        <FacebookPageSkeleton />
+        <FacebookPageSkeleton />
+        <FacebookPageSkeleton />
+        <FacebookPageSkeleton />
       </div>
     );
   }
   return (
     <div className="min-h-screen bg-gray-50 rounded-md ">
-      <div className="max-w-6xl mx-auto p-1">
+      <div className="max-w-full mx-auto p-1">
         <div className="flex justify-between">
           <h1 className="table-header-custom my-3">Company Warehouse</h1>
           {!showAddForm && (
@@ -307,9 +315,8 @@ const CompanyWarehouseSetting: React.FC = () => {
                         {/* <span className="text-gray-600 text-xs">Name : </span> */}
                         {/* <div className="flex items-center justify-between  w-full gap-1  hover:border border-blue-300 hover:rounded px-1 hover:bg-gray-50"> */}
                         <div
-                          className={`flex items-center ${
-                            item.name ? "justify-between" : "justify-end"
-                          }  w-full gap-1  hover:border border-blue-300 hover:rounded px-1 hover:bg-gray-50`}
+                          className={`flex items-center ${item.name ? "justify-between" : "justify-end"
+                            }  w-full gap-1  hover:border border-blue-300 hover:rounded px-1 hover:bg-gray-50`}
                         >
                           {item.name}
                           <Pen size={10} className="text-blue-500 " />
@@ -324,7 +331,7 @@ const CompanyWarehouseSetting: React.FC = () => {
                     Description:
                   </label>
                   {editingTypeId === item.id &&
-                  editingField === "description" ? (
+                    editingField === "description" ? (
                     <>
                       <input
                         id="description"
@@ -379,9 +386,8 @@ const CompanyWarehouseSetting: React.FC = () => {
                         {/* <span className="text-gray-600 text-xs">Name : </span> */}
                         {/* <div className="flex items-center justify-between  w-full gap-1  hover:border border-blue-300 hover:rounded px-1 hover:bg-gray-50"> */}
                         <div
-                          className={`flex items-center ${
-                            item.description ? "justify-between" : "justify-end"
-                          }  w-full gap-1  hover:border border-blue-300 hover:rounded px-1 hover:bg-gray-50`}
+                          className={`flex items-center ${item.description ? "justify-between" : "justify-end"
+                            }  w-full gap-1  hover:border border-blue-300 hover:rounded px-1 hover:bg-gray-50`}
                         >
                           {item.description}
                           <Pen size={10} className="text-blue-500 " />
@@ -450,9 +456,8 @@ const CompanyWarehouseSetting: React.FC = () => {
                         {/* <span className="text-gray-600 text-xs">Name : </span> */}
                         {/* <div className="flex items-center justify-between  w-full gap-1  hover:border border-blue-300 hover:rounded px-1 hover:bg-gray-50"> */}
                         <div
-                          className={`flex items-center ${
-                            item.location ? "justify-between" : "justify-end"
-                          }  w-full gap-1  hover:border border-blue-300 hover:rounded px-1 hover:bg-gray-50`}
+                          className={`flex items-center ${item.location ? "justify-between" : "justify-end"
+                            }  w-full gap-1  hover:border border-blue-300 hover:rounded px-1 hover:bg-gray-50`}
                         >
                           {item.location}
                           <Pen size={10} className="text-blue-500 " />

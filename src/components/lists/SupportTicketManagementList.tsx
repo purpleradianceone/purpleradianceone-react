@@ -1,7 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {
+  CheckCircle2,
+  Clock3,
+  FolderOpen,
   Headset,
+  Hourglass,
   ShoppingBag,
+  Ticket,
   TicketPlus,
   User,
   UserCheck,
@@ -11,7 +16,7 @@ import useScreenSize from "../../config/hooks/useScreenSize";
 import { JSX_CHILDREN_NAME, SIZE } from "../../constants/AppConstants";
 import Button from "../ui/Button";
 import { useUserAccessModules } from "../../config/hooks/useAccessModules";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import SearchInput from "../ui/SearchInput";
 import DateRangePicker from "../ui/DateRangePicker";
 import { useComapanySpecificSearchDateRange } from "../../config/hooks/useCompanySpecificDateRange";
@@ -33,6 +38,12 @@ import CreateSupportTicketModal from "../modals/support-ticket/CreateSupportTick
 import LookupCompanyUserSelection from "../views/lookups/lookup-company-user/LookupCompanyUserSelection";
 import LookupCompanyProductSelection from "../views/lookups/lookup-company-product/LookupCompanyProductSelection";
 import PaginationWithoutCount from "../ag-grid/PaginationWithoutCount";
+import { customDateRangeId } from "../../config/hooks/usePaginationHandler";
+import SupportTicketSummary from "../../@types/support-ticket-management/SupportTicketSummary";
+import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
+import axiosClient from "../../axios-client/AxiosClient";
+import POST_API from "../../constants/PostApi";
+import SummaryCards from "../ui/SummaryCards";
 
 export const supportTicketDataUrlSearchParamKey: string = "supportTicketData";
 
@@ -59,6 +70,7 @@ function SupportTicketManagementList({
   handleSupportSelectedSource,
   isUsedInSupportTicketModule,
   handleRowSelectedForShowSupportTicket,
+  isDataLoading,
 }: SupportTicketManagementListProps) {
   const [searchParams] = useSearchParams();
 
@@ -108,6 +120,48 @@ function SupportTicketManagementList({
       updatedBy: "",
       updatedOn: "",
     });
+
+     const { loginStatus } = useLoggedInUserContext();
+
+const [supportTicketSummary, setSupportTicketSummary] =
+  useState<SupportTicketSummary>({
+    total_support_tickets: 0,
+    total_support_tickets_today: 0,
+    total_open_support_tickets: 0,
+    total_in_progress_support_tickets: 0,
+    total_resolved_closed_support_tickets: 0,
+  });
+
+const fetchSupportTicketSummary = useCallback(async () => {
+  try {
+    const postData = {
+      company_id: loginStatus.companyId,
+      requestedby: loginStatus.id,
+    };
+
+    const response = await axiosClient.post(
+      POST_API.SUMMARY_SUPPORT_TICKET,
+      postData,
+      {
+        withCredentials: true,
+      }
+    );
+
+    if (response.data?.length > 0) {
+      setSupportTicketSummary(response.data[0]);
+    }
+  } catch (error) {
+    console.error(error);
+  }
+}, [loginStatus.companyId, loginStatus.id]);
+
+useEffect(() => {
+  if (loginStatus.companyId && loginStatus.id) {
+    fetchSupportTicketSummary();
+  }
+}, [fetchSupportTicketSummary]);
+
+
 
   //note : this is new
   const handleSupportTicketDataFormChange = (data: SupportTicketProps) => {
@@ -176,7 +230,7 @@ function SupportTicketManagementList({
 
     // eslint-disable-next-line react-hooks/rules-of-hooks
     useEffect(() => {
-      if (handleSearchOption.dateRangeId === 8) {
+      if (handleSearchOption.dateRangeId === customDateRangeId) {
         setIsCustomDateOptionSelected(true);
       }
     }, [
@@ -188,73 +242,167 @@ function SupportTicketManagementList({
     return (
       <div
         className={`w-full ${
-          position === "left" && isUsedInSupportTicketModule ? "pl-5" : "pl-1"
-        } pr-1 gap-1`}
+          position === "left" && isUsedInSupportTicketModule ? "pl-7 pr-2" : "pl-1"
+        } pr-1 gap-1 pt-2`}
       >
+        {/* Top Header */}
+            <div className="flex items-start justify-between ">
+
+            <div className="flex items-center gap-3 ">
+              <div className={`p-2 rounded-lg ${COLORS.PAGE_HEADER_SECTION_BG_COLOR}`}>
+              <Headset className={COLORS.PAGE_HEADER_ICONS_COLOR_AND_SIZE} />
+            </div>
+
+              <div>
+                <h1 className="page-header-custom tracking-tight pb-0.5">
+               Support
+            </h1>
+              <p className="page-subtitle-custom ">
+                Manage and resolve customer support tickets.
+            </p>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2 pt-1 w-fit">
+              {/* RIGHT SECTION - Create Button */}
+              {isUsedInSupportTicketModule && (
+                <div className="flex gap-1 justify-end w-fit">
+                  <Button
+                    type="submit"
+                    disabled={!userHasAccessToAddSupportTicket}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      if (!userHasAccessToAddSupportTicket) {
+                        toast.error(
+                          MESSAGE.MODULE_ACCESS.SUPPORT_MODULE
+                            .DENIED_ADD_ACCESS,
+                        );
+                        return;
+                      }
+                      setIsCreateSupportTicketModalOpen(true);
+                    }}
+                  >
+                    <span className="flex items-center gap-1">
+                      {!isSmallScreen && <TicketPlus size={SIZE.SIXTEEN} />}
+                      {isSmallScreen && <TicketPlus size={SIZE.EIGHT} />}
+                      {isLargeScreen && JSX_CHILDREN_NAME.CREATE_SUPPORT_TICKET}
+                    </span>
+                  </Button>
+                </div>
+              )}
+            </div>
+            </div>
+
+            <SummaryCards
+              cardGap={15}
+              width="100%"
+              gridCols={5}
+              loading={isDataLoading}
+              cards={[
+                {
+                  title: "Total Tickets",
+                  count: supportTicketSummary.total_support_tickets,
+                  subtitle: "All Support Tickets",
+                  icon: Ticket,
+                  iconBg: "bg-violet-100",
+                  iconColor: "text-violet-600",
+                },
+
+                {
+                  title: "New Ticket",
+                  count: supportTicketSummary.total_support_tickets_today,
+                  subtitle: "Created Today",
+                  icon:   FolderOpen,
+                  iconBg: "bg-blue-100",
+                  iconColor: "text-blue-600",
+                },
+
+                {
+                  title: "Open Ticket",
+                  count: supportTicketSummary.total_open_support_tickets,
+                  subtitle: "Currently Open",
+                  icon: Clock3,
+                  iconBg: "bg-orange-100",
+                  iconColor: "text-orange-600",
+                },
+
+                {
+                  title: "In Progress",
+                  count: supportTicketSummary.total_in_progress_support_tickets,
+                  subtitle: "Being Worked On",
+                  icon: Hourglass,
+                iconBg: "bg-amber-100",
+                  iconColor: "text-amber-600",
+                },
+
+                {
+                  title: "Resolved/Closed",
+                  count:
+                    supportTicketSummary.total_resolved_closed_support_tickets,
+                  subtitle: "Resolved/Closed Tickets",
+                  icon: CheckCircle2,
+                  iconBg: "bg-green-100",
+                  iconColor: "text-green-600",
+                },
+              ]}
+            />
         {/* sticky */}
         {
           <div
-            className={`sticky z-10 top-12 mt-1 p-1 flex flex-wrap items-center justify-between gap-3 text-sm ${COLORS.GRID_HEADER_SECTION_BG_COLOR} rounded-lg shadow-sm mb-1.5 
+            className={`sticky z-10 top-12 mt-1 py-1.5 px-3 mb-3  flex flex-wrap items-center justify-between gap-3 text-sm ${COLORS.GRID_HEADER_SECTION_BG_COLOR} border border-slate-200 rounded-lg mb-1.5 
                       w-full
                     `}
           >
             {/* LEFT SECTION - Support Label */}
             {isUsedInSupportTicketModule && (
-              <div className="flex gap-1 items-center w-fit">
-                {!isSmallScreen && (
-                  <Headset
-                    className={`${
-                      isCustomDateOptionSelected
-                        ? "w-4 h-4 text-blue-600"
-                        : COLORS.GRID_HEADER_ICONS_COLOR_AND_SIZE
-                    } `}
-                  />
-                )}
+              <div className="flex gap-2 items-center w-fit">
+                <div className="flex gap-1 items-center w-fit">
+                  
 
-                {(isMediumScreen || isLargeScreen) && (
-                  <span
-                    className={`${
-                      isCustomDateOptionSelected
-                        ? "text-xs"
-                        : "section-header-custom"
-                    } `}
-                  >
-                    Support
-                  </span>
-                )}
-              </div>
-            )}
+                  {(isMediumScreen || isLargeScreen) && (
+                    <span
+                      className={`${
+                        isCustomDateOptionSelected
+                          ? "text-xs"
+                          : "section-header-custom"
+                      } ${userPreference.sidebarOpen?"":"mr-2"}`}
+                    >
+                      {userPreference.sidebarOpen?"":"Support"}
+                    </span>
+                  )}
+                </div>
+                {/* Search Box */}
+                <div
+                  className={`relative flex items-start ${
+                    isCustomDateOptionSelected ?(userPreference.sidebarOpen?"w-24": "w-28 ") : (userPreference.sidebarOpen?"w-32":"w-40")
+                  }`}
+                >
+                  <SearchInput
+                    value={handleSearchOption.searchParameter}
+                    onChange={(e) => {
+                      handleSearchOption.handleSearchParameterChange(
+                        e.target.value,
+                      );
+                    }}
+                    height="h-8"
+                    placeholder="Search by ticket no, name, email, mobile no, barcode and serial no"
+                  ></SearchInput>
+                </div>
 
-            <div className="flex flex-wrap items-center gap-2 w-fit">
-              {/* Search Box */}
-              <div
-                className={`relative flex items-start ${
-                  isCustomDateOptionSelected ? "w-44 " : "w-44"
-                }`}
-              >
-                <SearchInput
-                  value={handleSearchOption.searchParameter}
-                  onChange={(e) => {
-                    handleSearchOption.handleSearchParameterChange(
-                      e.target.value,
-                    );
-                  }}
-                ></SearchInput>
-              </div>
-              {/* DATE FILTERS */}
-              <div className="flex flex-wrap items-center gap-2 w-fit">
+                {/* DATE FILTERS */}
                 <div>
                   <div className="grid grid-cols-1 justify-center gap-1 w-full">
                     {/* Shared width wrapper */}
                     <div className="relative w-fit flex justify-center gap-1">
-                      <div className="flex col-span-2 w-fit">
+                      <div className={`flex ${userPreference.sidebarOpen?"flex-col col-span-1":"col-span-2"} w-fit`}>
                         <DateRangeFilterDropdown
                           dropdownOptions={dateRangeDropdownOptions}
                           handleDateIdChange={handleDateRangeIdChange}
                           selectedOption={selectedDateName}
+                          height="h-8"
                         />
                         {isCustomDateOptionSelected && (
-                          <div className="mt-1 w-fit">
+                          <div className="mt-1 ml-1 w-fit">
                             <DateRangePicker
                               onStartDateChange={onStartDateChange}
                               onEndDateChange={onEndDateChange}
@@ -267,7 +415,6 @@ function SupportTicketManagementList({
                     </div>
                   </div>
                 </div>
-
                 {/* SUPPORT TICKET FILTERS */}
                 {isUsedInSupportTicketModule && (
                   <div className="flex flex-wrap gap-2 w-full md:w-auto">
@@ -281,6 +428,7 @@ function SupportTicketManagementList({
                         labelName="category"
                         options={supportTicketCategory!}
                         onSelect={handleSupportSelectedCategory}
+                        height="h-8"
                       />
                     </div>
 
@@ -294,6 +442,7 @@ function SupportTicketManagementList({
                         }
                         options={supportTicketSource!}
                         onSelect={handleSupportSelectedSource}
+                        height="h-8"
                       />
                     </div>
 
@@ -307,6 +456,7 @@ function SupportTicketManagementList({
                         }
                         options={supportTicketLifecycle!}
                         onSelect={handleSupportSelectedLifecycle}
+                        height="h-8"
                       />
                     </div>
 
@@ -327,7 +477,7 @@ function SupportTicketManagementList({
                           <div className="border rounded-md border-gray-400 p-0.5 max-w-[150px]">
                             <div
                               title={selectedAssignTo.fullname}
-                              className="relative max-h-6 rounded flex justify-between gap-x-0.5 bg-blue-600 caption-custom white-text p-0.5"
+                              className="relative max-h-8 rounded flex justify-between gap-x-0.5 bg-blue-600 caption-custom white-text p-0.5"
                             >
                               <span onClick={handleCompanyUserPopUp}>
                                 {selectedAssignTo.fullname.length > 14
@@ -365,10 +515,10 @@ function SupportTicketManagementList({
                             <span>ResolvedBy</span>
                           </Button>
                         ) : (
-                          <div className="border rounded-md border-gray-400 p-0.5 max-w-[150px]">
+                          <div className={`border rounded-md border-gray-400 p-0.5 max-w-[150px]`}>
                             <div
                               title={selectedResolvedBy.fullname}
-                              className="relative max-h-6 rounded flex justify-between gap-x-0.5 bg-blue-600 caption-custom white-text p-0.5"
+                              className="relative max-h-8 rounded flex justify-between gap-x-0.5 bg-blue-600 caption-custom white-text p-0.5"
                             >
                               <span onClick={handleResolvedByPopUp}>
                                 {selectedResolvedBy.fullname.length > 14
@@ -400,7 +550,7 @@ function SupportTicketManagementList({
                             type="button"
                             onClick={handleCompanyProductPopUp}
                             className="flex items-center gap-2 px-2 py-1 caption-custom border border-gray-300 
-                  rounded-md bg-white hover:bg-gray-50 shadow-sm"
+                              rounded-md bg-white hover:bg-gray-50 shadow-sm"
                           >
                             <ShoppingBag size={14} />
                             <span>Product</span>
@@ -409,7 +559,7 @@ function SupportTicketManagementList({
                           <div className="border rounded-md border-gray-400 p-0.5 max-w-[150px]">
                             <div
                               title={selectedCompanyProduct.name}
-                              className="relative rounded flex justify-between gap-x-0.5 bg-blue-600 caption-custom white-text p-0.5"
+                              className="relative max-h-8 rounded flex justify-between gap-x-0.5 bg-blue-600 caption-custom white-text p-0.5"
                             >
                               <span onClick={handleCompanyProductPopUp}>
                                 {selectedCompanyProduct.name.length > 14
@@ -432,40 +582,18 @@ function SupportTicketManagementList({
                             </div>
                           </div>
                         )}
+                        {/* <LookupCompanyProductDropdown
+                        placeholder="Product"
+                        onProductSelected={handleSelectedCompanyProductCheckBoxChange}
+                        /> */}
                       </div>
                     </div>
                   </div>
                 )}
-
-                {/* RIGHT SECTION - Create Button */}
-                {isUsedInSupportTicketModule && (
-                  <div className="flex gap-1 justify-end w-fit">
-                    <Button
-                      type="submit"
-                      disabled={!userHasAccessToAddSupportTicket}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        if (!userHasAccessToAddSupportTicket) {
-                          toast.error(
-                            MESSAGE.MODULE_ACCESS.SUPPORT_MODULE
-                              .DENIED_ADD_ACCESS,
-                          );
-                          return;
-                        }
-                        setIsCreateSupportTicketModalOpen(true);
-                      }}
-                    >
-                      <span className="flex items-center gap-1">
-                        {!isSmallScreen && <TicketPlus size={SIZE.SIXTEEN} />}
-                        {isSmallScreen && <TicketPlus size={SIZE.EIGHT} />}
-                        {isLargeScreen &&
-                          JSX_CHILDREN_NAME.CREATE_SUPPORT_TICKET}
-                      </span>
-                    </Button>
-                  </div>
-                )}
               </div>
-            </div>
+            )}
+
+            
           </div>
         }
 
@@ -473,8 +601,8 @@ function SupportTicketManagementList({
           <div
             className={
               userPreference.isLeftMenu
-                ? `ag-theme-balham w-full h-[calc(100vh-120px)]`
-                : "ag-theme-balham w-full h-[calc(100vh-122px)]"
+                ? `w-full h-[calc(100vh-278px)]`
+                : "w-full h-[calc(100vh-122px)]"
             }
           >
             <SupportTicketManagementAgGrid
@@ -485,12 +613,16 @@ function SupportTicketManagementList({
                 handleSupportTicketDataFormChange
               }
               supportTickets={supportTicketData}
+              isDataLoading={isDataLoading}
             />
           </div>
           <CreateSupportTicketModal
             isOpen={isCreateSupportTicketModalOpen}
             onClose={handleCreateSupportTicketModalClose}
-            handleSupportTicketCreated={handleAddSupportTicket}
+            handleSupportTicketCreated={async () => {
+            await handleAddSupportTicket();
+            await fetchSupportTicketSummary();
+          }}
           ></CreateSupportTicketModal>
         </div>
 

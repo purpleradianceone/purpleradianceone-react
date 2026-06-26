@@ -25,7 +25,6 @@ import CustomDropdown from "../modals/leads/CustomDropdown";
 import { useGeoLocationData } from "../../config/hooks/useGeoLocation";
 import toast from "react-hot-toast";
 import { Globe, KeySquare, Mail, Phone, User } from "lucide-react";
-import { AppVersionViewCard } from "../views/card/AppVersionViewCard";
 
 function SignUpForm() {
   const initialSignUpFormState: SignUpFormDataType = {
@@ -284,7 +283,7 @@ function SignUpForm() {
             </button>
           </span>
 
-          <AppVersionViewCard/>
+          {/* <AppVersionViewCard/> */}
         </div>
       </form>
 

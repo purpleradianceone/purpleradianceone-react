@@ -3,6 +3,7 @@ import {
   CheckCircle2,
   ClipboardPlus,
   EditIcon,
+  ListOrdered,
   LucideAirplay,
   LucideClock,
   LucideGroup,
@@ -61,7 +62,7 @@ function EditCompanyProductModal({
   const { intervalTypeData, loading: intervalTypeDataLoading } =
     useIntervalType();
   const { productTypeData, loading: productTypeLoading } = useProductType();
-  const {loading : unitDataLoading , unit : unitData} = useUnit();
+  const { loading: unitDataLoading, unit: unitData } = useUnit();
   const rangeOfNumber: Item[] = range(1, 365);
 
   const intialEditCompanyProductFormData = {
@@ -80,7 +81,8 @@ function EditCompanyProductModal({
     url: product.url,
     isActive: product.isActive,
     isSerialNumber: product.isSerialNumber,
-    unitId : product.unitId
+    unitId: product.unitId,
+    minimumStock: product.minimumStock,
   };
 
   const [selectedProductTypeId, setSelectedProductTypeId] = useState<
@@ -91,13 +93,11 @@ function EditCompanyProductModal({
     number | undefined
   >(0);
 
-  const [selectedUnitId, setSelectedUnitId] = useState<
-    number | undefined
-  >(0);
+  const [selectedUnitId, setSelectedUnitId] = useState<number | undefined>(0);
 
-  useEffect(()=>{
-    setSelectedUnitId(product.unitId)
-  },[product])
+  useEffect(() => {
+    setSelectedUnitId(product.unitId);
+  }, [product]);
 
   const [selectedDefaultWarranty, setDefaultWarranty] = useState<
     number | undefined
@@ -143,7 +143,7 @@ function EditCompanyProductModal({
   } = useFormChange(intialEditCompanyProductFormData);
 
   const [productIsActive, setProductIsActive] = useState<boolean>(
-    product.isActive
+    product.isActive,
   );
 
   useEffect(() => {
@@ -153,7 +153,7 @@ function EditCompanyProductModal({
   }, [isOpen]);
 
   const handleProductToggle = async (
-    event: React.ChangeEvent<HTMLInputElement>
+    event: React.ChangeEvent<HTMLInputElement>,
   ) => {
     const { checked } = event.target;
 
@@ -191,39 +191,37 @@ function EditCompanyProductModal({
         });
     } else {
       toast.error(
-        MESSAGE.MODULE_ACCESS.PRODUCT_MANAGEMENT.DENIED_UPDATE_ACCESS
+        MESSAGE.MODULE_ACCESS.PRODUCT_MANAGEMENT.DENIED_UPDATE_ACCESS,
       );
     }
   };
 
   const { errors, handleBlur, setErrors } = useFormValidation(
     updateCompanyProductFormData,
-    "registration"
+    "registration",
   );
 
   const [selectedProductTypeIdError, setSelectedProductTypeIdError] =
     useState<boolean>(false);
 
-     const [selectedUnitIdError, setSelectedUnitIdError] =
+  const [selectedUnitIdError, setSelectedUnitIdError] =
     useState<boolean>(false);
 
   const [isSerialNumberChecked, setIsSerialNumberChecked] = useState<boolean>(
-    product.isSerialNumber!
+    product.isSerialNumber!,
   );
 
   const validateDropdown = (): boolean => {
-  const isProductTypeInvalid =
-    selectedProductTypeId === 0 || selectedProductTypeId === undefined;
+    const isProductTypeInvalid =
+      selectedProductTypeId === 0 || selectedProductTypeId === undefined;
 
-  const isUnitInvalid =
-    selectedUnitId === 0 || selectedUnitId === undefined;
+    const isUnitInvalid = selectedUnitId === 0 || selectedUnitId === undefined;
 
-  setSelectedProductTypeIdError(isProductTypeInvalid);
-  setSelectedUnitIdError(isUnitInvalid);
+    setSelectedProductTypeIdError(isProductTypeInvalid);
+    setSelectedUnitIdError(isUnitInvalid);
 
-  return !isProductTypeInvalid && !isUnitInvalid;
-};
-
+    return !isProductTypeInvalid && !isUnitInvalid;
+  };
 
   const handleCompanyProductTaxChange = () => {
     handleCompanyProductChange();
@@ -235,18 +233,35 @@ function EditCompanyProductModal({
     setCompanyProductTaxChangeCount((prev) => prev + 1);
   };
 
-  function validate()  {
-    if(errors.url ){
-      toast.error(MESSAGE.ERROR.REQUIRED_FIELDS)
+  function validate() {
+    // Validation the minimum stock field here also before the api call
+    if (
+      updateCompanyProductFormData.minimumStock == 0 ||
+      updateCompanyProductFormData.minimumStock == null ||
+      updateCompanyProductFormData.minimumStock === undefined
+    ) {
+      setErrors((prev) => ({
+        ...prev,
+        mininumStock: "minimum stock is required.",
+      }));
+    } else {
+      setErrors((prev) => ({
+        ...prev,
+        mininumStock: "",
+      }));
+    }
+    if (errors.url) {
+      toast.error(MESSAGE.ERROR.REQUIRED_FIELDS);
       return false;
     }
     return true;
   }
   const hanldeUpdateCompanyProductFormSubmit = async () => {
     // event.preventDefault();
-    const isvalid =validate();
-    if(!isvalid) return;
-    if(!validateDropdown())return;
+    const isvalid = validate();
+    // alert(JSON.stringify(updateCompanyProductFormData, null, 2));
+    if (!isvalid) return;
+    if (!validateDropdown()) return;
     if (
       updateCompanyProductFormData.name !== "" &&
       updateCompanyProductFormData.name !== null &&
@@ -255,7 +270,10 @@ function EditCompanyProductModal({
       updateCompanyProductFormData.version !== null &&
       updateCompanyProductFormData.version !== undefined &&
       selectedProductTypeId !== 0 &&
-      selectedProductTypeId !== undefined
+      selectedProductTypeId !== undefined &&
+      updateCompanyProductFormData.minimumStock !== null &&
+      updateCompanyProductFormData.minimumStock !== undefined &&
+      updateCompanyProductFormData.minimumStock != 0
       // selectedWarrantyIntervalTypeId !== 0 &&
       // selectedWarrantyIntervalTypeId !== undefined &&
       // selectedDefaultWarranty !== 0 &&
@@ -267,29 +285,31 @@ function EditCompanyProductModal({
     ) {
       if (
         updateCompanyProductFormData.barcode !==
-          intialEditCompanyProductFormData.barcode ||
+        intialEditCompanyProductFormData.barcode ||
         updateCompanyProductFormData.name !==
-          intialEditCompanyProductFormData.name ||
+        intialEditCompanyProductFormData.name ||
         updateCompanyProductFormData.description !==
-          intialEditCompanyProductFormData.description ||
+        intialEditCompanyProductFormData.description ||
         updateCompanyProductFormData.cost !==
-          intialEditCompanyProductFormData.cost ||
+        intialEditCompanyProductFormData.cost ||
         selectedProductTypeId !==
-          intialEditCompanyProductFormData.product_type_id ||
+        intialEditCompanyProductFormData.product_type_id ||
         selectedWarrantyIntervalTypeId !==
-          intialEditCompanyProductFormData.default_warranty_interval_type_id ||
+        intialEditCompanyProductFormData.default_warranty_interval_type_id ||
         selectedDefaultWarranty !==
-          intialEditCompanyProductFormData.default_warranty ||
+        intialEditCompanyProductFormData.default_warranty ||
         selectedAmcIntervalTypeId !==
-          intialEditCompanyProductFormData.default_amc_cycle_interval_type_id ||
+        intialEditCompanyProductFormData.default_amc_cycle_interval_type_id ||
         selectedDefaultAmc !==
-          intialEditCompanyProductFormData.default_amc_cycle ||
+        intialEditCompanyProductFormData.default_amc_cycle ||
         updateCompanyProductFormData.version !==
-          intialEditCompanyProductFormData.version ||
+        intialEditCompanyProductFormData.version ||
         updateCompanyProductFormData.url !==
-          intialEditCompanyProductFormData.url ||
+        intialEditCompanyProductFormData.url ||
         updateCompanyProductFormData.isSerialNumber !== isSerialNumberChecked ||
-        selectedUnitId !== intialEditCompanyProductFormData.unitId 
+        selectedUnitId !== intialEditCompanyProductFormData.unitId ||
+        updateCompanyProductFormData.minimumStock !==
+        Number(intialEditCompanyProductFormData.minimumStock)
       ) {
         if (userHasAccessToUpdateProduct) {
           const updateProductPostData = {
@@ -299,7 +319,10 @@ function EditCompanyProductModal({
               selectedProductTypeId !== 0
                 ? selectedProductTypeId
                 : updateCompanyProductFormData.product_type_id,
-            unit_id : selectedUnitId !==0 ? selectedUnitId : updateCompanyProductFormData.unitId,
+            unit_id:
+              selectedUnitId !== 0
+                ? selectedUnitId
+                : updateCompanyProductFormData.unitId,
             default_warranty_interval_type_id:
               selectedWarrantyIntervalTypeId !== 0
                 ? selectedWarrantyIntervalTypeId
@@ -322,6 +345,7 @@ function EditCompanyProductModal({
             cost: updateCompanyProductFormData.cost,
             description: updateCompanyProductFormData.description,
             version: updateCompanyProductFormData.version,
+            minimum_stock: Number(updateCompanyProductFormData.minimumStock),
             url: updateCompanyProductFormData.url,
             updatedby_id: loginStatus.id,
           };
@@ -337,9 +361,11 @@ function EditCompanyProductModal({
                 toast.success(response.data.message);
                 handleCompanyProductChange();
                 setTimeout(() => {
-                  // onClose();
+                  onClose();
                   setIsCreateCompanyProductTaxModalOpen(false);
                 }, 500);
+              } else {
+                toast.error(response.data.messge);
               }
             })
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -353,12 +379,10 @@ function EditCompanyProductModal({
                 }
               }
             })
-            .finally(()=>{
-              onClose();
-            });
+            .finally(() => { });
         } else {
           toast.error(
-            MESSAGE.MODULE_ACCESS.PRODUCT_MANAGEMENT.DENIED_UPDATE_ACCESS
+            MESSAGE.MODULE_ACCESS.PRODUCT_MANAGEMENT.DENIED_UPDATE_ACCESS,
           );
         }
       } else {
@@ -394,13 +418,14 @@ function EditCompanyProductModal({
                   hsn: res.hsn,
                   sac: res.sac,
                   taxRate: res.tax_rate,
+                  cess: res.cess,
                   validFrom: res.valid_from,
                   createdBy: res.createdby,
                   createdOn: res.createdon,
                   updatedBy: res.updatedby,
                   updatedOn: res.updatedon,
                 },
-              ])
+              ]),
             );
           }
         })
@@ -437,7 +462,7 @@ function EditCompanyProductModal({
     data: {
       isActive?: boolean;
       expectedResolutionTimeHours?: number;
-    }
+    },
   ) => {
     const postData = {
       company_id: loginStatus.companyId,
@@ -474,11 +499,7 @@ function EditCompanyProductModal({
 
   if (!isOpen) return null;
 
-  if (
-    productTypeLoading ||
-    intervalTypeDataLoading ||
-    unitDataLoading
-  ) {
+  if (productTypeLoading || intervalTypeDataLoading || unitDataLoading) {
     return (
       <FormLayout width={6}>
         <FormSkeleton></FormSkeleton>
@@ -498,13 +519,10 @@ function EditCompanyProductModal({
         {/* Edit Company product  */}
         <form
           className="space-y-2  border  rounded-md p-1 "
-          onSubmit={
-            (e)=>{
-
-              e.preventDefault()
-              hanldeUpdateCompanyProductFormSubmit()
-            }
-          }
+          onSubmit={(e) => {
+            e.preventDefault();
+            hanldeUpdateCompanyProductFormSubmit();
+          }}
         >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
             <FormInput
@@ -522,15 +540,12 @@ function EditCompanyProductModal({
               error={errors.name}
               onBlur={handleBlur}
             />
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-2 gap-3">
               <div className="">
-
-               <CustomDropdown
+                <CustomDropdown
                   logo={LucideClock}
                   labelName="Unit :"
-                  preselectedOption={
-                    intialEditCompanyProductFormData.unitId
-                  }
+                  preselectedOption={intialEditCompanyProductFormData.unitId}
                   onSelect={(e) => {
                     if (e) {
                       setSelectedUnitIdError(false);
@@ -538,13 +553,17 @@ function EditCompanyProductModal({
                     setSelectedUnitId(e);
                   }}
                   options={unitData}
-                  />
-                  {selectedUnitIdError && (
+                  readOnly={
+                    updateCompanyProductFormData.product_type_id === 3 ||
+                    updateCompanyProductFormData.product_type_id === 4
+                  }
+                />
+                {selectedUnitIdError && (
                   <div className="caption-custom-inactive">
                     Unit is required
                   </div>
                 )}
-                  </div>
+              </div>
               <div className="">
                 <CustomDropdown
                   labelName="Product Type"
@@ -561,6 +580,12 @@ function EditCompanyProductModal({
                   }}
                   options={productTypeData}
                   requiredRedDot={true}
+                  readOnly={
+                    updateCompanyProductFormData.product_type_id === 1 ||
+                    updateCompanyProductFormData.product_type_id === 2 ||
+                    updateCompanyProductFormData.product_type_id === 3 ||
+                    updateCompanyProductFormData.product_type_id === 4
+                  }
                 />
                 {selectedProductTypeIdError && (
                   <div className="caption-custom-inactive">
@@ -568,21 +593,8 @@ function EditCompanyProductModal({
                   </div>
                 )}
               </div>
-              <FormInput
-                label="URL : "
-                logo={LucideLink}
-                type="text"
-                name="url"
-                // required={false}
-                defaultValue={intialEditCompanyProductFormData.url}
-                // value={intialEditCompanyProductFormData.url}
-                placeholder="Product URL"
-                onChange={handleEditCompanyProductFormDataChange}
-                onBlur={handleBlur}
-                error={errors.url}
-              />
             </div>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-3 gap-3">
               <FormInput
                 logo={LucideIndianRupee}
                 label="Cost :"
@@ -592,6 +604,29 @@ function EditCompanyProductModal({
                 placeholder="Enter Product Cost"
                 defaultValue={intialEditCompanyProductFormData.cost}
                 onChange={handleEditCompanyProductFormDataChange}
+                  step={'0.0001'}  
+              />
+              {/* Minimum Stock */}
+              <FormInput
+                label="Minimum Stock : "
+                logo={ListOrdered}
+                type="number"
+                name="minimumStock"
+                defaultValue={
+                  intialEditCompanyProductFormData.minimumStock == 0
+                    ? ""
+                    : intialEditCompanyProductFormData.minimumStock
+                }
+                // value={addProductFormData.minimumStock ===0 ? "" : addProductFormData.minimumStock}
+                placeholder="Enter Mininum Stock"
+                onChange={handleEditCompanyProductFormDataChange}
+                error={errors.mininumStock}
+                min={0}
+                required={true}
+                disabled={
+                  updateCompanyProductFormData.product_type_id === 3 ||
+                  updateCompanyProductFormData.product_type_id === 4
+                }
               />
               <FormInput
                 label="Version :"
@@ -606,6 +641,10 @@ function EditCompanyProductModal({
                 onBlur={handleBlur}
                 required={true}
                 error={errors.version}
+                disabled={
+                  updateCompanyProductFormData.product_type_id === 3 ||
+                  updateCompanyProductFormData.product_type_id === 4
+                }
               />
             </div>
 
@@ -628,6 +667,10 @@ function EditCompanyProductModal({
                     setIsSerialNumberChecked(event.target.checked);
                   }}
                   checked={isSerialNumberChecked}
+                  disabled={
+                    updateCompanyProductFormData.product_type_id === 3 ||
+                    updateCompanyProductFormData.product_type_id === 4
+                  }
                 />
               </div>
             </div>
@@ -644,6 +687,10 @@ function EditCompanyProductModal({
                     setDefaultWarranty(e);
                   }}
                   options={rangeOfNumber}
+                  readOnly={
+                    updateCompanyProductFormData.product_type_id === 3 ||
+                    updateCompanyProductFormData.product_type_id === 4
+                  }
                 />
               </div>
 
@@ -659,6 +706,10 @@ function EditCompanyProductModal({
                   }}
                   options={intervalTypeData}
                   // requiredRedDot={true}
+                  readOnly={
+                    updateCompanyProductFormData.product_type_id === 3 ||
+                    updateCompanyProductFormData.product_type_id === 4
+                  }
                 />
                 {/* {selectedWarrantyIntervalTypeIdError && (
                     <div className="caption-custom-inactive">
@@ -683,6 +734,10 @@ function EditCompanyProductModal({
                   }}
                   options={rangeOfNumber}
                   // requiredRedDot={true}
+                  readOnly={
+                    updateCompanyProductFormData.product_type_id === 3 ||
+                    updateCompanyProductFormData.product_type_id === 4
+                  }
                 />
                 {/* {selectedDefaultAmcError && (
                     <div className="caption-custom-inactive">
@@ -706,6 +761,10 @@ function EditCompanyProductModal({
                   }}
                   options={intervalTypeData}
                   // requiredRedDot={true}
+                  readOnly={
+                    updateCompanyProductFormData.product_type_id === 3 ||
+                    updateCompanyProductFormData.product_type_id === 4
+                  }
                 />
                 {/* {selectedAmcIntervalTypeIdError && (
                     <div className="caption-custom-inactive">
@@ -713,6 +772,21 @@ function EditCompanyProductModal({
                     </div>
                   )} */}
               </div>
+            </div>
+            <div className="mt-0.5">
+              <FormInput
+                label="URL : "
+                logo={LucideLink}
+                type="text"
+                name="url"
+                // required={false}
+                defaultValue={intialEditCompanyProductFormData.url}
+                // value={intialEditCompanyProductFormData.url}
+                placeholder="Product URL"
+                onChange={handleEditCompanyProductFormDataChange}
+                onBlur={handleBlur}
+                error={errors.url}
+              />
             </div>
             <div className="col-span-1">
               <TextAreaInput

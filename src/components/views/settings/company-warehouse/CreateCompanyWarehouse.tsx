@@ -1,8 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Edit, Text, Save, X, MapPin, User, FileText } from "lucide-react";
-import RefreshToken from "../../../../config/validations/RefreshToken";
-// import { STATUS_CODE, VALIDATIONS } from "../../../../constants/AppConstants";
-import { STATUS_CODE } from "../../../../constants/AppConstants";
 import toast from "react-hot-toast";
 import POST_API from "../../../../constants/PostApi";
 import axios from "axios";
@@ -19,6 +16,7 @@ import WarehouseType from "../../../../@types/warehouse/WarehouseType";
 import CompanyWarehouseType from "../../../../@types/warehouse/CompanyWarehouse";
 import { useFormChange } from "../../../../config/hooks/useFormChange";
 import { useFormValidation } from "../../../../config/hooks/useFormValidation";
+import { handleApiError } from "../../../../config/error/handleApiError";
 
 function CreateCompanyWarehouse({
   onClose,
@@ -78,9 +76,9 @@ function CreateCompanyWarehouse({
     }
   };
 
-  const handleAddCompanyWarehouse = async (e?: React.FormEvent) => {
+  const handleAddCompanyWarehouse = async (e: React.FormEvent<HTMLFormElement>) => {
 
-    e?.preventDefault();
+    e.preventDefault();
     if (!userHasAccessToAddSettingGeneral) {
       toast.error(
         MESSAGE.MODULE_ACCESS.SUPPORT_TICKET_CATEGORY.DENIED_ADD_ACCESS
@@ -136,16 +134,17 @@ function CreateCompanyWarehouse({
         }
       })
       .catch(async (error: any) => {
-        if (error.status === STATUS_CODE.UNATHORISED) {
-          const refreshTokenResponse = await RefreshToken({
-            callFunction: handleAddCompanyWarehouse,
-          });
-          if (refreshTokenResponse) {
-            handleAddCompanyWarehouse();
-          }
-        } else {
-          toast.error(error.response.status + error.response.data);
-        }
+        handleApiError(error)
+        // if (error.status === STATUS_CODE.UNATHORISED) {
+        //   const refreshTokenResponse = await RefreshToken({
+        //     callFunction: handleAddCompanyWarehouse,
+        //   });
+        //   if (refreshTokenResponse) {
+        //     handleAddCompanyWarehouse();
+        //   }
+        // } else {
+        //   toast.error(error.response.status + error.response.data);
+        // }
       });
   };
 
@@ -182,6 +181,7 @@ function CreateCompanyWarehouse({
           <div className="space-y-3 p-2">
             <FormInput
               label="Name :"
+              autoFocus={true}
               logo={User}
               maxLength={70}
               type="text"

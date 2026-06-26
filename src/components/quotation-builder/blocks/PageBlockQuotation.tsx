@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Element, useEditor, useNode } from "@craftjs/core";
 import { Save, X, Trash2, Edit } from "lucide-react";
 import { SIZE } from "../../../constants/AppConstants";
@@ -7,6 +7,15 @@ import Button from "../../ui/Button";
 import FormInput from "../../ui/FormInput";
 import { HeaderBlockQuotation } from "./HeaderBlockQuotation";
 import { FooterBlockQuotation } from "./FooterBlockQuotation";
+import ConfirmationDialog from "../../dialogue-box/ConfirmationDialogue";
+import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
+import { useSearchParams } from "react-router-dom";
+import {
+  PAGE_BLOCK_LAYOUT_Create,
+  PAGE_BLOCK_LAYOUT_UPDATE,
+  searchParamKey,
+} from "../local-storage/LocalStorageKeys";
+import localforage from "localforage";
 
 const A4_WIDTH = 794;
 const A4_HEIGHT = 1123;
@@ -30,6 +39,9 @@ export const PageBlockQuotation: React.FC = () => {
   const [tempPadding, setTempPadding] = useState(props.padding);
   const [tempBackground, setTempBackground] = useState(props.backgroundColor);
   const [tempAlign, setTempAlign] = useState(props.align);
+  const { loginStatus } = useLoggedInUserContext();
+  const [searchParams] = useSearchParams();
+  const quotationTemplateId = searchParams.get(searchParamKey);
 
   /* ---------- Detect Header / Footer ---------- */
   const childNodes = node.data.nodes || [];
@@ -41,10 +53,16 @@ export const PageBlockQuotation: React.FC = () => {
     (id) => query.node(id).get().data.displayName === "Footer Block",
   );
 
+  const [isConfirmationPopupOpen, setIsConfirmationPopupOpen] =
+    useState<boolean>(false);
   const [isHeaderRequired, setIsHeaderRequired] = useState<boolean>(hasHeader);
   const [isFooterRequired, setIsFooterRequired] = useState<boolean>(hasFooter);
 
-  const handleSave = () => {
+  const handleSave = async () => {
+    console.log("inside save Page Block");
+    const pageBlockLayoutKey = quotationTemplateId
+      ? PAGE_BLOCK_LAYOUT_UPDATE
+      : PAGE_BLOCK_LAYOUT_Create;
     if (isHeaderRequired) {
       if (!hasHeader) {
         addHeader();
@@ -68,8 +86,136 @@ export const PageBlockQuotation: React.FC = () => {
       p.isHeader = isHeaderRequired;
       p.isFooter = isFooterRequired;
     });
+    // const result = localStorage.getItem(pageBlockLayoutKey + loginStatus.id);
+    const result = await localforage.getItem(
+      pageBlockLayoutKey + loginStatus.id,
+    );
+    if (!result) {
+      handleSavePageLayout();
+    }
     setEditing(false);
   };
+
+  useEffect(() => {
+    //Local Storage
+    // const pageBlockLayoutKey = quotationTemplateId
+    //   ? PAGE_BLOCK_LAYOUT_UPDATE
+    //   : PAGE_BLOCK_LAYOUT_Create;
+    // const result = localStorage.getItem(pageBlockLayoutKey + loginStatus.id);
+    // if (!result) {
+    //   handleSavePageLayout();
+    // }
+
+    //Local Forage
+    const checkPageLayout = async () => {
+      const pageBlockLayoutKey = quotationTemplateId
+        ? PAGE_BLOCK_LAYOUT_UPDATE
+        : PAGE_BLOCK_LAYOUT_Create;
+
+      const result = await localforage.getItem(
+        pageBlockLayoutKey + loginStatus.id,
+      );
+
+      if (!result) {
+        if (!quotationTemplateId) await handleSavePageLayout();
+      }
+    };
+
+    checkPageLayout();
+  }, []);
+
+  const handleSavePageLayout = async () => {
+    const pageBlockLayoutKey = quotationTemplateId
+      ? PAGE_BLOCK_LAYOUT_UPDATE
+      : PAGE_BLOCK_LAYOUT_Create;
+
+    const newLayout = {
+      padding: tempPadding,
+      backgroundColor: tempBackground,
+      align: tempAlign,
+      isHeader: isHeaderRequired,
+      isFooter: isFooterRequired,
+    };
+
+    // ✅ 1. Save to localforage
+    await localforage.setItem(
+      pageBlockLayoutKey + loginStatus.id,
+      JSON.stringify(newLayout),
+    );
+
+    // ✅ 2. Apply to ALL Page Blocks in editor
+    const allNodes = query.getNodes();
+
+    Object.keys(allNodes).forEach((nodeId) => {
+      const node = allNodes[nodeId];
+
+      if (node.data.displayName === "Page Block") {
+        actions.setProp(nodeId, (props: any) => {
+          props.padding = newLayout.padding;
+          props.backgroundColor = newLayout.backgroundColor;
+          props.align = newLayout.align;
+          props.isHeader = newLayout.isHeader;
+          props.isFooter = newLayout.isFooter;
+        });
+      }
+    });
+
+    setEditing(false);
+    setIsConfirmationPopupOpen(false);
+    window.location.reload();
+  };
+
+  useEffect(() => {
+    //Local Storage
+    // const pageBlockLayoutKey = quotationTemplateId
+    //   ? PAGE_BLOCK_LAYOUT_UPDATE
+    //   : PAGE_BLOCK_LAYOUT_Create;
+    // const stored = localStorage.getItem(pageBlockLayoutKey + loginStatus.id);
+    // if (!stored) return;
+
+    // try {
+    //   const parsed = JSON.parse(stored);
+    //   setProp((p: any) => {
+    //     p.padding = parsed.padding;
+    //     p.backgroundColor = parsed.backgroundColor;
+    //     p.align = parsed.align;
+    //     // p.isHeader = false;
+    //     // p.isFooter = false;
+    //   });
+    // } catch (err) {
+    //   console.log("Error loading page props:", err);
+    // }
+
+    //Local forage
+    const loadPageLayout = async () => {
+      const pageBlockLayoutKey = quotationTemplateId
+        ? PAGE_BLOCK_LAYOUT_UPDATE
+        : PAGE_BLOCK_LAYOUT_Create;
+
+      const stored = await localforage.getItem(
+        pageBlockLayoutKey + loginStatus.id,
+      );
+
+      if (quotationTemplateId) return;
+      if (!stored) return;
+
+      try {
+        const parsed = typeof stored === "string" ? JSON.parse(stored) : stored;
+
+        setProp((p: any) => {
+          p.padding = parsed.padding;
+          p.backgroundColor = parsed.backgroundColor;
+          p.align = parsed.align;
+          // p.isHeader = false;
+          // p.isFooter = false;
+        });
+      } catch (err) {
+        console.log("Error loading page props:", err);
+      }
+    };
+
+    loadPageLayout();
+  }, [id]);
 
   const addHeader = () => {
     const headerNode = query.createNode(
@@ -124,14 +270,18 @@ export const PageBlockQuotation: React.FC = () => {
     >
       {/* Toolbar */}
       {(hovered || editing) && (
-        <div className="absolute w-full flex justify-between top-0 z-50">
-          <div>
+        <div className="group absolute w-full flex justify-between top-0 z-50">
+          <div
+            className={`scale-50 group-hover:scale-100 transition-transform duration-200`}
+          >
             <Button onClick={() => setEditing(true)}>
               <Edit size={SIZE.SIXTEEN} />
               Edit Page
             </Button>
           </div>
-          <div>
+          <div
+            className={`scale-50 group-hover:scale-100 transition-transform duration-200`}
+          >
             <Button type="button" onClick={() => actions.delete(id)}>
               <Trash2 size={SIZE.SIXTEEN} />
               Delete Page
@@ -154,6 +304,8 @@ export const PageBlockQuotation: React.FC = () => {
         <Element
           id={`${id}-header`}
           key={`${id}-header`}
+          // id={`global-header`}
+          // key={`global-header`}
           is={HeaderBlockQuotation}
         />
       )}
@@ -189,26 +341,30 @@ export const PageBlockQuotation: React.FC = () => {
           is={FooterBlockQuotation}
           id={`${id}-footer`}
           key={`${id}-footer`}
+          //   id={`global-header`}
+          //   key={`global-header`}
         />
       )}
 
       {/* Settings */}
       {editing && (
         <div
+          className="bg-white/80 backdrop-blur-lg 
+                  shadow-xl rounded-xl border border-gray-200"
           style={{
             position: "absolute",
             top: "0px",
             left: "0px",
-            background: "#fff",
-            border: "1px solid #ccc",
+            // background: "#fff",
+            // border: "1px solid #ccc",
             padding: "10px",
-            borderRadius: "6px",
-            zIndex: 100,
+            // borderRadius: "6px",
+            zIndex: 50,
             width: "220px",
           }}
         >
           <FormInput
-            label="Padding"
+            label="Page Padding"
             placeholder="eg: 16px"
             value={tempPadding}
             onChange={(e) => setTempPadding(e.target.value)}
@@ -258,13 +414,43 @@ export const PageBlockQuotation: React.FC = () => {
             ></input>
           </label>
 
-          <div className="flex justify-between mt-3">
-            <Button type="button" onClick={() => setEditing(false)}>
+          <div className="flex justify-between mt-3 gap-2">
+            <Button
+              type="button"
+              onClick={() => {
+                setEditing(false);
+                setIsConfirmationPopupOpen(false);
+              }}
+            >
               <X size={SIZE.SIXTEEN} /> Cancel
             </Button>
             <Button onClick={handleSave}>
               <Save size={SIZE.SIXTEEN} /> Save
             </Button>
+          </div>
+          <div className="flex justify-center items-center mt-2">
+            <Button onClick={() => setIsConfirmationPopupOpen(true)}>
+              <Save size={SIZE.SIXTEEN} /> Save This Page layout
+            </Button>
+          </div>
+          <div
+            className=""
+            style={{
+              zIndex: 1000,
+            }}
+          >
+            <ConfirmationDialog
+              open={isConfirmationPopupOpen}
+              icon={Save}
+              onCancel={() => setIsConfirmationPopupOpen(false)}
+              onConfirm={handleSavePageLayout}
+              title="Set this layout as the default for new pages?"
+              description="Newly created pages will automatically follow this layout structure."
+              message="This will apply the same layout settings — including padding, alignment, background styling, and spacing — to all future pages."
+              messageDescription="Note: Header and footer must be configured separately."
+              cancelButtonText="Cancel"
+              confirmButtonText="Save Page Layout"
+            />
           </div>
         </div>
       )}
@@ -275,7 +461,7 @@ export const PageBlockQuotation: React.FC = () => {
 (PageBlockQuotation as any).craft = {
   displayName: "Page Block",
   props: {
-    padding: "40px",
+    padding: "30px",
     backgroundColor: "#ffffff",
     align: "center",
     isHeader: false,

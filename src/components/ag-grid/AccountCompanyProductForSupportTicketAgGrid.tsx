@@ -5,15 +5,18 @@ import { INNERHTML, JSX_CHILDREN_NAME } from "../../constants/AppConstants";
 import { AllCommunityModule, ColDef, themeBalham } from "ag-grid-community";
 import AccountCompanyProductForSupportTicket from "../../@types/support-ticket-management/AccountCompanyProductForSupportTicket";
 import StatusIndicator from "../ui/StatusIndicator";
+import { SkeletonRowsAgGrid } from "../ui/SkeletonRowsAgGrid";
 
 function AccountCompanyProductForSupportTicketAgGrid({
   accountCompanyProductsForSupportTickt,
   handleRowClick,
   onRowSelect,
+  isDataLaoding
 }: {
   accountCompanyProductsForSupportTickt: AccountCompanyProductForSupportTicket[];
   handleRowClick?: (event: any) => void;
   onRowSelect?: (data: AccountCompanyProductForSupportTicket | any) => void;
+  isDataLaoding : boolean
 }) {
   const gridRef = useRef<AgGridReact>(null); // Ref to the AgGridReact component
 
@@ -82,6 +85,11 @@ function AccountCompanyProductForSupportTicketAgGrid({
         filter: true,
         minWidth: 100,
         cellRenderer: (params: any) => {
+          if (params.data?.__isSkeleton) {
+                      return (
+                        <SkeletonRowsAgGrid/>
+                      );
+                    }
           return (
             <div className="flex items-center text-sm gap-1 mt-1">
               <StatusIndicator isActive={params.value} />
@@ -96,6 +104,11 @@ function AccountCompanyProductForSupportTicketAgGrid({
         filter: true,
         minWidth: 130,
         cellRenderer: (params: any) => {
+          if (params.data?.__isSkeleton) {
+                      return (
+                        <SkeletonRowsAgGrid/>
+                      );
+                    }
           return (
             <div className="flex items-center text-sm gap-1 mt-1">
               <StatusIndicator
@@ -157,6 +170,11 @@ function AccountCompanyProductForSupportTicketAgGrid({
         pinned: "right",
         maxWidth: 80,
         cellRenderer: (params: AccountCompanyProductForSupportTicket | any) => {
+          if (params.data?.__isSkeleton) {
+                      return (
+                        <SkeletonRowsAgGrid/>
+                      );
+                    }
           return (
             <div className="flex items-center justify-center">
               <span
@@ -175,6 +193,12 @@ function AccountCompanyProductForSupportTicketAgGrid({
     []
   );
 
+  const skeletonRows = useMemo(() => {
+    return Array.from({ length: 30 }).map(() => ({
+      __isSkeleton: true,
+    }));
+  }, []);
+
   const defaultColDef = useMemo(
     () => ({
       filter: "agTextColumnFilter",
@@ -182,6 +206,14 @@ function AccountCompanyProductForSupportTicketAgGrid({
       flex: 0.8,
       suppressHeaderMenuButton: true,
       suppressHeaderContextMenu: true,
+       cellRenderer: (params: any) => {
+                    if (params.data?.__isSkeleton) {
+                      return (
+                        <SkeletonRowsAgGrid/>
+                      );
+                    }
+                    return params.value;
+                  },
     }),
     []
   );
@@ -193,7 +225,7 @@ function AccountCompanyProductForSupportTicketAgGrid({
     >
       <AgGridReact
         ref={gridRef} // Attach the ref
-        rowData={accountCompanyProductsForSupportTickt}
+        rowData={isDataLaoding ? skeletonRows : accountCompanyProductsForSupportTickt}
         columnDefs={columnDefs}
         defaultColDef={defaultColDef}
         modules={[AllCommunityModule]}

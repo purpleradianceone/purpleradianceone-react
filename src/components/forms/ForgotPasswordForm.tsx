@@ -13,7 +13,6 @@ import { VALIDATIONS } from "../../constants/AppConstants";
 import MESSAGE from "../../constants/Messages";
 import toast from "react-hot-toast";
 import { Mail } from "lucide-react";
-import { AppVersionViewCard } from "../views/card/AppVersionViewCard";
 
 /**
  *
@@ -108,7 +107,7 @@ function ForgotPasswordForm() {
             Reset Password
           </Button>
         </Link>
-        <AppVersionViewCard/>
+        {/* <AppVersionViewCard/> */}
         
       </form>
       {showEmailSentAnimation && (

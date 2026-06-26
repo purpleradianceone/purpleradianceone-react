@@ -7,14 +7,17 @@ import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
 import axios from "axios";
 import POST_API from "../../constants/PostApi";
 import { SIZE, STATUS_CODE } from "../../constants/AppConstants";
-import {  LayoutDashboard, LucideLayoutDashboard } from "lucide-react";
+import { LayoutDashboard, LucideLayoutDashboard } from "lucide-react";
 import { useComapanySpecificSearchDateRange } from "../../config/hooks/useCompanySpecificDateRange";
 import Button from "../ui/Button";
 import { useDateRangeIdChange } from "../../config/hooks/useDateRangeIdChange";
 import DateRangeFilterDropdown from "../ui/DateRangeFilterDropdown";
 import DateRangePicker from "../ui/DateRangePicker";
 import SearchInput from "../ui/SearchInput";
-import { useSearchFilterPaginationDateHandlers } from "../../config/hooks/usePaginationHandler";
+import {
+  customDateRangeId,
+  useSearchFilterPaginationDateHandlers,
+} from "../../config/hooks/usePaginationHandler";
 import { useUserAccessModules } from "../../config/hooks/useAccessModules";
 import EmailTemplate from "../../@types/email-template/EmailTemplateType";
 import MESSAGE from "../../constants/Messages";
@@ -46,7 +49,7 @@ export const TemplatesPage: React.FC = () => {
   const [hasMoreTemplates, setHasMoreTemplates] = useState(true);
   const [loadingTemplates, setLoadingTemplates] = useState<boolean>(false);
   const [loadingTemplatePage, setLoadingTemplatesPage] =
-    useState<boolean>(false);
+    useState<boolean>(true);
   const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
   const { loginStatus } = useLoggedInUserContext();
@@ -54,7 +57,7 @@ export const TemplatesPage: React.FC = () => {
   // Read filters from LocalStorage (before hook initializes)
   const savedFilters = JSON.parse(
     localStorage.getItem(LocalStorageKeys.EMAIL_TEMPLATE_MANAGEMENT_FILTERS) ||
-      "{}"
+      "{}",
   );
 
   const limit: number = 10;
@@ -92,7 +95,7 @@ export const TemplatesPage: React.FC = () => {
   };
 
   const getTemplateTypes = async () => {
-    if(loginStatus.companyId === 0)return;
+    if (loginStatus.companyId === 0) return;
     setLoadingTemplatesPage(true);
     try {
       const response = await axios.post(
@@ -102,12 +105,12 @@ export const TemplatesPage: React.FC = () => {
           requestedby: loginStatus.id,
           is_host_email: false,
         },
-        { withCredentials: true }
+        { withCredentials: true },
       );
 
       if (response.status === STATUS_CODE.OK) {
         const activeTypes = response.data.filter(
-          (type: TemplateType) => type.isactive
+          (type: TemplateType) => type.isactive,
         );
         setTemplateTypes(activeTypes);
         if (activeTypes.length > 0) {
@@ -150,8 +153,10 @@ export const TemplatesPage: React.FC = () => {
   // Removed 'loadingTemplates' and 'hasMoreTemplates' as dependencies to prevent loops
   const getTemplatesOfCompany = useCallback(
     async ({ typeId, reset = false }: { typeId: number; reset?: boolean }) => {
-      if(loginStatus.companyId === 0 )return;
-      if (dateRangeId === 8 && concatDate.trim() === "") return;
+      // ✅ FIX 1: prevent duplicate calls
+      if (loadingTemplates || (!reset && !hasMoreTemplates)) return;
+      if (loginStatus.companyId === 0) return;
+      if (dateRangeId === customDateRangeId && concatDate.trim() === "") return;
       // We use a functional update for setOffset to get the latest value
       // and avoid including 'offset' in useCallback dependencies.
       setLoadingTemplates(true); // Set loading state for templates
@@ -177,7 +182,7 @@ export const TemplatesPage: React.FC = () => {
             offset: currentOffset,
             limit,
           },
-          { withCredentials: true }
+          { withCredentials: true },
         );
 
         if (response.status === STATUS_CODE.OK) {
@@ -186,7 +191,7 @@ export const TemplatesPage: React.FC = () => {
           const newOffset: number = currentOffset + limit;
           setOffset(newOffset);
           setTemplates((prev) =>
-            reset ? newTemplates : [...prev, ...newTemplates]
+            reset ? newTemplates : [...prev, ...newTemplates],
           );
         } else {
           setHasMoreTemplates(false);
@@ -222,7 +227,7 @@ export const TemplatesPage: React.FC = () => {
       searchParameter,
       concatDate,
       limit,
-    ]
+    ],
   ); // Keep offset here if it's read directly, or use a ref
 
   const handleTabChange = (tab: string) => {
@@ -331,7 +336,7 @@ export const TemplatesPage: React.FC = () => {
 
     localStorage.setItem(
       LocalStorageKeys.SUPPORT_TICKET_MANAGEMENT_FILTERS,
-      JSON.stringify(filters)
+      JSON.stringify(filters),
     );
   }, [searchParameter, dateRangeId, concatDate, startDate, endDate]);
   // Note : On refresh button click clear the storage
@@ -339,7 +344,7 @@ export const TemplatesPage: React.FC = () => {
     window.addEventListener("beforeunload", clearSupportTicketFilters);
     function clearSupportTicketFilters() {
       localStorage.removeItem(
-        LocalStorageKeys.SUPPORT_TICKET_MANAGEMENT_FILTERS
+        LocalStorageKeys.SUPPORT_TICKET_MANAGEMENT_FILTERS,
       );
     }
     return () =>
@@ -351,10 +356,26 @@ export const TemplatesPage: React.FC = () => {
       ?.date_range || "Date Filter";
 
   useEffect(() => {
-    if (dateRangeId === 8) {
+    if (dateRangeId === customDateRangeId) {
       setIsCustomDateOptionSelected(true);
     }
   }, [searchParameter, dateRangeId, setIsCustomDateOptionSelected]);
+
+   // ✅ FIX 4: ADD SCROLL LISTENER (YOU REMOVED THIS EARLIER)
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+
+    const handleScroll = () => {
+      if (el.scrollTop + el.clientHeight >= el.scrollHeight - 50) {
+        getTemplatesOfCompany({typeId: selectedTypeId, reset: false });
+      }
+    };
+
+    el.addEventListener("scroll", handleScroll);
+
+    return () => el.removeEventListener("scroll", handleScroll);
+  }, [getTemplatesOfCompany]);
 
   if (!userHasAccessToViewEmailTemplateSetting)
     return (
@@ -373,7 +394,7 @@ export const TemplatesPage: React.FC = () => {
     <div
       className={`w-full pt-1 ${
         userPreference.isLeftMenu ? "pl-5" : "px-1"
-      }  gap-1 h-screen flex flex-col `}
+      }  gap-1 h-[95vh] flex flex-col `}
     >
       {/* Header */}
       <div
@@ -456,7 +477,7 @@ export const TemplatesPage: React.FC = () => {
           >
             <div className="flex items-center justify-center gap-1">
               <LucideLayoutDashboard size={SIZE.SIXTEEN} />
-              <span>Create</span>
+              <span>Create Email Template</span>
             </div>
           </Button>
         </div>
@@ -469,7 +490,13 @@ export const TemplatesPage: React.FC = () => {
         </div>
       ) : (
         <div>
-          <div className="flex-1 overflow-x-auto" ref={containerRef}>
+          <div
+            className="flex-1 overflow-y-auto max-h-[86vh] scroll-smooth will-change-scroll " // 👈 important
+            style={{
+              scrollBehavior: "smooth",
+            }}
+            ref={containerRef}
+          >
             <EmailTemplateList
               templates={templates}
               loading={loadingTemplates}

@@ -1,24 +1,23 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import FormHeader from "../../../ui/FormHeader";
-import { Handshake, Save, X } from "lucide-react";
+import { Handshake, Save, Text, X } from "lucide-react";
 import RadioButtons from "../../../ui/RadioButton";
-import { useState } from "react";
+import React, { useState } from "react";
 // import Lead from "../../../../@types/lead-management/LeadManagementProps";
-import ConfirmationDialog from "../../../dialogue-box/ConfirmationDialogue";
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
 import POST_API from "../../../../constants/PostApi";
 import toast from "react-hot-toast";
 import ApiError from "../../../../@types/error/ApiError";
-import { SIZE, STATUS_CODE } from "../../../../constants/AppConstants";
-import RefreshToken from "../../../../config/validations/RefreshToken";
+import { SIZE } from "../../../../constants/AppConstants";
 import Button from "../../../ui/Button";
 import TextAreaInput from "../../../ui/TextAreaInput";
 import LoadingPopUpAnimation from "../../../views/card/LoadingPopUpAnimation";
-import FormLayout from "../../../ui/FormLayout";
 import axiosClient from "../../../../axios-client/AxiosClient";
 import LeadDataProps from "../../../../@types/lead-management/LeadProps";
 import { LookupAccountManagement } from "../../../views/lookups/lookup-account/LookupAccountManagement";
 import { LookupAccount } from "../../../../@types/lookup/LookupAccount";
+import LeadUpdateConfirmationDialogue from "./LeadUpdateConfirmationDialogue";
+import { handleApiError } from "../../../../config/error/handleApiError";
 
 function ConvertLeadModal({
   isOpen,
@@ -34,7 +33,8 @@ function ConvertLeadModal({
   onClose: () => void;
   // leadData: Lead;
   leadData : LeadDataProps
-  handleLeadConversion: () => void;
+  handleLeadConversion: (event : React.FormEvent<HTMLFormElement>
+  ) => void;
   reasonText: string;
   onReasonChange: (event: React.ChangeEvent<HTMLTextAreaElement>) => void;
   handleLeadMappedToAccount: () => void;
@@ -64,7 +64,9 @@ function ConvertLeadModal({
     },
   ];
 
-  const createAccountLead = async () => {
+  const createAccountLead = async (
+  ) => {
+
     if(!selectedAccount) return;
     const postData = {
       company_id: loginStatus.companyId,
@@ -86,21 +88,22 @@ function ConvertLeadModal({
         }
       })
       .catch(async (error: ApiError | any) => {
-        if (error.status === STATUS_CODE.UNATHORISED) {
-          const refreshTokenResponse = await RefreshToken({
-            callFunction: createAccountLead,
-          });
-          if (refreshTokenResponse) {
-            createAccountLead();
-          }
-        }
+        handleApiError(error)
+        // if (error.status === STATUS_CODE.UNATHORISED) {
+        //   const refreshTokenResponse = await RefreshToken({
+        //     callFunctionWithEvent: createAccountLead,
+        //   });
+        //   if (refreshTokenResponse) {
+        //     createAccountLead();
+        //   }
+        // }
       });
   };
 
   if (!isOpen) return null;
   return (
-    // <>
-    <FormLayout padding={2} width={accountTypeSelected==="noAccount" ? 4:7  }>
+    <>
+    {/* // <FormLayout padding={2} width={accountTypeSelected==="noAccount" ? 4:7  }> */}
 
    
       {/* <div className="fixed inset-0 z-50 p-5 overflow-hidden bg-black bg-opacity-5">
@@ -120,7 +123,7 @@ function ConvertLeadModal({
                 description="Convert and manage a lead for your accounts."
               />
 
-              <form className="space-y-0">
+              {/* <form className="space-y-0"> */}
                 <div className="flex justify-center">
                   <RadioButtons
                     options={convertLeadRadioButtonOptions}
@@ -154,15 +157,19 @@ function ConvertLeadModal({
                 )}
                 {accountTypeSelected === "noAccount" && (
                   <div className="grid grid-cols-1">
+                    <form onSubmit={handleLeadConversion}>
+
+
                     <div>
                       <TextAreaInput
+                      logo={Text}
                       autoFocus
-                        placeholder="Enter reason for status update"
-                        value={reasonText}
-                        cols={3}
-                        rows={5}
-                        onChange={onReasonChange}
-                        label="Reason(Optional)"
+                      placeholder="Enter reason for status update"
+                      value={reasonText}
+                      cols={3}
+                      rows={5}
+                      onChange={onReasonChange}
+                      label="Reason(Optional)"
                       />
                     </div>
                     <div className="flex gap-2 col-span-1 justify-end">
@@ -172,7 +179,7 @@ function ConvertLeadModal({
                           onClick={() => {
                             onClose();
                           }}
-                        >
+                          >
                           <div className="flex gap-1 justify-center items-center">
                             <X size={SIZE.SIXTEEN} />
                             <span>Cancel</span>
@@ -182,10 +189,9 @@ function ConvertLeadModal({
                       <div className="max-w-32 mt-7">
                         <Button
                           type="submit"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            handleLeadConversion();
-                          }}
+                          // onClick={(e) => {
+                          //   e.preventDefault();
+                          // }}
                         >
                           <div className="flex gap-1 justify-center items-center">
                             <Save size={SIZE.SIXTEEN} />
@@ -194,31 +200,34 @@ function ConvertLeadModal({
                         </Button>
                       </div>
                     </div>
+                          </form>
                   </div>
                 )}
-
-                <ConfirmationDialog
+                
+                <LeadUpdateConfirmationDialogue
                   message="Please confirm the action to proceed."
                   messageDescription="We are about to map the selected lead to the designated account.
 Ensure all details are correct before finalizing the mapping"
                   onCancel={() => {
                     setFinalConfirm(false);
                   }}
-                  onConfirm={() => {
+                  onConfirm={ async () => {
                     if (accountTypeSelected === "existingAccount") {
-                      createAccountLead();
+
+                     await createAccountLead();
+                      setFinalConfirm(false)
                     }
                   }}
                   open={finalConfirm}
                   title="Are You Sure?"
                 />
-              </form>
+              {/* </form> */}
             </div>
-             </FormLayout>
-      //     // {/* </div>
+            {/* //  </FormLayout> */}
+       {/* </div>
       //   </div>
       // </div> */}
-    // {/* </>,
+    </>
     // document.body */}
   );
 }

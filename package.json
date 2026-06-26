@@ -1,7 +1,7 @@
 {
   "name": "purple-radiance-crm-react-app",
   "private": true,
-  "version": "v1.0.1",
+  "version": "v1.1.0",
   "type": "module",
   "scripts": {
     "dev": "vite --host --mode developmentlocal",
@@ -40,9 +40,10 @@
     "dayjs": "^1.11.19",
     "dompurify": "^3.3.1",
     "framer-motion": "^12.23.6",
-    "jodit-react": "^5.2.41",
+    "jodit-react": "^5.3.21",
     "jwt-decode": "^4.0.0",
     "lexical": "^0.31.2",
+    "localforage": "^1.10.0",
     "lodash": "^4.17.21",
     "lucide-react": "^0.344.0",
     "moment": "^2.30.1",
@@ -63,6 +64,7 @@
     "react-intersection-observer": "^9.16.0",
     "react-joyride": "^2.9.3",
     "react-modal": "^3.16.3",
+    "react-pdf": "^10.4.1",
     "react-resizable": "^3.0.5",
     "react-router-dom": "^7.1.1",
     "react-select": "^5.10.2",

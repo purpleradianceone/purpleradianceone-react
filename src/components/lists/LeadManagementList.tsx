@@ -2,10 +2,11 @@
 import {
   Calendar,
   ClipboardPlus,
+  Clock3,
   Handshake,
-  Plus,
   User,
   X,
+  XCircle,
 } from "lucide-react";
 import useScreenSize from "../../config/hooks/useScreenSize";
 import { JSX_CHILDREN_NAME, SIZE } from "../../constants/AppConstants";
@@ -13,7 +14,7 @@ import Button from "../ui/Button";
 import LeadManagementAgGrid from "../ag-grid/LeadManagementsAgGrid";
 import { useUserAccessModules } from "../../config/hooks/useAccessModules";
 import CreateLeadModal from "../modals/leads/CreateLeadModal";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import GetCompanyUsersForLead from "../modals/leads/company-users-selection-modal/GetCompanyUsersForLead";
 import SearchInput from "../ui/SearchInput";
 import DateRangePicker from "../ui/DateRangePicker";
@@ -34,6 +35,15 @@ import FormHeader from "../ui/FormHeader";
 import COLORS from "../../constants/Colors";
 import { createPortal } from "react-dom";
 import PaginationWithoutCount from "../ag-grid/PaginationWithoutCount";
+import { customDateRangeId } from "../../config/hooks/usePaginationHandler";
+import { ComponentHeaderAndLogo } from "../ui/ComponentHeaderAndLogo";
+import { CiImport } from "react-icons/ci";
+import LeadSummary from "../../@types/lead-management/LeadSummary";
+import axiosClient from "../../axios-client/AxiosClient";
+import POST_API from "../../constants/PostApi";
+import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
+import SummaryCards from "../ui/SummaryCards";
+
 function LeadManagementList({
   handleSearchOption,
   onStartDateChange,
@@ -50,11 +60,13 @@ function LeadManagementList({
   handleLeadSelectedSource,
   isUsedInLeadModule,
   handleRowSelectedForShowAccountLead,
+  isLoading
 }: LeadManagementListProps) {
   const navigate = useNavigate();
   const { position } = usePanel();
+  
   const { userPreference } = useUserPreference();
-  const { isLargeScreen, isMediumScreen, isSmallScreen } = useScreenSize();
+  const { isLargeScreen, isSmallScreen } = useScreenSize();
   const { userHasAccessToViewLead, userHasAccessToAddLead } =
     useUserAccessModules();
   const [isCreateLeadModalOpen, setIsCreateLeadModalOpen] =
@@ -99,6 +111,56 @@ function LeadManagementList({
     });
     console.log(selectedLeadForEdit);
   };
+
+  
+
+const { loginStatus } = useLoggedInUserContext();
+
+const [leadSummary, setLeadSummary] =
+  useState<LeadSummary>({
+    total_leads_converted_this_month: 0,
+    total_leads_converted_last_month: 0,
+    total_leads_created_this_month: 0,
+    total_leads_open: 0,
+    total_leads_lost_this_month: 0,
+  });
+
+  const fetchLeadSummary = useCallback(async () => {
+  try {
+    const postData = {
+      company_id: loginStatus.companyId,
+      requestedby: loginStatus.id,
+    };
+
+    const response = await axiosClient.post(
+      POST_API.SUMMARY_LEAD,
+      postData,
+      {
+        withCredentials: true,
+      }
+    );
+
+    if (response.data?.length > 0) {
+      setLeadSummary(response.data[0]);
+    }
+  } catch (error) {
+    console.error(error);
+  }
+}, [loginStatus.companyId, loginStatus.id]);
+
+
+useEffect(() => {
+  if (loginStatus.companyId && loginStatus.id) {
+    fetchLeadSummary();
+  }
+}, [fetchLeadSummary]);
+
+const refreshAllData = useCallback(async () => {
+  await Promise.all([
+    handleAddLead(),
+    fetchLeadSummary(),
+  ]);
+}, [handleAddLead, fetchLeadSummary]);
 
   const [openPopUpOfCompanyUserModal, setOpenPopUpOfCompanyUserModal] =
     useState(false);
@@ -146,7 +208,7 @@ function LeadManagementList({
   };
 
    useEffect(() => {
-      if(handleSearchOption.dateRangeId === 8){
+      if(handleSearchOption.dateRangeId === customDateRangeId){
         setIsCustomDateOptionSelected(true);
       }
     }, [handleSearchOption.searchParameter, handleSearchOption.dateRangeId, setIsCustomDateOptionSelected]);
@@ -159,35 +221,161 @@ function LeadManagementList({
   if (userHasAccessToViewLead) { 
     return (
       <div
-        className={`w-full ${position === "left" && isUsedInLeadModule ? "pl-5" : "pl-1"} pr-1 gap-1`}
+        className={`w-full ${position === "left" && isUsedInLeadModule ? "pl-7 pr-2" : "pl-1"} pr-1 gap-1 pt-2`}
       >
-        {/* sticky */}
-        <div
-          className={`z-10 top-12 mt-1 p-0.5  flex items-center justify-between text-sm ${COLORS.GRID_HEADER_SECTION_BG_COLOR} rounded-lg shadow-sm  mb-1.5 w-full`}
-        >
+
+        {/* Top Header */}
+        <div className="flex items-start justify-between ">
+             {/* Header */} 
+            <div className="flex items-center gap-3 ">
+              <div className={`p-2 rounded-lg ${COLORS.PAGE_HEADER_SECTION_BG_COLOR}`}>
+              <Handshake className={COLORS.PAGE_HEADER_ICONS_COLOR_AND_SIZE} />
+            </div>
+
+              <div>
+                <h1 className="page-header-custom tracking-tight pb-0.5">
+               Leads
+            </h1>
+              <p className="page-subtitle-custom ">
+               Track, Manage and Convert your leads efficiently.
+            </p>
+              </div>
+            </div>
+          <div className="pt-1">
           {isUsedInLeadModule && (
             <div className="flex gap-1">
-              {!isSmallScreen && (
-                <Handshake
-                  className={COLORS.GRID_HEADER_ICONS_COLOR_AND_SIZE}
-                />
-              )}
+              <Button
+                type="button"
+                className="button-import"
 
-              {(isMediumScreen || isLargeScreen) && (
-                <span className="section-header-custom">{" Leads"} </span>
-              )}
+                disabled={!userHasAccessToAddLead}
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (userHasAccessToAddLead) {
+                    handleShowImportModule();
+                  } else {
+                    toast.error(
+                      MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                        .DENIED_ADD_LEAD_IMPORT_ACCESS,
+                    );
+                  }
+                }}
+              >
+                  <CiImport size={SIZE.SIXTEEN}  />
+                  <span>Import </span>
+                {/* </span> */}
+              </Button>
+              <Button
+                type="submit"
+                disabled={!userHasAccessToAddLead}
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (!userHasAccessToAddLead) {
+                    toast.error(
+                      MESSAGE.MODULE_ACCESS.LEAD_MODULE.DENIED_ADD_ACCESS,
+                    );
+                    return;
+                  } else {
+                    setIsCreateLeadModalOpen(true);
+                  }
+                }}
+              >
+                <span className="flex items-center ">
+                  {!isSmallScreen && <ClipboardPlus size={SIZE.SIXTEEN} />}
+                  {isSmallScreen && <ClipboardPlus size={SIZE.EIGHT} />}
+                  {isLargeScreen && JSX_CHILDREN_NAME.CREATE_LEAD}
+                </span>
+              </Button>
             </div>
           )}
+            </div>
+        </div>
+ 
+        <SummaryCards
+          cardGap={15}
+          width="100%"
+          gridCols={5}
+          loading = {isLoading}
+          cards={[
+            {
+              title: "Converted Leads",
+              count: leadSummary.total_leads_converted_this_month,
+              subtitle: "This Month",
+              icon: Handshake,
+              iconBg: "bg-violet-100",
+              iconColor: "text-violet-600",
+            },
+
+            {
+              title: "Converted Leads",
+              count: leadSummary.total_leads_converted_last_month,
+              subtitle: "Last Month",
+              icon: Handshake,
+              iconBg: "bg-blue-100",
+              iconColor: "text-blue-600",
+            },
+
+            {
+              title: "New Leads",
+              count: leadSummary.total_leads_created_this_month,
+              subtitle: "Created This Month",
+              icon: ClipboardPlus,
+              iconBg: "bg-green-100",
+              iconColor: "text-green-600",
+            },
+
+            {
+              title: "Open Leads",
+              count: leadSummary.total_leads_open,
+              subtitle: "Current Open Leads",
+              icon: Clock3,
+              iconBg: "bg-orange-100",
+              iconColor: "text-orange-600",
+            },
+
+            {
+              title: "Lost Leads",
+              count: leadSummary.total_leads_lost_this_month,
+              subtitle: "This Month",
+              icon: XCircle,
+              iconBg: "bg-red-100",
+              iconColor:"text-red-600",
+            },
+          ]}
+        />
+        {/* sticky */}
+        <div
+          className={`z-10 top-12 mt-1 py-1.5 px-3 mb-3  flex items-center  text-sm ${COLORS.GRID_HEADER_SECTION_BG_COLOR} border border-slate-200 rounded-lg w-full mb-0.5 `}
+        >
+          {isUsedInLeadModule && (
+            // <div className="flex gap-1">
+            //   {!isSmallScreen && (
+            //     <Handshake
+            //       className={COLORS.GRID_HEADER_ICONS_COLOR_AND_SIZE}
+            //     />
+            //   )}
+
+            //   {(isMediumScreen || isLargeScreen) && (
+            //     <span className="section-header-custom">{" Leads"} </span>
+            //   )}
+            // </div>
+            <ComponentHeaderAndLogo
+            headerText="Leads"
+            logo={Handshake}
+            />
+          )}
+          
 
           {/* {isLargeScreen && ( */}
           <>
-            <div className="flex gap-2  px-1 justify-center items-center">
+            <div className="flex gap-4 px-5 justify-center items-center">
               {/* search box flex div */}
               <div
-                className={`relative flex items-start ${isCustomDateOptionSelected ? "w-56" : "w-80"}`}
+                className={`relative flex items-start ${isCustomDateOptionSelected ||  userPreference.sidebarOpen?  "w-56": "w-80"}`}
               >
                 <SearchInput
                   value={handleSearchOption.searchParameter}
+                  placeholder="Search by name, email, mobile number, country, state, district and address"
                   onChange={(e) => {
                     handleSearchOption.handleSearchParameterChange(
                       e.target.value,
@@ -234,7 +422,7 @@ function LeadManagementList({
                 </div>
               </div>
               {isUsedInLeadModule && (
-                <div className="flex gap-1">
+                <div className="flex gap-5">
                   <div className="ml-0.5 min-w-[120px] max-h-[40px]">
                     <CustomDropdown
                       selectedValue={
@@ -311,61 +499,17 @@ function LeadManagementList({
           </>
           {/* )} */}
 
-          {isUsedInLeadModule && (
-            <div className="flex  gap-1">
-              <Button
-                type="submit"
-                disabled={!userHasAccessToAddLead}
-                onClick={(e) => {
-                  e.preventDefault();
-                  if (userHasAccessToAddLead) {
-                    handleShowImportModule();
-                  } else {
-                    toast.error(
-                      MESSAGE.MODULE_ACCESS.LEAD_MODULE
-                        .DENIED_ADD_LEAD_IMPORT_ACCESS,
-                    );
-                  }
-                }}
-              >
-                <span className="flex items-center">
-                  <Plus size={SIZE.SIXTEEN} />
-                  <span>Import </span>
-                </span>
-              </Button>
-              <Button
-                type="submit"
-                disabled={!userHasAccessToAddLead}
-                onClick={(e) => {
-                  e.preventDefault();
-                  if (!userHasAccessToAddLead) {
-                    toast.error(
-                      MESSAGE.MODULE_ACCESS.LEAD_MODULE.DENIED_ADD_ACCESS,
-                    );
-                    return;
-                  } else {
-                    setIsCreateLeadModalOpen(true);
-                  }
-                }}
-              >
-                <span className="flex items-center ">
-                  {!isSmallScreen && <ClipboardPlus size={SIZE.SIXTEEN} />}
-                  {isSmallScreen && <ClipboardPlus size={SIZE.EIGHT} />}
-                  {isLargeScreen && JSX_CHILDREN_NAME.CREATE_LEAD}
-                </span>
-              </Button>
-            </div>
-          )}
+          
         </div>
 
         <div className="bg-white  overflow-y-auto rounded-lg shadow-sm ">
           <div
             className={
               !isUsedInLeadModule
-                ? `ag-theme-balham w-full h-[60vh]`
+                ? `w-full h-[60vh]`
                 : userPreference.isLeftMenu
-                  ? `ag-theme-balham w-full h-[calc(100vh-115px)]`
-                  : "ag-theme-balham w-full h-[calc(100vh-120px)]"
+                  ? `w-full h-[calc(100vh-278px)]`
+                  : "w-full h-[calc(100vh-120px)]"
             }
           >
             <LeadManagementAgGrid
@@ -374,12 +518,13 @@ function LeadManagementList({
               onRowSelect={handleRowSelectedForShowLead}
               handleLeadDataFormChange={handleLeadDataFormChange}
               leads={leadData}
+              isLoadingData ={isLoading}
             />
           </div>
           <CreateLeadModal
             isOpen={isCreateLeadModalOpen}
             onClose={handleCreateLeadModalClose}
-            onCreateLeadRefreshLeadData={handleAddLead}
+            onCreateLeadRefreshLeadData={refreshAllData}
           ></CreateLeadModal>
         </div>
 

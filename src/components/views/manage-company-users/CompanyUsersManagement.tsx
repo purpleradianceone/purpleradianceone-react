@@ -9,7 +9,7 @@ import { STATUS_CODE } from "../../../constants/AppConstants";
 import ApiError from "../../../@types/error/ApiError";
 import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
 import RefreshToken from "../../../config/validations/RefreshToken";
-import { useSearchFilterPaginationDateHandlers } from "../../../config/hooks/usePaginationHandler";
+import { customDateRangeId, useSearchFilterPaginationDateHandlers } from "../../../config/hooks/usePaginationHandler";
 import CompanyUser from "../../../@types/company-users/CompanyUser";
 import { useInView } from "react-intersection-observer";
 import { motion } from "framer-motion";
@@ -56,12 +56,18 @@ function GetCompanyUsers({
   const [companyUsers, setCompanyUsers] = useState<CompanyUsersSearchProps[]>(
     []
   );
+  const [isDataLoading , setIsDataLoading] = useState<boolean>(false);
   const [ref, inView] = useInView({ fallbackInView: true, threshold: 0.1 });
   const { loginStatus } = useLoggedInUserContext();
   const [accessDeniedPopUpOpen, setAccessDeniedPopUpOpen] = useState(false);
 
   const { userHasAccessToViewUser } = useUserAccessModules();
   const [userUpdateCount, setUserUpdateCount] = useState(0);
+
+   const [refreshUsers, setRefreshUsers] = useState(0);
+
+
+
 
   // Read filters from LocalStorage (before hook initializes)
 const savedFilters = JSON.parse(
@@ -94,13 +100,28 @@ const savedFilters = JSON.parse(
     }
   };
 
+    const [selectedStatus, setSelectedStatus] = useState<
+  "ALL" | "ACTIVE" | "INACTIVE"
+>(
+  savedFilters.selectedStatus || "ALL"
+);
+  const handleRefreshUsers = () => {
+  setRefreshUsers((prev) => prev + 1);
+};
+
   // Fetch data function
   const fetchCompanyUsers = async (signal: AbortSignal) => {
-    if (dateRangeId === 8 && concatDate.trim() === "") return;
+    if (dateRangeId === customDateRangeId && concatDate.trim() === "") return;
     const offset = (currentPage - 1) * pageSize;
 
     const effectiveDateRangeId =
-      dateRangeId === 8 && !concatDate ? 0 : dateRangeId;
+      dateRangeId === customDateRangeId && !concatDate ? 0 : dateRangeId;
+
+      const getIsActiveParam = (status: "ALL" | "ACTIVE" | "INACTIVE") => {
+  if (status === "ACTIVE") return true;
+  if (status === "INACTIVE") return false;
+  return null;
+};
 
     const postData = {
       company_id: loginStatus.companyId,
@@ -111,9 +132,11 @@ const savedFilters = JSON.parse(
       search_company_specific_date_range_id: effectiveDateRangeId,
       search_parameter: searchParameter,
       search_parameter_date: concatDate,
+      isactive: getIsActiveParam(selectedStatus),
     };
 
     try {
+      setIsDataLoading(true)
       const response = await axiosClient.post(POST_API.GET_COMPANY_USERS, postData, {
         signal,
         withCredentials: true,
@@ -131,6 +154,8 @@ const savedFilters = JSON.parse(
           fetchCompanyUsers(signal);
         }
       }
+    }finally{
+      setIsDataLoading(false)
     }
   };
 
@@ -158,7 +183,13 @@ const savedFilters = JSON.parse(
     endDate,
     concatDate,
     userUpdateCount,
+    refreshUsers,
+    selectedStatus, 
   ]);
+
+  useEffect(() => {
+  handlePageChange(1);
+}, [selectedStatus]);
 
   useEffect(() => {
     if (!userHasAccessToViewUser) {
@@ -176,6 +207,7 @@ const savedFilters = JSON.parse(
       concatDate,
       customStartDate: startDate,
       customEndDate: endDate,
+      selectedStatus,
     };
 
     localStorage.setItem(
@@ -190,6 +222,7 @@ const savedFilters = JSON.parse(
     concatDate,
     startDate,
     endDate,
+    selectedStatus,
   ]);
 
   // Note : On refresh button click clear the storage
@@ -212,6 +245,9 @@ const savedFilters = JSON.parse(
               transition={{ duration: 0.4, ease: "easeOut" }}
             >
               <GetCompanyUsersList
+               selectedStatus={selectedStatus}
+               setSelectedStatus={setSelectedStatus}
+                onRefreshUsers={handleRefreshUsers}
                 handleCompanyUserChangeOnEdit={handleCompanyUserChangeOnEdit}
                 onEndDateChange={handleEndDateChange}
                 onStartDateChange={handleStartDateChange}
@@ -235,6 +271,7 @@ const savedFilters = JSON.parse(
                   isUsedInAccountProductForAssingingInstalledBy
                 }
                 onRowSelect={onRowSelect}
+                isDataLoading={isDataLoading}
               />
             </motion.section>
           </div>

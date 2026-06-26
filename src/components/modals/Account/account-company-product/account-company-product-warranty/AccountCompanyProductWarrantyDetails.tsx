@@ -16,38 +16,43 @@ interface AccountCompanyProductWarrantyDetails {
 export const AccountCompanyProductWarrantyDetails: React.FC<
   AccountCompanyProductWarrantyDetails
 > = ({ accountCompanyProductId }) => {
-
-
-  const {userHasAccessToAddAccountProductsWarranty , userHasAccessToViewAccountProductsWarranty} = useUserAccessModules();
+  const {
+    userHasAccessToAddAccountProductsWarranty,
+    userHasAccessToViewAccountProductsWarranty,
+  } = useUserAccessModules();
   // Note : function to fetch the data for the list
-  const { accountCompanyProductWarranty: data, loading , getAccountCompanyProductWarranty : refreshCall } =
-    useAccountCompanyProductWarranty(accountCompanyProductId);
+  const {
+    accountCompanyProductWarranty: data,
+    loading,
+    getAccountCompanyProductWarranty: refreshCall,
+  } = useAccountCompanyProductWarranty(accountCompanyProductId);
 
   // Note: state to update selected amc
   const [selectedAmcForUpdate, setSelectedAmcForUpdate] =
     useState<AccountCompanyProductWarranty | null>(null);
 
-    // Note : State to manage for open close of AMC creation
-  const [openCreateWarrantyForm, setOpenCreateWarrnatyForm] = useState<boolean>(false);
+  // Note : State to manage for open close of AMC creation
+  const [openCreateWarrantyForm, setOpenCreateWarrnatyForm] =
+    useState<boolean>(false);
 
-    // Note : function to update the state of selectedAmcForUpdate
+  // Note : function to update the state of selectedAmcForUpdate
   const handleRowSelectForUpdate = (data: AccountCompanyProductWarranty) => {
     if (!data) return;
 
     setSelectedAmcForUpdate(data);
   };
 
-    // Note : function to update the state of selectedAmcForUpdate which will close the form
+  // Note : function to update the state of selectedAmcForUpdate which will close the form
   function handleUpdateWarrantyFormClose() {
     setSelectedAmcForUpdate(null);
   }
 
-  if(!userHasAccessToViewAccountProductsWarranty) return null;
+  if (!userHasAccessToViewAccountProductsWarranty) return null;
   return (
     <div className="bg-white rounded-xl border p-1 grid gap-1 border-slate-200">
       <h3 className="flex items-center justify-between bg-gray-100 table-header-custom rounded-t-md px-2">
         <span>Warranty Details</span>
-        <div className="flex justify-end items-center text-xs gap-x-2 py-0.5 text-gray-500">
+        <div className="justify-end items-center text-xs gap-x-2 py-0.5 text-gray-500">
           <Button
             disabled={!userHasAccessToAddAccountProductsWarranty}
             onClick={() => {
@@ -55,8 +60,8 @@ export const AccountCompanyProductWarrantyDetails: React.FC<
                 setOpenCreateWarrnatyForm(true);
               } else {
                 toast.error(
-                  MESSAGE.MODULE_ACCESS.ACCOUNT_COMPANY_PRODUCT_WARRANTY.DENIED_ADD_ACCESS
-
+                  MESSAGE.MODULE_ACCESS.ACCOUNT_COMPANY_PRODUCT_WARRANTY
+                    .DENIED_ADD_ACCESS,
                 );
               }
             }}
@@ -84,18 +89,16 @@ export const AccountCompanyProductWarrantyDetails: React.FC<
           onSuccess={refreshCall}
         />
       )}
-      {
-        openCreateWarrantyForm && (
-          <AccountCompanyProductWarrantyCreate
+      {openCreateWarrantyForm && (
+        <AccountCompanyProductWarrantyCreate
           accountCompanyProductId={accountCompanyProductId}
           isOpen={openCreateWarrantyForm}
-          onClose={()=>{
+          onClose={() => {
             setOpenCreateWarrnatyForm(false);
           }}
           onSuccess={refreshCall}
-          />
-        )
-      }
+        />
+      )}
     </div>
   );
 };

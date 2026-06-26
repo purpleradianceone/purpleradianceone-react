@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import axios from "axios";
-import { useSearchFilterPaginationDateHandlers } from "../../config/hooks/usePaginationHandler";
+import { customDateRangeId, useSearchFilterPaginationDateHandlers } from "../../config/hooks/usePaginationHandler";
 import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
 import POST_API from "../../constants/PostApi";
 import { STATUS_CODE } from "../../constants/AppConstants";
@@ -33,6 +33,8 @@ function SubscriptionManagement() {
     SubscriptionListProps[]
   >([]);
 
+  const [isDataLoading, setIsDataLoading] = useState<boolean>(false);
+
   const [subscriptionListUpdateCount, setSubscriptionListUpdateCount] = useState<number>(0);
   const handleSubscriptionListChange=()=>{
     setSubscriptionListUpdateCount(subscriptionListUpdateCount+1);
@@ -40,10 +42,11 @@ function SubscriptionManagement() {
 
   //NOTE : API call to get subscription list
   const fetchCompanySubscription = async () => {
+    setIsDataLoading(true)
     const offset = (currentPage - 1) * pageSize;
 
     const effectiveDateRangeId =
-      dateRangeId === 8 && !concatDate ? 0 : dateRangeId;
+      dateRangeId === customDateRangeId && !concatDate ? 0 : dateRangeId;
 
     //NOTE : POST DATA
     const postData = {
@@ -82,6 +85,9 @@ function SubscriptionManagement() {
             ]);
           });
         }
+      })
+      .finally(()=>{
+        setIsDataLoading(false);
       });
   };
 
@@ -113,6 +119,7 @@ function SubscriptionManagement() {
             pageSize,
           }}
           handleSubscriptionListChange={handleSubscriptionListChange}
+          isDataLoading={isDataLoading}
         />
       </div>
     </div>

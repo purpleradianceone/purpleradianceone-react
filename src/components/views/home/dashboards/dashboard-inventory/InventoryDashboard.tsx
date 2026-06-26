@@ -1,86 +1,405 @@
-import React from "react";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import {
+  AlertOctagonIcon,
+  LucideShoppingCart,
+  PackageX,
+  TruckIcon,
+  Wallet,
+  WarehouseIcon,
+} from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { AccessManagementType } from "../../../../../@types/company-users/AccessManagementContextType";
+import RecentStockMovementProps from "../../../../../@types/home/dashboard/inventory/RecentStockMovementProps";
+import TopLowStockProducsProp from "../../../../../@types/home/dashboard/inventory/TopLowStockProducts";
+import axiosClient from "../../../../../axios-client/AxiosClient";
+import { handleApiError } from "../../../../../config/error/handleApiError";
+import { STATUS_CODE } from "../../../../../constants/AppConstants";
+import POST_API from "../../../../../constants/PostApi";
+import { REFCURSOR_KEY } from "../../../../../constants/RefcursorConstants";
+import { useLoggedInUserContext } from "../../../../../context/user/LoggedInUserContext";
+import { useUserPreference } from "../../../../../context/user/UserPreference";
+import { DashboardComponentJsxKey } from "../../../../../enums/dashboard/DashboardComponentJsxKey.enum";
+import { DashboardLoadingSpinner } from "../dashboards_components/DashboardLoadingSpinner";
+import MetricCard from "../dashboards_components/MetricCard";
+import PieChartSmall from "../dashboards_components/PieChartSmall";
+import PipelineChart from "../dashboards_components/PipeLineChart";
+import QuickActions from "../dashboards_components/QuickActions";
+import RecentStockMovement from "./RecentStockMovement";
+import StockValueTrendChart from "./StockValueTrendChart";
+import TopLowStockProducts from "./TopLowStockProducts";
+type DashboardDataType = Record<string, Array<Record<string, any>>>;
 
-const InventoryDashboard: React.FC = () => {
-  const stockLevels = [
-    { itemName: "Laptop", quantity: 25, threshold: 10 },
-    { itemName: "Mouse", quantity: 120, threshold: 30 },
-    { itemName: "Keyboard", quantity: 40, threshold: 15 }
+interface DashboardInventoryProp {
+  companyUserId: number | null;
+}
+const InventoryDashboard: React.FC<DashboardInventoryProp> = ({
+  companyUserId,
+}) => {
+  const { loginStatus } = useLoggedInUserContext();
+  const { userPreference } = useUserPreference();
+  const [accessModuleCompanyUser, setAccessModuleCompanyUser] = useState<
+    AccessManagementType[]
+  >([]);
+  const [isDashboardDataLoading, setIsDashboardDataLoading] = useState(true);
+
+  const [dashboardData, setDashboardData] = useState<DashboardDataType>({});
+
+  const [dashboardLayout, setDashboardLayout] = useState<string[]>([]);
+  const [dashboardVisiblity, setDasboardVisibility] = useState<
+    { key: string; value: boolean; chartType: string }[]
+  >([]);
+
+  const [stockOverview, setStockOverview] = useState<any>();
+    const [stockValueTrend, setStockValueTrend] = useState<any>();
+
+  const [recentStockMovement, setRecentStockMovement] = useState<RecentStockMovementProps[]>([]);
+
+  const [topLowStockProducs, setTopLowStockProducs] = useState<TopLowStockProducsProp[]>([]);
+
+
+  const getCrmModuleAccessOfCompanyUser = async () => {
+    try {
+      const response = await axiosClient.post(
+        POST_API.GET_CRM_MODULE_ACCESS,
+        {
+          company_id: loginStatus.companyId,
+          company_user_id: companyUserId,
+          requestedby: loginStatus.id,
+        },
+        { withCredentials: true },
+      );
+
+      if (response.status === STATUS_CODE.OK) {
+        setAccessModuleCompanyUser(response.data);
+      }
+    } catch (error: any) {
+      handleApiError(error);
+    }
+  };
+
+  const getDashboardData = async () => {
+    try {
+      setIsDashboardDataLoading(true);
+      const response = await axiosClient.post(
+        POST_API.GET_COMPANY_USER_DASHBOARD_INVENTORY,
+        {
+          company_id: loginStatus.companyId,
+          assignto: companyUserId,
+          requestedby_id: loginStatus.id,
+        },
+        { withCredentials: true },
+      );
+
+      if (response.status === STATUS_CODE.OK) {
+        const data = response.data;
+        console.log("inventory dashboard data:");
+        console.log(data);
+        setDashboardLayout(
+          data.my_fixed_cursor_get_dashboard_widget?.map(
+            (w: any) => w.dashboard_widget_name,
+          ) ?? [],
+        );
+
+        setDasboardVisibility(
+          data.my_fixed_cursor_get_dashboard_widget?.map((w: any) => ({
+            key: w.dashboard_widget_name,
+            value: true,
+            chartType: w.chart_type_name,
+          })) ?? [],
+        );
+
+         setStockOverview(
+          data.my_fixed_cursor_stock_overview
+        );
+
+        
+        setStockValueTrend(
+          data.my_fixed_cursor_stock_value_trend
+        );
+
+        setRecentStockMovement(data.my_fixed_cursor_recent_stock_movement);
+
+        setTopLowStockProducs(data.my_fixed_cursor_top_low_stock_product);
+
+        setDashboardData(data);
+      }
+    } catch (error: any) {
+      handleApiError(error);
+    } finally {
+      setIsDashboardDataLoading(false);
+    }
+  };
+
+  const getVisibility = (key: string): boolean =>
+    dashboardVisiblity.find((v) => v.key.trim() === key.trim())?.value ?? false;
+
+  const isPieChart = (key: string): boolean => dashboardVisiblity.find((v)=> v.key.trim() === key.trim())?.chartType === "Pie";
+
+  const TOTAL_TICKET_ROW_COMPONENT_KEYS = [
+    "Total Products",
+    "Total Stock Value",
+    "Low Stock Products",
+    "Out of Stock Products",
+    "Today's Inward Value",
+    "Today's Outward Value",
   ];
 
-  const recentShipments = [
-    { shipmentId: "SHIP001", supplier: "Tech Supplies Ltd", itemsReceived: 50, date: "2025-08-01" },
-    { shipmentId: "SHIP002", supplier: "Office Gear Co", itemsReceived: 200, date: "2025-08-03" }
-  ];
+  const isAnyKeyVisible = (TOTAL_TICKET_KEYS: string[]): boolean => {
+    return dashboardVisiblity.some(
+      (v) => TOTAL_TICKET_KEYS.includes(v.key) && v.value === true,
+    );
+  };
 
-  const pendingOrders = [
-    { orderId: "ORD001", customer: "Alice", item: "Laptop", quantity: 5, status: "Pending" },
-    { orderId: "ORD002", customer: "Bob", item: "Mouse", quantity: 10, status: "Shipped" }
-  ];
+  const componentMapDefault: Record<string, JSX.Element> = {
+    [DashboardComponentJsxKey.Total_Products]: isAnyKeyVisible(
+      TOTAL_TICKET_ROW_COMPONENT_KEYS,
+    ) ? (
+      <div
+        key={TOTAL_TICKET_ROW_COMPONENT_KEYS[0]}
+        className="flex col-span-3 w-full gap-4 justify-around"
+      >
+        <div
+          className={`${userPreference.sidebarOpen && userPreference.isLeftMenu ? "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 w-full items-stretch" : "flex grid-cols-6 sm:gap-1 md:gap-2 lg:gap-4 w-full"}`}
+        >
+          <MetricCard
+            title={TOTAL_TICKET_ROW_COMPONENT_KEYS[0]}
+            id="total_products"
+            value={(
+              dashboardData?.[
+                REFCURSOR_KEY.MY_FIXED_CURSOR_TOTAL_PRODUCTS
+              ]?.[0]?.total_products ?? 0
+            ).toString()}
+            icon={WarehouseIcon}
+            color="bg-gradient-to-r from-cyan-500 to-cyan-600"
+            gradient="bg-gradient-to-r from-cyan-500 to-cyan-600"
+            visibility={getVisibility(TOTAL_TICKET_ROW_COMPONENT_KEYS[0])}
+          />
+          <MetricCard
+            title={TOTAL_TICKET_ROW_COMPONENT_KEYS[1]}
+            id="total_stock_value"
+            value={(
+              dashboardData?.[
+                REFCURSOR_KEY.MY_FIXED_CURSOR_TOTAL_STOCK_VALUE
+              ]?.[0]?.total_stock_value ?? 0
+            ).toString()}
+            icon={Wallet}
+            color="bg-gradient-to-r from-emerald-500 to-emerald-600"
+            gradient="bg-gradient-to-r from-emerald-500 to-emerald-600"
+            visibility={getVisibility(TOTAL_TICKET_ROW_COMPONENT_KEYS[1])}
+          />
+          <MetricCard
+            title={TOTAL_TICKET_ROW_COMPONENT_KEYS[2]}
+            id="low_stock_products"
+            value={(
+              dashboardData?.[
+                REFCURSOR_KEY.MY_FIXED_CURSOR_LOW_STOCK_PRODUCTS
+              ]?.[0]?.low_stock_products ?? 0
+            ).toString()}
+            icon={AlertOctagonIcon}
+            color="bg-gradient-to-r from-yellow-500 to-yellow-600"
+            gradient="bg-gradient-to-r from-yellow-500 to-yellow-600"
+            visibility={getVisibility(TOTAL_TICKET_ROW_COMPONENT_KEYS[2])}
+          />
+          <MetricCard
+            title={TOTAL_TICKET_ROW_COMPONENT_KEYS[3]}
+            id="outof_stock_products"
+            value={(
+              dashboardData?.[
+                REFCURSOR_KEY.MY_FIXED_CURSOR_OUT_OF_STOCK_PRODUCTS
+              ]?.[0]?.outof_stock_products ?? 0
+            ).toString()}
+            icon={PackageX}
+            color="bg-gradient-to-r from-orange-500 to-orange-600"
+            gradient="bg-gradient-to-r from-orange-500 to-orange-600"
+            visibility={getVisibility(TOTAL_TICKET_ROW_COMPONENT_KEYS[3])}
+          />
+          <MetricCard
+            title={TOTAL_TICKET_ROW_COMPONENT_KEYS[4]}
+            id="today_inward_value_of_products"
+            value={
+              dashboardData?.[
+                REFCURSOR_KEY.MY_FIXED_CURSOR_TODAYS_INWARD_VALUE
+              ]?.[0]?.today_inward_value_of_products ?? 0
+            }
+        
+            icon={LucideShoppingCart}
+            color="bg-gradient-to-r from-teal-500 to-teal-600"
+            gradient="bg-gradient-to-r from-teal-500 to-teal-600"
+            visibility={getVisibility(TOTAL_TICKET_ROW_COMPONENT_KEYS[4])}
+            currentValue={(dashboardData?.[
+                REFCURSOR_KEY.MY_FIXED_CURSOR_TODAYS_INWARD_VALUE
+              ]?.[0]?.today_inward_value_of_products ?? 0)}
+            previousValue={(dashboardData?.[
+                REFCURSOR_KEY.MY_FIXED_CURSOR_TODAYS_INWARD_VALUE
+              ]?.[0]?.yesterday_inward_value_of_products ?? 0)}
 
-  const supplierPerformance = [
-    { supplierName: "Tech Supplies Ltd", onTimeDeliveries: 95, qualityRating: "Excellent" },
-    { supplierName: "Office Gear Co", onTimeDeliveries: 88, qualityRating: "Good" }
-  ];
+            isTrend={true}
+            trendLabel="from yesterday"
+            
+            isSparkline={true}
+          />
+
+          <MetricCard
+            title={TOTAL_TICKET_ROW_COMPONENT_KEYS[5]}
+            id="today_outward_value_of_products"
+            value={`${(
+              dashboardData?.[
+                REFCURSOR_KEY.MY_FIXED_CURSOR_TODAYS_OUTWARD_VALUE
+              ]?.[0]?.today_outward_value_of_products ?? 0
+            ).toString()}`}
+            icon={TruckIcon}
+            color="bg-gradient-to-r from-green-500 to-green-600"
+            gradient="bg-gradient-to-r from-green-500 to-green-600"
+            visibility={getVisibility(TOTAL_TICKET_ROW_COMPONENT_KEYS[5])}
+            currentValue={(dashboardData?.[
+                REFCURSOR_KEY.MY_FIXED_CURSOR_TODAYS_OUTWARD_VALUE
+              ]?.[0]?.today_outward_value_of_products ?? 0)}
+            previousValue={(dashboardData?.[
+                REFCURSOR_KEY.MY_FIXED_CURSOR_TODAYS_OUTWARD_VALUE
+              ]?.[0]?.yesterday_outward_value_of_products ?? 0)}
+
+            isTrend={true}  
+            trendLabel="from yesterday"
+            
+            isSparkline={true}
+          />
+        </div>
+      </div>
+    ) : (
+      <div />
+    ),
+    [DashboardComponentJsxKey.QUICK_ACTIONS]: (
+      <div
+        id="quickActions"
+        key="Quick Actions"
+        className="h-full col-span-2 overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-thumb]:rounded-full"
+      >
+        <QuickActions
+          companyUserId={companyUserId}
+          moduleAccessCompanyUser={accessModuleCompanyUser}
+        />
+      </div>
+    ),
+    [DashboardComponentJsxKey.Recent_Stock_Movement]: (
+      <div
+      id="recentStockMovement"
+        key="Recent Stock Movement"
+        className="flex col-span-3 w-full gap-4 justify-around"
+      >
+        <div className="flex sm:gap-1 md:gap-2 lg:gap-11 w-full">
+          <RecentStockMovement
+            isLoading={isDashboardDataLoading}
+            recentStockMovement={recentStockMovement}
+          />
+        </div>
+      </div>
+    ),
+    [DashboardComponentJsxKey.Top_Low_Stock_Products]: (
+      <div
+      id="topLowStockProducts"
+        key="Top Low Stock Products"
+        className="flex col-span-1 w-full h-full gap-4 justify-around"
+      >
+        <div className="flex sm:gap-1 md:gap-2 lg:gap-11 w-full">
+          <TopLowStockProducts
+            isLoading={isDashboardDataLoading}
+            topLowStockProducs={topLowStockProducs}
+          />
+        </div>
+      </div>
+    ),
+    [DashboardComponentJsxKey.Stock_Overview]: (
+      <div
+        id="stockOverview"
+        key="Stock Overview"
+        className="h-full col-span-1 overflow-y-auto max-h-[700px] [&::-webkit-scrollbar]:w-2
+  [&::-webkit-scrollbar-track]:bg-gray-50
+  [&::-webkit-scrollbar-thumb]:bg-gray-50
+   [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full"
+      >
+        <PipelineChart
+          pipelineData={stockOverview}
+          header="Stock Overview"
+          headerDescription="Available quantity of products"
+        ></PipelineChart>
+      </div>
+    ),[DashboardComponentJsxKey.Stock_Value_Trend]: (
+      
+      <div
+        id="stockValueTrend"
+        key="Stock Value Trend"
+        className="min-h-[200px] h-full col-span-1"
+      >
+        {/* <SalesChart leadsData={stockValueTrend} /> */}
+        <StockValueTrendChart stockValueTrend={stockValueTrend}/>
+      </div>
+    ),
+    
+  };
+
+  const componentMapPieChart: { [key: string]: JSX.Element } = {
+    [DashboardComponentJsxKey.Stock_Overview]: (
+      <div
+        key="Stock Overview"
+        id="stockOverview"
+        className="h-full col-span-1 overflow-y-auto max-h-[700px] [&::-webkit-scrollbar]:w-2
+  [&::-webkit-scrollbar-track]:bg-gray-50
+  [&::-webkit-scrollbar-thumb]:bg-gray-50
+   [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full"
+      >
+        <PieChartSmall data={stockOverview} 
+        totalLable="Total Products"
+        headerText="Stock Overview"
+        headerDescription="Products availability by stock."
+        />
+      </div>
+    ),
+  };
+
+  useEffect(() => {
+    if (companyUserId !== null) {
+      getCrmModuleAccessOfCompanyUser();
+    }
+    getDashboardData();
+  }, [companyUserId]);
+
+
+
+  const renderDashboardSections = () => {
+    let totalProductCountRowComponentRendered = false;
+    return dashboardLayout.map((key) => {
+      if (!getVisibility(key)) return null;
+      if (TOTAL_TICKET_ROW_COMPONENT_KEYS.includes(key)) {
+        if (!totalProductCountRowComponentRendered) {
+          totalProductCountRowComponentRendered = true;
+          return componentMapDefault[DashboardComponentJsxKey.Total_Products];
+        } else return null;
+      }
+
+      if(isPieChart(key)){
+        console.log("inside pie chart inventory:"+key)
+      return componentMapPieChart[key];
+      // return null;
+      }
+      console.log("key:"+key)
+      return componentMapDefault[key] || null;
+    });
+  };
 
   return (
-    <div className="p-6 space-y-6">
-      <h2 className="text-2xl font-bold text-gray-800">📦 Inventory Dashboard</h2>
-
-      {/* Stock Levels */}
-      <div className="bg-white rounded-2xl shadow p-4">
-        <h3 className="text-lg font-semibold mb-3">Stock Levels</h3>
-        {stockLevels.map((item, idx) => (
-          <div key={idx} className="flex justify-between border-b py-2">
-            <span>{item.itemName}</span>
-            <span className={item.quantity <= item.threshold ? "text-red-600" : "text-green-600"}>
-              {item.quantity}
-            </span>
-            <span className="text-gray-500">Threshold: {item.threshold}</span>
+      <div className="min-h-screen w-full bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50">
+        {isDashboardDataLoading ? (
+          <div className={`grid justify-center items-center min-h-[100vh] ${isDashboardDataLoading?"cursor-wait":"cursor-default"}`}>
+            <DashboardLoadingSpinner/>
           </div>
-        ))}
-      </div>
-
-      {/* Recent Shipments */}
-      <div className="bg-white rounded-2xl shadow p-4">
-        <h3 className="text-lg font-semibold mb-3">Recent Shipments</h3>
-        {recentShipments.map((ship, idx) => (
-          <div key={idx} className="flex justify-between border-b py-2">
-            <span>{ship.shipmentId} - {ship.supplier}</span>
-            <span className="text-blue-600">{ship.itemsReceived} items</span>
-            <span className="text-gray-500">{ship.date}</span>
+        ) : (
+          <div className="max-w-full p-6 mx-auto grid gap-3 grid-cols-3 space-y-5">
+            {dashboardVisiblity.length > 0 && renderDashboardSections()}
           </div>
-        ))}
+        )}
       </div>
+    );
 
-      {/* Pending Orders */}
-      <div className="bg-white rounded-2xl shadow p-4">
-        <h3 className="text-lg font-semibold mb-3">Pending Orders</h3>
-        {pendingOrders.map((order, idx) => (
-          <div key={idx} className="flex justify-between border-b py-2">
-            <span>{order.orderId} - {order.customer}</span>
-            <span>{order.item} ({order.quantity})</span>
-            <span className={order.status === "Shipped" ? "text-green-600" : "text-yellow-600"}>
-              {order.status}
-            </span>
-          </div>
-        ))}
-      </div>
-
-      {/* Supplier Performance */}
-      <div className="bg-white rounded-2xl shadow p-4">
-        <h3 className="text-lg font-semibold mb-3">Supplier Performance</h3>
-        {supplierPerformance.map((supplier, idx) => (
-          <div key={idx} className="flex justify-between border-b py-2">
-            <span>{supplier.supplierName}</span>
-            <span className="text-green-600">{supplier.onTimeDeliveries}% On-time</span>
-            <span className={supplier.qualityRating === "Excellent" ? "text-green-600" : "text-yellow-600"}>
-              {supplier.qualityRating}
-            </span>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
 };
 
 export default InventoryDashboard;

@@ -31,6 +31,7 @@ import RecentTicketDashboardProps from "../../../../../@types/support-ticket-man
 import RecentTicketsDashboard from "./RecentTicketsDashboard";
 import { DashboardLoadingSpinner } from "../dashboards_components/DashboardLoadingSpinner";
 import { AccessManagementType } from "../../../../../@types/company-users/AccessManagementContextType";
+import { useUserPreference } from "../../../../../context/user/UserPreference";
 
 
 type DashboardDataType = Record<string, Array<Record<string, any>>>;
@@ -46,6 +47,8 @@ const DashboardSupport: React.FC<DashboardSupportProp> = ({
 }) => {
   const navigate = useNavigate();
   const { loginStatus } = useLoggedInUserContext();
+    const {userPreference} = useUserPreference();
+  
 
   const [isTasksLoading, setIsTasksLoading] = useState(true);
   const [upcomingTask, setUpcomingTasks] = useState<
@@ -210,7 +213,7 @@ const DashboardSupport: React.FC<DashboardSupportProp> = ({
         key="Total Tickets"
         className="flex col-span-2 w-full gap-4 justify-around"
       >
-        <div className="flex grid-cols-6 sm:gap-1 md:gap-2 lg:gap-11 w-full">
+        <div className={`${(userPreference.sidebarOpen&& userPreference.isLeftMenu)?"grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 w-full items-stretch":"flex grid-cols-6 sm:gap-1 md:gap-2 lg:gap-4 w-full"}`}>
           <MetricCard
             title="Total Tickets"
             id="totalTickets"
@@ -299,7 +302,7 @@ const DashboardSupport: React.FC<DashboardSupportProp> = ({
       <div
         id="quickActions"
         key="Quick Actions"
-        className="h-full col-span-1 overflow-y-auto max-h-[700px] [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-thumb]:rounded-full"
+        className="h-full col-span-1 overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-thumb]:rounded-full"
       >
         <QuickActions
           companyUserId={companyUserId}

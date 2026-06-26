@@ -22,7 +22,8 @@ function ProductsManagementListLead({
   // handleSelectedProductChange,
   interestTypeData,
   handleProductCheckboxChange,
-  alreadyAssignedCompanyProduct
+  alreadyAssignedCompanyProduct,
+  isDataLoading
 }: LeadProductsManagementListProps) {
   const { isLargeScreen, isMediumScreen, isSmallScreen } = useScreenSize();
 
@@ -254,6 +255,7 @@ function ProductsManagementListLead({
               // handleSelectedProductChange={handleSelectedProductChange}
               interestTypeData={interestTypeData}
               alreadyAssignedCompanyProduct={alreadyAssignedCompanyProduct}
+              isDataLoading={isDataLoading}
             />
           </div>
         </div>

@@ -1,7 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react-hooks/rules-of-hooks */
-
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import {
@@ -12,7 +11,7 @@ import {
   ViewportChangedEvent,
 } from "ag-grid-community";
 import { useMemo, useState, useRef } from "react";
-import { INNERHTML, STATUS_CODE } from "../../constants/AppConstants";
+import {  STATUS_CODE } from "../../constants/AppConstants";
 import { AgGridReact } from "ag-grid-react";
 import companyUsersSearchProps from "../../@types/company-users/CompanyUserProps";
 import { CheckCircle2, XCircle } from "lucide-react";
@@ -22,6 +21,9 @@ import axios from "axios";
 import POST_API from "../../constants/PostApi";
 import ApiError from "../../@types/error/ApiError";
 import RefreshToken from "../../config/validations/RefreshToken";
+import toast from "react-hot-toast";
+import MESSAGE from "../../constants/Messages";
+import { SkeletonRowsAgGrid } from "../ui/SkeletonRowsAgGrid";
 
 function AddCompanyTeamUsersAgGrid({
   companyUsers,
@@ -34,19 +36,21 @@ function AddCompanyTeamUsersAgGrid({
   handleCompanyUserStatusChange,
   isGridForSubscription,
   handleCompanyUserToggleChange,
+  isDataLoading 
 }: {
   companyUsers: companyUsersSearchProps[];
   handleViewPortChanged: (params: ViewportChangedEvent) => void;
   onGridReady: (params: { api: GridApi }) => void;
   handleCompanyUserCheckBoxChange?: (
     params: companyUsersSearchProps,
-    event: React.ChangeEvent<HTMLInputElement>
+    event: React.ChangeEvent<HTMLInputElement>,
   ) => void;
   addCompanyTeamUserArray?: number[];
   isGridForUpdateCompanyUser?: boolean;
   handleCompanyUserStatusChange?: (statusChangeCount: number) => void;
   isGridForSubscription: boolean;
   handleCompanyUserToggleChange?: (message: string, status: boolean) => void;
+  isDataLoading : boolean
 }) {
   const { userHasAccessToUpdateUser } = useUserAccessModules();
   const { loginStatus } = useLoggedInUserContext();
@@ -56,6 +60,9 @@ function AddCompanyTeamUsersAgGrid({
 
   // This helper updates the global counter.
   const updateGlobalCount = (delta: number) => {
+    if(isGridForSubscription){
+    console.log(statusChangeCount);
+    }
     setStatusChangeCount((prev) => {
       const newCount = prev + delta;
       // Optionally call the provided callback with the new count
@@ -88,6 +95,13 @@ function AddCompanyTeamUsersAgGrid({
         flex: 1.5,
       },
       {
+        field: "mobilenumber",
+        headerName: "Mobile Number",
+        sortable: true,
+        filter: true,
+        flex: 1.5,
+      },
+      {
         field: "isactive",
         headerName: "Status",
         sortable: true,
@@ -95,6 +109,9 @@ function AddCompanyTeamUsersAgGrid({
         hide: !isGridForUpdateCompanyUser,
         // Render the active/inactive badge
         cellRenderer: (params: any) => {
+           if (params.data?.__isSkeleton) {
+                      return <SkeletonRowsAgGrid />;
+                    }
           return (
             <div className="flex items-center gap-1 mt-3">
               {params.value ? (
@@ -119,6 +136,9 @@ function AddCompanyTeamUsersAgGrid({
         pinned: "right",
         width: 100,
         cellRenderer: (params: any) => {
+           if (params.data?.__isSkeleton) {
+                      return <SkeletonRowsAgGrid />;
+                    }
           // For non-update grids, simply render a checkbox.
           if (!isGridForUpdateCompanyUser) {
             const isChecked = addCompanyTeamUserArray
@@ -129,6 +149,7 @@ function AddCompanyTeamUsersAgGrid({
               <div className="flex justify-center mt-2 items-center">
                 <input
                   type="checkbox"
+                  // autoFocus
                   checked={isChecked}
                   className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
                   onChange={(event) => {
@@ -144,14 +165,14 @@ function AddCompanyTeamUsersAgGrid({
             const originalStatusRef = useRef<boolean>(params.data.isactive);
             // Local state for the current status.
             const [isActive, setIsActive] = useState<boolean>(
-              params.data.isactive
+              params.data.isactive,
             );
-            
+
             // Local delta tracks how this row’s status differs from the original.
             const [localDelta, setLocalDelta] = useState<number>(0);
 
             const handleCompanyUserUpdateToggle = async (
-              event: React.FormEvent<HTMLButtonElement>
+              event: React.FormEvent<HTMLButtonElement>,
             ) => {
               const userId = parseInt(event.currentTarget.id);
               const updateCompanyUserPostData = {
@@ -168,7 +189,7 @@ function AddCompanyTeamUsersAgGrid({
                   updateCompanyUserPostData,
                   {
                     withCredentials: true,
-                  }
+                  },
                 );
                 if (res.data.status) {
                   // Toggle the local state.
@@ -185,7 +206,7 @@ function AddCompanyTeamUsersAgGrid({
                 }
                 handleCompanyUserToggleChange!(
                   res.data.message,
-                  res.data.status
+                  res.data.status,
                 );
               } catch (error: ApiError | any) {
                 if (error.status === STATUS_CODE.UNATHORISED) {
@@ -200,25 +221,30 @@ function AddCompanyTeamUsersAgGrid({
             };
 
             return (
-              <div className="flex flex-col items-center mt-3">
+              <div className="flex justify-center mt-3">
                 <button
+                type="button"
                   id={params.data.id.toString()}
-                  onClick={(event) => {
-                    // console.log("this is the below");
-
-                    handleCompanyUserUpdateToggle(event);
+                  onClick={(e)=>{
+                    if(userHasAccessToUpdateUser){
+                    handleCompanyUserUpdateToggle(e)
+                    }else{
+                      toast.error(MESSAGE.MODULE_ACCESS.COMPANY_USER.DENIED_UPDATE_ACCESS_COMPANY_USER+"\n Please contact Administrator!")
+                    }
+                    
                   }}
-                  className={`w-6 h-5 rounded-md transition-colors duration-200 ${
-                    isActive
-                      ? "bg-green-500 hover:bg-green-600"
-                      : "bg-red-500 hover:bg-red-600"
-                  } text-white font-semibold`}
+                  className={
+                    `relative !w-10 !h-5 !rounded-full !transition-colors !duration-300
+                    ${isActive ? "!bg-green-500" : "!bg-gray-500"}
+                  `}
                 >
-                  <div
-                    className={`bg-gray-200 h-2 w-2 transition-opacity rounded-full ${
-                      isActive ? "float-end" : "float-start"
-                    }`}
-                  ></div>
+                  <span
+                    className={
+                      `absolute top-0.5 left-0.5 h-4 w-4 rounded-full bg-white shadow
+                        transition-transform duration-300
+                        ${isActive ? "translate-x-5" : "translate-x-0"}
+                      `}
+                  />
                 </button>
               </div>
             );
@@ -235,7 +261,7 @@ function AddCompanyTeamUsersAgGrid({
       handleCompanyUserCheckBoxChange,
       userHasAccessToUpdateUser,
       loginStatus,
-    ]
+    ],
     //[addCompanyTeamUserArray, companyUsers]
     //need to check the above code
   );
@@ -247,29 +273,43 @@ function AddCompanyTeamUsersAgGrid({
       flex: 0.8,
       suppressHeaderMenuButton: true,
       suppressHeaderContextMenu: true,
+
+       // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  cellRenderer: (params: any) => {
+                    if (params.data?.__isSkeleton) {
+                      return <SkeletonRowsAgGrid />;
+                    }
+                    return params.value;
+                  },
     };
   }, []);
+
+   const skeletonRows = useMemo(() => {
+      return Array.from({ length: 30 }).map(() => ({
+        __isSkeleton: true,
+      }));
+    }, []);
 
   return (
     <>
       {/* Optional: display the global change count */}
 
-      {isGridForSubscription && (
+      {/* {isGridForSubscription && (
         <>
           <div className="mb-2 ">
             <span className="font-semibold">Net Status Change Count: </span>
             <span>{statusChangeCount}</span>
           </div>
         </>
-      )}
+      )} */}
 
       <div className="ag-theme-balham w-full h-full">
         <AgGridReact
-          rowData={companyUsers}
+          rowData={isDataLoading ? skeletonRows : companyUsers}
           columnDefs={companyUserColDefs}
           defaultColDef={defaultColDef}
           modules={[AllCommunityModule]}
-          overlayNoRowsTemplate={INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
+          // overlayNoRowsTemplate={INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
           theme={themeAlpine}
           onViewportChanged={handleViewPortChanged}
           onGridReady={onGridReady}

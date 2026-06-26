@@ -173,8 +173,6 @@ export const EmailTemplateList: React.FC<TemplateListProps> = ({
             </div>
 
             <div className="flex  items-center justify-between col-span-2 input-label-custom">
-              {/* <div className="grid  items-center justify-between grid-cols-2 space-y-2   text-sm text-gray-700"> */}
-
               <div className="flex flex-col col-span-1">
                 {/* Active */}
                 <span className="flex items-center mb-2 justify-between gap-2">
@@ -184,45 +182,7 @@ export const EmailTemplateList: React.FC<TemplateListProps> = ({
                     <XCircle className="text-gray-400" size={16} />
                   )}
                   <strong className="input-label-custom">Active: </strong>
-                  {/* <label className="inline-flex items-center cursor-pointer relative">
-                    <input
-                      type="checkbox"
-                      className="sr-only peer"
-                      checked={template.isactive}
-                      id={`active-${template.id}`}
-                      onChange={() => {
-                        if (!template.is_master) {
-                          if (!template.is_default) {
-                            if (
-                              userHasAccessToUpdateEmailTemplateSetting &&
-                              !template.is_master
-                            ) {
-                              template.isactive = !template.isactive;
-                              handleDefaultToggle(template);
-                            } else {
-                              if (template.is_master) {
-                                toast.error(
-                                  "Can't change active status of master template."
-                                );
-                              } else {
-                                toast.error(MESSAGE.ERROR.NOT_ATHORISED);
-                              }
-                            }
-                          } else {
-                            toast.error(
-                              "To make this inactive, please set another template as default first."
-                            );
-                          }
-                        } else {
-                          toast.error(
-                            "The master template cannot be deactivated."
-                          );
-                        }
-                      }}
-                    />
-                    <div className="w-10 h-5 bg-gray-300 rounded-full peer peer-checked:bg-green-500 transition-all duration-300" />
-                    <div className="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transform peer-checked:translate-x-5 transition-all duration-300" />
-                  </label> */}
+                  
                   <ToggleButton
                   checked={template.isactive}
                   name={`active-${template.id}`}
@@ -368,7 +328,7 @@ export const EmailTemplateList: React.FC<TemplateListProps> = ({
       </div>
 
       {loading && hasmore && (
-        <div className="flex justify-center h-full items-center">
+        <div className="flex justify-center h-[7vh] items-center transition duration-200 ease-in-out">
           <Loader2 className="animate-spin text-blue-600" size={30} />
         </div>
       )}

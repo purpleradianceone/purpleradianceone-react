@@ -36,6 +36,8 @@ function LookupCompanyProductSelection({
   const [companyProducts, setCompanyProducts] = useState<
     LookupCompanyProduct[]
   >([]);
+
+  const [isDataLoading, setIsDataLoading] = useState<boolean>(false);
   
   const { loginStatus } = useLoggedInUserContext();
 
@@ -54,7 +56,7 @@ function LookupCompanyProductSelection({
   const fetchLookupCompanyProduct = async () => {
     if (loginStatus.companyId === 0) return;
     const offset = (currentPage - 1) * pageSize;
-
+    setIsDataLoading(true)
     const postDataForLookupCompanyUser = {
       company_id: loginStatus.companyId,
       requestedby: loginStatus.id,
@@ -88,6 +90,8 @@ function LookupCompanyProductSelection({
       } else {
         handleApiError(error);
       }
+    }finally{
+      setIsDataLoading(false)
     }
   };
 
@@ -132,6 +136,7 @@ function LookupCompanyProductSelection({
                 handleSelectedCompanyProductChange={
                   handleSelectedCompanyProductChange
                 }
+                isDataLoading={isDataLoading}
               />
             </div>
 

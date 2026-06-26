@@ -34,6 +34,7 @@ function Button(prop: ButtonProps) {
   } else {
     return (
       <button
+      autoFocus={prop.autoFocus}
         title={prop.title}
         type={prop.type}
         onClick={prop.onClick}

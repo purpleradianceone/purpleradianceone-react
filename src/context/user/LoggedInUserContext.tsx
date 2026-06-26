@@ -27,20 +27,20 @@ export const LoggedInUserContextProvider: React.FC<{ children: ReactNode }> = ({
     return savedLoginStatus
       ? JSON.parse(savedLoginStatus)
       : {
-          companyId: 0,
-          companyName: "",
-          createdOn: "",
-          email: "",
-          fullName: "",
-          id: 0,
-          message: "",
-          mobileNumber: "",
-          status: false,
-          token: "",
-          isActiveSubscription: false,
-          subscriptionAllowedUsers: 0,
-          activeUsersInCompany: 0,
-        };
+        companyId: 0,
+        companyName: "",
+        createdOn: "",
+        email: "",
+        fullName: "",
+        id: 0,
+        message: "",
+        mobileNumber: "",
+        status: false,
+        token: "",
+        isActiveSubscription: false,
+        subscriptionAllowedUsers: 0,
+        activeUsersInCompany: 0,
+      };
   });
 
   useEffect(() => {

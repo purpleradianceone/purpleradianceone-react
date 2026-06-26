@@ -23,6 +23,22 @@
 }
 
 
+/* page header */
+.page-header-custom {
+  font-family: "Inter", sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: #334155; /* slate-700 */
+}
+
+.page-subtitle-custom {
+  font-family: "Inter", sans-serif;
+  font-size: 12px; 
+  font-weight: 400;
+  color: #64748b; 
+}
+
+
 /* Section Headers */
 .section-header-custom {
   font-family: "Inter", sans-serif;
@@ -181,15 +197,49 @@
 .action-btn-custom {
   font-family: "Inter", sans-serif;
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 400;
   color: #ffffff;
   cursor: pointer;
 }
 
+.button-import {
+  font-family: "Inter", sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: #1f2937; /* dark gray */
+  cursor: pointer;
+  
+  background-color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  border: 1px solid #d1d5db;
+  border-radius: 7px;
+  padding: 6px 14px;
+
+  transition: all 0.2s ease-in-out;
+}
+
+/* Hover state */
+.button-import:hover {
+  background-color: #f3f4f6;
+  border-color: #9ca3af;
+}
+
+/* Active (click) state */
+.button-import:active {
+  transform: scale(0.98);
+}
+
+/* Optional: subtle shadow on hover */
+/* .button-import:hover {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+} */
 .action-btn-custom.disabled-btn {
   font-family: "Inter", sans-serif;
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 400;
   color: #ffffff;
   cursor: not-allowed;
 }
@@ -207,6 +257,22 @@
   font-size: 12px;
   font-weight: 400; /* Maps to Regular */
   color: #757575;
+}
+
+.font-sans-status-card {
+  display: flex;
+  align-items: center;
+  font-family: "Roboto", sans-serif;
+  font-size: 12px;
+  letter-spacing: 0.05em;
+  width: fit-content;
+  font-weight: 500;
+  gap: 5px;
+  padding: 5px;
+  border-radius: 6px;
+  height: 22px;
+  /*  gap-1 px-2 py-1 h-6 rounded-lg font-medium   */
+  /* font-weight: 400; */
 }
 
 
@@ -266,6 +332,21 @@
   color: #eb9225;
 }
 
+
+/* Input Labels */
+.dashboard-card-headers {
+  font-family: "Roboto", sans-serif;
+  font-size: 13px;
+  font-weight: 600; /* Maps to Regular */
+  color: #5e5e5e;
+}
+
+.dashboard-card-headers-value {
+  font-family: "Roboto", sans-serif;
+  font-size: 18px;
+  font-weight: 600; /* Maps to Regular */
+  color: #1f1e1e;
+}
 /* Input Labels */
 .input-label-custom {
   font-family: "Roboto", sans-serif;
@@ -323,6 +404,14 @@
   color: #eb9225;
 }
 
+
+.url{
+  font-family: "Roboto", sans-serif;
+  font-size: 14px;
+  font-weight: 400; 
+   color: #445bef;
+  
+}
 .custom-height-scrollbar {
   overflow: auto; /* Use 'auto' to apply to both vertical and horizontal scrollbars as needed */
 }

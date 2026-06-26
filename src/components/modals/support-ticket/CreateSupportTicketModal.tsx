@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
 import POST_API from "../../../constants/PostApi";
 import toast from "react-hot-toast";
@@ -217,7 +217,7 @@ function CreateSupportTicketModal({
     } else {
       setCompanyProductSla([]);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedAccount]);
 
   useEffect(() => {
@@ -360,7 +360,9 @@ function CreateSupportTicketModal({
     return flagVariable;
   };
 
-  const createSupportTicket = async () => {
+  const createSupportTicket = async (event: React.FormEvent<HTMLFormElement>
+  ) => {
+    event.preventDefault();
     if (!validateForm()) return;
 
     setIsSupportTicketCreating(true);
@@ -631,7 +633,7 @@ function CreateSupportTicketModal({
           </div>
         )}
 
-        <form className="space-y-0">
+        {/* <form className="space-y-0"> */}
           {isOpenForAccountSelection && (
             <div className="md:col-span-2  w-full h-fit">
               <GetAccountCompanyProductForSupportTicket
@@ -650,10 +652,11 @@ function CreateSupportTicketModal({
             isOpenForAddingSupportTicketDetails && (
               <div>
                 {/* Form */}
-                <form className="space-y-4 mt-2">
+                <form className="space-y-4 mt-2" onSubmit={ createSupportTicket}>
                   <div className="grid grid-cols-3 gap-2">
                     <div className="">
                       <TextAreaInput
+                      autoFocus={true}
                         label="Query Description:"
                         logo={LucideMessageCircleQuestion}
                         name="query_description"
@@ -661,14 +664,14 @@ function CreateSupportTicketModal({
                         value={
                           createSupportTicketModalFormData.query_description
                         }
-                        defaultValue={
-                          createSupportTicketModalFormData.query_description
-                        }
+                        // defaultValue={
+                        //   createSupportTicketModalFormData.query_description
+                        // }
                         onChange={handleSupportTicketModalFormDataChange}
                         required={true}
                         onBlur={handleBlur}
-                        cols={0}
                         rows={3}
+                        cols={0}
                         error={error.query_description}
                       />
                     </div>
@@ -680,12 +683,12 @@ function CreateSupportTicketModal({
                         name="public_notes"
                         placeholder="Enter public notes "
                         value={createSupportTicketModalFormData.public_notes}
-                        defaultValue={
-                          createSupportTicketModalFormData.public_notes
-                        }
+                        // defaultValue={
+                        //   createSupportTicketModalFormData.public_notes
+                        // }
                         onChange={handleSupportTicketModalFormDataChange}
-                        cols={0}
                         rows={3}
+                        cols={0}
                         // onBlur={handleBlur}
                       />
                     </div>
@@ -699,13 +702,13 @@ function CreateSupportTicketModal({
                         value={
                           createSupportTicketModalFormData.resolution_applied
                         }
-                        defaultValue={
-                          createSupportTicketModalFormData.resolution_applied
-                        }
+                        // defaultValue={
+                        //   createSupportTicketModalFormData.resolution_applied
+                        // }
                         // onBlur={handleBlur}
                         onChange={handleSupportTicketModalFormDataChange}
-                        cols={0}
                         rows={3}
+                        cols={0}
                       />
                     </div>
 
@@ -854,10 +857,6 @@ function CreateSupportTicketModal({
                       </Button>
                       <Button
                         type="submit"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          createSupportTicket();
-                        }}
                       >
                         <div className="flex items-center gap-1">
                           <Save size={16} />
@@ -869,7 +868,7 @@ function CreateSupportTicketModal({
                 </form>
               </div>
             )}
-        </form>
+        {/* </form> */}
       </div>
     </FormLayout>
   );

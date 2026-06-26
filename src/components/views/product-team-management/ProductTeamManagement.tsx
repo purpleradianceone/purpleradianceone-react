@@ -11,7 +11,7 @@ import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContex
 import RefreshToken from "../../../config/validations/RefreshToken";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import ApiError from "../../../@types/error/ApiError";
-import { useSearchFilterPaginationDateHandlers } from "../../../config/hooks/usePaginationHandler";
+import { customDateRangeId, useSearchFilterPaginationDateHandlers } from "../../../config/hooks/usePaginationHandler";
 import { Product } from "../../../@types/products/ProductsManagementProps";
 import ProductsManagementList from "../../lists/ProductsManagementsList";
 import { useInView } from "react-intersection-observer";
@@ -22,6 +22,7 @@ function ProductTeamManagement() {
   const { loginStatus } = useLoggedInUserContext();
   const [ref, inView] = useInView({ fallbackInView: true, threshold: 0.1 });
 
+  const [isDataLoading, setIsDataLoading] = useState<boolean>(false);
 
   const [accessDeniedPopUpOpen, setAccessDeniedPopUpOpen] = useState(
     false
@@ -51,7 +52,7 @@ function ProductTeamManagement() {
       const offset = (currentPage - 1) * pageSize;
 
       const effectiveDateRangeId =
-        dateRangeId === 8 && !concatDate
+        dateRangeId === customDateRangeId && !concatDate
           ? 0
           : dateRangeId;
 
@@ -66,6 +67,7 @@ function ProductTeamManagement() {
         search_parameter_date: concatDate,
       };
 
+      setIsDataLoading(true)
       try {
         const response = await axios.post(
           POST_API.GET_PRODUCTS,
@@ -111,6 +113,8 @@ function ProductTeamManagement() {
            fetchCompanyProducts(signal);
           }
         }
+      }finally{
+        setIsDataLoading(false)
       }
     }
   };
@@ -168,6 +172,7 @@ function ProductTeamManagement() {
 
               }}
               products={productsData}
+              isDataLoading={isDataLoading}
               // isListForProductUser={true}
 
             /> 

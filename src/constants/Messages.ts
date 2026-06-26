@@ -36,7 +36,9 @@ const MESSAGE = {
         SELECT_DIFFERENT_USER: "Select different user.",
 
         MODULE_ACCESS_UPDATE: "You do not have permission to update details.",
-        SAME_PRODUCT_SELECTED : "Same product selected."
+        SAME_PRODUCT_SELECTED : "Same product selected.",
+        DENIED_FACEBOOK_INTEGRATION_MESSAGE:"Facebook account is already integrated. you can manage pages and whatsapp account on the other tabs.",
+        DENIED_GOOGLE_INTEGRATION_MESSAGE:"Google account is already integrated."
     },
     SUCCESS: {
         LOGGED_IN: "Logged In",
@@ -88,9 +90,32 @@ const MESSAGE = {
             DENIED_ADD_ACCESS: "You do not have permission to add new Company Warehouse.",
             DENIED_UPDATE_ACCESS: "You do not have permission to update Company Warehouse.",
         }, STOCK: {
+            STOCK :{
             DENIED_VIEW_ACCESS: "You do not have permission to view Stock.",
             DENIED_ADD_ACCESS: "You do not have permission to add new Stock.",
             DENIED_UPDATE_ACCESS: "You do not have permission to update Stock.",
+            },
+            PRODUCT_WISE_STOCK :{
+                DENIED_VIEW_ACCESS: "You do not have permission to view Product wise Company Stock.",
+                DENIED_ADD_ACCESS: "You do not have permission to add Product wise Company Stock.",
+                DENIED_UPDATE_ACCESS: "You do not have permission to update Product wise Company Stock.",
+            },
+            WAREHOUSE_WISE_STOCK :{
+                DENIED_VIEW_ACCESS: "You do not have permission to view Warehouse wise Company Stock.",
+                DENIED_ADD_ACCESS: "You do not have permission to add Warehouse wise Company Stock.",
+                DENIED_UPDATE_ACCESS: "You do not have permission to update Warehouse wise Company Stock.",
+            },
+            STOCK_LEDGER :{
+                DENIED_VIEW_ACCESS: "You do not have permission to view Stock Ledger.",
+                DENIED_ADD_ACCESS: "You do not have permission to add Stock Ledger.",
+                DENIED_UPDATE_ACCESS: "You do not have permission to update Stock Ledger.",
+            },
+            STOCK_AGEING :{
+                DENIED_VIEW_ACCESS: "You do not have permission to view Stock Ageing.",
+                DENIED_ADD_ACCESS: "You do not have permission to add Stock Ageing.",
+                DENIED_UPDATE_ACCESS: "You do not have permission to update Stock Ageing.",
+            }
+
         }, SUPPORT_MODULE: {
             DENIED_VIEW_ACCESS: "You do not have permission to view support ticket.",
             DENIED_ADD_ACCESS: "You do not have permission to create support ticket.",
@@ -131,6 +156,21 @@ const MESSAGE = {
             DENIED_ADD_ACCESS: "You do not have permission to add account contact.",
             DENIED_UPDATE_ACCESS: "You do not have permission to update account contact",
         },
+        ACCOUNT_SERVICE: {
+            DENIED_VIEW_ACCESS: "You do not have permission to view account service.",
+            DENIED_ADD_ACCESS: "You do not have permission to add account service.",
+            DENIED_UPDATE_ACCESS: "You do not have permission to update account service",
+        },
+        ACCOUNT_SUBSCRIPTION: {
+            DENIED_VIEW_ACCESS: "You do not have permission to view account subscription.",
+            DENIED_ADD_ACCESS: "You do not have permission to add account subscription.",
+            DENIED_UPDATE_ACCESS: "You do not have permission to update account subscription",
+        },
+        ACCOUNT_QUOTATION: {
+            DENIED_VIEW_ACCESS: "You do not have permission to view account quotation.",
+            DENIED_ADD_ACCESS: "You do not have permission to create account quotation.",
+            DENIED_UPDATE_ACCESS: "You do not have permission to update account quotation.",
+        },
         LEADS_SETTINGS: {
             DENIED_VIEW_ACCESS: "You do not have permission to view lead settings.",
             DENIED_ADD_ACCESS: "You do not have permission to add.",
@@ -159,6 +199,10 @@ const MESSAGE = {
             DENIED_VIEW_ACCESS: "You do not have permission to view lead tasks.",
             DENIED_ADD_ACCESS: "You do not have permission to create lead tasks.",
             DENIED_UPDATE_ACCESS: "You do not have permission to update lead tasks.",
+        }, LEAD_QUOTATION: {
+            DENIED_VIEW_ACCESS: "You do not have permission to view lead quotation.",
+            DENIED_ADD_ACCESS: "You do not have permission to create lead quotation.",
+            DENIED_UPDATE_ACCESS: "You do not have permission to update lead quotation.",
         },TEAM_USERS: {
             DENIED_VIEW_ACCESS: "You do not have permission to view team users.",
             DENIED_ADD_ACCESS: "You do not have permission to add users to team.",
@@ -175,7 +219,16 @@ const MESSAGE = {
             DENIED_VIEW_ACCESS: "You do not have permission to view product teams.",
             DENIED_ADD_ACCESS: "You do not have permission to assign team to product.",
             DENIED_UPDATE_ACCESS: "You do not have permission to update product team.",
-        },SETTING: {
+        },
+         COMPANY_QUOTATION: {
+            DENIED_VIEW_ACCESS: "You do not have permission to view company quotation.",
+            DENIED_ADD_ACCESS: "You do not have permission to create company quotation.",
+            DENIED_UPDATE_ACCESS: "You do not have permission to update company quotation.",
+        },
+        SUBSCRIPTION:{
+            DENIED_ADD_ACCESS:"You do not have permission to purchase subscription."
+        },
+        SETTING: {
 
             ACCOUNT_SETTING: {
                 DENIED_VIEW_ACCESS: "You do not have permission to view account type setting.",
@@ -228,11 +281,62 @@ const MESSAGE = {
             },
             INTEGRATION : {
                DENIED_VIEW_ACCESS: "You do not have permission to view integration setting.",
-                DENIED_ADD_ACCESS: "You do not have permission to create integration setting.",
-                DENIED_UPDATE_ACCESS: "You do not have permission to update integration setting .",  
+                DENIED_ADD_ACCESS: "You do not have permission to add integration related setting.",
+                DENIED_UPDATE_ACCESS: "You do not have permission to update integration related setting .",  
+            },
+            REMINDER : {
+                DENIED_VIEW_ACCESS: "You do not have permission to view reminder setting.",
+                DENIED_ADD_ACCESS: "You do not have permission to create reminder setting.",
+                DENIED_UPDATE_ACCESS: "You do not have permission to update reminder setting .",  
             }
-        }
 
+        },
+        MY_TASK : {
+
+            TASK : {
+            DENIED_VIEW_ACCESS: "You do not have permission to view product users.",
+            DENIED_ADD_ACCESS: "You do not have permission to add users to product.",
+            DENIED_UPDATE_ACCESS: "You do not have permission to update product users.",
+            },
+            MY_TASK :{
+                DENIED_VIEW_ACCESS: "You do not have permission to view my tasks.",
+                DENIED_ADD_ACCESS: "You do not have permission to create my tasks.",
+                DENIED_UPDATE_ACCESS: "You do not have permission to update my tasks.",
+            },
+            MASTER_TASK :{
+                DENIED_VIEW_ACCESS: "You do not have permission to view master tasks.", 
+                DENIED_ADD_ACCESS: "You do not have permission to create master tasks.",
+                DENIED_UPDATE_ACCESS: "You do not have permission to update master tasks.",
+            },
+        },
+        COMPANY_INVOICE: {
+            DENIED_VIEW_ACCESS: "You do not have permission to view invoices.",
+            DENIED_ADD_ACCESS: "You do not have permission to add invoice.",
+            DENIED_UPDATE_ACCESS: "You do not have permission to update invoice.",
+        },
+        ACCOUNT_PROFORMA_INVOICE: {
+            DENIED_VIEW_ACCESS: "You do not have permission to view account proforma invoices.",
+            DENIED_ADD_ACCESS: "You do not have permission to add account proforma invoice.",
+            DENIED_UPDATE_ACCESS: "You do not have permission to update account proforma invoice.",
+        },
+        COMPANY_INVOICE_ITEM :  {
+            DENIED_VIEW_ACCESS: "You do not have permission to view invoice items.",
+            DENIED_ADD_ACCESS: "You do not have permission to add invoice item.",
+            DENIED_UPDATE_ACCESS: "You do not have permission to update invoice item.",
+        },
+        COMPANY_PRODUCT_SALE_MODULE: {
+            DENIED_VIEW_ACCESS: "You do not have permission to view product sale.",
+            DENIED_ADD_ACCESS: "You do not have permission to sale product.",
+            UPDATE_ACCESS_DENIED_MESSAGE: "You do not have permission to update sale product details.",
+            
+        },
+        REPORT:{
+            USER_REPORT:{
+            DENIED_VIEW_ACCESS: "You do not have permission to view user report.",
+            DENIED_ADD_ACCESS: "You do not have permission to add user report.",
+            UPDATE_ACCESS_DENIED_MESSAGE: "You do not have permission to update user report.",
+            }
+        },
     }
 }
 

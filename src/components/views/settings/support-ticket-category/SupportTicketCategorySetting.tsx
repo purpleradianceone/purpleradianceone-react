@@ -13,10 +13,10 @@ import MESSAGE from "../../../../constants/Messages";
 import SupportTicketCategoryType from "../../../../@types/support-ticket-category/SupportTicketCategoryType";
 import Button from "../../../ui/Button";
 import CreateSupportTicketCategory from "./CreateSupportTicketCategory";
-import LoadingSpinner from "../../../../assets/animations/LoadingSpinner";
 import ToggleButton from "../../../ui/ToggleButton";
 import validateName from "../../../../config/validations/ValidateName";
 import validateDescription from "../../../../config/validations/ValidateDescription";
+import FacebookPageSkeleton from "../social-media-integration/meta-app-facebook/PafeIdListCardPopUp";
 
 const SupportTicketCategorySetting: React.FC = () => {
   const {
@@ -99,7 +99,7 @@ const SupportTicketCategorySetting: React.FC = () => {
     isactive?: boolean | null;
   }) => {
 
-    if(!userHasAccessToUpdateSettingSupposeTicketCategory){
+    if (!userHasAccessToUpdateSettingSupposeTicketCategory) {
       toast.error(MESSAGE.MODULE_ACCESS.SETTING.SUPPORT_TICKET_CATEGORY_SETTING.DENIED_UPDATE_ACCESS)
       return;
     }
@@ -171,23 +171,31 @@ const SupportTicketCategorySetting: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="h-screen flex items-center justify-center">
-        <div className="flex items-center justify-between gap-3">
-          {/* <span>Loading...</span> */}
-           <LoadingSpinner />
-        </div>
+      <div className="grid md:grid-cols-3 sm:grid-cols-2 gap-4">
+        <FacebookPageSkeleton />
+        <FacebookPageSkeleton />
+        <FacebookPageSkeleton />
+        <FacebookPageSkeleton />
+        <FacebookPageSkeleton />
+        <FacebookPageSkeleton />
+        <FacebookPageSkeleton />
+        <FacebookPageSkeleton />
+        <FacebookPageSkeleton />
+        <FacebookPageSkeleton />
+        <FacebookPageSkeleton />
+        <FacebookPageSkeleton />
       </div>
     );
   }
   return (
     <div className="min-h-screen bg-gray-50 rounded-md">
-      <div className="max-w-6xl mx-auto p-1">
+      <div className="max-w-full mx-auto p-1">
         <div className="flex justify-between">
           <h1 className="table-header-custom my-3">Support Ticket Category</h1>
           {!showAddForm && (
             <div>
               <Button
-              disabled={!userHasAccessToAddSettingSupposeTicketCategory}
+                disabled={!userHasAccessToAddSettingSupposeTicketCategory}
                 type="submit"
                 onClick={(e) => {
                   e.preventDefault();
@@ -285,9 +293,8 @@ const SupportTicketCategorySetting: React.FC = () => {
                       <div className="grid items-center pl-2  w-full">
                         {/* <span className="text-gray-600 text-xs">Name : </span> */}
                         <div
-                          className={`flex items-center ${
-                            item.name ? "justify-between" : "justify-end"
-                          }  w-full gap-1  hover:border border-blue-300 hover:rounded px-1 hover:bg-gray-50`}
+                          className={`flex items-center ${item.name ? "justify-between" : "justify-end"
+                            }  w-full gap-1  hover:border border-blue-300 hover:rounded px-1 hover:bg-gray-50`}
                         >
                           {item.name}
                           <Pen size={10} className="text-blue-500 " />
@@ -302,7 +309,7 @@ const SupportTicketCategorySetting: React.FC = () => {
                     Description:
                   </label>
                   {editingTypeId === item.id &&
-                  editingField === "description" ? (
+                    editingField === "description" ? (
                     <>
                       <input
                         id="description"
@@ -356,9 +363,8 @@ const SupportTicketCategorySetting: React.FC = () => {
                       <div className="grid items-center pl-2  w-full">
                         {/* <span className="text-gray-600 text-xs">Name : </span> */}
                         <div
-                          className={`flex items-center ${
-                            item.description ? "justify-between" : "justify-end"
-                          }  w-full gap-1  hover:border border-blue-300 hover:rounded px-1 hover:bg-gray-50`}
+                          className={`flex items-center ${item.description ? "justify-between" : "justify-end"
+                            }  w-full gap-1  hover:border border-blue-300 hover:rounded px-1 hover:bg-gray-50`}
                         >
                           {item.description}
                           <Pen size={10} className="text-blue-500 " />

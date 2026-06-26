@@ -10,5 +10,6 @@ type TeamManagementListProps = {
   paginationData : PaginationDataWithoutCountProps;
   handleCompanyTeamChangeOnUpdate : (teamId : number) => void;
   handleCompanyTeamChangeOnAdd : ()=> void;
+  isDataLoading: boolean
 }
  export default TeamManagementListProps;

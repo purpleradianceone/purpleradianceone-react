@@ -38,6 +38,7 @@ import { useTutorailDataContext } from "../../../../../context/tutorail/useTutor
 import { DashboardComponentJsxKey } from "../../../../../enums/dashboard/DashboardComponentJsxKey.enum";
 import { DashboardLoadingSpinner } from "../dashboards_components/DashboardLoadingSpinner";
 import { AccessManagementType } from "../../../../../@types/company-users/AccessManagementContextType";
+import { useUserPreference } from "../../../../../context/user/UserPreference";
 
 // import DashboardChartComponent from "../../../dashboarcrmcomponents/DashboardChartComponent";
 // import { PieDataItem } from "../../../../@types/dashboard/PieDataItem";
@@ -51,6 +52,7 @@ interface DashboardCRMProp {
 const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
   const navigate = useNavigate();
   const { loginStatus } = useLoggedInUserContext();
+  const {userPreference} = useUserPreference();
 
   const [isTasksLoading, setIsTasksLoading] = useState<boolean>(true); // Set to true initially
   const [upcomingTask, setUpcomingTasks] = useState<LeadTaskType[]>([]);
@@ -273,9 +275,9 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
     [DashboardComponentJsxKey.TOTAL_LEADS]: (
       <div
         key="Total Leads"
-        className="flex col-span-2 w-full gap-4 justify-around"
+        className="group flex col-span-2 w-full gap-4 justify-around"
       >
-        <div className="flex grid-cols-6 sm:gap-1 md:gap-2 lg:gap-11 w-full">
+        <div className={`${(userPreference.sidebarOpen && userPreference.isLeftMenu)?"grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 w-full items-stretch":"flex grid-cols-6 sm:gap-1 md:gap-2 lg:gap-4 w-full"}`}>
           <MetricCard
             title="Total Leads"
             id="totalLeadsMetricCard"
@@ -401,7 +403,8 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
           {leadSummaryReportData && (
             <PipelineChart
               pipelineData={leadSummaryReportData}
-              chartFor="leadByStatus"
+              header="Leads Pipeline"
+              headerDescription="Current pipeline by Lead Status"
             />
           )}
         </div>
@@ -461,7 +464,8 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
       >
         <PipelineChart
           pipelineData={leadBySource}
-          chartFor="leadBySource"
+          header="Leads Pipeline"
+          headerDescription="Current pipeline by Lead Source"
         ></PipelineChart>
       </div>
     ),
@@ -469,7 +473,7 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
       <div
         id="quickActions"
         key="Quick Actions"
-        className="h-full col-span-1 overflow-y-auto max-h-[700px] [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-thumb]:rounded-full"
+        className="h-full col-span-1 overflow-y-auto  [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-thumb]:rounded-full"
       >
         <QuickActions
           companyUserId={companyUserId}
@@ -574,7 +578,11 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
       >
         <div id="leadByStatusPipeline" className="min-h-[500px]">
           {leadSummaryReportData && (
-            <PieChart data={leadSummaryReportData} chartFor="leadByStatus" />
+            <PieChart data={leadSummaryReportData} 
+            totalLable="Total Leads"
+            headerText="Lead Status"
+            headerDescription="Distribution of leads by current status"
+            />
           )}
         </div>
       </div>
@@ -588,7 +596,11 @@ const DashboardCRM: React.FC<DashboardCRMProp> = ({ companyUserId }) => {
   [&::-webkit-scrollbar-thumb]:bg-gray-50
    [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full"
       >
-        <PieChart data={leadBySource} chartFor="leadBySource" />
+        <PieChart data={leadBySource} 
+        totalLable={"Total Leads"}
+        headerText="Lead Sources"
+        headerDescription="Distribution of leads by acquisition source"
+        />
       </div>
     ),
   };

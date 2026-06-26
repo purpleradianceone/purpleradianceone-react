@@ -32,8 +32,8 @@ function LookupCompanyUserSelection({
   description?: string;
 }) {
   const [companyUsers, setCompanyUsers] = useState<LookupCompanyUser[]>([]);
+  const [isDataLoading, setIsDataLoading] = useState<boolean>(false)
   const { loginStatus } = useLoggedInUserContext();
-  
 
   const {
     currentPage,
@@ -50,7 +50,7 @@ function LookupCompanyUserSelection({
   const fetchLookupCompanyUsers = async () => {
     if (loginStatus.companyId === 0) return;
     const offset = (currentPage - 1) * pageSize;
-
+    setIsDataLoading(true)
     const postDataForLookupCompanyUser = {
       company_id: loginStatus.companyId,
       requestedby: loginStatus.id,
@@ -70,7 +70,10 @@ function LookupCompanyUserSelection({
       );
 
       setCompanyUsers(response.data);
-      setCurrentPageData({currentPage:currentPage, pageDataLength: response.data.length});
+      setCurrentPageData({
+        currentPage: currentPage,
+        pageDataLength: response.data.length,
+      });
     } catch (error: any) {
       console.log(error);
       if (error.status === STATUS_CODE.UNATHORISED) {
@@ -83,6 +86,8 @@ function LookupCompanyUserSelection({
       } else {
         handleApiError(error);
       }
+    }finally{
+      setIsDataLoading(false)
     }
   };
 
@@ -127,6 +132,7 @@ function LookupCompanyUserSelection({
                 handleSelectedCompanyUserChange={
                   handleSelectedCompanyUserChange
                 }
+                isDataLoading={isDataLoading}
               />
             </div>
 

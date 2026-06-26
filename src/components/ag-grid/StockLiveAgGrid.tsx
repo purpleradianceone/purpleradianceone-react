@@ -1,30 +1,46 @@
-import { AllCommunityModule, ColDef, themeBalham } from "ag-grid-community";
+import { AllCommunityModule, ColDef, } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 import { useMemo } from "react";
 import LiveStock from "../../@types/stock/LiveStock";
+import { SkeletonRowsAgGrid } from "../ui/SkeletonRowsAgGrid";
+import { AGGRID } from "../../constants/AppConstants";
+import AgGridProfileCell from "../ui/AgGridProfileCell";
+import { Warehouse } from "lucide-react";
 
-const StockLiveAgGrid = ({ data }: { data: LiveStock[] }) => {
-
+const StockLiveAgGrid = ({
+  data,
+  isDataLoading,
+}: {
+  data: LiveStock[];
+  isDataLoading: boolean;
+}) => {
   const columnDefs = useMemo<ColDef[]>(
     () => [
-      {
-        hide: true,
-        field: "companyProductName",
-        headerName: " Product",
-        cellStyle: {
-          color: "black",
-          fontWeight: "bold",
-        },
-      },
-      {
+       {
+
         field: "companyWarehouseName",
         headerName: "Warehouse",
-        hide: false,
-        cellStyle: {
-          color: "black",
+        cellStyle:{
+          color : "black",
           fontWeight: "bold",
         },
+        cellRenderer: (params: any) => (
+      <AgGridProfileCell
+        primaryText={params.value}
+        icon={<Warehouse size={16} />}
+      />
+    ),
       },
+      {
+        hide: false,
+        field: "companyProductName",
+        headerName: " Product",
+        // cellStyle: {
+        //   color: "black",
+        //   // fontWeight: "bold",
+        // },
+      },
+     
       {
         field: "quantityLive",
         headerName: "Current Quantity",
@@ -38,8 +54,14 @@ const StockLiveAgGrid = ({ data }: { data: LiveStock[] }) => {
         headerName: "Outward",
       },
     ],
-    []
+    [],
   );
+
+  const skeletonRows = useMemo(() => {
+    return Array.from({ length: 30 }).map(() => ({
+      __isSkeleton: true,
+    }));
+  }, []);
 
   const defaultColDef = useMemo(() => {
     return {
@@ -48,20 +70,30 @@ const StockLiveAgGrid = ({ data }: { data: LiveStock[] }) => {
       flex: 0.8,
       suppressHeaderMenuButton: true,
       suppressHeaderContextMenu: true,
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      cellRenderer: (params: any) => {
+        if (params.data?.__isSkeleton) {
+          return <SkeletonRowsAgGrid />;
+        }
+        return params.value;
+      },
     };
   }, []);
   return (
     <div
-      className="ag-theme-balham w-full"
+      className="modern-user-grid custom-height-scrollbar w-full"
       style={{ height: "100%", width: "100%" }}
     >
       <AgGridReact
-        rowData={data}
+        rowData={isDataLoading ? skeletonRows : data}
         columnDefs={columnDefs}
         defaultColDef={defaultColDef}
         modules={[AllCommunityModule]}
         // overlayNoRowsTemplate={INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
-        theme={themeBalham}
+        // theme={themeBalham}
+        rowHeight={AGGRID.ROW_HEIGHT}
+                headerHeight={AGGRID.HEADER_HEIGHT}
       />
     </div>
   );

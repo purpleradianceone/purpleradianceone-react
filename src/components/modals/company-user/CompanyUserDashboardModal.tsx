@@ -1,23 +1,22 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import axios from "axios";
-import CompanyUserDashboardProps from "../../../@types/company-users/CompanyUserDashboardProps";
+import { Grid, Save, X } from "lucide-react";
 import { useEffect, useState } from "react";
+import CompanyUserDashboardProps from "../../../@types/company-users/CompanyUserDashboardProps";
+import ApiError from "../../../@types/error/ApiError";
+import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
+import RefreshToken from "../../../config/validations/RefreshToken";
+import { STATUS_CODE } from "../../../constants/AppConstants";
+import MESSAGE from "../../../constants/Messages";
 import POST_API from "../../../constants/PostApi";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
-import ApiError from "../../../@types/error/ApiError";
-import { STATUS_CODE } from "../../../constants/AppConstants";
-import RefreshToken from "../../../config/validations/RefreshToken";
-import MESSAGE from "../../../constants/Messages";
 import Button from "../../ui/Button";
-import { Grid, Save, X } from "lucide-react";
-import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
 
-import FormHeader from "../../ui/FormHeader";
 import toast from "react-hot-toast";
-import LoadingSpinner from "../../../assets/animations/LoadingSpinner";
+import FormHeader from "../../ui/FormHeader";
 
-interface CompanyUserDashboard {
+export interface CompanyUserDashboard {
   id: number;
   company_user_id: number;
   dashboard_id: number;
@@ -181,20 +180,33 @@ function CompanyUserDashboardModal({
   return (
     <div className="fixed inset-0 z-50 overflow-hidden bg-black bg-opacity-5">
       <div className="flex min-h-screen items-center justify-center">
-        <div id="company-user-dashboard-modal" className="relative p-4 w-full max-w-lg h-[50vh] bg-white rounded-lg shadow-xl animate-fadeIn flex flex-col gap-1">
+        <div id="company-user-dashboard-modal" className="relative p-4 w-full max-w-[50%] bg-white rounded-lg shadow-xl animate-fadeIn flex flex-col gap-1">
             <FormHeader
               icon={Grid}
               onClose={onClose}
-              postText="dashboard"
-              description="Modify who can view the dashboard based on roles and responsibilities."
+              postText="'s assigned dashboard"
+              description="Manage and configure dashboard visibility settings assigned to individual users."
               userName={users.fullname}
             />
          
 
           {companyUserDashboard.length === 0 && (
-            <div className="flex w-full h-full justify-center items-center">
-              <LoadingSpinner />
-            </div>
+            <ul className="space-y-2">
+              {Array.from({ length: 5 }).map((_, index) => (
+                <li
+                  key={index}
+                  className="p-2 border border-gray-200 rounded-lg bg-white animate-pulse"
+                >
+                  <div className="flex justify-between items-center">
+                    <div className="flex flex-col gap-2">
+                      <div className="h-4 w-44 bg-gray-200 rounded"></div>
+                    </div>
+
+                    <div className="h-5 w-5 bg-gray-200 rounded-sm"></div>
+                  </div>
+                </li>
+              ))}
+            </ul>
           )}
           {companyUserDashboard.length !== 0 && (
             <ul className="space-y-2">
@@ -229,8 +241,8 @@ function CompanyUserDashboardModal({
             </ul>
           )}
 
-          <div className="p-3 border-t bg-white">
-            <div className="flex gap-1 justify-self-end min-w-36 max-w-56">
+          <div className="pt-3 border-t bg-white">
+            <div className="flex gap-2 justify-self-end min-w-36 max-w-56">
               <Button type="button" onClick={onClose}>
                 <div className="flex gap-0.5 items-center">
                   <X size={16} />

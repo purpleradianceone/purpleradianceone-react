@@ -20,8 +20,8 @@ import CreateSubscription from "../subscription-module/CreateSubscription";
 import UpdateSubscription from "../subscription-module/UpdateSubscription";
 import { useUserPreference } from "../../context/user/UserPreference";
 import FormHeader from "../ui/FormHeader";
-import COLORS from "../../constants/Colors";
 import PaginationWithoutCount, { PaginationDataWithoutCountProps } from "../ag-grid/PaginationWithoutCount";
+import { ComponentHeaderAndLogo } from "../ui/ComponentHeaderAndLogo";
 
 function SubscriptionManagementList({
   subscriptionList,
@@ -30,6 +30,7 @@ function SubscriptionManagementList({
   onStartDateChange,
   onEndDateChange,
   handleSubscriptionListChange,
+  isDataLoading
 }: {
   subscriptionList: SubscriptionListProps[];
   paginationData: PaginationDataWithoutCountProps;
@@ -37,6 +38,7 @@ function SubscriptionManagementList({
   onStartDateChange: (date: Date) => void;
   onEndDateChange: (date: Date) => void;
   handleSubscriptionListChange: () => void;
+  isDataLoading : boolean
 }) {
   const { userPreference } = useUserPreference();
   const [isAddSubscriptionModalOpen, setIsAddSubscriptionModalOpen] =
@@ -47,7 +49,7 @@ function SubscriptionManagementList({
   const { dateRangeDropdownOptions } = useComapanySpecificSearchDateRange();
   const { isCustomDateOptionSelected, handleDateRangeIdChange } =
     useDateRangeIdChange({ dateRangeDropdownOptions, handleSearchOption });
-  const { isLargeScreen, isMediumScreen, isSmallScreen } = useScreenSize();
+  const { isLargeScreen, isSmallScreen } = useScreenSize();
 
   const [isUpdateSubscriptionModalOpen, setIsUpdateSubscriptionModalOpen] =
     useState<boolean>(false);
@@ -78,14 +80,7 @@ function SubscriptionManagementList({
         }   pr-1 gap-1`}
       >
         <div className="sticky z-10 top-9 mt-1 p-0.5 flex items-center justify-between  bg-gray-50 rounded-lg shadow-sm  mb-1.5 w-full">
-          <div className="flex  gap-2">
-            {!isSmallScreen && <CreditCard className={COLORS.GRID_HEADER_ICONS_COLOR_AND_SIZE} />}
-
-            {(isMediumScreen || isLargeScreen) && (
-              <span className="section-header-custom">Subscription</span>
-            )}
-          </div>
-
+          <ComponentHeaderAndLogo headerText="Subscription" logo={CreditCard}/>
           {isLargeScreen && (
             <>
               <div className="flex gap-1">
@@ -143,7 +138,7 @@ function SubscriptionManagementList({
             >
               <div className="flex min-h-screen mb-5 items-center justify-center">
                 <div
-                  className="relative w-full max-w-xl max-h-[100vh] overflow-y-scroll bg-white rounded-lg shadow-xl animate-fadeIn [&::-webkit-scrollbar]:w-2
+                  className="relative w-full  max-w-xl min-h-[50vh] max-h-[100vh]  bg-white rounded-lg shadow-xl animate-fadeIn [&::-webkit-scrollbar]:w-2
       [&::-webkit-scrollbar-track]:bg-gray-300
       [&::-webkit-scrollbar-thumb]:bg-gray-400
        [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full"
@@ -234,6 +229,7 @@ function SubscriptionManagementList({
                 handleUpdateSubscriptionModalOpen
               }
               subscriptionList={subscriptionList}
+              isDataLoading={isDataLoading}
             />
           </div>
         </div>

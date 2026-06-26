@@ -3,18 +3,23 @@ import LeadAssignedCompanyProduct from "../../../@types/lead-management/LeadAssi
 import InterestType from "../../../@types/lead-management/InterestType";
 import POST_API from "../../../constants/PostApi";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
-import {  STATUS_CODE } from "../../../constants/AppConstants";
+import { STATUS_CODE } from "../../../constants/AppConstants";
 
 import RefreshToken from "../../../config/validations/RefreshToken";
 import { useUserAccessModules } from "../../../config/hooks/useAccessModules";
 import MESSAGE from "../../../constants/Messages";
 import toast from "react-hot-toast";
-import { Edit2, Save } from "lucide-react";
+import { Edit2, Package, Save } from "lucide-react";
 import COLORS from "../../../constants/Colors";
 import Button from "../../ui/Button";
 import axiosClient from "../../../axios-client/AxiosClient";
-import AccessDeniedMessagePage from "../../views/not-found/AccessDeniedMessagePage";
+// import AccessDeniedMessagePage from "../../views/not-found/AccessDeniedMessagePage";
 import LoadingSpinner from "../../../assets/animations/LoadingSpinner";
+import { taskPriorityStyles } from "../../../utils/colourSpecifierForNameInAggrid";
+import {
+  formatQuantityWithoutDecimal,
+  formatRupee,
+} from "../../../utils/helperMethods/formatFunctions";
 
 interface LeadAssignedProductsTableProps {
   data: LeadAssignedCompanyProduct[];
@@ -34,11 +39,11 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
   const { loginStatus } = useLoggedInUserContext();
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  useEffect(()=>{
-    if(data){
-      setIsLoading(false)
+  useEffect(() => {
+    if (data) {
+      setIsLoading(false);
     }
-  },[data])
+  }, [data]);
   const [editingProductId, setEditingProductId] = useState<number | null>(null);
   const [editedValues, setEditedValues] = useState<{
     quantityRequired: string;
@@ -62,7 +67,7 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
   } = useUserAccessModules();
 
   const handleUpdateLeadCompanyProductStatus = async (
-    product: LeadAssignedCompanyProduct
+    product: LeadAssignedCompanyProduct,
   ) => {
     const updatedStatus = !product.isActive;
 
@@ -82,7 +87,7 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
         postData,
         {
           withCredentials: true,
-        }
+        },
       );
       if (response) {
         if (response.status === STATUS_CODE.OK) {
@@ -189,7 +194,7 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
           updatedProductPostData,
           {
             withCredentials: true,
-          }
+          },
         );
         if (response.status === STATUS_CODE.OK) {
           if (response.data.status) {
@@ -220,7 +225,7 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
     setIsAddProductModalOpen(true);
   };
 
-  if(isLoading && userHasAccessToViewLeadProduct){
+  if (isLoading && userHasAccessToViewLeadProduct) {
     return (
       <>
         <div className="w-full h-full  flex justify-center items-center">
@@ -229,249 +234,282 @@ const LeadAssignedCompanyProducts: React.FC<LeadAssignedProductsTableProps> = ({
       </>
     );
   }
-  
+
   return (
-    <div className=" h-auto w-full overflow-auto  bg-gray-0 ">
-      {/* Header row */}
-      <div className="grid grid-cols-[2.3fr_1.2fr_1fr_1fr_0.5fr] bg-gray-200 border-gray-500 px-1 py-0.5 ">
-        <div className="table-header-custom">Product Name</div>
-        <div className="table-header-custom">Req. Quantity</div>
-        <div className="table-header-custom">Exp. Cost</div>
-        <div className="table-header-custom">Interest</div>
-        <div className="table-header-custom">Status</div>
-      </div>
-       {!userHasAccessToViewLeadProduct && (
-<AccessDeniedMessagePage message={MESSAGE.MODULE_ACCESS.LEAD_PRODUCT.DENIED_VIEW_ACCESS}/>      )}
-      { userHasAccessToViewLeadProduct && data.length == 0 && (
-        <div className="flex w-full gap-1 h-28 caption-custom justify-center items-center ">
-          <Button
-            disabled={!userHasAccessToAddLeadProduct}
-            onClick={() =>{
-              if(userHasAccessToAddLeadProduct){
-                handleAddProductToLeadButtonClick()
-              }else{
-                toast.error(MESSAGE.MODULE_ACCESS.LEAD_MODULE.UPDATE_LEAD_ACCESS_DENIED_message)
-              }
-            }}
-            className={COLORS.ADD_BUTTON}
-          >
-            +Add
-          </Button>
-          <span className="italic">Product is not assigned to lead.</span>
-        </div>
-      )}
-      {/* Data rows */}
-     
-      {userHasAccessToViewLeadProduct && data.length>0 && (
-        <div className="flex justify-end items-center gap-x-2 p-1 input-label-custom">
-          <Button
-            disabled={!userHasAccessToAddLeadProduct}
-            onClick={() => {
-              if (userHasAccessToAddLeadProduct) {
-                handleAddProductToLeadButtonClick();
-              } else {
-                toast.error(
-                  MESSAGE.MODULE_ACCESS.LEAD_PRODUCT.DENIED_ADD_ACCESS
-                );
-              }
-            }}
-            className={COLORS.ADD_BUTTON}
-          >
-            +Add
-          </Button>
-        </div>
-      )}
-      {userHasAccessToViewLeadProduct &&
-        data.length > 0 &&
-        data.map(
-          (
-            product,
-            index // Added 'index' to the map function
-          ) => (
-            <>
-              <form key={product.id} className="px-1">
-                <div
-                  key={index}
-                  ref={editingProductId === product.id ? wrapperRef : null}
-                  title={product.companyProductName}
-                  className="grid grid-cols-[2fr_1fr_1fr_0.8fr_0.7fr] gap-4 bg-slate-50  border shadow-sm  border-gray-100 rounded-md p-1 mb-2 text-[13px]  hover:shadow-md items-center " // Added 'animate-fade-in' removed this function of animation
-                >
-                  <div
-                    className={`  input-label-custom rounded-lg ${
-                      !product.isActive ? "opacity-50 " : ""
-                    }`}
-                    onClick={() => {
-                      if (!product.isActive) {
-                        handleShowToasterAboutProductIsInactive();
-                        return;
-                      }
-                    }}
-                  >
-                    {product.companyProductName}
-                  </div>
+    <div className="  w-full  h-[210px] border rounded-lg bg-gray-0 ">
+      <div>
+        <div className="border-b px-1 my-1 flex justify-between">
+          <span className="table-header-custom text-black whitespace-nowrap pl-1 py-1 ">
+            Products/Requirements
+          </span>
 
-                  {product.isActive &&
-                  editingProductId === product.id &&
-                  userHasAccessToUpdateLeadProduct ? (
-                    <>
-                      <input
-                        type="text"
-                        disabled={!userHasAccessToUpdateLeadProduct}
-                        value={editedValues.quantityRequired}
-                        onChange={(e) => handleQuantityChange(e.target.value)}
-                        className="border py-0.5 px-1 rounded w-16 input-label-custom "
-                      />
-                      <input
-                        type="text"
-                        disabled={!userHasAccessToUpdateLeadProduct}
-                        value={editedValues.costExpected}
-                        onChange={(e) => handleCostChange(e.target.value)}
-                        className="border px-1 rounded w-16 input-label-custom"
-                      />
-                      <select
-                        disabled={!userHasAccessToUpdateLeadProduct}
-                        value={editedValues.leadInterestId ?? ""}
-                        onChange={(e) =>
-                          setEditedValues((prev) => ({
-                            ...prev,
-                            leadInterestId:
-                              e.target.value === ""
-                                ? null
-                                : parseInt(e.target.value),
-                            interestName: e.target.selectedOptions[0].text,
-                          }))
+          {userHasAccessToViewLeadProduct && (
+            <div className="flex justify-end items-center gap-x-2 p-1 input-label-custom">
+              <Button
+                disabled={!userHasAccessToAddLeadProduct}
+                onClick={() => {
+                  if (userHasAccessToAddLeadProduct) {
+                    handleAddProductToLeadButtonClick();
+                  } else {
+                    toast.error(
+                      MESSAGE.MODULE_ACCESS.LEAD_PRODUCT.DENIED_ADD_ACCESS,
+                    );
+                  }
+                }}
+                className={COLORS.ADD_BUTTON}
+              >
+                +Add
+              </Button>
+            </div>
+          )}
+        </div>
+
+        {/* Header row */}
+        <div className="border rounded-lg m-2 ">
+          <div className="grid grid-cols-[2.3fr_1.5fr_1.5fr_0.9fr_0.6fr] border-b rounded-t-md px-1 py-1.5 bg-slate-100">
+            <div className="table-header-custom">Product Name</div>
+            <div className="table-header-custom">Req. Quantity</div>
+            <div className="table-header-custom">Exp. Cost</div>
+            <div className="table-header-custom">Interest</div>
+            <div className="table-header-custom">Status</div>
+          </div>
+
+          {/* Data rows */}
+
+          <div
+            className="
+        max-h-[110px] overflow-y-auto
+        [&::-webkit-scrollbar]:w-2
+        [&::-webkit-scrollbar-track]:bg-gray-50
+        [&::-webkit-scrollbar-thumb]:bg-gray-50
+        [&::-webkit-scrollbar-thumb]:rounded-full
+        [&::-webkit-scrollbar-track]:rounded-full
+      "
+          >
+            {userHasAccessToViewLeadProduct &&
+              data.length > 0 &&
+              data.map(
+                (
+                  product,
+                  index, // Added 'index' to the map function
+                ) => (
+                  <>
+                    <form key={product.id} className="px-1">
+                      <div
+                        key={index}
+                        ref={
+                          editingProductId === product.id ? wrapperRef : null
                         }
-                        className="border rounded w-20 input-label-custom"
+                        title={product.companyProductName}
+                        className="grid grid-cols-[2fr_1fr_1.5fr_0.8fr_0.4fr] gap-4 p-1 my-2 text-[13px] hover:shadow-md items-center" // Added 'animate-fade-in' removed this function of animation
                       >
-                        {/* <option value="">Select</option> */}
-                        {interestTypeData.map((option) => (
-                          <option key={option.id} value={option.id}>
-                            {option.name}
-                          </option>
-                        ))}
-                      </select>
-                      <div className="flex items-center justify-center">
-                        <button
-                          type="button"
-                          className="bg-blue-600 caption-custom white-text px-2 py-0.5 rounded"
-                          onClick={() => {
-                            if (userHasAccessToUpdateLeadProduct) {
-                              handleSaveClick(product);
-                            } else {
-                              toast.error(
-                                MESSAGE.MODULE_ACCESS.LEAD_MODULE
-                                  .UPDATE_LEAD_ACCESS_DENIED_message
-                              );
-                            }
-                          }}
-                        >
-                          <div className="flex items-center gap-0.5">
-                            <Save size={12} /> Save
-                          </div>
-                        </button>
-                      </div>
-                    </>
-                  ) : (
-                    <>
-                      <div
-                        className={`input-label-custom flex justify-center gap-2 items-center cursor-pointer  border rounded-lg ${
-                          !product.isActive
-                            ? "opacity-50 cursor-not-allowed"
-                            : ""
-                        }`}
-                        onClick={() => {
-                          if (!product.isActive) {
-                            handleShowToasterAboutProductIsInactive();
-                            return;
-                          }
-                          handleEditClick(product);
-                        }}
-                      >
-                        {product.quantityRequired}
-                        <span>
-                          <Edit2 size={9} />
-                        </span>
-                      </div>
-                      <div
-                        className={`input-label-custom cursor-pointer flex items-center justify-center gap-2 border rounded-lg ${
-                          !product.isActive
-                            ? "opacity-50 cursor-not-allowed"
-                            : ""
-                        }`}
-                        onClick={() => {
-                          if (!product.isActive) {
-                            handleShowToasterAboutProductIsInactive();
-                            return;
-                          }
-                          handleEditClick(product);
-                        }}
-                      >
-                        ₹{product.costExpected}
-                        <span>
-                          <Edit2 size={9} />
-                        </span>
-                      </div>
-                      <div
-                        className={`input-label-custom cursor-pointer flex items-center justify-center gap-1 border rounded-lg ${
-                          !product.isActive
-                            ? "opacity-50 cursor-not-allowed"
-                            : ""
-                        }`}
-                        onClick={() => {
-                          if (!product.isActive) {
-                            handleShowToasterAboutProductIsInactive();
-                            return;
-                          }
-                          handleEditClick(product);
-                        }}
-                      >
-                        {product.leadInterestName}
-                        <span>
-                          <Edit2 size={9} />
-                        </span>
-                      </div>
-                      <div className="flex items-center justify-start sm:justify-center">
-                        <button
-                          type="submit"
-                          id={product.companyProductName}
-                          title={product.isActive ? "Active" : "Inactive"}
-                          className={`w-7 h-3 rounded-full flex items-center transition-colors duration-300 ${
-                            product.isActive ? "bg-green-500" : "bg-gray-400"
+                        <div
+                          className={`flex items-center gap-2 input-label-custom rounded-lg min-w-0 ${
+                            !product.isActive ? "opacity-50" : ""
                           }`}
-                          onClick={(e) => {
-                            e.preventDefault();
-                            if (userHasAccessToUpdateLeadProduct) {
-                              handleUpdateLeadCompanyProductStatus(product);
-                            } else {
-                              toast.error(
-                                MESSAGE.MODULE_ACCESS.LEAD_MODULE
-                                  .UPDATE_LEAD_ACCESS_DENIED_message
-                              );
+                          onClick={() => {
+                            if (!product.isActive) {
+                              handleShowToasterAboutProductIsInactive();
+                              return;
                             }
                           }}
                         >
-                          <div
-                            className={`bg-white w-2.5 h-2.5 rounded-full  transform transition-transform ${
-                              product.isActive
-                                ? "translate-x-4"
-                                : "translate-x-0"
-                            }`}
-                          ></div>
-                        </button>
-                      </div>
-                    </>
-                  )}
-                </div>
-              </form>
-            </>
-          )
-        )}
+                          <div className="w-5 h-5 rounded-md bg-blue-100 flex items-center justify-center">
+                            <Package
+                              size={14}
+                              className="text-blue-600 flex-shrink-0"
+                            />
+                          </div>
 
-      {/* {userHasAccessToViewLeadProduct && data.length === 0 && (
+                          <span className="truncate w-full">
+                            {product.companyProductName}
+                          </span>
+                        </div>
+
+                        {product.isActive &&
+                        editingProductId === product.id &&
+                        userHasAccessToUpdateLeadProduct ? (
+                          <>
+                            <input
+                              type="text"
+                              disabled={!userHasAccessToUpdateLeadProduct}
+                              value={editedValues.quantityRequired}
+                              onChange={(e) =>
+                                handleQuantityChange(e.target.value)
+                              }
+                              className="border py-0.5 px-1 rounded w-full input-label-custom "
+                            />
+                            <input
+                              type="text"
+                              disabled={!userHasAccessToUpdateLeadProduct}
+                              value={editedValues.costExpected}
+                              onChange={(e) => handleCostChange(e.target.value)}
+                              className="border px-1 rounded w-full input-label-custom"
+                            />
+                            <select
+                              disabled={!userHasAccessToUpdateLeadProduct}
+                              value={editedValues.leadInterestId ?? ""}
+                              onChange={(e) =>
+                                setEditedValues((prev) => ({
+                                  ...prev,
+                                  leadInterestId:
+                                    e.target.value === ""
+                                      ? null
+                                      : parseInt(e.target.value),
+                                  interestName:
+                                    e.target.selectedOptions[0].text,
+                                }))
+                              }
+                              className="border rounded w-full input-label-custom"
+                            >
+                              {/* <option value="">Select</option> */}
+                              {interestTypeData.map((option) => (
+                                <option key={option.id} value={option.id}>
+                                  {option.name}
+                                </option>
+                              ))}
+                            </select>
+                            <div className="flex items-center justify-center">
+                              <button
+                                type="button"
+                                className="bg-blue-600 caption-custom white-text px-1 py-0.5 rounded"
+                                onClick={() => {
+                                  if (userHasAccessToUpdateLeadProduct) {
+                                    handleSaveClick(product);
+                                  } else {
+                                    toast.error(
+                                      MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                                        .UPDATE_LEAD_ACCESS_DENIED_message,
+                                    );
+                                  }
+                                }}
+                              >
+                                <div className="flex items-center gap-0.5">
+                                  <Save size={12} /> Save
+                                </div>
+                              </button>
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            <div
+                              className={`input-label-custom flex justify-center gap-2 items-center cursor-pointer  border rounded-lg ${
+                                !product.isActive
+                                  ? "opacity-50 cursor-not-allowed"
+                                  : ""
+                              }`}
+                              onClick={() => {
+                                if (!product.isActive) {
+                                  handleShowToasterAboutProductIsInactive();
+                                  return;
+                                }
+                                handleEditClick(product);
+                              }}
+                            >
+                              {formatQuantityWithoutDecimal(
+                                product.quantityRequired,
+                              )}
+                              {/* {product.quantityRequired} */}
+                              <span>
+                                <Edit2 size={9} />
+                              </span>
+                            </div>
+                            <div
+                              className={`input-label-custom cursor-pointer flex items-center justify-center gap-2 border rounded-lg whitespace-nowrap ${
+                                !product.isActive
+                                  ? "opacity-50 cursor-not-allowed"
+                                  : ""
+                              }`}
+                              onClick={() => {
+                                if (!product.isActive) {
+                                  handleShowToasterAboutProductIsInactive();
+                                  return;
+                                }
+                                handleEditClick(product);
+                              }}
+                            >
+                              ₹ {formatRupee(product.costExpected)}
+                              {/* {product.costExpected} */}
+                              <span>
+                                <Edit2 size={9} />
+                              </span>
+                            </div>
+                            <div
+                              className={`
+                          input-label-custom cursor-pointer flex items-center justify-center gap-1 
+                          rounded-lg px-2 border 
+                          ${
+                            taskPriorityStyles[product.leadInterestName] ||
+                            "bg-slate-100 text-slate-700 border-slate-200"
+                          }
+                          ${
+                            !product.isActive
+                              ? "opacity-50 cursor-not-allowed"
+                              : ""
+                          }
+                        `}
+                              onClick={() => {
+                                if (!product.isActive) {
+                                  handleShowToasterAboutProductIsInactive();
+                                  return;
+                                }
+                                handleEditClick(product);
+                              }}
+                            >
+                              {product.leadInterestName}
+                              <span>
+                                <Edit2 size={9} />
+                              </span>
+                            </div>
+                            <div className="flex items-center justify-start sm:justify-center">
+                              <button
+                                type="submit"
+                                id={product.companyProductName}
+                                title={product.isActive ? "Active" : "Inactive"}
+                                className={`w-7 h-3 rounded-full flex items-center transition-colors duration-300 ${
+                                  product.isActive
+                                    ? "bg-green-500"
+                                    : "bg-gray-400"
+                                }`}
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  if (userHasAccessToUpdateLeadProduct) {
+                                    handleUpdateLeadCompanyProductStatus(
+                                      product,
+                                    );
+                                  } else {
+                                    toast.error(
+                                      MESSAGE.MODULE_ACCESS.LEAD_MODULE
+                                        .UPDATE_LEAD_ACCESS_DENIED_message,
+                                    );
+                                  }
+                                }}
+                              >
+                                <div
+                                  className={`bg-white w-2.5 h-2.5 rounded-full  transform transition-transform ${
+                                    product.isActive
+                                      ? "translate-x-4"
+                                      : "translate-x-0"
+                                  }`}
+                                ></div>
+                              </button>
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    </form>
+                  </>
+                ),
+              )}
+          </div>
+
+          {/* {userHasAccessToViewLeadProduct && data.length === 0 && (
         <p className="caption-custom italic text-center p-3">
           No product assigned
         </p>
       )} */}
+        </div>
+      </div>
     </div>
   );
 };

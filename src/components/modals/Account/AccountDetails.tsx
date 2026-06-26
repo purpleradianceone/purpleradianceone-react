@@ -176,9 +176,9 @@ const AccountDetails: React.FC = () => {
 
   function permissionVerification(): boolean {
     console.log("inside per verification 1");
-    
+
     if (!userHasAccessToUpdateAccount) {
-          console.log("inside per verification 2");
+      console.log("inside per verification 2");
       toast.error(MESSAGE.MODULE_ACCESS.ACCOUNT_ACCESS.DENIED_UPDATE_ACCESS);
       return false;
     }
@@ -264,13 +264,13 @@ const AccountDetails: React.FC = () => {
     fieldName: keyof Account,
     value: string | number | any,
   ) => {
-          console.log("in api call 1");
+    console.log("in api call 1");
 
     const isDropdown = dropdownFieldMap[fieldName];
     const permission = permissionVerification();
     if (!permission) {
       revert(fieldName);
-                console.log("in api call 2");
+      console.log("in api call 2");
 
       return;
     }
@@ -313,7 +313,7 @@ const AccountDetails: React.FC = () => {
       updatedby_id: loginStatus.id,
     };
 
-              console.log("in api call 3");
+    console.log("in api call 3");
 
     try {
       const response = await axiosClient.post(
@@ -373,13 +373,13 @@ const AccountDetails: React.FC = () => {
     event: React.ChangeEvent<HTMLInputElement>,
   ) => {
     console.log("inside the toggle api call : 1 line");
-    
+
     if (!userHasAccessToUpdateAccount) {
       console.log("in api call toggle check block 1");
       toast.error(MESSAGE.MODULE_ACCESS.ACCOUNT_ACCESS.DENIED_UPDATE_ACCESS);
       return;
     }
-  console.log("in api call toggle");
+    console.log("in api call toggle");
     const { checked } = event.target;
     const postData = {
       id: formData.id,
@@ -403,7 +403,7 @@ const AccountDetails: React.FC = () => {
       isactive: checked,
       updatedby_id: loginStatus.id,
     };
-      console.log("in api call toggle final ");
+    console.log("in api call toggle final ");
 
     await axiosClient
       .post(POST_API.UPDATE_ACCOUNT, postData, { withCredentials: true })
@@ -515,34 +515,33 @@ const AccountDetails: React.FC = () => {
 
     // Only call API if value actually changed
     if (currentValue !== originalValue) {
-    console.log("inside the api call input blur");
+      console.log("inside the api call input blur");
       handleUpdateAccountDetails(fieldName, currentValue);
     }
     setEditingField(null);
   };
 
   // Note : need to make changes here
-  const handleDropdownBlur = (fieldName: keyof Account ) => {
+  const handleDropdownBlur = (fieldName: keyof Account) => {
+    const dropdownMeta = dropdownFieldMap[fieldName];
+    if (!dropdownMeta) return;
 
-    const dropdownMeta= dropdownFieldMap[fieldName];
-    if(!dropdownMeta) return;
+    const { idKey } = dropdownMeta;
 
-    const {idKey } =dropdownMeta;
+    const originalId = originalValues[idKey];
+    const curretntId = formData[idKey];
 
-    const originalId = originalValues[idKey]
-    const curretntId =   formData[idKey]
-
-      console.log("ori value");
+    console.log("ori value");
     console.log(originalId);
 
     console.log("curr value");
     console.log(curretntId);
 
     // comparing the id's
-    if(originalId !== curretntId){
+    if (originalId !== curretntId) {
       console.log("inside the api call dropdown");
-      
-      handleUpdateAccountDetails(fieldName, curretntId)
+
+      handleUpdateAccountDetails(fieldName, curretntId);
     }
 
     // const originalValue = originalValues[fieldName];
@@ -668,9 +667,11 @@ const AccountDetails: React.FC = () => {
               type={type}
               required={required}
               value={(formData[fieldName as keyof Account] as string) || ""}
-              onChange={(e) => handleInputChange(fieldName, e.target.value)}
-              onBlur={() => handleInputBlur(fieldName)}
-              onKeyDown={(e) => handleKeyPress(e, fieldName)}
+              onChange={(e) =>
+                handleInputChange(fieldName as keyof Account, e.target.value)
+              }
+              onBlur={() => handleInputBlur(fieldName as keyof Account)}
+              onKeyDown={(e) => handleKeyPress(e, fieldName as keyof Account)}
               placeholder={placeholder}
               className={`w-full h-full bg-white border-1 rounded px-2 py-1 mt-2 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                 fieldName === "name"
@@ -733,7 +734,7 @@ const AccountDetails: React.FC = () => {
             <div className="space-y-0">
               <h3 className="font-medium text-slate-700 flex items-center">
                 <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
-                <span className="caption-custom">Account Status</span>
+                <span className="caption-custom">Account Status New</span>
               </h3>
               <div className="text-sm text-slate-600 bg-white p-2 rounded-lg border border-green-100">
                 <div className="flex items-center gap-4">
@@ -1004,7 +1005,9 @@ const AccountDetails: React.FC = () => {
             <div className="space-y-1">
               <h3 className="font-medium text-slate-700 flex items-center">
                 <div className="w-2 h-2 bg-purple-500 rounded-full mr-2"></div>
-                <span className="caption-custom">Registered Office Address</span>
+                <span className="caption-custom">
+                  Registered Office Address
+                </span>
               </h3>
               <div className="text-sm text-slate-600 bg-purple-50 p-2 rounded-lg border border-purple-100">
                 {renderEditableField(

@@ -12,6 +12,7 @@ import toast from "react-hot-toast";
 import MESSAGE from "../../../../constants/Messages";
 import { useUserAccessModules } from "../../../../config/hooks/useAccessModules";
 import StatusIndicator from "../../../ui/StatusIndicator";
+import { SkeletonRowsAgGrid } from "../../../ui/SkeletonRowsAgGrid";
 
 type CompanyUserAgGridPropsForLead = {
   users: CompanyUsersSearchProps[];
@@ -19,6 +20,7 @@ type CompanyUserAgGridPropsForLead = {
   selectedUserId: number | null; // Receive the prop
   isUsedForSettings: boolean;
   handleUpdateLeadUser?: (params: CompanyUser | null) => boolean;
+  isDataLoading: boolean
 };
 
 function CompanyUserAgGridForLead({
@@ -27,6 +29,7 @@ function CompanyUserAgGridForLead({
   selectedUserId, // Destructure the prop
   isUsedForSettings,
   handleUpdateLeadUser,
+  isDataLoading
 }: CompanyUserAgGridPropsForLead) {
   const {userHasAccessToUpdateSettingLead} = useUserAccessModules();
   const [localSelectedUserId, setLocalSelectedUserId] = useState<number | null>(
@@ -83,6 +86,12 @@ function CompanyUserAgGridForLead({
         filter: false,
         width: 100,
         cellRenderer: (params: any) => {
+          if (params.data?.__isSkeleton) {
+                return (
+                  <SkeletonRowsAgGrid/>
+                );
+              }
+              
           const user: CompanyUser = params.data;
           const isChecked = isUsedForSettings
             ? user!.all_leads_visible
@@ -144,6 +153,11 @@ function CompanyUserAgGridForLead({
         sortable: true,
         filter: true,
         cellRenderer: (params: any) => {
+          if (params.data?.__isSkeleton) {
+                return (
+                  <SkeletonRowsAgGrid/>
+                );
+              }
           return (
             <div className="flex items-center gap-1 ">
               {params.value ? (
@@ -171,6 +185,12 @@ function CompanyUserAgGridForLead({
     [localSelectedUserId] // Dependency array now includes local state
   );
 
+  const skeletonRows = useMemo(() => {
+    return Array.from({ length: 30 }).map(() => ({
+      __isSkeleton: true,
+    }));
+  }, []);
+
   const defaultColDef = useMemo(() => {
     return {
       filter: "agTextColumnFilter",
@@ -178,6 +198,16 @@ function CompanyUserAgGridForLead({
       flex: 0.8,
       suppressHeaderMenuButton: true,
       suppressHeaderContextMenu: true,
+
+      cellRenderer: (params: any) => {
+              if (params.data?.__isSkeleton) {
+                return (
+                  <SkeletonRowsAgGrid/>
+                );
+              }
+              return params.value;
+            },
+
     };
   }, []);
 
@@ -188,7 +218,7 @@ function CompanyUserAgGridForLead({
     >
       <AgGridReact
         ref={gridRef}
-        rowData={users}
+        rowData={ isDataLoading ? skeletonRows : users}
         columnDefs={columnDefs}
         defaultColDef={defaultColDef}
         modules={[AllCommunityModule]}

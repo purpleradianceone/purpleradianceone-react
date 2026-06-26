@@ -200,14 +200,14 @@ function SupportTasksDashboard({
         {/* Header */}
         <div className="flex items-center justify-between mb-4 flex-shrink-0">
           <div>
-            <h3 className="section-header-custom mb-1">
+            <h3 className="table-header-custom">
               {taskType === "upcoming"
                 ? "Upcoming Tasks"
                 : taskType === "pending"
                 ? "Pending Tasks"
                 : "Completed Tasks"}
             </h3>
-            <p className="table-header-custom">
+            <p className="caption-custom">
               {taskType === "upcoming"
                 ? "Your scheduled activities"
                 : taskType === "pending"
@@ -273,7 +273,7 @@ function SupportTasksDashboard({
                             onClick={() => {
                               // getSupportTicketDetails(task.support_ticket_id);
                             }}
-                            className={`table-header-custom  ${isLoadingForNavigate ? "cursor-wait" : "cursor-pointer"} group-hover:text-blue-600 transition-colors`}
+                            className={`table-data-custom  ${isLoadingForNavigate ? "cursor-wait" : "cursor-pointer"} group-hover:text-blue-600 transition-colors`}
                           >
                             Ticket Number: {task.ticket_number}
                             {/* ({task.support_ticket_task_stage_name}) */}

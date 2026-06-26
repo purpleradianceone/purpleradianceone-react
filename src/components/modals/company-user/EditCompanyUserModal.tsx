@@ -55,7 +55,7 @@ function EditCompanyUserModal({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen]);
 
-  const handleEditUserSubmit = async (event: React.FormEvent) => {
+  const handleEditUserSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     const mobileRegex = REGEX.MOBILE_NUMBER_NEW;
@@ -100,13 +100,13 @@ function EditCompanyUserModal({
             .put(POST_API.UPDATE_COMPANY_USER, postUpdateUserData, {
               withCredentials: true,
             })
-            .then((response) => {
+            .then(async (response) => {
               if (response.data.status) {
                 toast.success(response.data.message);
               } else if (!response.data.status) {
                 toast.error(response.data.message);
               }
-              handleCompanyUserChange(user);
+              await handleCompanyUserChange();
               setTimeout(() => {
                 onClose();
               }, 100);
@@ -165,14 +165,14 @@ function EditCompanyUserModal({
       .put(POST_API.UPDATE_COMPANY_USER, postUpdateUserData, {
         withCredentials: true,
       })
-      .then((response) => {
+      .then(async (response) => {
         if (response.data.status) {
           toast.success(response.data.message);
           setUserIsActive(checked);
         } else if (!response.data.status) {
           toast.error(response.data.message);
         }
-        handleCompanyUserChange(user);
+        await handleCompanyUserChange();
       })
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .catch(async (error: ApiError | any) => {
@@ -201,20 +201,6 @@ function EditCompanyUserModal({
    [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full"
           >
             <div  className="p-5">
-              {/* <div className="flex justify-between items-center  mb-3 border-b ">
-                <div className="flex gap-2">
-                  <EditIcon className="text-blue-500" size={SIZE.TWENTY_FOUR} />
-                  <h2 className="text-xl font-semibold text-gray-800">
-                    Edit <span className="text-blue-700">{user.fullname}</span>
-                  </h2>
-                </div>
-                <button
-                  onClick={onClose}
-                  className=" right-4 top-4 text-gray-400 hover:text-gray-600"
-                >
-                  <X size={SIZE.TWENTY} />
-                </button>
-              </div> */}
               <FormHeader
                 icon={EditIcon}
                 onClose={onClose}
@@ -225,6 +211,7 @@ function EditCompanyUserModal({
 
               <form id="company-user-edit-modal" className="space-y-5" onSubmit={handleEditUserSubmit}>
                 <FormInput
+                autoFocus={true}
                   logo={User}
                   label="Name"
                   type="text"

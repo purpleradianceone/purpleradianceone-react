@@ -16,6 +16,10 @@ import toast from "react-hot-toast";
 import ApiError from "../../@types/error/ApiError";
 import RefreshToken from "../../config/validations/RefreshToken";
 import { ArrowRight, CalendarDays, Loader, Users2, X } from "lucide-react";
+import { useUserAccessModules } from "../../config/hooks/useAccessModules";
+import AccessDeniedMessagePage from "../views/not-found/AccessDeniedMessagePage";
+import { useNavigate } from "react-router-dom";
+import ROUTES_URL from "../../constants/Routes";
 
 function CreateSubscription({
   isSubscrptionFromLoginPage,
@@ -32,7 +36,9 @@ function CreateSubscription({
     numberOfUsers: 0,
     monthsToPurchase: 0,
   };
-  const { loginStatus } = useLoggedInUserContext();
+  const { loginStatus, setLoginStatus } = useLoggedInUserContext();
+    const navigate = useNavigate();
+
   const [responseState, setReponseState] = useState<{
     orderId: number;
     amount: number;
@@ -41,12 +47,13 @@ function CreateSubscription({
     amount: 0,
   });
   const { formData: createSubscriptionFormData, handleChange } = useFormChange(
-    initialCreateSubscriptionFormData
+    initialCreateSubscriptionFormData,
   );
 
-  const { setLoginStatus } = useLoggedInUserContext();
   const [isPaymentSubscriptionOpen, setIsPaymentSubscriptionOpen] =
     useState(false);
+
+  const { userHasAccessToAddSubscription } = useUserAccessModules();
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -125,7 +132,7 @@ function CreateSubscription({
             handleCreateSubscription(event);
           } else {
             toast.error(
-              MESSAGE.ERROR.SUBSCRIPTION_CREATION_ERROR + error.message
+              MESSAGE.ERROR.SUBSCRIPTION_CREATION_ERROR + error.message,
             );
             setLoginStatus({
               companyId: 0,
@@ -171,11 +178,31 @@ function CreateSubscription({
     }
   }, [isOpen]);
 
+  const formChangeForSubsciption = (
+    e:
+      | React.ChangeEvent<HTMLInputElement>
+      | React.ChangeEvent<HTMLTextAreaElement>,
+  ) => {
+    const { value } = e.target;
+
+    // Allow empty value while typing
+    if (value === "") {
+      handleChange(e);
+      return;
+    }
+
+    // ✅ Allow ONLY digits (no decimal, no minus, no e)
+    if (!/^\d+$/.test(value)) return;
+    handleChange(e);
+  };
+
   if (!isOpen) return null;
-  return (
-    <>
-      <div className="  "></div>
-      <h2 className="table-header-custom flex flex-wrap">
+  return userHasAccessToAddSubscription ? (
+    <div className="flex flex-col w-full items-center justify-center ">
+      <div className="section-header-custom bold italic mb-4 mt-2 text-center">
+        Please enter how many users you need and for how long (in months).
+      </div>
+      <h2 className="table-header-custom flex flex-wrap mb-2">
         <span>Active Users in the Company:</span>
         <span className="input-label-custom-inactive ml-1">
           {loginStatus.activeUsersInCompany}
@@ -185,13 +212,14 @@ function CreateSubscription({
       <form className="space-y-5" onSubmit={handleCreateSubscription}>
         <FormInput
           logo={Users2}
+          autoFocus={true}
           required
           label="Company users count:"
           placeholder="Count of users (min 1)"
           type="number"
           value={createSubscriptionFormData.numberOfUsers.toString()}
           name="numberOfUsers"
-          onChange={handleChange}
+          onChange={formChangeForSubsciption}
           onBlur={handleCreateSubscrptioFormFieldOnBlur}
           min={1}
           error={createSubscriptionErrors.companyUserCount}
@@ -200,11 +228,13 @@ function CreateSubscription({
           logo={CalendarDays}
           required
           label="Months to purchase:"
-          placeholder="Number of months (min: 1 to max: 48 months)"
+          placeholder="Months (min: 1 to max: 48 months)"
           type="number"
+          step="1"
+          inputMode="numeric"
           value={createSubscriptionFormData.monthsToPurchase.toString()}
           name="monthsToPurchase"
-          onChange={handleChange}
+          onChange={formChangeForSubsciption}
           onBlur={handleCreateSubscrptioFormFieldOnBlur}
           min={1}
           max={48}
@@ -212,18 +242,23 @@ function CreateSubscription({
         />
         <div className="flex items-center justify-end">
           <div className="flex items-center gap-1 text-nowrap">
-            <Button type="button" onClick={onClose}>
+            <Button type="button" onClick={()=>{
+              if(isSubscrptionFromLoginPage){
+                navigate(ROUTES_URL.SIGN_IN)
+              }
+              if(onClose)
+                  onClose();
+              }}>
               <div className=" flex items-center">
                 <X size={16} /> Cancel
               </div>
             </Button>
-          <Button type="submit">
+            <Button type="submit">
               <div className=" flex items-center">
-
-             {isLoading ?  <Loader size={16}/> :               <ArrowRight size={16}/>}
-            {isLoading ? "Generating Order Id..." : "Continue Payment"}
+                {isLoading ? <Loader size={16} /> : <ArrowRight size={16} />}
+                {isLoading ? "Generating Order Id..." : "Continue Payment"}
               </div>
-          </Button>
+            </Button>
           </div>
         </div>
       </form>
@@ -235,11 +270,11 @@ function CreateSubscription({
           orderId={responseState.orderId}
           onCancel={handleOnCancelPaymentPage}
           monthsOfSubscription={parseInt(
-            createSubscriptionFormData.monthsToPurchase.toString()
+            createSubscriptionFormData.monthsToPurchase.toString(),
           )}
           onClose={onClose!}
           numberOfCompanyUsers={parseInt(
-            createSubscriptionFormData.numberOfUsers.toString()
+            createSubscriptionFormData.numberOfUsers.toString(),
           )}
           isSubscrptionFromLoginPage={isSubscrptionFromLoginPage!}
           handleSubscriptionListChange={handleSubscriptionListChange!}
@@ -247,7 +282,11 @@ function CreateSubscription({
           cancelText="Cancel"
         />
       )}
-    </>
+    </div>
+  ) : (
+    <div className="flex justify-center items-center h-[80vh]">
+      <AccessDeniedMessagePage message="You do not have the permissions to purchase subscription ." />
+    </div>
   );
 }
 

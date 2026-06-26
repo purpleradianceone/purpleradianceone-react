@@ -1,106 +1,50 @@
-import { Calendar, Layers, Plus } from "lucide-react";
-import COLORS from "../../constants/Colors";
-import { useUserPreference } from "../../context/user/UserPreference";
-import Button from "../ui/Button";
-import MESSAGE from "../../constants/Messages";
+import { Package } from "lucide-react";
+import { useState } from "react";
 import toast from "react-hot-toast";
-import { ActionTypeForStockMOdule, SIZE } from "../../constants/AppConstants";
-import { useUserAccessModules } from "../../config/hooks/useAccessModules";
-import { useEffect, useState } from "react";
-import AddStock from "../modals/stock/AddStock";
-import StockManagementListProps from "../../@types/stock/StockManagementListProps";
-import StockLiveForCompanyProductAgGrid from "../ag-grid/StockLiveForCompanyProductAgGrid";
-import LiveStockForCompanyProduct from "../../@types/stock/LiveStockForCompanyProduct";
-import DateRangeFilterDropdown from "../ui/DateRangeFilterDropdown";
-import DateRangePicker from "../ui/DateRangePicker";
-import SearchInput from "../ui/SearchInput";
-import { useDateRangeIdChange } from "../../config/hooks/useDateRangeIdChange";
-import { useComapanySpecificSearchDateRange } from "../../config/hooks/useCompanySpecificDateRange";
-import StockLiveForCompanyProduct from "../modals/stock/StockLiveForCompanyProduct";
-import StockTransactions from "../modals/stock/StockTransactions";
-import { fetchCompanyProduct } from "../../config/apis/api";
-import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
-import { handleApiError } from "../../config/error/handleApiError";
 import { Product } from "../../@types/products/ProductsManagementProps";
+import LiveStockForCompanyProduct from "../../@types/stock/LiveStockForCompanyProduct";
+import StockManagementListProps from "../../@types/stock/StockManagementListProps";
+// import { fetchCompanyProduct } from "../../config/apis/api";
+import { handleApiError } from "../../config/error/handleApiError";
+import { useUserAccessModules } from "../../config/hooks/useAccessModules";
+import { ActionTypeForStockMOdule } from "../../constants/AppConstants";
+import COLORS from "../../constants/Colors";
+import MESSAGE from "../../constants/Messages";
+import { useLoggedInUserContext } from "../../context/user/LoggedInUserContext";
+import { useUserPreference } from "../../context/user/UserPreference";
 import PaginationWithoutCount from "../ag-grid/PaginationWithoutCount";
+import StockLiveForCompanyProductAgGrid from "../ag-grid/StockLiveForCompanyProductAgGrid";
+import AddStock from "../modals/stock/AddStock";
+import SearchInput from "../ui/SearchInput";
+import { getLookupCompanyProduct } from "../../config/apis/Lookups";
+import { ComponentHeaderAndLogo } from "../ui/ComponentHeaderAndLogo";
 
 type StockView = ActionTypeForStockMOdule | null;
 
 const StockManagementList = ({
   liveStockForCompanyProduct,
   paginationData,
-  handleSearchOption,
-  onStartDateChange,
-  onEndDateChange,
+  searchParameter,
+  handleSearchParameterChange,
+  isDataLoading
 }: StockManagementListProps) => {
-  const { loginStatus } = useLoggedInUserContext();
   const { userPreference } = useUserPreference();
   const { userHasAccessToAddStock } = useUserAccessModules();
   const [isAddStockModalOpen, setIsAddStockModalOpen] =
     useState<boolean>(false);
   const [isAddStockModalOpenFromStock, setIsAddStockModalOpenFromStock] =
     useState<boolean>(false);
-  // const [openStockLivePage, setOpenStockLivePage] = useState<boolean>(false);
-  const [openAllTransactionPage, setOpenAllTransactionPage] =
-    useState<boolean>(false);
-  // const [openTransactionsPage, setOpenTransactionsPage] =
-  //   useState<boolean>(false);
-  // const [stockForCompanyProductLive, setStockLiveForCompanyProduct] =
-  //   useState<LiveStockForCompanyProduct | null>(null);
-  // const [selectedStockForTransaction, setSelectedStockForTransaction] =
-  // useState<LiveStockForCompanyProduct | null>(null);
   const [activeStockView, setActiveStockview] = useState<StockView>(null);
-  const [selectedStock, setSelectedStock] =
-    useState<LiveStockForCompanyProduct | null>(null);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-
-  // function handleSelectedStockLiveForCompanyProduct(
-  //   data: LiveStockForCompanyProduct,
-  //   action: ActionTypeForStockMOdule
-  // ) {
-  //   switch (action) {
-  //     case ActionTypeForStockMOdule.DETAILS:
-  //       if (data !== null && data !== undefined) {
-  //         setStockLiveForCompanyProduct(data);
-  //         setOpenStockLivePage(true);
-  //       }
-  //       break;
-  //     case ActionTypeForStockMOdule.TRANSACTIONS:
-  //       if (data !== null && data !== undefined) {
-  //         setSelectedStockForTransaction(data);
-  //         setOpenTransactionsPage(true);
-  //       }
-  //       break;
-  //     case ActionTypeForStockMOdule.CREATE_STOCK:
-
-  //   }
-
-  // }
-
+  const { loginStatus } = useLoggedInUserContext();
   const [isCreateStockLoading, setIsCreateStockLoading] = useState(false);
-
   function handleSelectedStockLiveForCompanyProduct(
     data: LiveStockForCompanyProduct,
-    action: ActionTypeForStockMOdule
   ) {
-    switch (action) {
-      case ActionTypeForStockMOdule.DETAILS:
-        if (data !== null && data !== undefined) {
-          setSelectedStock(data);
-          setActiveStockview(ActionTypeForStockMOdule.DETAILS);
-        }
-        break;
-      case ActionTypeForStockMOdule.TRANSACTIONS:
-        if (data !== null && data !== undefined) {
-          setSelectedStock(data);
-          setActiveStockview(ActionTypeForStockMOdule.TRANSACTIONS);
-        }
-        break;
-      case ActionTypeForStockMOdule.CREATE_STOCK:
-        if (data !== null && data !== undefined) {
-          handleCreateStock(data);
-        }
-        break;
+    if (userHasAccessToAddStock) {
+      handleCreateStock(data);
+    } else {
+      toast.error(MESSAGE.MODULE_ACCESS.STOCK.STOCK.DENIED_ADD_ACCESS);
     }
   }
   const [isCreateStockReady, setIsCreateStockReady] = useState(false);
@@ -118,9 +62,10 @@ const StockManagementList = ({
         search_company_specific_date_range_id: null,
         search_parameter: null,
         search_parameter_date: null,
-        requestedby_id: loginStatus.id,
+        requestedby: loginStatus.id,
+        product_type_id: null,
       };
-      const response = await fetchCompanyProduct(postData);
+      const response = await getLookupCompanyProduct(postData);
       const product = response?.data?.[0] ?? response?.data;
 
       if (!product) return;
@@ -157,6 +102,7 @@ const StockManagementList = ({
         validFrom: product.valid_from,
         createdBy: product.created_by,
         createdOn: product.created_on,
+        minimumStock: product.minimum_stock,
       };
 
       // 1️ Set data first
@@ -175,145 +121,54 @@ const StockManagementList = ({
     }
   };
 
-  function handleShowAllTransactionButtonClick() {
-    setOpenAllTransactionPage(true);
-  }
-  const { dateRangeDropdownOptions } = useComapanySpecificSearchDateRange();
-  const {
-    handleDateRangeIdChange,
-    isCustomDateOptionSelected,
-    setIsCustomDateOptionSelected,
-  } = useDateRangeIdChange({ dateRangeDropdownOptions, handleSearchOption });
-
-  const selectedDateName =
-    dateRangeDropdownOptions.find(
-      (o) => o.search_date_range_id === handleSearchOption.dateRangeId
-    )?.date_range || "Date Filter";
-
-  useEffect(() => {
-    if (handleSearchOption.dateRangeId === 8) {
-      setIsCustomDateOptionSelected(true);
-    }
-  }, [
-    handleSearchOption.searchParameter,
-    handleSearchOption.dateRangeId,
-    setIsCustomDateOptionSelected,
-  ]);
-
   return (
     <div
       className={`w-full  pt-1  ${
-        userPreference.isLeftMenu ? "pl-5" : "pl-1"
+        userPreference.isLeftMenu ? "pl-1" : "pl-1"
       } pr-1 gap-1`}
     >
       <div
-        className={`sticky z-10 top-9 py-0.5 flex items-center justify-between ${COLORS.GRID_HEADER_SECTION_BG_COLOR} rounded-lg shadow-sm  mb-1.5 w-full`}
+        className={`sticky z-10 top-9 py-1.5 px-3 mb-2 flex items-center justify-between ${COLORS.GRID_HEADER_SECTION_BG_COLOR} rounded-lg shadow-sm  mb-1.5 w-full`}
       >
         <div className="flex items-center pl-1 gap-5">
-          <div className="flex gap-1">
-            <Layers className={COLORS.GRID_HEADER_ICONS_COLOR_AND_SIZE} />
-            <span className="section-header-custom">Stock Management</span>
-          </div>
+          {/* <div className="flex gap-1">
+            <Package className={COLORS.GRID_HEADER_ICONS_COLOR_AND_SIZE} />
+            <span className="section-header-custom">Product Stock</span>
+          </div> */}
+          <ComponentHeaderAndLogo
+            headerText="Product Stock"
+            logo={Package}
+          />
 
-          <div className="flex justify-center items-center  gap-1">
+          <div className="flex justify-center items-center gap-1">
             {/* search box flex div */}
-
             <div className="flex items-start w-80">
               <SearchInput
+              autoFocus={true}
+              placeholder="Search by product name"
                 id="company-user-module-search-box"
                 onChange={(e) => {
-                  handleSearchOption.handleSearchParameterChange(
-                    e.target.value,
-                  );
+                  handleSearchParameterChange(e.target.value);
                 }}
-                value={handleSearchOption.searchParameter}
+                value={searchParameter}
               ></SearchInput>
             </div>
-
-            {/* Date FIlters Dropdown */}
-            <div
-              className={`flex flex-wrap items-center gap-0.5 ${
-                isCustomDateOptionSelected ? "max-h-12" : "max-h-8"
-              }`}
-            >
-              <div className="flex gap-1">
-                <div className="flex ">
-                  <div className="flex input-label-custom items-center size-4 justify-center mt-2 mr-2 gap-2">
-                    <Calendar className="input-label-custom" />
-                  </div>
-                  <DateRangeFilterDropdown
-                    dropdownOptions={dateRangeDropdownOptions}
-                    handleDateIdChange={handleDateRangeIdChange}
-                    selectedOption={selectedDateName}
-                  ></DateRangeFilterDropdown>
-                </div>
-              </div>
-            </div>
-            {/* Custom Date Picker Div Flex Box*/}
-            {isCustomDateOptionSelected && (
-              <div
-                style={
-                  isCustomDateOptionSelected
-                    ? { visibility: "visible" }
-                    : { visibility: "hidden" }
-                }
-              >
-                <DateRangePicker
-                  onStartDateChange={onStartDateChange}
-                  onEndDateChange={onEndDateChange}
-                  initialStartDate={handleSearchOption.startDate}
-                  initialEndDate={handleSearchOption.endDate}
-                />
-              </div>
-            )}
           </div>
         </div>
-        <div
-          id="company-users-module-add-button"
-          className="flex gap-1 items-center"
-        >
-          <Button
-            type="button"
-            onClick={handleShowAllTransactionButtonClick}
-            className="flex items-center gap-2 h-7 px-2 py-1 caption-custom border border-gray-300 
-                      rounded-md bg-white  hover:bg-gray-50 
-                      focus:outline-none shadow-sm"
-          >
-            <span className="inline md:hidden">Transa...</span>
-            <span className="hidden md:inline"> Transactions</span>
-          </Button>
-
-          <Button
-            type="submit"
-            disabled={!userHasAccessToAddStock}
-            onClick={(e) => {
-              e.preventDefault();
-              if (!userHasAccessToAddStock) {
-                toast.error(MESSAGE.MODULE_ACCESS.STOCK.DENIED_ADD_ACCESS);
-                return;
-              } else {
-                setIsAddStockModalOpen(true);
-              }
-            }}
-          >
-            <div className="flex items-center gap-1">
-              <Plus size={SIZE.SIXTEEN} />
-              <span className="hidden md:inline">Add</span>
-            </div>
-          </Button>
-        </div>
       </div>
-      <div className="bg-white  overflow-y-auto rounded-lg shadow-sm ">
+      <div className="bg-white overflow-y-auto rounded-lg shadow-sm ">
         <div
           className={
             userPreference.isLeftMenu
-              ? `ag-theme-balham w-full h-[calc(100vh-116px)]`
-              : "ag-theme-balham w-full h-[calc(100vh-120px)]"
+              ? `w-full h-[calc(100vh-252px)]`
+              : "w-full h-[calc(100vh-192px)]"
           }
         >
           <StockLiveForCompanyProductAgGrid
             data={liveStockForCompanyProduct}
             onRowSelect={handleSelectedStockLiveForCompanyProduct}
+            isDataLoading={isDataLoading}
+            // handleRowClick={}
           />
         </div>
         <div className="flex items-center justify-end ">
@@ -349,29 +204,6 @@ const StockManagementList = ({
             }}
           />
         )}
-      {activeStockView === ActionTypeForStockMOdule.DETAILS && (
-        <StockLiveForCompanyProduct
-          companyStockLive={selectedStock!}
-          handleClose={() => {
-            setActiveStockview(null);
-          }}
-        />
-      )}
-      {activeStockView === ActionTypeForStockMOdule.TRANSACTIONS && (
-        <StockTransactions
-          companyProductId={selectedStock!.companyProductId}
-          onClose={() => {
-            setActiveStockview(null);
-          }}
-        />
-      )}
-      {openAllTransactionPage && (
-        <StockTransactions
-          onClose={() => {
-            setOpenAllTransactionPage(false);
-          }}
-        />
-      )}
     </div>
   );
 };

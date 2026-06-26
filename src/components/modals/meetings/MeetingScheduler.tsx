@@ -26,7 +26,6 @@ import ROUTES_URL from "../../../constants/Routes";
 import { useLoggedInUserContext } from "../../../context/user/LoggedInUserContext";
 import AddCompanyUsersEmailAttendeesModal from "./AddCompanyUsersEmailAttendeesModal";
 import CompanyUsersSearchProps from "../../../@types/company-users/CompanyUserProps";
-import { useGoogleMeetContext } from "../../../context/meeting/GoogleMeetContext";
 import { STATUS_CODE } from "../../../constants/AppConstants";
 import ApiError from "../../../@types/error/ApiError";
 import RefreshToken from "../../../config/validations/RefreshToken";
@@ -38,10 +37,12 @@ import { useMeetingPlatform } from "../../../config/hooks/useMeetingPlatforms";
 import CompanyLeadContactsSelectionAgGrid from "../../ag-grid/CompanyLeadContactsSelectionAgGrid";
 import LeadContactType from "../../../@types/lead-management/LeadContact";
 import Lead from "../../../@types/lead-management/LeadManagementProps";
-import { useGoogleMeetStatus } from "../../../config/hooks/useGoogleMeetStatus";
+// import { useGoogleMeetStatus } from "../../../config/hooks/useGoogleMeetStatus";
 import { useZoomMeetingsStatus } from "../../../config/hooks/useZoomMeetingsStatus";
 import toast from "react-hot-toast";
 import FormHeader from "../../ui/FormHeader";
+import { useGoogleMeetStatusUpdated } from "../../../config/hooks/useGoogleMeetStatusUpdated";
+import LoadingSpinner from "../../../assets/animations/LoadingSpinner";
 
 const MeetingScheduler = () => {
   const { loginStatus } = useLoggedInUserContext();
@@ -59,9 +60,13 @@ const MeetingScheduler = () => {
   const [startDate, setStartDate] = useState<string>("");
   const [endDate, setEndDate] = useState<string>("");
 
-  useGoogleMeetStatus();
+  // useGoogleMeetStatus();
   useZoomMeetingsStatus();
 
+ const {googleMeetStatus  , loading : googleMeetStatusLoading }= useGoogleMeetStatusUpdated({
+  companyId : loginStatus.companyId,
+  userId : loginStatus.id
+  })
   const { userPreference } = useUserPreference();
   const { meetingPlatform } = useMeetingPlatform();
 
@@ -73,20 +78,6 @@ const MeetingScheduler = () => {
     isAddCompanyLeadContactModalOpen,
     setIsAddCompanyLeadContactModalOpen,
   ] = useState<boolean>(false);
-
-  // const [messageSnackbar, setMessageSnackbar] = useState<MessageSnackbarState>({
-  //   open: false,
-  //   message: "",
-  //   type: "success" as "success" | "error",
-  // });
-
-  // const showMessageSnackbar = ({ message, type }: ShowMessageSnackbarProps) => {
-  //   setMessageSnackbar({ open: true, message, type });
-  // };
-
-  // const handleCloseSnackbar = () => {
-  //   setMessageSnackbar((prev) => ({ ...prev, open: false }));
-  // };
 
   useEffect(() => {
     setServerCurrentTime(new Date(currentTime.replace(" ", "T")));
@@ -110,7 +101,8 @@ const MeetingScheduler = () => {
   ] = useState<LeadContactType[]>([]);
 
   const navigate = useNavigate();
-  const { googleMeetStatus } = useGoogleMeetContext();
+  // const { googleMeetStatus } = useGoogleMeetContext();
+
   const { zoomMeetingStatus } = useZoomMeetingContext();
 
   const [leadData, setLeadData] = useState<Lead>();
@@ -131,6 +123,11 @@ const MeetingScheduler = () => {
     }
   }, [searchParams]);
   const createGoogleMeetMeeting = async () => {
+
+    if(!googleMeetStatus?.isactive){
+      toast.error("Google Meet is not integrated.")
+      return;
+    } 
     if (isCreating) {
       return;
     }
@@ -141,70 +138,43 @@ const MeetingScheduler = () => {
     const startDateTIme = momentTimezone.tz(
       combinedPickerStartDateTimeString,
       pickerFormatString,
-      userPreference.timezoneName
+      userPreference.timezoneName,
     );
     const endDateTime = momentTimezone.tz(
       combinedPickerEndDateTimeString,
       pickerFormatString,
-      userPreference.timezoneName
+      userPreference.timezoneName,
     );
 
     if (title === "") {
-      // showMessageSnackbar({
-      //   message: "Please give title to meeting",
-      //   type: "error",
-      // });
       toast.error("Please give title to meeting");
       setIsCreating(false);
       return;
     } else if (startDate === "") {
-      // showMessageSnackbar({
-      //   message: "Please select start date",
-      //   type: "error",
-      // });
       toast.error("Please select start date");
       setIsCreating(false);
       return;
     } else if (startTime === "") {
-      // showMessageSnackbar({
-      //   message: "Please select start time",
-      //   type: "error",
-      // });
       toast.error("Please select start time");
       setIsCreating(false);
       return;
     } else if (endDate === "") {
-      // showMessageSnackbar({ message: "Please select end date", type: "error" });
       toast.error("Please select end date");
       setIsCreating(false);
       return;
     } else if (endTime === "") {
-      // showMessageSnackbar({ message: "Please select end time", type: "error" });
       toast.error("Please select end time");
       setIsCreating(false);
       return;
     } else if (selectedMeetingPlatform === "") {
-      // showMessageSnackbar({
-      //   message: "Please select meeting platform",
-      //   type: "error",
-      // });
       toast.error("Please select meeting platform");
-
       setIsCreating(false);
       return;
     } else if (endDateTime.toDate() < startDateTIme.toDate()) {
-      // showMessageSnackbar({
-      //   message: "End Time should be greater than start time",
-      //   type: "error",
-      // });
       toast.error("End Time should be greater than start time");
       setIsCreating(false);
       return;
     } else if (serverCurrentTime! > startDateTIme.toDate()) {
-      // showMessageSnackbar({
-      //   message: "Connot create meeting as start time is in the past",
-      //   type: "error",
-      // });
       toast.error("Connot create meeting as start time is in the past");
       setIsCreating(false);
       return;
@@ -281,11 +251,7 @@ const MeetingScheduler = () => {
           setIsCreating(false);
         });
     } else {
-      // showMessageSnackbar({
-      //   message: "Please fill the required fields",
-      //   type: "error",
-      // });
-      toast.error("Please fill the required fields");
+       toast.error("Please fill the required fields");
     }
   };
   const createZoomMeeting = async () => {
@@ -299,69 +265,43 @@ const MeetingScheduler = () => {
     const startDateTIme = momentTimezone.tz(
       combinedPickerStartDateTimeString,
       pickerFormatString,
-      userPreference.timezoneName
+      userPreference.timezoneName,
     );
     const endDateTime = momentTimezone.tz(
       combinedPickerEndDateTimeString,
       pickerFormatString,
-      userPreference.timezoneName
+      userPreference.timezoneName,
     );
     if (title === "") {
-      // showMessageSnackbar({
-      //   message: "Please give title to meeting",
-      //   type: "error",
-      // });
       toast.error("Please give title to meeting");
       setIsCreating(false);
       return;
     } else if (startDate === "") {
-      // showMessageSnackbar({
-      //   message: "Please select start date",
-      //   type: "error",
-      // });
-      toast.error("Please select start date");
+       toast.error("Please select start date");
       setIsCreating(false);
       return;
     } else if (startTime === "") {
-      // showMessageSnackbar({
-      //   message: "Please select start time",
-      //   type: "error",
-      // });
-      toast.error("Please select start time");
+       toast.error("Please select start time");
       setIsCreating(false);
       return;
     } else if (endDate === "") {
-      // showMessageSnackbar({ message: "Please select end date", type: "error" });
       toast.error("Please select end date");
       setIsCreating(false);
       return;
     } else if (endTime === "") {
-      // showMessageSnackbar({ message: "Please select end time", type: "error" });
       toast.error("Please select end time");
       setIsCreating(false);
       return;
     } else if (selectedMeetingPlatform === "") {
-      // showMessageSnackbar({
-      //   message: "Please select meeting platform",
-      //   type: "error",
-      // });
-      toast.error("Please select meeting platform");
+       toast.error("Please select meeting platform");
       setIsCreating(false);
       return;
     } else if (endDateTime.toDate() < startDateTIme.toDate()) {
-      // showMessageSnackbar({
-      //   message: "End Time should be greater than start time",
-      //   type: "error",
-      // });
       toast.error("End Time should be greater than start time.");
       setIsCreating(false);
       return;
     } else if (serverCurrentTime! > startDateTIme.toDate()) {
-      // showMessageSnackbar({
-      //   message: "Connot create meeting as start time is in the past",
-      //   type: "error",
-      // });
-      toast.error("Connot create meeting as start time is in the past");
+     toast.error("Connot create meeting as start time is in the past");
       setIsCreating(false);
       return;
     }
@@ -396,16 +336,8 @@ const MeetingScheduler = () => {
         .then((response) => {
           if (response.status === STATUS_CODE.OK) {
             if (response.data.status) {
-              // showMessageSnackbar({
-              //   message: response.data.message,
-              //   type: "success",
-              // });
-              toast.success(response.data.message);
+               toast.success(response.data.message);
             } else {
-              // showMessageSnackbar({
-              //   message: response.data.message,
-              //   type: "error",
-              // });
               toast.error(response.data.message);
             }
           }
@@ -457,7 +389,7 @@ const MeetingScheduler = () => {
         getCompanyUserPostData,
         {
           withCredentials: true,
-        }
+        },
       );
 
       if (response.status === STATUS_CODE.OK) {
@@ -509,24 +441,26 @@ const MeetingScheduler = () => {
   const handleRemoveAttendee = (
     email: string,
     id: number,
-    type: "user" | "leadContact" | "normal"
+    type: "user" | "leadContact" | "normal",
   ) => {
-    console.log("remove lead attanfosdn");
-    console.log(email);
-    console.log(id);
+    
     setAttendees(attendees.filter((attendee) => attendee !== email));
     if (type === "user") {
       setSelectedCompanyUsersIdArray((prev) =>
-        prev.filter((userId) => userId !== id)
+        prev.filter((userId) => userId !== id),
       );
-      setSelectedCompanyUserDetailArray((prev) => prev.filter((user) => user.id !== id));
+      setSelectedCompanyUserDetailArray((prev) =>
+        prev.filter((user) => user.id !== id),
+      );
     }
 
     if (type === "leadContact") {
       setAddCompanyLeadContactIdArray((prev) =>
-        prev.filter((userId) => userId !== id)
+        prev.filter((userId) => userId !== id),
       );
-      setAddCompanyLeadContactDetailsArray((prev) => prev.filter((contact) => contact.id !== id));
+      setAddCompanyLeadContactDetailsArray((prev) =>
+        prev.filter((contact) => contact.id !== id),
+      );
     }
   };
 
@@ -550,7 +484,7 @@ const MeetingScheduler = () => {
 
   const handleAddCompanyUserEmailCheckboxChange = (
     params: CompanyUsersSearchProps,
-    event: React.ChangeEvent<HTMLInputElement>
+    event: React.ChangeEvent<HTMLInputElement>,
   ) => {
     if (event.target.checked) {
       setSelectedCompanyUsersIdArray((prev) => [...prev, params.id]);
@@ -564,18 +498,18 @@ const MeetingScheduler = () => {
       ]);
     } else if (!event.target.checked) {
       setSelectedCompanyUsersIdArray((prev) =>
-        prev.filter((id) => id !== params.id)
+        prev.filter((id) => id !== params.id),
       );
       setAttendees((prev) => prev.filter((email) => email !== params.email));
       setSelectedCompanyUserDetailArray((prev) =>
-        prev.filter((user) => user.id !== params.id)
+        prev.filter((user) => user.id !== params.id),
       );
     }
   };
 
   const handleCompanyLeadContactCheckBoxChange = (
     data: LeadContactType,
-    event: React.ChangeEvent<HTMLInputElement>
+    event: React.ChangeEvent<HTMLInputElement>,
   ) => {
     if (event.target.checked && data.email) {
       setAddCompanyLeadContactIdArray((prev) => [...prev, data.id]);
@@ -589,10 +523,10 @@ const MeetingScheduler = () => {
       toast.error("please add email for contact and then try again.");
     } else if (!event.target.checked && data.email) {
       setAddCompanyLeadContactIdArray((prev) =>
-        prev.filter((id) => id !== data.id)
+        prev.filter((id) => id !== data.id),
       );
       setAddCompanyLeadContactDetailsArray((prev) =>
-        prev.filter((contact) => contact.id !== data.id)
+        prev.filter((contact) => contact.id !== data.id),
       );
       setAttendees((prev) => prev.filter((email) => email !== data.email));
     }
@@ -615,30 +549,23 @@ const MeetingScheduler = () => {
     }
   };
 
+
+  if(googleMeetStatusLoading){
+    return (
+      <LoadingSpinner/>
+    )
+  }
+
   return createPortal(
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50  overflow-y-auto">
-      <div className="max-w-4xl mt-1 w-full p-4 bg-white rounded-lg shadow-xl overflow-y-auto">
-        {/* <div className="flex justify-between">
-          <h1 className="text-xl font-semibold mb-3 text-gray-800">
-            Schedule Meeting
-          </h1>
-          <div className="flex self-start">
-            <button
-              onClick={() => {
-                handleCloseMeetingModal();
-              }}
-            >
-              <X className="text-gray-500 hover:text-gray-700" size={20}></X>
-            </button>
-          </div>
-        </div> */}
+      <div className="max-w-5xl mt-1 w-full p-4 bg-white rounded-lg shadow-xl overflow-y-auto">
         <FormHeader
           onClose={handleCloseMeetingModal}
           icon={CalendarPlusIcon}
           description="Schedule your mettings as per your need"
           preText="Schedule Meeting"
         />
-        <div className="mb-1 grid grid-cols-3 gap-1">
+        <div className="mb-1 grid grid-cols-3 gap-2">
           <div className="col-span-2">
             <FormInput
               id="title"
@@ -646,14 +573,14 @@ const MeetingScheduler = () => {
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Meeting Title"
-              className="mt-1"
+              className=""
               label="Title"
               logo={ClipboardList}
             />
           </div>
           <div className="col-span-1">
             <label htmlFor="platform" className="input-label-custom mb-0">
-              <div className="flex gap-2 text-center mt-2">
+              <div className="flex gap-2 text-center ">
                 <CalendarPlusIcon className="text-blue-600 w-3 h-3 justify-center mt-1" />
                 <span>Meeting Platform</span>
               </div>
@@ -663,11 +590,13 @@ const MeetingScheduler = () => {
               value={selectedMeetingPlatform}
               onChange={(e) => {
                 if (e.target.value === meetingPlatform[0].name) {
-                  if (googleMeetStatus.isConnected) {
+                  // if (googleMeetStatus.isConnected) {
+                  if (googleMeetStatus?.isactive) {
                     setSelectedMeetingPlatform(e.target.value);
                   } else {
-                    setSelectedMeetingPlatform(e.target.value);
-                    handleGoogleMeetAuth();
+                    setSelectedMeetingPlatform("");
+                    toast.error("Google meet is not connected.")
+                    // handleGoogleMeetAuth();
                   }
                 } else if (e.target.value === meetingPlatform[1].name) {
                   if (zoomMeetingStatus.isConnected) {
@@ -681,7 +610,7 @@ const MeetingScheduler = () => {
                   setSelectedMeetingPlatform("");
                 }
               }}
-              className="block w-full pl-3 pr-10 py-2 border input-label-custom border-gray-300 focus:outline-1 focus:ring-indigo-500 focus:border-indigo-500 rounded-md"
+              className=" w-full h-7 border input-label-custom border-gray-300 focus:outline-1 focus:ring-indigo-500 focus:border-indigo-500 rounded-md"
             >
               <option className="input-label-custom" value="">
                 Select Platform
@@ -698,10 +627,11 @@ const MeetingScheduler = () => {
             </select>
           </div>
         </div>
-        <div className="grid grid-cols-8 gap-2 mb-1">
-          <div className="col-span-2">
+        <div className="grid grid-cols-4 gap-2 my-1">
+          <div className="">
             <DatePickerInput
               label="Start Date"
+              value={startDate}
               onChange={(e) => {
                 setStartDate(e.target.value);
               }}
@@ -716,7 +646,7 @@ const MeetingScheduler = () => {
             /> */}
           </div>
 
-          <div className="mt-2 col-span-2">
+          <div className="">
             <label htmlFor="startTime" className="input-label-custom">
               <div className="flex gap-2 text-center">
                 <Clock className="text-blue-600 w-3 h-3 justify-center mt-1" />
@@ -727,7 +657,7 @@ const MeetingScheduler = () => {
               id="startTtime"
               value={startTime}
               onChange={(e) => setStartTime(e.target.value)}
-              className="mt-1 block w-full pl-3 pr-10 input-label-custom py-2.5 border border-gray-300 focus:outline-1 focus:ring-indigo-500 focus:border-indigo-500 rounded-md"
+              className="h-7 block w-full input-label-custom border border-gray-300 focus:outline-1 focus:ring-indigo-500 focus:border-indigo-500 rounded-md"
             >
               <option value="">Start Time</option>
               {timeOptions.map((option) => (
@@ -738,9 +668,11 @@ const MeetingScheduler = () => {
             </select>
           </div>
 
-          <div className="col-span-2">
+          <div className="">
             <DatePickerInput
+            value={endDate}
               label="End Date"
+              minDate={startDate}
               onChange={(e) => {
                 setEndDate(e.target.value);
               }}
@@ -748,7 +680,7 @@ const MeetingScheduler = () => {
             />
           </div>
 
-          <div className="mt-2 col-span-2">
+          <div className="">
             <label htmlFor="endTime" className="input-label-custom">
               <div className="flex gap-2 text-center">
                 <Clock className="text-blue-600 w-3 h-3 justify-center mt-1" />
@@ -759,7 +691,7 @@ const MeetingScheduler = () => {
               id="endTime"
               value={endTime}
               onChange={(e) => setEndTime(e.target.value)}
-              className="mt-1 block w-full pl-3 pr-10 py-2.5 border border-gray-300 focus:outline-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+              className=" w-full h-7 border border-gray-300 focus:outline-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
             >
               <option value="">End Time</option>
               {timeOptions.map((option) => (
@@ -770,8 +702,6 @@ const MeetingScheduler = () => {
             </select>
           </div>
         </div>
-        <div className="mb-1"></div>
-        <div className="mb-1 grid grid-cols-3 gap-4"></div>
         <div className="mb-1">
           <TextAreaInput
             cols={2}
@@ -796,7 +726,7 @@ const MeetingScheduler = () => {
                 logo={UserPlus}
               />
             </div>
-            <div className="col-span-1 mt-7">
+            <div className="col-span-1 mt-5 w-fit">
               <Button
                 type="submit"
                 onClick={(e) => {
@@ -836,7 +766,7 @@ const MeetingScheduler = () => {
                 </span>
               </span>
             </div>
-            <div className="col-span-1 max-w-24">
+            <div className="col-span-1 w-fit">
               <Button
                 type="submit"
                 onClick={(e) => {
@@ -890,7 +820,7 @@ const MeetingScheduler = () => {
                               return true;
                             }
                             return false;
-                          }
+                          },
                         );
 
                         if (userRemoved) {
@@ -903,7 +833,7 @@ const MeetingScheduler = () => {
                               handleRemoveAttendee(
                                 attendee,
                                 contact.id,
-                                "leadContact"
+                                "leadContact",
                               );
                               return true;
                             }
@@ -947,11 +877,11 @@ const MeetingScheduler = () => {
               onClick={(e) => {
                 e.preventDefault();
                 if (selectedMeetingPlatform === meetingPlatform[0].name) {
-                  if (googleMeetStatus.isConnected) {
-                    createGoogleMeetMeeting();
-                  } else {
-                    handleGoogleMeetAuth();
-                  }
+                  // if (googleMeetStatus.isConnected) {
+                  createGoogleMeetMeeting();
+                  // } else {
+                  // handleGoogleMeetAuth();
+                  // }
                 } else if (
                   selectedMeetingPlatform === meetingPlatform[1].name
                 ) {
@@ -964,7 +894,7 @@ const MeetingScheduler = () => {
                   selectedMeetingPlatform === meetingPlatform[2].name
                 ) {
                   toast.error(
-                    "Microsofft teams is coming soon... Choose another platform instead."
+                    "Microsofft teams is coming soon... Choose another platform instead.",
                   );
                 } else {
                   toast.error("Select the Meeting platform first.");
@@ -1007,7 +937,7 @@ const MeetingScheduler = () => {
         />
       )}
     </div>,
-    document.body // Use the non-null assertion here.  We've ensured it's not null.
+    document.body, // Use the non-null assertion here.  We've ensured it's not null.
   );
 };
 

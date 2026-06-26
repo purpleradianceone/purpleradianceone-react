@@ -66,13 +66,13 @@ function UpdateSupportTicketTaskModal({
   const parsedDate = parse(
     supportTicketTask.dueDateTime,
     "MMM dd, yyyy HH:mm:ss",
-    new Date()
+    new Date(),
   );
   const dueDateValue = format(parsedDate, "yyyy-MM-dd");
   const dueTimeValue = format(parsedDate, "HH:mm");
 
   const [description, setDescription] = useState<string>(
-    supportTicketTask.description || ""
+    supportTicketTask.description || "",
   );
   const [dueDate, setDueDate] = useState<string>(dueDateValue);
   const [dueTime, setDueTime] = useState<string>(dueTimeValue);
@@ -92,7 +92,7 @@ function UpdateSupportTicketTaskModal({
   });
 
   const [resultOutcome, setResultOutcome] = useState<string>(
-    supportTicketTask.resultOutcome || ""
+    supportTicketTask.resultOutcome || "",
   );
 
   const [isActive, setIsActive] = useState<boolean>(supportTicketTask.isActive);
@@ -105,7 +105,7 @@ function UpdateSupportTicketTaskModal({
     assignedToId: supportTicketTask.assignedTo,
     resultOutcome: supportTicketTask.resultOutcome || "",
     isActive: supportTicketTask.isActive,
-  }
+  };
 
   useEffect(() => {
     if (parsedDate instanceof Date && !isNaN(parsedDate.getTime())) {
@@ -133,8 +133,16 @@ function UpdateSupportTicketTaskModal({
   };
 
   const updateSupportTicketTask = async (
-    event: React.FormEvent<HTMLButtonElement>
+    event: React.FormEvent<HTMLFormElement>,
   ) => {
+    event.preventDefault();
+    if (!userHasAccessToUpdateSupportTicketTask) {
+      toast.error(
+        MESSAGE.MODULE_ACCESS.SUPPORT_MODULE.DENIED_UPDATE_TASK_ACCESS,
+      );
+      return;
+    }
+    if (isSaving) return;
     if (
       previousData.supportTicketTaskStageId == supportTicketTaskStageId &&
       previousData.description === description &&
@@ -149,7 +157,7 @@ function UpdateSupportTicketTaskModal({
     }
     if (!userHasAccessToUpdateSupportTicketTask) {
       toast.error(
-        MESSAGE.MODULE_ACCESS.SUPPORT_MODULE.DENIED_UPDATE_TASK_ACCESS
+        MESSAGE.MODULE_ACCESS.SUPPORT_MODULE.DENIED_UPDATE_TASK_ACCESS,
       );
       return;
     }
@@ -174,7 +182,7 @@ function UpdateSupportTicketTaskModal({
         updateSupportTicketTaskPostData,
         {
           withCredentials: true,
-        }
+        },
       )
       .then((response) => {
         if (response.status === STATUS_CODE.OK) {
@@ -198,11 +206,11 @@ function UpdateSupportTicketTaskModal({
   };
 
   const handleIsActiveCheckboxChange = async (
-    event: React.ChangeEvent<HTMLInputElement>
+    event: React.ChangeEvent<HTMLInputElement>,
   ) => {
     if (!userHasAccessToUpdateSupportTicketTask) {
       toast.error(
-        MESSAGE.MODULE_ACCESS.SUPPORT_MODULE.DENIED_UPDATE_TASK_ACCESS
+        MESSAGE.MODULE_ACCESS.SUPPORT_MODULE.DENIED_UPDATE_TASK_ACCESS,
       );
       return;
     }
@@ -222,7 +230,7 @@ function UpdateSupportTicketTaskModal({
         updateSupportTicketTaskPostData,
         {
           withCredentials: true,
-        }
+        },
       )
       .then((response) => {
         if (response.status === STATUS_CODE.OK) {
@@ -261,6 +269,7 @@ function UpdateSupportTicketTaskModal({
       {isSaving && <LoadingPopUpAnimation show={isSaving} />}
       {/* Form Grid */}
       <form
+        onSubmit={updateSupportTicketTask}
         className={`space-y-1 ${isSaving ? "cursor-wait" : "cursor-default"}`}
       >
         <div className="grid grid-cols-2 gap-2 mt-2">
@@ -305,6 +314,16 @@ function UpdateSupportTicketTaskModal({
                 </div>
               </label>
               <select
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault(); // prevents dropdown open
+                    e.stopPropagation();
+
+                    // submit form manually
+                    const form = (e.target as HTMLElement).closest("form");
+                    form?.requestSubmit();
+                  }
+                }}
                 id="endTime"
                 className=" w-full pl-1 py-1 border border-gray-300 focus:outline-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
                 onChange={(e) => {
@@ -326,6 +345,7 @@ function UpdateSupportTicketTaskModal({
         <div className="grid grid-cols-2 gap-2">
           {/* description */}
           <TextAreaInput
+            autoFocus={true}
             logo={FileText}
             cols={5}
             rows={2}
@@ -403,48 +423,33 @@ function UpdateSupportTicketTaskModal({
             wantLabel={true}
           />
         </div>
-      </form>
-
-      {/* Footer Buttons */}
-      <div className="flex justify-center gap-4 mt-6">
-        <div className=" flex w-full justify-end ">
-          <div className="flex items-center gap-1 ">
-            {/* Cancel */}
-            <Button
-              onClick={() => {
-                handleClose(false);
-              }}
-              type="button"
-            >
-              <div className="flex items-center gap-1">
-                <X size={16} />
-                Cancel
-              </div>
-            </Button>
-            {/* Save */}
-            <Button
-              type="submit"
-              disabled={isSaving}
-              onClick={(event: React.FormEvent<HTMLButtonElement>) => {
-                if (!userHasAccessToUpdateSupportTicketTask) {
-                  toast.error(
-                    MESSAGE.MODULE_ACCESS.SUPPORT_MODULE
-                      .DENIED_UPDATE_TASK_ACCESS
-                  );
-                  return;
-                }
-                if (isSaving) return;
-                updateSupportTicketTask(event);
-              }}
-            >
-              <div className="flex items-center gap-1">
-                <Save size={16} />
-                Save
-              </div>
-            </Button>
+        {/* Footer Buttons */}
+        <div className="flex justify-center gap-4 mt-6">
+          <div className=" flex w-full justify-end ">
+            <div className="flex items-center gap-1 ">
+              {/* Cancel */}
+              <Button
+                onClick={() => {
+                  handleClose(false);
+                }}
+                type="button"
+              >
+                <div className="flex items-center gap-1">
+                  <X size={16} />
+                  Cancel
+                </div>
+              </Button>
+              {/* Save */}
+              <Button type="submit" disabled={isSaving}>
+                <div className="flex items-center gap-1">
+                  <Save size={16} />
+                  Save
+                </div>
+              </Button>
+            </div>
           </div>
         </div>
-      </div>
+      </form>
     </FormLayout>
   );
 }

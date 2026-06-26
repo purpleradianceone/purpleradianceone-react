@@ -1,9 +1,9 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-import { AllCommunityModule, ColDef, themeBalham } from "ag-grid-community";
+import { AllCommunityModule, ColDef } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import {  INNERHTML, JSX_CHILDREN_NAME } from "../../constants/AppConstants";
+import { AGGRID, JSX_CHILDREN_NAME } from "../../constants/AppConstants";
 import { CLASS_NAMES } from "../../constants/ClassNames";
 import ActionsDropdownButton from "../ui/ActionsDropdownButton";
 import { Edit, Network, Plus, UserPlus } from "lucide-react";
@@ -13,6 +13,11 @@ import toast from "react-hot-toast";
 import MESSAGE from "../../constants/Messages";
 import StatusIndicator from "../ui/StatusIndicator";
 import { Product } from "../../@types/products/ProductsManagementProps";
+import { SkeletonRowsAgGrid } from "../ui/SkeletonRowsAgGrid";
+import GridActionButton from "../ui/GridActionButton";
+import StatusBadge from "../ui/StatusBadge";
+import { productTypeStyles } from "../../utils/colourSpecifierForNameInAggrid";
+import RenderUserWithIcon from "../ui/UserAgGridCellRenderer";
 
 function ProductsManagementGrid({
   products,
@@ -24,13 +29,15 @@ function ProductsManagementGrid({
   isGridForAccountProduct,
   onRowSelect, //selected user for view lead details
   handleCreateStockModalOpen,
+  isDataLoading,
 }: ProductsManagementGridProps) {
   const {
     userHasAccessToViewProduct,
     userHasAccessToViewProductTax,
     userHasAccessToUpdateProduct,
     userHasAccessToViewProductTeam,
-    userHasAccessToViewProductUsers
+    userHasAccessToViewProductUsers,
+    userHasAccessToAddProductStock,
   } = useUserAccessModules();
 
   const columnDefs = useMemo<ColDef[]>(
@@ -50,16 +57,13 @@ function ProductsManagementGrid({
           if (!valueB) return 1;
           return valueA.toLowerCase().localeCompare(valueB.toLowerCase());
         },
+        cellStyle: () => ({
+          fontSize: "14px",
+          fontWeight: 600,
+          color: "#1f2937",
+        }),
       },
-      {
-        field: "barcode",
-        headerName: "Barcode",
-        sortable: true,
-        maxWidth: 130,
-        filter: true,
-        flex: 1,
-        hide: isGridForAccountProduct
-      },
+
       {
         field: "cost",
         headerName: "Basic Cost",
@@ -67,17 +71,50 @@ function ProductsManagementGrid({
         maxWidth: 130,
         filter: true,
         flex: 1,
-        hide: isGridForAccountProduct
+        hide: isGridForAccountProduct,
       },
+      {
+        // hide: true,
+        field: "minimumStock",
+        headerName: "Minimum Stock",
+        sortable: true,
+        filter: true,
+        flex: 1,
+        valueFormatter: (params) => {
+          if (!params.data) return "";
 
+          const minStock = params.value;
+          const unit = params.data.unitName;
+          return `${minStock} ${unit}`;
+          // return params.value ? `${params.value} ${}` : "";
+        },
+      },
       {
         field: "productTypeName",
         headerName: "Product Type",
         sortable: true,
-        maxWidth: 120,
+        maxWidth: 140,
         filter: true,
         flex: 1,
-        hide: isGridForAccountProduct
+        hide: isGridForAccountProduct,
+         cellRenderer: (params: any) => {
+          if (params.data?.__isSkeleton) {
+            return <SkeletonRowsAgGrid />;
+          }
+        const type = params.value || "-";
+          return (
+          <div className="flex items-center h-full">
+            <span
+              className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap ${
+                productTypeStyles[type] ||
+                "bg-slate-100 text-slate-700"
+              }`}
+            >
+              {type}
+            </span>
+          </div>
+        );
+        },
       },
       {
         field: "unitName",
@@ -86,7 +123,16 @@ function ProductsManagementGrid({
         filter: true,
         flex: 1,
         hide: isGridForAccountProduct,
+      },
 
+      {
+        field: "barcode",
+        headerName: "Barcode",
+        sortable: true,
+        maxWidth: 130,
+        filter: true,
+        flex: 1,
+        hide: isGridForAccountProduct,
       },
 
       {
@@ -97,14 +143,16 @@ function ProductsManagementGrid({
         maxWidth: 100,
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         cellRenderer: (params: any) => {
+          if (params.data?.__isSkeleton) {
+            return <SkeletonRowsAgGrid />;
+          }
           return (
-            <div className="flex items-center gap-1">
-              <StatusIndicator isActive={params.value} />
-            </div>
+             <div className="h-full flex items-center">
+                  <StatusBadge isActive={params.value} />
+                </div>
           );
         },
         hide: isGridForAccountProduct,
-
       },
       {
         field: "isSerialNumber",
@@ -115,6 +163,9 @@ function ProductsManagementGrid({
         maxWidth: 160,
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         cellRenderer: (params: any) => {
+          if (params.data?.__isSkeleton) {
+            return <SkeletonRowsAgGrid />;
+          }
           return (
             <div className="flex items-center gap-1">
               <StatusIndicator
@@ -126,7 +177,6 @@ function ProductsManagementGrid({
           );
         },
         hide: isGridForAccountProduct,
-
       },
 
       {
@@ -146,7 +196,6 @@ function ProductsManagementGrid({
         filter: true,
         flex: 1,
         hide: !userHasAccessToViewProduct || isGridForAccountProduct,
-
       },
       {
         field: "version",
@@ -156,7 +205,6 @@ function ProductsManagementGrid({
         filter: true,
         flex: 1,
         hide: !userHasAccessToViewProduct || isGridForAccountProduct,
-
       },
       {
         field: "url",
@@ -175,7 +223,6 @@ function ProductsManagementGrid({
           }
         },
         cellStyle: { color: "blue", cursor: "pointer" },
-
       },
       {
         field: "hsn",
@@ -217,6 +264,21 @@ function ProductsManagementGrid({
         },
       },
       {
+        field: "cess",
+        headerName: "Cess",
+        sortable: true,
+        filter: true,
+        flex: 1,
+        hide: !userHasAccessToViewProductTax || isGridForAccountProduct,
+        valueFormatter: (params) => {
+          if (params.value === 0) {
+            return "";
+          }
+          return params.value;
+        },
+      },
+
+      {
         field: "validFrom",
         headerName: "Effective From",
         sortable: true,
@@ -236,7 +298,6 @@ function ProductsManagementGrid({
         },
         hide: isGridForAccountProduct,
       },
-
       {
         hide: true,
         field: "unitId",
@@ -261,6 +322,7 @@ function ProductsManagementGrid({
         filter: true,
         flex: 1,
         hide: isGridForAccountProduct,
+        cellRenderer: RenderUserWithIcon,
       },
       {
         field: "createdOn",
@@ -268,22 +330,25 @@ function ProductsManagementGrid({
         sortable: true,
         filter: true,
         flex: 1,
-                hide: isGridForAccountProduct,
-
+        hide: isGridForAccountProduct,
       },
       {
         headerName: "Actions",
-        hide: !isGridForAccountProduct,
+        hide: isDataLoading || !isGridForAccountProduct,
         sortable: false,
         maxWidth: 100,
         pinned: "right",
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         cellRenderer: (params: Product | any) => {
+          if (params.data?.__isSkeleton) {
+            return <SkeletonRowsAgGrid />;
+          }
           return (
             <div className="flex items-center justify-center  ">
               <span
                 className="lead-details cursor-pointer text-blue-600  "
                 onClick={() => {
+                  if (isDataLoading) return;
                   params.context.handleRowSelect(params.data);
                 }}
               >
@@ -295,12 +360,17 @@ function ProductsManagementGrid({
       },
       {
         headerName: "Actions",
-        hide: isGridForAccountProduct,
+        hide: isDataLoading || isGridForAccountProduct,
         sortable: false,
         maxWidth: 100,
         pinned: "right",
+        filter: false,
+        headerClass: "",
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         cellRenderer: (params: any) => {
+          if (params.data?.__isSkeleton) {
+            return <SkeletonRowsAgGrid />;
+          }
           const [isActionsDropDownOpen, setIsActionsDropDownOpen] =
             useState(false);
           const [position, setPosition] = useState({
@@ -312,6 +382,7 @@ function ProductsManagementGrid({
 
           const handleActionsButtonClick = (event: React.MouseEvent) => {
             event.stopPropagation();
+
             setIsActionsDropDownOpen((prev) => !prev);
 
             const rect = (
@@ -343,23 +414,23 @@ function ProductsManagementGrid({
 
             document.addEventListener(
               "mousedown",
-              handleClickOutsideActionsDropDown
+              handleClickOutsideActionsDropDown,
             );
             return () =>
               document.removeEventListener(
                 "mousedown",
-                handleClickOutsideActionsDropDown
+                handleClickOutsideActionsDropDown,
               );
           }, []);
 
           return (
             <>
-              <button
-                className="text-blue-600"
-                onClick={handleActionsButtonClick}
-              >
-                {JSX_CHILDREN_NAME.ACTIONS}
-              </button>
+              <div>
+              <GridActionButton        
+                  id="actions-button"
+                  onClick={handleActionsButtonClick}
+                />
+                </div>
 
               {isActionsDropDownOpen &&
                 createPortal(
@@ -370,45 +441,50 @@ function ProductsManagementGrid({
                   >
                     <>
                       <ActionsDropdownButton
-                        disabled={!userHasAccessToUpdateProduct}
+                        disabled={
+                          isDataLoading || !userHasAccessToUpdateProduct
+                        }
                         onClick={() => {
-                          if (userHasAccessToUpdateProduct) {
+                          if (isDataLoading) {
+                            return;
+                          } else if (userHasAccessToUpdateProduct) {
                             setIsActionsDropDownOpen(false);
                             handleEditCompanyProductModalOpen(true);
                             handleSelectedProductChange(params.data);
                           } else {
                             toast.error(
                               MESSAGE.MODULE_ACCESS.PRODUCT_MANAGEMENT
-                                .DENIED_UPDATE_ACCESS
+                                .DENIED_UPDATE_ACCESS,
                             );
                           }
                         }}
                       >
                         <div>
-                        <Edit className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR} />{" "}
-                        {JSX_CHILDREN_NAME.EDIT}
+                          <Edit className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR} />{" "}
+                          {JSX_CHILDREN_NAME.EDIT}
                         </div>
                       </ActionsDropdownButton>
                     </>
 
                     <>
                       <ActionsDropdownButton
-                        disabled={!userHasAccessToUpdateProduct}
+                        disabled={!userHasAccessToAddProductStock}
                         onClick={() => {
-                          if (userHasAccessToUpdateProduct) {
+                          if (userHasAccessToAddProductStock) {
                             setIsActionsDropDownOpen(false);
                             handleCreateStockModalOpen!(true);
                             handleSelectedProductChange(params.data);
                           } else {
                             toast.error(
-                              MESSAGE.MODULE_ACCESS.STOCK.DENIED_ADD_ACCESS
+                              MESSAGE.MODULE_ACCESS.STOCK.STOCK
+                                .DENIED_ADD_ACCESS,
                             );
                           }
                         }}
                       >
                         <div className="">
                           <Plus className={CLASS_NAMES.INLINE_ICON_SIZE_FOUR} />
-                         {JSX_CHILDREN_NAME.ADD_STOCK}
+                          {JSX_CHILDREN_NAME.ADD_STOCK}
                         </div>
                       </ActionsDropdownButton>
                     </>
@@ -424,7 +500,8 @@ function ProductsManagementGrid({
                               handleSelectedProductChange(params.data);
                             } else {
                               toast.error(
-                                MESSAGE.MODULE_ACCESS.PRODUCT_USERS.DENIED_VIEW_ACCESS
+                                MESSAGE.MODULE_ACCESS.PRODUCT_USERS
+                                  .DENIED_VIEW_ACCESS,
                               );
                             }
                           }}
@@ -443,7 +520,8 @@ function ProductsManagementGrid({
                               handleSelectedProductChange(params.data);
                             } else {
                               toast.error(
-                                MESSAGE.MODULE_ACCESS.PRODUCT_TEAMS.DENIED_VIEW_ACCESS
+                                MESSAGE.MODULE_ACCESS.PRODUCT_TEAMS
+                                  .DENIED_VIEW_ACCESS,
                               );
                             }
                           }}
@@ -457,7 +535,7 @@ function ProductsManagementGrid({
                       </>
                     </>
                   </div>,
-                  document.body // Render dropdown in body to avoid clipping
+                  document.body, // Render dropdown in body to avoid clipping
                 )}
             </>
           );
@@ -465,8 +543,14 @@ function ProductsManagementGrid({
       },
     ],
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+    [],
   );
+
+  const skeletonRows = useMemo(() => {
+    return Array.from({ length: 30 }).map(() => ({
+      __isSkeleton: true,
+    }));
+  }, []);
 
   const defaultColDef = useMemo(() => {
     return {
@@ -475,22 +559,40 @@ function ProductsManagementGrid({
       flex: 0.8,
       suppressHeaderMenuButton: true,
       suppressHeaderContextMenu: true,
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      cellRenderer: (params: any) => {
+        if (params.data?.__isSkeleton) {
+          return <SkeletonRowsAgGrid />;
+        }
+         return (
+          <span className="">
+            {params.value !== null &&
+            params.value !== undefined &&
+            params.value !== ""
+              ? params.value
+              : "-"}
+          </span>
+        );
+      },
     };
   }, []);
 
   return (
     <div
-      className="ag-theme-balham w-full"
+      className="modern-user-grid custom-height-scrollbar w-full"
       style={{ height: "100%", width: "100%" }}
     >
       <AgGridReact
-        rowData={products}
+        rowData={isDataLoading ? skeletonRows : products}
         columnDefs={columnDefs}
         defaultColDef={defaultColDef}
         modules={[AllCommunityModule]}
-        overlayNoRowsTemplate={INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
-        theme={themeBalham}
-        context={{ handleRowSelect: onRowSelect }}
+        rowHeight={AGGRID.ROW_HEIGHT}
+        headerHeight={AGGRID.HEADER_HEIGHT}
+        // overlayNoRowsTemplate={INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
+        // theme={themeBalham}
+        context={{ handleRowSelect: isDataLoading ? undefined : onRowSelect }}
       />
     </div>
   );

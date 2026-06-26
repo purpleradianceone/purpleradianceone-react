@@ -57,7 +57,10 @@ import { useSupportTicketSource } from "../../../config/hooks/useSupportTicketSo
 import { PageLayout } from "../../ui/PageLayout";
 import { handleApiError } from "../../../config/error/handleApiError";
 import { supportTicketDataUrlSearchParamKey } from "../../lists/SupportTicketManagementList";
-
+import { Popover } from "../../ui/PopOver";
+import FormHeader from "../../ui/FormHeader";
+import { SupportWhatsappConversation } from "./support-whatsapp-conversation/SupportWhatsappConversation";
+import { FaWhatsapp } from "react-icons/fa";
 
 const ViewSupportTicketManagement = () => {
   const searchRef = useRef<CompanyUserSearchFieldRef>(null);
@@ -68,10 +71,11 @@ const ViewSupportTicketManagement = () => {
   const {
     userHasAccessToUpdateSupportTicket,
     userHasAccessToViewSupportTicketTask,
+    userHasAccessToViewSupportWhatsAppConversation
   } = useUserAccessModules();
 
   const [selectedSupportTicket, setSelectedSupportTicket] = useState(
-    JSON.parse(searchParams.get(supportTicketDataUrlSearchParamKey) || "{}")
+    JSON.parse(searchParams.get(supportTicketDataUrlSearchParamKey) || "{}"),
   );
 
   const [formData, setFormData] = useState<{
@@ -227,7 +231,7 @@ const ViewSupportTicketManagement = () => {
   const [keyForPageDataChange, setkeyForPageDataChange] = useState<number>(0);
 
   const handleSaveSupportTicketLifecycleUpdate = async (
-    lifecycleFormData: supportTicketLifecycleType
+    lifecycleFormData: supportTicketLifecycleType,
   ) => {
     setIsLoadingForLifecycleChanging(true);
     // console.log(lifecycleFormData);
@@ -254,12 +258,12 @@ const ViewSupportTicketManagement = () => {
       const response = await axiosClient.post(
         POST_API.UPDATE_SUPPORT_TICKET,
         postDataForSupportLifecycleUpdate,
-        { withCredentials: true }
+        { withCredentials: true },
       );
       if (response?.status == STATUS_CODE.OK) {
         if (response.data.status) {
           const updatedStatusName = supportTicketLifecycle?.find(
-            (item) => item.id === selectedSupportTicketLifecycleId
+            (item) => item.id === selectedSupportTicketLifecycleId,
           )?.name;
 
           const updatedSupportTicketLifecycle = {
@@ -296,7 +300,7 @@ const ViewSupportTicketManagement = () => {
           const searchParams = new URLSearchParams(location.search);
 
           const existingData = searchParams.get(
-            supportTicketDataUrlSearchParamKey
+            supportTicketDataUrlSearchParamKey,
           );
 
           const updatedQueryData = {
@@ -306,7 +310,7 @@ const ViewSupportTicketManagement = () => {
 
           searchParams.set(
             supportTicketDataUrlSearchParamKey,
-            JSON.stringify(updatedQueryData)
+            JSON.stringify(updatedQueryData),
           );
           setSelectedSupportTicketLifecycleId(undefined);
           setSelectedSupportTicketLifecycleName(undefined);
@@ -400,7 +404,8 @@ const ViewSupportTicketManagement = () => {
           ? selectedAssignTo.id
           : selectedSupportTicket.assignTo,
       resolvedby: selectedResolvedBy.id,
-      support_ticket_lifecycle_id: selectedSupportTicket.supportTicketLifecycleId,
+      support_ticket_lifecycle_id:
+        selectedSupportTicket.supportTicketLifecycleId,
       updatedby_id: loginStatus.id,
     };
     console.log(PostDataForSupportTicketUpdate);
@@ -409,7 +414,7 @@ const ViewSupportTicketManagement = () => {
       const response = await axiosClient.post(
         POST_API.UPDATE_SUPPORT_TICKET,
         PostDataForSupportTicketUpdate,
-        { withCredentials: true }
+        { withCredentials: true },
       );
       if (response.data.status) {
         //updating the local state
@@ -437,7 +442,7 @@ const ViewSupportTicketManagement = () => {
         const searchParams = new URLSearchParams(location.search);
 
         const existingData = searchParams.get(
-          supportTicketDataUrlSearchParamKey
+          supportTicketDataUrlSearchParamKey,
         );
 
         const updatedQueryData = {
@@ -447,7 +452,7 @@ const ViewSupportTicketManagement = () => {
 
         searchParams.set(
           supportTicketDataUrlSearchParamKey,
-          JSON.stringify(updatedQueryData)
+          JSON.stringify(updatedQueryData),
         );
 
         navigate(`${location.pathname}?${searchParams.toString()}`, {
@@ -497,10 +502,6 @@ const ViewSupportTicketManagement = () => {
   ]);
 
   const [showAccountName, setShowAccountName] = useState<boolean>(false);
-
-  
-  
-
 
   return (
     <PageLayout onScrollChange={setShowAccountName} scrollTopValue={80}>
@@ -593,7 +594,7 @@ const ViewSupportTicketManagement = () => {
                       } else {
                         toast.error(
                           MESSAGE.MODULE_ACCESS.SUPPORT_MODULE
-                            .UPDATE_ACCESS_DENIED_MESSAGE
+                            .UPDATE_ACCESS_DENIED_MESSAGE,
                         );
                       }
                     }}
@@ -720,29 +721,62 @@ const ViewSupportTicketManagement = () => {
                   )}
                 </div>
 
-                <div
-                  className={`${
-                    selectedSupportTicket?.resolvedByName !== "NA" &&
-                    selectedSupportTicket?.resolvedByName
-                      ? "hover:cursor-cell"
-                      : "hover:cursor-not-allowed"
-                  }`}
-                >
-                  <Detail
-                    type="none"
-                    onClick={() => {
-                      searchRef.current?.focus();
-                    }}
-                    label={
+                <div className="flex gap-1 caption-custom ">
+                  <div className=" flex items-center ">
+                    {/* Whatsapp conversation */}
+                    {selectedSupportTicket.supportTicketSourceId === 5 && (
+                      <Popover
+                        trigger={
+                          <button className="text-green-500 flex items-center gap-1" type="button">
+                           <FaWhatsapp /> Conversation
+                          </button>
+                        }
+                        padding={3}
+                        width={500}
+                        align="left"
+                        accessRight={userHasAccessToViewSupportWhatsAppConversation}
+                        children={(onClose) => (
+                          <>
+                            <FormHeader
+                              iconColour="text-green-500"
+                              icon={FaWhatsapp}
+                              onClose={() => onClose()}
+                              description="Conversation happened while creating support ticket."
+                              preText="Whatsapp Conversation"
+                            />
+                            <SupportWhatsappConversation
+                              selectedSupportTicketId={selectedSupportTicket.id}
+                            />
+                          </>
+                        )}
+                      />
+                    )}
+                  </div>
+
+                  <div
+                    className={`${
                       selectedSupportTicket?.resolvedByName !== "NA" &&
                       selectedSupportTicket?.resolvedByName
-                        ? "Resolved By"
-                        : "Status"
-                    }
-                    value={
-                      selectedSupportTicket?.resolvedByName || "Not Resolved"
-                    }
-                  />
+                        ? "hover:cursor-cell"
+                        : "hover:cursor-not-allowed"
+                    }`}
+                  >
+                    <Detail
+                      type="none"
+                      onClick={() => {
+                        searchRef.current?.focus();
+                      }}
+                      label={
+                        selectedSupportTicket?.resolvedByName !== "NA" &&
+                        selectedSupportTicket?.resolvedByName
+                          ? "Resolved By"
+                          : "Status"
+                      }
+                      value={
+                        selectedSupportTicket?.resolvedByName || "Not Resolved"
+                      }
+                    />
+                  </div>
                 </div>
               </div>
             </div>
@@ -782,7 +816,7 @@ const ViewSupportTicketManagement = () => {
                         onSelect={(value) => {
                           if (userHasAccessToUpdateSupportTicket) {
                             const result = supportTicketCategory?.find(
-                              (item) => item.id === value
+                              (item) => item.id === value,
                             );
                             if (value) {
                               setSelectedSupportTicketCategor({
@@ -839,7 +873,7 @@ const ViewSupportTicketManagement = () => {
                         onSelect={(value) => {
                           if (userHasAccessToUpdateSupportTicket) {
                             const result = supportTicketSource?.find(
-                              (item) => item.id === value
+                              (item) => item.id === value,
                             );
                             if (value) {
                               setSelectedSupportTicketSource({
@@ -896,7 +930,7 @@ const ViewSupportTicketManagement = () => {
                         onSelect={(value) => {
                           if (userHasAccessToUpdateSupportTicket) {
                             const result = companyProductSla?.find(
-                              (item) => item.id === value
+                              (item) => item.id === value,
                             );
                             if (value) {
                               setSelectedCompanyProductSla({
@@ -996,11 +1030,11 @@ const ViewSupportTicketManagement = () => {
                       key={keyForAssignTo}
                       logo={User}
                       has={{
-                          border: true,
-                          penLogo: true,
-                          searchLogo: true,
-                          xLogo:true
-                        }}
+                        border: true,
+                        penLogo: true,
+                        searchLogo: true,
+                        xLogo: true,
+                      }}
                       label="Assign To"
                       // placeholder={selectedSupportTicket.assignedToName}
                       defaultValue={selectedSupportTicket.assignedToName}
@@ -1014,7 +1048,7 @@ const ViewSupportTicketManagement = () => {
                           setSelectedAssignTo(user);
                         }
                         if (user === null || user === undefined) {
-                          setkeyForAssignTo((prev)=>prev+1);
+                          setkeyForAssignTo((prev) => prev + 1);
                           setSelectedAssignTo({
                             company_id: 0,
                             email: "",
@@ -1047,7 +1081,7 @@ const ViewSupportTicketManagement = () => {
                           border: true,
                           searchLogo: true,
                           penLogo: true,
-                          xLogo:true
+                          xLogo: true,
                         }}
                         label="Resolved By"
                         defaultValue={selectedSupportTicket.resolvedByName}
@@ -1138,7 +1172,6 @@ const ViewSupportTicketManagement = () => {
                       value={selectedSupportTicket?.updatedOn}
                     />
                   </div>
-                   
                 </div>
               </div>
             </div>
@@ -1217,11 +1250,11 @@ const ViewSupportTicketManagement = () => {
           </div>
 
           {/* third Column */}
-          {(
+          {
             <div className="mt-3">
               <SupportTicketTasksModal />
             </div>
-          )}
+          }
         </div>
 
         {/* Support Ticket history */}
@@ -1265,7 +1298,7 @@ type DetailProps = {
   onChange?: (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-    >
+    >,
   ) => void;
   handleSupportTicketInfoSave?: () => Promise<void>;
   hasBorder?: boolean;
@@ -1318,7 +1351,7 @@ const Detail: React.FC<DetailProps> = ({
         } as any);
 
         toast.error(
-          MOBILE_NUMBER_VALIDATION.ERROR_MESSAGE_MOBILE_NUMBER_INDIAN
+          MOBILE_NUMBER_VALIDATION.ERROR_MESSAGE_MOBILE_NUMBER_INDIAN,
         );
         return;
       }
