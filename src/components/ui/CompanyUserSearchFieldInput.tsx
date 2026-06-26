@@ -364,7 +364,7 @@ const CompanyUserSearchFieldInput = forwardRef<
           } `}
         >
           {Icon && (
-            <Icon size={19} className={COLORS.INPUT_LABEL_ICONS_COLOR} />
+            <Icon size={16} className={COLORS.INPUT_LABEL_ICONS_COLOR} />
           )}
 
           {label}

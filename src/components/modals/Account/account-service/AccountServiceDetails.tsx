@@ -21,6 +21,7 @@ import {
   CheckCircle2,
   XCircle,
   FileText,
+  Headset,
 } from "lucide-react";
 import Button from "../../../ui/Button";
 import TextAreaInput from "../../../ui/TextAreaInput";
@@ -483,12 +484,11 @@ const AccountServiceDetails = () => {
           <div className="grid grid-cols-[350px_1fr]">
             {/* Left */}
             <div className="px-3 py-2 border-r border-slate-200 flex gap-4 mt-1">
-              <div
-                className={`w-9 h-9 rounded-full ${COLORS.LIGHT_PURPLE_BACKGROUND}
-        flex items-center justify-center`}
-              >
-                <FileCode size={20} className={COLORS.PRIMARY_PURPLE} />
-              </div>
+              <div className="flex items-center ">
+             <div className={`p-3 rounded-lg ${COLORS.PAGE_HEADER_SECTION_BG_COLOR} flex items-center justify-center shrink-0`}>
+              <Headset className={COLORS.PAGE_HEADER_ICONS_COLOR_AND_SIZE} />
+            </div>
+            </div>
 
               <div>
                 <h2 className="page-header-custom">

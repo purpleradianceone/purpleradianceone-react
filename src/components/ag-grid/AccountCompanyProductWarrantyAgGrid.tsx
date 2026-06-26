@@ -1,12 +1,14 @@
 import { useMemo } from "react";
 import { AccountCompanyProductWarranty } from "../../@types/account/AccountCompanyProductWarranty";
-import { AllCommunityModule, ColDef, themeBalham } from "ag-grid-community";
+import { AllCommunityModule, ColDef,  } from "ag-grid-community";
 import StatusIndicator from "../ui/StatusIndicator";
 import { AgGridReact } from "ag-grid-react";
 import { useUserAccessModules } from "../../config/hooks/useAccessModules";
 import toast from "react-hot-toast";
 import MESSAGE from "../../constants/Messages";
 import Button from "../ui/Button";
+import { AGGRID } from "../../constants/AppConstants";
+import RenderUserWithIcon from "../ui/UserAgGridCellRenderer";
 
 
 interface AccountCompanyProductWarrantyAgGrid {
@@ -64,11 +66,13 @@ export const AccountCompanyProductWarrantyAgGrid : React.FC<
       {
         field: "createdBy",
         headerName: "Created By",
+        cellRenderer: RenderUserWithIcon,
       },
       
       {
         field: "updatedBy",
         headerName: "updated By",
+        cellRenderer: RenderUserWithIcon,
       },
       {
         field: "updatedOn",
@@ -78,7 +82,8 @@ export const AccountCompanyProductWarrantyAgGrid : React.FC<
               headerName: "Actions",
               field: "view",
               pinned: "right",
-              maxWidth: 80,
+              maxWidth: 100,
+              filter: false,
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               cellRenderer: (params: AccountCompanyProductWarranty | any) => {
                 return (
@@ -116,7 +121,7 @@ export const AccountCompanyProductWarrantyAgGrid : React.FC<
   }, []);
   return (
     <div
-      className="ag-theme-balham w-full"
+      className="modern-user-grid custom-height-scrollbar w-full"
       style={{ height: "100%", width: "100%" }}
     >
       <AgGridReact
@@ -124,7 +129,10 @@ export const AccountCompanyProductWarrantyAgGrid : React.FC<
         columnDefs={columnDefs}
         defaultColDef={defaultColDef}
         modules={[AllCommunityModule]}
-        theme={themeBalham}
+        // theme={themeBalham}
+        rowHeight={AGGRID.ROW_HEIGHT}
+        headerHeight={AGGRID.HEADER_HEIGHT}
+
          context={{ handleRowSelect: onRowSelect }}
       />
     </div>

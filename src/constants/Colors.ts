@@ -10,7 +10,7 @@ const COLORS={
     WHITE : "white",
     GRID_HEADER_ICONS_COLOR_AND_SIZE : "w-5 h-5 text-blue-600",
     GRID_HEADER_SECTION_BG_COLOR : "bg-gray-50",
-    FORM_HEADER_ICONS_COLOR : "text-blue-500 mt-1",
+    FORM_HEADER_ICONS_COLOR : "text-[#6C4CF1] mt-1",
     INPUT_LABEL_ICONS_COLOR : `inline mr-1 text-[#6C4CF1]`, //purplecoloR
     INPUT_READONLY_BG_COLOR : "bg-gray-100",
     INPUT_FOCUS_COLOR : "focus:outline-none focus:ring-violet-400 focus:border-violet-400",

@@ -10,6 +10,8 @@ import { AccountCompanyProductAmcCreate } from "./AccountCompanyProductAmcCreate
 import { useUserAccessModules } from "../../../../../config/hooks/useAccessModules";
 import toast from "react-hot-toast";
 import MESSAGE from "../../../../../constants/Messages";
+import COLORS from "../../../../../constants/Colors";
+import { CalendarClock,  } from "lucide-react";
 
 export const AccountCompanyProductAmcDetails = ({
   accountCompanyProductId,
@@ -48,8 +50,14 @@ export const AccountCompanyProductAmcDetails = ({
   if (!userHasAccessToViewAccountProductsAmc) return null;
   return (
     <div className="bg-white rounded-xl border p-1 grid gap-1 border-slate-200">
-      <h3 className="flex items-center justify-between bg-gray-100 table-header-custom rounded-t-md px-2">
+      <h3 className="flex items-center justify-between  table-header-custom rounded-t-md px-2">
+       
+       <div className="flex items-center gap-1">
+       <div className={COLORS.SECTION_HEADER_ICON_STYLE}>
+              <CalendarClock size={16} />
+              </div>
         <span>AMC Details</span>
+        </div>
         <div className="  hidden justify-end items-center text-xs gap-x-2 py-0.5 text-gray-500">
           <Button
             disabled={!userHasAccessToAddAccountProductsAmc}
@@ -63,14 +71,14 @@ export const AccountCompanyProductAmcDetails = ({
                 );
               }
             }}
-            className="bg-blue-600 hover:bg-blue-700 caption-custom white-text px-1 py-0.5 rounded-md flex items-center gap-1"
+            className={COLORS.ADD_BUTTON}
           >
             <span>+Add</span>
           </Button>
         </div>
       </h3>
 
-      <div className={"ag-theme-balham w-full h-[20vh]"}>
+      <div className={"w-full h-[20vh]"}>
         {loading && <LoadingSpinner />}
         {!loading && (
           <AccountCompanyProductAmcAggrid
