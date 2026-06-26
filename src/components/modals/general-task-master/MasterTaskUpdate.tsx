@@ -5,6 +5,7 @@ import {
   CalendarClock,
   CalendarDays,
   ChevronRight,
+  ClipboardList,
   Download,
   File,
   FileText,
@@ -83,7 +84,7 @@ function MasterTaskUpdate() {
     number | undefined
   >();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const { userHasAccessToUpdateMasterTasks } = useUserAccessModules();
+  const { userHasAccessToUpdateMasterTasks ,userHasAccessToViewMasterTasks } = useUserAccessModules();
   const [selectedCompanyUser, setSelectedCompanyUser] = useState<CompanyUser>({
     company_id: 0,
     id: 0,
@@ -252,10 +253,10 @@ function MasterTaskUpdate() {
   };
 
   useEffect(() => {
-    if (!userHasAccessToUpdateMasterTasks) {
+    if (!userHasAccessToViewMasterTasks) {
       setAccessDeniedPopUpOpen(true);
     }
-  }, [userHasAccessToUpdateMasterTasks]);
+  }, [userHasAccessToViewMasterTasks]);
   // ⭐ PREFILL FORM
   useEffect(() => {
     const controller = new AbortController();
@@ -476,7 +477,7 @@ function MasterTaskUpdate() {
 
   return (
     <>
-      {userHasAccessToUpdateMasterTasks ? (
+      {userHasAccessToViewMasterTasks ? (
         <div className=" w-full pl-5 min-h-[90vh] ">
           {" "}
           <div>
@@ -510,14 +511,16 @@ function MasterTaskUpdate() {
                       {/* Logo */}
 
                       <div className="p-5 border-r border-slate-200 flex gap-4">
-                        <div
-                          className={`w-10 h-10 rounded-lg ${COLORS.LIGHT_PURPLE_BACKGROUND}
-                        flex items-center justify-center`}
-                        >
-                          <FileText
-                            size={22}
-                            className={COLORS.PRIMARY_PURPLE}
-                          />
+                        <div className="flex items-start ">
+                          <div
+                            className={`p-3 rounded-lg ${COLORS.PAGE_HEADER_SECTION_BG_COLOR} flex items-center justify-center shrink-0`}
+                          >
+                            <ClipboardList
+                              className={
+                                COLORS.PAGE_HEADER_ICONS_COLOR_AND_SIZE
+                              }
+                            />
+                          </div>
                         </div>
 
                         <div>
@@ -618,16 +621,17 @@ function MasterTaskUpdate() {
                               <ToggleButton
                                 checked={formData.isActive}
                                 name="isActive"
-                                onToggle={() => {
-                                  if (!formData.isActive) {
-                                    toast.error(
-                                      "Inactive master task cannot be updated.",
-                                    );
-                                    return;
-                                  }
-                                  setConfirmationOpen(true);
-                                }}
-                              />
+                                 onToggle={() => {
+                              if (!userHasAccessToUpdateMasterTasks) return;
+
+                              if (!formData.isActive) {
+                                toast.error("Inactive master task cannot be updated.");
+                                return;
+                              }
+
+                              setConfirmationOpen(true);
+                            }}
+                                                        />
 
                               <span
                                 className={`text-sm ${
@@ -655,6 +659,7 @@ function MasterTaskUpdate() {
                             label="Subject"
                             name="subject"
                             defaultValue={formData.subject}
+                             disabled={!userHasAccessToUpdateMasterTasks}
                             value={formData.subject}
                             onChange={(e: any) =>
                               handleInputChange("subject", e.target.value)
@@ -666,6 +671,7 @@ function MasterTaskUpdate() {
                           <CustomDropdown
                             logo={Flag}
                             labelName="Priority"
+                               readOnly={!userHasAccessToUpdateMasterTasks}
                             options={taskPriority!}
                             preselectedOption={formData.taskPriority}
                             onSelect={(v) =>
@@ -680,6 +686,7 @@ function MasterTaskUpdate() {
                             label="Description"
                             logo={FileText}
                             value={formData.description}
+                             disabled={!userHasAccessToUpdateMasterTasks}
                             onChange={(e: any) =>
                               handleInputChange("description", e.target.value)
                             }
@@ -693,6 +700,7 @@ function MasterTaskUpdate() {
                           <CompanyUserSearchFieldInput
                             label="Assign"
                             logo={User}
+                            readOnly={!userHasAccessToUpdateMasterTasks}
                             defaultValue={
                               selectedSupportTicket?.assignedToName ?? ""
                             }
@@ -715,12 +723,15 @@ function MasterTaskUpdate() {
                         <div className="flex justify-end items-end ">
                           <div>
                             <Button
-                              onClick={(e) => {
-                                e.preventDefault();
+                                disabled={isSubmitting || !userHasAccessToUpdateMasterTasks}
+                                onClick={(e) => {
+                                  e.preventDefault();
 
-                                updateTask();
-                              }}
-                            >
+                                  if (!userHasAccessToUpdateMasterTasks) return;
+
+                                  updateTask();
+                                }}
+                              >
                               <div className="flex gap-2 items-center">
                                 <Save size={15} />
                                 Save
@@ -766,7 +777,7 @@ function MasterTaskUpdate() {
                           <div className="mt-2 w-[50%]">
                             <Button
                               className={`caption-custom w-full flex items-center justify-center p-1 ml-12 ${COLORS.LIGHT_PURPLE_HOVER} ${COLORS.PRIMARY_PURPLE} rounded-lg
-   border !border-violet-200 gap-1 font-medium shadow-sm hover:shadow-md`}
+                  border !border-violet-200 gap-1 font-medium shadow-sm hover:shadow-md`}
                               onClick={downloadTaskDocument}
                               disabled={!selectedSupportTicket?.extension}
                             >
@@ -788,6 +799,7 @@ function MasterTaskUpdate() {
                                 fileExtension={selectedSupportTicket?.extension}
                                 width={"50%"}
                                 enableDownload={true}
+                                
                               />
                             </div>
                           )}
@@ -800,6 +812,7 @@ function MasterTaskUpdate() {
                           type="file"
                           id="fileUpload"
                           className="hidden"
+                          disabled={!userHasAccessToUpdateMasterTasks}
                           onChange={(e) => {
                             if (e.target.files?.[0]) {
                               setSelectedFile(e.target.files[0]);
@@ -808,8 +821,13 @@ function MasterTaskUpdate() {
                         />
 
                         <label
-                          htmlFor="fileUpload"
-                          className={`flex items-center justify-center gap-2 cursor-pointer ${COLORS.PRIMARY_PURPLE} text-sm font-medium`}
+                          htmlFor={userHasAccessToUpdateMasterTasks ? "fileUpload" : undefined}
+                          className={`flex items-center justify-center gap-2 text-sm font-medium
+                            ${
+                              userHasAccessToUpdateMasterTasks
+                                ? "cursor-pointer text-violet-600"
+                                : "cursor-not-allowed text-gray-400"
+                            }`}
                         >
                           <Upload size={16} />
                           Select Document
@@ -838,12 +856,19 @@ function MasterTaskUpdate() {
                       {/* Upload Button */}
                       <div className="flex flex-col justify-end items-center gap-2 py-1">
                         <Button
-                          onClick={(e) => {
-                            e.preventDefault();
-                            updateTaskDocument();
-                          }}
-                          disabled={!selectedFile}
-                        >
+                        disabled={
+                          !selectedFile ||
+                          isSubmitting ||
+                          !userHasAccessToUpdateMasterTasks
+                        }
+                        onClick={(e) => {
+                          e.preventDefault();
+
+                          if (!userHasAccessToUpdateMasterTasks) return;
+
+                          updateTaskDocument();
+                        }}
+                      >
                           <div className="flex gap-2 items-center">
                             <Save size={15} />
                             Upload Document
@@ -954,7 +979,20 @@ export default MasterTaskUpdate;
 
 export const TaskCard = ({ task, setTaskList }: TaskCardProps) => {
   const { loginStatus } = useLoggedInUserContext();
+const { userHasAccessToUpdateMasterTasks} = useUserAccessModules();
 
+<ToggleButton
+  label="Status"
+  wantLabel={true}
+  checked={task.isactive}
+  
+  name="isActive"
+  onToggle={(e) => {
+    if (!userHasAccessToUpdateMasterTasks) return;
+    handleGeneralTaskToggle(e, task.id);
+  }}
+  
+/>
   const handleGeneralTaskToggle = async (
     event: React.ChangeEvent<HTMLInputElement>,
     taskId: number,
@@ -1118,9 +1156,13 @@ export const TaskCard = ({ task, setTaskList }: TaskCardProps) => {
         <ToggleButton
           label="Status"
           wantLabel={true}
-          checked={task.isactive}
+          checked={task.isactive} 
           name="isActive"
-          onToggle={(e) => handleGeneralTaskToggle(e, task.id)}
+           onToggle={(e) => {
+    if (!userHasAccessToUpdateMasterTasks) return;
+    handleGeneralTaskToggle(e, task.id);
+  }}
+          
         />
       </div>
     </div>

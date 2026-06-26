@@ -1,4 +1,4 @@
-import { AllCommunityModule, ColDef, themeBalham } from "ag-grid-community";
+import { AllCommunityModule, ColDef,  } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 import { useMemo } from "react";
 import { AccountCompanyProductAmc } from "../../@types/account/AccountCompanyProductAmc";
@@ -7,6 +7,9 @@ import { useUserAccessModules } from "../../config/hooks/useAccessModules";
 import Button from "../ui/Button";
 import toast from "react-hot-toast";
 import MESSAGE from "../../constants/Messages";
+import { AGGRID } from "../../constants/AppConstants";
+import { Eye } from "lucide-react";
+import RenderUserWithIcon from "../ui/UserAgGridCellRenderer";
 
 interface AccountCompanyProductAmcAgGrid {
   data: AccountCompanyProductAmc[];
@@ -59,11 +62,13 @@ export const AccountCompanyProductAmcAggrid: React.FC<
       {
         field: "createdBy",
         headerName: "Created By",
+         cellRenderer: RenderUserWithIcon,
       },
 
       {
         field: "updatedBy",
         headerName: "updated By",
+         cellRenderer: RenderUserWithIcon,
       },
       {
         field: "updatedOn",
@@ -73,7 +78,8 @@ export const AccountCompanyProductAmcAggrid: React.FC<
         headerName: "Actions",
         field: "view",
         pinned: "right",
-        maxWidth: 80,
+        maxWidth: 100,
+        filter:false,
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         cellRenderer: (params: AccountCompanyProductAmc | any) => {
           return (
@@ -89,7 +95,10 @@ export const AccountCompanyProductAmcAggrid: React.FC<
                   params.context.handleRowSelect(params.data);
                 }}
               >
-                Update
+                 <Eye size={12} strokeWidth={1.5} />
+                 <span>
+                 Update
+                 </span>
               </Button>
             </div>
           );
@@ -110,7 +119,7 @@ export const AccountCompanyProductAmcAggrid: React.FC<
   }, []);
   return (
     <div
-      className="ag-theme-balham w-full"
+      className="modern-user-grid custom-height-scrollbar w-full"
       style={{ height: "100%", width: "100%" }}
     >
       <AgGridReact
@@ -118,7 +127,9 @@ export const AccountCompanyProductAmcAggrid: React.FC<
         columnDefs={columnDefs}
         defaultColDef={defaultColDef}
         modules={[AllCommunityModule]}
-        theme={themeBalham}
+        // theme={themeBalham}
+        rowHeight={AGGRID.ROW_HEIGHT}
+        headerHeight={AGGRID.HEADER_HEIGHT}
         context={{ handleRowSelect: onRowSelect }}
       />
     </div>

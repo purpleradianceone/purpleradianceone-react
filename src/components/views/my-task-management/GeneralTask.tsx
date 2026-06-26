@@ -7,6 +7,7 @@ import {
   CalendarDays,
   ChevronRight,
   Download,
+  FileEdit,
   FileText,
   Flag,
   Save,
@@ -42,7 +43,8 @@ function GeneralTask() {
   const [originalFormData, setOriginalFormData] = useState<any>(null);
   const { taskStage } = useTaskStage();
   const { taskId, masterId } = useParams();
-  const { userHasAccessToUpdateAllTasks } = useUserAccessModules();
+  const { userHasAccessToUpdateAllTasks, userHasAccessToViewAllTasks } =
+    useUserAccessModules();
   const [selectedGeneralTask, setSelectedGeneralTask] = useState<any>(null);
   const [generalMasterTask, setGeneralMasterTask] = useState<MasterTaskProps>();
   const [isLoadingTask, setIsLoadingTask] = useState<boolean>(false);
@@ -50,10 +52,10 @@ function GeneralTask() {
   const [showCompanyLogoPreview, setShowCompanyLogoPreview] = useState(false);
 
   useEffect(() => {
-    if (!userHasAccessToUpdateAllTasks) {
+    if (!userHasAccessToViewAllTasks) {
       setAccessDeniedPopUpOpen(true);
     }
-  }, [userHasAccessToUpdateAllTasks]);
+  }, [userHasAccessToViewAllTasks]);
   /* ---------- FORM DATA ---------- */
   const [formData, setFormData] = useState({
     remark: "",
@@ -75,7 +77,7 @@ function GeneralTask() {
       subject: selectedGeneralTask?.subject,
     };
     setFormData(data);
-    // 👇 store original copy
+    // store original copy
     setOriginalFormData(data);
   }, [selectedGeneralTask]);
 
@@ -123,6 +125,8 @@ function GeneralTask() {
       setIsLoadingTask(false);
     }
   };
+
+
   /* ---------- UPDATE ---------- */
   const updateTask = async () => {
     try {
@@ -273,7 +277,7 @@ function GeneralTask() {
   /* ---------- UI ---------- */
   return (
     <>
-      {userHasAccessToUpdateAllTasks ? (
+      {userHasAccessToViewAllTasks ? (
         <div className="w-full min-h-screen bg-slate-50 pl-5">
           <div className=" sticky top-10 z-10 bg-slate-100 h-8 flex text-center justify-start items-center gap-3 ml-0.5 ">
             <Link to={ROUTES_URL.TASKS_MANAGEMENT}>
@@ -294,13 +298,14 @@ function GeneralTask() {
                   <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm h-full">
                     {/* HEADER */}
                     <div className="flex items-center gap-3 pb-3 border-b border-slate-200">
-                      <div
-                        className={`w-10 h-10 rounded-lg ${COLORS.LIGHT_PURPLE_BACKGROUND} flex items-center justify-center`}
-                      >
-                        <FileText
-                          size={22}
-                          className={`${COLORS.PRIMARY_PURPLE}`}
-                        />
+                      <div className="flex items-start ">
+                        <div
+                          className={`p-2 rounded-lg ${COLORS.PAGE_HEADER_SECTION_BG_COLOR} flex items-center justify-center shrink-0`}
+                        >
+                          <FileEdit
+                            className={COLORS.PAGE_HEADER_ICONS_COLOR_AND_SIZE}
+                          />
+                        </div>
                       </div>
 
                       <div>
@@ -369,10 +374,10 @@ function GeneralTask() {
                           // logo={FileText}
                           value={formData.remark}
                           placeholder="Enter remark here...."
-                          onChange={(e: any) => {
-                            handleInputChange("remark", e.target.value);
-                          }}
-                          // onBlur={autoSave}
+                           readonly={!userHasAccessToUpdateAllTasks}
+                          disabled={!userHasAccessToUpdateAllTasks}
+                          onChange={(e) => handleInputChange("remark", e.target.value)}
+                                                  // onBlur={autoSave}
                           cols={5}
                           rows={3}
                         />
@@ -383,19 +388,21 @@ function GeneralTask() {
                           labelName="Task Stage"
                           options={taskStage}
                           preselectedOption={formData.taskStageId}
-                          onSelect={(v) => {
-                            handleDropdownChange("taskStageId", v);
-                          }}
+                         readOnly={!userHasAccessToUpdateAllTasks}
+                          onSelect={(v) => handleDropdownChange("taskStageId", v)}
                         />
                       </div>
                     </div>
                     <div className="flex justify-end border-t border-slate-200 pt-5 mt-2">
                       <div>
                         <Button
-                          disabled={isSubmitting}
-                          onClick={updateTask}
-                          // className={`px-4 py-1.5 rounded `}
-                        >
+                        disabled={isSubmitting || !userHasAccessToUpdateAllTasks}
+                        onClick={() => {
+                          if (userHasAccessToUpdateAllTasks) {
+                            updateTask();
+                          }
+                        }}
+                      >
                           <div className="flex gap-2 items-center">
                             <Save size={15} />
                             {isSubmitting ? "Saving..." : "Save"}
@@ -414,11 +421,14 @@ function GeneralTask() {
                 <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm h-full">
                   {/* Header */}
                   <div className="flex items-center gap-3 pb-3 border-b border-slate-200">
-                    <div
-                      className={`w-10 h-10 rounded-lg ${COLORS.LIGHT_PURPLE_BACKGROUND}
-                        flex items-center justify-center`}
-                    >
-                      <FileText size={22} className={COLORS.PRIMARY_PURPLE} />
+                    <div className="flex items-start ">
+                      <div
+                        className={`p-2 rounded-lg ${COLORS.PAGE_HEADER_SECTION_BG_COLOR} flex items-center justify-center shrink-0`}
+                      >
+                        <FileText
+                          className={COLORS.PAGE_HEADER_ICONS_COLOR_AND_SIZE}
+                        />
+                      </div>
                     </div>
 
                     <h2 className="page-header-custom !text-[16px] font-semibold">
