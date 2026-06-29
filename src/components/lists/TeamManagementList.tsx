@@ -195,8 +195,8 @@ const handleUpdateAndRefresh = async (teamId: number) => {
               count: teamSummary.total_company_team,
               subtitle: "All Teams in workspace",
               icon: Network,
-               iconBg: "bg-violet-100",
-              iconColor: "text-violet-600",
+               iconBg: COLORS.LIGHT_PURPLE_BACKGROUND,
+               iconColor: COLORS.PRIMARY_PURPLE,
               
 
             },

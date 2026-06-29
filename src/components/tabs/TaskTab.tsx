@@ -113,7 +113,7 @@ function TaskTab({ onAddMasterTask }: TaskTabProps) {
             onPointerLeaveCapture={undefined}
             indicatorProps={{
               className:
-                "bg-violet-100 rounded-md shadow-[0_4px_14px_rgba(37,99,235,0.35)] border border-violet-400 shadow-sm",
+                `${COLORS.LIGHT_PURPLE_BACKGROUND} rounded-md shadow-[0_4px_14px_rgba(37,99,235,0.35)] border border-violet-400 shadow-sm`,
             }}
             className="bg-transparent p-0 shadow-none flex gap-1 min-w-fit"
           >
@@ -126,7 +126,7 @@ function TaskTab({ onAddMasterTask }: TaskTabProps) {
                 }
                 className={`px-2 py-2 text-xs transition-all rounded-md font-['Roboto'] ${
                   activeTab === value
-                    ? "text-violet-700 font-bold shadow-sm"
+                    ? `${COLORS.PRIMARY_PURPLE} font-bold shadow-sm`
                     : "text-slate-500 hover:text-slate-700"
                 }`}
                 placeholder=""

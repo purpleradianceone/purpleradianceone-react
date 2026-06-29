@@ -69,6 +69,7 @@ function LeadManagementList({
   const { isLargeScreen, isSmallScreen } = useScreenSize();
   const { userHasAccessToViewLead, userHasAccessToAddLead } =
     useUserAccessModules();
+    const [isSummaryLoading, setIsSummaryLoading] = useState(false);
   const [isCreateLeadModalOpen, setIsCreateLeadModalOpen] =
     useState<boolean>(false);
 
@@ -127,6 +128,7 @@ const [leadSummary, setLeadSummary] =
 
   const fetchLeadSummary = useCallback(async () => {
   try {
+    setIsSummaryLoading(true);
     const postData = {
       company_id: loginStatus.companyId,
       requestedby: loginStatus.id,
@@ -145,6 +147,9 @@ const [leadSummary, setLeadSummary] =
     }
   } catch (error) {
     console.error(error);
+  }
+  finally {
+    setIsSummaryLoading(false);
   }
 }, [loginStatus.companyId, loginStatus.id]);
 
@@ -295,15 +300,15 @@ const refreshAllData = useCallback(async () => {
           cardGap={15}
           width="100%"
           gridCols={5}
-          loading = {isLoading}
+          loading={isSummaryLoading}
           cards={[
             {
               title: "Converted Leads",
               count: leadSummary.total_leads_converted_this_month,
               subtitle: "This Month",
               icon: Handshake,
-              iconBg: "bg-violet-100",
-              iconColor: "text-violet-600",
+              iconBg: COLORS.LIGHT_PURPLE_BACKGROUND,
+              iconColor: COLORS.PRIMARY_PURPLE,
             },
 
             {

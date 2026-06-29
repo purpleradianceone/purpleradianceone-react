@@ -14,6 +14,7 @@ import {
   LabelList,
 } from "recharts";
 import { formatRupee } from "../../../utils/helperMethods/formatFunctions";
+import COLORS from "../../../constants/Colors";
 
 type Props = {
   title: string;
@@ -94,7 +95,7 @@ function SalesRevenueTrendChart({
     return (
       <div className="bg-white border rounded-lg p-1">
         <p className="caption-custom">{label}</p>
-        <p className="caption-custom !text-violet-600 ">
+         <p className={`caption-custom ${COLORS.PRIMARY_PURPLE}`}>
           ₹{formatRupee(payload[0].value)}
         </p>
       </div>
@@ -181,14 +182,14 @@ function SalesRevenueTrendChart({
               <Line
                type="linear"
                 dataKey={yKey}
-                stroke="#8b5cf6"
+                stroke="#6C4CF1"
                 strokeWidth={1.5}
                 isAnimationActive
                 animationDuration={900}
                 animationEasing="ease-out"
                 dot={{
                   r: 4,
-                  fill: "#8b5cf6",
+                  fill: "#6C4CF1",
                   stroke: "#ffffff",
                   strokeWidth: 2,
                 }}

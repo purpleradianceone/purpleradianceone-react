@@ -2,7 +2,7 @@ import { ChevronDown } from "lucide-react";
 import React, { useState, useRef, useEffect } from "react";
 import SideNavBarItemProps from "../../../../@types/home/navbar/SideNavBarItemProps";
 import { useLocation } from "react-router-dom";
-
+import COLORS from "../../../../constants/Colors";
 
 function SideNavBarItem({
   icon: Icon,
@@ -12,17 +12,23 @@ function SideNavBarItem({
   onClick,
   disabled,
   isActive,
-   iconColor,
+  iconColor,
   bgColor,
 }: SideNavBarItemProps) {
   const [expanded, setExpanded] = useState(false);
   const [isTooltipVisible, setIsTooltipVisible] = useState(false);
   const [tooltipPosition, setTooltipPosition] = useState({ top: 0, left: 0 });
   const buttonRef = useRef<HTMLButtonElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
   const [hoveredItem, setHoveredItem] = useState(false);
 
   const [openUpwards, setOpenUpwards] = useState<boolean>(false);
   const location = useLocation();
+  const [dropdownPosition, setDropdownPosition] = useState({
+    top: 0,
+    left: 0,
+  });
+  const DROPDOWN_HEIGHT = 180;
 
   const hasActiveChild = React.Children.toArray(children).some((child) => {
     // Check if the child is a valid React element and if it has props
@@ -59,6 +65,31 @@ function SideNavBarItem({
     }
   }, [isTooltipVisible]);
 
+  // close on sidebar expand/collapse
+  useEffect(() => {
+    setHoveredItem(false);
+    setExpanded(false);
+    setIsTooltipVisible(false);
+  }, [isOpen]);
+
+  // close on outside click
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node) &&
+        buttonRef.current &&
+        !buttonRef.current.contains(event.target as Node)
+      ) {
+        setHoveredItem(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   const updateTooltipPosition = () => {
     if (buttonRef.current) {
       const rect = buttonRef.current.getBoundingClientRect();
@@ -69,10 +100,9 @@ function SideNavBarItem({
     }
   };
 
-
   const baseClasses =
     "w-full flex items-center px-4 py-1 table-header-custom rounded-lg";
-  const hoverClasses = "hover:bg-violet-100";
+  const hoverClasses = "hover:bg-[#F5F3FF]";
   const iconActiveClasses = "table-header-custom";
   const iconBaseClasses = "table-header-custom text-gray-600";
 
@@ -158,14 +188,15 @@ function SideNavBarItem({
 
             if (buttonRef.current) {
               const rect = buttonRef.current.getBoundingClientRect();
-              const spaceBelow = window.innerHeight - rect.bottom;
-              const dropdownHeight = 180;
 
-              if (spaceBelow < dropdownHeight) {
-                setOpenUpwards(true);
-              } else {
-                setOpenUpwards(false);
-              }
+              setDropdownPosition({
+                top: rect.top,
+                left: rect.right + 8,
+              });
+
+              const spaceBelow = window.innerHeight - rect.bottom;
+
+              setOpenUpwards(spaceBelow < DROPDOWN_HEIGHT);
             }
           }}
           // onClick={() => setHoveredItem(true)}
@@ -175,41 +206,37 @@ function SideNavBarItem({
         >
           {isOpen ? (
             <button
-             ref={buttonRef}
+              ref={buttonRef}
               onClick={() => (children ? setExpanded(!expanded) : onClick?.())}
              className={`${baseClasses} ${hoverClasses} text-gray-700 ${
-  isActive && label !== "App Settings"
-    ? "bg-[#F3EEFF] font-semibold"
-    : ""
-}`}
+              isIconActive ? `${COLORS.LIGHT_PURPLE_BACKGROUND} font-semibold` : ""
+            }`}
             >
               <div className="flex items-center gap-3">
-              <div
-                className="flex items-center justify-center w-8 h-8 rounded-lg"
-                style={{
-                  backgroundColor: bgColor || "#F3F4F6",
-                }}
-              >
-                <Icon
-                  size={20}
+                <div
+                  className="flex items-center justify-center w-8 h-8 rounded-lg"
                   style={{
-                    color: iconColor || "#4F46E5",
+                    backgroundColor: bgColor || "#F3F4F6",
                   }}
-                />
-              </div>
+                >
+                  <Icon
+                    size={18}
+                    style={{
+                      color: iconColor || "#4F46E5",
+                    }}
+                  />
+                </div>
 
-                    <span
-          className={
-            label === "App Settings" && isIconActive
-              ? "text-violet-600 font-semibold"
-              : isIconActive
-              ? iconActiveClasses
-              : iconBaseClasses
-          }
-        >
-          {label}
-        </span>
-            </div>
+                <span
+                    className={
+                      isIconActive
+                        ? "font-semibold"
+                        : iconBaseClasses
+                    }
+                  >
+                  {label}
+                </span>
+              </div>
               {/* {children && (
                 <ChevronDown
                   size={20}
@@ -221,16 +248,16 @@ function SideNavBarItem({
             <button
               ref={buttonRef}
               onClick={onClick}
-              className={`w-full cursor-pointer flex items-center justify-center px-0 py-2.5 rounded-lg ${hoverClasses} ${isIconActive ? "bg-[#F3EEFF] rounded-lg" : ""}`}
+              className={`w-full cursor-pointer flex items-center justify-center px-0 py-2.5 rounded-lg ${hoverClasses} ${isIconActive ? "bg-[#F5F3FF] rounded-lg" : ""}`}
             >
               <Icon
-  size={20}
-  style={{
-    color: isIconActive ? "#6C4CF1" : undefined,
-  }}
-  className={`${isIconActive ? iconActiveClasses : iconBaseClasses}`}
-/>
-              
+                size={20}
+                style={{
+                  color: isIconActive ? "#6C4CF1" : undefined,
+                }}
+                className={`${isIconActive ? iconActiveClasses : iconBaseClasses}`}
+              />
+
               {/* {isOpen && (
                 <span
                   className={`${isIconActive ? iconActiveClasses : iconBaseClasses}`}
@@ -241,9 +268,9 @@ function SideNavBarItem({
             </button>
           )}
 
-          {isTooltipVisible && (
+          {!isOpen && isTooltipVisible && (
             <div
-              className="fixed z-50 px-2 py-1 text-sm text-white bg-gray-500 rounded"
+              className={`fixed z-50 px-2 py-1 text-sm font-semibold ${COLORS.PRIMARY_PURPLE} ${COLORS.LIGHT_PURPLE_BACKGROUND} rounded`}
               style={{
                 top: `${tooltipPosition.top}px`,
                 left: `${tooltipPosition.left}px`,
@@ -254,16 +281,21 @@ function SideNavBarItem({
           )}
           {children && hoveredItem && (
             <div
+              ref={dropdownRef}
               onMouseLeave={() => setHoveredItem(false)}
               onMouseEnter={() => setIsTooltipVisible(false)}
-              className={`absolute left-full ml-2 bg-white rounded-lg shadow-lg py-2 min-w-48
-  ${openUpwards ? "bottom-0" : "top-0"}`}
-              // className="absolute left-full top-0 ml-2 bg-white rounded-lg shadow-lg py-2 min-w-48"
+              className="fixed z-[9999] bg-white rounded-lg shadow-lg py-2 min-w-48"
+              style={{
+                left: dropdownPosition.left,
+                top: openUpwards
+                  ? dropdownPosition.top - DROPDOWN_HEIGHT
+                  : dropdownPosition.top,
+              }}
             >
               {React.Children.toArray(children).map((child, index) => (
                 <button
                   key={index}
-                  className={`w-full flex items-center px-4 py-2 min-w-full ${isIconActive ? iconActiveClasses : iconBaseClasses} hover:bg-blue-50`}
+                  className={`w-full flex items-center px-4 py-2 min-w-full ${isIconActive ? iconActiveClasses : iconBaseClasses} ${COLORS.LIGHT_PURPLE_HOVER}`}
                 >
                   {child}
                 </button>

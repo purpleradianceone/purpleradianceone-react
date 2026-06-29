@@ -20,6 +20,8 @@ import {
   SlidersHorizontal,
   CheckCircle2,
   XCircle,
+  FileText,
+  Headset,
 } from "lucide-react";
 import Button from "../../../ui/Button";
 import TextAreaInput from "../../../ui/TextAreaInput";
@@ -45,9 +47,9 @@ import ToggleButton from "../../../ui/ToggleButton";
 import COLORS from "../../../../constants/Colors";
 import { useUserAccessModules } from "../../../../config/hooks/useAccessModules";
 import FormInput from "../../../ui/FormInput";
-import { DisplayComponent } from "../account-company-product/account-company-product-details/AccountCompanyProductDetailsCard";
 import CustomSelect from "../../../ui/CustomSelect";
 import { toSelectOptions } from "../../../../utils/toSelectOption";
+import MetaInfoItem from "../../../ui/MetaInfoItem";
 
 interface CustomField {
   id: string;
@@ -139,7 +141,7 @@ const AccountServiceDetails = () => {
     }
     return options;
   };
-  
+
   const timeOptions = useMemo(
     () =>
       generateTimeOptions().map((time, index) => ({
@@ -184,15 +186,14 @@ const AccountServiceDetails = () => {
     setTotalCost(Number(value));
   };
 
- const handleBookingTimeChange = (val: number | undefined) => {
-  const selectedTime =
-    timeOptions.find((t) => t.id === val)?.name || "";
+  const handleBookingTimeChange = (val: number | undefined) => {
+    const selectedTime = timeOptions.find((t) => t.id === val)?.name || "";
 
-  setFormData((prev) => ({
-    ...prev,
-    service_booking_time: selectedTime,
-  }));
-};
+    setFormData((prev) => ({
+      ...prev,
+      service_booking_time: selectedTime,
+    }));
+  };
 
   // Fetch existing account service details
   const getAccountServiceDetail = async () => {
@@ -202,12 +203,12 @@ const AccountServiceDetails = () => {
       const postDataToGetAccountServiceDetail = {
         company_id: loginStatus.companyId,
         account_service_id: Number(accountServiceId),
-        requestedby_id: loginStatus.id
+        requestedby_id: loginStatus.id,
       };
       const response = await axiosClient.post(
         POST_API.GET_ACCOUNT_SERVICE_DETAIL,
         postDataToGetAccountServiceDetail,
-        { withCredentials: true }
+        { withCredentials: true },
       );
       if (response.status === 200 && response.data) {
         const data = response.data[0];
@@ -275,8 +276,8 @@ const AccountServiceDetails = () => {
           ([key, value], index) => ({
             id: index.toString(),
             key,
-            value: String(value)
-          })
+            value: String(value),
+          }),
         );
 
         setFields(fieldsArray);
@@ -295,7 +296,7 @@ const AccountServiceDetails = () => {
                 requestedby: "",
                 createdby: "",
                 generate_password: "",
-              }
+              },
         );
       }
     } catch (error) {
@@ -316,11 +317,9 @@ const AccountServiceDetails = () => {
     if (!formData.service_booking_date) {
       setShowErrorAtServiceBookingDateError(true);
       flag = false;
-    } 
-    else {
+    } else {
       setShowErrorAtServiceBookingDateError(false);
     }
-
 
     if (!formData.service_booking_time) {
       setShowErrorAtServiceBookingTimeError(true);
@@ -367,17 +366,16 @@ const AccountServiceDetails = () => {
     event.preventDefault();
 
     if (!userHasAccessToUpdateAccountService) {
-      toast.error('You are not authorized user');
+      toast.error("You are not authorized user");
       return;
     }
 
     if (!validateForm()) return;
 
-
     if (isSaving) return;
 
     const customizationsForBackend = Object.fromEntries(
-      fields.map((field) => [field.key, field.value])
+      fields.map((field) => [field.key, field.value]),
     );
 
     console.log("FOr backennd data");
@@ -444,7 +442,7 @@ const AccountServiceDetails = () => {
   const addField = () => {
     setFields((prev) => [
       ...prev,
-      { id: crypto.randomUUID(), key: "", value: "" }
+      { id: crypto.randomUUID(), key: "", value: "" },
     ]);
   };
 
@@ -480,115 +478,121 @@ const AccountServiceDetails = () => {
     return <ShimmerEffect></ShimmerEffect>;
   }
   return (
-    <div className=" shadow-sm p-1 w-full">
+    <div className=" shadow-sm p-1 w-full bg-gray-50">
       <form onSubmit={handleUpdate}>
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-4">
-            {/* Logo */}
-            <div
-              className="w-14 h-14 rounded-full flex items-center justify-center
-            text-2xl font-semibold text-white bg-blue-500 shrink-0"
-            >
-              {accountServiceDetail?.company_product_name
-                ? accountServiceDetail.company_product_name
-                    .charAt(0)
-                    .toUpperCase()
-                : "?"}
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm">
+          <div className="grid grid-cols-[350px_1fr]">
+            {/* Left */}
+            <div className="px-3 py-2 border-r border-slate-200 flex gap-4 mt-1">
+              <div className="flex items-center ">
+             <div className={`p-3 rounded-lg ${COLORS.PAGE_HEADER_SECTION_BG_COLOR} flex items-center justify-center shrink-0`}>
+              <Headset className={COLORS.PAGE_HEADER_ICONS_COLOR_AND_SIZE} />
+            </div>
             </div>
 
-            <div className="flex flex-col">
-              {/* Product Name */}
-              <h2 className="table-header-custom">
-                {accountServiceDetail?.company_product_name ||
-                  "Unnamed Product"}
-              </h2>
+              <div>
+                <h2 className="page-header-custom">
+                  {accountServiceDetail?.company_product_name}
+                </h2>
 
-              <span className="caption-custom">
-                Account Name :{" "}
-                <span className="caption-custom">
-                  {accountServiceDetail?.account_name || "-"}
-                </span>
-              </span>
+                <p
+                  className={`${COLORS.PRIMARY_PURPLE} ${COLORS.LIGHT_PURPLE_BACKGROUND} caption-custom !font-bold w-fit px-1 rounded-md`}
+                >
+                  {accountServiceDetail?.account_service_code}
+                </p>
+
+                <p className="caption-custom mt-1">
+                  Account Name :
+                  <span className="caption-custom !text-slate-700 !font-bold">
+                    {" "}
+                    {accountServiceDetail?.account_name}
+                  </span>
+                </p>
+              </div>
             </div>
-          </div>
 
-          <div className="mr-2">
-            <label className="flex items-center gap-1 text-sm text-gray-700">
-              {formData.is_active ? (
-                <CheckCircle2 size={14} className="text-blue-500" />
-              ) : (
-                <XCircle size={14} className="text-blue-500" />
-              )}
-              Status
-            </label>
-            <div className="flex gap-2 items-center">
-              <ToggleButton
-                checked={formData.is_active}
-                name="is_active"
-                onToggle={(e) => {
-                  const checked = e.target.checked;
+            {/* Right */}
+            <div className="p-5">
+              <div className="grid grid-cols-5 gap-4">
+                <MetaInfoItem
+                  icon={CalendarClock}
+                  label="Service Date Time"
+                  value={`${accountServiceDetail?.service_booking_date}
+          ${accountServiceDetail?.service_booking_time}`}
+                />
 
-                  setFormData((prev) => ({
-                    ...prev,
-                    is_active: checked,
-                  }));
+                <MetaInfoItem
+                  icon={User}
+                  label="Created By"
+                  value={accountServiceDetail?.createdBy}
+                   iconBgClass = "bg-orange-50"
+                  iconColorClass = "text-orange-600"
+                 
+                />
 
-                  handleUpdateStatus(e, checked);
-                }}
-              />
-              <span
-                className={`text-sm ${
-                  formData.is_active ? "text-green-600" : "text-red-600"
-                }`}
-              >
-                {formData.is_active ? "Active" : "Inactive"}
-              </span>
+                <MetaInfoItem
+                  icon={Calendar}
+                  label="Created On"
+                  value={accountServiceDetail?.createdOn}
+                  
+                   iconBgClass = "bg-blue-50"
+                  iconColorClass = "text-blue-600"
+                />
+
+                <div className="flex flex-col border-l pl-6">
+                    <label className="flex items-center caption-custom gap-1">
+                                {formData.is_active ? (
+                                  <CheckCircle2 size={14} className="text-blue-500" />
+                                ) : (
+                                  <XCircle size={14} className="text-blue-500" />
+                                )}
+                                Status
+                              </label>
+                  
+
+                  <div className="flex items-center gap-2 mt-2">
+                    <ToggleButton
+                      checked={formData.is_active}
+                      name="is_active"
+                      onToggle={(e) => {
+                        const checked = e.target.checked;
+
+                        setFormData((prev) => ({
+                          ...prev,
+                          is_active: checked,
+                        }));
+
+                        handleUpdateStatus(e, checked);
+                      }}
+                    />
+
+                    <span
+                      className={
+                        formData.is_active ? "text-green-600" : "text-red-600"
+                      }
+                    >
+                      {formData.is_active ? "Active" : "Inactive"}
+                    </span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Top Details */}
-        <div className="grid grid-cols-4 gap-1 ">
-          {/* <MetaField
-          label="Account Service Code"
-          value={accountServiceDetail?.account_service_code || "-"}
-        /> */}
-          <DisplayComponent
-            icon={FileCode}
-            title="Account Service Code"
-            value={
-              accountServiceDetail?.account_service_code
-                ? accountServiceDetail?.account_service_code
-                : "-"
-            }
-            penLogo={false}
-          />
+        <div className="grid grid-cols-2 gap-x-3 gap-y-3 mt-2">
+          {/* Service Information */}
+          <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4">
+            <div className="flex items-center gap-2 mb-2 ">
+              <div className={COLORS.SECTION_HEADER_ICON_STYLE}>
+              <FileCode size={16} />
+              </div>
+              <h3 className="table-header-custom">Service Information</h3>
+            </div>
 
-          <DisplayComponent
-            icon={CalendarClock}
-            title="Service Date Time"
-            value={`${accountServiceDetail?.service_booking_date} ${accountServiceDetail?.service_booking_time}`}
-            penLogo={false}
-          />
-
-          <DisplayComponent
-            icon={User}
-            title="Createdby"
-            value={accountServiceDetail?.createdBy || "-"}
-            penLogo={false}
-          />
-
-          <DisplayComponent
-            icon={Calendar}
-            title="Createdon"
-            value={accountServiceDetail?.createdOn || "-"}
-            penLogo={false}
-          />
-        </div>
-
-        <div className="grid grid-cols-4 gap-1 mt-1">
-          <div>
-            {/* {!isLoadingForServiceBookingSource && (
+            <div className="grid grid-cols-2 gap-3 ">
+              <div>
+                {/* {!isLoadingForServiceBookingSource && (
               <CustomDropdown
                 logo={Share2}
                 preselectedOption={selectedServiceBookingSource}
@@ -598,213 +602,278 @@ const AccountServiceDetails = () => {
                 onSelect={setSelectedServiceBookingSource}
               />
             )} */}
-
-            {!isLoadingForServiceBookingSource && (
-              <CustomSelect
-                label="Source"
-                value={selectedServiceBookingSource}
-                onChange={setSelectedServiceBookingSource}
-                options={serviceBookingSourceOptions}
-                icon={Share2}
-                isRequired
-              />
-            )}
-            {showErrorAtServiceBookingSource &&
-              !selectedServiceBookingSource && (
-                <div className="text-red-500 text-xs">
-                  Please select Service Booking Source
+                <div>
+                  {!isLoadingForServiceBookingSource && (
+                    <CustomSelect
+                      label="Source"
+                      value={selectedServiceBookingSource}
+                      onChange={setSelectedServiceBookingSource}
+                      options={serviceBookingSourceOptions}
+                      icon={Share2}
+                      isRequired
+                    />
+                  )}
+                  {showErrorAtServiceBookingSource &&
+                    !selectedServiceBookingSource && (
+                      <div className="text-red-500 text-xs">
+                        Please select Service Booking Source
+                      </div>
+                    )}
                 </div>
-              )}
+              </div>
+
+              <div>
+                {!isLoadingForServiceLocationType && (
+                  <CustomSelect
+                    label="Location"
+                    value={selectedServiceLocationType}
+                    onChange={setSelectedServiceLocationType}
+                    options={serviceLocationTypeOptions}
+                    icon={MapPin}
+                    isRequired
+                  />
+                )}
+
+                {showErrorAtServiceLocationType &&
+                  !selectedServiceLocationType && (
+                    <div className="text-red-500 text-xs">
+                      Please select Service Location Type
+                    </div>
+                  )}
+              </div>
+
+              <div>
+                {!isLoadingForServiceStatus && (
+                  <CustomSelect
+                    label="Status"
+                    value={selectedServiceStatus}
+                    onChange={setSelectedServiceStatus}
+                    options={serviceStatusOptions}
+                    icon={Activity}
+                    isRequired
+                  />
+                )}
+
+                {showErrorAtServiceStatus && !selectedServiceStatus && (
+                  <div className="text-red-500 text-xs">
+                    Please select Service Status
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <FormInput
+                  required
+                  type="number"
+                  label="Total Cost"
+                  placeholder="Enter total cost"
+                  logo={IndianRupee}
+                  defaultValue={totalCost}
+                  value={totalCost === "" ? "" : totalCost}
+                  onChange={handleCostChange}
+                />
+                {totalCostError && (
+                  <p className="text-xs  text-red-600 ">{totalCostError}</p>
+                )}
+              </div>
+              <div>
+                <DatePickerInput
+                  label="Booking Date"
+                  name="service_booking_date"
+                  onChange={handleChange}
+                  logo={Calendar}
+                  required
+                  value={formData.service_booking_date}
+                />
+                {showErrorAtServiceBookingDateError && (
+                  <div className="text-red-500 text-xs">
+                    Please select Service Booking Date
+                  </div>
+                )}
+              </div>
+
+              <div className="col-span-1">
+                <label className="block input-label-custom">
+                  <div className="flex gap-1 items-center">
+                    <Clock size={13} className={`${COLORS.PRIMARY_PURPLE}`} />
+                    <span>Booking Time</span>
+                  </div>
+                </label>
+
+                <CustomSelect
+                  placeholder="Select Service Booking Time"
+                  label=""
+                  value={
+                    timeOptions.find(
+                      (t) => t.name === formData.service_booking_time,
+                    )?.id
+                  }
+                  onChange={handleBookingTimeChange}
+                  options={bookingTimeOptions}
+                />
+
+                {showErrorAtServiceBookingTimeError && (
+                  <div className="text-red-500 text-xs">
+                    Please select Service Booking Time
+                  </div>
+                )}
+              </div>
+
+              
+            </div>
           </div>
+
+          <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4">
+            <div className="flex items-center gap-2 mb-2">
+              <div className={COLORS.SECTION_HEADER_ICON_STYLE}>
+              <MessageSquare size={16}/>
+              </div>
+              <h3 className="table-header-custom">Customer Communication</h3>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-2 col-span-full">
+                <TextAreaInput
+                  logo={MapPin}
+                  rows={2}
+                  cols={2}
+                  label="Location Address"
+                  name="location_address"
+                  placeholder="Enter Location address"
+                  value={formData.location_address}
+                  maxLength={VALIDATIONS.MAX_DESCRIPTION_LENGTH}
+                  onChange={handleChange}
+                />
+
+                <TextAreaInput
+                  logo={ShieldCheck}
+                  rows={2}
+                  cols={2}
+                  label="Note"
+                  name="service_notes"
+                  placeholder="Enter Service Note"
+                  value={formData.service_notes}
+                  onChange={handleChange}
+                />
+                <TextAreaInput
+                  logo={Ban}
+                  rows={2}
+                  cols={2}
+                  label="Cancellation Reason"
+                  name="cancellation_reason"
+                  placeholder="Enter Cancellation Reason"
+                  value={formData.cancellation_reason}
+                  maxLength={VALIDATIONS.MAX_DESCRIPTION_LENGTH}
+                  onChange={handleChange}
+                />
+                <TextAreaInput
+                  logo={MessageSquare}
+                  rows={2}
+                  cols={2}
+                  label="Customer Feedback"
+                  name="customer_feedback"
+                  placeholder="Enter Customer Feedback"
+                  value={formData.customer_feedback}
+                  maxLength={VALIDATIONS.MAX_DESCRIPTION_LENGTH}
+                  onChange={handleChange}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Assignment */}
 
           <div>
-            {/* {!isLoadingForServiceLocationType && (
-              <CustomDropdown
-                logo={MapPin}
-                preselectedOption={selectedServiceLocationType}
-                requiredRedDot
-                labelName="Location"
-                options={serviceLocationType!}
-                onSelect={setSelectedServiceLocationType}
-              />
-            )} */}
-            {!isLoadingForServiceLocationType && (
-              <CustomSelect
-                label="Location"
-                value={selectedServiceLocationType}
-                onChange={setSelectedServiceLocationType}
-                options={serviceLocationTypeOptions}
-                icon={MapPin}
-                isRequired
-              />
-            )}
-
-            {showErrorAtServiceLocationType && !selectedServiceLocationType && (
-              <div className="text-red-500 text-xs">
-                Please select Service Location Type
-              </div>
-            )}
-          </div>
-
-          <div>
-            {/* {!isLoadingForServiceStatus && (
-              <CustomDropdown
-                logo={Activity}
-                preselectedOption={selectedServiceStatus}
-                requiredRedDot
-                labelName="Status"
-                options={serviceStatus!}
-                onSelect={setSelectedServiceStatus}
-                
-              />
-            )} */}
-            {!isLoadingForServiceStatus && (
-              <CustomSelect
-                label="Status"
-                value={selectedServiceStatus}
-                onChange={setSelectedServiceStatus}
-                options={serviceStatusOptions}
-                icon={Activity}
-                isRequired
-              />
-            )}
-
-            {showErrorAtServiceStatus && !selectedServiceStatus && (
-              <div className="text-red-500 text-xs">
-                Please select Service Status
-              </div>
-            )}
-          </div>
-
-          <div>
-            <DatePickerInput
-              label="Booking Date"
-              name="service_booking_date"
-              onChange={handleChange}
-              logo={Calendar}
-              required
-              value={formData.service_booking_date}
-            />
-            {showErrorAtServiceBookingDateError && (
-              <div className="text-red-500 text-xs">
-                Please select Service Booking Date
-              </div>
-            )}
-          </div>
-
-          <div className="col-span-1">
-            <label className="block input-label-custom">
-              <div className="flex gap-1 items-center">
-                <Clock size={13} className="text-blue-600" />
-                <span>Booking Time</span>
-              </div>
-            </label>
-
-            <CustomSelect
-              placeholder="Select Service Booking Time"
-              label=""
-              value={
-                timeOptions.find(
-                  (t) => t.name === formData.service_booking_time,
-                )?.id
-              }
-               onChange={handleBookingTimeChange}
-               options={bookingTimeOptions}
-            />
-
-            {showErrorAtServiceBookingTimeError && (
-              <div className="text-red-500 text-xs">
-                Please select Service Booking Time
-              </div>
-            )}
-          </div>
-          <div className="flex flex-col gap-1">
-            <FormInput
-              required
-              type="number"
-              label="Total Cost"
-              placeholder="Enter total cost"
-              logo={IndianRupee}
-              defaultValue={totalCost}
-              value={totalCost === "" ? "" : totalCost}
-              onChange={handleCostChange}
-            />
-            {totalCostError && (
-              <p className="text-xs  text-red-600 ">{totalCostError}</p>
-            )}
-          </div>
-
-          <DatePickerInput
-            label="Next Service Due Date"
-            name="next_service_due_date"
-            onChange={handleChange}
-            logo={Calendar}
-            value={formData.next_service_due_date}
-          />
-
-          <CompanyUserSearchFieldInput
-            logo={User}
-            label="Assign To:"
-            defaultValue={accountServiceDetail?.assignedto_name}
-            onUserSelected={setAssignedTo}
-          />
-
-          <div className="grid grid-cols-2 gap-1 col-span-full">
-            <TextAreaInput
-              logo={MapPin}
-              rows={2}
-              cols={2}
-              label="Location Address"
-              name="location_address"
-              placeholder="Enter Location address"
-              value={formData.location_address}
-              maxLength={VALIDATIONS.MAX_DESCRIPTION_LENGTH}
-              onChange={handleChange}
-            />
-
-            <TextAreaInput
-              logo={ShieldCheck}
-              rows={2}
-              cols={2}
-              label="Note"
-              name="service_notes"
-              placeholder="Enter Service Note"
-              value={formData.service_notes}
-              onChange={handleChange}
-            />
-            <TextAreaInput
-              logo={Ban}
-              rows={2}
-              cols={2}
-              label="Cancellation Reason"
-              name="cancellation_reason"
-              placeholder="Enter Cancellation Reason"
-              value={formData.cancellation_reason}
-              maxLength={VALIDATIONS.MAX_DESCRIPTION_LENGTH}
-              onChange={handleChange}
-            />
-            <TextAreaInput
-              logo={MessageSquare}
-              rows={2}
-              cols={2}
-              label="Customer Feedback"
-              name="customer_feedback"
-              placeholder="Enter Customer Feedback"
-              value={formData.customer_feedback}
-              maxLength={VALIDATIONS.MAX_DESCRIPTION_LENGTH}
-              onChange={handleChange}
-            />
-          </div>
-
-          <div className="p-2 bg-white border rounded-lg shadow-sm col-span-4 min-h-[85px] ">
-            <div className="flex justify-between items-center">
-              <div className="flex items-center gap-1">
-                <SlidersHorizontal size={14} className="text-blue-500" />
-                <h3 className="flex  gap-1 input-label-custom">
-                  Customizations
-                </h3>
+            <div className="bg-white rounded-xl border border-slate-200 shadow-sm px-4 py-4">
+              <div className="flex items-center gap-2 mb-2">
+                <div className={COLORS.SECTION_HEADER_ICON_STYLE}>
+                <User size={16} />
+                </div>
+                <h3 className="table-header-custom">Assignment</h3>
               </div>
 
+              <div className="grid grid-cols-2 gap-3 mt-3">
+                <CompanyUserSearchFieldInput
+                  logo={User}
+                  label="Assign To:"
+                  defaultValue={accountServiceDetail?.assignedto_name}
+                  onUserSelected={setAssignedTo}
+                />
+
+                <DatePickerInput
+                  label="Next Service Due Date"
+                  name="next_service_due_date"
+                  onChange={handleChange}
+                  logo={Calendar}
+                  value={formData.next_service_due_date}
+                />
+
+                {/* <MetaInfoItem
+          icon={User}
+          label="Created By"
+          value={accountServiceDetail?.createdBy}
+        />
+
+        <MetaInfoItem
+          icon={Calendar}
+          label="Created On"
+          value={accountServiceDetail?.createdOn}
+        /> */}
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-2 h-[80px] mt-3">
+              <div className="bg-white rounded-xl border border-slate-200 shadow-sm px-4 py-2 pb-1">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className={COLORS.SECTION_HEADER_ICON_STYLE}>
+                  <Calendar size={16} />
+                  </div>
+                  <h3 className="table-header-custom">Follow Up</h3>
+                </div>
+                <FormCheckbox
+                  label="Is Follow Up Required"
+                  name="is_follow_up_required"
+                  onChange={handleFollowUpChange}
+                  checked={isFollowUpRequired}
+                />
+              </div>
+
+              <div className="bg-white rounded-xl border border-slate-200 shadow-sm px-4 py-2  pb-2">
+                {/* <div className="flex items-center gap-2 mb-1">
+                    <ThumbsUp
+                      size={16}
+                      className={`${COLORS.PRIMARY_PURPLE}`}
+                    />
+                      <h3 className="table-header-custom">
+                      Customer Rating
+                    </h3>
+                  </div> */}
+
+                <CustomerRating
+                  logo={ThumbsUp}
+                  label="Customer Rating"
+                  value={customerRating}
+                  onChange={handleCustomerRatingChange}
+                  labelClassName="!font-bold "
+                  iconContainerClassName={COLORS.SECTION_HEADER_ICON_STYLE}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-3">
+            <div className="flex items-center gap-2 mb-2 justify-between">
+              <div>
+                <div className="flex items-center gap-2">
+                  <div className={COLORS.SECTION_HEADER_ICON_STYLE}>
+                  <SlidersHorizontal size={16} className="text-violet-600" />
+                  </div>
+                  <h3 className="table-header-custom">Customization</h3>
+                </div>
+
+                <p className="caption-custom mt-1">
+                  Add custom field to capture additional information
+                </p>
+              </div>
               <Button
                 type="button"
                 onClick={addField}
@@ -814,82 +883,68 @@ const AccountServiceDetails = () => {
               </Button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 ">
-              {fields?.map((field) => (
-                <div
-                  key={field.id}
-                  className="grid grid-cols-[1fr_1fr_auto] items-center gap-2 p-2 bg-gray-50 rounded-lg border border-gray-200"
-                >
-                  <input
-                    type="text"
-                    placeholder="Customization name"
-                    value={field.key}
-                    onChange={(e) =>
-                      updateField(field.id, "key", e.target.value)
-                    }
-                    className="w-full px-2 py-1 border border-gray-300 rounded-md placeholder:text-sm"
-                  />
+            <div className="border border-dashed rounded-xl p-2 min-h-[80px]">
+              <div className="grid grid-cols-1 md:grid-cols-1 gap-3 ">
+                {fields?.map((field) => (
+                  <div
+                    key={field.id}
+                    className="grid grid-cols-[1fr_1fr_auto] items-center gap-2 px-2 py-2 bg-gray-50 rounded-lg border border-gray-200"
+                  >
+                    <input
+                      type="text"
+                      placeholder="Customization name"
+                      value={field.key}
+                      onChange={(e) =>
+                        updateField(field.id, "key", e.target.value)
+                      }
+                      className="w-full px-2 py-1 border border-gray-300 rounded-md placeholder:text-sm"
+                    />
 
-                  <input
-                    type="text"
-                    placeholder="Enter Value"
-                    value={field.value}
-                    onChange={(e) =>
-                      updateField(field.id, "value", e.target.value)
-                    }
-                    className="w-full px-2 py-1 border border-gray-300 rounded-md placeholder:text-sm"
-                  />
+                    <input
+                      type="text"
+                      placeholder="Enter Value"
+                      value={field.value}
+                      onChange={(e) =>
+                        updateField(field.id, "value", e.target.value)
+                      }
+                      className="w-full px-2 py-1 border border-gray-300 rounded-md placeholder:text-sm"
+                    />
 
-                  <button type="button" onClick={() => removeField(field.id)}>
-                    <Trash
-                      size={SIZE.ICON_DELETE_BUTTON_SIZE}
-                      className={COLORS.ICON_DELETE_BUTTON}
-                    ></Trash>
-                  </button>
-                </div>
-              ))}
+                    <button type="button" onClick={() => removeField(field.id)}>
+                      <Trash
+                        size={SIZE.ICON_DELETE_BUTTON_SIZE}
+                        className={COLORS.ICON_DELETE_BUTTON}
+                      ></Trash>
+                    </button>
+                  </div>
+                ))}
 
-              {fields?.length === 0 && (
-                <div className="flex items-center justify-center w-full bg-slate-00">
-                  <p className="caption-custom italic ">
-                    No customization fields added yet.
-                  </p>
-                </div>
-              )}
+                {fields?.length === 0 && (
+                  <div className=" col-span-full  flex flex-col items-center justify-center pt-2 gap-4">
+                    <FileText size={20} />
+                    <p className="caption-custom ">
+                      No custom fields added yet.
+                    </p>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
+        </div>
 
-          <div className="col-span-full flex items-center justify-between mt-1 w-full">
-            <div className="flex items-center gap-20 flex-wrap">
-              <div className="flex items-center">
-                <FormCheckbox
-                  label="Is Follow Up Required"
-                  name="is_follow_up_required"
-                  onChange={handleFollowUpChange}
-                  checked={isFollowUpRequired}
-                />
+        <div
+          className={`sticky bottom-0 border-violet-100  h-11 bg-gray-50 flex justify-end p-2`}
+        >
+          <div className="">
+            <Button
+              type="submit"
+              disabled={!userHasAccessToUpdateAccountService}
+            >
+              <div className="flex items-center gap-1">
+                <Save size={SIZE.SIXTEEN} />
+                <span>Save</span>
               </div>
-
-              <div className="flex items-center ">
-                <CustomerRating
-                  logo={ThumbsUp}
-                  label="Customer Rating"
-                  onChange={handleCustomerRatingChange}
-                  value={customerRating}
-                />
-              </div>
-            </div>
-            <div>
-              <Button
-                type="submit"
-                disabled={!userHasAccessToUpdateAccountService}
-              >
-                <div className="flex items-center gap-1">
-                  <Save size={SIZE.SIXTEEN} />
-                  <span>Save</span>
-                </div>
-              </Button>
-            </div>
+            </Button>
           </div>
         </div>
       </form>

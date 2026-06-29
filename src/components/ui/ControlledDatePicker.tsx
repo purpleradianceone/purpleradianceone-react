@@ -112,6 +112,7 @@ import { LucideIcon, Pen } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import COLORS from "../../constants/Colors";
 
 type ControlledDatePickerProps = {
   value?: string | Date | null;
@@ -146,7 +147,7 @@ const ControlledDatePicker: React.FC<ControlledDatePickerProps> = ({
   return (
     <div className=" w-full">
       <label htmlFor={label} className="input-label-custom cursor-pointer">
-        {Logo && <Logo size={14} className="inline mr-1 text-blue-500" />}
+        {Logo && <Logo size={14} className={`inline mr-1 ${COLORS.PRIMARY_PURPLE}`} />}
         {label} {isRequired && <span className="text-red-600">*</span>}
       </label>
       <div className="relative ">

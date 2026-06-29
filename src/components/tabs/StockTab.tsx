@@ -53,7 +53,7 @@ function StockTab() {
             onPointerLeaveCapture={undefined}
             indicatorProps={{
               className:
-                "main-nav-custom-setting active-header-setting !bg-violet-100 border !border-violet-100 rounded-md shadow-none",
+                `main-nav-custom-setting active-header-setting ${COLORS.LIGHT_PURPLE_BACKGROUND} border !border-violet-100 rounded-md shadow-none`,
             }}
             className="shadow-none"
           >
@@ -66,7 +66,7 @@ function StockTab() {
                 }
                 className={
                   activeTab === value
-                    ? "main-nav-custom-setting active-tab-setting !text-violet-700"
+                    ? `main-nav-custom-setting active-tab-setting ${COLORS.PRIMARY_PURPLE}`
                     : "main-nav-custom-setting"
                 }
                 placeholder=""

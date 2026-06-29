@@ -3,6 +3,7 @@ import {
   ChevronDown,
   ChevronUp,
 } from "lucide-react";
+import COLORS from "../../constants/Colors";
 
 type StatusOption = {
   id: number;
@@ -84,7 +85,7 @@ function CustomStatusFilterDropdown({
 
       default:
         return {
-          bg: "bg-violet-100",
+          bg: COLORS.LIGHT_PURPLE_BACKGROUND,
           dot: "bg-violet-500",
         };
     }
@@ -222,7 +223,7 @@ function CustomStatusFilterDropdown({
                   hover:bg-slate-50
                   ${
                     selectedValue === option.value
-                      ? "bg-violet-50 text-violet-700"
+                      ? `${COLORS.LIGHT_PURPLE_BACKGROUND} ${COLORS.PRIMARY_PURPLE}`
                       : "text-slate-700"
                   }
                 `}

@@ -1,8 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import {
+  Calendar,
   CalendarClock,
+  CalendarDays,
   ChevronRight,
+  ClipboardList,
   Download,
   File,
   FileText,
@@ -51,8 +54,9 @@ import useTaskStage from "../../../config/hooks/useTaskStage";
 import { handleApiError } from "../../../config/error/handleApiError";
 import ConfirmationDialog from "../../dialogue-box/ConfirmationDialogue";
 import FormInput from "../../ui/FormInput";
-import MetaField from "../../ui/MetaField";
 import CustomDocumentPreviewComponent from "../../custom-document-preview-component/CustomDocumentPreviewComponent";
+import COLORS from "../../../constants/Colors";
+import MetaInfoItem from "../../ui/MetaInfoItem";
 
 interface TaskCardProps {
   task: any;
@@ -80,7 +84,7 @@ function MasterTaskUpdate() {
     number | undefined
   >();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const { userHasAccessToUpdateMasterTasks } = useUserAccessModules();
+  const { userHasAccessToUpdateMasterTasks ,userHasAccessToViewMasterTasks } = useUserAccessModules();
   const [selectedCompanyUser, setSelectedCompanyUser] = useState<CompanyUser>({
     company_id: 0,
     id: 0,
@@ -249,10 +253,10 @@ function MasterTaskUpdate() {
   };
 
   useEffect(() => {
-    if (!userHasAccessToUpdateMasterTasks) {
+    if (!userHasAccessToViewMasterTasks) {
       setAccessDeniedPopUpOpen(true);
     }
-  }, [userHasAccessToUpdateMasterTasks]);
+  }, [userHasAccessToViewMasterTasks]);
   // ⭐ PREFILL FORM
   useEffect(() => {
     const controller = new AbortController();
@@ -473,8 +477,8 @@ function MasterTaskUpdate() {
 
   return (
     <>
-      {userHasAccessToUpdateMasterTasks ? (
-        <div className=" w-full pl-5 pt-2 min-h-[90vh] ">
+      {userHasAccessToViewMasterTasks ? (
+        <div className=" w-full pl-5 min-h-[90vh] ">
           {" "}
           <div>
             <ConfirmationDialog
@@ -486,7 +490,7 @@ function MasterTaskUpdate() {
               open={confirmationOpen}
               title="Master Inactive"
             />
-            <div className=" sticky top-10 z-10 bg-slate-100 flex text-center justify-start items-center gap-3 ml-0.5 ">
+            <div className="h-[30px] sticky top-10 z-10 bg-slate-100 flex text-center justify-start items-center gap-3 ml-0.5 ">
               <Link to={ROUTES_URL.TASKS_MANAGEMENT + "/my-tasks"}>
                 <Button className="caption-custom flex items-center justify-center hover:text-gray-800">
                   Master Tasks
@@ -495,153 +499,292 @@ function MasterTaskUpdate() {
               <ChevronRight size={16} />
               <h1 className="table-header-custom">Master Task Details</h1>
             </div>
-            <div className="bg-gray-50 w-full px-2 pt-1 rounded">
+            <div className="bg-gray-50 w-full px-2 pt-0.5 rounded">
               {isSubmitting && <LoadingPopUpAnimation show={isSubmitting} />}
               {!selectedSupportTicket ? (
                 <MasterTaskSkeleton />
               ) : (
-                <div className="flex gap-2 items-start">
-                  <div className="flex-1 bg-white border rounded p-2 space-y-2">
-                    {/* ROW 1 */}
-                    <div className="grid grid-cols-8 gap-3 items-end text-sm">
-                      <MetaField
-                        label=" Task Type"
-                        value={selectedSupportTicket.generalTaskTypeName}
-                      />
-                      <MetaField
-                        label="Frequency"
-                        value={selectedSupportTicket.frequencyName}
-                      />
-                      <MetaField
-                        label="Start"
-                        value={selectedSupportTicket.startDate}
-                      />
-                      <MetaField
-                        label="End"
-                        value={selectedSupportTicket.endDate}
-                      />
-                      <MetaField
-                        label="Time"
-                        value={selectedSupportTicket.taskTime}
-                      />
-                      <MetaField
-                        label="Created By"
-                        value={selectedSupportTicket.createdByName}
-                      />
-                      <MetaField
-                        label="Updated By"
-                        value={selectedSupportTicket.updatedByName}
-                      />
-                      {/* STATUS */}
-                      <div>
-                        <label className="text-xs text-gray-500">Status</label>
-                        <div className="flex gap-2 items-center">
-                          <ToggleButton
-                            checked={formData.isActive}
-                            name="isActive"
-                            onToggle={() => {
+                <div className="space-y-4 mt-3">
+                  {/* ROW 1 */}
+                  <div className="bg-white rounded-xl border border-slate-200 shadow-sm">
+                    <div className="grid grid-cols-[220px_1fr]">
+                      {/* Logo */}
+
+                      <div className="p-5 border-r border-slate-200 flex gap-4">
+                        <div className="flex items-start ">
+                          <div
+                            className={`p-3 rounded-lg ${COLORS.PAGE_HEADER_SECTION_BG_COLOR} flex items-center justify-center shrink-0`}
+                          >
+                            <ClipboardList
+                              className={
+                                COLORS.PAGE_HEADER_ICONS_COLOR_AND_SIZE
+                              }
+                            />
+                          </div>
+                        </div>
+
+                        <div>
+                          <h2 className="page-header-custom !text-[17px] font-semibold">
+                            {selectedSupportTicket.subject}
+                          </h2>
+
+                          <p className="caption-custom mt-1">
+                            {selectedSupportTicket.generalTaskTypeName}
+                          </p>
+                          <div className="mt-2 flex justify-start items-start flex-col gap-2">
+                            <TaskPriorityChip
+                              priorityName={
+                                selectedSupportTicket.generalTaskPriorityName
+                              }
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* header */}
+                      <div className="p-5 ">
+                        <div className="grid grid-cols-5 gap-x-2 gap-y-6 py-1">
+                          <MetaInfoItem
+                            icon={Flag}
+                            label="Task Type"
+                            value={selectedSupportTicket.generalTaskTypeName}
+                            iconBgClass={COLORS.LIGHT_PURPLE_BACKGROUND}
+                            iconColorClass={COLORS.PRIMARY_PURPLE}
+                          />
+
+                          <MetaInfoItem
+                            icon={Calendar}
+                            label="Frequency"
+                            value={selectedSupportTicket.frequencyName}
+                            iconBgClass="bg-orange-50"
+                            iconColorClass="text-orange-600"
+                          />
+
+                          <MetaInfoItem
+                            icon={CalendarDays}
+                            label="Start Date"
+                            value={selectedSupportTicket.startDate}
+                            iconBgClass="bg-green-50"
+                            iconColorClass="text-green-600"
+                          />
+
+                          <MetaInfoItem
+                            icon={CalendarDays}
+                            label="End Date"
+                            value={selectedSupportTicket.endDate}
+                            iconBgClass="bg-red-50"
+                            iconColorClass="text-red-600"
+                          />
+                          <MetaInfoItem
+                            icon={CalendarClock}
+                            label="Time"
+                            value={selectedSupportTicket.taskTime}
+                            iconBgClass="bg-blue-50"
+                            iconColorClass="text-blue-600"
+                          />
+
+                          <MetaInfoItem
+                            icon={User}
+                            label="Created By"
+                            value={selectedSupportTicket.createdByName}
+                            iconBgClass="bg-violet-50"
+                            iconColorClass="text-violet-600"
+                          />
+                          <MetaInfoItem
+                            icon={Calendar}
+                            label="Created On"
+                            value={selectedSupportTicket.createdOn}
+                            iconBgClass="bg-amber-50"
+                            iconColorClass="text-amber-600"
+                          />
+
+                          <MetaInfoItem
+                            icon={User}
+                            label="Updated By"
+                            value={selectedSupportTicket.updatedByName}
+                            iconBgClass="bg-violet-50"
+                            iconColorClass="text-violet-600"
+                          />
+                          <MetaInfoItem
+                            icon={Calendar}
+                            label="Updated On"
+                            value={selectedSupportTicket.updatedOn}
+                            iconBgClass="bg-amber-50"
+                            iconColorClass="text-amber-600"
+                          />
+
+                          {/* STATUS */}
+                          <div className="flex flex-col border-l-2 pl-10">
+                            <span className="caption-custom">Status</span>
+
+                            <div className="flex items-center gap-2 mt-1">
+                              <ToggleButton
+                                checked={formData.isActive}
+                                name="isActive"
+                                 onToggle={() => {
+                              if (!userHasAccessToUpdateMasterTasks) return;
+
                               if (!formData.isActive) {
-                                toast.error(
-                                  "Inactive master task cannot be updated.",
-                                );
+                                toast.error("Inactive master task cannot be updated.");
                                 return;
                               }
+
                               setConfirmationOpen(true);
                             }}
-                          />
-                          <span
-                            className={`text-sm ${
-                              formData.isActive
-                                ? "text-green-600"
-                                : "text-red-600"
-                            }`}
-                          >
-                            {formData.isActive ? "Active" : "Inactive"}
-                          </span>
+                                                        />
+
+                              <span
+                                className={`text-sm ${
+                                  formData.isActive
+                                    ? "text-green-600"
+                                    : "text-red-600"
+                                }`}
+                              >
+                                {formData.isActive ? "Active" : "Inactive"}
+                              </span>
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </div>
-                    {/* ROW 2 */}
-                    <div className="grid grid-cols-8 gap-3 text-sm">
-                      <div className="col-span-3 ">
-                        <div className="py-2">
+                  </div>
+                  {/* ROW 2 */}
+
+                  <div className="grid grid-cols-[minmax(0,1fr)_350px] gap-4">
+                    <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4">
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
                           <FormInput
                             logo={File}
                             label="Subject"
                             name="subject"
                             defaultValue={formData.subject}
+                             disabled={!userHasAccessToUpdateMasterTasks}
                             value={formData.subject}
                             onChange={(e: any) =>
                               handleInputChange("subject", e.target.value)
                             }
                           />
                         </div>
-                        <div className="flex gap-2 w-full">
-                          <div className="flex-1 min-w-0">
-                            <CustomDropdown
-                              logo={Flag}
-                              labelName="Priority"
-                              options={taskPriority!}
-                              preselectedOption={formData.taskPriority}
-                              onSelect={(v) =>
-                                handleDropdownChange("taskPriority", v)
-                              }
-                            />
-                          </div>
-                          {/* ASSIGN */}
 
-                          <div className="flex-1 min-w-0">
-                            <CompanyUserSearchFieldInput
-                              label="Assign"
-                              logo={User}
-                              defaultValue={
-                                selectedSupportTicket?.assignedToName ?? ""
+                        <div>
+                          <CustomDropdown
+                            logo={Flag}
+                            labelName="Priority"
+                               readOnly={!userHasAccessToUpdateMasterTasks}
+                            options={taskPriority!}
+                            preselectedOption={formData.taskPriority}
+                            onSelect={(v) =>
+                              handleDropdownChange("taskPriority", v)
+                            }
+                          />
+                        </div>
+
+                        {/* DESCRIPTION */}
+                        <div>
+                          <TextAreaInput
+                            label="Description"
+                            logo={FileText}
+                            value={formData.description}
+                             disabled={!userHasAccessToUpdateMasterTasks}
+                            onChange={(e: any) =>
+                              handleInputChange("description", e.target.value)
+                            }
+                            cols={3}
+                            rows={3}
+                          />
+                        </div>
+                        {/* ASSIGN */}
+
+                        <div>
+                          <CompanyUserSearchFieldInput
+                            label="Assign"
+                            logo={User}
+                            readOnly={!userHasAccessToUpdateMasterTasks}
+                            defaultValue={
+                              selectedSupportTicket?.assignedToName ?? ""
+                            }
+                            onUserSelected={(user: any) => {
+                              if (user) {
+                                setSelectedCompanyUser(user);
                               }
-                              onUserSelected={(user: any) => {
-                                if (user) {
-                                  setSelectedCompanyUser(user);
-                                }
-                              }}
-                              has={{
-                                searchLogo: false,
-                                border: true,
-                                xLogo: true,
-                                // penLogo: true
-                              }}
-                            />
+                            }}
+                            has={{
+                              searchLogo: false,
+                              border: true,
+                              xLogo: true,
+                              // penLogo: true
+                            }}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="flex flex-col items-end justify-end gap-1  ">
+                        <div className="flex justify-end items-end ">
+                          <div>
+                            <Button
+                                disabled={isSubmitting || !userHasAccessToUpdateMasterTasks}
+                                onClick={(e) => {
+                                  e.preventDefault();
+
+                                  if (!userHasAccessToUpdateMasterTasks) return;
+
+                                  updateTask();
+                                }}
+                              >
+                              <div className="flex gap-2 items-center">
+                                <Save size={15} />
+                                Save
+                              </div>
+                            </Button>
                           </div>
                         </div>
                       </div>
-                      {/* DESCRIPTION */}
-                      <div className="col-span-4">
-                        <TextAreaInput
-                          label="Description"
-                          logo={FileText}
-                          value={formData.description}
-                          onChange={(e: any) =>
-                            handleInputChange("description", e.target.value)
-                          }
-                          cols={3}
-                          rows={4}
-                        />
+                    </div>
+
+                    <div className="bg-white rounded-2xl border border-slate-200 shadow-sm py-3 px-5 h-fit">
+                      {/* Header */}
+                      <div className="flex items-center gap-2 mb-3">
+                        <Paperclip size={16} className="text-violet-600" />
+                        <h3 className="font-medium text-slate-800">
+                          Attachments
+                        </h3>
                       </div>
 
-                      <div className="flex flex-col items-end justify-end gap-1 ">
-                        <div className="mb-2 pr-2">
-                          <button
-                            title="Document Download"
-                            className="justify-end items-start"
-                            onClick={(e) => {
-                              e.preventDefault();
-                              downloadTaskDocument();
-                            }}
-                            disabled={
-                              selectedSupportTicket?.extension === null ||
-                              selectedSupportTicket?.extension === ""
-                            }
-                          >
-                            <Download size={22} className="text-blue-500" />
-                          </button>
+                      {/* Existing Document */}
+                      {selectedSupportTicket?.extension && (
+                        <div className="border rounded-xl p-2 bg-slate-50 mb-4">
+                          <div className="flex items-start gap-3">
+                            <div className="w-9 h-9 rounded-lg bg-red-50 flex items-center justify-center">
+                              <FileText size={20} className="text-red-500" />
+                            </div>
+
+                            <div className="flex-1 min-w-0">
+                              <p
+                                className="table-header-custom truncate"
+                                title={selectedSupportTicket.subject}
+                              >
+                                {selectedSupportTicket.subject ||
+                                  "Task Document"}
+                              </p>
+
+                              <p className="caption-custom ">
+                                {selectedSupportTicket.extension?.toUpperCase()}
+                              </p>
+                            </div>
+                          </div>
+                          {/* Actions */}
+                          <div className="mt-2 w-[50%]">
+                            <Button
+                              className={`caption-custom w-full flex items-center justify-center p-1 ml-12 ${COLORS.LIGHT_PURPLE_HOVER} ${COLORS.PRIMARY_PURPLE} rounded-lg
+                  border !border-violet-200 gap-1 font-medium shadow-sm hover:shadow-md`}
+                              onClick={downloadTaskDocument}
+                              disabled={!selectedSupportTicket?.extension}
+                            >
+                              <Download size={16} />
+                              Preview & Download
+                            </Button>
+                          </div>{" "}
                           {showCompanyLogoPreview && (
                             <div
                               className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50"
@@ -656,64 +799,44 @@ function MasterTaskUpdate() {
                                 fileExtension={selectedSupportTicket?.extension}
                                 width={"50%"}
                                 enableDownload={true}
+                                
                               />
                             </div>
                           )}
                         </div>
-                        <div className="flex justify-end items-end ">
-                          <div>
-                            <Button
-                              onClick={(e) => {
-                                e.preventDefault();
+                      )}
 
-                                updateTask();
-                              }}
-                            >
-                              <div className="flex gap-2 items-center">
-                                <Save size={15} />
-                                Save
-                              </div>
-                            </Button>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="bg-white border rounded p-1 space-y-2 w-[200px] flex-shrink-0 ">
-                    {/* DOCUMENT UPLOAD */}
-                    <div className="">
-                      <label className="input-label-custom flex gap-1 items-center">
-                        <Paperclip size={13} className="text-blue-500" />
-                        Attachment :
-                      </label>
-
-                      <div className="border border-dashed rounded-md p-3">
+                      {/* Upload Area */}
+                      <div className="border border-dashed border-slate-300 rounded-xl p-2 mb-1 ">
                         <input
                           type="file"
+                          id="fileUpload"
+                          className="hidden"
+                          disabled={!userHasAccessToUpdateMasterTasks}
                           onChange={(e) => {
-                            if (e.target.files && e.target.files[0]) {
+                            if (e.target.files?.[0]) {
                               setSelectedFile(e.target.files[0]);
                             }
                           }}
-                          className="hidden"
-                          id="fileUpload"
                         />
 
                         <label
-                          htmlFor="fileUpload"
-                          className="flex gap-2 items-center text-sm cursor-pointer text-blue-600"
+                          htmlFor={userHasAccessToUpdateMasterTasks ? "fileUpload" : undefined}
+                          className={`flex items-center justify-center gap-2 text-sm font-medium
+                            ${
+                              userHasAccessToUpdateMasterTasks
+                                ? "cursor-pointer text-violet-600"
+                                : "cursor-not-allowed text-gray-400"
+                            }`}
                         >
                           <Upload size={16} />
-                          Upload File
+                          Select Document
                         </label>
 
-                        {/* Selected File */}
-
                         {selectedFile && (
-                          <div className="flex justify-between mt-2 bg-gray-100 rounded px-2 py-1">
+                          <div className="mt-1 bg-slate-50 rounded-lg p-2 flex items-center justify-between">
                             <span
-                              className="caption-custom truncate"
+                              className="text-xs truncate flex-1"
                               title={selectedFile.name}
                             >
                               {selectedFile.name}
@@ -722,20 +845,30 @@ function MasterTaskUpdate() {
                             <button
                               type="button"
                               onClick={() => setSelectedFile(null)}
+                              className="ml-2"
                             >
                               <X size={14} />
                             </button>
                           </div>
                         )}
                       </div>
+
+                      {/* Upload Button */}
                       <div className="flex flex-col justify-end items-center gap-2 py-1">
                         <Button
-                          onClick={(e) => {
-                            e.preventDefault();
-                            updateTaskDocument();
-                          }}
-                          disabled={!selectedFile}
-                        >
+                        disabled={
+                          !selectedFile ||
+                          isSubmitting ||
+                          !userHasAccessToUpdateMasterTasks
+                        }
+                        onClick={(e) => {
+                          e.preventDefault();
+
+                          if (!userHasAccessToUpdateMasterTasks) return;
+
+                          updateTaskDocument();
+                        }}
+                      >
                           <div className="flex gap-2 items-center">
                             <Save size={15} />
                             Upload Document
@@ -748,7 +881,9 @@ function MasterTaskUpdate() {
               )}
               <div className="p-2 mt-2 border rounded ">
                 <div className="flex gap-2 border-b">
-                  <h3 className="font-semibold text-gray-800 mb-3 ">
+                  <h3
+                    className={`font-semibold ${COLORS.PRIMARY_PURPLE} mb-3 `}
+                  >
                     General tasks
                   </h3>
                   <SearchInput
@@ -844,7 +979,20 @@ export default MasterTaskUpdate;
 
 export const TaskCard = ({ task, setTaskList }: TaskCardProps) => {
   const { loginStatus } = useLoggedInUserContext();
+const { userHasAccessToUpdateMasterTasks} = useUserAccessModules();
 
+<ToggleButton
+  label="Status"
+  wantLabel={true}
+  checked={task.isactive}
+  
+  name="isActive"
+  onToggle={(e) => {
+    if (!userHasAccessToUpdateMasterTasks) return;
+    handleGeneralTaskToggle(e, task.id);
+  }}
+  
+/>
   const handleGeneralTaskToggle = async (
     event: React.ChangeEvent<HTMLInputElement>,
     taskId: number,
@@ -951,8 +1099,10 @@ export const TaskCard = ({ task, setTaskList }: TaskCardProps) => {
       </div>
 
       {/* Assigned To */}
-      <div className="flex items-center gap-2 mt-3 text-xs text-blue-500">
-        <User size={14} className="text-blue-500 " />
+      <div
+        className={`flex items-center gap-2 mt-2 text-xs ${COLORS.PRIMARY_PURPLE}`}
+      >
+        <User size={14} className={`${COLORS.PRIMARY_PURPLE}`} />
 
         <span>{task.assignedto || "Unassigned"}</span>
       </div>
@@ -1006,9 +1156,13 @@ export const TaskCard = ({ task, setTaskList }: TaskCardProps) => {
         <ToggleButton
           label="Status"
           wantLabel={true}
-          checked={task.isactive}
+          checked={task.isactive} 
           name="isActive"
-          onToggle={(e) => handleGeneralTaskToggle(e, task.id)}
+           onToggle={(e) => {
+    if (!userHasAccessToUpdateMasterTasks) return;
+    handleGeneralTaskToggle(e, task.id);
+  }}
+          
         />
       </div>
     </div>

@@ -5,9 +5,10 @@ import { useParams } from "react-router-dom";
 import {
   Calendar,
   CheckCircle2,
-  FileCode,
+  
   IndianRupee,
   Package,
+  RefreshCw,
   Repeat,
   Save,
   Trash,
@@ -24,10 +25,7 @@ import toast from "react-hot-toast";
 
 import { useLoggedInUserContext } from "../../../../context/user/LoggedInUserContext";
 
-import {
-  SIZE,
-  VALIDATIONS,
-} from "../../../../constants/AppConstants";
+import { SIZE, VALIDATIONS } from "../../../../constants/AppConstants";
 import { handleApiError } from "../../../../config/error/handleApiError";
 
 import axiosClient from "../../../../axios-client/AxiosClient";
@@ -37,7 +35,7 @@ import ShimmerEffect from "../account-service/ShimerEffect";
 import COLORS from "../../../../constants/Colors";
 import { useUserAccessModules } from "../../../../config/hooks/useAccessModules";
 import FormInput from "../../../ui/FormInput";
-import { DisplayComponent } from "../account-company-product/account-company-product-details/AccountCompanyProductDetailsCard";
+import MetaInfoItem from "../../../ui/MetaInfoItem";
 
 interface CustomField {
   id: string;
@@ -266,18 +264,18 @@ const AccountSubscriptionDetails = () => {
       }
     } catch (error: any) {
       handleApiError(error);
-    //   if (error.status === STATUS_CODE.UNATHORISED) {
-    //     const refreshTokenResponse = await RefreshToken({
-    //       callFunction: handleUpdate,
-    //     });
+      //   if (error.status === STATUS_CODE.UNATHORISED) {
+      //     const refreshTokenResponse = await RefreshToken({
+      //       callFunction: handleUpdate,
+      //     });
 
-    //     if (refreshTokenResponse) {
-    //       await handleUpdate();
-    //     }
-    //   } else {
-    //     toast.error(error.response?.data || "Error updating subscription");
-    //   }
-     } finally {
+      //     if (refreshTokenResponse) {
+      //       await handleUpdate();
+      //     }
+      //   } else {
+      //     toast.error(error.response?.data || "Error updating subscription");
+      //   }
+    } finally {
       setIsSaving(false);
     }
   };
@@ -421,169 +419,75 @@ const AccountSubscriptionDetails = () => {
 
   return (
     <form onSubmit={handleUpdate}>
-      <div className="p-1 shadow-sm w-full">
+      <div className="p-1 shadow-sm w-full bg-gray-50 ">
         {/* Header */}
-
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-4">
+  <div className="flex flex-col gap-2">
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm">
+          <div className="grid grid-cols-[350px_1fr]">
             {/* Logo */}
-            <div
-              className="w-14 h-14 rounded-full flex items-center justify-center
-      text-2xl font-semibold text-white bg-blue-500 shrink-0"
-            >
-              {accountSubscriptionDetail?.companyProductName
-                ? accountSubscriptionDetail.companyProductName
-                    .charAt(0)
-                    .toUpperCase()
-                : "?"}
+            <div className="px-3 py-4 border-r border-slate-200 flex gap-4 mt-1">
+            <div className="flex items-center ">
+             <div className={`p-3 rounded-lg ${COLORS.PAGE_HEADER_SECTION_BG_COLOR} flex items-center justify-center shrink-0`}>
+              <RefreshCw className={COLORS.PAGE_HEADER_ICONS_COLOR_AND_SIZE} />
             </div>
-
-            {/* Product + Account Name */}
-            <div className="flex flex-col">
-              <h2 className="table-header-custom">
-                {accountSubscriptionDetail?.companyProductName ||
-                  "Unnamed Product"}
-              </h2>
-
-              <span className="caption-custom">
-                Account Name :{" "}
-                <span className="caption-custom">
-                  {accountSubscriptionDetail?.accountName || "-"}
-                </span>
-              </span>
             </div>
-          </div>
-        </div>
+              {/* Product + Account Name */}
 
-        {/* Top Details */}
+              <div>
+                <h2 className="page-header-custom">
+                  {accountSubscriptionDetail?.companyProductName}
+                </h2>
 
-        <div className="grid grid-cols-4 gap-1">
-          {/* <MetaField
-          label="Account Subscription Code"
-          value={accountSubscriptionDetail?.accountSubscriptionCode || "-"}
-        ></MetaField> */}
+                <p
+                  className={`${COLORS.PRIMARY_PURPLE}
+                ${COLORS.LIGHT_PURPLE_BACKGROUND}
+                caption-custom !font-bold w-fit px-2  rounded-md`}
+                >
+                  {accountSubscriptionDetail?.accountSubscriptionCode}
+                </p>
 
-          <DisplayComponent
-            icon={FileCode}
-            title="Account Subscription Code"
-            value={String(
-              accountSubscriptionDetail?.accountSubscriptionCode || "-",
-            )}
-            penLogo={false}
-          />
-
-          {/* <MetaField
-          label="Account Name"
-          value={accountSubscriptionDetail?.accountName || "-"}
-        ></MetaField> */}
-
-          {/* <MetaField
-          label="Company Product"
-          value={accountSubscriptionDetail?.companyProductName || "-"}
-        ></MetaField> */}
-
-          {/* <MetaField
-          label="Start Date"
-          value={accountSubscriptionDetail?.startDate || "-"}
-        ></MetaField>
-        <MetaField
-          label="End Date"
-          value={accountSubscriptionDetail?.endDate || "-"}
-        ></MetaField> */}
-
-          {/* <MetaField
-          label="Is Renewal"
-          value={accountSubscriptionDetail?.isRenewal ? "Yes" : "No"}
-        ></MetaField> */}
-
-          <DisplayComponent
-            icon={Repeat}
-            title="Is Renewal"
-            value={accountSubscriptionDetail?.isRenewal ? "Yes" : "No"}
-            penLogo={false}
-          />
-
-          {/* <MetaField
-          label="Total Cost"
-          value={accountSubscriptionDetail?.totalCost || "-"}
-        ></MetaField> */}
-
-          {/* <MetaField
-          label="Createdby"
-          value={accountSubscriptionDetail?.createdBy || "-"}
-        ></MetaField>
-
-        <MetaField
-          label="Createdon"
-          value={accountSubscriptionDetail?.createdOn || "-"}
-        ></MetaField> */}
-          <DisplayComponent
-            icon={User}
-            title="Createdby"
-            value={accountSubscriptionDetail?.createdBy || "-"}
-            penLogo={false}
-          />
-
-          <DisplayComponent
-            icon={Calendar}
-            title="Createdon"
-            value={accountSubscriptionDetail?.createdOn || "-"}
-            penLogo={false}
-          />
-        </div>
-
-        {/* Form Section */}
-
-        <div className="grid grid-cols-4 gap-1 items-start my-1">
-          <div>
-            <DatePickerInput
-              label="Start Date"
-              name="start_date"
-              onChange={handleChange}
-              logo={Calendar}
-              required
-              value={formData.start_date}
-            />
-
-            {showStartDateError && (
-              <div className="text-red-500 text-xs">
-                Please select Start Date
+                <p className="caption-custom mt-1">
+                  Account Name :
+                  <span className="caption-custom !font-bold !text-slate-700">
+                    {" "}
+                    {accountSubscriptionDetail?.accountName}
+                  </span>
+                </p>
               </div>
-            )}
-          </div>
+            </div>
 
-          <div>
-            <DatePickerInput
-              label="End Date"
-              name="end_date"
-              onChange={handleChange}
-              logo={Calendar}
-              required
-              value={formData.end_date}
-            />
-            {showEndDateError && (
-              <div className="text-red-500 text-xs">Please select End Date</div>
-            )}
-          </div>
+ {/* Top Details */}
+            <div className="px-3 py-7">
+  <div className="grid grid-cols-5 gap-4">
 
-          <div>
-            <FormInput
-              required
-              type="number"
-              label="Total Cost"
-              placeholder="Enter total cost"
-              logo={IndianRupee}
-              defaultValue={totalCost}
-              value={totalCost === "" ? "" : totalCost}
-              onChange={handleCostChange}
-            />
-            {totalCostError && (
-              <p className="text-xs  text-red-600 ">{totalCostError}</p>
-            )}
-          </div>
+    <MetaInfoItem
+  icon={Repeat}
+  label="Is Renewal"
+  value={
+    accountSubscriptionDetail?.isRenewal
+      ? "Yes"
+      : "No"
+  }
+/>
 
-          <div className="flex flex-col justify-start pt-1 ">
-            <label className="flex items-center gap-1 text-sm text-gray-700">
+<MetaInfoItem
+  icon={User}
+  label="Created By"
+  value={accountSubscriptionDetail?.createdBy}
+  iconBgClass="bg-orange-50"
+  iconColorClass="text-orange-600"
+/>
+
+<MetaInfoItem
+  icon={Calendar}
+  label="Created On"
+  value={accountSubscriptionDetail?.createdOn}
+  iconBgClass="bg-blue-50"
+  iconColorClass="text-blue-600"
+/>
+
+     <div className="flex flex-col border-l pl-6 ">
+            <label className="flex items-center caption-custom gap-1">
               {formData.is_active ? (
                 <CheckCircle2 size={14} className="text-blue-500" />
               ) : (
@@ -617,14 +521,91 @@ const AccountSubscriptionDetails = () => {
               </span>
             </div>
           </div>
+     </div>
+        </div>
+          </div>
         </div>
 
-        <div className="p-1 bg-white border rounded-lg shadow-sm col-span-2  min-h-[180px]">
-          <div className="flex justify-between mb-1 items-center ">
-            <div className="flex items-center gap-1">
-              <Package size={14} className="text-blue-500" />
-              <h3 className="flex gap-1 input-label-custom">Package Details</h3>
+            <div>
+            <div className="bg-white rounded-xl border border-slate-200  shadow-sm px-4 py-2">
+              <div className="flex items-center gap-2 mb-2">
+                <div className={COLORS.SECTION_HEADER_ICON_STYLE}>
+                <User size={16} />
+                </div>
+                <h3 className="table-header-custom">Subscription Information</h3>
+              </div>
+
+ {/* Form Section */}
+
+        <div className="grid grid-cols-3 gap-10 items-start my-1 ">
+          <div className="border-r pr-7">
+            <DatePickerInput
+              label="Start Date"
+              name="start_date"
+              onChange={handleChange}
+              logo={Calendar}
+              required
+              value={formData.start_date}
+            />
+
+            {showStartDateError && (
+              <div className="text-red-500 text-xs">
+                Please select Start Date
+              </div>
+            )}
+          </div>
+
+          <div className="border-r pr-7">
+            <DatePickerInput
+              label="End Date"
+              name="end_date"
+              onChange={handleChange}
+              logo={Calendar}
+              required
+              value={formData.end_date}
+            />
+            {showEndDateError && (
+              <div className="text-red-500 text-xs">Please select End Date</div>
+            )}
+          </div>
+
+          <div >
+            <FormInput
+              required
+              type="number"
+              label="Total Cost"
+              placeholder="Enter total cost"
+              logo={IndianRupee}
+              defaultValue={totalCost}
+              value={totalCost === "" ? "" : totalCost}
+              onChange={handleCostChange}
+            />
+            {totalCostError && (
+              <p className="text-xs  text-red-600 ">{totalCostError}</p>
+            )}
+          </div>
+
+          </div>
+        </div>
+
+              <div className="grid grid-cols-2 gap-3 mt-3">
+               
+              </div>
             </div>
+                </div>
+       
+
+
+       
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4">
+          <div className="flex justify-between items-center mb-4">
+            <div className="flex items-center gap-2">
+               <div className={COLORS.SECTION_HEADER_ICON_STYLE}>
+                <Package size={16} />
+                </div>
+              <h3 className="table-header-custom">Package Details</h3>
+            </div>
+
             <Button
               type="button"
               onClick={addPackage}
@@ -635,74 +616,110 @@ const AccountSubscriptionDetails = () => {
           </div>
 
           {/* Packages */}
-          <div className="grid grid-cols-4 gap-3 p-1 ">
-            {packages.map((pkg) => (
-              <div
-                key={pkg.id}
-                className="border p-2 rounded-md gap-1 bg-gray-50 "
-              >
-                {/* Package Name + Remove */}
-                <div className="flex items-center mb-2 gap-5 pr-2 justify-between ">
-                  <input
-                    value={pkg.packageName}
-                    placeholder="Package Name"
-                    onChange={(e) => updatePackageName(pkg.id, e.target.value)}
-                    className=" input-label-custom border px-2 py-1 rounded flex-1 items-center justify-between focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                  />
-                  {pkg.isNew && (
-                    <button type="button" onClick={() => removePackage(pkg.id)}>
-                      <Trash
-                        size={SIZE.ICON_DELETE_BUTTON_SIZE}
-                        className={COLORS.ICON_DELETE_BUTTON}
-                      ></Trash>
-                    </button>
-                  )}
-                </div>
+          <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-3 gap-4 mt-3">
+  {packages.map((pkg, index) => (
+    <div
+      key={pkg.id}
+      className="bg-white border border-slate-200 rounded-lg shadow-sm overflow-hidden"
+    >
+      {/* Card Header */}
+      <div className="flex items-center justify-between px-4 py-1 border-b bg-slate-50">
+  <div className="flex items-center gap-2">
+    <div
+      className={`w-7 h-7 rounded-lg ${COLORS.LIGHT_PURPLE_BACKGROUND}
+      flex items-center justify-center`}
+    >
+      <Package size={16} className={COLORS.PRIMARY_PURPLE} />
+    </div>
 
-                {/* Package Fields */}
-                {pkg.field.map((f) => (
-                  <div key={f.id} className="flex gap-2 mb-2 items-center ">
-                    {/* Key */}
-                    <input
-                      value={f.key}
-                      readOnly
-                      className=" input-label-custom border rounded bg-gray-100 px-2 py-1 w-[140px] shrink-0 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                    />
+    <span className="font-medium">
+      Package {index + 1}
+    </span>
+  </div>
 
-                    {/* Value */}
-                    {f.key === "Active" ? (
-                      <>
-                        <ToggleButton
-                          checked={f.value === "true"}
-                          onToggle={(e) => {
-                            handlePackageChange(
-                              pkg.id,
-                              f.id,
-                              e.target.checked ? "true" : "false",
-                            );
-                          }}
-                          name={""}
-                        />
-                      </>
-                    ) : (
-                      <input
-                        value={f.value}
-                        onChange={(e) =>
-                          handlePackageChange(pkg.id, f.id, e.target.value)
-                        }
-                        className=" input-label-custom border rounded bg-gray-100 px-2 py-1 w-[140px] shrink-0 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                      />
-                    )}
-                  </div>
-                ))}
+  {pkg.isNew && (
+    <button
+      type="button"
+      onClick={() => removePackage(pkg.id)}
+    >
+      <Trash
+        size={16}
+        className="text-red-500 hover:text-red-600"
+      />
+    </button>
+  )}
+</div>
+
+      {/* Package Table */}
+      <div className="p-">
+        <table className="w-full border border-slate-200 rounded-lg overflow-hidden">
+          <tbody>
+  {/* Package Name Row */}
+  <tr className="border-b">
+    <td className="w-1/2 px-3 py-2 input-label-custom !font-medium bg-slate-50 border-r">
+      Package Name
+    </td>
+    <td className="px-3 py-2">
+      <input
+        value={pkg.packageName}
+        placeholder="Enter package name"
+        onChange={(e) =>
+          updatePackageName(pkg.id, e.target.value)
+        }
+        className="w-full bg-transparent focus:outline-none table-header-custom placeholder:text-xs font-normal"
+      />
+    </td>
+  </tr>
+
+  {/* Existing Fields */}
+  {pkg.field.map((f) => (
+    <tr key={f.id} className="border-b last:border-b-1 table-header-custom">
+      <td className="w-1/2 px-3 py-2 input-label-custom !font-medium bg-slate-50 border-r">
+        {f.key}
+      </td>
+
+      <td className="px-3 py-2">
+        {f.key === "Active" ? (
+              <div className="flex justify-start items-center">
+          <ToggleButton
+            checked={f.value === "true"}
+            onToggle={(e) =>
+              handlePackageChange(
+                pkg.id,
+                f.id,
+                e.target.checked ? "true" : "false"
+              )
+            }
+            name=""
+          />
               </div>
-            ))}
-          </div>
+        ) : (
+          <input
+            value={f.value}
+            onChange={(e) =>
+              handlePackageChange(
+                pkg.id,
+                f.id,
+                e.target.value
+              )
+            }
+            className="w-full bg-transparent focus:outline-none text-sm"
+          />
+        )}
+      </td>
+    </tr>
+  ))}
+</tbody>
+        </table>
+      </div>
+    </div>
+  ))}
+</div>
         </div>
 
         {/* Buttons */}
 
-        <div className="flex items-center justify-end gap-2 mt-6">
+        <div className="flex items-center justify-end gap-2 mt-3 mr-2">
           <div>
             <Button
               type="submit"

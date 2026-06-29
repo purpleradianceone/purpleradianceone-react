@@ -458,7 +458,15 @@ function CompanyUserAgGrid({
           return <SkeletonRowsAgGrid />;
         }
 
-        return params.value;
+        return (
+          <span className="">
+            {params.value !== null &&
+            params.value !== undefined &&
+            params.value !== ""
+              ? params.value
+              : "-"}
+          </span>
+        );
       },
     };
   }, []);

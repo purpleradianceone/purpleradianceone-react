@@ -64,6 +64,7 @@ function MasterTaskManagementList({
   const { userPreference } = useUserPreference();
   const { userHasAccessToViewAllTasks } =
     useUserAccessModules();
+    const [isSummaryLoading, setIsSummaryLoading] = useState(false);
   const {
     handleDateRangeIdChange,
     isCustomDateOptionSelected,
@@ -93,6 +94,7 @@ const [summaryData, setSummaryData] =
 
   const fetchSummaryGeneralTaskMaster = useCallback(async () => {
   try {
+     setIsSummaryLoading(true);
     const postData = {
       company_id: loginStatus.companyId,
       requestedby: loginStatus.id,
@@ -112,6 +114,8 @@ const [summaryData, setSummaryData] =
 }
   } catch (error) {
     console.log(error);
+  }finally {
+    setIsSummaryLoading(false);
   }
 }, [loginStatus.companyId, loginStatus.id]);
 
@@ -184,16 +188,16 @@ useEffect(() => {
           cardCss="bg-white border border-slate-200 rounded-2xl px-5 py-1.5  shadow-sm flex items-center justify-between gap-2 over:shadow-md transition-all  "
           showGraph
           cardGap={40}
-          loading={isDataLoading}
+         loading={isSummaryLoading}
           cards={[
             {
               title: "Master Tasks",
               count: summaryData.total_master_task_created,
               subtitle: "Total created tasks",
               icon: ClipboardList,
-              iconBg: "bg-violet-100",
-              iconColor: "text-violet-600",
-              graphColor: "bg-violet-500",
+              iconBg: COLORS.LIGHT_PURPLE_BACKGROUND,
+              iconColor: COLORS.PRIMARY_PURPLE,
+              graphColor: COLORS.PRIMARY_PURPLE_BACKGROUND,
             },
 
             {
@@ -232,7 +236,7 @@ useEffect(() => {
         {/* sticky */}
         {
           <div
-            className={`sticky z-10 top-12 mt-1 px-3 py-1.5 flex flex-wrap items-center justify-between gap-3 text-sm ${COLORS.GRID_HEADER_SECTION_BG_COLOR} mb-3 border rounded-lg
+            className={`sticky z-10 top-12 mt-1 px-3 py-1.5 flex flex-wrap items-center justify-between gap-1 text-sm ${COLORS.GRID_HEADER_SECTION_BG_COLOR} mb-3 border rounded-lg
                       w-full
                     `}
           >
@@ -246,7 +250,7 @@ useEffect(() => {
                       isCustomDateOptionSelected
                         ? "text-xs"
                         : "section-header-custom"
-                    } mr-4`}
+                    } mr-3`}
                   >
                     Master Tasks
                   </span>
@@ -272,8 +276,8 @@ useEffect(() => {
                       <div className="grid grid-cols-1 justify-center gap-1 w-full">
                         {/* Shared width wrapper */}
                         <div className="relative w-fit flex justify-center gap-1">
-                          <div className="flex col-span-2  w-fit">
-                            <div className="w-40">
+                          <div className="flex col-span-2 w-fit">
+                            <div className="w-40 ">
                               <DateRangeFilterDropdown
                                 dropdownOptions={dateRangeDropdownOptions}
                                 handleDateIdChange={handleDateRangeIdChange}
@@ -298,7 +302,7 @@ useEffect(() => {
                     </div>
 
                     {isUsedInAllTasksModule && (
-                      <div className="flex flex-wrap gap-1 w-full md:w-auto">
+                      <div className="flex flex-wrap gap-1 md:w-auto">
                         {/* priority */}
 
                         <div className="min-w-[100px]">

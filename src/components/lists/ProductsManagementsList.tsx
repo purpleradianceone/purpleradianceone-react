@@ -57,6 +57,8 @@ ProductsManagementListProps) {
   const { userHasAccessToAddProduct, userHasAccessToViewProduct } =
     useUserAccessModules();
   const { dateRangeDropdownOptions } = useComapanySpecificSearchDateRange();
+  const [isSummaryLoading, setIsSummaryLoading] = useState(false);
+
 
   const [selectedProduct, setSelectedProduct] = useState<Product>({
     count: 0,
@@ -101,6 +103,8 @@ const [productSummary, setProductSummary] =
 
   const fetchProductSummary = useCallback(async () => {
   try {
+    setIsSummaryLoading(true);
+
     const postData = {
       company_id: loginStatus.companyId,
       requestedby: loginStatus.id,
@@ -119,6 +123,8 @@ const [productSummary, setProductSummary] =
     }
   } catch (error) {
     console.error(error);
+  }finally {
+    setIsSummaryLoading(false);
   }
 }, [loginStatus.companyId, loginStatus.id]);
 
@@ -239,51 +245,51 @@ useEffect(() => {
         </div>
 
         <SummaryCards
-  cardGap={15}
-  width="80%"
-  gridCols={4}
-  loading={isDataLoading}
-  cards={[
-    {
-      title: "Total Products",
-      count: productSummary.total_company_product,
-      subtitle: "All Products in catalog",
-      icon: Package,
-       iconBg: "bg-violet-100",
-      iconColor: "text-violet-600",
-    },
+              cardGap={15}
+              width="80%"
+              gridCols={4}
+              loading={isSummaryLoading}
+              cards={[
+                {
+                  title: "Total Products",
+                  count: productSummary.total_company_product,
+                  subtitle: "All Products in catalog",
+                  icon: Package,
+                  iconBg: COLORS.LIGHT_PURPLE_BACKGROUND,
+                  iconColor: COLORS.PRIMARY_PURPLE,
+                },
 
-    {
-      title: "Active Products",
-      count: productSummary.total_active_company_product,
-      subtitle: "Currently Active",
-      icon: PackageCheck,
-      iconBg: "bg-green-100",
-      iconColor: "text-green-600",
-    },
+                {
+                  title: "Active Products",
+                  count: productSummary.total_active_company_product,
+                  subtitle: "Currently Active",
+                  icon: PackageCheck,
+                  iconBg: "bg-green-100",
+                  iconColor: "text-green-600",
+                },
 
-    {
-      title: "Low Stock",
-      count: productSummary.total_low_stock_company_product,
-      subtitle: "Needs Reorder",
-       icon: AlertTriangle,
-      iconBg: "bg-orange-100",
-      iconColor: "text-orange-600",
-    },
+                {
+                  title: "Low Stock",
+                  count: productSummary.total_low_stock_company_product,
+                  subtitle: "Needs Reorder",
+                  icon: AlertTriangle,
+                  iconBg: "bg-orange-100",
+                  iconColor: "text-orange-600",
+                },
 
-    {
-      title: "Inventory Value",
-      count: `₹${Number(
-        productSummary.total_stock_value ?? 0
-      ).toLocaleString("en-IN")}`,
-      subtitle: "Current Stock Value",
-      icon: IndianRupee,
-     
-      iconBg: "bg-blue-100",
-      iconColor: "text-blue-600",
-    },
-  ]}
-/>
+                {
+                  title: "Inventory Value",
+                  count: `₹${Number(
+                    productSummary.total_stock_value ?? 0
+                  ).toLocaleString("en-IN")}`,
+                  subtitle: "Current Stock Value",
+                  icon: IndianRupee,
+                
+                  iconBg: "bg-blue-100",
+                  iconColor: "text-blue-600",
+                },
+              ]}
+            />
         
         <div
           className={`sticky z-10 top-12 mt-1 py-1.5 px-3 mb-3  flex items-center justify-between ${COLORS.GRID_HEADER_SECTION_BG_COLOR}  border border-slate-200 rounded-lg mb-1 w-full`}
