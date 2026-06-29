@@ -9,6 +9,8 @@ import {
 import SupportTicketTaskStage from "../../../../@types/support-ticket-management/SupportTicketTaskStage";
 import SupportTicketTaskList from "../SupportTaskList";
 import SupportTicketTaskProps from "../../../../@types/support-ticket-management/SupportTicketTaskProps";
+import COLORS from "../../../../constants/Colors";
+import { CheckCircle2, Clock, ListTodo, PlayCircle } from "lucide-react";
 
 function SupportTasksTabs({
   supportTicketTaskStage,
@@ -29,6 +31,8 @@ function SupportTasksTabs({
     {
       label: "All Tasks",
       value: "allTasks",
+      icon: ListTodo,
+      
       desc: (
         <SupportTicketTaskList
           taskId={0}
@@ -43,6 +47,7 @@ function SupportTasksTabs({
     {
       label: supportTicketTaskStage[0]?.name,
       value: supportTicketTaskStage[0]?.name,
+       icon: Clock,
       desc: (
         <SupportTicketTaskList
           taskId={supportTicketTaskStage[0]?.id}
@@ -57,6 +62,7 @@ function SupportTasksTabs({
     {
       label: supportTicketTaskStage[1]?.name,
       value: supportTicketTaskStage[1]?.name,
+         icon: PlayCircle,
       desc: (
         <SupportTicketTaskList
           taskId={supportTicketTaskStage[1]?.id}
@@ -71,6 +77,7 @@ function SupportTasksTabs({
     {
       label: supportTicketTaskStage[2]?.name,
       value: supportTicketTaskStage[2]?.name,
+       icon: CheckCircle2,
       desc: (
         <SupportTicketTaskList
           taskId={supportTicketTaskStage[2]?.id}
@@ -92,15 +99,15 @@ function SupportTasksTabs({
             placeholder="All Tasks"
             onPointerEnterCapture={undefined}
             onPointerLeaveCapture={undefined}
-            className="rounded-none border-b border-blue-gray-50  bg-transparent p-0"
+            className="rounded-none border-b border-violet-gray-50  bg-transparent p-0"
             indicatorProps={{
-              className:
-                "bg-transparent border-b-2 border-teal-600 shadow-none rounded-none",
+              className: `${COLORS.LIGHT_PURPLE_BACKGROUND} rounded-md shadow-none  border-b-2
+           ${COLORS.BORDER_PRIMARY_COLOUR}`,
             }}
             onResize={undefined}
             onResizeCapture={undefined}
           >
-            {data.map(({ label, value, taskId }) => (
+            {data.map(({ label, value, taskId ,icon: Icon }) => (
               <Tab
                 placeholder="All Tasks"
                 onPointerEnterCapture={undefined}
@@ -115,11 +122,22 @@ function SupportTasksTabs({
                 }}
                 className={
                   activeTab === value
-                    ? "input-label-custom-active-tab"
-                    : "input-label-custom"
+                    ? `input-label-custom ${COLORS.PRIMARY_PURPLE} !font-medium`
+                    : `input-label-custom ${COLORS.PRIMARY_PURPLE_TEXT_HOVER} ${COLORS.LIGHT_BACKGROUND_HOVER} mx-4 rounded-md`
                 }
               >
-                {label}
+                <div className="flex items-center justify-center gap-2">
+          {Icon && <Icon size={18} 
+           className={
+        Icon === PlayCircle
+          ? "text-green-600"
+          : activeTab === value
+          ? `${COLORS.PRIMARY_PURPLE}`
+          : "text-slate-500"
+      }
+          />}
+          <span>{label}</span>
+        </div>
               </Tab>
             ))}
           </TabsHeader>

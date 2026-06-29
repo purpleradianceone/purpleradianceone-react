@@ -622,7 +622,7 @@ function Navbar({ children }: { children: React.ReactNode }) {
                           to={ROUTES_URL.HOME}
                           icon={<Home size={SIZE.TWENTY} />}
                           label="Home"
-                        />
+                        />    
                         {/* {userHasAccessToViewUser && ( */}
                         <NavItem
                           disable={!userHasAccessToViewUser}

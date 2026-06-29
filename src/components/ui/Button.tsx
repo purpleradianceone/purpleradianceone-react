@@ -25,7 +25,7 @@ function Button(prop: ButtonProps) {
           prop.className
             ? "cursor-not-allowed opacity-50 " + prop.className
             : (prop.children == "Reset Password" ? "mt-6 " : "") +
-              `w-full flex justify-center ${paddingClasses} opacity-50 border border-transparent rounded-md shadow-sm action-btn-custom disabled-btn ${COLORS.BG_BLUE_600_COLOR} ${COLORS.HOVER_BG_BLUE_700_COLOR_HOVER} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`
+              `w-full flex justify-center ${paddingClasses} opacity-50 border border-transparent rounded-md shadow-sm action-btn-custom disabled-btn ${COLORS.PRIMARY_PURPLE_BACKGROUND} ${COLORS.DARK_PURPLE_HOVER} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`
         }
       >
         {prop.children}
@@ -42,7 +42,7 @@ function Button(prop: ButtonProps) {
           prop.className
             ? prop.className
             : (prop.children == "Reset Password" ? "mt-6 " : "") +
-              `w-full flex justify-center ${paddingClasses} border border-transparent rounded-md shadow-sm action-btn-custom ${prop.type === "reset" || prop.type === "button" ? COLORS.BG_GRAY_500_COLOR +" " + COLORS.HOVER_BG_GRAY_600_COLOR_HOVER  : COLORS.BG_BLUE_600_COLOR +" " + COLORS.HOVER_BG_BLUE_700_COLOR_HOVER}  focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`
+              `w-full flex justify-center ${paddingClasses} border border-transparent rounded-md shadow-sm action-btn-custom ${prop.type === "reset" || prop.type === "button" ? COLORS.BG_GRAY_500_COLOR +" " + COLORS.HOVER_BG_GRAY_600_COLOR_HOVER  : COLORS.PRIMARY_PURPLE_BACKGROUND +" " + COLORS.DARK_PURPLE_HOVER}  focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500`
         }
       >
         {prop.spinner ? (

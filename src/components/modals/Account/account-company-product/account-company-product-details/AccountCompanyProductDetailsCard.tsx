@@ -16,6 +16,7 @@ import {
   IndianRupee,
   LucideIcon,
   MapPin,
+  Package,
   Pen,
   ReceiptText,
   Save,
@@ -35,6 +36,7 @@ import FormInput from "../../../../ui/FormInput";
 import { updateAccountCompanyProductSerialNumberApiCall } from "../../../../../config/apis/AccountApis";
 import Button from "../../../../ui/Button";
 import LoadingSpinner from "../../../../../assets/animations/LoadingSpinner";
+import MetaInfoItem from "../../../../ui/MetaInfoItem";
 
 export const AccountCompanyProductDetailsCard = ({
   selectedProductCard,
@@ -313,22 +315,20 @@ export const AccountCompanyProductDetailsCard = ({
     );
 
   return (
-    <form onSubmit={handleUpdate} className="px-1  py-0.5">
+    <form onSubmit={handleUpdate} className="px-1 bg-gray-50 py-0.5">
       {/* user access : {userHasAccessToUpdateAccount ? "true" : "false"} */}
       {/* Header */}
-      <div className="grid  w-full grid-cols-4 md:grid-cols-4 gap-1    rounded p-0.5 pt-1">
-        <div className=" col-span-4 flex items-center justify-between">
-          <div className="flex items-center gap-4">
+              {/* Header */}
+  <div className="flex flex-col gap-2">
+      <div className="bg-white rounded-xl border border-slate-200 shadow-sm">
+        <div className="grid grid-cols-[350px_1fr]">
+          <div className="px-3 py-4 border-r border-slate-200 flex gap-4 mt-1">
             {/* Logo */}
-            <div
-              className="w-14 h-14 rounded-full flex items-center justify-center 
-                  text-2xl font-semibold text-white bg-blue-500 shrink-0"
-            >
-              {productData?.companyProductName
-                ? productData.companyProductName.charAt(0).toUpperCase()
-                : "?"}
+              <div className="flex items-center ">
+             <div className={`p-3 rounded-lg ${COLORS.PAGE_HEADER_SECTION_BG_COLOR} flex items-center justify-center shrink-0`}>
+              <Package className={COLORS.PAGE_HEADER_ICONS_COLOR_AND_SIZE} />
             </div>
-
+            </div>
             {/* Text Content */}
             <div className="flex flex-col">
               {/* Product Name */}
@@ -341,7 +341,7 @@ export const AccountCompanyProductDetailsCard = ({
               </h2>
 
               {/* Account Name */}
-              <span className="caption-custom">
+              <span className="caption-custom pt-1">
                 {productData?.accountName ? (
                   <>
                     Account :{" "}
@@ -355,62 +355,110 @@ export const AccountCompanyProductDetailsCard = ({
               </span>
             </div>
           </div>
-          <div>
-            <Button
-              className={`flex action-btn-custom items-center gap-1 border px-2 rounded-md py-1 ${isSaving ? "opacity-30" : " "} bg-blue-600 text-white`}
-              disabled={isSaving}
-              autoFocus
-              type="submit"
-            >
-               {isSaving ? <>
-               <LoadingSpinner colour="white"  height={20} width={20}/>
-                Saving 
-               </>
-               : <>
-               
-                <Save size={16} /> Save
-               </>
-               }
-            </Button>
+
+          <div className="flex justify-between px-8 py-4">
+            <div>
+              <MetaInfoItem
+                icon={ShoppingBag}
+                label="Quantity"
+                value={
+                  productData?.quantity
+                    ? productData.quantity
+                        .toLocaleString()
+                        .concat(" " + productData!.unitNameInStock)
+                    : ""
+                }
+                iconBgClass = "bg-orange-50"
+                  iconColorClass = "text-orange-600"
+              />
+            </div>
+            <div>
+              {productData?.barcode && (
+               <MetaInfoItem
+                  icon={Barcode}
+                  label="Barcode"
+                  value={productData!.barcode ? productData!.barcode : ""}
+                   iconBgClass = "bg-blue-50"
+                  iconColorClass = "text-blue-600"
+                />
+              )}
+            </div>
+            <div>
+              {productData?.serialNumber && (
+                <FormInput
+                  logo={FileDigit}
+                  label="Serial Number"
+                  name="serialNumber"
+                  placeholder="Enter serial number"
+                  value={productSerialNumber ? productSerialNumber : ""}
+                  onChange={handleSerialNumberChange}
+                  inputMode="text"
+                  type="text"
+                  penLogo={Pen}
+                />
+              )}
+            </div>
+
+            <div className="border-l pl-4 py-2">
+              <Button
+                className={`flex action-btn-custom items-center gap-1 border px-2 rounded-md py-1 ${isSaving ? "opacity-30" : " "} ${COLORS.PRIMARY_PURPLE_BACKGROUND} text-white`}
+                disabled={isSaving}
+                autoFocus
+                type="submit"
+              >
+                {isSaving ? (
+                  <>
+                    <LoadingSpinner colour="white" height={20} width={20} />
+                    Saving
+                  </>
+                ) : (
+                  <>
+                    <Save size={16} /> Save
+                  </>
+                )}
+              </Button>
+            </div>
           </div>
         </div>
-        <DisplayComponent
-          icon={ShoppingBag}
-          title="Quantity"
-          value={
-            productData?.quantity
-              ? productData.quantity
-                  .toLocaleString()
-                  .concat(" " + productData!.unitNameInStock)
-              : ""
-          }
-          penLogo={false}
-        />
-        {productData?.barcode && (
-          <DisplayComponent
-            icon={Barcode}
-            title="Barcode"
-            value={productData!.barcode ? productData!.barcode : ""}
-            penLogo={false}
-          />
-        )}
-        {productData?.serialNumber && (
-          <FormInput
-            logo={FileDigit}
-            label="Serial Number"
-            name="serialNumber"
-            placeholder="Enter serial number"
-            value={productSerialNumber ? productSerialNumber : ""}
-            onChange={handleSerialNumberChange}
-            inputMode="text"
-            type="text"
-            penLogo={Pen}
-          />
-        )}
       </div>
 
       {/* Left Section */}
-      <div className="grid  grid-cols-2 md:grid-cols-5 gap-1   rounded p-0.5 ">
+     
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4">
+
+        <div className="flex items-center gap-2 mb-2 ">
+              <div className={COLORS.SECTION_HEADER_ICON_STYLE}>
+              <ShoppingBag size={16} />
+              </div>
+              <h3 className="table-header-custom"> Product Information</h3>
+            </div>
+
+             {/* Form Section */}
+             <div className="grid grid-cols-5 gap-x-3 gap-y-3 mt-2">
+
+               <FormInput
+          required
+          logo={IndianRupee}
+          label="Total Cost"
+          name="totalCost"
+          placeholder="Enter Total Cost"
+          value={productData?.totalCost ?? ""}
+          onChange={(e) => {
+            const value = e.target.value;
+
+            setProductData((prev) => {
+              if (!prev) return prev;
+
+              return {
+                ...prev,
+                totalCost: value === "" ? "" : Number(value), // handle number
+              };
+            });
+          }}
+          type="number"
+          penLogo={Pen}
+        ></FormInput>
+
         <ControlledDatePicker
           label="Purchase Date"
           onCommit={(date) => {
@@ -456,32 +504,15 @@ export const AccountCompanyProductDetailsCard = ({
           placeholder="Select User"
         />
 
-        <FormInput
-          required
-          logo={IndianRupee}
-          label="Total Cost"
-          name="totalCost"
-          placeholder="Enter Total Cost"
-          value={productData?.totalCost ?? ""}
-          onChange={(e) => {
-            const value = e.target.value;
-
-            setProductData((prev) => {
-              if (!prev) return prev;
-
-              return {
-                ...prev,
-                totalCost: value === "" ? "" : Number(value), // handle number
-              };
-            });
-          }}
-          type="number"
-          penLogo={Pen}
-        ></FormInput>
+       
       </div>
 
-      <div className=" grid grid-cols-2 gap-1 pb-1">
+</div>
+
+      <div className=" grid grid-cols-2 gap-1 pb-2">
         {/* Addresses */}
+
+        <div className="border rounded-lg bg-gray-50 p-2">
         <TextAreaInput
           cols={2}
           placeholder="Enter delivery address"
@@ -495,6 +526,9 @@ export const AccountCompanyProductDetailsCard = ({
           disabled={!userHasAccessToUpdateAccountProducts}
           logo={MapPin}
         />
+        </div>
+
+        <div className="border rounded-lg bg-gray-50 p-2">
         <TextAreaInput
           readonly={!userHasAccessToUpdateAccountProducts}
           placeholder="Enter billing address"
@@ -508,7 +542,10 @@ export const AccountCompanyProductDetailsCard = ({
           disabled={!userHasAccessToUpdateAccountProducts}
           logo={ReceiptText}
         />
+        </div>
       </div>
+      </div>
+      
       {/* Right Card - Empty for future use */}
 
       <AccountCompanyProductAmcDetails
@@ -550,7 +587,7 @@ export function DisplayComponent({
                   <span className="text-gray-400 italic">Not provided</span>
                 )}
           </p>
-          {penLogo && <Pen className="text-blue-500 " size={14} />}
+          {penLogo && <Pen className={COLORS.PRIMARY_PURPLE} size={14} />}
         </div>
       </div>
     </div>

@@ -256,12 +256,12 @@ function AccountServiceManagementList({
           </div>
         }
 
-        <div className="bg-white  overflow-y-auto rounded-lg shadow-sm ">
+        <div className="bg-white overflow-y-auto rounded-lg shadow-sm ">
           <div
             className={
               userPreference.isLeftMenu
-                ? `ag-theme-balham w-full h-[calc(50vh-120px)]`
-                : "ag-theme-balham w-full h-[calc(50vh-122px)]"
+                ? `w-full h-[calc(50vh-120px)]`
+                : "w-full h-[calc(50vh-122px)]"
             }
           >
             {/* <SupportTicketManagementAgGrid

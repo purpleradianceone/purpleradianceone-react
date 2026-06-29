@@ -64,6 +64,9 @@ function AccountProformaInvoiceManagementList({
   const [isCreateInvoiceModalOpen, setIsCreateInvoiceModalOpen] =
     useState<boolean>(false);
 
+  const [isSummaryLoading, setIsSummaryLoading] = useState(false);
+
+
     const [proformaInvoiceSummary, setProformaInvoiceSummary] =
   useState<CompanyProformaInvoiceSummary>({
     total_company_proforma_invoice_this_month: 0,
@@ -139,6 +142,8 @@ function AccountProformaInvoiceManagementList({
 
     const fetchProformaInvoiceSummary = useCallback(async () => {
   try {
+    setIsSummaryLoading(true);
+
     const postData = {
       company_id: loginStatus.companyId,
       requestedby: loginStatus.id,
@@ -157,6 +162,8 @@ function AccountProformaInvoiceManagementList({
     }
   } catch (error) {
     console.error(error);
+  }finally {
+    setIsSummaryLoading(false);
   }
 }, [loginStatus.companyId, loginStatus.id]);
 
@@ -321,7 +328,7 @@ const refreshAllData = useCallback(async () => {
             cardGap={20}
             width="80%"
             gridCols={4}
-            loading={gridLoading}
+            loading={isSummaryLoading}
             cards={[
               {
                 title: "Total Proforma Invoices",
@@ -329,8 +336,8 @@ const refreshAllData = useCallback(async () => {
                   proformaInvoiceSummary.total_company_proforma_invoice_this_month,
                 subtitle: "Created This Month",
                 icon: FileText,
-                iconBg: "bg-violet-100",
-                iconColor: "text-violet-600",
+                iconBg: COLORS.LIGHT_PURPLE_BACKGROUND,
+                iconColor: COLORS.PRIMARY_PURPLE,
               },
 
               {

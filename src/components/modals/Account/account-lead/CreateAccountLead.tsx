@@ -14,6 +14,7 @@ import axiosClient from "../../../../axios-client/AxiosClient";
 import { LookupLeadManagement } from "../../../views/lookups/lookup-lead/LookupLeadManagement";
 import { LookupLead } from "../../../../@types/lookup/LookupLead";
 import { Popover } from "../../../ui/PopOver";
+import COLORS from "../../../../constants/Colors";
 
 const CreateAccountLead = ({
   account,
@@ -88,9 +89,10 @@ const CreateAccountLead = ({
               //     );
               //   }
               // }}
-              className="bg-blue-600 hover:bg-blue-700 caption-custom white-text px-1 py-0.5 rounded-md flex items-center gap-1"
-            >
+             className={COLORS.ADD_BUTTON}            >
               <span>+Add</span>
+
+              
             </Button>
           }
         >

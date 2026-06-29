@@ -1,4 +1,5 @@
 import React from "react";
+import COLORS from "../../constants/Colors";
 
 type Tab = {
   key: string;
@@ -21,7 +22,7 @@ const Tabs: React.FC<TabsProps> = ({ tabs, activeTab, onChange }) => {
           className={`px-4 py-1  text-sm font-medium rounded-t-md transition-all
             ${
               activeTab === tab.key
-                ? "bg-blue-700 border  border-slate-200 text-white"
+                ? `${COLORS.PRIMARY_PURPLE_BACKGROUND} border  border-slate-200 text-white `
                 : "bg-gray-100 text-gray-800 hover:bg-gray-200"
             }`}
         >

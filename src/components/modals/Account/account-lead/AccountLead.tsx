@@ -18,6 +18,7 @@ import { useUserAccessModules } from "../../../../config/hooks/useAccessModules"
 import MESSAGE from "../../../../constants/Messages";
 import axiosClient from "../../../../axios-client/AxiosClient";
 import AccessDeniedMessagePage from "../../../views/not-found/AccessDeniedMessagePage";
+import COLORS from "../../../../constants/Colors";
 
 const AccountLead = ({ account }: CreateAccountLeadType) => {
   const { loginStatus } = useLoggedInUserContext();
@@ -238,7 +239,7 @@ const AccountLead = ({ account }: CreateAccountLeadType) => {
                 <div className="flex flex-col">
                   <h2
                     title={item.leadName || ""}
-                    className=" input-label-custom hover:text-blue-500 "
+                    className={`input-label-custom ${COLORS.PRIMARY_PURPLE_TEXT_HOVER} `}
                   >
                     {item.leadName && item.leadName.length > 35
                       ? item.leadName.substring(0, 34) + "..."
@@ -252,7 +253,7 @@ const AccountLead = ({ account }: CreateAccountLeadType) => {
                   </h2>
                   <p
                     title={item.leadEmail || ""}
-                    className="caption-custom hover:text-blue-500"
+                    className={`caption-custom ${COLORS.PRIMARY_PURPLE_TEXT_HOVER}`}
                   >
                     {item.leadEmail || (
                       <>
@@ -262,7 +263,7 @@ const AccountLead = ({ account }: CreateAccountLeadType) => {
                   </p>
                   <p
                     title={item.leadMobileNumber || ""}
-                    className="caption-custom hover:text-blue-500"
+                    className={`caption-custom ${COLORS.PRIMARY_PURPLE_TEXT_HOVER}`}
                   >
                     {item.leadMobileNumber || (
                       <>

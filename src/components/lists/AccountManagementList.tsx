@@ -58,6 +58,8 @@ function AccountManagementList({
   const { position } = usePanel();
   const { userPreference } = useUserPreference();
   // const { isLargeScreen, isMediumScreen, isSmallScreen } = useScreenSize();
+     const [isSummaryLoading, setIsSummaryLoading] = useState(false);
+
 
   const [openCreateAccountForm, setOpenAccountForm] = useState<boolean>(false);
   const { dateRangeDropdownOptions } = useComapanySpecificSearchDateRange();
@@ -118,6 +120,8 @@ const [accountSummary, setAccountSummary] =
 
   const fetchAccountSummary = useCallback(async () => {
   try {
+      setIsSummaryLoading(true);
+
     const postData = {
       company_id: loginStatus.companyId,
       requestedby: loginStatus.id,
@@ -136,6 +140,8 @@ const [accountSummary, setAccountSummary] =
     }
   } catch (error) {
     console.error(error);
+  } finally {
+    setIsSummaryLoading(false);
   }
 }, [loginStatus.companyId, loginStatus.id]);
 
@@ -252,15 +258,15 @@ const refreshAllData = useCallback(async () => {
         cardGap={12}
         width="55%"
         gridCols={3}
-        loading={isDataLoading}
+        loading={isSummaryLoading}
         cards={[
           {
             title: "Total Accounts",
             count: accountSummary.total_account,
             subtitle: "All Accounts",
             icon: Building2,
-            iconBg: "bg-violet-100",
-            iconColor: "text-violet-600",
+            iconBg: COLORS.LIGHT_PURPLE_BACKGROUND,
+             iconColor: COLORS.PRIMARY_PURPLE,
           },
 
           {

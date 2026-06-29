@@ -969,9 +969,11 @@ const ViewLeadManagement = () => {
           {/* LEFT SECTION */}
           <div className="flex items-start gap-3 min-w-0">
             {/* ICON */}
-            <div className="bg-blue-600 p-2 rounded text-white mt-1">
-              <Handshake size={30} />
-            </div>
+                <div className="flex items-start ">
+                    <div className={`p-3 rounded-lg ${COLORS.PAGE_HEADER_SECTION_BG_COLOR} flex items-center justify-center shrink-0`}>
+                      <Handshake className={COLORS.PAGE_HEADER_ICONS_COLOR_AND_SIZE} />
+                    </div>
+                    </div>
 
             {/* NAME + STATUS */}
             <div className="flex flex-col leading-none min-w-0">

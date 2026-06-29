@@ -62,6 +62,7 @@ function GetCompanyUsersList({
   const [isAccessModalOpen, setIsAccessModalOpen] = useState<boolean>(false);
 
   const [isActionsTourEnded, setIsActionsTourEnded] = useState<boolean>(false);
+   const [isSummaryLoading, setIsSummaryLoading] = useState(false);
 
   const [isDashboardModalOpen, setIsDashboardModalOpen] =
     useState<boolean>(false);
@@ -273,28 +274,32 @@ function GetCompanyUsersList({
       total_users_created_this_month: 0,
     });
 
-  const fetchCompanyUserSummary = useCallback(async () => {
-    try {
-      const postData = {
-        company_id: loginStatus.companyId,
-        requestedby: loginStatus.id,
-        
-      };
-      const response = await axios.post(
-        POST_API.SUMMARY_COMPANY_USER,
-        postData,
-        {
-          withCredentials: true,
-        },
-      );
+const fetchCompanyUserSummary = useCallback(async () => {
+  try {
+    setIsSummaryLoading(true);
 
-      if (response.data?.length > 0) {
-        setCompanyUserSummary(response.data[0]);
+    const postData = {
+      company_id: loginStatus.companyId,
+      requestedby: loginStatus.id,
+    };
+
+    const response = await axios.post(
+      POST_API.SUMMARY_COMPANY_USER,
+      postData,
+      {
+        withCredentials: true,
       }
-    } catch (error) {
-      console.error(error);
+    );
+
+    if (response.data?.length > 0) {
+      setCompanyUserSummary(response.data[0]);
     }
-  },[loginStatus.companyId, loginStatus.id]);
+  } catch (error) {
+    console.error(error);
+  } finally {
+    setIsSummaryLoading(false);
+  }
+}, [loginStatus.companyId, loginStatus.id]);
 
 
   useEffect(() => {
@@ -313,7 +318,6 @@ const handleResetFilters = () => {
 
   setTimeout(() => {
     onRefreshUsers();
-    fetchCompanyUserSummary();
   }, 0);
 };
 
@@ -431,15 +435,15 @@ const handleResetFilters = () => {
         <SummaryCards
          cardGap={15}
          width="75%"
-         loading={isDataLoading}
+         loading={isSummaryLoading}
           cards={[
             {
               title: "Total Users",
               count: companyUserSummary.total_company_users,
               subtitle: "Organization users",
               icon: Users,
-              iconBg: "bg-violet-100",
-              iconColor: "text-violet-600",
+              iconBg: COLORS.LIGHT_PURPLE_BACKGROUND,
+              iconColor: COLORS.PRIMARY_PURPLE,
             },
 
             {
@@ -491,16 +495,16 @@ const handleResetFilters = () => {
           <div className="flex items-center gap-3 flex-wrap">
 
              
-                    <span
-                      className={`${
-                        isCustomDateOptionSelected
-                          ? "text-xs"
-                          : "section-header-custom"
-                      } ${userPreference.sidebarOpen?"":"mr-2"}`}
-                    >
-                      {userPreference.sidebarOpen?"":"Company Users"}
-                    </span>
-                 
+                   <span
+                className={`${
+                  isCustomDateOptionSelected
+                    ? "text-xs"
+                    : "section-header-custom"
+                }`}
+              >
+                Company Users
+              </span>
+                          
             {/* SEARCH */}
             <div className=" relative w-[350px] ">
               <Search

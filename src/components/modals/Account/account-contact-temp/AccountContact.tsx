@@ -514,8 +514,8 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
                     {/* Avatar */}
                     <div
                       className={` ${
-                        contact.isActive ? "bg-blue-500 " : "bg-red-500"
-                      } text-white flex items-center justify-center w-9 h-9 rounded-full border    font-semibold shadow-sm`}
+                        contact.isActive ? `${COLORS.PRIMARY_PURPLE_BACKGROUND} ` : "bg-red-500"
+                      } text-white flex items-center justify-center w-9 h-9 rounded-full border font-semibold shadow-sm`}
                     >
                       {contact.name
                         ? contact.name.charAt(0).toUpperCase()
@@ -592,7 +592,7 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
                       <div
                         className={`w-20 h-20 rounded-full flex items-center justify-center text-3xl font-bold text-white ${
                           selectedContactCard.isActive
-                            ? "bg-blue-500"
+                            ? `${COLORS.PRIMARY_PURPLE_BACKGROUND}`
                             : "bg-gray-400"
                         }`}
                       >
@@ -635,7 +635,7 @@ const AccountContact = ({ accountId }: AccountContactTypeComponent) => {
                             );
                           }
                         }}
-                        className={`bg-blue-600 hover:bg-blue-700 ${!userHasAccessToUpdateAccountContacts ? "opacity-25" : ""} text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors`}
+                        className={`${COLORS.PRIMARY_PURPLE_BACKGROUND} ${COLORS.DARK_PURPLE_HOVER} ${!userHasAccessToUpdateAccountContacts ? "opacity-25" : ""} text-white px-2 py-1 rounded-lg flex items-center gap-2 transition-colors`}
                       >
                         <Edit3 size={16} />
                         Edit

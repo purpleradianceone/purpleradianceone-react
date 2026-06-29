@@ -4,6 +4,7 @@ import {
   
 } from "lucide-react";
 import { formatRupee } from "../../../utils/helperMethods/formatFunctions";
+import COLORS from "../../../constants/Colors";
 
 type Props = {
   topProducts: TopSaleProductProps[];
@@ -51,7 +52,7 @@ function TopSellingProducts({
                       w-7 h-7 rounded-lg flex items-center justify-center text-sm font-semibold
                       ${
                         index === 0
-                          ? "bg-violet-50 text-violet-600"
+                          ? `${COLORS.LIGHT_PURPLE_BACKGROUND} ${COLORS.PRIMARY_PURPLE}`
                           : index === 1
                           ? "bg-blue-50 text-blue-600"
                           : "bg-orange-50 text-orange-500"

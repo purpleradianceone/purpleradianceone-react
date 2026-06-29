@@ -1,4 +1,5 @@
 import { ReactNode } from "react";
+import COLORS from "../../constants/Colors";
 
 interface AgGridProfileCellProps {
   primaryText?: string;
@@ -11,38 +12,45 @@ function AgGridProfileCell({
   secondaryText,
   icon,
 }: AgGridProfileCellProps) {
-  const displayName = primaryText?.trim() || "-";
+const displayName = primaryText?.trim() || "-";
 
-  const initials =
-    displayName !== "-"
-      ? displayName
+const initials =
+  displayName !== "-"
+    ? (() => {
+        const originalWords = displayName
           .split(/\s+/)
-          .filter(Boolean)
-          .map((word: string, index: number, array: string[]) =>
-            index === 0 || index === array.length - 1
-              ? word.charAt(0)
-              : "",
-          )
-          .join("")
-          .substring(0, 2)
-          .toUpperCase()
-      : "-";
+          .filter(Boolean);
+
+        // Single word (Mr, Dr, Pravin, etc.)
+        if (originalWords.length === 1) {
+          return originalWords[0].charAt(0).toUpperCase();
+        }
+
+        const cleanedName = displayName.replace(
+          /^(mr|mrs|ms|miss|dr|prof)\s*\.?\s*/i,
+          "",
+        );
+
+        const words = cleanedName
+          .split(/\s+/)
+          .filter(Boolean);
+
+        if (!words.length) {
+          return "-";
+        }
+
+        return (
+          words[0].charAt(0) +
+          words[words.length - 1].charAt(0)
+        ).toUpperCase();
+      })()
+    : "-";
 
   return (
     <div className="flex items-center gap-3 h-full overflow-hidden">
       <div
-        className="
-          w-8 h-8
-          rounded-full
-          bg-violet-100
-          text-violet-700
-          text-xs
-          font-semibold
-          flex
-          items-center
-          justify-center
-          flex-shrink-0
-        "
+        className={`w-8 h-8 rounded-full ${COLORS.LIGHT_PURPLE_BACKGROUND} ${COLORS.PRIMARY_PURPLE} text-xs font-semibold 
+        flex items-center justify-center flex-shrink-0`}
       >
         {icon || initials}
       </div>

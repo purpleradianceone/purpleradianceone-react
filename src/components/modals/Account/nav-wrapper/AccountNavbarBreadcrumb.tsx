@@ -194,7 +194,7 @@ if (data && data.length > 0) {
     <>
         <PageLayout onScrollChange={setShowName}>
           {/* Sticky Navigation Header */}
-          <div className="sticky top-0 z-20 bg-white py-0.5 border-b">
+          <div className="sticky top-0 z-20 bg-gray-50 pt-1 pl-1 ">
             <div className="flex items-center text-center  gap-3 mx-1">
               <Link to={ROUTES_URL.ACCOUNT_MANAGEMENT} className="">
                 <span className="caption-custom  hover:text-gray-700 hover:font-medium">

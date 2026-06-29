@@ -1,14 +1,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/rules-of-hooks */
 import { useMemo, useRef } from "react";
-import { INNERHTML } from "../../constants/AppConstants";
-import { AllCommunityModule, ColDef, themeBalham } from "ag-grid-community";
+import { AGGRID, } from "../../constants/AppConstants";
+import { AllCommunityModule, ColDef, } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 import AccountProduct from "../../@types/account/AccountProduct";
 import { useUserAccessModules } from "../../config/hooks/useAccessModules";
 
 import COLORS from "../../constants/Colors";
 import Button from "../ui/Button";
+import RenderUserWithIcon from "../ui/UserAgGridCellRenderer";
+import { Eye } from "lucide-react";
 const AccountCompanyProductAgGrid = ({
   accountProductData,
   onRowSelect, //selected user for view lead details
@@ -36,6 +38,11 @@ const AccountCompanyProductAgGrid = ({
         headerName: "Product",
         sortable: true,
         filter: true,
+         cellStyle: () => ({
+          fontSize: "14px",
+          fontWeight: 600,
+          color: "#1f2937",
+        }),
       },
       {
         field: "ProductTypeName",
@@ -119,7 +126,7 @@ const AccountCompanyProductAgGrid = ({
                     params.context.handleAddToInvoice(params.data);
                   }}
                 >
-                  Add to Invoice
+                  + Add to Invoice
                 </Button>
               )}
             </div>
@@ -176,6 +183,7 @@ const AccountCompanyProductAgGrid = ({
         headerName: "Installed By",
         sortable: true,
         filter: true,
+         cellRenderer: RenderUserWithIcon,
       },
       {
         field: "installationDate",
@@ -307,6 +315,7 @@ const AccountCompanyProductAgGrid = ({
         headerName: "Created By",
         sortable: true,
         filter: true,
+        cellRenderer: RenderUserWithIcon,
       },
       {
         field: "createdOn",
@@ -319,6 +328,7 @@ const AccountCompanyProductAgGrid = ({
         headerName: "Updated By",
         sortable: true,
         filter: true,
+        cellRenderer: RenderUserWithIcon,
       },
       {
         field: "updatedOn",
@@ -355,7 +365,8 @@ const AccountCompanyProductAgGrid = ({
         headerName: "Actions",
         field: "view",
         pinned: "right",
-        maxWidth: 80,
+        maxWidth: 90,
+         filter: false,
         cellRenderer: (params: any) => {
           return (
             <div className="flex items-center justify-center">
@@ -370,11 +381,15 @@ const AccountCompanyProductAgGrid = ({
                   params.context.handleRowSelect(params.data);
                 }}
               >
+                 <Eye size={12} strokeWidth={1.5} />
+                 <span>
                 {isUsedForSelection ? "Select" : "Details"}
+                </span>
               </button>
             </div>
           );
         },
+
       },
 
       // {
@@ -523,7 +538,7 @@ const AccountCompanyProductAgGrid = ({
 
   return (
     <div
-      className="ag-theme-balham w-full"
+      className="w-full modern-user-grid custom-height-scrollbar"
       style={{ height: "100%", width: "100%" }}
     >
       <AgGridReact
@@ -532,8 +547,10 @@ const AccountCompanyProductAgGrid = ({
         columnDefs={columnDefs}
         defaultColDef={defaultColDef}
         modules={[AllCommunityModule]}
-        theme={themeBalham}
-        overlayNoRowsTemplate={INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
+        // theme={themeBalham}
+        // overlayNoRowsTemplate={INNERHTML.OVERLAY_NO_ROWS_TEMPLATE}
+        rowHeight={AGGRID.ROW_HEIGHT}
+        headerHeight={AGGRID.HEADER_HEIGHT}
         context={{
           handleRowSelect: onRowSelect,
           handleAddToInvoice: handleAddToInvoice,
